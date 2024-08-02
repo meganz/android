@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.getState
@@ -736,7 +736,7 @@ class ContactInfoViewModel @Inject constructor(
             )
         }.onSuccess { result ->
             val collisions = result.conflictNodes.values.map {
-                LegacyNameCollision.Copy.fromNodeNameCollision(it)
+                NameCollisionUiEntity.Copy.fromNodeNameCollision(it)
             }
             _uiState.update {
                 it.copy(isCopyInProgress = false, nameCollisions = collisions)

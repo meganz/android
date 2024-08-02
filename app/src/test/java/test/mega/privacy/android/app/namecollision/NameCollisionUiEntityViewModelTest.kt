@@ -45,7 +45,7 @@ import test.mega.privacy.android.app.extensions.withCoroutineExceptions
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(value = [InstantExecutorExtension::class, TestSchedulerExtension::class])
-internal class LegacyNameCollisionViewModelTest {
+internal class NameCollisionUiEntityViewModelTest {
     private lateinit var underTest: LegacyNameCollisionViewModel
 
     private val getFileVersionsOption = mock<GetFileVersionsOption>()

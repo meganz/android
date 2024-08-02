@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
@@ -332,7 +332,7 @@ class QRCodeViewModel @Inject constructor(
                 )
             }.onSuccess { fileCollisions ->
                 fileCollisions.map {
-                    LegacyNameCollision.Upload.getUploadCollision(it)
+                    NameCollisionUiEntity.Upload.getUploadCollision(it)
                 }.firstOrNull()?.let { collision ->
                     _uiState.update { it.copy(showCollision = triggered(collision)) }
                 } ?: _uiState.update {

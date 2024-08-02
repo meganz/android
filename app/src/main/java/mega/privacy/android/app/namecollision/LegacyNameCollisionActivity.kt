@@ -29,10 +29,10 @@ import mega.privacy.android.app.databinding.ActivityNameCollisionBinding
 import mega.privacy.android.app.databinding.ViewNameCollisionOptionBinding
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.OptionalRequestListener
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
-import mega.privacy.android.app.namecollision.data.NameCollisionResult
+import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
 import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
@@ -66,7 +66,7 @@ class LegacyNameCollisionActivity : PasscodeActivity() {
         @JvmStatic
         fun getIntentForList(
             context: Context,
-            collisions: ArrayList<LegacyNameCollision>,
+            collisions: ArrayList<NameCollisionUiEntity>,
         ): Intent =
             Intent(context, LegacyNameCollisionActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_COLLISION_RESULTS, collisions)
@@ -75,14 +75,14 @@ class LegacyNameCollisionActivity : PasscodeActivity() {
         @JvmStatic
         fun getIntentForFolderUpload(
             context: Context,
-            collisions: ArrayList<LegacyNameCollision>,
+            collisions: ArrayList<NameCollisionUiEntity>,
         ): Intent =
             getIntentForList(context, collisions).apply { action = UPLOAD_FOLDER_CONTEXT }
 
         @JvmStatic
         fun getIntentForSingleItem(
             context: Context,
-            collision: LegacyNameCollision,
+            collision: NameCollisionUiEntity,
         ): Intent =
             Intent(context, LegacyNameCollisionActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_SINGLE_COLLISION_RESULT, collision)
@@ -110,19 +110,19 @@ class LegacyNameCollisionActivity : PasscodeActivity() {
                 } else {
                     @Suppress("DEPRECATION")
                     getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS)
-                } as ArrayList<LegacyNameCollision>?
+                } as ArrayList<NameCollisionUiEntity>?
             }
 
             val singleCollision = with(intent) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     getSerializableExtra(
                         INTENT_EXTRA_SINGLE_COLLISION_RESULT,
-                        LegacyNameCollision::class.java
+                        NameCollisionUiEntity::class.java
                     )
                 } else {
                     @Suppress("DEPRECATION")
                     getSerializableExtra(INTENT_EXTRA_SINGLE_COLLISION_RESULT)
-                } as LegacyNameCollision?
+                } as NameCollisionUiEntity?
             }
 
             when {
@@ -245,7 +245,7 @@ class LegacyNameCollisionActivity : PasscodeActivity() {
      *
      * @param collisionResult   Object containing all the required info to present a collision.
      */
-    private fun showCollision(collisionResult: NameCollisionResult?) {
+    private fun showCollision(collisionResult: NameCollisionResultUiEntity?) {
         if (collisionResult == null) {
             Timber.e("Cannot show any collision. Finishing...")
             finish()
@@ -284,7 +284,7 @@ class LegacyNameCollisionActivity : PasscodeActivity() {
                         else IconPackR.drawable.ic_folder_medium_solid
                     )
 
-                    if (isFile && collisionResult.nameCollision is LegacyNameCollision.Upload) {
+                    if (isFile && collisionResult.nameCollision is NameCollisionUiEntity.Upload) {
                         requestFileThumbnail(collisionResult.nameCollision.absolutePath)
                     }
                 }
@@ -295,7 +295,7 @@ class LegacyNameCollisionActivity : PasscodeActivity() {
                 this@LegacyNameCollisionActivity
             ) else getFolderContentString(collision)
             date.text = formatLongDateTime(
-                if (collision is LegacyNameCollision.Upload) collision.lastModified / 1000
+                if (collision is NameCollisionUiEntity.Upload) collision.lastModified / 1000
                 else collision.lastModified
             )
 
@@ -318,19 +318,19 @@ class LegacyNameCollisionActivity : PasscodeActivity() {
         val renameButtonId: Int
 
         when (collision) {
-            is LegacyNameCollision.Upload -> {
+            is NameCollisionUiEntity.Upload -> {
                 cancelButtonId = R.string.do_not_upload
                 renameInfoId = R.string.warning_upload_and_rename
                 renameButtonId = R.string.upload_and_rename
             }
 
-            is LegacyNameCollision.Copy, is LegacyNameCollision.Import -> {
+            is NameCollisionUiEntity.Copy, is NameCollisionUiEntity.Import -> {
                 cancelButtonId = R.string.do_not_copy
                 renameInfoId = R.string.warning_copy_and_rename
                 renameButtonId = R.string.copy_and_rename
             }
 
-            is LegacyNameCollision.Movement -> {
+            is NameCollisionUiEntity.Movement -> {
                 cancelButtonId = R.string.do_not_move
                 renameInfoId = R.string.warning_move_and_rename
                 renameButtonId = R.string.move_and_rename
@@ -388,7 +388,7 @@ class LegacyNameCollisionActivity : PasscodeActivity() {
                     else -> {
                         thumbnailIcon.setImageResource(MimeTypeList.typeForName(name).iconResourceId)
 
-                        if (collisionResult.nameCollision is LegacyNameCollision.Upload) {
+                        if (collisionResult.nameCollision is NameCollisionUiEntity.Upload) {
                             requestFileThumbnail(collisionResult.nameCollision.absolutePath)
                         }
                     }
@@ -430,7 +430,7 @@ class LegacyNameCollisionActivity : PasscodeActivity() {
         }
     }
 
-    private fun getFolderContentString(collision: LegacyNameCollision) =
+    private fun getFolderContentString(collision: NameCollisionUiEntity) =
         TextUtil.getFolderInfo(collision.childFolderCount, collision.childFileCount, this)
 
     /**
@@ -561,7 +561,7 @@ class LegacyNameCollisionActivity : PasscodeActivity() {
             getString(replaceUpdateMergeButtonId)
     }
 
-    private fun manageCollisionsResolution(collisionsResolution: ArrayList<NameCollisionResult>) {
+    private fun manageCollisionsResolution(collisionsResolution: ArrayList<NameCollisionResultUiEntity>) {
         setResult(
             Activity.RESULT_OK,
             Intent().putParcelableArrayListExtra(

@@ -7,16 +7,16 @@ import androidx.activity.result.contract.ActivityResultContract
 import mega.privacy.android.app.namecollision.LegacyNameCollisionActivity.Companion.MESSAGE_RESULT
 import mega.privacy.android.app.namecollision.LegacyNameCollisionActivity.Companion.getIntentForList
 import mega.privacy.android.app.namecollision.LegacyNameCollisionActivity.Companion.getIntentForSingleItem
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 
 /**
  * A contract to start NameCollisionActivity and manage its result.
  */
 @Deprecated("Use NameCollisionActivityContract instead")
-class LegacyNameCollisionActivityContract : ActivityResultContract<ArrayList<LegacyNameCollision>, String?>() {
+class LegacyNameCollisionActivityContract : ActivityResultContract<ArrayList<NameCollisionUiEntity>, String?>() {
 
     @Suppress("UNCHECKED_CAST")
-    override fun createIntent(context: Context, input: ArrayList<LegacyNameCollision>): Intent =
+    override fun createIntent(context: Context, input: ArrayList<NameCollisionUiEntity>): Intent =
         if (input.size == 1) {
             getIntentForSingleItem(context, input[0])
         } else {

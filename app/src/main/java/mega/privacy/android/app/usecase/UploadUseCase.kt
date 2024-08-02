@@ -10,8 +10,8 @@ import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
-import mega.privacy.android.app.namecollision.data.NameCollisionResult
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
+import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
 import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
@@ -19,8 +19,6 @@ import mega.privacy.android.app.usecase.exception.BreakTransfersProcessingExcept
 import mega.privacy.android.app.usecase.exception.OverDiskQuotaPaywallMegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.node.FileNameCollision
-import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import java.io.File
 import javax.inject.Inject
@@ -143,33 +141,12 @@ class UploadUseCase @Inject constructor(
      */
     fun upload(
         context: Context,
-        collisionResult: NameCollisionResult,
+        collisionResult: NameCollisionResultUiEntity,
         rename: Boolean,
     ): Completable =
         upload(
             context,
-            (collisionResult.nameCollision as LegacyNameCollision.Upload).absolutePath,
-            if (rename) collisionResult.renameName!! else collisionResult.nameCollision.name,
-            collisionResult.nameCollision.lastModified,
-            collisionResult.nameCollision.parentHandle
-        )
-
-    /**
-     * Uploads a file after resolving a name collision.
-     *
-     * @param context           Application Context required to start the service.
-     * @param collisionResult   The result of the node name collision.
-     * @param rename            True if should rename the file, false otherwise.
-     * @return Completable.
-     */
-    fun upload(
-        context: Context,
-        collisionResult: NodeNameCollisionResult,
-        rename: Boolean,
-    ): Completable =
-        upload(
-            context,
-            (collisionResult.nameCollision as FileNameCollision).path.value,
+            (collisionResult.nameCollision as NameCollisionUiEntity.Upload).absolutePath,
             if (rename) collisionResult.renameName!! else collisionResult.nameCollision.name,
             collisionResult.nameCollision.lastModified,
             collisionResult.nameCollision.parentHandle
@@ -241,43 +218,7 @@ class UploadUseCase @Inject constructor(
      */
     fun upload(
         context: Context,
-        collisions: List<NameCollisionResult>,
-        rename: Boolean,
-    ): Completable =
-        Completable.create { emitter ->
-            if (collisions.isEmpty()) {
-                emitter.onError(NoPendingCollisionsException())
-                return@create
-            }
-
-            for (collision in collisions) {
-                if (emitter.isDisposed) {
-                    return@create
-                }
-
-                upload(context, collision, rename).blockingSubscribeBy(
-                    onError = { error -> emitter.onError(error) }
-                )
-            }
-
-            if (emitter.isDisposed) {
-                return@create
-            }
-
-            emitter.onComplete()
-        }
-
-    /**
-     * Uploads a list of files after resolving name collisions.
-     *
-     * @param context       Application Context required to start the service.
-     * @param collisions    The result of the node name collisions.
-     * @param rename        True if should rename the files, false otherwise.
-     * @return Completable.
-     */
-    fun uploadByCollisions(
-        context: Context,
-        collisions: List<NodeNameCollisionResult>,
+        collisions: List<NameCollisionResultUiEntity>,
         rename: Boolean,
     ): Completable =
         Completable.create { emitter ->

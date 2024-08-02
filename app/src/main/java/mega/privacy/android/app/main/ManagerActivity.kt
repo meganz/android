@@ -159,8 +159,8 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision.Upload.Companion.getUploadCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity.Upload.Companion.getUploadCollision
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_CLOUD_SLOT_ID
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_HOME_SLOT_ID
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
@@ -2053,9 +2053,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     when (result.type) {
                         NodeNameCollisionType.RESTORE,
                         NodeNameCollisionType.MOVE,
-                        -> LegacyNameCollision.Movement.fromNodeNameCollision(it)
+                        -> NameCollisionUiEntity.Movement.fromNodeNameCollision(it)
 
-                        NodeNameCollisionType.COPY -> LegacyNameCollision.Copy.fromNodeNameCollision(it)
+                        NodeNameCollisionType.COPY -> NameCollisionUiEntity.Copy.fromNodeNameCollision(it)
                     }
                 }))
         }

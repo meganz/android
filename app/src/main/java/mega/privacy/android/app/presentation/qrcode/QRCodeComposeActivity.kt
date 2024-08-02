@@ -22,7 +22,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileStorageActivity
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.usecase.UploadUseCase
@@ -168,7 +168,7 @@ class QRCodeComposeActivity : PasscodeActivity() {
         selectStorageDestinationLauncher.launch(intent)
     }
 
-    private fun showCollision(collision: LegacyNameCollision) {
+    private fun showCollision(collision: NameCollisionUiEntity) {
         legacyNameCollisionActivityContract?.launch(arrayListOf(collision))
     }
 }

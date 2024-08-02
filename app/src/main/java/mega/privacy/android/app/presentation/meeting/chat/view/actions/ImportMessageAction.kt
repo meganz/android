@@ -17,7 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.namecollision.LegacyNameCollisionActivity
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFileExplorerActivity
@@ -31,7 +31,7 @@ import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveAction
 
 internal class ImportMessageAction(
     private val launchFolderPicker: (Context, ActivityResultLauncher<Intent>) -> Unit = ::openFileExplorerActivity,
-    private val launchNameCollisionActivity: (Context, List<LegacyNameCollision>, ActivityResultLauncher<Intent>) -> Unit = ::openNameCollisionActivity,
+    private val launchNameCollisionActivity: (Context, List<NameCollisionUiEntity>, ActivityResultLauncher<Intent>) -> Unit = ::openNameCollisionActivity,
 ) : MessageAction(
     text = R.string.general_import,
     icon = R.drawable.ic_cloud_upload_medium_regular_outline,
@@ -100,7 +100,7 @@ internal class ImportMessageAction(
                                     messages.first { (it as NodeAttachmentMessage).fileNode.id.longValue == collision.nodeHandle }
                                         .let { message ->
                                             with(collision) {
-                                                LegacyNameCollision.Import(
+                                                NameCollisionUiEntity.Import(
                                                     collisionHandle = collisionHandle,
                                                     nodeHandle = nodeHandle,
                                                     chatId = message.chatId,

@@ -6,7 +6,7 @@ import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import kotlinx.coroutines.rx3.rxSingle
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
-import mega.privacy.android.app.namecollision.data.NameCollisionResult
+import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
 import mega.privacy.android.app.uploadFolder.DocumentEntityDataMapper
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
@@ -140,7 +140,7 @@ class GetFolderContentUseCase @Inject constructor(
         context: Context,
         parentNodeId: NodeId,
         pendingUploads: List<FolderContent.Data>,
-        collisionsResolution: List<NameCollisionResult>?,
+        collisionsResolution: List<NameCollisionResultUiEntity>?,
     ): Single<Int> =
         Single.create { emitter ->
             val parentNodeExists =

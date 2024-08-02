@@ -69,7 +69,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
@@ -975,7 +975,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
-    private fun handleNodesNameCollisionResult(conflictNodes: List<LegacyNameCollision>) {
+    private fun handleNodesNameCollisionResult(conflictNodes: List<NameCollisionUiEntity>) {
         if (conflictNodes.isNotEmpty()) {
             statusDialog?.dismiss()
             legacyNameCollisionActivityContract?.launch(ArrayList(conflictNodes))

@@ -6,7 +6,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -54,7 +54,7 @@ data class FolderLinkState(
     val isLoginComplete: Boolean = false,
     val isNodesFetched: Boolean = false,
     val askForDecryptionKeyDialog: Boolean = false,
-    val collisions: List<LegacyNameCollision>? = null,
+    val collisions: List<NameCollisionUiEntity>? = null,
     val copyThrowable: Throwable? = null,
     val copyResultText: String? = null,
     val shouldLogin: Boolean? = null,

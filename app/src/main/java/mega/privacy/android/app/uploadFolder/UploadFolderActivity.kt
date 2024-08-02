@@ -37,8 +37,8 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
 import mega.privacy.android.app.namecollision.LegacyNameCollisionActivity
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
-import mega.privacy.android.app.namecollision.data.NameCollisionResult
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
+import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -119,7 +119,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 result.data?.getParcelableArrayListExtra(
                                     INTENT_EXTRA_COLLISION_RESULTS,
-                                    NameCollisionResult::class.java
+                                    NameCollisionResultUiEntity::class.java
                                 )
                             } else {
                                 @Suppress("DEPRECATION")
@@ -406,9 +406,9 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
     /**
      * Manages name collisions if any. Proceeds with the upload if not.
      *
-     * @param collisions    List of [LegacyNameCollision] to manage.
+     * @param collisions    List of [NameCollisionUiEntity] to manage.
      */
-    private fun manageCollisions(collisions: ArrayList<LegacyNameCollision>) {
+    private fun manageCollisions(collisions: ArrayList<NameCollisionUiEntity>) {
         if (collisions.isEmpty()) {
             viewModel.proceedWithUpload(this)
         } else {

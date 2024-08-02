@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.namecollision.data.toLegacyImport
 import mega.privacy.android.app.presentation.chat.model.MediaPlayerOpenedErrorState
 import mega.privacy.android.app.presentation.copynode.CopyRequestState
@@ -52,10 +52,10 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
      */
     val mediaPlayerOpenedErrorFlow = _mediaPlayerOpenedErrorFlow.asStateFlow()
 
-    private val _collisionsFlow = MutableStateFlow<List<LegacyNameCollision>>(emptyList())
+    private val _collisionsFlow = MutableStateFlow<List<NameCollisionUiEntity>>(emptyList())
 
     /**
-     * Flow of [LegacyNameCollision] to notify the name collisions
+     * Flow of [NameCollisionUiEntity] to notify the name collisions
      */
     val collisionsFlow = _collisionsFlow.asStateFlow()
 

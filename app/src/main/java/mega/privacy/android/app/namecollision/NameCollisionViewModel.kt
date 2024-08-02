@@ -9,11 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -22,18 +18,15 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.namecollision.model.NameCollisionUiState
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -47,7 +40,6 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodesUseCase
@@ -73,7 +65,6 @@ class NameCollisionViewModel @Inject constructor(
     private val getNodeNameCollisionsResultUseCase: GetNodeNameCollisionsResultUseCase,
     private val reorderNodeNameCollisionsUseCase: ReorderNodeNameCollisionsUseCase,
     private val updateNodeNameCollisionsResultUseCase: UpdateNodeNameCollisionsResultUseCase,
-    private val uploadUseCase: UploadUseCase,
     private val copyCollidedNodeUseCase: CopyCollidedNodeUseCase,
     private val copyCollidedNodesUseCase: CopyCollidedNodesUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
@@ -85,7 +76,6 @@ class NameCollisionViewModel @Inject constructor(
     private val getNodeByFingerprintAndParentNodeUseCase: GetNodeByFingerprintAndParentNodeUseCase,
     private val moveCollidedNodeUseCase: MoveCollidedNodeUseCase,
     private val moveCollidedNodesUseCase: MoveCollidedNodesUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
     private val composite = CompositeDisposable()
 
@@ -135,7 +125,8 @@ class NameCollisionViewModel @Inject constructor(
      *
      * @param collision [NodeNameCollision] to resolve.
      */
-    private suspend fun checkCopyToOrigin(collision: NodeNameCollision) {
+    private suspend fun checkCopyToOrigin(collision: NodeNameCollision.Default) {
+        if (collision.type != NodeNameCollisionType.COPY) return
         runCatching {
             getNodeByHandleUseCase(collision.nodeHandle, true)
         }.getOrNull()?.let {
@@ -166,7 +157,7 @@ class NameCollisionViewModel @Inject constructor(
     fun setSingleData(collision: NameCollision, context: Context) {
         viewModelScope.launch {
             runCatching {
-                if (collision is NodeNameCollision) {
+                if (collision is NodeNameCollision.Default) {
                     checkCopyToOrigin(collision)
                 }
                 getCurrentCollision(collision, context, true)
@@ -210,12 +201,12 @@ class NameCollisionViewModel @Inject constructor(
      * @param collisions    ArrayList of [NameCollision] to resolve.
      * @param context       Required Context for uploads.
      */
-    fun setData(collisions: ArrayList<NameCollision>, context: Context) {
+    fun setData(collisions: List<NameCollision>, context: Context) {
         viewModelScope.launch {
             runCatching {
                 require(collisions.isNotEmpty()) { "Collisions list is empty" }
                 collisions.first().let {
-                    if (it is NodeNameCollision) {
+                    if (it is NodeNameCollision.Default) {
                         checkCopyToOrigin(it)
                     }
                 }
@@ -239,7 +230,7 @@ class NameCollisionViewModel @Inject constructor(
     /**
      * Gets the list with complete data of pending collisions.
      *
-     * @param collisions    MutableList of [LegacyNameCollision] to resolve.
+     * @param collisions    MutableList of [NameCollisionUiEntity] to resolve.
      * @param context       Required Context for uploads.
      */
     private fun getPendingCollisions(
@@ -333,9 +324,9 @@ class NameCollisionViewModel @Inject constructor(
                     })
                 }
 
-                collisionsResolution.value =
-                    arrayListOf<NodeNameCollisionResult>().apply { addAll(resolvedCollisions) }
-
+                collisionsResolution.value = arrayListOf<NodeNameCollisionResult>().apply {
+                    addAll(resolvedCollisions)
+                }
             }
 
             else -> currentCollision.value = null
@@ -354,9 +345,9 @@ class NameCollisionViewModel @Inject constructor(
             })
 
             if (pendingCollisions.isEmpty()) {
-                collisionsResolution.value =
-                    arrayListOf<NodeNameCollisionResult>().apply { addAll(resolvedCollisions) }
-
+                collisionsResolution.value = arrayListOf<NodeNameCollisionResult>().apply {
+                    addAll(resolvedCollisions)
+                }
                 return
             }
         }
@@ -454,10 +445,10 @@ class NameCollisionViewModel @Inject constructor(
             NameCollisionType.UPLOAD -> {
                 when {
                     applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 -> {
-                        upload(context, proceedWithAllFiles(choice), rename)
+                        upload(proceedWithAllFiles(choice), rename)
                     }
 
-                    applyOnNext -> upload(context, getAllPendingCollisions(), rename)
+                    applyOnNext -> upload(getAllPendingCollisions(), rename)
                     else -> singleUpload(context, rename)
                 }
             }
@@ -530,99 +521,60 @@ class NameCollisionViewModel @Inject constructor(
         val currentCollision = currentCollision.value ?: return
 
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                val parentId = currentCollision.nameCollision.parentHandle
-                val path = (currentCollision.nameCollision as FileNameCollision).path.value
-                val name =
-                    if (rename) currentCollision.renameName else currentCollision.nameCollision.name
-
-                uploadFiles(
-                    mapOf(path to name),
-                    NodeId(parentId),
-                )
-            } else {
-                uploadUseCase.upload(context, currentCollision, rename)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(
-                        onComplete = {
-                            setUploadResult(1, context)
-                            continueWithNext(choice)
-                        },
-                        onError = Timber::e
-                    ).addTo(composite)
-            }
+            val parentId = currentCollision.nameCollision.parentHandle
+            val path = (currentCollision.nameCollision as FileNameCollision).path.value
+            val name = if (rename)
+                currentCollision.renameName
+            else
+                currentCollision.nameCollision.name
+            uploadFiles(
+                mapOf(path to name),
+                NodeId(parentId),
+            )
         }
     }
 
     /**
      * Proceeds with the upload of the collisions list.
      *
-     * @param context   Required context for start the service.
      * @param list      List of collisions to upload.
      * @param rename    True if should rename the file, false otherwise.
      */
     private fun upload(
-        context: Context,
         list: MutableList<NodeNameCollisionResult>,
         rename: Boolean,
     ) {
         if (isFolderUploadContext) {
             list.forEach { item ->
                 resolvedCollisions.add(item.apply {
-                    choice =
-                        if (rename) NameCollisionChoice.RENAME
-                        else NameCollisionChoice.REPLACE_UPDATE_MERGE
+                    choice = if (rename)
+                        NameCollisionChoice.RENAME
+                    else
+                        NameCollisionChoice.REPLACE_UPDATE_MERGE
                 })
-
             }
 
             if (pendingCollisions.isEmpty()) {
-                collisionsResolution.value =
-                    arrayListOf<NodeNameCollisionResult>().apply { addAll(resolvedCollisions) }
+                collisionsResolution.value = arrayListOf<NodeNameCollisionResult>().apply {
+                    addAll(resolvedCollisions)
+                }
             }
             return
         }
 
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                val parentId = list.first().nameCollision.parentHandle ?: return@launch
-                val pathsAndNames = list.associate {
-                    (it.nameCollision as LegacyNameCollision.Upload).absolutePath to
+            val parentId = list.first().nameCollision.parentHandle
+            val pathsAndNames = list
+                .filter { it.nameCollision is FileNameCollision }
+                .associate {
+                    (it.nameCollision as FileNameCollision).path.value to
                             if (rename) it.renameName else it.nameCollision.name
                 }
-
-                uploadFiles(
-                    pathsAndNames,
-                    NodeId(parentId)
-                )
-            } else {
-                uploadUseCase.uploadByCollisions(context, list, rename)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(
-                        onComplete = { setUploadResult(list.size, context) },
-                        onError = Timber::e
-                    ).addTo(composite)
-            }
+            uploadFiles(
+                pathsAndNames,
+                NodeId(parentId)
+            )
         }
-    }
-
-    /**
-     * Sets the upload result.
-     *
-     * @param quantity  Number of processed uploads.
-     */
-    private fun setUploadResult(quantity: Int, context: Context) {
-        actionResult.value = NameCollisionActionResult(
-            message = context.resources.getQuantityString(
-                R.plurals.upload_began,
-                quantity,
-                quantity
-            ),
-            isForeignNode = false,
-            shouldFinish = pendingCollisions.isEmpty()
-        )
     }
 
     /**

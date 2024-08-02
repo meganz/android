@@ -70,7 +70,7 @@ import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision.Upload.Companion.getUploadCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity.Upload.Companion.getUploadCollision
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent

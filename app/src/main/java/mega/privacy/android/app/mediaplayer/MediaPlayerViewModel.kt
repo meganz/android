@@ -17,7 +17,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.model.MediaPlayerMenuClickedEvent
 import mega.privacy.android.app.mediaplayer.model.MediaPlayerState
 import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.namecollision.data.toLegacyCopy
 import mega.privacy.android.app.namecollision.data.toLegacyImport
 import mega.privacy.android.app.namecollision.data.toLegacyMove
@@ -46,7 +46,7 @@ class MediaPlayerViewModel @Inject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
 ) : ViewModel() {
 
-    private val collision = SingleLiveEvent<LegacyNameCollision>()
+    private val collision = SingleLiveEvent<NameCollisionUiEntity>()
     private val throwable = SingleLiveEvent<Throwable>()
     private val snackbarMessage = SingleLiveEvent<Int>()
 
@@ -106,7 +106,7 @@ class MediaPlayerViewModel @Inject constructor(
         }
     }
 
-    internal fun getCollision(): LiveData<LegacyNameCollision> = collision
+    internal fun getCollision(): LiveData<NameCollisionUiEntity> = collision
 
     internal fun onSnackbarMessage(): LiveData<Int> = snackbarMessage
 

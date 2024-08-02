@@ -46,7 +46,7 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
@@ -662,9 +662,9 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                             when (result.type) {
                                 NodeNameCollisionType.RESTORE,
                                 NodeNameCollisionType.MOVE,
-                                -> LegacyNameCollision.Movement.fromNodeNameCollision(it)
+                                -> NameCollisionUiEntity.Movement.fromNodeNameCollision(it)
 
-                                NodeNameCollisionType.COPY -> LegacyNameCollision.Copy.fromNodeNameCollision(
+                                NodeNameCollisionType.COPY -> NameCollisionUiEntity.Copy.fromNodeNameCollision(
                                     it
                                 )
                             }

@@ -24,10 +24,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
-import mega.privacy.android.app.namecollision.data.NameCollisionResult
+import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.model.NameCollisionUiState
 import mega.privacy.android.app.namecollision.usecase.GetNameCollisionResultUseCase
@@ -89,26 +89,26 @@ class LegacyNameCollisionViewModel @Inject constructor(
 
     val uiState: StateFlow<NameCollisionUiState> = _uiState
 
-    private val currentCollision: MutableLiveData<NameCollisionResult?> = MutableLiveData()
+    private val currentCollision: MutableLiveData<NameCollisionResultUiEntity?> = MutableLiveData()
     private val fileVersioningInfo: MutableLiveData<Triple<Boolean, NameCollisionType, Boolean>> =
         MutableLiveData()
     private val actionResult: MutableLiveData<NameCollisionActionResult> = MutableLiveData()
-    private val collisionsResolution: MutableLiveData<ArrayList<NameCollisionResult>> =
+    private val collisionsResolution: MutableLiveData<ArrayList<NameCollisionResultUiEntity>> =
         MutableLiveData()
     private val throwable = SingleLiveEvent<Throwable>()
 
-    fun getCurrentCollision(): LiveData<NameCollisionResult?> = currentCollision
+    fun getCurrentCollision(): LiveData<NameCollisionResultUiEntity?> = currentCollision
     fun getFileVersioningInfo(): LiveData<Triple<Boolean, NameCollisionType, Boolean>> =
         fileVersioningInfo
 
     fun onActionResult(): LiveData<NameCollisionActionResult> = actionResult
-    fun getCollisionsResolution(): LiveData<ArrayList<NameCollisionResult>> = collisionsResolution
+    fun getCollisionsResolution(): LiveData<ArrayList<NameCollisionResultUiEntity>> = collisionsResolution
     fun onExceptionThrown(): LiveData<Throwable> = throwable
 
     private val renameNames = mutableListOf<String>()
-    private val resolvedCollisions = mutableListOf<NameCollisionResult>()
+    private val resolvedCollisions = mutableListOf<NameCollisionResultUiEntity>()
     var isFolderUploadContext = false
-    private val pendingCollisions: MutableList<NameCollisionResult> = mutableListOf()
+    private val pendingCollisions: MutableList<NameCollisionResultUiEntity> = mutableListOf()
     var pendingFileCollisions = 0
     var pendingFolderCollisions = 0
     private var allCollisionsProcessed = false
@@ -135,9 +135,9 @@ class LegacyNameCollisionViewModel @Inject constructor(
      * Checks if a node is attempted to be copied to its parent folder again
      * isCopyToOrigin flag is used to create a duplicate node
      *
-     * @param collision [LegacyNameCollision.Copy] to resolve.
+     * @param collision [NameCollisionUiEntity.Copy] to resolve.
      */
-    private suspend fun checkCopyToOrigin(collision: LegacyNameCollision.Copy) {
+    private suspend fun checkCopyToOrigin(collision: NameCollisionUiEntity.Copy) {
         runCatching {
             getNodeByHandleUseCase(collision.nodeHandle, true)
         }.getOrNull()?.let {
@@ -163,12 +163,12 @@ class LegacyNameCollisionViewModel @Inject constructor(
     /**
      * Sets the initial data for resolving a single name collision.
      *
-     * @param collision [LegacyNameCollision] to resolve.
+     * @param collision [NameCollisionUiEntity] to resolve.
      */
-    fun setSingleData(collision: LegacyNameCollision, context: Context) {
+    fun setSingleData(collision: NameCollisionUiEntity, context: Context) {
         viewModelScope.launch {
             runCatching {
-                if (collision is LegacyNameCollision.Copy) {
+                if (collision is NameCollisionUiEntity.Copy) {
                     checkCopyToOrigin(collision)
                 }
                 getCurrentCollision(collision, context, true)
@@ -179,11 +179,11 @@ class LegacyNameCollisionViewModel @Inject constructor(
     /**
      * Gets the complete collision data.
      *
-     * @param collision [LegacyNameCollision] to resolve.
+     * @param collision [NameCollisionUiEntity] to resolve.
      * @param context   Required Context for uploads.
      * @param rename    Whether to call rename() or not
      */
-    private fun getCurrentCollision(collision: LegacyNameCollision, context: Context, rename: Boolean) {
+    private fun getCurrentCollision(collision: NameCollisionUiEntity, context: Context, rename: Boolean) {
         var firstUpdate = true
 
         getNameCollisionResultUseCase.get(collision)
@@ -217,15 +217,15 @@ class LegacyNameCollisionViewModel @Inject constructor(
      * Sets the initial data for resolving a list of name collisions.
      * Reorders the list to show files first, then folders. Then gets the current collision.
      *
-     * @param collisions    ArrayList of [LegacyNameCollision] to resolve.
+     * @param collisions    ArrayList of [NameCollisionUiEntity] to resolve.
      * @param context       Required Context for uploads.
      */
-    fun setData(collisions: ArrayList<LegacyNameCollision>, context: Context) {
+    fun setData(collisions: ArrayList<NameCollisionUiEntity>, context: Context) {
         viewModelScope.launch {
             runCatching {
                 require(collisions.isNotEmpty()) { "Collisions list is empty" }
                 collisions.first().let {
-                    if (it is LegacyNameCollision.Copy) {
+                    if (it is NameCollisionUiEntity.Copy) {
                         checkCopyToOrigin(it)
                     }
                 }
@@ -234,7 +234,7 @@ class LegacyNameCollisionViewModel @Inject constructor(
         }
     }
 
-    private fun getCollisionResult(collisions: ArrayList<LegacyNameCollision>, context: Context) =
+    private fun getCollisionResult(collisions: ArrayList<NameCollisionUiEntity>, context: Context) =
         getNameCollisionResultUseCase.reorder(collisions)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -260,10 +260,10 @@ class LegacyNameCollisionViewModel @Inject constructor(
     /**
      * Gets the list with complete data of pending collisions.
      *
-     * @param collisions    MutableList of [LegacyNameCollision] to resolve.
+     * @param collisions    MutableList of [NameCollisionUiEntity] to resolve.
      * @param context       Required Context for uploads.
      */
-    private fun getPendingCollisions(collisions: MutableList<LegacyNameCollision>, context: Context) {
+    private fun getPendingCollisions(collisions: MutableList<NameCollisionUiEntity>, context: Context) {
         getNameCollisionResultUseCase.get(collisions)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -307,8 +307,8 @@ class LegacyNameCollisionViewModel @Inject constructor(
      */
     private fun getCollisionType(): NameCollisionType =
         when (currentCollision.value?.nameCollision) {
-            is LegacyNameCollision.Copy, is LegacyNameCollision.Import -> NameCollisionType.COPY
-            is LegacyNameCollision.Movement -> NameCollisionType.MOVE
+            is NameCollisionUiEntity.Copy, is NameCollisionUiEntity.Import -> NameCollisionType.COPY
+            is NameCollisionUiEntity.Movement -> NameCollisionType.MOVE
             else -> NameCollisionType.UPLOAD
         }
 
@@ -319,8 +319,8 @@ class LegacyNameCollisionViewModel @Inject constructor(
      * @param choice    Resolution type as [NameCollisionChoice].
      * @return A MutableList with all the pending file collisions.
      */
-    private fun proceedWithAllFiles(choice: NameCollisionChoice): MutableList<NameCollisionResult> {
-        val fileCollisions = mutableListOf<NameCollisionResult>().apply {
+    private fun proceedWithAllFiles(choice: NameCollisionChoice): MutableList<NameCollisionResultUiEntity> {
+        val fileCollisions = mutableListOf<NameCollisionResultUiEntity>().apply {
             add(currentCollision.value!!)
         }
 
@@ -346,7 +346,7 @@ class LegacyNameCollisionViewModel @Inject constructor(
                 }
 
                 collisionsResolution.value =
-                    arrayListOf<NameCollisionResult>().apply { addAll(resolvedCollisions) }
+                    arrayListOf<NameCollisionResultUiEntity>().apply { addAll(resolvedCollisions) }
 
             }
 
@@ -367,7 +367,7 @@ class LegacyNameCollisionViewModel @Inject constructor(
 
             if (pendingCollisions.isEmpty()) {
                 collisionsResolution.value =
-                    arrayListOf<NameCollisionResult>().apply { addAll(resolvedCollisions) }
+                    arrayListOf<NameCollisionResultUiEntity>().apply { addAll(resolvedCollisions) }
 
                 return
             }
@@ -503,8 +503,8 @@ class LegacyNameCollisionViewModel @Inject constructor(
      * Processes all the pending collisions, including the current one,
      * and returns a list with all of them.
      */
-    private fun getAllPendingCollisions(): MutableList<NameCollisionResult> {
-        val allPendingCollisions = mutableListOf<NameCollisionResult>().apply {
+    private fun getAllPendingCollisions(): MutableList<NameCollisionResultUiEntity> {
+        val allPendingCollisions = mutableListOf<NameCollisionResultUiEntity>().apply {
             add(currentCollision.value!!)
             addAll(pendingCollisions)
         }
@@ -536,7 +536,7 @@ class LegacyNameCollisionViewModel @Inject constructor(
         viewModelScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
                 val parentId = currentCollision.nameCollision.parentHandle ?: return@launch
-                val path = (currentCollision.nameCollision as LegacyNameCollision.Upload).absolutePath
+                val path = (currentCollision.nameCollision as NameCollisionUiEntity.Upload).absolutePath
                 val name =
                     if (rename) currentCollision.renameName else currentCollision.nameCollision.name
 
@@ -568,7 +568,7 @@ class LegacyNameCollisionViewModel @Inject constructor(
      */
     private fun upload(
         context: Context,
-        list: MutableList<NameCollisionResult>,
+        list: MutableList<NameCollisionResultUiEntity>,
         rename: Boolean,
     ) {
         if (isFolderUploadContext) {
@@ -583,7 +583,7 @@ class LegacyNameCollisionViewModel @Inject constructor(
 
             if (pendingCollisions.isEmpty()) {
                 collisionsResolution.value =
-                    arrayListOf<NameCollisionResult>().apply { addAll(resolvedCollisions) }
+                    arrayListOf<NameCollisionResultUiEntity>().apply { addAll(resolvedCollisions) }
             }
             return
         }
@@ -592,7 +592,7 @@ class LegacyNameCollisionViewModel @Inject constructor(
             if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
                 val parentId = list.first().nameCollision.parentHandle ?: return@launch
                 val pathsAndNames = list.associate {
-                    (it.nameCollision as LegacyNameCollision.Upload).absolutePath to
+                    (it.nameCollision as NameCollisionUiEntity.Upload).absolutePath to
                             if (rename) it.renameName else it.nameCollision.name
                 }
 
@@ -636,8 +636,8 @@ class LegacyNameCollisionViewModel @Inject constructor(
      * @param result    The NameCollisionResult to map.
      * @return The mapped NodeNameCollision.
      */
-    private fun mapToNodeNameCollision(result: NameCollisionResult): NodeNameCollision {
-        return if (result.nameCollision is LegacyNameCollision.Import)
+    private fun mapToNodeNameCollision(result: NameCollisionResultUiEntity): NodeNameCollision {
+        return if (result.nameCollision is NameCollisionUiEntity.Import)
             with(result.nameCollision) {
                 NodeNameCollision.Chat(
                     collisionHandle = collisionHandle,
@@ -660,8 +660,8 @@ class LegacyNameCollisionViewModel @Inject constructor(
                 NodeNameCollision.Default(
                     collisionHandle = collisionHandle,
                     nodeHandle = when (this) {
-                        is LegacyNameCollision.Copy -> nodeHandle
-                        is LegacyNameCollision.Movement -> nodeHandle
+                        is NameCollisionUiEntity.Copy -> nodeHandle
+                        is NameCollisionUiEntity.Movement -> nodeHandle
                         else -> -1L
                     },
                     name = result.collisionName ?: "",
@@ -671,7 +671,7 @@ class LegacyNameCollisionViewModel @Inject constructor(
                     lastModified = result.collisionLastModified ?: 0L,
                     parentHandle = parentHandle ?: -1L,
                     isFile = isFile,
-                    serializedData = (this as? LegacyNameCollision.Copy)?.serializedNode,
+                    serializedData = (this as? NameCollisionUiEntity.Copy)?.serializedNode,
                     renameName = result.renameName
                 )
             }
@@ -710,7 +710,7 @@ class LegacyNameCollisionViewModel @Inject constructor(
      * @param list      List of collisions to move.
      * @param rename    True if should rename the nodes, false otherwise.
      */
-    private fun move(list: List<NameCollisionResult>, rename: Boolean) {
+    private fun move(list: List<NameCollisionResultUiEntity>, rename: Boolean) {
         if (list.isEmpty()) return
         viewModelScope.launch {
             runCatching {

@@ -55,7 +55,7 @@ import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.advertisements.AdsViewModel
 import mega.privacy.android.app.presentation.base.BaseViewModel
 import mega.privacy.android.app.presentation.billing.BillingViewModel
@@ -110,6 +110,7 @@ import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.entity.transfer.TransferFinishType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
@@ -214,7 +215,9 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     lateinit var pauseAllTransfersUseCase: PauseAllTransfersUseCase
 
     @JvmField
-    var legacyNameCollisionActivityContract: ActivityResultLauncher<ArrayList<LegacyNameCollision>>? = null
+    var legacyNameCollisionActivityContract: ActivityResultLauncher<ArrayList<NameCollisionUiEntity>>? =
+        null
+
     protected val billingViewModel by viewModels<BillingViewModel>()
     protected val adsViewModel: AdsViewModel by viewModels()
     private val viewModel by viewModels<BaseViewModel>()
@@ -1150,7 +1153,10 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     fun showGeneralTransferOverQuotaWarning() = lifecycleScope.launch {
         if (isActivityInBackground || transfersManagement.isOnTransfersSection || transferGeneralOverQuotaWarning != null) return@launch
         val builder =
-            MaterialAlertDialogBuilder(this@BaseActivity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            MaterialAlertDialogBuilder(
+                this@BaseActivity,
+                R.style.ThemeOverlay_Mega_MaterialAlertDialog
+            )
         val binding = TransferOverquotaLayoutBinding.inflate(layoutInflater)
         builder.setView(binding.root)
             .setOnDismissListener {

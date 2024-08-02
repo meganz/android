@@ -28,7 +28,7 @@ import mega.privacy.android.app.activities.contract.SelectFolderToImportActivity
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
@@ -158,7 +158,7 @@ class ImagePreviewActivity : BaseActivity() {
         manageNameCollision(state.nameCollision)
     }
 
-    private fun manageNameCollision(nameCollision: LegacyNameCollision?) {
+    private fun manageNameCollision(nameCollision: NameCollisionUiEntity?) {
         nameCollision ?: return
         legacyNameCollisionActivityContract?.launch(arrayListOf(nameCollision))
         viewModel.onNameCollisionConsumed()

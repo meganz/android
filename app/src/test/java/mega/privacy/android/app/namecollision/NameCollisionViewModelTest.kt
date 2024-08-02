@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.namecollision
+package mega.privacy.android.app.namecollision
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.namecollision.NameCollisionViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -21,7 +20,6 @@ import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodesUseCase
@@ -57,7 +55,6 @@ internal class NameCollisionViewModelTest {
     private val copyCollidedNodesUseCase = mock<CopyCollidedNodesUseCase>()
     private val copyCollidedNodeUseCase = mock<CopyCollidedNodeUseCase>()
     private val copyRequestMessageMapper = mock<CopyRequestMessageMapper>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getNodeNameCollisionResultUseCase: GetNodeNameCollisionResultUseCase = mock()
     private val getNodeNameCollisionsResultUseCase: GetNodeNameCollisionsResultUseCase = mock()
     private val reorderNodeNameCollisionsUseCase: ReorderNodeNameCollisionsUseCase = mock()
@@ -70,7 +67,6 @@ internal class NameCollisionViewModelTest {
             getNodeNameCollisionsResultUseCase = getNodeNameCollisionsResultUseCase,
             reorderNodeNameCollisionsUseCase = reorderNodeNameCollisionsUseCase,
             updateNodeNameCollisionsResultUseCase = updateNodeNameCollisionsResultUseCase,
-            uploadUseCase = mock(),
             copyCollidedNodesUseCase = copyCollidedNodesUseCase,
             copyCollidedNodeUseCase = copyCollidedNodeUseCase,
             monitorUserUpdates = monitorUserUpdates,
@@ -82,7 +78,6 @@ internal class NameCollisionViewModelTest {
             getNodeByFingerprintAndParentNodeUseCase = mock(),
             moveCollidedNodeUseCase = mock(),
             moveCollidedNodesUseCase = mock(),
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 

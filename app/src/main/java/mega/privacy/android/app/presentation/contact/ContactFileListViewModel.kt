@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
-import mega.privacy.android.app.namecollision.data.LegacyNameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.StorageState
@@ -128,8 +128,8 @@ class ContactFileListViewModel @Inject constructor(
     private fun updateStateWithConflictNodes(result: NodeNameCollisionsResult) = runCatching {
         result.conflictNodes.values.map {
             when (result.type) {
-                NodeNameCollisionType.MOVE -> LegacyNameCollision.Movement.fromNodeNameCollision(it)
-                NodeNameCollisionType.COPY -> LegacyNameCollision.Copy.fromNodeNameCollision(it)
+                NodeNameCollisionType.MOVE -> NameCollisionUiEntity.Movement.fromNodeNameCollision(it)
+                NodeNameCollisionType.COPY -> NameCollisionUiEntity.Copy.fromNodeNameCollision(it)
                 else -> throw UnsupportedOperationException("Invalid collision result")
             }
         }
