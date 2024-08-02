@@ -36,7 +36,7 @@ class HandleTransferEventUseCase @Inject internal constructor(
     suspend operator fun invoke(vararg events: TransferEvent) {
         val transferEvents = events.filterNot { event ->
             event.transfer.isVoiceClip() || event.transfer.isBackgroundTransfer()
-                    || event.transfer.isStreamingTransfer || event.transfer.isSyncTransfer
+                    || event.transfer.isStreamingTransfer
                     || event.transfer.isBackupTransfer
         }
         if (transferEvents.isEmpty()) return
