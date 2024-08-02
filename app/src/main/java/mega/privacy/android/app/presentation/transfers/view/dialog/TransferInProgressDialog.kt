@@ -42,20 +42,16 @@ fun TransferInProgressDialog(
         when (scanningTransfersProgress?.stage) {
             null, TransferStage.STAGE_TRANSFERRING_FILES, TransferStage.STAGE_NONE -> null
             TransferStage.STAGE_SCANNING -> {
-                if (scanningTransfersProgress.folderCount == 1) {
-                    pluralStringResource(
-                        id = sharedR.plurals.transfers_scanning_folders_dialog_scanning_folder_subtitle,
-                        count = scanningTransfersProgress.fileCount,
-                        scanningTransfersProgress.fileCount,
-                    )
-                } else {
+                pluralStringResource(
+                    id = sharedR.plurals.transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle,
+                    count = scanningTransfersProgress.fileCount,
                     pluralStringResource(
                         id = sharedR.plurals.transfers_scanning_folders_dialog_scanning_folders_subtitle,
-                        count = scanningTransfersProgress.fileCount,
+                        count = scanningTransfersProgress.folderCount,
                         scanningTransfersProgress.folderCount,
-                        scanningTransfersProgress.fileCount,
-                    )
-                }
+                    ),
+                    scanningTransfersProgress.fileCount,
+                )
             }
 
             TransferStage.STAGE_CREATING_TREE -> if (scanningTransfersProgress.allFoldersCreated()) {
@@ -102,8 +98,13 @@ private class DeviceBottomSheetBodyPreviewProvider :
         ),
         StartTransferJobInProgress.ScanningTransfers(
             TransferStage.STAGE_SCANNING,
-            fileCount = 2,
-            folderCount = 2
+            fileCount = 16,
+            folderCount = 1
+        ),
+        StartTransferJobInProgress.ScanningTransfers(
+            TransferStage.STAGE_SCANNING,
+            fileCount = 14364,
+            folderCount = 156
         ),
         StartTransferJobInProgress.ScanningTransfers(
             TransferStage.STAGE_CREATING_TREE,

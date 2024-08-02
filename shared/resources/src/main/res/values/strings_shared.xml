@@ -563,12 +563,12 @@
         <item quantity="one">Found 1 folder and %1$d file.</item>
         <item quantity="other">Found 1 folder and %1$d files.</item>
     </plurals>
-    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders -->
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
-        <item quantity="one">Found %1$d folders and %2$d file.</item>
-        <item quantity="other">Found %1$d folders and %2$d files.</item>
+        <item quantity="one">%1$d folder</item>
+        <item quantity="other">%1$d folders</item>
     </plurals>
-    <!-- Transfers scanning folders dialog sub-title when the app is creating the folders -->
+    <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
     <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
         <item quantity="one">%1$d/%2$d folder</item>
         <item quantity="other">%1$d/%2$d folders</item>
@@ -585,4 +585,9 @@
     <string name="settings_sync_clear_debris_dialog_continue">Continue</string>
     <!-- Snackbar message shown when user clears debris from settings menu -->
     <string name="settings_sync_debris_cleared_message">.debris folder successfully cleared</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
+    <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
+        <item quantity="one">Found %1$s and %2$d file.</item>
+        <item quantity="other">Found %1$s and %2$d files.</item>
+    </plurals>
 </resources>

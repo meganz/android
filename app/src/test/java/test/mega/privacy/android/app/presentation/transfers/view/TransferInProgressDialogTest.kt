@@ -1,6 +1,9 @@
 package test.mega.privacy.android.app.presentation.transfers.view
 
 import mega.privacy.android.shared.resources.R as sharedR
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -128,16 +131,55 @@ class TransferInProgressDialogTest {
                 StartTransferJobInProgress.ScanningTransfers(
                     TransferStage.STAGE_SCANNING,
                     folderCount = 1,
-                    fileCount = 2,
+                    fileCount = 1,
                 )
             ) {}
         }
         composeTestRule.onNodeWithText(
             substring = true,
             text = fromPluralId(
-                sharedR.plurals.transfers_scanning_folders_dialog_scanning_folder_subtitle, 2
+                sharedR.plurals.transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle,
+                quantity = 1,
+                fromPluralId(
+                    sharedR.plurals.transfers_scanning_folders_dialog_scanning_folders_subtitle,
+                    1
+                ),
+                1
             ),
         ).assertExists()
+    }
+
+    @Test
+    fun `test that the correct pluralization is applied to subtitle when stage is scanning`() {
+        var filesState by mutableStateOf(1)
+        var foldersState by mutableStateOf(1)
+        composeTestRule.setContent {
+            TransferInProgressDialog(
+                StartTransferJobInProgress.ScanningTransfers(
+                    TransferStage.STAGE_SCANNING,
+                    folderCount = foldersState,
+                    fileCount = filesState,
+                )
+            ) {}
+        }
+        (1..2).forEach { files ->
+            (1..2).forEach { folders ->
+                filesState = files
+                foldersState = folders
+                composeTestRule.onNodeWithText(
+                    substring = true,
+                    text = fromPluralId(
+                        sharedR.plurals.transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle,
+                        quantity = files,
+                        fromPluralId(
+                            sharedR.plurals.transfers_scanning_folders_dialog_scanning_folders_subtitle,
+                            folders
+                        ),
+                        files,
+                    ),
+                ).assertExists()
+            }
+        }
     }
 
     @Test
