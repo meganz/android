@@ -81,7 +81,7 @@ import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
-import mega.privacy.android.domain.usecase.QueryChatLink
+import mega.privacy.android.domain.usecase.QueryChatLinkUseCase
 import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInviteWithChatIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
@@ -148,7 +148,7 @@ import javax.inject.Inject
  * @property setOpenInviteWithChatIdUseCase                 [SetOpenInviteWithChatIdUseCase]
  * @property chatParticipantMapper                          [ChatParticipantMapper]
  * @property monitorChatRoomUpdatesUseCase                  [MonitorChatRoomUpdatesUseCase]
- * @property queryChatLink                                  [QueryChatLink]
+ * @property queryChatLinkUseCase                           [QueryChatLinkUseCase]
  * @property isEphemeralPlusPlusUseCase                     [IsEphemeralPlusPlusUseCase]
  * @property createChatLinkUseCase                          [CreateChatLinkUseCase]
  * @property inviteContactWithHandleUseCase                           [InviteContactWithHandleUseCase]
@@ -189,7 +189,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase,
-    private val queryChatLink: QueryChatLink,
+    private val queryChatLinkUseCase: QueryChatLinkUseCase,
     private val setOpenInviteWithChatIdUseCase: SetOpenInviteWithChatIdUseCase,
     private val chatParticipantMapper: ChatParticipantMapper,
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
@@ -1918,7 +1918,7 @@ class MeetingActivityViewModel @Inject constructor(
             _state.value.chatId.let { id ->
                 viewModelScope.launch {
                     runCatching {
-                        queryChatLink(id)
+                        queryChatLinkUseCase(id)
                     }.onFailure {
                         if (state.value.hasHostPermission() && shouldShareMeetingLink) {
                             createChatLink()

@@ -42,7 +42,7 @@ import mega.privacy.android.domain.entity.meeting.Weekday
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.QueryChatLink
+import mega.privacy.android.domain.usecase.QueryChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.InviteParticipantToChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
@@ -82,7 +82,7 @@ import javax.inject.Inject
  * @property getStringFromStringResMapper               [GetStringFromStringResMapper]
  * @property getPluralStringFromStringResMapper         [GetPluralStringFromStringResMapper]
  * @property setOpenInviteUseCase                       [SetOpenInviteUseCase]
- * @property queryChatLink                              [QueryChatLink]
+ * @property queryChatLinkUseCase                       [QueryChatLinkUseCase]
  * @property removeParticipantFromChat                  [RemoveParticipantFromChatUseCase]
  * @property inviteParticipantToChat                    [InviteParticipantToChatUseCase]
  * @property monitorChatRoomUpdatesUseCase              [MonitorChatRoomUpdatesUseCase]
@@ -103,7 +103,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private val updateScheduledMeetingUseCase: UpdateScheduledMeetingUseCase,
     private val createChatLinkUseCase: CreateChatLinkUseCase,
     private val removeChatLinkUseCase: RemoveChatLinkUseCase,
-    private val queryChatLink: QueryChatLink,
+    private val queryChatLinkUseCase: QueryChatLinkUseCase,
     private val recurrenceDialogOptionMapper: RecurrenceDialogOptionMapper,
     private val weekDayMapper: WeekDayMapper,
     private val deviceGateway: DeviceGateway,
@@ -986,7 +986,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private fun checkMeetingLink(chatId: Long) =
         viewModelScope.launch {
             runCatching {
-                queryChatLink(chatId)
+                queryChatLinkUseCase(chatId)
             }.onFailure { exception ->
                 Timber.e(exception)
             }.onSuccess { request ->

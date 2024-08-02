@@ -17,7 +17,6 @@ import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
-import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetMyChatFilesFolder
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
@@ -70,13 +69,6 @@ abstract class ChatModule {
         @Provides
         fun provideSetPublicChatToPrivate(chatRepository: ChatRepository): SetPublicChatToPrivate =
             SetPublicChatToPrivate(chatRepository::setPublicChatToPrivate)
-
-        /**
-         * Provides the Use Case [QueryChatLink]
-         */
-        @Provides
-        fun provideQueryChatLink(chatRepository: ChatRepository): QueryChatLink =
-            QueryChatLink(chatRepository::queryChatLink)
 
         /**
          * Provides the Use Case [MonitorChatListItemUpdates]

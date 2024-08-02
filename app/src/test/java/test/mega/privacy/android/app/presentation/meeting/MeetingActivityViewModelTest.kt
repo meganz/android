@@ -21,7 +21,7 @@ import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
-import mega.privacy.android.domain.usecase.QueryChatLink
+import mega.privacy.android.domain.usecase.QueryChatLinkUseCase
 import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInviteWithChatIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
@@ -91,7 +91,7 @@ class MeetingActivityViewModelTest {
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase = mock()
     private val getChatRoomUseCase: GetChatRoomUseCase = mock()
     private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase = mock()
-    private val queryChatLink: QueryChatLink = mock()
+    private val queryChatLinkUseCase: QueryChatLinkUseCase = mock()
     private val setOpenInviteWithChatIdUseCase: SetOpenInviteWithChatIdUseCase = mock()
     private val chatParticipantMapper: ChatParticipantMapper = mock()
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase = mock()
@@ -157,7 +157,7 @@ class MeetingActivityViewModelTest {
             monitorChatSessionUpdatesUseCase,
             getChatRoomUseCase,
             monitorChatRoomUpdatesUseCase,
-            queryChatLink,
+            queryChatLinkUseCase,
             setOpenInviteWithChatIdUseCase,
             chatParticipantMapper,
             isEphemeralPlusPlusUseCase,
@@ -215,7 +215,7 @@ class MeetingActivityViewModelTest {
             monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
             getChatRoomUseCase = getChatRoomUseCase,
             monitorChatRoomUpdatesUseCase = monitorChatRoomUpdatesUseCase,
-            queryChatLink = queryChatLink,
+            queryChatLinkUseCase = queryChatLinkUseCase,
             setOpenInviteWithChatIdUseCase = setOpenInviteWithChatIdUseCase,
             chatParticipantMapper = chatParticipantMapper,
             isEphemeralPlusPlusUseCase = isEphemeralPlusPlusUseCase,

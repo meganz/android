@@ -14,7 +14,7 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.QueryChatLink
+import mega.privacy.android.domain.usecase.QueryChatLinkUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatLinkUseCase
@@ -68,7 +68,7 @@ class CreateScheduledMeetingViewModelTest {
     private val updateScheduledMeetingUseCase: UpdateScheduledMeetingUseCase = mock()
     private val createChatLinkUseCase: CreateChatLinkUseCase = mock()
     private val removeChatLinkUseCase: RemoveChatLinkUseCase = mock()
-    private val queryChatLink: QueryChatLink = mock()
+    private val queryChatLinkUseCase: QueryChatLinkUseCase = mock()
     private val recurrenceDialogOptionMapper: RecurrenceDialogOptionMapper = mock()
     private val weekDayMapper: WeekDayMapper = mock()
     private val deviceGateway: DeviceGateway = mock()
@@ -109,7 +109,7 @@ class CreateScheduledMeetingViewModelTest {
             updateScheduledMeetingUseCase = updateScheduledMeetingUseCase,
             createChatLinkUseCase = createChatLinkUseCase,
             removeChatLinkUseCase = removeChatLinkUseCase,
-            queryChatLink = queryChatLink,
+            queryChatLinkUseCase = queryChatLinkUseCase,
             recurrenceDialogOptionMapper = recurrenceDialogOptionMapper,
             weekDayMapper = weekDayMapper,
             deviceGateway = deviceGateway,
@@ -138,7 +138,7 @@ class CreateScheduledMeetingViewModelTest {
             updateScheduledMeetingUseCase,
             createChatLinkUseCase,
             removeChatLinkUseCase,
-            queryChatLink,
+            queryChatLinkUseCase,
             recurrenceDialogOptionMapper,
             weekDayMapper,
             deviceGateway,

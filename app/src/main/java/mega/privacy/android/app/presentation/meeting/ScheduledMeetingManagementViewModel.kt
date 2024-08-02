@@ -26,25 +26,25 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManag
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
+import mega.privacy.android.domain.entity.call.ChatCallChanges
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
-import mega.privacy.android.domain.entity.call.ChatCallChanges
-import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
-import mega.privacy.android.domain.usecase.QueryChatLink
+import mega.privacy.android.domain.usecase.QueryChatLinkUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
-import mega.privacy.android.domain.usecase.chat.link.RemoveChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatLinkUseCase
+import mega.privacy.android.domain.usecase.chat.link.RemoveChatLinkUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingOccurrenceUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
-import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatHistoryEmptyUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
@@ -67,9 +67,9 @@ import javax.inject.Inject
  * @property cancelScheduledMeetingOccurrenceUseCase    [CancelScheduledMeetingOccurrenceUseCase]
  * @property getChatRoomUseCase                         [GetChatRoomUseCase]
  * @property getStringFromStringResMapper               [GetStringFromStringResMapper]
- * @property queryChatLink                              [QueryChatLink]
+ * @property queryChatLinkUseCase                       [QueryChatLinkUseCase]
  * @property removeChatLinkUseCase                      [RemoveChatLinkUseCase]
- * @property createChatLinkUseCase                             [CreateChatLink]
+ * @property createChatLinkUseCase                      [CreateChatLinkUseCase]
  * @property monitorConnectivityUseCase                 [MonitorConnectivityUseCase]
  * @property monitorChatListItemUpdates                 [MonitorChatListItemUpdates]
  * @property megaChatApiGateway                         [MegaChatApiGateway]
@@ -93,7 +93,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     private val cancelScheduledMeetingOccurrenceUseCase: CancelScheduledMeetingOccurrenceUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
-    private val queryChatLink: QueryChatLink,
+    private val queryChatLinkUseCase: QueryChatLinkUseCase,
     private val removeChatLinkUseCase: RemoveChatLinkUseCase,
     private val createChatLinkUseCase: CreateChatLinkUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
@@ -506,7 +506,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
         _state.value.chatId?.let { id ->
             viewModelScope.launch {
                 runCatching {
-                    queryChatLink(id)
+                    queryChatLinkUseCase(id)
                 }.onFailure { exception ->
                     Timber.e(exception)
                 }.onSuccess { request ->
