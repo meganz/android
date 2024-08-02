@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -44,7 +45,7 @@ fun UploadDestinationView(
     isUrl: Boolean = false,
 ) {
     MegaScaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.systemBarsPadding().fillMaxSize(),
         topBar = {
             MegaAppBar(
                 title = stringResource(id = R.string.title_upload_explorer),

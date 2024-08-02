@@ -6,9 +6,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -84,6 +86,7 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
      * onCreate
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(
@@ -91,7 +94,7 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
             )
             OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 ConstraintLayout(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.systemBarsPadding().fillMaxSize()
                 ) {
                     val (audioPlayer, audioSectionComposeView) = createRefs()
                     MiniAudioPlayerView(

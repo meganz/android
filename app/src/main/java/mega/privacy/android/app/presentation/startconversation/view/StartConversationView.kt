@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -54,14 +55,14 @@ import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.search.view.EmptySearchView
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
+import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
-import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 
 @Composable
 fun StartConversationView(
@@ -81,6 +82,7 @@ fun StartConversationView(
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
+        modifier = Modifier.systemBarsPadding(),
         scaffoldState = scaffoldState,
         topBar = {
             if (state.contactItemList.isEmpty()) {

@@ -71,6 +71,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.SearchView;
@@ -1424,6 +1425,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
 
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.DropdownMenu
@@ -52,10 +53,10 @@ import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
+import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_050_white_alpha_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
-import mega.privacy.android.domain.entity.photos.Photo
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -101,6 +102,7 @@ fun MediaDiscoveryScreen(
     )
 
     Scaffold(
+        modifier = Modifier.systemBarsPadding(),
         topBar = {
             MDHeader(
                 screenTitle = screenTitle,

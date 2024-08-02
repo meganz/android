@@ -36,6 +36,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.EditTextPIN
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.presentation.verification.model.SmsVerificationTextState
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Util
@@ -78,6 +79,7 @@ class SMSVerificationTextActivity : PasscodeActivity(),
     private val viewModel by viewModels<SMSVerificationTextViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdgeAndConsumeInsets()
         Timber.d("onCreate")
         super.onCreate(savedInstanceState)
 

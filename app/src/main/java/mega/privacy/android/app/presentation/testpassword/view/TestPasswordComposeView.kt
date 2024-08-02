@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -107,9 +108,11 @@ import mega.privacy.android.app.presentation.testpassword.view.Constants.SEE_PAS
 import mega.privacy.android.app.presentation.testpassword.view.Constants.TEST_PASSWORD_APP_BAR_TAG
 import mega.privacy.android.app.presentation.testpassword.view.Constants.TEST_PASSWORD_BUTTON_TAG
 import mega.privacy.android.app.presentation.testpassword.view.Constants.TEST_PASSWORD_LAYOUT_TAG
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.legacy.core.ui.controls.textfields.MegaTextField
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.autofill
 import mega.privacy.android.shared.original.core.ui.theme.extensions.green_500_green_400
@@ -117,8 +120,6 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_
 import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.white
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
-import mega.privacy.android.legacy.core.ui.controls.textfields.MegaTextField
 import java.io.File
 
 internal object Constants {
@@ -301,6 +302,7 @@ internal fun TestPasswordComposeView(
     }
 
     Scaffold(
+        modifier = Modifier.systemBarsPadding(),
         scaffoldState = rememberScaffoldState(),
         topBar = {
 

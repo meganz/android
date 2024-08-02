@@ -47,6 +47,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -311,6 +312,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        EdgeToEdge.enable(this);
         Timber.d("onCreate");
         super.onCreate(savedInstanceState);
 

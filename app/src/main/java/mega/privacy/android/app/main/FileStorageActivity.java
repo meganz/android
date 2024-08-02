@@ -59,6 +59,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.extensions.EdgeToEdgeExtensionsKt;
 import mega.privacy.android.app.interfaces.Scrollable;
 import mega.privacy.android.app.main.adapters.FileStorageAdapter;
 import mega.privacy.android.app.psa.PsaWebBrowser;
@@ -169,6 +170,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
     protected void onCreate(Bundle savedInstanceState) {
         Timber.d("onCreate");
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        EdgeToEdgeExtensionsKt.enableEdgeToEdgeAndConsumeInsets(this);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_filestorage);

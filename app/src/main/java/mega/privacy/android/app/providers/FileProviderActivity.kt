@@ -28,6 +28,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
@@ -265,6 +266,7 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate first")
         requestWindowFeature(Window.FEATURE_NO_TITLE)
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         setStatusBarTextColor(this@FileProviderActivity)

@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.transfers
 
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
 import androidx.fragment.app.commit
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -14,9 +14,8 @@ import dagger.hilt.android.AndroidEntryPoint
 class TransfersActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-
-        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {

@@ -8,12 +8,14 @@ import android.view.View
 import android.widget.Button
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication.Companion.isBlockedDueToWeakAccount
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityWeakAccountProtectionAlertBinding
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.listeners.ResendVerificationEmailListener
 import mega.privacy.android.app.listeners.WhyAmIBlockedListener
 import mega.privacy.android.app.presentation.login.LoginActivity
@@ -39,6 +41,7 @@ class WeakAccountProtectionAlertActivity : PasscodeActivity(), View.OnClickListe
      * onCreate lifecycle callback
      */
     public override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdgeAndConsumeInsets(WindowInsetsCompat.Type.navigationBars())
         super.onCreate(savedInstanceState)
         isBlockedDueToWeakAccount = true
         activityWeakAccountProtectionAlertBinding =
