@@ -24,6 +24,7 @@ class GetTransferDestinationUriUseCase @Inject constructor(
     suspend operator fun invoke(transfer: Transfer): DestinationUriAndSubFolders? {
         return when {
             transfer.transferType != TransferType.DOWNLOAD -> null
+            transfer.isSyncTransfer -> null
 
             transfer.isRootTransfer -> {
                 transfer.getSDCardTransferUri()?.let {

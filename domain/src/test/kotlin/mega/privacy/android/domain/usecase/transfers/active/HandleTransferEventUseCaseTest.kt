@@ -123,38 +123,6 @@ class HandleTransferEventUseCaseTest {
         }
 
     @Test
-    fun `test that upload sync transfer does not invoke repository nor GetTransferDestinationUriUseCase when event is TransferFinishEvent`() =
-        runTest {
-            val transfer = mock<Transfer> {
-                on { this.transferType } doReturn TransferType.GENERAL_UPLOAD
-                on { this.isSyncTransfer } doReturn true
-            }
-            val transferEvent = mock<TransferEvent.TransferFinishEvent> {
-                on { this.transfer }.thenReturn(transfer)
-            }
-
-            underTest.invoke(transferEvent)
-            verifyNoInteractions(getTransferDestinationUriUseCase)
-            verifyNoInteractions(transferRepository)
-        }
-
-    @Test
-    fun `test that download sync transfer does not invoke repository nor GetTransferDestinationUriUseCase when event is TransferFinishEvent`() =
-        runTest {
-            val transfer = mock<Transfer> {
-                on { this.transferType } doReturn TransferType.DOWNLOAD
-                on { this.isSyncTransfer } doReturn true
-            }
-            val transferEvent = mock<TransferEvent.TransferFinishEvent> {
-                on { this.transfer }.thenReturn(transfer)
-            }
-
-            underTest.invoke(transferEvent)
-            verifyNoInteractions(getTransferDestinationUriUseCase)
-            verifyNoInteractions(transferRepository)
-        }
-
-    @Test
     fun `test that backups transfer does not invoke repository nor GetTransferDestinationUriUseCase when event is TransferFinishEvent`() =
         runTest {
             val transfer = mock<Transfer> {

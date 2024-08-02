@@ -47,6 +47,15 @@ class GetTransferDestinationUriUseCaseTest {
     }
 
     @Test
+    fun `test that null is returned when is a sync transfer`() = runTest {
+        val transfer = mock<Transfer> {
+            on { it.transferType } doReturn TransferType.DOWNLOAD
+            on { it.isSyncTransfer } doReturn true
+        }
+        assertThat(underTest(transfer)).isNull()
+    }
+
+    @Test
     fun `test that transfer's targetUri is returned when it's a root transfer`() = runTest {
         val expected = "destinationUri"
         val transfer = mock<Transfer> {
