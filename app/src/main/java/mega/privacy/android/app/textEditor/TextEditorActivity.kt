@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
@@ -75,6 +76,7 @@ import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MO
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER
 import mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
@@ -100,6 +102,9 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
+/**
+ * Activity to view and edit text files
+ */
 @AndroidEntryPoint
 class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
@@ -114,36 +119,30 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         private const val STATE_HIDDEN = 1
     }
 
+    /**
+     * Use case to get feature flag
+     */
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
     private val viewModel by viewModels<TextEditorViewModel>()
-
     private lateinit var binding: ActivityTextFileEditorBinding
-
     private var menu: Menu? = null
-
     private var discardChangesDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
     private var errorReadingContentDialog: AlertDialog? = null
-
     private var currentUIState = STATE_SHOWN
     private var animator: ViewPropertyAnimator? = null
     private var countDownTimer: CountDownTimer? = null
     private var isHiddenNodesEnabled: Boolean = false
     private var tempNodeId: NodeId? = null
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
-
+    private var originalContentTextSize: Float = 0f
+    private var originalNameTextSize: Float = 0f
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private val toolbarElevationColor by lazy { getColorForElevation(this, elevation) }
-    private val transparentColor by lazy {
-        ContextCompat.getColor(
-            this,
-            android.R.color.transparent
-        )
-    }
-
     private val nodeAttacher by lazy { MegaAttacher(this) }
-
+    private val transparentColor by lazy {
+        ContextCompat.getColor(this, android.R.color.transparent)
+    }
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             if (!viewModel.isViewMode() && viewModel.isFileEdited()) {
@@ -168,9 +167,13 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             }
         }
     }
-
-    private var originalContentTextSize: Float = 0f
-    private var originalNameTextSize: Float = 0f
+    private val nameCollisionActivityContract = registerForActivityResult(
+        NameCollisionActivityContract()
+    ) { result ->
+        result?.let {
+            showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdgeAndConsumeInsets()
@@ -682,7 +685,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             showSnackbar(getString(message))
         }
         viewModel.getCollision().observe(this) { collision ->
-            legacyNameCollisionActivityContract?.launch(arrayListOf(collision))
+            nameCollisionActivityContract.launch(arrayListOf(collision))
         }
         viewModel.onExceptionThrown().observe(this, ::manageException)
         viewModel.onFatalError().observe(this) {

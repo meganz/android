@@ -686,6 +686,11 @@
             android:launchMode="singleTop"
             android:theme="@style/Theme.Mega.FullScreen.Viewer" />
         <activity
+            android:name=".namecollision.NameCollisionActivity"
+            android:label="@string/title_duplicated_items"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Mega.FullScreen.Viewer" />
+        <activity
             android:name=".presentation.permissions.NotificationsPermissionActivity"
             android:launchMode="singleTop" />
         <activity

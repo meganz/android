@@ -30,10 +30,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.listeners.ExportListener
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
-import mega.privacy.android.app.namecollision.data.toLegacyCopy
-import mega.privacy.android.app.namecollision.data.toLegacyImport
-import mega.privacy.android.app.namecollision.data.toLegacyMove
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -69,6 +65,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.document.DocumentEntity
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.ViewerNode
@@ -155,7 +152,7 @@ class TextEditorViewModel @Inject constructor(
     private val pagination: MutableLiveData<Pagination> = MutableLiveData()
     private val snackBarMessage = SingleLiveEvent<Int>()
     private val fatalError = SingleLiveEvent<Unit>()
-    private val collision = SingleLiveEvent<NameCollisionUiEntity>()
+    private val collision = SingleLiveEvent<NameCollision>()
     private val throwable = SingleLiveEvent<Throwable>()
 
     private var needsReadContent = false
@@ -194,7 +191,7 @@ class TextEditorViewModel @Inject constructor(
 
     fun onSnackBarMessage(): LiveData<Int> = snackBarMessage
 
-    fun getCollision(): LiveData<NameCollisionUiEntity> = collision
+    fun getCollision(): LiveData<NameCollision> = collision
 
     fun onExceptionThrown(): LiveData<Throwable> = throwable
 
@@ -650,9 +647,7 @@ class TextEditorViewModel @Inject constructor(
                     parentNodeId = NodeId(parentHandle)
                 )
             }.onSuccess { fileCollisions ->
-                fileCollisions.map {
-                    NameCollisionUiEntity.Upload.getUploadCollision(it)
-                }.firstOrNull()?.let {
+                fileCollisions.firstOrNull()?.let {
                     collision.value = it
                 } ?: uploadFile(activity, fromHome, tempFile, parentHandle)
             }.onFailure {
@@ -758,7 +753,7 @@ class TextEditorViewModel @Inject constructor(
                     newNodeParent = newParentNode,
                 )
             }.onSuccess { result ->
-                result.firstChatNodeCollisionOrNull?.toLegacyImport()?.let { item ->
+                result.firstChatNodeCollisionOrNull?.let { item ->
                     collision.value = item
                 }
 
@@ -789,7 +784,7 @@ class TextEditorViewModel @Inject constructor(
                     type = NodeNameCollisionType.COPY,
                 )
             }.onSuccess { result ->
-                result.firstNodeCollisionOrNull?.toLegacyCopy()?.let { item ->
+                result.firstNodeCollisionOrNull?.let { item ->
                     collision.value = item
                 }
                 result.moveRequestResult?.let {
@@ -823,7 +818,7 @@ class TextEditorViewModel @Inject constructor(
                     type = NodeNameCollisionType.MOVE,
                 )
             }.onSuccess { result ->
-                result.firstNodeCollisionOrNull?.toLegacyMove()?.let { item ->
+                result.firstNodeCollisionOrNull?.let { item ->
                     collision.value = item
                 }
                 result.moveRequestResult?.let {
