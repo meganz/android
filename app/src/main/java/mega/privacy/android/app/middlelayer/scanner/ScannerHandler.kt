@@ -1,13 +1,17 @@
 package mega.privacy.android.app.middlelayer.scanner
 
-import mega.privacy.android.app.presentation.qrcode.model.ScanResult
+import mega.privacy.android.app.presentation.qrcode.model.BarcodeScanResult
 
 /**
- * Scanner handler
+ * Interface for all Scanning related functionalities
  */
 interface ScannerHandler {
+
     /**
-     * Start the scanner
+     * Attempts to install the ML Kit Barcode Scanner from Google Play services. Once installed,
+     * the User can start scanning Barcodes
+     *
+     * @return the Barcode scanning result
      */
-    suspend fun scan(): ScanResult
+    suspend fun scanBarcode(): BarcodeScanResult
 }

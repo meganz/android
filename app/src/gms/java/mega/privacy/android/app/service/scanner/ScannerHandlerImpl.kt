@@ -12,25 +12,29 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
-import mega.privacy.android.app.presentation.qrcode.model.ScanResult
+import mega.privacy.android.app.presentation.qrcode.model.BarcodeScanResult
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import javax.inject.Inject
 
 /**
- * Implementation of scanner handler
+ * Default implementation of [ScannerHandler]
  */
 class ScannerHandlerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ScannerHandler {
-    private val scanner: GmsBarcodeScanner by lazy {
+
+    /**
+     * The ML Kit Barcode Scanner
+     */
+    private val barcodeScanner: GmsBarcodeScanner by lazy {
         val options = GmsBarcodeScannerOptions.Builder()
             .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
             .build()
         GmsBarcodeScanning.getClient(context, options)
     }
 
-    override suspend fun scan() = withContext(ioDispatcher) {
+    override suspend fun scanBarcode() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val moduleInstall = ModuleInstall.getClient(context)
             val moduleInstallRequest = ModuleInstallRequest.newBuilder()
@@ -40,12 +44,12 @@ class ScannerHandlerImpl @Inject constructor(
                 .installModules(moduleInstallRequest)
                 .addOnSuccessListener { moduleResponse ->
                     if (moduleResponse.areModulesAlreadyInstalled()) {
-                        scanner.startScan()
+                        barcodeScanner.startScan()
                             .addOnSuccessListener {
-                                continuation.resumeWith(Result.success(ScanResult.Success(it.rawValue)))
+                                continuation.resumeWith(Result.success(BarcodeScanResult.Success(it.rawValue)))
                             }
                             .addOnCanceledListener {
-                                continuation.resumeWith(Result.success(ScanResult.Cancel))
+                                continuation.resumeWith(Result.success(BarcodeScanResult.Cancelled))
                             }
                             .addOnFailureListener {
                                 continuation.resumeWith(Result.failure(it))

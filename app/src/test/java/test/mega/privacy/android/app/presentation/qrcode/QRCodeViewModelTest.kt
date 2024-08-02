@@ -19,7 +19,7 @@ import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.qrcode.QRCodeViewModel
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
-import mega.privacy.android.app.presentation.qrcode.model.ScanResult
+import mega.privacy.android.app.presentation.qrcode.model.BarcodeScanResult
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -312,9 +312,9 @@ class QRCodeViewModelTest {
         }
 
     @Test
-    fun `test that scanCancel is set to triggered when ScanResult Cancel is returned from scanCode`() =
+    fun `test that scanCancel is set to triggered when BarcodeScanResult Cancelled is returned from scanCode`() =
         runTest {
-            whenever(scannerHandler.scan()).thenReturn(ScanResult.Cancel)
+            whenever(scannerHandler.scanBarcode()).thenReturn(BarcodeScanResult.Cancelled)
             underTest.scanCode(mock())
             underTest.uiState.test {
                 val result = awaitItem()

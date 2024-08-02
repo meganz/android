@@ -21,7 +21,7 @@ import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
 import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
-import mega.privacy.android.app.presentation.qrcode.model.ScanResult
+import mega.privacy.android.app.presentation.qrcode.model.BarcodeScanResult
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.service.scanner.BarcodeScannerModuleIsNotInstalled
@@ -268,10 +268,10 @@ class QRCodeViewModel @Inject constructor(
      */
     fun scanCode(context: Context) {
         viewModelScope.launch {
-            runCatching { scannerHandler.scan() }
+            runCatching { scannerHandler.scanBarcode() }
                 .onSuccess { scanResult ->
                     when (scanResult) {
-                        is ScanResult.Success -> {
+                        is BarcodeScanResult.Success -> {
                             val contactLink = scanResult.rawValue
                             contactLink?.let {
                                 val s = contactLink.split("C!").toTypedArray()
@@ -283,7 +283,7 @@ class QRCodeViewModel @Inject constructor(
                             }
                         }
 
-                        ScanResult.Cancel -> {
+                        BarcodeScanResult.Cancelled -> {
                             _uiState.update { it.copy(scanCancel = triggered) }
                         }
                     }
