@@ -65,12 +65,12 @@ class LeftMeetingActivity : BaseActivity() {
     private fun collectFlows() {
         collectFlow(viewModel.state.map { it.callEndedDueToTooManyParticipants }
             .distinctUntilChanged()) { showSnackbar ->
-            Util.showSnackbar(
-                this,
-                getString(R.string.call_error_too_many_participants)
-            )
             if (showSnackbar) {
                 viewModel.onConsumeShowParticipantsLimitSnackbarEvent()
+                Util.showSnackbar(
+                    this,
+                    getString(R.string.call_error_too_many_participants)
+                )
             }
         }
     }

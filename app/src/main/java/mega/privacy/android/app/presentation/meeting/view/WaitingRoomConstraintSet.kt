@@ -33,7 +33,7 @@ fun createWaitingRoomConstraintSet(
     val guestGuideline = if (isLandscape) {
         timestampText.bottom
     } else {
-        createGuidelineFromBottom(0.4f)
+        createGuidelineFromBottom(0.44f)
     }
 
     constrain(closeButton) {

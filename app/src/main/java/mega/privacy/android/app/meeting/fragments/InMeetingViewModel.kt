@@ -944,7 +944,7 @@ class InMeetingViewModel @Inject constructor(
                         R.string.meeting_call_screen_one_participant_joined_call
                     else
                         R.string.meeting_call_screen_one_participant_left_call,
-                    getParticipantFullName(list[0])
+                    getParticipantName(list.first())
                 )
             }
 
@@ -954,7 +954,7 @@ class InMeetingViewModel @Inject constructor(
                         R.string.meeting_call_screen_two_participants_joined_call
                     else
                         R.string.meeting_call_screen_two_participants_left_call,
-                    getParticipantFullName(list[0]), getParticipantFullName(list[1])
+                    getParticipantName(list.first()), getParticipantName(list.last())
                 )
             }
 
@@ -963,14 +963,12 @@ class InMeetingViewModel @Inject constructor(
                     if (type == TYPE_JOIN) R.plurals.meeting_call_screen_more_than_two_participants_joined_call
                     else
                         R.plurals.meeting_call_screen_more_than_two_participants_left_call,
-                    numParticipants,
-                    getParticipantFullName(list[0]),
-                    (numParticipants - 1)
+                    numParticipants, getParticipantName(list.first()), (numParticipants - 1)
                 )
             }
         }
 
-        _getParticipantsChanges.value = Pair(type, action)
+        _getParticipantsChanges.value = Pair(first = type, second = action)
     }
 
     /**
@@ -1401,7 +1399,7 @@ class InMeetingViewModel @Inject constructor(
      * @param peerId User handle of a participant
      * @return The name of a participant
      */
-    fun getParticipantFullName(peerId: Long): String =
+    fun getParticipantFullName(peerId: Long): String? =
         CallUtil.getUserNameCall(MegaApplication.getInstance().applicationContext, peerId)
 
     /**
@@ -1421,8 +1419,9 @@ class InMeetingViewModel @Inject constructor(
                 return@map when {
                     participant.peerId == peerId && typeChange == NAME_CHANGE -> {
                         listWithChanges.add(participant)
+                        val newName = getParticipantFullName(peerId)
                         participant.copy(
-                            name = getParticipantFullName(peerId),
+                            name = newName ?: participant.name,
                             avatar = getAvatarBitmap(peerId)
                         )
                     }
