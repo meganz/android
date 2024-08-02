@@ -481,13 +481,4 @@ class FavouritesViewModelTest {
             assertThat(actual).isEqualTo(expectedContentUri)
             verify(getNodeContentUriUseCase).invoke(mockTypedFileNode)
         }
-
-    @Test
-    fun `test that GetNodeContentUriUseCase returns null when an exception is thrown`() =
-        runTest {
-            val mockTypedFileNode = mock<TypedFileNode>()
-            whenever(getNodeContentUriUseCase(any())).thenThrow(NullPointerException())
-            val actual = underTest.getNodeContentUri(mockTypedFileNode)
-            assertThat(actual).isNull()
-        }
 }

@@ -410,10 +410,6 @@ class FavouritesViewModel @Inject constructor(
         null
     }.getOrNull()
 
-    internal suspend fun getNodeContentUri(fileNode: TypedFileNode) = runCatching {
+    internal suspend fun getNodeContentUri(fileNode: TypedFileNode) =
         getNodeContentUriUseCase(fileNode)
-    }.recover {
-        Timber.e(it)
-        null
-    }.getOrNull()
 }

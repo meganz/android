@@ -75,6 +75,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -376,8 +377,8 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         val fileTypeInfo = viewModel.getFileTypeInfo(favourite.typedNode.name) ?: return
         if (fileTypeInfo is VideoFileTypeInfo || fileTypeInfo is AudioFileTypeInfo) {
             viewLifecycleOwner.lifecycleScope.launch {
-                val contentUri = viewModel.getNodeContentUri(favourite.typedNode) ?: return@launch
                 runCatching {
+                    val contentUri = viewModel.getNodeContentUri(favourite.typedNode)
                     megaNavigator.openMediaPlayerActivityByFileNode(
                         context = requireContext(),
                         contentUri = contentUri,
@@ -386,6 +387,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                         isMediaQueueAvailable = false
                     )
                 }.onFailure {
+                    Timber.e(it)
                     Snackbar.make(
                         requireView(),
                         getString(R.string.intent_not_available),

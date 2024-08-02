@@ -417,10 +417,4 @@ class FileLinkViewModelTest {
         whenever(getFileLinkNodeContentUriUseCase(anyOrNull())).thenReturn(expectedNodeContentUri)
         assertThat(underTest.getNodeContentUri()).isEqualTo(expectedNodeContentUri)
     }
-
-    @Test
-    fun `test that getNodeContentUri returns null if throw an exception`() = runTest {
-        whenever(getFileLinkNodeContentUriUseCase(anyOrNull())).thenThrow(IllegalStateException())
-        assertThat(underTest.getNodeContentUri()).isEqualTo(null)
-    }
 }

@@ -414,10 +414,5 @@ class FileLinkViewModel @Inject constructor(
      */
     fun resetForeignNodeError() = _state.update { it.copy(foreignNodeError = consumed) }
 
-    internal suspend fun getNodeContentUri() = runCatching {
-        getFileLinkNodeContentUriUseCase(_state.value.url)
-    }.recover {
-        Timber.e(it)
-        null
-    }.getOrNull()
+    internal suspend fun getNodeContentUri() = getFileLinkNodeContentUriUseCase(_state.value.url)
 }

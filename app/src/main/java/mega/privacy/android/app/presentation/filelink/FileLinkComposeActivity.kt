@@ -310,9 +310,8 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                 nameType.isVideoMimeType || nameType.isAudio -> {
                     lifecycleScope.launch {
                         if (fileNode is TypedFileNode) {
-                            val contentUri = viewModel.getNodeContentUri()
-                                ?: return@launch
                             runCatching {
+                                val contentUri = viewModel.getNodeContentUri()
                                 megaNavigator.openMediaPlayerActivityByFileNode(
                                     context = this@FileLinkComposeActivity,
                                     contentUri = contentUri,

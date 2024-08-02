@@ -360,7 +360,7 @@ class RecentActionBucketFragment : Fragment() {
     private fun openAudioVideo(node: MegaNode) {
         viewLifecycleOwner.lifecycleScope.launch {
             runCatching {
-                val contentUri = viewModel.getNodeContentUri(node.handle) ?: return@launch
+                val contentUri = viewModel.getNodeContentUri(node.handle)
                 megaNavigator.openMediaPlayerActivity(
                     context = requireContext(),
                     contentUri = contentUri,
