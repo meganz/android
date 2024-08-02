@@ -11,8 +11,8 @@ import android.content.Context;
 import android.content.Intent;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.logging.LegacyLoggingSettings;
 import mega.privacy.android.app.presentation.login.LoginActivity;
+import mega.privacy.android.domain.usecase.ResetSdkLoggerUseCase;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
@@ -20,11 +20,11 @@ import nz.mega.sdk.MegaChatRequest;
 public class ChatLogoutListener extends ChatBaseListener {
 
     private String accountBlockedString;
-    private LegacyLoggingSettings loggingSettings;
+    private ResetSdkLoggerUseCase resetSdkLoggerUseCase;
 
-    public ChatLogoutListener(Context context, LegacyLoggingSettings loggingSettings) {
+    public ChatLogoutListener(Context context, ResetSdkLoggerUseCase resetSdkLoggerUseCase) {
         super(context);
-        this.loggingSettings = loggingSettings;
+        this.resetSdkLoggerUseCase = resetSdkLoggerUseCase;
     }
 
     /**
@@ -34,11 +34,11 @@ public class ChatLogoutListener extends ChatBaseListener {
      * @param context              current Context
      * @param accountBlockedString text to show in the warning
      */
-    public ChatLogoutListener(Context context, String accountBlockedString, LegacyLoggingSettings loggingSettings) {
+    public ChatLogoutListener(Context context, String accountBlockedString, ResetSdkLoggerUseCase resetSdkLoggerUseCase) {
         super(context);
 
         this.accountBlockedString = accountBlockedString;
-        this.loggingSettings = loggingSettings;
+        this.resetSdkLoggerUseCase = resetSdkLoggerUseCase;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ChatLogoutListener extends ChatBaseListener {
 
         // Code for LoginFragment
         MegaApplication.getInstance().disableMegaChatApi();
-        loggingSettings.resetLoggerSDK();
+        resetSdkLoggerUseCase.invoke();
 
         if (!isTextEmpty(accountBlockedString)) {
             if (context instanceof LoginActivity) {

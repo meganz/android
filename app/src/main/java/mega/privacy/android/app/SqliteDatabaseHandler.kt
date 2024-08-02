@@ -11,7 +11,6 @@ import androidx.sqlite.db.SupportSQLiteOpenHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
@@ -47,7 +46,6 @@ import javax.inject.Inject
 class SqliteDatabaseHandler @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val crashReporter: CrashReporter,
-    private val legacyLoggingSettings: LegacyLoggingSettings,
     private val storageStateMapper: StorageStateMapper,
     private val storageStateIntMapper: StorageStateIntMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
@@ -590,18 +588,6 @@ class SqliteDatabaseHandler @Inject constructor(
                             )
                         )
                     )
-                    if (!legacyLoggingSettings.areSDKLogsEnabled() && cursor.getColumnIndex(
-                            KEY_FILE_LOGGER_SDK
-                        ) != Constants.INVALID_VALUE
-                    ) {
-                        val fileLoggerSDK =
-                            decrypt(cursor.getString(getColumnIndex(cursor, KEY_FILE_LOGGER_SDK)))
-                        legacyLoggingSettings.updateSDKLogs(
-                            java.lang.Boolean.parseBoolean(
-                                fileLoggerSDK
-                            )
-                        )
-                    }
                     val accountDetailsTimeStamp = decrypt(
                         cursor.getString(
                             getColumnIndex(
@@ -620,24 +606,6 @@ class SqliteDatabaseHandler @Inject constructor(
                     )
                     val invalidateSdkCache =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_INVALIDATE_SDK_CACHE)))
-                    if (!legacyLoggingSettings.areKarereLogsEnabled() && cursor.getColumnIndex(
-                            KEY_FILE_LOGGER_KARERE
-                        ) != Constants.INVALID_VALUE
-                    ) {
-                        val fileLoggerKarere = decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    KEY_FILE_LOGGER_KARERE
-                                )
-                            )
-                        )
-                        legacyLoggingSettings.updateKarereLogs(
-                            java.lang.Boolean.parseBoolean(
-                                fileLoggerKarere
-                            )
-                        )
-                    }
                     val useHttpsOnly =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_USE_HTTPS_ONLY)))
                     val showCopyright =
@@ -1986,8 +1954,6 @@ class SqliteDatabaseHandler @Inject constructor(
         const val KEY_PREFERRED_SORT_CLOUD = "preferredsortcloud"
         const val KEY_PREFERRED_SORT_CAMERA_UPLOAD = "preferredsortcameraupload"
         const val KEY_PREFERRED_SORT_OTHERS = "preferredsortothers"
-        const val KEY_FILE_LOGGER_SDK = "filelogger"
-        const val KEY_FILE_LOGGER_KARERE = "fileloggerkarere"
         const val KEY_USE_HTTPS_ONLY = "usehttpsonly"
         const val KEY_SHOW_COPYRIGHT = "showcopyright"
         const val KEY_SHOW_NOTIF_OFF = "shownotifoff"

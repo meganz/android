@@ -23,8 +23,6 @@ object SettingsConstants {
     const val KEY_COOKIE_SETTINGS = "settings_cookie"
     const val KEY_ABOUT_TOS = "settings_about_terms_of_service"
     const val KEY_ABOUT_CODE_LINK = "settings_about_code_link"
-    const val KEY_ABOUT_SDK_VERSION = "settings_about_sdk_version"
-    const val KEY_ABOUT_KARERE_VERSION = "settings_about_karere_version"
     const val KEY_ABOUT_APP_VERSION = "settings_about_app_version"
     const val KEY_CANCEL_ACCOUNT = "settings_about_cancel_account"
     const val KEY_AUDIO_BACKGROUND_PLAY_ENABLED = "settings_audio_background_play_enabled"

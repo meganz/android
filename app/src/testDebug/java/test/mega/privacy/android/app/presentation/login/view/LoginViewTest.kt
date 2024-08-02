@@ -46,8 +46,6 @@ class LoginViewTest {
                 on2FAChanged = {},
                 onLostAuthenticatorDevice = {},
                 onBackPressed = {},
-                onUpdateKarereLogs = {},
-                onUpdateSdkLogs = {},
                 onFirstTime2FAConsumed = {},
                 onReportIssue = {},
             )

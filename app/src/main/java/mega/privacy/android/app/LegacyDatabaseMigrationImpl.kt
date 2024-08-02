@@ -4,7 +4,6 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.TextUtil
@@ -24,7 +23,6 @@ import javax.inject.Inject
 class LegacyDatabaseMigrationImpl @Inject constructor(
     private val storageStateMapper: StorageStateMapper,
     private val storageStateIntMapper: StorageStateIntMapper,
-    private val legacyLoggingSettings: LegacyLoggingSettings,
 ) : LegacyDatabaseMigration {
     override fun onCreate(db: SupportSQLiteDatabase) {
         Timber.d("onCreate")
@@ -1085,25 +1083,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                             )
                         )
                     )
-                    if (!legacyLoggingSettings.areSDKLogsEnabled() && cursor.getColumnIndex(
-                            SqliteDatabaseHandler.KEY_FILE_LOGGER_SDK
-                        ) != Constants.INVALID_VALUE
-                    ) {
-                        val fileLoggerSDK =
-                            SqliteDatabaseHandler.decrypt(
-                                cursor.getString(
-                                    getColumnIndex(
-                                        cursor,
-                                        SqliteDatabaseHandler.KEY_FILE_LOGGER_SDK
-                                    )
-                                )
-                            )
-                        legacyLoggingSettings.updateSDKLogs(
-                            java.lang.Boolean.parseBoolean(
-                                fileLoggerSDK
-                            )
-                        )
-                    }
                     val accountDetailsTimeStamp = SqliteDatabaseHandler.decrypt(
                         cursor.getString(
                             getColumnIndex(
@@ -1129,24 +1108,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                                 )
                             )
                         )
-                    if (!legacyLoggingSettings.areKarereLogsEnabled() && cursor.getColumnIndex(
-                            SqliteDatabaseHandler.KEY_FILE_LOGGER_KARERE
-                        ) != Constants.INVALID_VALUE
-                    ) {
-                        val fileLoggerKarere = SqliteDatabaseHandler.decrypt(
-                            cursor.getString(
-                                getColumnIndex(
-                                    cursor,
-                                    SqliteDatabaseHandler.KEY_FILE_LOGGER_KARERE
-                                )
-                            )
-                        )
-                        legacyLoggingSettings.updateKarereLogs(
-                            java.lang.Boolean.parseBoolean(
-                                fileLoggerKarere
-                            )
-                        )
-                    }
                     val useHttpsOnly =
                         SqliteDatabaseHandler.decrypt(
                             cursor.getString(

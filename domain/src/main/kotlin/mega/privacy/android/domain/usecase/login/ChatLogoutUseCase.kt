@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.login
 
 import mega.privacy.android.domain.repository.security.LoginRepository
-import mega.privacy.android.domain.usecase.ResetSdkLogger
+import mega.privacy.android.domain.usecase.ResetSdkLoggerUseCase
 import javax.inject.Inject
 
 /**
@@ -9,7 +9,7 @@ import javax.inject.Inject
  */
 class ChatLogoutUseCase @Inject constructor(
     private val loginRepository: LoginRepository,
-    private val resetSdkLogger: ResetSdkLogger,
+    private val resetSdkLoggerUseCase: ResetSdkLoggerUseCase,
 ) {
 
     /**
@@ -21,7 +21,7 @@ class ChatLogoutUseCase @Inject constructor(
         runCatching { loginRepository.chatLogout() }
             .onSuccess {
                 disableChatApiUseCase?.invoke()
-                resetSdkLogger()
+                resetSdkLoggerUseCase()
             }
     }
 }

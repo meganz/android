@@ -24,13 +24,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueUiState
+import mega.privacy.android.legacy.core.ui.controls.controlssliders.LabelledSwitch
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ProgressDialog
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
-import mega.privacy.android.legacy.core.ui.controls.controlssliders.LabelledSwitch
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.ProgressDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 fun ReportIssueView(
@@ -89,16 +89,14 @@ private fun ReportIssueBody(
                 .padding(horizontal = 16.dp)
                 .defaultMinSize(minHeight = 150.dp)
         )
-        if (uiState.includeLogsVisible) {
-            LabelledSwitch(
-                label = stringResource(id = R.string.settings_help_report_issue_attach_logs_label),
-                checked = uiState.includeLogs,
-                onCheckChanged = onIncludeLogsChanged,
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-            )
-        }
+        LabelledSwitch(
+            label = stringResource(id = R.string.settings_help_report_issue_attach_logs_label),
+            checked = uiState.includeLogs,
+            onCheckChanged = onIncludeLogsChanged,
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+        )
     }
 }
 
@@ -132,7 +130,6 @@ fun PreviewReportIssueView() {
                     description = "",
                     includeLogs = checkedState,
                     canSubmit = true,
-                    includeLogsVisible = true,
                     error = R.string.settings_help_report_issue_error,
                 ),
                 onIncludeLogsChanged = { checkedState = !checkedState },

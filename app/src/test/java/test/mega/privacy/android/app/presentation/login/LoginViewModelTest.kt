@@ -14,7 +14,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetails
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.login.LoginViewModel
@@ -80,7 +79,6 @@ internal class LoginViewModelTest {
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase =
         mock { onBlocking { invoke(any()) }.thenReturn(false) }
-    private val loggingSettings: LegacyLoggingSettings = mock()
     private val resetChatSettingsUseCase: ResetChatSettingsUseCase = mock()
     private val saveAccountCredentialsUseCase: SaveAccountCredentialsUseCase = mock()
     private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase = mock()
@@ -120,7 +118,6 @@ internal class LoginViewModelTest {
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            loggingSettings = loggingSettings,
             resetChatSettingsUseCase = resetChatSettingsUseCase,
             saveAccountCredentialsUseCase = saveAccountCredentialsUseCase,
             getAccountCredentialsUseCase = getAccountCredentialsUseCase,

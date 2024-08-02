@@ -39,9 +39,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_2FA
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_APP_VERSION
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_CODE_LINK
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_COOKIE_POLICY
-import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_KARERE_VERSION
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_PRIVACY_POLICY
-import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_SDK_VERSION
 import mega.privacy.android.app.constants.SettingsConstants.KEY_ABOUT_TOS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_BACKGROUND_PLAY_ENABLED
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CANCEL_ACCOUNT
@@ -65,7 +63,6 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_FILE_MAN
 import mega.privacy.android.app.constants.SettingsConstants.KEY_SUB_FOLDER_MEDIA_DISCOVERY
 import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
 import mega.privacy.android.app.di.settings.ViewModelPreferenceDataStoreFactory
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.hideKeyboard
 import mega.privacy.android.app.presentation.settings.calls.SettingsCallsActivity
@@ -77,7 +74,6 @@ import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAu
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncActivity
 import javax.inject.Inject
 
@@ -91,14 +87,9 @@ class SettingsFragment :
     lateinit var additionalPreferences: Set<@JvmSuppressWildcards PreferenceResource>
 
     @Inject
-    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
-
-    @Inject
     lateinit var viewModelPreferenceDataStoreFactory: ViewModelPreferenceDataStoreFactory
 
-    private var numberOfClicksKarere = 0
     private var numberOfClicksAppVersion = 0
-    private var numberOfClicksSDK = 0
 
     private val viewModel: SettingsViewModel by viewModels()
 
@@ -375,20 +366,6 @@ class SettingsFragment :
                 }
             }
 
-            KEY_ABOUT_SDK_VERSION -> {
-                if (++numberOfClicksSDK == 5) {
-                    numberOfClicksSDK = 0
-                    toggleLogger()
-                }
-            }
-
-            KEY_ABOUT_KARERE_VERSION -> {
-                if (++numberOfClicksKarere == 5) {
-                    numberOfClicksKarere = 0
-                    toggleChatLogger()
-                }
-            }
-
             KEY_CANCEL_ACCOUNT -> deleteAccountClicked()
             KEY_ABOUT_COOKIE_POLICY -> {
                 if (cookiePolicyLink == null) {
@@ -466,61 +443,6 @@ class SettingsFragment :
         return super.onPreferenceTreeClick(preference)
     }
 
-    private fun toggleLogger() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (!getFeatureFlagUseCase(AppFeatures.PermanentLogging)) {
-                if (viewModel.disableLogger()) {
-                    view?.let {
-                        Snackbar.make(it, R.string.settings_disable_logs, Snackbar.LENGTH_SHORT)
-                            .show()
-                    }
-                } else {
-                    showConfirmationEnableLogs(this@SettingsFragment::enableSdkLogger)
-                }
-            }
-        }
-    }
-
-    private fun enableSdkLogger() {
-        viewModel.enableLogger()
-        view?.let {
-            Snackbar.make(it, R.string.settings_enable_logs, Snackbar.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun toggleChatLogger() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (!getFeatureFlagUseCase(AppFeatures.PermanentLogging)) {
-                if (viewModel.disableChatLogger()) {
-                    view?.let {
-                        Snackbar.make(it, R.string.settings_disable_logs, Snackbar.LENGTH_SHORT)
-                            .show()
-                    }
-                } else {
-                    showConfirmationEnableLogs(this@SettingsFragment::enableChatLogger)
-                }
-            }
-        }
-    }
-
-    private fun enableChatLogger() {
-        viewModel.enableChatLogger()
-        view?.let {
-            Snackbar.make(it, R.string.settings_enable_logs, Snackbar.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun showConfirmationEnableLogs(enableFunction: () -> Unit) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setMessage(R.string.enable_log_text_dialog)
-            .setPositiveButton(R.string.general_enable) { _, _ ->
-                enableFunction()
-            }
-            .setNegativeButton(R.string.general_cancel, null)
-            .show()
-            .setCanceledOnTouchOutside(false)
-    }
-
     private fun showEvaluatedAppDialog() {
         FeedBackDialog.newInstance(
             viewModel.uiState.value.email,
@@ -586,12 +508,6 @@ class SettingsFragment :
     private fun resetCounters(key: String?) {
         if (key != KEY_ABOUT_APP_VERSION) {
             numberOfClicksAppVersion = 0
-        }
-        if (key != KEY_ABOUT_SDK_VERSION) {
-            numberOfClicksSDK = 0
-        }
-        if (key != KEY_ABOUT_KARERE_VERSION) {
-            numberOfClicksKarere = 0
         }
     }
 

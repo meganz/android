@@ -6,12 +6,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
-import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.PutPreference
-import mega.privacy.android.domain.usecase.SetChatLogsEnabled
-import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 
 /**
  * Settings module
@@ -27,14 +24,6 @@ abstract class SettingsModule {
         @Provides
         @ElementsIntoSet
         fun providePreferenceResourceSet(): Set<@JvmSuppressWildcards PreferenceResource> = setOf()
-
-        @Provides
-        fun provideSetSdkLogsEnabled(repository: LoggingRepository): SetSdkLogsEnabled =
-            SetSdkLogsEnabled(repository::setSdkLoggingEnabled)
-
-        @Provides
-        fun provideSetChatLogsEnabled(repository: LoggingRepository): SetChatLogsEnabled =
-            SetChatLogsEnabled(repository::setChatLoggingEnabled)
 
         @Provides
         fun providePutStringPreference(settingsRepository: SettingsRepository): PutPreference<String> =

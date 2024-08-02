@@ -30,7 +30,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -100,8 +99,6 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSe
  * @param on2FAChanged              Action when a 2FA code was pasted.
  * @param onLostAuthenticatorDevice Action when Lost authenticator device is pressed.
  * @param onBackPressed             Action when back is pressed.
- * @param onUpdateKarereLogs        Action when needs to update MegaChat logs.
- * @param onUpdateSdkLogs           Action when needs to update Sdk logs.
  * @param onFirstTime2FAConsumed    Action when the 2FA is shown for the first time.
  * @param modifier                  [Modifier]
  */
@@ -119,8 +116,6 @@ fun LoginView(
     on2FAChanged: (String) -> Unit,
     onLostAuthenticatorDevice: () -> Unit,
     onBackPressed: () -> Unit,
-    onUpdateKarereLogs: () -> Unit,
-    onUpdateSdkLogs: () -> Unit,
     onFirstTime2FAConsumed: () -> Unit,
     onReportIssue: () -> Unit,
     modifier: Modifier = Modifier,
@@ -161,8 +156,6 @@ fun LoginView(
                     onForgotPassword = onForgotPassword,
                     onCreateAccount = onCreateAccount,
                     paddingValues = paddingValues,
-                    onUpdateKarereLogs = onUpdateKarereLogs,
-                    onUpdateSdkLogs = onUpdateSdkLogs,
                     onChangeApiServer = { showChangeApiServerDialog = true },
                     onReportIssue = onReportIssue,
                     modifier = modifier,
@@ -210,8 +203,6 @@ private fun RequireLogin(
     onForgotPassword: () -> Unit,
     onCreateAccount: () -> Unit,
     paddingValues: PaddingValues,
-    onUpdateKarereLogs: () -> Unit,
-    onUpdateSdkLogs: () -> Unit,
     onChangeApiServer: () -> Unit,
     onReportIssue: () -> Unit,
     modifier: Modifier = Modifier,
@@ -225,8 +216,6 @@ private fun RequireLogin(
     ) {
         val emailFocusRequester = remember { FocusRequester() }
         val passwordFocusRequester = remember { FocusRequester() }
-        var pendingClicksKarere by remember { mutableIntStateOf(CLICKS_TO_ENABLE_LOGS) }
-        var pendingClicksSDK by remember { mutableIntStateOf(CLICKS_TO_ENABLE_LOGS) }
         val focusManager = LocalFocusManager.current
 
         Text(
@@ -239,13 +228,6 @@ private fun RequireLogin(
                         val upTime = System.currentTimeMillis()
                         if (upTime - downTime >= LONG_PRESS_DELAY) {
                             onChangeApiServer()
-                        } else {
-                            pendingClicksKarere = if (pendingClicksKarere == 1) {
-                                onUpdateKarereLogs()
-                                CLICKS_TO_ENABLE_LOGS
-                            } else {
-                                pendingClicksKarere - 1
-                            }
                         }
                     })
                 }
@@ -368,14 +350,6 @@ private fun RequireLogin(
             Text(
                 modifier = Modifier
                     .padding(start = 22.dp, top = 18.dp)
-                    .clickable {
-                        pendingClicksSDK = if (pendingClicksSDK == 1) {
-                            onUpdateSdkLogs()
-                            CLICKS_TO_ENABLE_LOGS
-                        } else {
-                            pendingClicksSDK - 1
-                        }
-                    }
                     .testTag(NEW_TO_MEGA_TAG),
                 text = stringResource(id = R.string.new_to_mega),
                 style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorPrimary),
@@ -573,8 +547,6 @@ private fun PreviewEmptyLoginView() {
             onForgotPassword = {},
             onCreateAccount = {},
             paddingValues = PaddingValues(),
-            onUpdateKarereLogs = {},
-            onUpdateSdkLogs = {},
             onChangeApiServer = {},
             onReportIssue = {},
         )
@@ -600,8 +572,6 @@ private fun PreviewLoginView(
             on2FAChanged = {},
             onLostAuthenticatorDevice = {},
             onBackPressed = {},
-            onUpdateKarereLogs = {},
-            onUpdateSdkLogs = {},
             onFirstTime2FAConsumed = {},
             onReportIssue = {},
         )
@@ -685,5 +655,4 @@ internal const val INVALID_CODE_TAG =
 internal const val LOST_AUTHENTICATION_CODE_TAG =
     "two_factor_authentication:text_mega_button_lost_authentication_code"
 
-internal const val CLICKS_TO_ENABLE_LOGS = 5
 private const val LONG_PRESS_DELAY = 5000L

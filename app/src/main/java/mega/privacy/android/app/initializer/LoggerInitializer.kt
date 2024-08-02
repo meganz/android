@@ -8,12 +8,9 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.usecase.EnableLogAllToConsole
-import mega.privacy.android.domain.usecase.InitialiseLogging
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.InitialiseLoggingUseCase
 
 /**
  * Logger initializer
@@ -31,24 +28,13 @@ class LoggerInitializer : Initializer<Unit> {
          * Initialise logging
          *
          */
-        fun initialiseLogging(): InitialiseLogging
-
-        /**
-         * Mega chat api android
-         */
-        fun loggingRepository(): LoggingRepository
+        fun initialiseLogging(): InitialiseLoggingUseCase
 
         /**
          * Enable log all to console
          *
          */
         fun enableLogAllToConsole(): EnableLogAllToConsole
-
-        /**
-         * Get feature flag value
-         *
-         */
-        fun getFeatureFlagValue(): GetFeatureFlagValueUseCase
 
         /**
          * App scope
@@ -68,9 +54,7 @@ class LoggerInitializer : Initializer<Unit> {
 
         entryPoint.enableLogAllToConsole().invoke()
         entryPoint.appScope().launch {
-            val permanentEnabled =
-                entryPoint.getFeatureFlagValue().invoke(AppFeatures.PermanentLogging)
-            entryPoint.initialiseLogging().invoke(permanentEnabled)
+            entryPoint.initialiseLogging().invoke()
         }
     }
 

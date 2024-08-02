@@ -81,7 +81,7 @@ class ReportIssueViewTest {
     fun test_that_toggle_is_displayed_if_include_logs_visible_is_true() {
         composeTestRule.setContent {
             ReportIssueView(
-                uiState = ReportIssueUiState(includeLogsVisible = true),
+                uiState = ReportIssueUiState(),
             )
         }
 
@@ -89,23 +89,12 @@ class ReportIssueViewTest {
             .assertExists()
     }
 
-    @Test
-    fun test_that_toggle_is_hidden_if_include_logs_visible_is_false() {
-        composeTestRule.setContent {
-            ReportIssueView(
-                uiState = ReportIssueUiState(includeLogsVisible = false),
-            )
-        }
-
-        composeTestRule.onNodeWithText(fromId(R.string.settings_help_report_issue_attach_logs_label))
-            .assertDoesNotExist()
-    }
 
     @Test
     fun test_that_toggle_is_checked_if_include_logs_is_set_to_true() {
         composeTestRule.setContent {
             ReportIssueView(
-                uiState = ReportIssueUiState(includeLogsVisible = true, includeLogs = true),
+                uiState = ReportIssueUiState(includeLogs = true),
             )
         }
 
@@ -117,7 +106,7 @@ class ReportIssueViewTest {
     fun test_that_toggle_is_not_checked_if_include_logs_is_set_to_false() {
         composeTestRule.setContent {
             ReportIssueView(
-                uiState = ReportIssueUiState(includeLogsVisible = true, includeLogs = false),
+                uiState = ReportIssueUiState( includeLogs = false),
             )
         }
 
@@ -130,7 +119,7 @@ class ReportIssueViewTest {
         val onIncludeLogsChanged = mock<(Boolean) -> Unit>()
         composeTestRule.setContent {
             ReportIssueView(
-                uiState = ReportIssueUiState(includeLogs = true, includeLogsVisible = true),
+                uiState = ReportIssueUiState(includeLogs = true, ),
                 onIncludeLogsChanged = onIncludeLogsChanged,
             )
         }
@@ -161,7 +150,6 @@ class ReportIssueViewTest {
             ReportIssueView(
                 uiState = ReportIssueUiState(
                     includeLogs = true,
-                    includeLogsVisible = true,
                     uploadProgress = 0.5f
                 ),
             )

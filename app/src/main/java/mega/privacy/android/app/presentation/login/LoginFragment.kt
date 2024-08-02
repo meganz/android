@@ -151,8 +151,6 @@ class LoginFragment : Fragment() {
                 on2FAChanged = viewModel::on2FAChanged,
                 onLostAuthenticatorDevice = ::onLostAuthenticationDevice,
                 onBackPressed = { onBackPressed(uiState) },
-                onUpdateKarereLogs = { viewModel.checkAndUpdateKarereLogs(requireActivity()) },
-                onUpdateSdkLogs = { viewModel.checkAndUpdateSDKLogs(requireActivity()) },
                 onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed,
                 onReportIssue = {
                     viewModel.onReportIssue(

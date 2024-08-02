@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
@@ -33,16 +32,12 @@ import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
-import mega.privacy.android.domain.usecase.SetChatLogsEnabled
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
-import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.logging.AreChatLogsEnabledUseCase
-import mega.privacy.android.domain.usecase.logging.AreSdkLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -60,8 +55,6 @@ class SettingsViewModel @Inject constructor(
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val canDeleteAccount: CanDeleteAccount,
     private val refreshPasscodeLockPreference: RefreshPasscodeLockPreference,
-    areSdkLogsEnabledUseCase: AreSdkLogsEnabledUseCase,
-    areChatLogsEnabledUseCase: AreChatLogsEnabledUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
@@ -76,8 +69,6 @@ class SettingsViewModel @Inject constructor(
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val requestAccountDeletion: RequestAccountDeletion,
     private val isChatLoggedIn: IsChatLoggedIn,
-    private val setSdkLogsEnabled: SetSdkLogsEnabled,
-    private val setChatLoggingEnabled: SetChatLogsEnabled,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorPasscodeLockPreferenceUseCase: MonitorPasscodeLockPreferenceUseCase,
     private val setSubFolderMediaDiscoveryEnabledUseCase: SetSubFolderMediaDiscoveryEnabledUseCase,
@@ -92,10 +83,6 @@ class SettingsViewModel @Inject constructor(
     val uiState: StateFlow<SettingsState> = state
     private val online =
         monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
-    private val sdkLogsEnabled =
-        areSdkLogsEnabledUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
-    private val chatLogsEnabled =
-        areChatLogsEnabledUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private var toggleBackgroundPlayJob: Job? = null
 
@@ -296,24 +283,6 @@ class SettingsViewModel @Inject constructor(
                 false
             }
         )
-
-    fun disableLogger() = if (sdkLogsEnabled.value) {
-        viewModelScope.launch { setSdkLogsEnabled(false) }
-        true
-    } else {
-        false
-    }
-
-    fun disableChatLogger() = if (chatLogsEnabled.value) {
-        viewModelScope.launch { setChatLoggingEnabled(false) }
-        true
-    } else {
-        false
-    }
-
-    fun enableLogger() = viewModelScope.launch { setSdkLogsEnabled(true) }
-
-    fun enableChatLogger() = viewModelScope.launch { setChatLoggingEnabled(true) }
 
     /**
      * Set hide recent activity setting

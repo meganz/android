@@ -365,14 +365,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
             .show()
     }
 
-    public override fun showConfirmationEnableLogsKarere() {
-        super.showConfirmationEnableLogsKarere()
-    }
-
-    public override fun showConfirmationEnableLogsSDK() {
-        super.showConfirmationEnableLogsSDK()
-    }
-
     /**
      * Sets the received string as temporal email.
      *

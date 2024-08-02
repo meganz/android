@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
@@ -17,16 +16,12 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.settings.reportissue.ReportIssueViewModel
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.usecase.GetSupportEmailUseCase
 import mega.privacy.android.domain.usecase.SubmitIssueUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.logging.AreChatLogsEnabledUseCase
-import mega.privacy.android.domain.usecase.logging.AreSdkLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -53,8 +48,6 @@ class ReportIssueViewModelTest {
     private lateinit var underTest: ReportIssueViewModel
 
     private val submitIssueUseCase = mock<SubmitIssueUseCase>()
-    private val areSdkLogsEnabledUseCase = mock<AreSdkLogsEnabledUseCase>()
-    private val areChatLogsEnabledUseCase = mock<AreChatLogsEnabledUseCase>()
 
     private var savedStateHandle = SavedStateHandle(mapOf())
 
@@ -63,21 +56,11 @@ class ReportIssueViewModelTest {
 
     private val supportEmail = "Support@Email.address"
     private val getSupportEmail = mock<GetSupportEmailUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeEach
     fun setUp() {
         monitorConnectivityUseCase.stub {
             on { invoke() } doReturn true.asHotFlow()
-        }
-        areSdkLogsEnabledUseCase.stub {
-            on { invoke() } doReturn false.asHotFlow()
-        }
-        areChatLogsEnabledUseCase.stub {
-            on { invoke() } doReturn false.asHotFlow()
-        }
-        getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.PermanentLogging) } doReturn false
         }
     }
 
@@ -85,12 +68,9 @@ class ReportIssueViewModelTest {
     private fun initViewModel() {
         underTest = ReportIssueViewModel(
             submitIssueUseCase = submitIssueUseCase,
-            areSdkLogsEnabledUseCase = areSdkLogsEnabledUseCase,
-            areChatLogsEnabledUseCase = areChatLogsEnabledUseCase,
             savedStateHandle = savedStateHandle,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getSupportEmailUseCase = getSupportEmail,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -99,11 +79,8 @@ class ReportIssueViewModelTest {
         savedStateHandle = SavedStateHandle(mapOf())
         reset(
             submitIssueUseCase,
-            areSdkLogsEnabledUseCase,
-            areChatLogsEnabledUseCase,
             monitorConnectivityUseCase,
             getSupportEmail,
-            getFeatureFlagValueUseCase,
         )
     }
 
@@ -113,7 +90,6 @@ class ReportIssueViewModelTest {
         underTest.uiState.test {
             val initial = awaitItem()
             assertThat(initial.description).isEmpty()
-            assertThat(initial.includeLogsVisible).isFalse()
             assertThat(initial.includeLogs).isFalse()
             assertThat(initial.canSubmit).isFalse()
         }
@@ -122,47 +98,18 @@ class ReportIssueViewModelTest {
     @Test
     fun `test that saved state values are returned`() = runTest {
         val expectedDescription = "A saved description"
-        savedStateHandle.set(underTest.descriptionKey, expectedDescription)
-        savedStateHandle.set(underTest.includeLogsVisibleKey, true)
-        savedStateHandle.set(underTest.includeLogsKey, true)
+        savedStateHandle.set(ReportIssueViewModel.descriptionKey, expectedDescription)
+        savedStateHandle.set(ReportIssueViewModel.includeLogsKey, true)
         initViewModel()
 
         underTest.uiState.filter {
             it.description == expectedDescription &&
-                    it.includeLogsVisible &&
                     it.includeLogs
         }.test {
             val latest = awaitItem()
             assertThat(latest.description).isEqualTo(expectedDescription)
-            assertThat(latest.includeLogsVisible).isTrue()
             assertThat(latest.includeLogs).isTrue()
         }
-    }
-
-    @Test
-    fun `test that when logging is enabled include logs toggle is shown`() = runTest {
-        whenever(areSdkLogsEnabledUseCase()).thenReturn(flowOf(true))
-        whenever(areChatLogsEnabledUseCase()).thenReturn(flowOf(true))
-
-        initViewModel()
-        underTest.uiState.map { it.includeLogsVisible }.distinctUntilChanged()
-            .test {
-                assertThat(awaitItem()).isFalse()
-                assertThat(awaitItem()).isTrue()
-            }
-    }
-
-    @Test
-    fun `test that include logs is set to true if logging is enabled`() = runTest {
-        whenever(areSdkLogsEnabledUseCase()).thenReturn(flowOf(true))
-        whenever(areChatLogsEnabledUseCase()).thenReturn(flowOf(true))
-
-        initViewModel()
-        underTest.uiState.map { it.includeLogs }.distinctUntilChanged()
-            .test {
-                assertThat(awaitItem()).isFalse()
-                assertThat(awaitItem()).isTrue()
-            }
     }
 
     @Test
@@ -174,22 +121,6 @@ class ReportIssueViewModelTest {
                 assertThat(awaitItem()).isEmpty()
                 underTest.setDescription(newDescription)
                 assertThat(awaitItem()).isEqualTo(newDescription)
-            }
-    }
-
-    @Test
-    fun `test that include logs is updated if new boolean is provided`() = runTest {
-        whenever(areSdkLogsEnabledUseCase()).thenReturn(flowOf(true))
-        whenever(areChatLogsEnabledUseCase()).thenReturn(flowOf(true))
-
-        initViewModel()
-
-        underTest.uiState.map { it.includeLogs }.distinctUntilChanged()
-            .test {
-                assertThat(awaitItem()).isFalse()
-                assertThat(awaitItem()).isTrue()
-                underTest.setIncludeLogsEnabled(false)
-                assertThat(awaitItem()).isFalse()
             }
     }
 
@@ -371,29 +302,6 @@ class ReportIssueViewModelTest {
             assertThat(awaitItem()).isTrue()
         }
     }
-
-    @Test
-    internal fun `test that permanent logging feature flag overrides logging enabled settings`() =
-        runTest {
-            getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(AppFeatures.PermanentLogging) } doReturn true
-            }
-
-            areSdkLogsEnabledUseCase.stub {
-                on { invoke() } doReturn flowOf(false)
-            }
-            areChatLogsEnabledUseCase.stub {
-                on { invoke() } doReturn flowOf(false)
-            }
-
-            initViewModel()
-
-            underTest.uiState.map { it.includeLogsVisible }.distinctUntilChanged()
-                .test {
-                    assertThat(awaitItem()).isFalse()
-                    assertThat(awaitItem()).isTrue()
-                }
-        }
 
     private fun getProgressFlow() = (0..100).map { Progress(it / 100f) }.asFlow()
 

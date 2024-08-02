@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.login
 
-import android.app.Activity
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,7 +22,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.getState
@@ -104,7 +102,6 @@ class LoginViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val loggingSettings: LegacyLoggingSettings,
     private val resetChatSettingsUseCase: ResetChatSettingsUseCase,
     private val saveAccountCredentialsUseCase: SaveAccountCredentialsUseCase,
     private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase,
@@ -377,36 +374,6 @@ class LoginViewModel @Inject constructor(
                 accountSession = saveAccountCredentialsUseCase(),
                 isAlreadyLoggedIn = true
             )
-        }
-    }
-
-    /**
-     * Enables Karere logs if not enabled. Disables them if already enabled.
-     *
-     * @param activity Required [Activity]
-     */
-    fun checkAndUpdateKarereLogs(activity: Activity) = viewModelScope.launch {
-        if (!getFeatureFlagValueUseCase(AppFeatures.PermanentLogging)) {
-            if (loggingSettings.areKarereLogsEnabled()) {
-                loggingSettings.setStatusLoggerKarere(activity, false)
-            } else {
-                (activity as LoginActivity).showConfirmationEnableLogsKarere()
-            }
-        }
-    }
-
-    /**
-     * Decrements the required value for enabling/disabling SDK logs.
-     *
-     * @param activity Required [Activity]
-     */
-    fun checkAndUpdateSDKLogs(activity: Activity) = viewModelScope.launch {
-        if (!getFeatureFlagValueUseCase(AppFeatures.PermanentLogging)) {
-            if (loggingSettings.areSDKLogsEnabled()) {
-                loggingSettings.setStatusLoggerSDK(activity, false)
-            } else {
-                (activity as LoginActivity).showConfirmationEnableLogsSDK()
-            }
         }
     }
 

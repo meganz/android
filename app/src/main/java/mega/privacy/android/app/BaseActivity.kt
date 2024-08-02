@@ -3,7 +3,6 @@ package mega.privacy.android.app
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
@@ -51,7 +50,6 @@ import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.ChatLogoutListener
-import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
@@ -103,7 +101,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.toAppInfo
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
-import mega.privacy.android.domain.entity.LogsType
 import mega.privacy.android.domain.entity.PurchaseType
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.account.AccountBlockedType
@@ -116,6 +113,7 @@ import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
+import mega.privacy.android.domain.usecase.ResetSdkLoggerUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
@@ -180,7 +178,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     lateinit var transfersManagement: TransfersManagement
 
     @Inject
-    lateinit var loggingSettings: LegacyLoggingSettings
+    lateinit var resetSdkLoggerUseCase: ResetSdkLoggerUseCase
 
     @JvmField
     var composite = CompositeDisposable()
@@ -1049,7 +1047,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                 ChatLogoutListener(
                     this,
                     getString(R.string.dialog_account_suspended_ToS_copyright_message),
-                    loggingSettings
+                    resetSdkLoggerUseCase
                 )
             )
 
@@ -1057,7 +1055,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                 ChatLogoutListener(
                     this,
                     getString(R.string.dialog_account_suspended_ToS_non_copyright_message),
-                    loggingSettings
+                    resetSdkLoggerUseCase
                 )
             )
 
@@ -1065,7 +1063,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                 ChatLogoutListener(
                     this,
                     getString(R.string.error_business_disabled),
-                    loggingSettings
+                    resetSdkLoggerUseCase
                 )
             )
 
@@ -1073,7 +1071,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                 ChatLogoutListener(
                     this,
                     getString(R.string.error_business_removed),
-                    loggingSettings
+                    resetSdkLoggerUseCase
                 )
             )
 
@@ -1109,41 +1107,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     protected fun setFinishActivityAtError(finishActivityAtError: Boolean) {
         this.finishActivityAtError = finishActivityAtError
-    }
-
-    /**
-     * Shows a dialog to confirm enable the SDK logs.
-     */
-    protected open fun showConfirmationEnableLogsSDK() {
-        showConfirmationEnableLogs(LogsType.SDK_LOGS)
-    }
-
-    /**
-     * Shows a dialog to confirm enable the Karere logs.
-     */
-    protected open fun showConfirmationEnableLogsKarere() {
-        showConfirmationEnableLogs(LogsType.MEGA_CHAT_LOGS)
-    }
-
-    /**
-     * Shows a dialog to confirm enable the SDK or Karere logs.
-     *
-     * @param logsType SDK_LOGS to confirm enable the SDK logs,
-     * KARERE_LOGS to confirm enable the Karere logs.
-     */
-    protected fun showConfirmationEnableLogs(logsType: LogsType?) {
-        MaterialAlertDialogBuilder(this)
-            .setMessage(R.string.enable_log_text_dialog)
-            .setPositiveButton(R.string.general_enable) { _: DialogInterface?, _: Int ->
-                when (logsType) {
-                    LogsType.SDK_LOGS -> loggingSettings.setStatusLoggerSDK(this, true)
-                    LogsType.MEGA_CHAT_LOGS -> loggingSettings.setStatusLoggerKarere(this, true)
-                    else -> {}
-                }
-            }
-            .setNegativeButton(R.string.general_cancel, null)
-            .show()
-            .setCanceledOnTouchOutside(false)
     }
 
     /**
@@ -1299,7 +1262,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
             if (state == MegaChatApi.INIT_ERROR) {
                 // The megaChatApi cannot be recovered, then logout
-                megaChatApi.logout(ChatLogoutListener(this, loggingSettings))
+                megaChatApi.logout(ChatLogoutListener(this, resetSdkLoggerUseCase))
                 return true
             }
         }

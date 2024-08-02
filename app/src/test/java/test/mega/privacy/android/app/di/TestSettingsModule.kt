@@ -25,14 +25,10 @@ import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetChatImageQuality
-import mega.privacy.android.domain.usecase.SetChatLogsEnabled
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
-import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.call.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.call.SetCallsSoundNotifications
-import mega.privacy.android.domain.usecase.logging.AreChatLogsEnabledUseCase
-import mega.privacy.android.domain.usecase.logging.AreSdkLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -72,14 +68,6 @@ object TestSettingsModule {
         mock()
 
     @Provides
-    fun provideIsLoggingEnabled(): AreSdkLogsEnabledUseCase =
-        mock { on { invoke() }.thenReturn(flowOf(true)) }
-
-    @Provides
-    fun provideIsChatLoggingEnabled(): AreChatLogsEnabledUseCase =
-        mock { on { invoke() }.thenReturn(flowOf(true)) }
-
-    @Provides
     fun provideIsMultiFactorAuthAvailable(): IsMultiFactorAuthAvailable =
         isMultiFactorAuthAvailable
 
@@ -108,12 +96,6 @@ object TestSettingsModule {
 
     @Provides
     fun provideIsChatLoggedIn(): IsChatLoggedIn = mock { on { invoke() }.thenReturn(flowOf(true)) }
-
-    @Provides
-    fun provideSetLoggingEnabled(): SetSdkLogsEnabled = mock()
-
-    @Provides
-    fun provideSetChatLoggingEnabled(): SetChatLogsEnabled = mock()
 
     @Provides
     fun provide(): MonitorAutoAcceptQRLinks = mock {

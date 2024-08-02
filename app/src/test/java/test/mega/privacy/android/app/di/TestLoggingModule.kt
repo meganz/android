@@ -12,8 +12,8 @@ import mega.privacy.android.domain.usecase.CreateLogEntry
 import mega.privacy.android.domain.usecase.CreateTraceString
 import mega.privacy.android.domain.usecase.EnableLogAllToConsole
 import mega.privacy.android.domain.usecase.GetCurrentTimeString
-import mega.privacy.android.domain.usecase.InitialiseLogging
-import mega.privacy.android.domain.usecase.ResetSdkLogger
+import mega.privacy.android.domain.usecase.InitialiseLoggingUseCase
+import mega.privacy.android.domain.usecase.ResetSdkLoggerUseCase
 import org.mockito.kotlin.mock
 
 @Module
@@ -39,10 +39,10 @@ object TestLoggingModule {
         mock()
 
     @Provides
-    fun provideResetSdkLogger(): ResetSdkLogger = mock()
+    fun provideResetSdkLogger(): ResetSdkLoggerUseCase = mock()
 
     @Provides
-    fun provideInitialiseLogging(): InitialiseLogging = mock()
+    fun provideInitialiseLogging(): InitialiseLoggingUseCase = mock()
 
     @Provides
     fun provideEnableLogAllToConsole(): EnableLogAllToConsole = mock()

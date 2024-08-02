@@ -78,7 +78,6 @@ import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.InAppUpdatePreferencesGateway
-import mega.privacy.android.data.gateway.preferences.LoggingPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.MediaPlayerPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.RequestPhoneNumberPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.SlideshowPreferencesGateway
@@ -96,7 +95,6 @@ import mega.privacy.android.data.preferences.CredentialsPreferencesDataStore
 import mega.privacy.android.data.preferences.EphemeralCredentialsDataStore
 import mega.privacy.android.data.preferences.FeatureFlagPreferencesDataStore
 import mega.privacy.android.data.preferences.InAppUpdatePreferencesDatastore
-import mega.privacy.android.data.preferences.LoggingPreferencesDataStore
 import mega.privacy.android.data.preferences.MediaPlayerPreferencesDatastore
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore
 import mega.privacy.android.data.preferences.SlideshowPreferencesDataStore
@@ -149,9 +147,6 @@ internal abstract class GatewayModule {
 
     @Binds
     abstract fun bindCallsPreferencesGateway(implementation: CallsPreferencesDataStore): CallsPreferencesGateway
-
-    @Binds
-    abstract fun bindLoggingPreferencesGateway(implementation: LoggingPreferencesDataStore): LoggingPreferencesGateway
 
     @Binds
     abstract fun bindAppPreferencesGateway(implementation: AppPreferencesDatastore): AppPreferencesGateway
