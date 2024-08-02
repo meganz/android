@@ -572,47 +572,35 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                         contactNodes[position].name
                     ).isAudio
                 ) {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        val megaNode = contactNodes[position]
-                        val contentUri =
-                            viewModel?.getNodeContentUri(megaNode.handle) ?: return@launch
-                        val localPath = FileUtil.getLocalFile(megaNode)
-                        if (localPath != null) {
-                            val file = File(localPath)
+                    viewModel?.let {
+                        viewLifecycleOwner.lifecycleScope.launch {
                             runCatching {
-                                megaNavigator.openMediaPlayerActivityByLocalFile(
-                                    context = requireContext(),
-                                    localFile = file,
-                                    handle = megaNode.handle,
-                                    parentId = megaNode.parentHandle,
-                                    viewType = CONTACT_FILE_ADAPTER,
-                                    sortOrder = orderGetChildren,
-                                )
+                                val megaNode = contactNodes[position]
+                                val contentUri = it.getNodeContentUri(megaNode.handle)
+                                val localPath = FileUtil.getLocalFile(megaNode)
+                                if (localPath != null) {
+                                    val file = File(localPath)
+                                    megaNavigator.openMediaPlayerActivityByLocalFile(
+                                        context = requireContext(),
+                                        localFile = file,
+                                        handle = megaNode.handle,
+                                        parentId = megaNode.parentHandle,
+                                        viewType = CONTACT_FILE_ADAPTER,
+                                        sortOrder = orderGetChildren,
+                                    )
+                                } else {
+                                    megaNavigator.openMediaPlayerActivity(
+                                        context = requireContext(),
+                                        contentUri = contentUri,
+                                        name = megaNode.name,
+                                        handle = megaNode.handle,
+                                        parentId = megaNode.parentHandle,
+                                        viewType = CONTACT_FILE_ADAPTER,
+                                        sortOrder = orderGetChildren
+                                    )
+                                }
                             }.onFailure { exception ->
                                 Timber.e(exception)
-                                (context as ContactFileListActivity).showSnackbar(
-                                    Constants.SNACKBAR_TYPE, context.resources.getString(
-                                        R.string.intent_not_available
-                                    )
-                                )
-                                adapter.notifyDataSetChanged()
-                                (context as ContactFileListActivity).downloadFile(
-                                    listOf(contactNodes[position])
-                                )
-                            }
-                        } else {
-                            runCatching {
-                                megaNavigator.openMediaPlayerActivity(
-                                    context = requireContext(),
-                                    contentUri = contentUri,
-                                    name = megaNode.name,
-                                    handle = megaNode.handle,
-                                    parentId = megaNode.parentHandle,
-                                    viewType = CONTACT_FILE_ADAPTER,
-                                    sortOrder = orderGetChildren
-                                )
-                            }.onFailure {
-                                Timber.e(it)
                                 (context as ContactFileListActivity).showSnackbar(
                                     Constants.SNACKBAR_TYPE, context.resources.getString(
                                         R.string.intent_not_available

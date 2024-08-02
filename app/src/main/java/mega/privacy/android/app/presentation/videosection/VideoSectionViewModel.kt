@@ -938,12 +938,8 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    internal suspend fun getNodeContentUri(fileNode: TypedFileNode) = runCatching {
+    internal suspend fun getNodeContentUri(fileNode: TypedFileNode) =
         FileNodeContent.AudioOrVideo(uri = getNodeContentUriUseCase(fileNode)).uri
-    }.recover {
-        Timber.e(it)
-        null
-    }.getOrNull()
 
     internal fun getTypedVideoNodeById(id: NodeId) = originalData.firstOrNull { it.id == id }
 

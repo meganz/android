@@ -227,12 +227,7 @@ class ContactFileListViewModel @Inject constructor(
         }
     }
 
-    internal suspend fun getNodeContentUri(handle: Long) = runCatching {
-        getNodeContentUriByHandleUseCase(handle)
-    }.recover {
-        Timber.e(it)
-        null
-    }.getOrNull()
+    internal suspend fun getNodeContentUri(handle: Long) = getNodeContentUriByHandleUseCase(handle)
 
     /**
      * Consume upload event

@@ -22,8 +22,8 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -714,11 +714,5 @@ class FolderLinkViewModelTest {
 
         whenever(getFolderLinkNodeContentUriUseCase(anyOrNull())).thenReturn(expectedNodeContentUri)
         assertThat(underTest.getNodeContentUri(mock())).isEqualTo(expectedNodeContentUri)
-    }
-
-    @Test
-    fun `test that getNodeContentUri returns null if throw an exception`() = runTest {
-        whenever(getFolderLinkNodeContentUriUseCase(anyOrNull())).thenThrow(IllegalStateException())
-        assertThat(underTest.getNodeContentUri(mock())).isEqualTo(null)
     }
 }

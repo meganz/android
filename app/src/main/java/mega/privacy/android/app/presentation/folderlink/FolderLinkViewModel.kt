@@ -885,10 +885,6 @@ class FolderLinkViewModel @Inject constructor(
         }
     }
 
-    internal suspend fun getNodeContentUri(fileNode: TypedFileNode) = runCatching {
+    internal suspend fun getNodeContentUri(fileNode: TypedFileNode) =
         getFolderLinkNodeContentUriUseCase(fileNode)
-    }.recover {
-        Timber.e(it)
-        null
-    }.getOrNull()
 }

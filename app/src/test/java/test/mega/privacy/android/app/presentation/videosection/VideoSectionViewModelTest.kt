@@ -1091,16 +1091,6 @@ class VideoSectionViewModelTest {
     }
 
     @Test
-    fun `test that getNodeContentUri function returns null when the exception is thrown`() =
-        runTest {
-            initVideosReturned()
-            whenever(getNodeContentUriUseCase(anyOrNull())).thenThrow(NullPointerException())
-
-            val result = underTest.getNodeContentUri(mock())
-            assertThat(result).isNull()
-        }
-
-    @Test
     fun `test that clickedItem is updated correctly`() = runTest {
         val expectedVideoNode = mock<TypedVideoNode>()
         initUnderTest()

@@ -286,8 +286,8 @@ class VideoSectionFragment : Fragment() {
                 || isDurationFilterEnabled || isLocationFilterEnabled
 
         viewLifecycleOwner.lifecycleScope.launch {
-            val nodeContentUri = videoSectionViewModel.getNodeContentUri(node) ?: return@launch
             runCatching {
+                val nodeContentUri = videoSectionViewModel.getNodeContentUri(node)
                 megaNavigator.openMediaPlayerActivityByFileNode(
                     context = requireContext(),
                     contentUri = nodeContentUri,
@@ -316,8 +316,8 @@ class VideoSectionFragment : Fragment() {
     private fun openVideoFileFromPlaylist(node: TypedVideoNode) {
         val uiState = videoSectionViewModel.state.value
         viewLifecycleOwner.lifecycleScope.launch {
-            val nodeContentUri = videoSectionViewModel.getNodeContentUri(node) ?: return@launch
             runCatching {
+                val nodeContentUri = videoSectionViewModel.getNodeContentUri(node)
                 megaNavigator.openMediaPlayerActivityByFileNode(
                     context = requireContext(),
                     contentUri = nodeContentUri,
