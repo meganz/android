@@ -215,12 +215,7 @@ class ZipBrowserViewModel @Inject constructor(
 
     internal fun clearOpenedFile() = _uiState.update { it.copy(openedFile = null) }
 
-    internal suspend fun getFileTypeInfo(file: File) =
-        runCatching { getFileTypeInfoUseCase(file) }
-            .recover {
-                Timber.e(it)
-                null
-            }.getOrNull()
+    internal suspend fun getFileTypeInfo(file: File) = getFileTypeInfoUseCase(file)
 
     companion object {
         private const val TITLE_ZIP = "ZIP "

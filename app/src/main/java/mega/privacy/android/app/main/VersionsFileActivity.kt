@@ -610,11 +610,11 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
                 mimetype.isVideoMimeType || mimetype.isAudio -> {
                     lifecycleScope.launch {
-                        val contentUri = viewModel.getNodeContentUri(vNode.handle) ?: return@launch
-                        val localPath = FileUtil.getLocalFile(vNode)
-                        if (localPath != null) {
-                            val file = File(localPath)
-                            runCatching {
+                        runCatching {
+                            val contentUri = viewModel.getNodeContentUri(vNode.handle)
+                            val localPath = FileUtil.getLocalFile(vNode)
+                            if (localPath != null) {
+                                val file = File(localPath)
                                 megaNavigator.openMediaPlayerActivityByLocalFile(
                                     context = this@VersionsFileActivity,
                                     localFile = file,
@@ -622,17 +622,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                                     parentId = vNode.parentHandle,
                                     viewType = VERSIONS_ADAPTER
                                 )
-                            }.onFailure { exception ->
-                                Timber.e(exception)
-                                showSnackbar(
-                                    Constants.SNACKBAR_TYPE,
-                                    getString(R.string.intent_not_available),
-                                    -1
-                                )
-                                downloadNodes(listOf(vNode))
-                            }
-                        } else {
-                            runCatching {
+                            } else {
                                 megaNavigator.openMediaPlayerActivity(
                                     context = this@VersionsFileActivity,
                                     contentUri = contentUri,
@@ -641,15 +631,15 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                                     parentId = vNode.parentHandle,
                                     viewType = VERSIONS_ADAPTER
                                 )
-                            }.onFailure { exception ->
-                                Timber.e(exception)
-                                showSnackbar(
-                                    Constants.SNACKBAR_TYPE,
-                                    getString(R.string.intent_not_available),
-                                    -1
-                                )
-                                downloadNodes(listOf(vNode))
                             }
+                        }.onFailure { exception ->
+                            Timber.e(exception)
+                            showSnackbar(
+                                Constants.SNACKBAR_TYPE,
+                                getString(R.string.intent_not_available),
+                                -1
+                            )
+                            downloadNodes(listOf(vNode))
                         }
                     }
                 }
@@ -727,7 +717,11 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
 
                 mimetype.isOpenableTextFile(vNode.size) -> {
-                    megaNodeUtilWrapper.manageTextFileIntent(this, vNode, Constants.VERSIONS_ADAPTER)
+                    megaNodeUtilWrapper.manageTextFileIntent(
+                        this,
+                        vNode,
+                        Constants.VERSIONS_ADAPTER
+                    )
                 }
 
                 else -> {

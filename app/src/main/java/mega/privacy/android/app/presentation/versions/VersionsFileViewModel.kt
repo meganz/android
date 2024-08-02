@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.versions.model.VersionsFileState
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -78,10 +77,5 @@ class VersionsFileViewModel @Inject constructor(
             else -> false
         }
 
-    internal suspend fun getNodeContentUri(handle: Long) = runCatching {
-        getNodeContentUriByHandleUseCase(handle)
-    }.recover {
-        Timber.e(it)
-        null
-    }.getOrNull()
+    internal suspend fun getNodeContentUri(handle: Long) = getNodeContentUriByHandleUseCase(handle)
 }

@@ -366,13 +366,4 @@ class ZipBrowserViewModelTest {
             assertThat(actual is VideoFileTypeInfo).isTrue()
             verify(getFileTypeInfoUseCase).invoke(mockFile)
         }
-
-    @Test
-    fun `test that getFileTypeInfoUseCase returns null when an exception is thrown`() =
-        runTest {
-            val mockFile = mock<File>()
-            whenever(getFileTypeInfoUseCase(mockFile)).thenThrow(NullPointerException())
-            val actual = underTest.getFileTypeInfo(mockFile)
-            assertThat(actual).isNull()
-        }
 }

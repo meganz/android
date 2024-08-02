@@ -40,15 +40,15 @@ class ImagePreviewVideoLauncher @Inject constructor(
         source: ImagePreviewFetcherSource = ImagePreviewFetcherSource.DEFAULT,
         adapterType: Int = Constants.FROM_IMAGE_VIEWER,
     ) {
-        val viewType = if (source == ImagePreviewFetcherSource.ZIP) { //handle zip file
-            VIEWER_FROM_ZIP_BROWSER
-        } else {
-            adapterType
-        }
-        isLocalFile(imageNode, source)?.let { localPath ->
-            val file = File(localPath)
-            val fileTypeInfo = getFileTypeInfoUseCase(file)
-            runCatching {
+        runCatching {
+            val viewType = if (source == ImagePreviewFetcherSource.ZIP) { //handle zip file
+                VIEWER_FROM_ZIP_BROWSER
+            } else {
+                adapterType
+            }
+            isLocalFile(imageNode, source)?.let { localPath ->
+                val file = File(localPath)
+                val fileTypeInfo = getFileTypeInfoUseCase(file)
                 megaNavigator.openMediaPlayerActivityByLocalFile(
                     context = context,
                     localFile = file,
@@ -57,38 +57,24 @@ class ImagePreviewVideoLauncher @Inject constructor(
                     handle = imageNode.id.longValue,
                     parentId = imageNode.parentId.longValue,
                 )
-            }.onFailure { Timber.e(it) }
-        } ?: run {
-            val typedFileNode = addImageTypeUseCase(imageNode)
-            if (source == ImagePreviewFetcherSource.CHAT) {
-                getFileUrlByImageNodeUseCase(imageNode as ChatImageFile)?.let {
-                    runCatching {
+            } ?: run {
+                val typedFileNode = addImageTypeUseCase(imageNode)
+                if (source == ImagePreviewFetcherSource.CHAT) {
+                    getFileUrlByImageNodeUseCase(imageNode as ChatImageFile)?.let {
                         getFileLinkNodeContentUriUseCase(it)
-                    }.recover {
-                        Timber.e(it)
-                        null
-                    }.getOrNull()
-                }
-            } else {
-                runCatching {
+                    }
+                } else {
                     getFolderLinkNodeContentUriUseCase(typedFileNode)
-                }.recover {
-                    Timber.e(it)
-                    null
-                }.getOrNull()
-            }?.let { contentUri ->
-                runCatching {
+                }?.let { contentUri ->
                     megaNavigator.openMediaPlayerActivityByFileNode(
                         context = context,
                         contentUri = contentUri,
                         fileNode = typedFileNode,
                         viewType = viewType
                     )
-                }.onFailure {
-                    Timber.e(it)
                 }
             }
-        }
+        }.onFailure { Timber.e(it) }
     }
 
     /**

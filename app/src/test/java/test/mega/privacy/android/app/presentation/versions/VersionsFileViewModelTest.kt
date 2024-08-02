@@ -189,13 +189,4 @@ class VersionsFileViewModelTest {
             assertThat(actual).isEqualTo(expectedContentUri)
             verify(getNodeContentUriByHandleUseCase).invoke(paramHandle)
         }
-
-    @Test
-    fun `test that getNodeContentUriByHandleUseCase returns null when an exception is thrown`() =
-        runTest {
-            val paramHandle = 1L
-            whenever(getNodeContentUriByHandleUseCase(any())).thenThrow(IllegalStateException())
-            val actual = underTest.getNodeContentUri(paramHandle)
-            assertThat(actual).isNull()
-        }
 }

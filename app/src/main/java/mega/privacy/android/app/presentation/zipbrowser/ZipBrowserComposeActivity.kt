@@ -185,8 +185,8 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
 
     private fun openMediaFile(file: File) {
         lifecycleScope.launch {
-            val fileTypeInfo = viewModel.getFileTypeInfo(file) ?: return@launch
             runCatching {
+                val fileTypeInfo = viewModel.getFileTypeInfo(file)
                 megaNavigator.openMediaPlayerActivityByLocalFile(
                     context = this@ZipBrowserComposeActivity,
                     localFile = file,
