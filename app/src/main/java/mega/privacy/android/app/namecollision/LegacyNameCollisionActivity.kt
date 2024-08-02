@@ -198,7 +198,7 @@ class LegacyNameCollisionActivity : PasscodeActivity() {
             createStartTransferView(
                 this,
                 viewModel.uiState.map { it.uploadEvent },
-                viewModel::consumeUploadEvent,
+                { },
             ) { transferEvent ->
                 ((transferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.CollidedFiles).let {
                     setResult(
@@ -211,6 +211,7 @@ class LegacyNameCollisionActivity : PasscodeActivity() {
                             shouldFinish = viewModel.shouldFinish()
                         )
                     )
+                    viewModel.consumeUploadEvent()
                 }
             }
         )

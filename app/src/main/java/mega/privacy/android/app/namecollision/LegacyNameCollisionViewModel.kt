@@ -24,11 +24,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
-import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
 import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.namecollision.model.NameCollisionUiState
 import mega.privacy.android.app.namecollision.usecase.GetNameCollisionResultUseCase
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
@@ -41,6 +40,7 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
+import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
@@ -543,6 +543,7 @@ class LegacyNameCollisionViewModel @Inject constructor(
                 uploadFiles(
                     mapOf(path to name),
                     NodeId(parentId),
+                    choice,
                 )
             } else {
                 uploadUseCase.upload(context, currentCollision, rename)
@@ -833,7 +834,7 @@ class LegacyNameCollisionViewModel @Inject constructor(
         }
     }
 
-    fun uploadFiles(
+    internal fun uploadFiles(
         pathsAndNames: Map<String, String?>,
         destinationId: NodeId,
         choice: NameCollisionChoice? = null,
