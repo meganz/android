@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -40,18 +41,18 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSelectedState
 import mega.privacy.android.app.presentation.view.NodeGridView
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.utils.ListGridStateMap
 import mega.privacy.android.shared.original.core.ui.utils.getState
 import mega.privacy.android.shared.original.core.ui.utils.sync
-import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -86,7 +87,7 @@ internal fun VideoSelectedView(
     }
 
     Scaffold(
-        modifier = modifier.semantics { testTagsAsResourceId = true },
+        modifier = modifier.systemBarsPadding().semantics { testTagsAsResourceId = true },
         scaffoldState = rememberScaffoldState(),
         topBar = {
             VideoSelectedTopBar(

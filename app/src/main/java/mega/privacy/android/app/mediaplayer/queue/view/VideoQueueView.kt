@@ -13,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel
@@ -32,7 +31,8 @@ internal fun VideoQueueView(
     onClickedFinished: () -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    val playlistTitle = legacyVideoPlayerViewModel.playlistTitleState.collectAsStateWithLifecycle().value
+    val playlistTitle =
+        legacyVideoPlayerViewModel.playlistTitleState.collectAsStateWithLifecycle().value
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -69,7 +69,6 @@ internal fun VideoQueueView(
     }
 
     MegaScaffold(
-        modifier = Modifier.padding(top = 24.dp),
         topBar = {
             VideoQueueTopBar(
                 title = playlistTitle ?: "",

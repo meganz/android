@@ -15,6 +15,7 @@ import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.database.ContentObserver
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
@@ -23,6 +24,7 @@ import android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
 import android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL
 import android.view.Menu
 import android.view.MenuItem
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
@@ -39,6 +41,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -181,6 +184,9 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
 
     private var tempNodeId: NodeId? = null
 
+    @ColorInt
+    private var statusBarColor: Int = Color.TRANSPARENT
+
     private val headsetPlugReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == Intent.ACTION_HEADSET_PLUG) {
@@ -283,6 +289,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
 
         createPlayer()
         setupToolbar()
+        setupToolbarColors()
         setupNavDestListener()
         setupObserver()
         initMediaData()
@@ -1390,10 +1397,15 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
     }
 
     override fun showSystemUI() {
-        WindowInsetsControllerCompat(
-            window,
-            binding.root
-        ).show(WindowInsetsCompat.Type.systemBars())
+        with(WindowInsetsControllerCompat(window, window.decorView)) {
+            isAppearanceLightNavigationBars = false
+            isAppearanceLightStatusBars = false
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                window.statusBarColor = statusBarColor
+                window.navigationBarColor = getColor(android.R.color.transparent)
+            }
+            show(WindowInsetsCompat.Type.systemBars())
+        }
     }
 
     /**
@@ -1419,7 +1431,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         val isPlaylist = navController.currentDestination?.id == R.id.video_playlist ||
                 navController.currentDestination?.id == R.id.video_queue
         @ColorRes val toolbarBackgroundColor: Int
-        @ColorInt val statusBarColor: Int
         val toolbarElevation: Float
 
         val elevationStatusBarColor =
@@ -1479,7 +1490,9 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
             }
         }
 
-        window.statusBarColor = statusBarColor
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            window.statusBarColor = statusBarColor
+        }
         binding.toolbar.setBackgroundColor(ContextCompat.getColor(this, toolbarBackgroundColor))
         binding.toolbar.elevation = toolbarElevation
     }
@@ -1494,12 +1507,14 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
             isAppearanceLightNavigationBars = false
             isAppearanceLightStatusBars = false
         }
-        window.navigationBarColor = getColor(android.R.color.transparent)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            window.navigationBarColor = getColor(android.R.color.transparent)
+        }
     }
 
     private fun updatePaddingForSystemUI() {
         binding.rootLayout.post {
-            ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { _, windowInsets ->
+            ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { v, windowInsets ->
                 val isVideoPlayerMainView =
                     navController.currentDestination?.id == R.id.video_main_player
                 val isVideoPlaylist = navController.currentDestination?.id == R.id.video_playlist ||
@@ -1536,12 +1551,12 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                             }
                         }
 
-                        binding.rootLayout.updatePadding(
-                            left = if (isVideoPlaylist) horizontalInsets.first else 0,
-                            top = 0,
-                            right = if (isVideoPlaylist) horizontalInsets.second else 0,
-                            bottom = if (isVideoPlaylist) insets.bottom else 0
-                        )
+                        v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                            leftMargin = if (isVideoPlaylist) horizontalInsets.first else 0
+                            topMargin = if (isVideoPlaylist) insets.top else 0
+                            rightMargin = if (isVideoPlaylist) horizontalInsets.second else 0
+                            bottomMargin = if (isVideoPlaylist) insets.bottom else 0
+                        }
                     }
                 }
                 WindowInsetsCompat.CONSUMED
