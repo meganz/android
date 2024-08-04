@@ -36,7 +36,6 @@ import mega.privacy.android.data.mapper.SortOrderMapperImpl
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
-import mega.privacy.android.data.mapper.SubscriptionStatusMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.VideoMapper
@@ -70,7 +69,6 @@ import mega.privacy.android.data.mapper.toMegaSku
 import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toPricing
 import mega.privacy.android.data.mapper.toStorageState
-import mega.privacy.android.data.mapper.toSubscriptionStatus
 import mega.privacy.android.data.mapper.toUserAlert
 import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toVideo
@@ -229,13 +227,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideUserSetMapper(): UserSetMapper = ::toUserSet
-
-
-        /**
-         * Provide [SubscriptionStatusMapper] mapper
-         */
-        @Provides
-        fun provideSubscriptionStatusMapper(): SubscriptionStatusMapper = ::toSubscriptionStatus
 
         /**
          * Provide [CountryMapper] mapper
