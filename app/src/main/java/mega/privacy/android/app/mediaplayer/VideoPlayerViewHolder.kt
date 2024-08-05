@@ -15,8 +15,8 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.playlist.AudioPlaylistFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
+import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 

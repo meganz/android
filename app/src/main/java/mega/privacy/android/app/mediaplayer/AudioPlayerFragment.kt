@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -208,12 +207,7 @@ class AudioPlayerFragment : Fragment() {
                     findNavController().let {
                         viewLifecycleOwner.lifecycleScope.launch {
                             if (it.currentDestination?.id == R.id.audio_main_player) {
-                                it.navigate(
-                                    if (getFeatureFlagValueUseCase(AppFeatures.NewAudioQueue))
-                                        AudioPlayerFragmentDirections.actionAudioPlayerToQueue()
-                                    else
-                                        AudioPlayerFragmentDirections.actionAudioPlayerToPlaylist()
-                                )
+                                it.navigate(AudioPlayerFragmentDirections.actionAudioPlayerToQueue())
                             }
                         }
                     }

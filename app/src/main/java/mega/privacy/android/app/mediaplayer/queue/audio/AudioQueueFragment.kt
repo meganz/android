@@ -35,7 +35,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
-import mega.privacy.android.app.mediaplayer.playlist.AudioPlaylistFragment
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistActionModeCallback
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemUiEntity
 import mega.privacy.android.app.mediaplayer.queue.view.AudioQueueView
@@ -76,10 +75,7 @@ class AudioQueueFragment : Fragment() {
     private val positionUpdateRunnable = object : Runnable {
         override fun run() {
             // Up the frequency of refresh, keeping in sync with Exoplayer.
-            positionUpdateHandler.postDelayed(
-                this,
-                AudioPlaylistFragment.UPDATE_INTERVAL_PLAYING_POSITION
-            )
+            positionUpdateHandler.postDelayed(this, UPDATE_INTERVAL_PLAYING_POSITION)
             audioQueueViewModel.updateCurrentPlayingPosition(
                 serviceGateway?.getCurrentPlayingPosition() ?: 0
             )
@@ -322,5 +318,17 @@ class AudioQueueFragment : Fragment() {
         serviceGateway = null
         playerServiceViewModelGateway = null
         context?.unbindService(connection)
+    }
+
+    companion object {
+        /**
+         * The update interval for playing position
+         */
+        const val UPDATE_INTERVAL_PLAYING_POSITION: Long = 500
+
+        /**
+         * The minimum size of single playlist
+         */
+        const val SINGLE_PLAYLIST_SIZE = 2
     }
 }

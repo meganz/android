@@ -56,14 +56,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables new audio queue
-     */
-    NewAudioQueue(
-        "Enable new audio queue",
-        true,
-    ),
-
-    /**
      * Enables the report issue button on the login screen
      */
     LoginReportIssueButton(

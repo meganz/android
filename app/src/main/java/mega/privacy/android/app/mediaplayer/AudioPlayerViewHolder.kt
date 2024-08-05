@@ -12,8 +12,8 @@ import androidx.core.view.isVisible
 import androidx.media3.common.Player
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
-import mega.privacy.android.app.mediaplayer.playlist.AudioPlaylistFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
+import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
