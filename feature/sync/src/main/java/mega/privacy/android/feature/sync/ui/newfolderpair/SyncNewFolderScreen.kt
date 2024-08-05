@@ -193,6 +193,7 @@ private fun SyncNewFolderScreenContent(
                 confirmButtonText = stringResource(sharedResR.string.sync_error_dialog_insufficient_storage_confirm_button),
                 cancelButtonText = stringResource(sharedResR.string.sync_error_dialog_insufficient_storage_cancel_button),
                 onConfirm = {
+                    onDismissStorageOverQuota()
                     onOpenUpgradeAccount()
                 },
                 onDismiss = {
