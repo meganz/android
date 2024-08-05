@@ -35,6 +35,7 @@ class InProgressTransferItemTest {
                 isPaused = false,
                 isQueued = false,
                 isOverQuota = false,
+                areTransfersPaused = false,
             )
         )
         with(composeRule) {
@@ -66,6 +67,7 @@ class InProgressTransferItemTest {
                 isPaused = true,
                 isQueued = false,
                 isOverQuota = false,
+                areTransfersPaused = false,
             )
         )
         with(composeRule) {
@@ -98,6 +100,7 @@ class InProgressTransferItemTest {
                 isPaused = true,
                 isQueued = true,
                 isOverQuota = false,
+                areTransfersPaused = false,
             )
         )
         with(composeRule) {
@@ -129,6 +132,7 @@ class InProgressTransferItemTest {
                     isPaused,
                     isQueued,
                     isOverQuota,
+                    areTransfersPaused,
                     onPlayPauseClicked,
                 )
             }

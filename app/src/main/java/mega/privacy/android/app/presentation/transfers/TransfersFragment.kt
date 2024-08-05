@@ -49,7 +49,7 @@ internal class TransfersFragment : Fragment() {
                         passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         content = {
                             val tabIndex = arguments?.getInt(EXTRA_TAB) ?: IN_PROGRESS_TAB_INDEX
-                            TransfersView(tabIndex = tabIndex)
+                            TransfersView(tabIndexToSelect = tabIndex)
                         }
                     )
                 }

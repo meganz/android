@@ -4,11 +4,13 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,7 +37,11 @@ internal fun TransferImage(
     fileTypeResId: Int?,
     previewUri: Uri?,
     modifier: Modifier = Modifier,
-) = Column(modifier = modifier.size(48.dp)) {
+) = Column(
+    modifier = modifier.size(48.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center
+) {
     val noThumbnailContent: @Composable () -> Unit = {
         TransferFileType(isDownload = isDownload, fileTypeResId = fileTypeResId)
     }
@@ -50,12 +56,26 @@ internal fun TransferImage(
             loading = { noThumbnailContent() },
             error = { noThumbnailContent() },
             success = { result ->
-                Image(
-                    painter = result.painter,
-                    contentDescription = "Image",
-                    contentScale = ContentScale.Inside,
-                    modifier = Modifier.testTag(TEST_TAG_FILE_THUMBNAIL)
-                )
+                Box(
+                    modifier = modifier
+                        .testTag(TEST_TAG_FILE_TYPE_ICON)
+                        .size(42.dp)
+                ) {
+                    Image(
+                        painter = result.painter,
+                        contentDescription = "Image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .testTag(TEST_TAG_FILE_THUMBNAIL)
+                            .size(40.dp)
+                            .padding(start = 2.dp, top = 2.dp)
+                            .clip(RoundedCornerShape(4.dp)),
+                    )
+                    LeadingIndicator(
+                        isDownload = isDownload,
+                        modifier = Modifier.align(Alignment.TopEnd)
+                    )
+                }
             }
         )
     } ?: noThumbnailContent()
@@ -66,7 +86,7 @@ private fun TransferFileType(
     isDownload: Boolean,
     fileTypeResId: Int?,
     modifier: Modifier = Modifier,
-) = Box(modifier = modifier.size(48.dp).testTag(TEST_TAG_FILE_TYPE_ICON)) {
+) = Box(modifier = modifier.testTag(TEST_TAG_FILE_TYPE_ICON)) {
     fileTypeResId?.let {
         Image(
             painter = painterResource(id = it),

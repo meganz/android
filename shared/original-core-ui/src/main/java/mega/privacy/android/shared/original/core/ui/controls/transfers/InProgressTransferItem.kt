@@ -42,6 +42,7 @@ fun InProgressTransferItem(
     isPaused: Boolean,
     isQueued: Boolean,
     isOverQuota: Boolean,
+    areTransfersPaused: Boolean,
     onPlayPauseClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) = Row(
@@ -80,7 +81,7 @@ fun InProgressTransferItem(
             modifier = Modifier.padding(top = 2.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (isQueued) {
+            if (isQueued && areTransfersPaused.not()) {
                 Icon(
                     modifier = Modifier
                         .size(16.dp)
@@ -148,6 +149,7 @@ private fun InProgressTransferItemPreview(
                 isPaused = isPaused,
                 isQueued = isQueued,
                 isOverQuota = isOverQuota,
+                areTransfersPaused = areTransfersPaused,
                 onPlayPauseClicked = {},
             )
         }
@@ -164,6 +166,7 @@ internal data class InProgressTransferUI(
     val isPaused: Boolean,
     val isQueued: Boolean,
     val isOverQuota: Boolean,
+    val areTransfersPaused: Boolean,
 )
 
 private class InProgressTransferItemProvider : PreviewParameterProvider<InProgressTransferUI> {
@@ -182,6 +185,19 @@ private class InProgressTransferItemProvider : PreviewParameterProvider<InProgre
             isPaused = false,
             isQueued = false,
             isOverQuota = false,
+            areTransfersPaused = false,
+        ),
+        InProgressTransferUI(
+            isDownload = true,
+            fileTypeResId = iconPackR.drawable.ic_pdf_medium_solid,
+            previewUri = null,
+            fileName = name,
+            progress = progress,
+            speed = speed,
+            isPaused = false,
+            isQueued = false,
+            isOverQuota = false,
+            areTransfersPaused = true,
         ),
         InProgressTransferUI(
             isDownload = true,
@@ -193,6 +209,7 @@ private class InProgressTransferItemProvider : PreviewParameterProvider<InProgre
             isPaused = true,
             isQueued = false,
             isOverQuota = false,
+            areTransfersPaused = false,
         ),
         InProgressTransferUI(
             isDownload = true,
@@ -204,6 +221,7 @@ private class InProgressTransferItemProvider : PreviewParameterProvider<InProgre
             isPaused = false,
             isQueued = true,
             isOverQuota = false,
+            areTransfersPaused = false,
         ),
         InProgressTransferUI(
             isDownload = true,
@@ -215,6 +233,7 @@ private class InProgressTransferItemProvider : PreviewParameterProvider<InProgre
             isPaused = false,
             isQueued = false,
             isOverQuota = true,
+            areTransfersPaused = false,
         ),
         InProgressTransferUI(
             isDownload = false,
@@ -226,6 +245,7 @@ private class InProgressTransferItemProvider : PreviewParameterProvider<InProgre
             isPaused = false,
             isQueued = false,
             isOverQuota = true,
+            areTransfersPaused = false,
         )
     ).asSequence()
 }
