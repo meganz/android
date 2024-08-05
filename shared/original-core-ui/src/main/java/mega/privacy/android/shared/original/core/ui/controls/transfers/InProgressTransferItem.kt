@@ -33,6 +33,7 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
  */
 @Composable
 fun InProgressTransferItem(
+    tag: Int,
     isDownload: Boolean,
     fileTypeResId: Int?,
     previewUri: Uri?,
@@ -47,7 +48,7 @@ fun InProgressTransferItem(
     modifier: Modifier = Modifier,
 ) = Row(
     modifier = modifier
-        .testTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM)
+        .testTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag")
         .height(72.dp)
         .fillMaxWidth(),
     verticalAlignment = Alignment.CenterVertically
@@ -140,6 +141,7 @@ private fun InProgressTransferItemPreview(
     OriginalTempTheme(isDark = isDark) {
         with(inProgressTransferUI) {
             InProgressTransferItem(
+                tag = 1,
                 isDownload = isDownload,
                 fileTypeResId = fileTypeResId,
                 previewUri = previewUri,
@@ -250,18 +252,53 @@ private class InProgressTransferItemProvider : PreviewParameterProvider<InProgre
     ).asSequence()
 }
 
-internal const val TEST_TAG_IN_PROGRESS_TRANSFER_ITEM =
+/**
+ * Tag for the in-progress transfer item.
+ */
+const val TEST_TAG_IN_PROGRESS_TRANSFER_ITEM =
     "transfers_view:tab_in_progress:transfer_item"
-internal const val TEST_TAG_IN_PROGRESS_TRANSFER_IMAGE =
+
+/**
+ * Tag for the in-progress transfer image.
+ */
+const val TEST_TAG_IN_PROGRESS_TRANSFER_IMAGE =
     "transfers_view:tab_in_progress:transfer_image"
-internal const val TEST_TAG_IN_PROGRESS_TRANSFER_NAME =
+
+/**
+ * Tag for the in-progress transfer name.
+ */
+const val TEST_TAG_IN_PROGRESS_TRANSFER_NAME =
     "transfers_view:tab_in_progress:transfer_name"
-internal const val TEST_TAG_IN_PROGRESS_TRANSFER_PROGRESS =
+
+/**
+ * Tag for the in-progress transfer progress.
+ */
+const val TEST_TAG_IN_PROGRESS_TRANSFER_PROGRESS =
     "transfers_view:tab_in_progress:transfer_progress"
-internal const val TEST_TAG_IN_PROGRESS_TRANSFER_SPEED =
+
+/**
+ * Tag for the in-progress transfer speed.
+ */
+const val TEST_TAG_IN_PROGRESS_TRANSFER_SPEED =
     "transfers_view:tab_in_progress:transfer_speed"
-internal const val TEST_TAG_IN_PROGRESS_TRANSFER_QUEUED_ICON =
+
+/**
+ * Tag for the in-progress transfer queued icon.
+ */
+const val TEST_TAG_IN_PROGRESS_TRANSFER_QUEUED_ICON =
     "transfers_view:tab_in_progress:transfer_queued_icon"
-internal const val TEST_TAG_QUEUE_ICON = "transfers_view:tab_in_progress:transfer_item:queue_icon"
-internal const val TEST_TAG_PAUSE_ICON = "transfers_view:tab_in_progress:transfer_item:pause_icon"
-internal const val TEST_TAG_PLAY_ICON = "transfers_view:tab_in_progress:transfer_item:play_icon"
+
+/**
+ * Tag for the in-progress transfer queue icon.
+ */
+const val TEST_TAG_QUEUE_ICON = "transfers_view:tab_in_progress:transfer_item:queue_icon"
+
+/**
+ * Tag for the in-progress transfer pause icon.
+ */
+const val TEST_TAG_PAUSE_ICON = "transfers_view:tab_in_progress:transfer_item:pause_icon"
+
+/**
+ * Tag for the in-progress transfer play icon.
+ */
+const val TEST_TAG_PLAY_ICON = "transfers_view:tab_in_progress:transfer_item:play_icon"

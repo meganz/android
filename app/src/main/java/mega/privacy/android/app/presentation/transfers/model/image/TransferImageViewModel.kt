@@ -40,10 +40,14 @@ class TransferImageViewModel @Inject constructor(
      */
     fun addInProgressTransfer(inProgressTransfer: InProgressTransfer) = with(inProgressTransfer) {
         viewModelScope.launch {
+            val fileTypeResId = getFileTypeIcon(fileName)
+
             if (this@with is InProgressTransfer.Download) {
                 getMutableStateFlow(tag)?.update { state ->
-                    state.copy(fileTypeResId = getFileTypeIcon(fileName))
-                }
+                    state.copy(fileTypeResId = fileTypeResId)
+                } ?: MutableStateFlow(TransferImageUiState(fileTypeResId = fileTypeResId))
+                    .also { _uiStateFlowMap[tag] = it }
+
                 runCatching { getThumbnailUseCase(nodeId.longValue, true) }
                     .onSuccess { thumbnail ->
                         getMutableStateFlow(tag)?.update { state ->
@@ -53,10 +57,15 @@ class TransferImageViewModel @Inject constructor(
             } else {
                 getMutableStateFlow(tag)?.update { state ->
                     state.copy(
-                        fileTypeResId = getFileTypeIcon(fileName),
+                        fileTypeResId = fileTypeResId,
                         previewUri = (this@with as InProgressTransfer.Upload).localPath.toUri()
                     )
-                }
+                } ?: MutableStateFlow(
+                    TransferImageUiState(
+                        fileTypeResId = fileTypeResId,
+                        previewUri = (this@with as InProgressTransfer.Upload).localPath.toUri()
+                    )
+                ).also { _uiStateFlowMap[tag] = it }
             }
         }
     }

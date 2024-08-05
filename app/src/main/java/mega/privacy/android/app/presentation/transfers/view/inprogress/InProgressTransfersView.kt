@@ -59,6 +59,7 @@ internal fun InProgressTransferItem(
     }
 
     InProgressTransferItem(
+        tag = tag,
         isDownload = inProgressTransfer is InProgressTransfer.Download,
         fileTypeResId = uiState.fileTypeResId,
         previewUri = uiState.previewUri,

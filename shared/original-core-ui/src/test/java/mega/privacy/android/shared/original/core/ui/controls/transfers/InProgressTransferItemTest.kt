@@ -21,6 +21,7 @@ class InProgressTransferItemTest {
     private val name = "File name.pdf"
     private val progress = "63% of 1MB"
     private val speed = "4.2MB/s"
+    private val tag = 1
 
     @Test
     fun `test that non paused, in progress transfer shows correctly`() {
@@ -39,7 +40,7 @@ class InProgressTransferItemTest {
             )
         )
         with(composeRule) {
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag").assertIsDisplayed()
             onNodeWithTag(TEST_TAG_QUEUE_ICON).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_IMAGE).assertIsDisplayed()
             onNodeWithText(name).assertIsDisplayed()
@@ -71,7 +72,7 @@ class InProgressTransferItemTest {
             )
         )
         with(composeRule) {
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag").assertIsDisplayed()
             onNodeWithTag(TEST_TAG_QUEUE_ICON).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_IMAGE).assertIsDisplayed()
             onNodeWithText(name).assertIsDisplayed()
@@ -104,7 +105,7 @@ class InProgressTransferItemTest {
             )
         )
         with(composeRule) {
-            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM).assertIsDisplayed()
+            onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_ITEM + "_$tag").assertIsDisplayed()
             onNodeWithTag(TEST_TAG_QUEUE_ICON).assertIsDisplayed()
             onNodeWithTag(TEST_TAG_IN_PROGRESS_TRANSFER_IMAGE).assertIsDisplayed()
             onNodeWithText(name).assertIsDisplayed()
@@ -123,6 +124,7 @@ class InProgressTransferItemTest {
         with(inProgressTransferUI) {
             composeRule.setContent {
                 InProgressTransferItem(
+                    tag = tag,
                     isDownload,
                     fileTypeResId,
                     previewUri,

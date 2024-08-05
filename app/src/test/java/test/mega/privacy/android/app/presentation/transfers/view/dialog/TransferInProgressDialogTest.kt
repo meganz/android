@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.transfers.view
+package test.mega.privacy.android.app.presentation.transfers.view.dialog
 
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.runtime.getValue
