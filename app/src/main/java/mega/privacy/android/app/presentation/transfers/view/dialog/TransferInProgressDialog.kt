@@ -12,19 +12,44 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.domain.entity.transfer.TransferStage
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ProgressDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.MinimumTimeVisibility
 
 /**
- * [ProgressDialog] for showing transfer processing in progress, it handles cancel confirmation showing a [ConfirmationDialog]
+ * [ProgressDialog] for showing scanning transfers progress information. It also allows to cancel the transfers and shows a [ProgressDialog] while cancelling.
+ * @param startTransferJobInProgress the current progress of the start transfer job to be shown
+ * @param modifier
+ * @param onCancel callback that will be invoked when the user taps "Cancel transfers" button
  */
 @Composable
 fun TransferInProgressDialog(
+    startTransferJobInProgress: StartTransferJobInProgress?,
+    modifier: Modifier = Modifier,
+    onCancel: () -> Unit,
+) {
+    if (startTransferJobInProgress is StartTransferJobInProgress.CancellingTransfers) {
+        ProgressDialog(
+            title = stringResource(id = sharedR.string.transfers_scanning_folders_dialog_cancel_cancelling_title),
+            progress = null,
+        )
+    } else {
+        MinimumTimeVisibility(visible = startTransferJobInProgress != null) {
+            TransferInProgressScanningDialog(
+                scanningTransfersProgress = (startTransferJobInProgress as? StartTransferJobInProgress.ScanningTransfers),
+                modifier = modifier,
+                onCancel = onCancel
+            )
+        }
+    }
+}
+
+@Composable
+internal fun TransferInProgressScanningDialog(
     scanningTransfersProgress: StartTransferJobInProgress.ScanningTransfers?,
     modifier: Modifier = Modifier,
-    onCancelConfirmed: () -> Unit,
+    onCancel: () -> Unit,
 ) {
     val title = stringResource(
         when (scanningTransfersProgress?.stage) {
@@ -72,7 +97,7 @@ fun TransferInProgressDialog(
         subTitle = subtitleWithInfo,
         progress = null,
         cancelButtonText = stringResource(R.string.cancel_transfers),
-        onCancel = onCancelConfirmed,
+        onCancel = onCancel,
         modifier = modifier.testTag(PROGRESS_TAG),
     )
 }
@@ -80,14 +105,14 @@ fun TransferInProgressDialog(
 
 @CombinedThemePreviews
 @Composable
-private fun PreviewTransferInProgressDialog(@PreviewParameter(DeviceBottomSheetBodyPreviewProvider::class) scanningTransfersProgress: StartTransferJobInProgress.ScanningTransfers) {
+private fun TransferInProgressDialogPreview(@PreviewParameter(DeviceBottomSheetBodyPreviewProvider::class) scanningTransfersProgress: StartTransferJobInProgress.ScanningTransfers) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         TransferInProgressDialog(scanningTransfersProgress) {}
     }
 }
 
 private class DeviceBottomSheetBodyPreviewProvider :
-    PreviewParameterProvider<StartTransferJobInProgress.ScanningTransfers?> {
+    PreviewParameterProvider<StartTransferJobInProgress?> {
     override val values = sequenceOf(
         null,
         StartTransferJobInProgress.ScanningTransfers(TransferStage.STAGE_NONE),
@@ -119,6 +144,7 @@ private class DeviceBottomSheetBodyPreviewProvider :
             createdFolderCount = 5
         ),
         StartTransferJobInProgress.ScanningTransfers(TransferStage.STAGE_TRANSFERRING_FILES),
+        StartTransferJobInProgress.CancellingTransfers,
     )
 }
 

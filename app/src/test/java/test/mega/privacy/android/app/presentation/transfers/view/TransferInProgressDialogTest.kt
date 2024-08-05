@@ -4,6 +4,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -13,6 +14,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.view.dialog.PROGRESS_TAG
 import mega.privacy.android.app.presentation.transfers.view.dialog.TransferInProgressDialog
+import mega.privacy.android.app.presentation.transfers.view.dialog.TransferInProgressScanningDialog
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import org.junit.Rule
 import org.junit.Test
@@ -21,6 +23,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import test.mega.privacy.android.app.fromPluralId
 import test.mega.privacy.android.app.onNodeWithText
+import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
 class TransferInProgressDialogTest {
@@ -28,7 +31,7 @@ class TransferInProgressDialogTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `test that progress dialog is showed when first composed`() {
+    fun `test that progress dialog is showed after some time when job in progress is scanning transfers`() {
         composeTestRule.setContent {
             TransferInProgressDialog(
                 StartTransferJobInProgress.ScanningTransfers(
@@ -36,16 +39,37 @@ class TransferInProgressDialogTest {
                 )
             ) {}
         }
+        composeTestRule.onNodeWithTag(PROGRESS_TAG).assertDoesNotExist()
+        composeTestRule.mainClock.advanceTimeBy(1.seconds.inWholeMilliseconds)
         composeTestRule.onNodeWithTag(PROGRESS_TAG).assertExists()
+    }
+
+    @Test
+    fun `test that progress dialog is showed during a minimum time`() {
+        var transfersJob by mutableStateOf<StartTransferJobInProgress?>(
+            StartTransferJobInProgress.ScanningTransfers(
+                TransferStage.STAGE_NONE
+            )
+        )
+        composeTestRule.setContent {
+            TransferInProgressDialog(transfersJob) {}
+        }
+        composeTestRule.mainClock.advanceTimeBy(0.9.seconds.inWholeMilliseconds)//wait until showed
+        transfersJob = null //this will hide the dialog, but after a while
+        composeTestRule.onNodeWithTag(PROGRESS_TAG).assertExists()
+        composeTestRule.mainClock.advanceTimeBy(0.8.seconds.inWholeMilliseconds)
+        composeTestRule.onNodeWithTag(PROGRESS_TAG).assertExists() //still showed
+        composeTestRule.mainClock.advanceTimeBy(0.5.seconds.inWholeMilliseconds)
+        composeTestRule.onNodeWithTag(PROGRESS_TAG).assertDoesNotExist()//hide after a while
     }
 
     @Test
     fun `test that on confirm canceled is triggered when cancel is clicked`() {
         val lambdaMock = mock<() -> Unit>()
         composeTestRule.setContent {
-            TransferInProgressDialog(
+            TransferInProgressScanningDialog(
                 StartTransferJobInProgress.ScanningTransfers(TransferStage.STAGE_NONE),
-                onCancelConfirmed = lambdaMock
+                onCancel = lambdaMock
             )
         }
         composeTestRule.onNodeWithText(R.string.cancel_transfers).performClick()
@@ -55,7 +79,7 @@ class TransferInProgressDialogTest {
     @Test
     fun `test that the correct title is shown when stage is none`() {
         composeTestRule.setContent {
-            TransferInProgressDialog(
+            TransferInProgressScanningDialog(
                 StartTransferJobInProgress.ScanningTransfers(TransferStage.STAGE_NONE)
             ) {}
         }
@@ -65,7 +89,7 @@ class TransferInProgressDialogTest {
     @Test
     fun `test that the correct title is shown when stage is scanning`() {
         composeTestRule.setContent {
-            TransferInProgressDialog(
+            TransferInProgressScanningDialog(
                 StartTransferJobInProgress.ScanningTransfers(TransferStage.STAGE_SCANNING)
             ) {}
         }
@@ -75,7 +99,7 @@ class TransferInProgressDialogTest {
     @Test
     fun `test that the correct title is shown when stage is creating tree`() {
         composeTestRule.setContent {
-            TransferInProgressDialog(
+            TransferInProgressScanningDialog(
                 StartTransferJobInProgress.ScanningTransfers(TransferStage.STAGE_CREATING_TREE)
             ) {}
         }
@@ -86,7 +110,7 @@ class TransferInProgressDialogTest {
     @Test
     fun `test that the correct title is shown when stage is creating tree and all folders are created`() {
         composeTestRule.setContent {
-            TransferInProgressDialog(
+            TransferInProgressScanningDialog(
                 StartTransferJobInProgress.ScanningTransfers(
                     TransferStage.STAGE_CREATING_TREE,
                     folderCount = 10,
@@ -101,7 +125,7 @@ class TransferInProgressDialogTest {
     @Test
     fun `test that the correct title is shown when stage is transferring files`() {
         composeTestRule.setContent {
-            TransferInProgressDialog(
+            TransferInProgressScanningDialog(
                 StartTransferJobInProgress.ScanningTransfers(TransferStage.STAGE_TRANSFERRING_FILES)
             ) {}
         }
@@ -112,7 +136,7 @@ class TransferInProgressDialogTest {
     @Test
     fun `test that the correct subtitle is shown when stage is none`() {
         composeTestRule.setContent {
-            TransferInProgressDialog(
+            TransferInProgressScanningDialog(
                 StartTransferJobInProgress.ScanningTransfers(
                     TransferStage.STAGE_NONE,
                     folderCount = 1,
@@ -127,7 +151,7 @@ class TransferInProgressDialogTest {
     @Test
     fun `test that the correct subtitle is shown when stage is scanning`() {
         composeTestRule.setContent {
-            TransferInProgressDialog(
+            TransferInProgressScanningDialog(
                 StartTransferJobInProgress.ScanningTransfers(
                     TransferStage.STAGE_SCANNING,
                     folderCount = 1,
@@ -154,7 +178,7 @@ class TransferInProgressDialogTest {
         var filesState by mutableStateOf(1)
         var foldersState by mutableStateOf(1)
         composeTestRule.setContent {
-            TransferInProgressDialog(
+            TransferInProgressScanningDialog(
                 StartTransferJobInProgress.ScanningTransfers(
                     TransferStage.STAGE_SCANNING,
                     folderCount = foldersState,
@@ -185,7 +209,7 @@ class TransferInProgressDialogTest {
     @Test
     fun `test that the correct subtitle is shown when stage is creating tree`() {
         composeTestRule.setContent {
-            TransferInProgressDialog(
+            TransferInProgressScanningDialog(
                 StartTransferJobInProgress.ScanningTransfers(
                     TransferStage.STAGE_CREATING_TREE,
                     folderCount = 5,
@@ -202,5 +226,14 @@ class TransferInProgressDialogTest {
                 5,
             ),
         ).assertExists()
+    }
+
+    @Test
+    fun `test that cancelling progress dialog is shown when state is cancelling`() {
+        composeTestRule.setContent {
+            TransferInProgressDialog(startTransferJobInProgress = StartTransferJobInProgress.CancellingTransfers) {}
+        }
+        composeTestRule.onNodeWithText(sharedR.string.transfers_scanning_folders_dialog_cancel_cancelling_title)
+            .assertIsDisplayed()
     }
 }

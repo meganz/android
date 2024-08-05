@@ -51,7 +51,6 @@ import mega.privacy.android.app.presentation.settings.model.TargetPreference
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
-import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeTransfersDialog
@@ -65,7 +64,6 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.Confirmatio
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.utils.MinimumTimeVisibility
 import timber.log.Timber
 
 /**
@@ -135,7 +133,7 @@ internal fun StartTransferComponent(
     StartTransferComponent(
         uiState = uiState,
         onOneOffEventConsumed = viewModel::consumeOneOffEvent,
-        onCancelledConfirmed = viewModel::cancelCurrentJob,
+        onCancelled = viewModel::cancelCurrentTransfersJob,
         onDownloadConfirmed = { transferTriggerEventPrimary, saveDoNotAskAgain ->
             viewModel.startDownloadWithoutConfirmation(
                 transferTriggerEventPrimary,
@@ -190,7 +188,7 @@ fun createStartTransferView(
 private fun StartTransferComponent(
     uiState: StartTransferViewState,
     onOneOffEventConsumed: () -> Unit,
-    onCancelledConfirmed: () -> Unit,
+    onCancelled: () -> Unit,
     onDownloadConfirmed: (TransferTriggerEvent.DownloadTriggerEvent, saveDoNotAskAgain: Boolean) -> Unit,
     onDestinationSet: (TransferTriggerEvent, destination: Uri) -> Unit,
     onPromptSaveDestinationConsumed: () -> Unit,
@@ -279,12 +277,11 @@ private fun StartTransferComponent(
         }
     )
 
-    MinimumTimeVisibility(visible = uiState.jobInProgressState is StartTransferJobInProgress.ScanningTransfers) {
-        TransferInProgressDialog(
-            (uiState.jobInProgressState as? StartTransferJobInProgress.ScanningTransfers),
-            onCancelConfirmed = onCancelledConfirmed,
-        )
-    }
+    TransferInProgressDialog(
+        uiState.jobInProgressState,
+        onCancel = onCancelled,
+    )
+
     if (showOfflineAlertDialog) {
         MegaAlertDialog(
             text = stringResource(id = R.string.error_server_connection_problem),

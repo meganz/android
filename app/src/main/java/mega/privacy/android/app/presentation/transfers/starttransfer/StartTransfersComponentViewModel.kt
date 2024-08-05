@@ -9,7 +9,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -38,6 +37,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -94,9 +94,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val saveOfflineNodesToDevice: SaveOfflineNodesToDevice,
     private val saveUriToDeviceUseCase: SaveUriToDeviceUseCase,
     private val getCurrentUploadSpeedUseCase: GetCurrentUploadSpeedUseCase,
+    private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
-
-    private var currentInProgressJob: Job? = null
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
 
@@ -240,7 +239,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             is TransferTriggerEvent.StartDownloadNode -> {
                 val nodes = startDownloadNode.nodes
                 if (nodes.isEmpty()) return
-                currentInProgressJob = viewModelScope.launch {
+                viewModelScope.launch {
                     startDownloadNodes(
                         nodes = nodes,
                         isHighPriority = startDownloadNode.isHighPriority,
@@ -300,7 +299,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         if (event.node == null) {
             return
         }
-        currentInProgressJob = viewModelScope.launch {
+        viewModelScope.launch {
             startDownloadNodes(
                 nodes = listOf(event.node),
                 isHighPriority = true,
@@ -322,7 +321,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         if (event.node == null) {
             return
         }
-        currentInProgressJob = viewModelScope.launch {
+        viewModelScope.launch {
             startDownloadNodes(
                 nodes = listOf(event.node),
                 event.isHighPriority,
@@ -478,16 +477,26 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     }
 
     /**
-     * Cancel current in progress job
+     * Cancel the current in-progress transfers job.
+     *
+     * This won't stop the transfer flow immediately but will send a cancel token to the SDK, which will cancel the transfer flow with the appropriate events.
      */
-    fun cancelCurrentJob() {
-        currentInProgressJob?.cancel()
-        _uiState.update {
-            it.copy(
-                jobInProgressState = null,
-            )
+    fun cancelCurrentTransfersJob() =
+        viewModelScope.launch {
+            runCatching {
+                cancelCancelTokenUseCase()
+            }.onSuccess {
+                _uiState.update {
+                    if (it.jobInProgressState is StartTransferJobInProgress.ScanningTransfers) {
+                        it.copy(
+                            jobInProgressState = StartTransferJobInProgress.CancellingTransfers,
+                        )
+                    } else it
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
         }
-    }
 
     /**
      * consume prompt save destination event
@@ -560,29 +569,30 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         //check download speed and size to show rating
         if (checkShowDownloadRating) {
             viewModelScope.launch {
-                monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD).conflate().takeWhile {
-                    checkShowDownloadRating
-                }.catch {
-                    Timber.e(it)
-                }.collect { (transferTotals, paused) ->
-                    if (checkShowDownloadRating && !paused && transferTotals.totalFileTransfers > 0) {
-                        val currentDownloadSpeed = getCurrentDownloadSpeedUseCase()
-                        RatingHandlerImpl().showRatingBaseOnSpeedAndSize(
-                            size = transferTotals.totalFileTransfers.toLong(),
-                            speed = currentDownloadSpeed.toLong(),
-                            listener = object : OnCompleteListener {
-                                override fun onComplete() {
-                                    checkShowDownloadRating = false
-                                }
+                monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD).conflate()
+                    .takeWhile {
+                        checkShowDownloadRating
+                    }.catch {
+                        Timber.e(it)
+                    }.collect { (transferTotals, paused) ->
+                        if (checkShowDownloadRating && !paused && transferTotals.totalFileTransfers > 0) {
+                            val currentDownloadSpeed = getCurrentDownloadSpeedUseCase()
+                            RatingHandlerImpl().showRatingBaseOnSpeedAndSize(
+                                size = transferTotals.totalFileTransfers.toLong(),
+                                speed = currentDownloadSpeed.toLong(),
+                                listener = object : OnCompleteListener {
+                                    override fun onComplete() {
+                                        checkShowDownloadRating = false
+                                    }
 
 
-                                override fun onConditionsUnmet() {
-                                    checkShowDownloadRating = false
+                                    override fun onConditionsUnmet() {
+                                        checkShowDownloadRating = false
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
-                }
             }
         }
     }
