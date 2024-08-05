@@ -52,7 +52,6 @@ class TagsActivity : AppCompatActivity() {
             SessionContainer {
                 OriginalTempTheme(themeMode.isDarkMode()) {
                     TagsScreen(
-                        addNodeTag = viewModel::addNodeTag,
                         consumeInfoMessage = viewModel::consumeInfoMessage,
                         validateTagName = viewModel::validateTagName,
                         onBackPressed = onBackPressedDispatcher::onBackPressed,

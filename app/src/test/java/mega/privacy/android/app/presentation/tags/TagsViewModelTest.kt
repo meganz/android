@@ -10,11 +10,12 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.node.GetAllNodeTagsUseCase
 import mega.privacy.android.domain.usecase.node.ManageNodeTagUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -33,7 +34,7 @@ class TagsViewModelTest {
 
     private val manageNodeTagUseCase = mock<ManageNodeTagUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
-    private val monitorNodeUpdatesById = mock<MonitorNodeUpdatesById>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val getAllNodeTagsUseCase = mock<GetAllNodeTagsUseCase>()
     private val tagsValidationMessageMapper = mock<TagsValidationMessageMapper>()
     private lateinit var stateHandle: SavedStateHandle
@@ -43,14 +44,14 @@ class TagsViewModelTest {
     fun resetMock() {
         stateHandle = SavedStateHandle(mapOf(TagsActivity.NODE_ID to 123L))
         whenever(tagsValidationMessageMapper.invoke("")).thenReturn(Pair("", false))
-        whenever(monitorNodeUpdatesById.invoke(nodeId = NodeId(123L))).thenReturn(emptyFlow())
+        whenever(monitorNodeUpdatesUseCase.invoke()).thenReturn(emptyFlow())
         underTest = TagsViewModel(
             manageNodeTagUseCase = manageNodeTagUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
-            monitorNodeUpdatesById = monitorNodeUpdatesById,
             tagsValidationMessageMapper = tagsValidationMessageMapper,
             stateHandle = stateHandle,
-            getAllNodeTagsUseCase = getAllNodeTagsUseCase
+            getAllNodeTagsUseCase = getAllNodeTagsUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase
         )
     }
 
@@ -59,15 +60,23 @@ class TagsViewModelTest {
         reset(
             manageNodeTagUseCase,
             getNodeByIdUseCase,
-            monitorNodeUpdatesById,
-            tagsValidationMessageMapper
+            monitorNodeUpdatesUseCase,
+            tagsValidationMessageMapper,
+            getAllNodeTagsUseCase,
         )
     }
 
     @Test
     fun `test that getNodeByHandle update uiState with nodeHandle and tags`() = runTest {
-        whenever(monitorNodeUpdatesById.invoke(nodeId = NodeId(123L))).thenReturn(emptyFlow())
+        whenever(monitorNodeUpdatesUseCase.invoke()).thenReturn(emptyFlow())
         whenever(getAllNodeTagsUseCase("")).thenReturn(listOf("tag1", "tag2"))
+        whenever(
+            tagsValidationMessageMapper.invoke(
+                "",
+                nodeTags = listOf("tag1", "tag2"),
+                userTags = listOf("tag1", "tag2")
+            )
+        ).thenReturn(Pair("", false))
         val node = mock<TypedNode> {
             on { id } doReturn NodeId(123L)
             on { name } doReturn "tags"
@@ -75,25 +84,24 @@ class TagsViewModelTest {
         }
         whenever(getNodeByIdUseCase(NodeId(123L))).thenReturn(node)
         val nodeId = NodeId(123L)
-        underTest.getNodeTags(nodeId)
+        underTest.updateExistingTagsAndErrorState(nodeId)
         val uiState = underTest.uiState.value
         assertThat(uiState.tags).containsExactly("tag1", "tag2")
     }
 
     @Test
     fun `test that getNodeByHandle logs an error when getNodeByIdUseCase fails`() = runTest {
-        whenever(monitorNodeUpdatesById.invoke(nodeId = NodeId(123L))).thenReturn(emptyFlow())
+        whenever(monitorNodeUpdatesUseCase.invoke()).thenReturn(emptyFlow())
         whenever(getNodeByIdUseCase(NodeId(123L))).thenThrow(RuntimeException())
+        whenever(
+            tagsValidationMessageMapper.invoke(
+                "",
+                nodeTags = listOf("tag1", "tag2"),
+                userTags = listOf("tag1", "tag2")
+            )
+        ).thenReturn(Pair("", false))
         val nodeHandle = NodeId(123L)
-        underTest.getNodeTags(nodeHandle)
-    }
-
-    @Test
-    fun `test that addNodeTag updates the node tags`() = runTest {
-        whenever(monitorNodeUpdatesById.invoke(nodeId = NodeId(123L))).thenReturn(emptyFlow())
-        whenever(manageNodeTagUseCase(NodeId(123L), newTag = "new tag")).thenReturn(Unit)
-        underTest.addNodeTag("new tag")
-        verify(manageNodeTagUseCase).invoke(NodeId(123L), newTag = "new tag")
+        underTest.updateExistingTagsAndErrorState(nodeHandle)
     }
 
     @Test
@@ -105,11 +113,18 @@ class TagsViewModelTest {
 
 
     @Test
-    fun `test that monitorNodeUpdatesById updates the node`() = runTest {
-        whenever(monitorNodeUpdatesById.invoke(nodeId = NodeId(123L))).thenReturn(
-            flowOf(listOf(NodeChanges.Tags))
+    fun `test that monitorNodeUpdatesUseCase updates the node`() = runTest {
+        val node = mock<TypedNode> {
+            on { id } doReturn NodeId(123L)
+            on { name } doReturn "tags"
+            on { tags } doReturn listOf("tag1", "tag2")
+        }
+        whenever(monitorNodeUpdatesUseCase.invoke()).thenReturn(emptyFlow()).thenReturn(
+            flowOf(
+                NodeUpdate(changes = mapOf(node to listOf(NodeChanges.Tags)))
+            )
         )
-        underTest.getNodeTags(NodeId(123L))
+        underTest.updateExistingTagsAndErrorState(NodeId(123L))
         verify(getNodeByIdUseCase, times(2)).invoke(NodeId(123L))
     }
 
@@ -120,11 +135,18 @@ class TagsViewModelTest {
             on { name } doReturn "tags"
             on { tags } doReturn listOf("tag1", "tag2", "old tag")
         }
-        whenever(monitorNodeUpdatesById.invoke(nodeId = NodeId(123L))).thenReturn(emptyFlow())
+        whenever(
+            tagsValidationMessageMapper.invoke(
+                "",
+                nodeTags = listOf("tag1", "tag2", "old tag"),
+                userTags = emptyList()
+            )
+        ).thenReturn(Pair("", false))
+        whenever(monitorNodeUpdatesUseCase.invoke()).thenReturn(emptyFlow())
         whenever(manageNodeTagUseCase(NodeId(123L), oldTag = "old tag", newTag = null))
             .thenReturn(Unit)
         whenever(getNodeByIdUseCase(NodeId(123L))).thenReturn(node)
-        underTest.getNodeTags(NodeId(123L))
+        underTest.updateExistingTagsAndErrorState(NodeId(123L))
         underTest.addOrRemoveTag("old tag")
         verify(manageNodeTagUseCase).invoke(NodeId(123L), oldTag = "old tag", newTag = null)
     }

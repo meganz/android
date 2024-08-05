@@ -39,6 +39,7 @@ import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -65,11 +66,12 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetImageNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
-import mega.privacy.android.domain.usecase.account.IsProAccountUseCase
+import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
@@ -148,7 +150,8 @@ class FileInfoViewModel @Inject constructor(
     private val monitorOfflineFileAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
-    private val isProAccountUseCase: IsProAccountUseCase,
+    private val getAccountTypeUseCase: GetAccountTypeUseCase,
+    private val isBusinessAccountActive: IsBusinessAccountActive,
     private val getImageNodeByNodeId: GetImageNodeByIdUseCase,
     @IoDispatcher private val iODispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -185,7 +188,7 @@ class FileInfoViewModel @Inject constructor(
         checkDescriptionFlag()
         checkMapLocationFeatureFlag()
         checkTagsFeatureFlag()
-        checkIsProAccount()
+        checkAccountStatus()
         viewModelScope.launch {
             val isRemindersForContactVerificationEnabled =
                 getContactVerificationWarningUseCase()
@@ -193,13 +196,23 @@ class FileInfoViewModel @Inject constructor(
         }
     }
 
-    private fun checkIsProAccount() = viewModelScope.launch {
+    private fun checkAccountStatus() = viewModelScope.launch {
         runCatching {
-            isProAccountUseCase()
+            getAccountTypeUseCase()
         }.onSuccess { result ->
-            _uiState.update { it.copy(isProAccount = result) }
+            if (result == AccountType.BUSINESS) {
+                runCatching {
+                    isBusinessAccountActive()
+                }.onSuccess { isBusinessAccountActive ->
+                    _uiState.update { it.copy(isBusinessAccountActive = isBusinessAccountActive) }
+                }.onFailure {
+                    Timber.e("Get isBusinessAccountActive failed with error: $it")
+                }
+            } else {
+                _uiState.update { it.copy(isProAccount = result != AccountType.FREE) }
+            }
         }.onFailure {
-            Timber.e("Get isProAccount failed $it")
+            Timber.e("Get getAccountType failed with error: $it")
         }
     }
 

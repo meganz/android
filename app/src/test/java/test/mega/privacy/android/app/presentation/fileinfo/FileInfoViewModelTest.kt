@@ -28,6 +28,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
@@ -39,9 +40,9 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -53,11 +54,12 @@ import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetImageNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
-import mega.privacy.android.domain.usecase.account.IsProAccountUseCase
+import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
@@ -147,7 +149,8 @@ internal class FileInfoViewModelTest {
     private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val isMediaUploadsEnabledUseCase = mock<IsMediaUploadsEnabledUseCase>()
-    private val isProAccountUseCase = mock<IsProAccountUseCase>()
+    private val getAccountTypeUseCase = mock<GetAccountTypeUseCase>()
+    private val isBusinessAccountActive = mock<IsBusinessAccountActive>()
     private val monitorOfflineFileAvailabilityUseCase =
         mock<MonitorOfflineFileAvailabilityUseCase>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
@@ -210,7 +213,8 @@ internal class FileInfoViewModelTest {
             getContactVerificationWarningUseCase,
             typedFileNode,
             previewFile,
-            isProAccountUseCase,
+            getAccountTypeUseCase,
+            isBusinessAccountActive,
         )
     }
 
@@ -254,9 +258,10 @@ internal class FileInfoViewModelTest {
             isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
             monitorOfflineFileAvailabilityUseCase = monitorOfflineFileAvailabilityUseCase,
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
-            isProAccountUseCase = isProAccountUseCase,
+            getAccountTypeUseCase = getAccountTypeUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
             getImageNodeByNodeId = getImageNodeByIdUseCase,
+            isBusinessAccountActive = isBusinessAccountActive,
             iODispatcher = UnconfinedTestDispatcher()
         )
     }
@@ -1008,9 +1013,9 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test that isProAccount is invoked when view model is initialized`() = runTest {
-        whenever(isProAccountUseCase()).thenReturn(true)
+        whenever(getAccountTypeUseCase()).thenReturn(AccountType.PRO_I)
         underTest.setNode(node.handle, true)
-        verify(isProAccountUseCase).invoke()
+        verify(getAccountTypeUseCase).invoke()
     }
 
     private fun mockMonitorStorageStateEvent(state: StorageState) {

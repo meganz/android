@@ -17,9 +17,9 @@ import mega.privacy.android.app.presentation.tags.TagsActivity.Companion.MAX_TAG
 import mega.privacy.android.app.presentation.tags.TagsActivity.Companion.NODE_ID
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.node.GetAllNodeTagsUseCase
 import mega.privacy.android.domain.usecase.node.ManageNodeTagUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -34,7 +34,7 @@ class TagsViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val tagsValidationMessageMapper: TagsValidationMessageMapper,
     private val getAllNodeTagsUseCase: GetAllNodeTagsUseCase,
-    monitorNodeUpdatesById: MonitorNodeUpdatesById,
+    monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     stateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -47,13 +47,17 @@ class TagsViewModel @Inject constructor(
     private val nodeId: NodeId = NodeId(stateHandle.get<Long>(NODE_ID) ?: -1L)
 
     init {
-        getNodeTags(nodeId)
+        updateExistingTagsAndErrorState(nodeId)
         viewModelScope.launch {
-            monitorNodeUpdatesById(nodeId).catch {
-                Timber.e(it, "Error monitoring node updates by id")
+            monitorNodeUpdatesUseCase().catch {
+                Timber.e(it, "Error monitoring node updates")
             }.conflate()
-                .collect {
-                    getNodeTags(nodeId)
+                .collect { nodeChanges ->
+                    if (nodeChanges.changes.any { it.key.id == nodeId }) {
+                        updateExistingTagsAndErrorState(nodeId)
+                    } else {
+                        validateTagName()
+                    }
                 }
         }
     }
@@ -63,31 +67,15 @@ class TagsViewModel @Inject constructor(
      *
      * @param nodeId    Node ID
      */
-    fun getNodeTags(nodeId: NodeId) {
+    fun updateExistingTagsAndErrorState(nodeId: NodeId) {
         viewModelScope.launch {
             runCatching {
                 getNodeByIdUseCase(nodeId)
             }.onSuccess { node ->
                 _uiState.update { it.copy(nodeTags = node?.tags.orEmpty().toImmutableList()) }
-                getAllNodeTags()
+                validateTagName()
             }.onFailure {
                 Timber.e(it, "Error getting node by handle")
-            }
-        }
-    }
-
-    /**
-     * Add a tag to a node.
-     *
-     * @param tag Tag to add
-     */
-    fun addNodeTag(tag: String) {
-        viewModelScope.launch {
-            runCatching {
-                manageNodeTagUseCase(nodeHandle = nodeId, newTag = tag)
-                onTagUpdateSuccess()
-            }.onFailure {
-                Timber.e(it, "Error adding tag to node")
             }
         }
     }
@@ -105,38 +93,25 @@ class TagsViewModel @Inject constructor(
      * @param tag   Tag to validate
      * @return      True if the tag is valid, false otherwise
      */
-    fun validateTagName(tag: String) {
-        viewModelScope.launch {
-            val tagString = tag.removePrefix("#").lowercase()
-            // Step 1: Validate the tag
-            val (message, isError) = tagsValidationMessageMapper(
-                tag = tagString,
-                nodeTags = uiState.value.nodeTags,
-                userTags = uiState.value.tags
-            )
-            // Step 2: Update UI state with validation result
-            _uiState.update {
-                it.copy(
-                    message = message,
-                    isError = isError,
-                    searchText = tagString
-                )
-            }
-
-            // Step 3: Get all node tags
-            getAllNodeTags()
-        }
-    }
-
-    private fun getAllNodeTags() {
+    fun validateTagName(tag: String = uiState.value.searchText) {
         viewModelScope.launch {
             runCatching {
-                getAllNodeTagsUseCase(searchString = uiState.value.searchText)
-            }.onSuccess { tags ->
+                getAllNodeTagsUseCase(searchString = tag)
+            }.onSuccess { userTags ->
+                val sortedTags = userTags.orEmpty()
+                    .sortedByDescending { it in uiState.value.nodeTags }
+                    .toImmutableList()
+                val (message, isError) = tagsValidationMessageMapper(
+                    tag = tag,
+                    nodeTags = uiState.value.nodeTags,
+                    userTags = userTags.orEmpty()
+                )
                 _uiState.update { currentState ->
                     currentState.copy(
-                        tags = tags.orEmpty().sortedByDescending { it in currentState.nodeTags }
-                            .toImmutableList()
+                        message = message,
+                        isError = isError,
+                        tags = sortedTags,
+                        searchText = tag
                     )
                 }
             }.onFailure {
@@ -167,7 +142,7 @@ class TagsViewModel @Inject constructor(
                     newTag = tag.takeUnless { isTagPresent },
                 )
                 onTagUpdateSuccess()
-                getAllNodeTags()
+                validateTagName()
                 Timber.d("Tag updated successfully $tag already exists: $isTagPresent")
             }.onFailure {
                 Timber.e(it)

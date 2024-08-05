@@ -234,6 +234,7 @@ internal fun FileInfoContent(
                         .padding(vertical = 8.dp),
                     tags = tags,
                     isProAccount = isProAccount,
+                    isBusinessAccountActive = isBusinessAccountActive,
                     onAddTagClick = onAddTagClick,
                     onUpgradeAccountClick = onUpgradeAccountClick
                 )

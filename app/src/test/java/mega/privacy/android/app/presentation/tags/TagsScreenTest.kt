@@ -22,7 +22,6 @@ class TagsScreenTest {
         // Test the TagsScreen
         composeTestRule.setContent {
             TagsScreen(
-                addNodeTag = {},
                 consumeInfoMessage = {},
                 validateTagName = { _ -> },
                 onBackPressed = {},
@@ -47,7 +46,6 @@ class TagsScreenTest {
     fun `test that tags are displayed when tags available in UI state`() {
         composeTestRule.setContent {
             TagsScreen(
-                addNodeTag = {},
                 consumeInfoMessage = {},
                 validateTagName = { _ -> },
                 onBackPressed = {},
