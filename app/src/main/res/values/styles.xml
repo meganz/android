@@ -209,9 +209,8 @@
     <!--- SnackBar -->
     <style name="Widget.Mega.SnackBar" parent="Widget.MaterialComponents.Snackbar">
         <item name="actionTextColorAlpha">1</item>
-        <item name="backgroundTintMode">add</item>
-        <item name="backgroundTint">@color/grey_087_white</item>
-        <item name="textColor">@color/white_087_grey_087</item>
+        <item name="backgroundTint">@color/color_component_toastBackground</item>
+        <item name="textColor">@color/color_text_inverse</item>
     </style>
 
     <style name="Widget.Mega.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">

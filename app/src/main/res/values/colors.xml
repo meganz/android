@@ -554,5 +554,7 @@
     <color name="color_primary_400">#FB6361</color>
     <color name="color_icon_fill">#303233</color>
     <color name="color_button_secondary">#494A4D</color>
+    <color name="color_component_toastBackground">#FF494A4D</color>
+    <color name="color_text_inverse">#FFFAFAFA</color>
 
 </resources>

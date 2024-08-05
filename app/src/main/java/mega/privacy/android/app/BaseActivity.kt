@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import dagger.hilt.android.AndroidEntryPoint
@@ -130,6 +131,7 @@ import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Base activity which includes common behaviors for several activities.
@@ -214,7 +216,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     @JvmField
     var legacyNameCollisionActivityContract: ActivityResultLauncher<ArrayList<NameCollisionUiEntity>>? =
         null
-
     protected val billingViewModel by viewModels<BillingViewModel>()
     protected val adsViewModel: AdsViewModel by viewModels()
     private val viewModel by viewModels<BaseViewModel>()
@@ -887,6 +888,10 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         }
 
         snackbar?.apply {
+            // Match snackbar time with compose MegaSnackbar
+            if (duration == LENGTH_LONG) {
+                duration = 4.seconds.inWholeMilliseconds.toInt()
+            }
             val snackbarLayout = this.view as SnackbarLayout
             if (forceDarkMode) {
                 setTextColor(resources.getColor(R.color.grey_alpha_087, theme))
