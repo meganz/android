@@ -84,6 +84,27 @@ internal class SyncBackgroundService : LifecycleService() {
         Timber.d("SyncBackgroundService created")
         serviceInstance = this
         startForegroundOnAndroid14()
+        monitorCompletedSyncTransfers()
+        lifecycleScope.launch {
+            combine(
+                monitorConnectivityUseCase(),
+                monitorSyncByWiFiUseCase(),
+                monitorBatteryInfoUseCase(),
+                monitorAccountDetailUseCase()
+            ) { connectedToInternet: Boolean, syncByWifi: Boolean, batteryInfo: BatteryInfo, accountDetail: AccountDetail ->
+                Triple(
+                    batteryInfo,
+                    Pair(
+                        connectedToInternet,
+                        syncByWifi,
+                    ),
+                    accountDetail.levelDetail?.accountType == AccountType.FREE
+                )
+            }.collect { (batteryInfo, connectionDetails, isFreeAccount) ->
+                val (connectedToInternet, syncByWifi) = connectionDetails
+                updateSyncState(connectedToInternet, syncByWifi, batteryInfo, isFreeAccount)
+            }
+        }
     }
 
     /*
@@ -131,27 +152,6 @@ internal class SyncBackgroundService : LifecycleService() {
         if (!loginMutex.isLocked) {
             lifecycleScope.launch {
                 runCatching { backgroundFastLoginUseCase() }.getOrElse(Timber::e)
-            }
-        }
-        monitorCompletedSyncTransfers()
-        lifecycleScope.launch {
-            combine(
-                monitorConnectivityUseCase(),
-                monitorSyncByWiFiUseCase(),
-                monitorBatteryInfoUseCase(),
-                monitorAccountDetailUseCase()
-            ) { connectedToInternet: Boolean, syncByWifi: Boolean, batteryInfo: BatteryInfo, accountDetail: AccountDetail ->
-                Triple(
-                    batteryInfo,
-                    Pair(
-                        connectedToInternet,
-                        syncByWifi,
-                    ),
-                    accountDetail.levelDetail?.accountType == AccountType.FREE
-                )
-            }.collect { (batteryInfo, connectionDetails, isFreeAccount) ->
-                val (connectedToInternet, syncByWifi) = connectionDetails
-                updateSyncState(connectedToInternet, syncByWifi, batteryInfo, isFreeAccount)
             }
         }
         return START_STICKY
