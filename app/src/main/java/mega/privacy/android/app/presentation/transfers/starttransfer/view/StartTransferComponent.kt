@@ -64,6 +64,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.Confirmatio
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 
 /**
@@ -243,7 +244,7 @@ private fun StartTransferComponent(
                         it.totalFiles,
                         it.totalFiles,
                     )
-                    snackBarHostState.showSnackbar(message)
+                    snackBarHostState.showAutoDurationSnackbar(message)
                     onScanningFinished(it)
                 }
 
@@ -334,7 +335,7 @@ private fun StartTransferComponent(
             runCatching {
                 folderPicker.launch(null)
             }.onFailure {
-                snackBarHostState.showSnackbar(context.getString(R.string.general_warning_no_picker))
+                snackBarHostState.showAutoDurationSnackbar(context.getString(R.string.general_warning_no_picker))
             }
         }
     }
@@ -443,11 +444,11 @@ private suspend fun consumeFinishProcessing(
                 coroutineScope {
                     launch {
                         delay(100)
-                        snackBarHostState.showSnackbar(message)
+                        snackBarHostState.showAutoDurationSnackbar(message)
                     }
                 }
             } else {
-                snackBarHostState.showSnackbar(message)
+                snackBarHostState.showAutoDurationSnackbar(message)
             }
         }
 
@@ -461,7 +462,7 @@ private suspend fun consumeFinishProcessing(
 
         else -> {
             Timber.e(event.exception)
-            snackBarHostState.showSnackbar(context.getString(R.string.general_error))
+            snackBarHostState.showAutoDurationSnackbar(context.getString(R.string.general_error))
         }
     }
 }
@@ -472,7 +473,7 @@ private suspend fun consumeMessage(
     context: Context,
 ) {
     //show snack bar with an optional action
-    val result = snackBarHostState.showSnackbar(
+    val result = snackBarHostState.showAutoDurationSnackbar(
         context.getString(event.message),
         event.action?.let { context.getString(it) }
     )

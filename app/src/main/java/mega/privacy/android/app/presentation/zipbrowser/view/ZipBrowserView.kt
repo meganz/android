@@ -41,6 +41,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -65,7 +66,7 @@ internal fun ZipBrowserView(
     LaunchedEffect(showSnackBar) {
         if (showSnackBar) {
             coroutineScope.launch {
-                snackBarHostState.showSnackbar(
+                snackBarHostState.showAutoDurationSnackbar(
                     context.resources.getString(R.string.message_zip_format_error)
                 )
             }

@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.graphics.Typeface
@@ -78,6 +78,10 @@ import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.timeline.view.AlbumListSkeletonView
 import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.button
@@ -88,10 +92,7 @@ import mega.privacy.android.shared.original.core.ui.theme.teal_200
 import mega.privacy.android.shared.original.core.ui.theme.teal_300
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
-import mega.privacy.android.domain.entity.photos.Album
-import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.CreateAlbumDialogButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CreateAlbumFABEvent
 import mega.privacy.mobile.analytics.event.DeleteAlbumCancelButtonPressedEvent
@@ -136,7 +137,7 @@ fun AlbumsView(
 
     if (albumsViewState.albumDeletedMessage.isNotEmpty()) {
         LaunchedEffect(Unit) {
-            scaffoldState.snackbarHostState.showSnackbar(
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                 message = albumsViewState.albumDeletedMessage,
             )
             delay(3000L)
@@ -150,7 +151,7 @@ fun AlbumsView(
             count = albumsViewState.removedLinksCount,
         )
         LaunchedEffect(Unit) {
-            scaffoldState.snackbarHostState.showSnackbar(
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                 message = snackbarMessage,
             )
             delay(3000L)

@@ -120,6 +120,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_
 import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import java.io.File
 
 internal object Constants {
@@ -269,7 +270,7 @@ internal fun TestPasswordComposeView(
     var errorAlertMessage by remember { mutableStateOf<String?>(null) }
 
     EventEffect(event = uiState.userMessage, onConsumed = onResetUserMessage) { res ->
-        snackBarHostState.showSnackbar(context.resources.getString(res))
+        snackBarHostState.showAutoDurationSnackbar(context.resources.getString(res))
     }
 
     EventEffect(

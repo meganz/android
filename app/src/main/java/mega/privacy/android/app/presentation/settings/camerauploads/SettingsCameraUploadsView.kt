@@ -69,6 +69,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
  * A Composable that holds views displaying the main Settings Camera Uploads screen
@@ -206,7 +207,7 @@ internal fun SettingsCameraUploadsView(
         event = uiState.snackbarMessage,
         onConsumed = { onSnackbarMessageConsumed() },
         action = { messageResId ->
-            scaffoldState.snackbarHostState.showSnackbar(
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                 message = context.resources.getString(messageResId),
             )
         },

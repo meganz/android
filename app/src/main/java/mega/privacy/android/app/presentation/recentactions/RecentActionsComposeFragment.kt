@@ -47,6 +47,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import javax.inject.Inject
 
 /**
@@ -123,7 +124,7 @@ class RecentActionsComposeFragment : Fragment() {
                                     showOptionsMenuForItem(it)
                                 } else {
                                     coroutineScope.launch {
-                                        snackbarHostState.showSnackbar(
+                                        snackbarHostState.showAutoDurationSnackbar(
                                             message = getString(R.string.error_server_connection_problem),
                                         )
                                     }

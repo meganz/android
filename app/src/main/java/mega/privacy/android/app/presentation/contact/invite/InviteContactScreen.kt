@@ -112,6 +112,7 @@ import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -160,7 +161,7 @@ internal fun InviteContactRoute(
                         it.argument
                     )
                 } else context.getString(it.id)
-                snackBarHostState.showSnackbar(message)
+                snackBarHostState.showAutoDurationSnackbar(message)
             }
         }
     }
@@ -197,7 +198,7 @@ internal fun InviteContactRoute(
                             }
                         }
                     }
-                    snackBarHostState.showSnackbar(message)
+                    snackBarHostState.showAutoDurationSnackbar(message)
                 }
             }
 

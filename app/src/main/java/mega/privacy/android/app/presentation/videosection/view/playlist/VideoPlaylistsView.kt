@@ -56,6 +56,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -127,7 +128,7 @@ internal fun VideoPlaylistsView(
                 )
             }
             coroutineScope.launch {
-                snackBarHostState.showSnackbar(deletedMessage)
+                snackBarHostState.showAutoDurationSnackbar(deletedMessage)
             }
             onDeletedMessageShown()
         }

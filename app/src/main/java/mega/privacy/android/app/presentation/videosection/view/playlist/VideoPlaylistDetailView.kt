@@ -72,6 +72,7 @@ import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import nz.mega.sdk.MegaNode
 
 /**
@@ -138,7 +139,7 @@ fun VideoPlaylistDetailView(
                 playlist?.title
             )
             coroutineScope.launch {
-                snackBarHostState.showSnackbar(message)
+                snackBarHostState.showAutoDurationSnackbar(message)
             }
             addedMessageShown()
         }
@@ -163,7 +164,7 @@ fun VideoPlaylistDetailView(
                 playlist?.title
             )
             coroutineScope.launch {
-                snackBarHostState.showSnackbar(message)
+                snackBarHostState.showAutoDurationSnackbar(message)
             }
             removedMessageShown()
         }

@@ -21,6 +21,7 @@ import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssu
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLatestModifiedTimeEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLocalFileEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseRemoteFileEvent
@@ -149,7 +150,7 @@ internal fun SyncListRoute(
 
     LaunchedEffect(key1 = state.snackbarMessage) {
         message?.let {
-            snackBarHostState.showSnackbar(it)
+            snackBarHostState.showAutoDurationSnackbar(it)
             viewModel.handleAction(SyncListAction.SnackBarShown)
         }
     }

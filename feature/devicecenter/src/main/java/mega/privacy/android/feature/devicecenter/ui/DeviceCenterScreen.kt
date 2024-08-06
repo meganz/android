@@ -61,6 +61,7 @@ import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnack
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.sync.ui.SyncEmptyState
 import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogCancelButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogDisplayedEvent
@@ -147,7 +148,7 @@ internal fun DeviceCenterScreen(
         event = uiState.renameDeviceSuccess,
         onConsumed = onRenameDeviceSuccessfulSnackbarShown,
         action = {
-            snackbarHostState.showSnackbar(
+            snackbarHostState.showAutoDurationSnackbar(
                 context.resources.getString(
                     R.string.device_center_snackbar_message_rename_device_successful
                 )

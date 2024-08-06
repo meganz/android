@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.ReactionsInfoView
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReactionUser
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
  * Bottom sheet for reactions for a message
@@ -53,7 +54,7 @@ fun ReactionsInfoBottomSheet(
         coroutineScope.launch {
             val isMe = uiState.myUserHandle == userHandle
             if (isMe) {
-                scaffoldState.snackbarHostState.showSnackbar(context.getString(R.string.contact_is_me))
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(context.getString(R.string.contact_is_me))
             } else {
                 getUser(UserId(userHandle))?.let { user ->
                     val isUserMyContact = user.visibility == UserVisibility.Visible

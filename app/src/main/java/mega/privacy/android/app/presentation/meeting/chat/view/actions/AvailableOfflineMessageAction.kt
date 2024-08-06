@@ -19,12 +19,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
-import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
-import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ChatConversationAvailableOfflineActionMenuItemEvent
 import timber.log.Timber
 
@@ -86,7 +87,7 @@ internal class AvailableOfflineMessageAction(
                 val isAvailableOffline = viewModel.isAvailableOffline(fileNode)
                 if (isAvailableOffline) {
                     viewModel.removeOfflineNode(fileNode)
-                    snackbarHostState?.showSnackbar(removeMessage)
+                    snackbarHostState?.showAutoDurationSnackbar(removeMessage)
                 } else {
                     chatViewModel.onDownloadForOfflineChatNode(fileNode)
                 }

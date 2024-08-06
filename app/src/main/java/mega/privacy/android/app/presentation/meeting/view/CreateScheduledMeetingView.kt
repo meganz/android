@@ -25,7 +25,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Surface
@@ -90,6 +89,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -251,9 +251,8 @@ internal fun CreateScheduledMeetingView(
         EventEffect(
             event = state.snackbarMessageContent, onConsumed = onResetSnackbarMessage
         ) {
-            scaffoldState.snackbarHostState.showSnackbar(
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                 message = it,
-                duration = SnackbarDuration.Short
             )
         }
     }

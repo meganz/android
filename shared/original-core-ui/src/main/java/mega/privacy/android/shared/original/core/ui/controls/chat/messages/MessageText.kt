@@ -35,6 +35,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackB
 import mega.privacy.android.shared.original.core.ui.controls.text.megaSpanStyle
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.robotoMono
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
  * Message text view.
@@ -457,7 +458,7 @@ fun OpenMessageLink(link: String) {
         uriHandler.openUri(link.completeURLProtocol())
     }.onFailure {
         coroutineScope.launch {
-            snackbarHostState?.showSnackbar(context.getString(R.string.chat_click_link_in_message_intent_not_available))
+            snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.chat_click_link_in_message_intent_not_available))
         }
     }
 }

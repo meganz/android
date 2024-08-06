@@ -23,9 +23,10 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.attachmen
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFileExplorerActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openNameCollisionActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuItemEvent
 
@@ -91,7 +92,7 @@ internal class ImportMessageAction(
                         } else {
                             null
                         }?.let {
-                            snackbarHostState?.showSnackbar(it)
+                            snackbarHostState?.showAutoDurationSnackbar(it)
                         }
                         if (conflictNodes.isNotEmpty()) {
                             launchNameCollisionActivity(
@@ -120,14 +121,14 @@ internal class ImportMessageAction(
                         }
                     }
                 }.onFailure {
-                    snackbarHostState?.showSnackbar(error)
+                    snackbarHostState?.showAutoDurationSnackbar(error)
                     onHandled()
                 }
             }
         }
         collisionsResult?.let {
             LaunchedEffect(Unit) {
-                collisionsResult?.let { snackbarHostState?.showSnackbar(it) }
+                collisionsResult?.let { snackbarHostState?.showAutoDurationSnackbar(it) }
                 onHandled()
             }
         }

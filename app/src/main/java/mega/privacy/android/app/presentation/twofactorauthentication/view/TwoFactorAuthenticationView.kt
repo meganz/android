@@ -33,10 +33,11 @@ import mega.privacy.android.app.presentation.twofactorauthentication.model.Scree
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.AuthenticationCompletedScreen
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.AuthenticationScreen
-import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.InitialisationScreen
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.AuthenticationSetupScreen
+import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.InitialisationScreen
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -117,7 +118,7 @@ internal fun TwoFactorAuthenticationView(
         val onBeginSetupClicked: () -> Unit = {
             if (uiState.is2FAFetchCompleted && uiState.seed.isNullOrEmpty()) {
                 coroutineScope.launch {
-                    snackBarHostState.showSnackbar(context.resources.getString(R.string.qr_seed_text_error))
+                    snackBarHostState.showAutoDurationSnackbar(context.resources.getString(R.string.qr_seed_text_error))
                 }
             } else {
                 currentScreen.value = ScreenType.SetupScreen
@@ -168,14 +169,14 @@ internal fun TwoFactorAuthenticationView(
             event = uiState.seedCopiedToClipboardEvent,
             onConsumed = onIsSeedCopiedToClipboardConsumed
         ) {
-            snackBarHostState.showSnackbar(context.resources.getString(R.string.messages_copied_clipboard))
+            snackBarHostState.showAutoDurationSnackbar(context.resources.getString(R.string.messages_copied_clipboard))
         }
 
         EventEffect(
             event = uiState.writePermissionDeniedEvent,
             onConsumed = onIsWritePermissionDeniedConsumed
         ) {
-            snackBarHostState.showSnackbar(context.resources.getString(R.string.denied_write_permissions))
+            snackBarHostState.showAutoDurationSnackbar(context.resources.getString(R.string.denied_write_permissions))
         }
 
         EventEffect(
@@ -189,7 +190,7 @@ internal fun TwoFactorAuthenticationView(
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                snackBarHostState.showSnackbar(context.resources.getString(R.string.general_text_error))
+                snackBarHostState.showAutoDurationSnackbar(context.resources.getString(R.string.general_text_error))
             }
         }
 
@@ -201,7 +202,7 @@ internal fun TwoFactorAuthenticationView(
             AuthenticationState.Error,
             -> {
                 LaunchedEffect(key1 = uiState.authenticationState) {
-                    snackBarHostState.showSnackbar(context.resources.getString(R.string.error_enable_2fa))
+                    snackBarHostState.showAutoDurationSnackbar(context.resources.getString(R.string.error_enable_2fa))
                 }
             }
 

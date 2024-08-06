@@ -55,8 +55,9 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.LabelTex
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -90,7 +91,7 @@ internal fun ConfirmEmailRoute(
     val successMessage = stringResource(id = R.string.confirm_email_misspelled_email_sent)
     LaunchedEffect(uiState.shouldShowSuccessMessage) {
         if (uiState.shouldShowSuccessMessage) {
-            snackBarHostState.showSnackbar(
+            snackBarHostState.showAutoDurationSnackbar(
                 message = successMessage
             )
             viewModel.onSuccessMessageDisplayed()
@@ -99,7 +100,7 @@ internal fun ConfirmEmailRoute(
 
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let {
-            snackBarHostState.showSnackbar(
+            snackBarHostState.showAutoDurationSnackbar(
                 message = it
             )
             viewModel.onErrorMessageDisplayed()
@@ -121,7 +122,7 @@ internal fun ConfirmEmailRoute(
             },
             onShowOfflineMessage = {
                 coroutineScope.launch {
-                    snackBarHostState.showSnackbar(
+                    snackBarHostState.showAutoDurationSnackbar(
                         message = offlineSnackBarMessage
                     )
                 }

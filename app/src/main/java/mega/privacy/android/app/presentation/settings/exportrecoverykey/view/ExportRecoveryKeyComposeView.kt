@@ -43,6 +43,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDi
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import java.io.File
 
 private typealias ExportRecoveryAction = () -> Unit
@@ -107,7 +108,7 @@ fun ExportRecoveryKeyView(
     ) { paddingValues ->
         uiState.message?.let {
             LaunchedEffect(it) {
-                snackBarHostState.showSnackbar(it)
+                snackBarHostState.showAutoDurationSnackbar(it)
                 onSnackBarShown()
             }
         }

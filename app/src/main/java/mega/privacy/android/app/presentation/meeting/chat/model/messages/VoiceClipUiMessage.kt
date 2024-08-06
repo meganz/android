@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.CoreVoiceClipMessageView
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
  * UI message for voice clip
@@ -52,7 +53,7 @@ class VoiceClipUiMessage(
                     viewModel.onPlayOrPauseClicked(msgId)
                 } else {
                     coroutineScope.launch {
-                        snackbarHostState?.showSnackbar(context.getString(R.string.error_message_voice_clip))
+                        snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.error_message_voice_clip))
                     }
                 }
             }

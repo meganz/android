@@ -82,6 +82,7 @@ import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.MultipleAlbumLinksScreenEvent
 
 private typealias ImageDownloader = (photo: Photo, callback: (Boolean) -> Unit) -> Unit
@@ -316,7 +317,7 @@ private fun AlbumGetMultipleLinksContent(
                     clipboardManager.setText(AnnotatedString(albumsLinks))
 
                     coroutineScope.launch {
-                        scaffoldState.snackbarHostState.showSnackbar(
+                        scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                             message = context.resources.getQuantityString(
                                 R.plurals.album_share_links_copied,
                                 links.size,

@@ -27,9 +27,10 @@ import mega.privacy.android.feature.sync.ui.views.SyncOptionsDialog
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R
 import mega.privacy.mobile.analytics.event.SyncOptionSelected
 import mega.privacy.mobile.analytics.event.SyncOptionSelectedEvent
-import mega.privacy.android.shared.resources.R
 
 @Composable
 internal fun SettingsSyncRoute(
@@ -131,7 +132,7 @@ private fun SettingSyncScreen(
     val context = LocalContext.current
     LaunchedEffect(key1 = uiState.snackbarMessage) {
         uiState.snackbarMessage?.let { message ->
-            scaffoldState.snackbarHostState.showSnackbar(context.resources.getString(message))
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(context.resources.getString(message))
         }
     }
 }

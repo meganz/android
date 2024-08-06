@@ -95,6 +95,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_te
 import mega.privacy.android.shared.original.core.ui.theme.extensions.yellow_100_yellow_700_alpha_015
 import mega.privacy.android.shared.original.core.ui.theme.subtitle1
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
  * Screen is shown when user taps on Upgrade button
@@ -260,7 +261,7 @@ fun UpgradeAccountView(
                             if (isPaymentMethodAvailable) {
                                 if (disableCardClick) {
                                     coroutineScope.launch {
-                                        scaffoldState.snackbarHostState.showSnackbar(
+                                        scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                                             message = context.getString(R.string.account_upgrade_account_snackbar_recurring_plan_already_exist)
                                         )
                                     }

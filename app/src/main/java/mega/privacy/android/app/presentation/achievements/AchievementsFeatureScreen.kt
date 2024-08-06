@@ -27,6 +27,7 @@ import mega.privacy.android.app.presentation.achievements.invites.navigateToInvi
 import mega.privacy.android.app.presentation.achievements.referral.navigateToReferralBonus
 import mega.privacy.android.app.presentation.achievements.referral.referralBonusScreen
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
  * Scaffold for the Achievements Flow Screen
@@ -48,7 +49,7 @@ fun AchievementsFeatureScreen(
      * the view model instance to the AchievementsRoute, better to just put the effect to ease out future modification.
      */
     EventEffect(uiState.errorMessage, viewModel::resetErrorState) {
-        snackbarHostState.showSnackbar(context.resources.getString(it))
+        snackbarHostState.showAutoDurationSnackbar(context.resources.getString(it))
     }
 
     Scaffold(

@@ -95,6 +95,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
@@ -157,7 +158,7 @@ internal fun QRCodeView(
         event = viewState.resultMessage,
         onConsumed = onResultMessageConsumed
     ) {
-        snackBarHostState.showSnackbar(context.resources.getString(it.first, *it.second))
+        snackBarHostState.showAutoDurationSnackbar(context.resources.getString(it.first, *it.second))
     }
 
     EventEffect(
@@ -446,7 +447,7 @@ private fun ShowSnackBar(
     }
     snackBarText?.let {
         coroutineScope.launch {
-            snackbarHostState.showSnackbar(snackBarText)
+            snackbarHostState.showAutoDurationSnackbar(snackBarText)
         }
     }
 }
@@ -550,8 +551,8 @@ private fun handleSave(
                 bitmap?.let {
                     saveBitmap(bitmap, qrFilePath)
                     onSaveQRCode()
-                } ?: snackBarHostState.showSnackbar(activity.getString(R.string.general_text_error))
-            }.onFailure { snackBarHostState.showSnackbar(activity.getString(R.string.general_text_error)) }
+                } ?: snackBarHostState.showAutoDurationSnackbar(activity.getString(R.string.general_text_error))
+            }.onFailure { snackBarHostState.showAutoDurationSnackbar(activity.getString(R.string.general_text_error)) }
         }
     }
 }
@@ -572,8 +573,8 @@ private fun handleShare(
                     val file = saveBitmap(bitmap, qrFilePath)
                     val uri = getFileUri(activity, file)
                     shareImage(activity, uri)
-                } ?: snackBarHostState.showSnackbar(activity.getString(R.string.error_share_qr))
-            }.onFailure { snackBarHostState.showSnackbar(activity.getString(R.string.error_share_qr)) }
+                } ?: snackBarHostState.showAutoDurationSnackbar(activity.getString(R.string.error_share_qr))
+            }.onFailure { snackBarHostState.showAutoDurationSnackbar(activity.getString(R.string.error_share_qr)) }
         }
     }
 }

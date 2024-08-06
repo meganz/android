@@ -51,6 +51,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 @Composable
 internal fun SyncNewFolderScreen(
@@ -105,7 +106,7 @@ internal fun SyncNewFolderScreen(
                     onConsumed = { viewModel.onShowSnackbarConsumed() },
                 ) { stringId ->
                     stringId?.let {
-                        scaffoldState.snackbarHostState.showSnackbar(context.getString(stringId))
+                        scaffoldState.snackbarHostState.showAutoDurationSnackbar(context.getString(stringId))
                     }
                 }
             }
@@ -152,7 +153,7 @@ private fun SyncNewFolderScreenContent(
                     folderPicker.launch(null)
                 }.onFailure {
                     coroutineScope.launch {
-                        snackBarHostState.showSnackbar(context.getString(sharedResR.string.general_no_picker_warning))
+                        snackBarHostState.showAutoDurationSnackbar(context.getString(sharedResR.string.general_no_picker_warning))
                     }
                 }
             } else {
@@ -209,7 +210,7 @@ private fun SyncNewFolderScreenContent(
                         folderPicker.launch(null)
                     }.onFailure {
                         coroutineScope.launch {
-                            snackBarHostState.showSnackbar(context.getString(sharedResR.string.general_no_picker_warning))
+                            snackBarHostState.showAutoDurationSnackbar(context.getString(sharedResR.string.general_no_picker_warning))
                         }
                     }
                 } else {

@@ -33,14 +33,15 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ChatConversationAddParticipantsMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ChatConversationArchiveMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ChatConversationCallMenuToolbarEvent
@@ -87,7 +88,7 @@ internal fun ChatAppBar(
             onStartCall(isVideoCall)
         } else {
             coroutineScope.launch {
-                val result = snackBarHostState.showSnackbar(
+                val result = snackBarHostState.showAutoDurationSnackbar(
                     context.getString(R.string.allow_acces_calls_subtitle_microphone),
                     context.getString(R.string.general_allow),
                 )

@@ -63,7 +63,6 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -74,6 +73,7 @@ import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -204,7 +204,7 @@ class IncomingSharesComposeFragment : Fragment() {
                                 showOptionsMenuForItem(it)
                             } else {
                                 coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(
+                                    snackbarHostState.showAutoDurationSnackbar(
                                         message = getString(R.string.error_server_connection_problem),
                                     )
                                 }

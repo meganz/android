@@ -74,6 +74,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 internal object Constants {
 
@@ -189,7 +190,7 @@ internal fun FolderLinkView(
     )
 
     EventEffect(event = state.snackbarMessageContent, onConsumed = onResetSnackbarMessage) {
-        scaffoldState.snackbarHostState.showSnackbar(it)
+        scaffoldState.snackbarHostState.showAutoDurationSnackbar(it)
     }
 
     LaunchedEffect(modalSheetState.isVisible) {

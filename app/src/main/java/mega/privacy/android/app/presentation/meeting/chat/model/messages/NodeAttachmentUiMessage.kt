@@ -35,6 +35,7 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import java.io.File
 
@@ -66,7 +67,7 @@ data class NodeAttachmentUiMessage(
         val onClick: () -> Unit = {
             coroutineScope.launch {
                 if (!message.exists) {
-                    snackbarHostState?.showSnackbar(context.getString(R.string.error_file_not_available))
+                    snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.error_file_not_available))
                     return@launch
                 }
                 runCatching {
@@ -243,7 +244,7 @@ data class NodeAttachmentUiMessage(
                     context.startActivity(intent)
                 }.onFailure {
                     // no activity found to open file, just show download snackbar
-                    snackbarHostState?.showSnackbar(context.getString(R.string.general_already_downloaded))
+                    snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.general_already_downloaded))
                 }
             }
         } else {
@@ -268,7 +269,7 @@ data class NodeAttachmentUiMessage(
             nodeHandle = fileNode.id.longValue
         ) {
             coroutineScope.launch {
-                snackbarHostState?.showSnackbar(context.getString(R.string.message_zip_format_error))
+                snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.message_zip_format_error))
             }
         }
     }

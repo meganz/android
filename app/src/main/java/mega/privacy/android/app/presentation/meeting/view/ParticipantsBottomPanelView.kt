@@ -69,6 +69,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_200_gr
 import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.utils.isScreenOrientationLandscape
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ScheduledMeetingShareMeetingLinkButtonEvent
 
 /**
@@ -166,9 +167,8 @@ fun BottomPanelView(
     ) {
         if (!uiState.handRaisedSnackbarMsg.equals(consumed) && uiState.isBottomPanelExpanded) {
             coroutineScope.launch {
-                val result = snackbarHostState.showSnackbar(
+                val result = snackbarHostState.showAutoDurationSnackbar(
                     message = it,
-                    duration = SnackbarDuration.Short
                 )
 
                 if (result == SnackbarResult.Dismissed) {

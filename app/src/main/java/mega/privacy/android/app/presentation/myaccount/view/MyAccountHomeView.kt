@@ -135,6 +135,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPr
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_grey_800
 import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import java.io.File
 
 internal object Constants {
@@ -206,7 +207,7 @@ fun MyAccountHomeView(
         var accountTypeHeight by remember { mutableStateOf(0.dp) }
 
         EventEffect(event = uiState.userMessage, onConsumed = uiActions::resetUserMessage) { res ->
-            snackBarHostState.showSnackbar(context.resources.getString(res))
+            snackBarHostState.showAutoDurationSnackbar(context.resources.getString(res))
         }
 
         EventEffect(

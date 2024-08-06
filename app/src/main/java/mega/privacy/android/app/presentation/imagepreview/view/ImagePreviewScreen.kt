@@ -98,6 +98,7 @@ import mega.privacy.android.shared.original.core.ui.theme.teal_200
 import mega.privacy.android.shared.original.core.ui.theme.teal_300
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ImagePreviewHideNodeMenuToolBarEvent
 
 @Composable
@@ -187,7 +188,7 @@ internal fun ImagePreviewScreen(
 
         if (viewState.resultMessage.isNotEmpty()) {
             LaunchedEffect(Unit) {
-                scaffoldState.snackbarHostState.showSnackbar(
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                     message = viewState.resultMessage,
                 )
                 viewModel.clearResultMessage()
@@ -196,7 +197,7 @@ internal fun ImagePreviewScreen(
 
         if (viewState.showDeletedMessage) {
             LaunchedEffect(Unit) {
-                scaffoldState.snackbarHostState.showSnackbar(
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                     message = context.getString(R.string.context_correctly_removed),
                 )
                 viewModel.hideDeletedMessage()

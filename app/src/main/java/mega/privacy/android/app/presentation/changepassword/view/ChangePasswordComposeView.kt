@@ -80,6 +80,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.white
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import nz.mega.sdk.MegaApiJava
 
 internal object Constants {
@@ -197,13 +198,13 @@ fun ChangePasswordView(
             when {
                 uiState.isConnectedToNetwork.not() -> {
                     coroutineScope.launch {
-                        snackBarHostState.showSnackbar(noConnectionMessage)
+                        snackBarHostState.showAutoDurationSnackbar(noConnectionMessage)
                     }
                 }
 
                 isTnCChecked.not() -> {
                     coroutineScope.launch {
-                        snackBarHostState.showSnackbar(notCheckedMessage)
+                        snackBarHostState.showAutoDurationSnackbar(notCheckedMessage)
                     }
                 }
 
@@ -215,7 +216,7 @@ fun ChangePasswordView(
 
         LaunchedEffect(uiState.snackBarMessage) {
             if (uiState.snackBarMessage != null) {
-                snackBarHostState.showSnackbar(context.resources.getString(uiState.snackBarMessage))
+                snackBarHostState.showAutoDurationSnackbar(context.resources.getString(uiState.snackBarMessage))
                 onSnackBarShown()
             }
         }

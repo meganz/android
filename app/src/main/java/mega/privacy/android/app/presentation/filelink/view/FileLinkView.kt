@@ -47,6 +47,7 @@ import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWi
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
  * View to render the File Link Screen, including toolbar, content, etc.
@@ -83,7 +84,7 @@ internal fun FileLinkView(
         event = viewState.errorMessage,
         onConsumed = onErrorMessageConsumed
     ) {
-        snackBarHostState.showSnackbar(context.resources.getString(it))
+        snackBarHostState.showAutoDurationSnackbar(context.resources.getString(it))
     }
 
     EventEffect(event = viewState.overQuotaError, onConsumed = onOverQuotaErrorConsumed) {

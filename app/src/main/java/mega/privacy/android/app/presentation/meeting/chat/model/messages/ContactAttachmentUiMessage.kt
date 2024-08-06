@@ -26,11 +26,12 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.contact.C
 import mega.privacy.android.app.presentation.meeting.chat.view.message.contact.ContactMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openSentRequests
+import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
+import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.shared.original.core.ui.controls.chat.UiChatStatus
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
-import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
-import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
  * Contact attachment ui message
@@ -126,7 +127,7 @@ internal fun onUserClick(
         { openContactInfoActivity(context, email) },
         {
             coroutineScope.launch {
-                val result = snackbarHostState?.showSnackbar(
+                val result = snackbarHostState?.showAutoDurationSnackbar(
                     context.getString(
                         R.string.user_is_not_contact,
                         name
@@ -151,7 +152,7 @@ internal fun onUserClick(
         },
         {
             coroutineScope.launch {
-                val result = snackbarHostState?.showSnackbar(
+                val result = snackbarHostState?.showAutoDurationSnackbar(
                     context.getString(
                         R.string.contact_already_invited,
                         name

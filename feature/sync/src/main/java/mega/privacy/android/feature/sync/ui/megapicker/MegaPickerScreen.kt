@@ -38,6 +38,7 @@ import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import nz.mega.sdk.MegaApiJava
 
 @Composable
@@ -121,7 +122,7 @@ internal fun MegaPickerScreen(
 
     LaunchedEffect(errorMessageId) {
         if (errorMessageId != null) {
-            snackbarHostState.showSnackbar(
+            snackbarHostState.showAutoDurationSnackbar(
                 message = context.resources.getString(errorMessageId),
             )
             errorMessageShown()

@@ -96,6 +96,7 @@ import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -248,7 +249,7 @@ fun ScheduledMeetingInfoView(
         EventEffect(
             event = state.snackbarMsg, onConsumed = onResetStateSnackbarMessage
         ) {
-            scaffoldState.snackbarHostState.showSnackbar(it)
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(it)
         }
     }
 

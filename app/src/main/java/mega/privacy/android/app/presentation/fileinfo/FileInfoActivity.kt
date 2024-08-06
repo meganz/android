@@ -72,6 +72,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionAddedMessageDisplayedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoDescriptionUpdatedMessageDisplayedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoScreenEvent
@@ -191,7 +192,7 @@ class FileInfoActivity : BaseActivity() {
                     nodeAttachmentViewModel
                 ) { message, chatId ->
                     coroutineScope.launch {
-                        val result = snackBarHostState.showSnackbar(
+                        val result = snackBarHostState.showAutoDurationSnackbar(
                             message = message.ifBlank { getString(R.string.sent_as_message) },
                             actionLabel = getString(R.string.action_see)
                         )
@@ -472,12 +473,12 @@ class FileInfoActivity : BaseActivity() {
             FileInfoOneOffViewEvent.PublicLinkCopiedToClipboard -> {
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
                     //Android 13 and up shows a system notification, so no need to show the toast
-                    snackBarHostState.showSnackbar(getString(R.string.file_properties_get_link))
+                    snackBarHostState.showAutoDurationSnackbar(getString(R.string.file_properties_get_link))
                 }
             }
 
             is FileInfoOneOffViewEvent.GeneralError -> {
-                snackBarHostState.showSnackbar(getString(R.string.general_error))
+                snackBarHostState.showAutoDurationSnackbar(getString(R.string.general_error))
             }
 
             is FileInfoOneOffViewEvent.CollisionDetected -> {
@@ -489,7 +490,7 @@ class FileInfoActivity : BaseActivity() {
             is FileInfoOneOffViewEvent.Finished -> {
                 if (event.exception == null) {
                     event.successMessage(this)?.let {
-                        snackBarHostState.showSnackbar(it)
+                        snackBarHostState.showAutoDurationSnackbar(it)
                     }
                     sendBroadcast(
                         Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN).setPackage(
@@ -500,14 +501,14 @@ class FileInfoActivity : BaseActivity() {
                     Timber.e(event.exception)
                     if (!manageCopyMoveException(event.exception)) {
                         event.failMessage(this)?.let {
-                            snackBarHostState.showSnackbar(it)
+                            snackBarHostState.showAutoDurationSnackbar(it)
                         }
                     }
                 }
             }
 
             is FileInfoOneOffViewEvent.Message -> {
-                snackBarHostState.showSnackbar(getString(event.message))
+                snackBarHostState.showAutoDurationSnackbar(getString(event.message))
                 if (event is FileInfoOneOffViewEvent.Message.NodeDescriptionAdded) {
                     Analytics.tracker.trackEvent(NodeInfoDescriptionAddedMessageDisplayedEvent)
                 }

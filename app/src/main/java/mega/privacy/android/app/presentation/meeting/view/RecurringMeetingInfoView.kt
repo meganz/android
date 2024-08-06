@@ -76,6 +76,7 @@ import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
  * Recurring meeting info View
@@ -169,7 +170,7 @@ fun RecurringMeetingInfoView(
             event = managementState.snackbarMessageContent,
             onConsumed = onResetSnackbarMessage
         ) {
-            scaffoldState.snackbarHostState.showSnackbar(it)
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(it)
         }
     }
 

@@ -34,6 +34,7 @@ import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
  * Archived chats view
@@ -132,7 +133,7 @@ fun ArchivedChatsView(
 
     LaunchedEffect(state.snackBar) {
         state.snackBar?.let { snackBar ->
-            scaffoldState.snackbarHostState.showSnackbar(
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                 message = snackBar.getMessage(context.resources)
             )
             onSnackBarDismiss()

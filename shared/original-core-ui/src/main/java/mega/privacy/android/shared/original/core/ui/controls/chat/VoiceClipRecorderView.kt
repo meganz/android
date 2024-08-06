@@ -57,9 +57,10 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackB
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.tooltips.Tooltip
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -161,7 +162,7 @@ fun VoiceClipRecorderView(
     ) { isGranted ->
         if (!isGranted) {
             coroutineScope.launch {
-                val result = snackbarHostState?.showSnackbar(
+                val result = snackbarHostState?.showAutoDurationSnackbar(
                     context.getString(R.string.chat_microphone_permissions_denied_for_voice_clip),
                     context.getString(R.string.general_allow),
                 )

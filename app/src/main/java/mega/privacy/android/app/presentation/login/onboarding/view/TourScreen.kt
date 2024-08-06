@@ -62,6 +62,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -132,7 +133,7 @@ internal fun TourScreen(
             } else {
                 Timber.d("onActivityResult: PERMISSION DENIED")
                 coroutineScope.launch {
-                    val result = snackBarHostState.showSnackbar(
+                    val result = snackBarHostState.showAutoDurationSnackbar(
                         message = context.getString(R.string.meeting_bluetooth_connect_required_permissions_warning),
                         actionLabel = context.getString(R.string.action_settings)
                     )

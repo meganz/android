@@ -95,6 +95,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.react
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ChatConversationAddAttachmentButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ChatMessageLongPressedEvent
 
@@ -538,17 +539,17 @@ internal fun ChatView(
                         when {
                             info is InfoToShow.ForwardMessagesResult -> {
                                 info.result.getOpenChatId(chatId)?.let { openChatId ->
-                                    val result = scaffoldState.snackbarHostState.showSnackbar(
+                                    val result = scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                                         text,
                                         context.getString(R.string.general_confirmation_open)
                                     )
                                     if (result == SnackbarResult.ActionPerformed) {
                                         navigateToConversation(openChatId)
                                     }
-                                } ?: scaffoldState.snackbarHostState.showSnackbar(text)
+                                } ?: scaffoldState.snackbarHostState.showAutoDurationSnackbar(text)
                             }
 
-                            else -> scaffoldState.snackbarHostState.showSnackbar(text)
+                            else -> scaffoldState.snackbarHostState.showAutoDurationSnackbar(text)
                         }
                     }
                 } ?: context.findActivity()?.finish()
@@ -608,7 +609,7 @@ fun showPermissionNotAllowedSnackbar(
     @StringRes permissionStringId: Int,
 ) {
     coroutineScope.launch {
-        val result = snackBarHostState.showSnackbar(
+        val result = snackBarHostState.showAutoDurationSnackbar(
             context.getString(permissionStringId),
             context.getString(R.string.general_allow),
         )

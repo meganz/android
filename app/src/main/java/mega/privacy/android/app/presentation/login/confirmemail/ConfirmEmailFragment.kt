@@ -35,6 +35,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
 import javax.inject.Inject
@@ -96,7 +97,7 @@ class ConfirmEmailFragment : Fragment() {
                         stringResource(id = R.string.confirm_email_misspelled_email_sent)
                     LaunchedEffect(uiState.shouldShowSuccessMessage) {
                         if (uiState.shouldShowSuccessMessage) {
-                            snackBarHostState.showSnackbar(
+                            snackBarHostState.showAutoDurationSnackbar(
                                 message = successMessage
                             )
                             viewModel.onSuccessMessageDisplayed()
@@ -105,7 +106,7 @@ class ConfirmEmailFragment : Fragment() {
 
                     LaunchedEffect(uiState.errorMessage) {
                         uiState.errorMessage?.let {
-                            snackBarHostState.showSnackbar(
+                            snackBarHostState.showAutoDurationSnackbar(
                                 message = it
                             )
                             viewModel.onErrorMessageDisplayed()

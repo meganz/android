@@ -54,6 +54,7 @@ import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.isScrolledToEnd
 import mega.privacy.android.app.presentation.photos.view.isScrollingDown
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_038
@@ -68,7 +69,7 @@ import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
 import mega.privacy.android.shared.original.core.ui.theme.yellow_100
 import mega.privacy.android.shared.original.core.ui.theme.yellow_700
 import mega.privacy.android.shared.original.core.ui.theme.yellow_700_alpha_015
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
  * Base Compose Timeline View
@@ -109,14 +110,14 @@ fun TimelineView(
 
     LaunchedEffect(message) {
         if (message.isNotEmpty()) {
-            scaffoldState.snackbarHostState.showSnackbar(message)
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(message)
             message = ""
         }
     }
 
     LaunchedEffect(timelineViewState.cameraUploadsMessage) {
         if (timelineViewState.cameraUploadsMessage.isNotEmpty()) {
-            scaffoldState.snackbarHostState.showSnackbar(
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                 message = timelineViewState.cameraUploadsMessage,
             )
             clearCameraUploadsMessage()
@@ -125,7 +126,7 @@ fun TimelineView(
 
     LaunchedEffect(timelineViewState.showCameraUploadsCompletedMessage) {
         if (timelineViewState.showCameraUploadsCompletedMessage) {
-            scaffoldState.snackbarHostState.showSnackbar(
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                 message = context.resources.getQuantityString(
                     R.plurals.photos_camera_uploads_completed,
                     timelineViewState.cameraUploadsTotalUploaded,
@@ -138,7 +139,7 @@ fun TimelineView(
 
     LaunchedEffect(timelineViewState.showCameraUploadsChangePermissionsMessage) {
         if (timelineViewState.showCameraUploadsChangePermissionsMessage) {
-            val result = scaffoldState.snackbarHostState.showSnackbar(
+            val result = scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                 message = context.getString(R.string.camera_uploads_limited_access),
                 actionLabel = context.getString(R.string.file_properties_shared_folder_change_permissions),
             )

@@ -26,6 +26,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.MegaNavigatorEntryPoint
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import java.io.File
 import java.util.UUID
@@ -201,7 +202,7 @@ private suspend fun openZipFile(
         nodeHandle = content.nodeId.longValue,
     ) {
         coroutineScope.launch {
-            snackBarHostState?.showSnackbar(context.getString(R.string.message_zip_format_error))
+            snackBarHostState?.showAutoDurationSnackbar(context.getString(R.string.message_zip_format_error))
         }
     }
 }
@@ -281,7 +282,7 @@ private suspend fun openUrlFile(
             snackBarHostState = snackBarHostState
         )
     } ?: run {
-        snackBarHostState?.showSnackbar(message = context.getString(R.string.general_text_error))
+        snackBarHostState?.showAutoDurationSnackbar(message = context.getString(R.string.general_text_error))
     }
 }
 
@@ -325,7 +326,7 @@ private suspend fun openVideoOrAudioFile(
                 )
         }.onFailure {
             Timber.e(it)
-            snackBarHostState?.showSnackbar(message = context.getString(R.string.intent_not_available))
+            snackBarHostState?.showAutoDurationSnackbar(message = context.getString(R.string.intent_not_available))
         }
     }
 }
@@ -339,6 +340,6 @@ private suspend fun safeLaunchActivity(
         context.startActivity(intent)
     }.onFailure {
         Timber.e(it)
-        snackBarHostState?.showSnackbar(message = context.getString(R.string.intent_not_available))
+        snackBarHostState?.showAutoDurationSnackbar(message = context.getString(R.string.intent_not_available))
     }
 }

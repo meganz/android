@@ -47,13 +47,14 @@ import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.view.dialog.CancelScheduledMeetingDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.ForceAppUpdateDialog
+import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
+import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.red_600
-import mega.privacy.android.domain.entity.chat.ChatRoomItem
-import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
-import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
  * Chat tabs view
@@ -222,14 +223,14 @@ fun ChatTabsView(
             EventEffect(
                 event = state.snackbarMessageContent, onConsumed = onResetStateSnackbarMessage
             ) { resId ->
-                scaffoldState.snackbarHostState.showSnackbar(context.resources.getString(resId))
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(context.resources.getString(resId))
             }
 
             EventEffect(
                 event = managementState.snackbarMessageContent,
                 onConsumed = onResetManagementStateSnackbarMessage
             ) {
-                scaffoldState.snackbarHostState.showSnackbar(it)
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(it)
             }
         }
     }

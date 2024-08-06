@@ -44,6 +44,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.At
 import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.AttachItemPlaceHolder
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ChatConversationContactMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationFileMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationGIFMenuItemEvent
@@ -130,7 +131,7 @@ fun ChatToolbarBottomSheet(
             openAttachContactActivity(context, attachContactLauncher)
         } else {
             coroutineScope.launch {
-                scaffoldState.snackbarHostState.showSnackbar(context.getString(R.string.no_contacts_invite))
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(context.getString(R.string.no_contacts_invite))
             }
         }
     }

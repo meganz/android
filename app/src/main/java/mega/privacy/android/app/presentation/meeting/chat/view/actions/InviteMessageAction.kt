@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
 import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.Composable
-
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -16,9 +15,10 @@ import mega.privacy.android.app.presentation.meeting.chat.model.InviteUserAsCont
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.ContactAttachmentMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openSentRequests
-import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuItemEvent
 
@@ -48,7 +48,7 @@ class InviteMessageAction(
                         viewModel.inviteContact(messages.first() as ContactAttachmentMessage)
 
                     if (result is InviteUserAsContactResult.ContactInviteSent) {
-                        snackBarHostState?.showSnackbar(
+                        snackBarHostState?.showAutoDurationSnackbar(
                             result.toString(context),
                             context.getString(R.string.action_see)
                         ).also { snackBarResult ->
@@ -57,11 +57,11 @@ class InviteMessageAction(
                             }
                         }
                     } else {
-                        snackBarHostState?.showSnackbar(result.toString(context))
+                        snackBarHostState?.showAutoDurationSnackbar(result.toString(context))
                     }
                 } else {
                     viewModel.inviteMultipleContacts(messages as Set<ContactAttachmentMessage>)
-                        .also { result -> snackBarHostState?.showSnackbar(result.toString(context)) }
+                        .also { result -> snackBarHostState?.showAutoDurationSnackbar(result.toString(context)) }
                 }
                 Analytics.tracker.trackEvent(ChatConversationInviteActionMenuItemEvent)
                 onHandled()

@@ -50,6 +50,7 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.transfor
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.NodeInfoTagsAddedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoTagsRemovedEvent
 
@@ -89,10 +90,10 @@ fun TagsScreen(
         },
     ) { paddingValues ->
         EventEffect(event = uiState.informationMessage, onConsumed = consumeInfoMessage) { info ->
-            scaffoldState.snackbarHostState.showSnackbar(info.getInfo(context))
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(info.getInfo(context))
         }
         EventEffect(event = uiState.showMaxTagsError, onConsumed = { consumeMaxTagsError() }) {
-            scaffoldState.snackbarHostState.showSnackbar(
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                 message = context.getString(
                     sharedR.string.add_tags_error_max_tags,
                     MAX_TAGS_PER_NODE

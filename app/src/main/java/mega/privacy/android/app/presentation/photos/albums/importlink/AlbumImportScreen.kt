@@ -87,6 +87,7 @@ import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.AlbumImportInputDecryptionKeyDialogEvent
 import mega.privacy.mobile.analytics.event.AlbumImportSaveToCloudDriveButtonEvent
 import mega.privacy.mobile.analytics.event.AlbumImportSaveToDeviceButtonEvent
@@ -146,7 +147,7 @@ internal fun AlbumImportScreen(
         val message = state.importAlbumMessage
 
         if (message != null) {
-            scaffoldState.snackbarHostState.showSnackbar(message)
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(message)
             albumImportViewModel.clearImportAlbumMessage()
         }
     }
@@ -241,7 +242,7 @@ internal fun AlbumImportScreen(
                             albumImportViewModel.clearSelection()
                         } else {
                             coroutineScope.launch {
-                                scaffoldState.snackbarHostState.showSnackbar(
+                                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                                     message = context.resources.getString(R.string.error_server_connection_problem),
                                 )
                             }
@@ -282,7 +283,7 @@ internal fun AlbumImportScreen(
                             onPreviewPhoto(photo)
                         } else {
                             coroutineScope.launch {
-                                scaffoldState.snackbarHostState.showSnackbar(
+                                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
                                     message = context.resources.getString(R.string.error_server_connection_problem),
                                 )
                             }

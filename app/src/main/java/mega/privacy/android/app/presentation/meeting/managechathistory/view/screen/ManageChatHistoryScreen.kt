@@ -61,6 +61,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import java.util.Locale
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -88,7 +89,7 @@ internal fun ManageChatHistoryRoute(
 
     LaunchedEffect(uiState.statusMessageResId) {
         uiState.statusMessageResId?.let {
-            snackBarHostState.showSnackbar(
+            snackBarHostState.showAutoDurationSnackbar(
                 message = context.getString(it)
             )
             viewModel.onStatusMessageDisplayed()

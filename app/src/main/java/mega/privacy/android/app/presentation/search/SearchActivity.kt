@@ -96,6 +96,7 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -151,7 +152,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         registerForActivityResult(LegacyNameCollisionActivityContract()) { result: String? ->
             if (result != null) {
                 lifecycleScope.launch {
-                    snackbarHostState.showSnackbar(result)
+                    snackbarHostState.showAutoDurationSnackbar(result)
                 }
             }
         }
@@ -370,7 +371,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                 ) { info ->
                     info?.let {
                         info.getInfo(this@SearchActivity).let { text ->
-                            scaffoldState.snackbarHostState.showSnackbar(text)
+                            scaffoldState.snackbarHostState.showAutoDurationSnackbar(text)
                         }
                     } ?: findActivity()?.finish()
                 }
@@ -486,7 +487,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             startActivity(this)
         }.onFailure { error ->
             Timber.e(error)
-            snackbarHostState.showSnackbar(getString(R.string.intent_not_available))
+            snackbarHostState.showAutoDurationSnackbar(getString(R.string.intent_not_available))
         }
     }
 
@@ -501,7 +502,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             nodeHandle = fileNode.id.longValue
         ) {
             lifecycleScope.launch {
-                snackbarHostState.showSnackbar(getString(R.string.message_zip_format_error))
+                snackbarHostState.showAutoDurationSnackbar(getString(R.string.message_zip_format_error))
             }
         }
     }
