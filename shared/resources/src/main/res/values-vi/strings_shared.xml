@@ -293,7 +293,7 @@
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_list_empty_state_title">Không có đồng&#160;bộ nào đã lập</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Đồng&#160;bộ một thư&#160;mục cục&#160;bộ trong thiết&#160;bị của bạn với một thư&#160;mục trên MEGA.</string>
+    <string name="device_center_sync_list_empty_state_message">Sync a folder on your device with a folder on MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Thêm đồng&#160;bộ mới</string>
     <!-- Text for the Sync solved issues chip -->
@@ -441,7 +441,7 @@
     <!-- Rewind duration available in the free plan -->
     <string name="account_cancel_account_screen_plan_rewind_free">Lên đến 30 ngày (chỉ được xem)</string>
     <!-- Rewind duration available in the current plan. %1s represents the number of days. -->
-    <string name="account_cancel_account_screen_plan_rewind_current">Up to %1s days</string>
+    <string name="account_cancel_account_screen_plan_rewind_current">Lên đến %1s ngày</string>
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
@@ -479,15 +479,15 @@
     <!-- Label for the subscription managed by App Store on Cancellation instructions screen-->
     <string name="account_cancellation_instructions_ios_device">Trên thiết&#160;bị iOS</string>
     <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
-    <string name="account_cancellation_instructions_open_settings">1. Open the [A]Settings[/A] app.</string>
+    <string name="account_cancellation_instructions_open_settings">1. Mở app [A]Cài&#160;đặt[/A].</string>
     <!-- Step 2: instruction step no.2 to Tap on the name in the iOS device-->
     <string name="account_cancellation_instructions_tap_on_name">2. Chạm vào tên của bạn.</string>
     <!-- Step 3: instruction step no.3 to Select subscriptions section in the iOS device-->
-    <string name="account_cancellation_instructions_select_subscriptions">3. Tap [A]Subscriptions[/A].</string>
+    <string name="account_cancellation_instructions_select_subscriptions">3. Chạm vào [A]Gói thuê&#160;bao[/A].</string>
     <!-- Step 4: instruction step no.4 to Select MEGA subscription in the iOS device -->
     <string name="account_cancellation_instructions_select_mega_subscription">4. Chạm vào gói đăng&#160;ký MEGA.</string>
     <!-- Step 5: instruction step no.5 to Select Cancel subscription of the App inside subscription section in the iOS device-->
-    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Tap [A]Cancel subscription[/A].</string>
+    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Chạm vào [A]Hủy đăng&#160;ký[/A].</string>
     <!-- Message description to provide the user with more details on how to cancel your subscription on a computer or other device. -->
     <string name="account_cancellation_instructions_detailed_instructions">[A]Chạm vào đây[/A] để được hướng&#160;dẫn chi&#160;tiết về cách hủy gói đăng&#160;ký của bạn trên máy&#160;tính hoặc loại thiết&#160;bị khác.</string>
     <!-- Title shown when needing to cancel the subscription using a web browser -->
@@ -544,4 +544,48 @@
     <string name="general_invalid_characters_defined">Các ký&#160;tự này không&#160;được phép sử&#160;dụng: %1$s</string>
     <!-- Sync settings section title-->
     <string name="settings_section_sync">Đồng bộ</string>
+    <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
+    <string name="transfers_scanning_folders_dialog_creating_folders_title">Đang tạo các thư mục&#8230;</string>
+    <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
+    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Đang bắt&#160;đầu truyền tải&#8230;</string>
+    <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
+    <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Xin đừng đóng ứng dụng. Nếu bạn đóng, các phiên truyền tải chưa được xếp hàng sẽ bị mất.</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
+    <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
+        <item quantity="other">Tìm thấy 1 thư&#160;mục và %1$d tệp&#160;tin.</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
+    <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
+        <item quantity="one">%1$d folder</item>
+        <item quantity="other">%1$d folders</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
+    <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
+        <item quantity="other">%1$d/%2$d thư&#160;mục</item>
+    </plurals>
+    <!-- Title of the clear debris item displayed in the sync settings menu -->
+    <string name="settings_sync_clear_debris_item_title">Dọn .debris (nhớ tạm cục&#160;bộ)</string>
+    <!-- Title of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_title">Xóa rác vụn?</string>
+    <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_body">Backups of the previous versions of your synced files will be permanently deleted from your device. \n\nCheck the .debris folder in your local device to see if you need to restore anything.</string>
+    <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_cancel">Hủy</string>
+    <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_continue">Tiếp tục</string>
+    <!-- Snackbar message shown when user clears debris from settings menu -->
+    <string name="settings_sync_debris_cleared_message">Thư mục chứa .debris đã được dọn sạch</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
+    <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
+        <item quantity="one">Found %1$s folder and %2$d file.</item>
+        <item quantity="other">Found %1$s and %2$d files.</item>
+    </plurals>
+    <!-- Label for the file info information screen no tags label -->
+    <string name="file_info_information_no_tags_label">No tags</string>
+    <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
+    <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Đang hủy các phiên truyền tải&#8230;</string>
+    <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
+    <string name="report_issue_error_minimum_characters">Enquiries must be at least 10 characters</string>
+    <!-- placeholder message for report issue-->
+    <string name="report_issue_description_placeholder_message">Describe the issue with at least 10 characters</string>
 </resources>

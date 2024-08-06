@@ -65,7 +65,7 @@
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="general_sync_failure_accessing_persistent_storage">無法讀取同步位置。檢查該位置是否可用，而且是否已授予該資料夾位置的權限。</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">An unknown error occurred. Contact support@mega.nz.</string>
+    <string name="general_sync_message_unknown_error">發生未知錯誤。請聯繫support@mega.nz。</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
@@ -293,7 +293,7 @@
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_list_empty_state_title">未設定同步</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">將裝置上的本地資料夾與MEGA上的資料夾同步。</string>
+    <string name="device_center_sync_list_empty_state_message">將裝置上的資料夾與MEGA上的資料夾同步。</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">加入新的同步</string>
     <!-- Text for the Sync solved issues chip -->
@@ -544,4 +544,46 @@
     <string name="general_invalid_characters_defined">不允許使用以下字元：%1$s</string>
     <!-- Sync settings section title-->
     <string name="settings_section_sync">同步</string>
+    <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
+    <string name="transfers_scanning_folders_dialog_creating_folders_title">正在建立資料夾⋯</string>
+    <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
+    <string name="transfers_scanning_folders_dialog_starting_transfers_title">開始傳輸⋯</string>
+    <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
+    <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">請不要關閉應用程式。如果關閉，未在佇列中的傳輸將遺失。</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
+    <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
+        <item quantity="other">找到1個資料夾和%1$d個檔案。</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
+    <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
+        <item quantity="other">%1$d個資料夾</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
+    <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
+        <item quantity="other">%1$d/%2$d個資料夾</item>
+    </plurals>
+    <!-- Title of the clear debris item displayed in the sync settings menu -->
+    <string name="settings_sync_clear_debris_item_title">清除.debris（本地快取）</string>
+    <!-- Title of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_title">要清除同步碎片嗎？</string>
+    <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_body">同步檔案的先前版本的備份將從您的裝置中永久刪除。\n\n檢查本地裝置中的.debris資料夾，看看是否需要恢復任何內容。</string>
+    <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_cancel">取消</string>
+    <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_continue">繼續</string>
+    <!-- Snackbar message shown when user clears debris from settings menu -->
+    <string name="settings_sync_debris_cleared_message">.Debris資料夾已成功清除</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
+    <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
+        <item quantity="other">找到%1$s個和%2$d檔案。</item>
+    </plurals>
+    <!-- Label for the file info information screen no tags label -->
+    <string name="file_info_information_no_tags_label">No tags</string>
+    <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
+    <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">正在取消傳輸⋯</string>
+    <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
+    <string name="report_issue_error_minimum_characters">查詢內容必須至少10個字元（5個中文字）</string>
+    <!-- placeholder message for report issue-->
+    <string name="report_issue_description_placeholder_message">問題描述至少10個字元（5個中文字）</string>
 </resources>

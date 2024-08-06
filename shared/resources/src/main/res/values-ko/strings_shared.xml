@@ -65,7 +65,7 @@
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="general_sync_failure_accessing_persistent_storage">동기화 위치를 읽을 수 없습니다. 위치에 접근 가능한지 여부와 폴더 위치에 대한 권한이 승인 되었는지 확인하세요.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">An unknown error occurred. Contact support@mega.nz.</string>
+    <string name="general_sync_message_unknown_error">알 수 없는 오류가 발생하였습니다. support@mega.nz에 연락하세요.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
@@ -293,7 +293,7 @@
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_list_empty_state_title">설정된 동기화가 없습니다</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">장치의 로컬 폴더를 MEGA의 폴더와 동기화하세요.</string>
+    <string name="device_center_sync_list_empty_state_message">장치의 폴더를 MEGA의 폴더와 동기화하세요.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">새 동기화 추가</string>
     <!-- Text for the Sync solved issues chip -->
@@ -425,7 +425,7 @@
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">저장소</string>
     <!-- Storage amount available in the free plan. %1s represents the amount of storage in GB. -->
-    <string name="account_cancel_account_screen_plan_free_storage">%1s&#160;GB</string>
+    <string name="account_cancel_account_screen_plan_free_storage">%1sGB</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">전송</string>
     <!-- Transfer limit in the free plan -->
@@ -441,7 +441,7 @@
     <!-- Rewind duration available in the free plan -->
     <string name="account_cancel_account_screen_plan_rewind_free">최대 30일 (보기 전용)</string>
     <!-- Rewind duration available in the current plan. %1s represents the number of days. -->
-    <string name="account_cancel_account_screen_plan_rewind_current">Up to %1s days</string>
+    <string name="account_cancel_account_screen_plan_rewind_current">최대 %1s일</string>
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
@@ -479,15 +479,15 @@
     <!-- Label for the subscription managed by App Store on Cancellation instructions screen-->
     <string name="account_cancellation_instructions_ios_device">iOS 장치에서</string>
     <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
-    <string name="account_cancellation_instructions_open_settings">1. Open the [A]Settings[/A] app.</string>
+    <string name="account_cancellation_instructions_open_settings">1. [A]설정[/A] 앱을 엽니다.</string>
     <!-- Step 2: instruction step no.2 to Tap on the name in the iOS device-->
     <string name="account_cancellation_instructions_tap_on_name">2. 이름을 탭합니다.</string>
     <!-- Step 3: instruction step no.3 to Select subscriptions section in the iOS device-->
-    <string name="account_cancellation_instructions_select_subscriptions">3. Tap [A]Subscriptions[/A].</string>
+    <string name="account_cancellation_instructions_select_subscriptions">3. [A]구독[/A]을 탭합니다.</string>
     <!-- Step 4: instruction step no.4 to Select MEGA subscription in the iOS device -->
     <string name="account_cancellation_instructions_select_mega_subscription">4. 당신의 MEGA 구독을 탭합니다.</string>
     <!-- Step 5: instruction step no.5 to Select Cancel subscription of the App inside subscription section in the iOS device-->
-    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Tap [A]Cancel subscription[/A].</string>
+    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. [A]구독 취소[/A]를 탭합니다.</string>
     <!-- Message description to provide the user with more details on how to cancel your subscription on a computer or other device. -->
     <string name="account_cancellation_instructions_detailed_instructions">컴퓨터 또는 다른 장치에서 구독을 취소하는 자세한 방법은 [A]여기를 탭[/A]하세요.</string>
     <!-- Title shown when needing to cancel the subscription using a web browser -->
@@ -544,4 +544,46 @@
     <string name="general_invalid_characters_defined">다음의 문자는 허용되지 않습니다: %1$s</string>
     <!-- Sync settings section title-->
     <string name="settings_section_sync">동기화</string>
+    <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
+    <string name="transfers_scanning_folders_dialog_creating_folders_title">폴더 생성 중...</string>
+    <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
+    <string name="transfers_scanning_folders_dialog_starting_transfers_title">전송 시작 중...</string>
+    <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
+    <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">앱을 닫지 마세요. 만약 닫으면, 아직 대기열에 들어가지 않은 전송이 손실됩니다.</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
+    <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
+        <item quantity="other">폴더 1개와 파일 %1$d개 발견</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
+    <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
+        <item quantity="other">폴더 %1$d개</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
+    <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
+        <item quantity="other">%1$d/%2$d 폴더</item>
+    </plurals>
+    <!-- Title of the clear debris item displayed in the sync settings menu -->
+    <string name="settings_sync_clear_debris_item_title">.debris (로컬 캐시) 지우기</string>
+    <!-- Title of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_title">debris를 지울까요?</string>
+    <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_body">동기화된 파일의 이전 버전의 백업이 장치에서 영구적으로 삭제됩니다.\n\n복구해야 할 것이 있다면 로컬 장치의 .debris 폴더를 확인하세요.</string>
+    <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_cancel">취소</string>
+    <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_continue">계속</string>
+    <!-- Snackbar message shown when user clears debris from settings menu -->
+    <string name="settings_sync_debris_cleared_message">.debris 폴더를 성공적으로 지웠습니다</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
+    <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
+        <item quantity="other">%1$s와/과 파일 %2$d개 발견</item>
+    </plurals>
+    <!-- Label for the file info information screen no tags label -->
+    <string name="file_info_information_no_tags_label">No tags</string>
+    <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
+    <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">전송 취소 중...</string>
+    <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
+    <string name="report_issue_error_minimum_characters">문의사항은 최소 10자 이상이어야 합니다</string>
+    <!-- placeholder message for report issue-->
+    <string name="report_issue_description_placeholder_message">문제에 대한 설명을 최소 10자 이상을 입력하세요</string>
 </resources>

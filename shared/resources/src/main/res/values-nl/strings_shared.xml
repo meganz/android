@@ -65,7 +65,7 @@
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="general_sync_failure_accessing_persistent_storage">Kan de synchronisatielocatie niet lezen. Controleer of de locatie toegankelijk is en of er machtigingen voor de maplocatie zijn verleend.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">An unknown error occurred. Contact support@mega.nz.</string>
+    <string name="general_sync_message_unknown_error">Er is een onbekende fout opgetreden. Neem contact op support@mega.nz.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Er is iets misgegaan.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
@@ -301,7 +301,7 @@
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_list_empty_state_title">Geen synchronisaties ingesteld</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Synchroniseer een lokale map op uw apparaat met een map op MEGA.</string>
+    <string name="device_center_sync_list_empty_state_message">Synchroniseer een map op uw apparaat met een map op MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Nieuwe synchronisatie toevoegen</string>
     <!-- Text for the Sync solved issues chip -->
@@ -552,4 +552,50 @@
     <string name="general_invalid_characters_defined">De volgende tekens zijn niet toegestaan: %1$s</string>
     <!-- Sync settings section title-->
     <string name="settings_section_sync">Synchroniseren</string>
+    <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
+    <string name="transfers_scanning_folders_dialog_creating_folders_title">Mappen creëren&#8230;</string>
+    <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
+    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Overdrachten starten...</string>
+    <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
+    <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Sluit de applicatie niet. Als u sluit, gaan overdrachten die nog niet in de wachtrij staan ​​verloren.</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
+    <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
+        <item quantity="one">Er is 1 map gevonden en %1$d bestand.</item>
+        <item quantity="other">Er is 1 map gevonden en %1$d bestanden.</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
+    <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
+        <item quantity="one">%1$d map</item>
+        <item quantity="other">%1$d mappen</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
+    <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
+        <item quantity="one">%1$d/%2$d map</item>
+        <item quantity="other">%1$d/%2$d mappen</item>
+    </plurals>
+    <!-- Title of the clear debris item displayed in the sync settings menu -->
+    <string name="settings_sync_clear_debris_item_title">.Debris wissen (lokale cache)</string>
+    <!-- Title of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_title">Puin opruimen?</string>
+    <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_body">Back-ups van de vorige versies van uw gesynchroniseerde bestanden worden permanent van uw apparaat verwijderd. \n\nControleer de map .debris op uw lokale apparaat om te zien of u iets nodig hebt om te herstellen.</string>
+    <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_cancel">Annuleren</string>
+    <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_continue">Doorgaan</string>
+    <!-- Snackbar message shown when user clears debris from settings menu -->
+    <string name="settings_sync_debris_cleared_message">.debris map met succes gewist</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
+    <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
+        <item quantity="one">%1$s map en %2$d bestand gevonden</item>
+        <item quantity="other">%1$s mappen en %2$d bestanden gevonden</item>
+    </plurals>
+    <!-- Label for the file info information screen no tags label -->
+    <string name="file_info_information_no_tags_label">No tags</string>
+    <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
+    <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Overdrachten annuleren...</string>
+    <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
+    <string name="report_issue_error_minimum_characters">Vragen moeten minstens 10 tekens lang zijn</string>
+    <!-- placeholder message for report issue-->
+    <string name="report_issue_description_placeholder_message">Beschrijf het probleem met minstens 10 tekens</string>
 </resources>

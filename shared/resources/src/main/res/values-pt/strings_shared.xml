@@ -309,7 +309,7 @@
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_list_empty_state_title">Não há sincronizações configuradas</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Sincronize uma pasta local no seu dispositivo com uma pasta no MEGA.</string>
+    <string name="device_center_sync_list_empty_state_message">Sincronize uma pasta no seu dispositivo com uma pasta no MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Adicionar uma nova sincronização</string>
     <!-- Text for the Sync solved issues chip -->
@@ -560,4 +560,53 @@
     <string name="general_invalid_characters_defined">Os seguintes caracteres não são permitidos: %1$s</string>
     <!-- Sync settings section title-->
     <string name="settings_section_sync">Sincronizar</string>
+    <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
+    <string name="transfers_scanning_folders_dialog_creating_folders_title">Criando pastas&#8230;</string>
+    <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
+    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Iniciando transferências&#8230;</string>
+    <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
+    <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Não feche o aplicativo. Ao fechar, as transferências que ainda não estiverem na lista serão perdidas.</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
+    <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
+        <item quantity="one">1 pasta e %1$d arquivo encontrados.</item>
+        <item quantity="many">1 pasta e %1$d de arquivos encontrados.</item>
+        <item quantity="other">1 pasta e %1$d arquivos encontrados.</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
+    <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
+        <item quantity="one">%1$d folder</item>
+        <item quantity="other">%1$d folders</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
+    <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
+        <item quantity="one">%1$d/%2$d pasta</item>
+        <item quantity="many">%1$d/%2$d de pastas</item>
+        <item quantity="other">%1$d/%2$d pastas</item>
+    </plurals>
+    <!-- Title of the clear debris item displayed in the sync settings menu -->
+    <string name="settings_sync_clear_debris_item_title">Deletar .debris (cache local)</string>
+    <!-- Title of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_title">Deletar debris?</string>
+    <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_body">Os backups das versões anteriores dos seus arquivos sincronizados serão permanentemente excluídos do seu dispositivo. \n\nVerifique a pasta .debris no seu dispositivo local para ver se você precisa restaurar alguma coisa.</string>
+    <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_cancel">Cancelar</string>
+    <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_continue">Continuar</string>
+    <!-- Snackbar message shown when user clears debris from settings menu -->
+    <string name="settings_sync_debris_cleared_message">O conteúdo da pasta .debris foi deletado</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
+    <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
+        <item quantity="one">%1$s pasta e %2$d arquivo encontrados.</item>
+        <item quantity="many">%1$s e %2$d de arquivos encontrados.</item>
+        <item quantity="other">%1$s e %2$d arquivos encontrados.</item>
+    </plurals>
+    <!-- Label for the file info information screen no tags label -->
+    <string name="file_info_information_no_tags_label">No tags</string>
+    <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
+    <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Cancelando transferências&#8230;</string>
+    <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
+    <string name="report_issue_error_minimum_characters">As perguntas devem ter pelo menos 10 caracteres</string>
+    <!-- placeholder message for report issue-->
+    <string name="report_issue_description_placeholder_message">Descreva o problema usando um mínimo de 10 caracteres</string>
 </resources>
