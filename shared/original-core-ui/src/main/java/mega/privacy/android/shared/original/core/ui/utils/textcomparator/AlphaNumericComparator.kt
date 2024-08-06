@@ -1,5 +1,7 @@
 package mega.privacy.android.shared.original.core.ui.utils.textcomparator
 
+import java.math.BigDecimal
+
 /**
  * Comparator to sort strings in alphanumeric order.
  */
@@ -47,11 +49,12 @@ class AlphanumericComparator : Comparator<String> {
     }
 
 
-    private fun extractNumber(str: String, startIndex: Int): Int {
+    private fun extractNumber(str: String, startIndex: Int): BigDecimal {
         var endIndex = startIndex
         while (endIndex < str.length && str[endIndex].isDigit()) {
             endIndex++
         }
-        return str.substring(startIndex, endIndex).toInt()
+        return runCatching { str.substring(startIndex, endIndex).toBigDecimal() }
+            .getOrDefault(BigDecimal.ZERO)
     }
 }
