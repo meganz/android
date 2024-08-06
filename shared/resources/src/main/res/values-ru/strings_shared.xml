@@ -317,7 +317,7 @@
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_list_empty_state_title">Синхронизация не настроена</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Синхронизируйте локальную папку на устройстве с папкой в MEGA.</string>
+    <string name="device_center_sync_list_empty_state_message">Синхронизируйте папку на устройстве с папкой в MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Добавить синхронизацию</string>
     <!-- Text for the Sync solved issues chip -->
@@ -568,4 +568,58 @@
     <string name="general_invalid_characters_defined">Следующие символы не допускаются: %1$s</string>
     <!-- Sync settings section title-->
     <string name="settings_section_sync">Синхронизация</string>
+    <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
+    <string name="transfers_scanning_folders_dialog_creating_folders_title">Создание папок&#8230;</string>
+    <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
+    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Запуск передач&#8230;</string>
+    <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
+    <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Не закрывайте приложение. Если закрыть, ещё не поставленные в очередь передачи будут потеряны.</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
+    <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
+        <item quantity="one">Найдена 1 папка и %1$d файл.</item>
+        <item quantity="few">Найдена 1 папка и %1$d файла.</item>
+        <item quantity="many">Найдена 1 папка и %1$d файлов.</item>
+        <item quantity="other">Найдена 1 папка и %1$d файла.</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
+    <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
+        <item quantity="one">%1$d папка</item>
+        <item quantity="few">%1$d папки</item>
+        <item quantity="many">%1$d папок</item>
+        <item quantity="other">%1$d папки</item>
+    </plurals>
+    <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
+    <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
+        <item quantity="one">%1$d папка из %2$d</item>
+        <item quantity="few">%1$d папки из %2$d</item>
+        <item quantity="many">%1$d папок из %2$d</item>
+        <item quantity="other">%1$d папки из %2$d</item>
+    </plurals>
+    <!-- Title of the clear debris item displayed in the sync settings menu -->
+    <string name="settings_sync_clear_debris_item_title">Очистить .debris (локальный кеш)</string>
+    <!-- Title of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_title">Очистить .debris?</string>
+    <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_body">Резервные копии предыдущих версий синхронизируемых файлов будут безвозвратно удалены с вашего устройства. \n\nПроверьте папку .debris на локальном устройстве, чтобы узнать, нужно ли что-то восстановить.</string>
+    <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_cancel">Отмена</string>
+    <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
+    <string name="settings_sync_clear_debris_dialog_continue">Продолжить</string>
+    <!-- Snackbar message shown when user clears debris from settings menu -->
+    <string name="settings_sync_debris_cleared_message">Папка .debris успешно очищена</string>
+    <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
+    <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
+        <item quantity="one">Найдены %1$s и %2$d файл.</item>
+        <item quantity="few">Найдены %1$s и %2$d файла.</item>
+        <item quantity="many">Найдены %1$s и %2$d файлов.</item>
+        <item quantity="other">Найдены %1$s и %2$d файла.</item>
+    </plurals>
+    <!-- Label for the file info information screen no tags label -->
+    <string name="file_info_information_no_tags_label">No tags</string>
+    <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
+    <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Отмена передач&#8230;</string>
+    <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
+    <string name="report_issue_error_minimum_characters">Сообщение должно содержать не менее 10 символов</string>
+    <!-- placeholder message for report issue-->
+    <string name="report_issue_description_placeholder_message">Опишите проблему, используя не менее 10 символов</string>
 </resources>

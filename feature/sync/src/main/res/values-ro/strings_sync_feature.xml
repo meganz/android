@@ -7,7 +7,7 @@
     <!-- Sync text of sync-->
     <string name="sync">Sincronizează</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">MEGA trebuie să acceseze spațiul de stocare al aparatului dvs. pentru a sincroniza folderul local. Atingeți aici pentru a permite accesul.</string>
+    <string name="sync_storage_permission_banner">MEGA trebuie să acceseze spațiul de stocare al dispozitivului dvs. pentru a sincroniza folderul local. Atingeți aici pentru a permite accesul.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">Pentru a sincroniza continuu fișierele și folderele, permiteți MEGA să ruleze în fundal</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -53,7 +53,7 @@
     <!-- Sync message when conflict resolved -->
     <string name="sync_stalled_issue_conflict_resolved">Conflictul a fost rezolvat</string>
     <!-- Sync message to access storage permission on device -->
-    <string name="sync_access_storage_permission_message">Pentru backup-ul fișierelor dvs., MEGA are nevoie de acces la fișierele și folderele din acest aparat. Datele dvs. sunt întotdeauna în siguranță la noi.</string>
+    <string name="sync_access_storage_permission_message">Pentru backup-ul fișierelor dvs., MEGA are nevoie de acces la fișierele și folderele din acest dispozitiv. Datele dvs. sunt întotdeauna în siguranță la noi.</string>
     <!-- Sync dialog continue button -->
     <string name="sync_dialog_file_permission_positive_button">Continuați</string>
     <!-- Sync dialog not now button -->
@@ -69,7 +69,7 @@
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">Nicio problemă</string>
     <!-- Sync option to choose device folder -->
-    <string name="sync_folder_choose_device_folder_title">Folderul aparatului</string>
+    <string name="sync_folder_choose_device_folder_title">Folderul dispozitivului</string>
     <!-- Sync option to choose Mega folder -->
     <string name="sync_folders_choose_mega_folder_title">Folder MEGA</string>
     <!-- Sync state Paused -->
@@ -81,7 +81,7 @@
     <!-- Sync state synced -->
     <string name="sync_list_sync_state_synced">Sincronizată</string>
     <!-- Sync permission title for device storage -->
-    <string name="sync_folders_device_storage">Folderul aparatului</string>
+    <string name="sync_folders_device_storage">Folderul dispozitivului</string>
     <!-- Sync permission title for mega storage -->
     <string name="sync_folders_mega_storage">Folder MEGA</string>
     <!-- Sync while syncing title for Issues info -->
@@ -97,7 +97,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Numai Wi-Fi</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">Va trebui să configurați un folder local pe aparatul dvs. care se va sincroniza cu un folder ales de pe Unitatea dvs. cloud</string>
+    <string name="sync_empty_state_message">Va trebui să configurați un folder local pe dispozitivul dvs. care se va sincroniza cu un folder ales de pe Unitatea dvs. cloud</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">Monitorizarea sincronizărilor</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->

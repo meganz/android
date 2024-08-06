@@ -35,7 +35,7 @@
     <!-- Action text shown on document scanner dialog to discard scans -->
     <string name="scan_dialog_discard_action">Înlătură</string>
     <!-- Body text shown on document scanner dialog to delete current scan -->
-    <string name="scan_dialog_delete_body">Ștergi scanarea actuală?</string>
+    <string name="scan_dialog_delete_body">Ștergeți scanarea actuală?</string>
     <!-- Message shown when users deny camera permissions to scan documents -->
     <string name="scan_requires_permission">Permisiunea Cameră este necesară pentru a scana documente</string>
     <!-- Error text for incorrect name -->
