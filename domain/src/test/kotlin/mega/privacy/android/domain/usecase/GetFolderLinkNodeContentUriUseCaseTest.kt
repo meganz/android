@@ -17,7 +17,6 @@ import org.mockito.Mockito.verify
 import org.mockito.kotlin.any
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
-import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetFolderLinkNodeContentUriUseCaseTest {
@@ -26,7 +25,6 @@ class GetFolderLinkNodeContentUriUseCaseTest {
     private val httpServerStart = mock<MegaApiHttpServerStartUseCase>()
     private val httpServerIsRunning = mock<MegaApiHttpServerIsRunningUseCase>()
     private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
-    private val getLocalFileForNodeUseCase = mock<GetLocalFileForNodeUseCase>()
     private val hasCredentialsUseCase = mock<HasCredentialsUseCase>()
     private val getLocalFolderLinkFromMegaApiUseCase = mock<GetLocalFolderLinkFromMegaApiUseCase>()
     private val getLocalFolderLinkFromMegaApiFolderUseCase =
@@ -40,7 +38,6 @@ class GetFolderLinkNodeContentUriUseCaseTest {
             httpServerStart = httpServerStart,
             httpServerIsRunning = httpServerIsRunning,
             getNodeContentUriUseCase = getNodeContentUriUseCase,
-            getLocalFileForNodeUseCase = getLocalFileForNodeUseCase,
             hasCredentialsUseCase = hasCredentialsUseCase,
             getLocalFolderLinkFromMegaApiUseCase = getLocalFolderLinkFromMegaApiUseCase,
             getLocalFolderLinkFromMegaApiFolderUseCase = getLocalFolderLinkFromMegaApiFolderUseCase
@@ -53,7 +50,6 @@ class GetFolderLinkNodeContentUriUseCaseTest {
             httpServerStart,
             httpServerIsRunning,
             getNodeContentUriUseCase,
-            getLocalFileForNodeUseCase,
             hasCredentialsUseCase,
             getLocalFolderLinkFromMegaApiUseCase,
             getLocalFolderLinkFromMegaApiFolderUseCase
@@ -61,22 +57,10 @@ class GetFolderLinkNodeContentUriUseCaseTest {
     }
 
     @Test
-    fun `test that local content uri is returned`() = runTest {
-        val expectedFile = File("path")
-        val fileNode = mock<TypedFileNode>()
-        whenever(getLocalFileForNodeUseCase(any())).thenReturn(File("path"))
-        assertThat(underTest(fileNode)).isEqualTo(
-            NodeContentUri.LocalContentUri(expectedFile)
-        )
-    }
-
-    @Test
     fun `test that remote content uri is returned and should stop http server when hasCredentialsUseCase function returns true`() =
         runTest {
-            whenever(getLocalFileForNodeUseCase(any())).thenReturn(null)
             whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(getLocalFolderLinkFromMegaApiUseCase(any())).thenReturn(expectedUrl)
-            whenever(httpServerIsRunning()).thenReturn(0)
             whenever(httpServerIsRunning()).thenReturn(0)
             assertThat(underTest(mock())).isEqualTo(
                 NodeContentUri.RemoteContentUri(url = expectedUrl, shouldStopHttpSever = true)
@@ -86,10 +70,8 @@ class GetFolderLinkNodeContentUriUseCaseTest {
     @Test
     fun `test that remote content uri is returned and should stop http server when hasCredentialsUseCase function returns false`() =
         runTest {
-            whenever(getLocalFileForNodeUseCase(any())).thenReturn(null)
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(getLocalFolderLinkFromMegaApiFolderUseCase(any())).thenReturn(expectedUrl)
-            whenever(httpServerIsRunning()).thenReturn(0)
             whenever(httpServerIsRunning()).thenReturn(0)
             assertThat(underTest(mock())).isEqualTo(
                 NodeContentUri.RemoteContentUri(url = expectedUrl, shouldStopHttpSever = true)
@@ -99,10 +81,8 @@ class GetFolderLinkNodeContentUriUseCaseTest {
     @Test
     fun `test that remote content uri is returned and should not stop http server when hasCredentialsUseCase function returns true`() =
         runTest {
-            whenever(getLocalFileForNodeUseCase(any())).thenReturn(null)
             whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(getLocalFolderLinkFromMegaApiUseCase(any())).thenReturn(expectedUrl)
-            whenever(httpServerIsRunning()).thenReturn(1)
             whenever(httpServerIsRunning()).thenReturn(1)
             assertThat(underTest(mock())).isEqualTo(
                 NodeContentUri.RemoteContentUri(url = expectedUrl, shouldStopHttpSever = false)
@@ -112,10 +92,8 @@ class GetFolderLinkNodeContentUriUseCaseTest {
     @Test
     fun `test that remote content uri is returned and should not stop http server when hasCredentialsUseCase function returns false`() =
         runTest {
-            whenever(getLocalFileForNodeUseCase(any())).thenReturn(null)
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(getLocalFolderLinkFromMegaApiFolderUseCase(any())).thenReturn(expectedUrl)
-            whenever(httpServerIsRunning()).thenReturn(1)
             whenever(httpServerIsRunning()).thenReturn(1)
             assertThat(underTest(mock())).isEqualTo(
                 NodeContentUri.RemoteContentUri(url = expectedUrl, shouldStopHttpSever = false)
@@ -126,10 +104,8 @@ class GetFolderLinkNodeContentUriUseCaseTest {
     fun `test that getNodeContentUriUseCase is invoked as expected when hasCredentialsUseCase function returns true`() =
         runTest {
             val fileNode = mock<TypedFileNode>()
-            whenever(getLocalFileForNodeUseCase(any())).thenReturn(null)
             whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(getLocalFolderLinkFromMegaApiUseCase(any())).thenReturn(null)
-            whenever(httpServerIsRunning()).thenReturn(1)
             whenever(httpServerIsRunning()).thenReturn(1)
             underTest(fileNode)
             verify(getNodeContentUriUseCase).invoke(fileNode)
@@ -139,10 +115,8 @@ class GetFolderLinkNodeContentUriUseCaseTest {
     fun `test that getNodeContentUriUseCase is invoked as expected when hasCredentialsUseCase function returns false`() =
         runTest {
             val fileNode = mock<TypedFileNode>()
-            whenever(getLocalFileForNodeUseCase(any())).thenReturn(null)
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(getLocalFolderLinkFromMegaApiFolderUseCase(any())).thenReturn(null)
-            whenever(httpServerIsRunning()).thenReturn(1)
             whenever(httpServerIsRunning()).thenReturn(1)
             underTest(fileNode)
             verify(getNodeContentUriUseCase).invoke(fileNode)

@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.Photo
@@ -45,6 +46,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -109,6 +111,7 @@ class MediaDiscoveryViewModelTest {
             runBlocking { invoke() }
         }.thenReturn(false)
     }
+    private val getNodeContentUriByHandleUseCase = mock<GetNodeContentUriByHandleUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -148,6 +151,7 @@ class MediaDiscoveryViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
+            getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase
         )
     }
 
@@ -190,6 +194,7 @@ class MediaDiscoveryViewModelTest {
         getPublicChildNodeFromIdUseCase,
         monitorAccountDetailUseCase,
         monitorShowHiddenItemsUseCase,
+        getNodeContentUriByHandleUseCase
     )
 
     @Test
@@ -475,4 +480,15 @@ class MediaDiscoveryViewModelTest {
             on { this.isSensitiveInherited } doReturn isSensitiveInherited
         }
     }
+
+    @Test
+    fun `test that getNodeContentUriByHandleUseCase is invoked and returns as expected`() =
+        runTest {
+            val paramHandle = 1L
+            val expectedContentUri = NodeContentUri.RemoteContentUri("", false)
+            whenever(getNodeContentUriByHandleUseCase(paramHandle)).thenReturn(expectedContentUri)
+            val actual = underTest.getNodeContentUri(paramHandle)
+            assertThat(actual).isEqualTo(expectedContentUri)
+            verify(getNodeContentUriByHandleUseCase).invoke(paramHandle)
+        }
 }

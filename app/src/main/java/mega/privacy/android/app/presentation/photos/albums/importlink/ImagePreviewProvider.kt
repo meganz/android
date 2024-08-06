@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.photos.albums.importlink
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import androidx.core.content.FileProvider
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.first
@@ -17,8 +16,9 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetc
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
+import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -28,7 +28,10 @@ import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
+import mega.privacy.android.navigation.MegaNavigator
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -44,6 +47,8 @@ class ImagePreviewProvider @Inject constructor(
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
     private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
+    private val megaNavigator: MegaNavigator,
+    private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
 ) {
 
     /**
@@ -133,46 +138,12 @@ class ImagePreviewProvider @Inject constructor(
     private suspend fun launchVideoScreenFromAlbumSharing(activity: Activity, photo: Photo) {
         val nodeHandle = photo.id
         val nodeName = photo.name
-        val intent = Util.getMediaIntent(activity, nodeName).apply {
-            putExtra(Constants.INTENT_EXTRA_KEY_POSITION, 0)
-            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
-            putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, nodeName)
-            putExtra(
-                Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                Constants.FROM_ALBUM_SHARING
-            )
-            putExtra(
-                Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
-                getNodeParentHandle(nodeHandle)
-            )
-            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        }
-        activity.startActivity(
-            isLocalFile(nodeHandle)?.let { localPath ->
-                File(localPath).let { mediaFile ->
-                    kotlin.runCatching {
-                        FileProvider.getUriForFile(
-                            activity,
-                            Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                            mediaFile
-                        )
-                    }.onFailure {
-                        Uri.fromFile(mediaFile)
-                    }.map { mediaFileUri ->
-                        intent.setDataAndType(
-                            mediaFileUri,
-                            MimeTypeList.typeForName(nodeName).type
-                        )
-                        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    }
-                }
-                intent
-            } ?: updateIntent(
-                handle = nodeHandle,
-                name = nodeName,
-                intent = intent,
-                isAlbumSharing = true
-            )
+        startMediaActivity(
+            activity = activity,
+            nodeHandle = nodeHandle,
+            name = nodeName,
+            viewType = FROM_ALBUM_SHARING,
+            parentId = getNodeParentHandle(nodeHandle)
         )
     }
 
@@ -185,50 +156,58 @@ class ImagePreviewProvider @Inject constructor(
     ) {
         val nodeHandle = photo.id
         val nodeName = photo.name
-        val intent = Util.getMediaIntent(activity, nodeName).apply {
-            putExtra(Constants.INTENT_EXTRA_KEY_POSITION, 0)
-            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
-            putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, nodeName)
-            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FROM_MEDIA_DISCOVERY)
-
-            putExtra(
-                Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
-                folderNodeId ?: getNodeParentHandle(nodeHandle)
-            )
-            putExtra(
-                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                if (currentSort == Sort.NEWEST) {
-                    SortOrder.ORDER_MODIFICATION_DESC
-                } else {
-                    SortOrder.ORDER_MODIFICATION_ASC
-                }
-            )
-            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        }
-        activity.startActivity(
-            isLocalFile(nodeHandle)?.let { localPath ->
-                File(localPath).let { mediaFile ->
-                    kotlin.runCatching {
-                        FileProvider.getUriForFile(
-                            activity,
-                            Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                            mediaFile
-                        )
-                    }.onFailure {
-                        Uri.fromFile(mediaFile)
-                    }.map { mediaFileUri ->
-                        intent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(nodeName).type)
-                        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    }
-                }
-                intent
-            } ?: updateIntent(
-                handle = nodeHandle,
-                name = nodeName,
-                intent = intent,
-                isFolderLink = isFolderLink,
-            )
+        startMediaActivity(
+            activity = activity,
+            nodeHandle = nodeHandle,
+            name = nodeName,
+            viewType = FROM_MEDIA_DISCOVERY,
+            parentId = folderNodeId ?: getNodeParentHandle(nodeHandle),
+            sortOrder = if (currentSort == Sort.NEWEST) {
+                SortOrder.ORDER_MODIFICATION_DESC
+            } else {
+                SortOrder.ORDER_MODIFICATION_ASC
+            },
+            isFolderLink = isFolderLink
         )
+    }
+
+    private suspend fun startMediaActivity(
+        activity: Activity,
+        nodeHandle: Long,
+        name: String,
+        viewType: Int,
+        parentId: Long? = null,
+        sortOrder: SortOrder? = null,
+        isFolderLink: Boolean = false,
+    ) {
+        runCatching {
+            isLocalFile(nodeHandle)?.let { localPath ->
+                val file = File(localPath)
+                megaNavigator.openMediaPlayerActivityByLocalFile(
+                    context = activity,
+                    localFile = file,
+                    handle = nodeHandle,
+                    parentId = parentId ?: -1,
+                    viewType = viewType,
+                    sortOrder = sortOrder ?: SortOrder.ORDER_NONE,
+                    isFolderLink = isFolderLink
+                )
+            } ?: run {
+                val contentUri = getNodeContentUriByHandleUseCase(nodeHandle)
+                megaNavigator.openMediaPlayerActivity(
+                    context = activity,
+                    contentUri = contentUri,
+                    name = name,
+                    handle = nodeHandle,
+                    parentId = parentId ?: -1,
+                    viewType = viewType,
+                    sortOrder = sortOrder ?: SortOrder.ORDER_NONE,
+                    isFolderLink = isFolderLink
+                )
+            }
+        }.onFailure {
+            Timber.e(it)
+        }
     }
 
     /**

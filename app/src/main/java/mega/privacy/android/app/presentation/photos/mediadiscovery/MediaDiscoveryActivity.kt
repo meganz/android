@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.photos.mediadiscovery
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -14,7 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.getValue
-import androidx.core.content.FileProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -22,7 +20,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.LegacyNameCollisionActivityContract
 import mega.privacy.android.app.interfaces.PermissionRequester
@@ -35,14 +32,14 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetc
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDiscoveryScreen
 import mega.privacy.android.app.utils.AlertDialogUtil
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 import java.io.File
@@ -56,6 +53,12 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * [MegaNavigator] injection
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel by viewModels()
     private val mediaDiscoveryViewModel: MediaDiscoveryViewModel by viewModels()
@@ -276,49 +279,32 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
     private suspend fun launchVideoScreenForFolderLink(photo: Photo) {
         val nodeHandle = photo.id
         val nodeName = photo.name
-        val intent = Util.getMediaIntent(this, nodeName).apply {
-            putExtra(Constants.INTENT_EXTRA_KEY_POSITION, 0)
-            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
-            putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, nodeName)
-            putExtra(
-                Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                Constants.FOLDER_LINK_ADAPTER //FolderLink type
-            )
-            putExtra(
-                Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
-                mediaDiscoveryViewModel.getNodeParentHandle(nodeHandle)
-            )
-            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        }
-        startActivity(
+        runCatching {
             mediaDiscoveryViewModel.isLocalFile(nodeHandle)?.let { localPath ->
-                File(localPath).let { mediaFile ->
-                    kotlin.runCatching {
-                        FileProvider.getUriForFile(
-                            this,
-                            Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                            mediaFile
-                        )
-                    }.onFailure {
-                        Uri.fromFile(mediaFile)
-                    }.map { mediaFileUri ->
-                        intent.setDataAndType(
-                            mediaFileUri,
-                            MimeTypeList.typeForName(nodeName).type
-                        )
-                        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    }
-                }
-                intent
-            } ?: let {
-                mediaDiscoveryViewModel.updateIntent(
+                val file = File(localPath)
+                megaNavigator.openMediaPlayerActivityByLocalFile(
+                    context = this,
+                    localFile = file,
                     handle = nodeHandle,
+                    parentId = mediaDiscoveryViewModel.getNodeParentHandle(nodeHandle) ?: -1,
+                    viewType = FOLDER_LINK_ADAPTER,
+                    isFolderLink = true
+                )
+            } ?: run {
+                val contentUri = mediaDiscoveryViewModel.getNodeContentUri(nodeHandle)
+                megaNavigator.openMediaPlayerActivity(
+                    context = this,
+                    contentUri = contentUri,
                     name = nodeName,
-                    intent = intent,
+                    handle = nodeHandle,
+                    parentId = mediaDiscoveryViewModel.getNodeParentHandle(nodeHandle) ?: -1,
+                    viewType = FOLDER_LINK_ADAPTER,
                     isFolderLink = true
                 )
             }
-        )
+        }.onFailure {
+            Timber.e(it)
+        }
     }
 
     /**

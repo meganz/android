@@ -1311,21 +1311,6 @@ public class Util {
         }
     }
 
-    /**
-     * Get an Intent to play audio or video node.
-     *
-     * @param context  Android context
-     * @param nodeName the node name (not needed when New Video Player is implemented)
-     * @return the Intent with corresponding target activity class
-     */
-    public static Intent getMediaIntent(Context context, String nodeName) {
-        if (MimeTypeList.typeForName(nodeName).isAudio()) {
-            return new Intent(context, AudioPlayerActivity.class);
-        } else {
-            return new Intent(context, LegacyVideoPlayerActivity.class);
-        }
-    }
-
     public static void resetActionBar(ActionBar aB) {
         if (aB != null) {
             View customView = aB.getCustomView();

@@ -2,7 +2,6 @@ package mega.privacy.android.domain.usecase.node
 
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
@@ -17,7 +16,6 @@ class GetFolderLinkNodeContentUriUseCase @Inject constructor(
     private val httpServerStart: MegaApiHttpServerStartUseCase,
     private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
-    private val getLocalFileForNodeUseCase: GetLocalFileForNodeUseCase,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
     private val getLocalFolderLinkFromMegaApiFolderUseCase: GetLocalFolderLinkFromMegaApiFolderUseCase,
@@ -29,22 +27,19 @@ class GetFolderLinkNodeContentUriUseCase @Inject constructor(
      * @return [NodeContentUri]
      *
      */
-    suspend operator fun invoke(fileNode: TypedFileNode) =
-        getLocalFileForNodeUseCase(fileNode)?.let {
-            NodeContentUri.LocalContentUri(it)
+    suspend operator fun invoke(fileNode: TypedFileNode): NodeContentUri {
+        val shouldStopHttpSever = if (httpServerIsRunning() == 0) {
+            httpServerStart()
+            true
+        } else false
+        return if (hasCredentialsUseCase()) {
+            getLocalFolderLinkFromMegaApiUseCase(fileNode.id.longValue)
+        } else {
+            getLocalFolderLinkFromMegaApiFolderUseCase(fileNode.id.longValue)
+        }?.let { url ->
+            NodeContentUri.RemoteContentUri(url, shouldStopHttpSever)
         } ?: run {
-            val shouldStopHttpSever = if (httpServerIsRunning() == 0) {
-                httpServerStart()
-                true
-            } else false
-            if (hasCredentialsUseCase()) {
-                getLocalFolderLinkFromMegaApiUseCase(fileNode.id.longValue)
-            } else {
-                getLocalFolderLinkFromMegaApiFolderUseCase(fileNode.id.longValue)
-            }?.let { url ->
-                NodeContentUri.RemoteContentUri(url, shouldStopHttpSever)
-            } ?: run {
-                getNodeContentUriUseCase(fileNode)
-            }
+            getNodeContentUriUseCase(fileNode)
         }
+    }
 }
