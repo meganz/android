@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.pdfviewer
 
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.node.NameCollision
 
 /**
  * Pdf viewer UI state
@@ -19,7 +20,7 @@ data class PdfViewerState(
     val nodeMoveError: Throwable? = null,
     val nodeCopyError: Throwable? = null,
     val shouldFinishActivity: Boolean = false,
-    val nameCollision: NameCollisionUiEntity? = null,
+    val nameCollision: NameCollision? = null,
     val pdfStreamData: ByteArray? = null,
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean = false,

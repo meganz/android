@@ -17,12 +17,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.model.MediaPlayerMenuClickedEvent
 import mega.privacy.android.app.mediaplayer.model.MediaPlayerState
 import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
-import mega.privacy.android.app.namecollision.data.toLegacyCopy
-import mega.privacy.android.app.namecollision.data.toLegacyImport
-import mega.privacy.android.app.namecollision.data.toLegacyMove
 import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
@@ -46,7 +43,7 @@ class MediaPlayerViewModel @Inject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
 ) : ViewModel() {
 
-    private val collision = SingleLiveEvent<NameCollisionUiEntity>()
+    private val collision = SingleLiveEvent<NameCollision>()
     private val throwable = SingleLiveEvent<Throwable>()
     private val snackbarMessage = SingleLiveEvent<Int>()
 
@@ -106,7 +103,7 @@ class MediaPlayerViewModel @Inject constructor(
         }
     }
 
-    internal fun getCollision(): LiveData<NameCollisionUiEntity> = collision
+    internal fun getCollision(): LiveData<NameCollision> = collision
 
     internal fun onSnackbarMessage(): LiveData<Int> = snackbarMessage
 
@@ -139,7 +136,7 @@ class MediaPlayerViewModel @Inject constructor(
                     type = NodeNameCollisionType.COPY,
                 )
             }.onSuccess {
-                it.firstNodeCollisionOrNull?.toLegacyCopy()?.let { item ->
+                it.firstNodeCollisionOrNull?.let { item ->
                     collision.value = item
                 }
                 it.moveRequestResult?.let { result ->
@@ -179,7 +176,7 @@ class MediaPlayerViewModel @Inject constructor(
                 newNodeParent = newParentHandle,
             )
         }.onSuccess {
-            it.firstChatNodeCollisionOrNull?.toLegacyImport()?.let { item ->
+            it.firstChatNodeCollisionOrNull?.let { item ->
                 collision.value = item
             }
             it.moveRequestResult?.let { result ->
@@ -209,7 +206,7 @@ class MediaPlayerViewModel @Inject constructor(
                     type = NodeNameCollisionType.MOVE,
                 )
             }.onSuccess {
-                it.firstNodeCollisionOrNull?.toLegacyMove()?.let { item ->
+                it.firstNodeCollisionOrNull?.let { item ->
                     collision.value = item
                 }
                 it.moveRequestResult?.let {

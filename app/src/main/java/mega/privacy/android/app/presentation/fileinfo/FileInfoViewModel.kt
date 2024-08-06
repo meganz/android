@@ -23,8 +23,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.namecollision.data.toLegacyCopy
-import mega.privacy.android.app.namecollision.data.toLegacyMove
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
@@ -351,7 +349,7 @@ class FileInfoViewModel @Inject constructor(
                     }
                 }
             }.onSuccess {
-                it.firstNodeCollisionOrNull?.toLegacyMove()?.let { collision ->
+                it.firstNodeCollisionOrNull?.let { collision ->
                     _uiState.updateEventAndClearProgress(
                         FileInfoOneOffViewEvent.CollisionDetected(collision)
                     )
@@ -378,7 +376,7 @@ class FileInfoViewModel @Inject constructor(
                     }
                 }
             }.onSuccess {
-                it.firstNodeCollisionOrNull?.toLegacyCopy()?.let { collision ->
+                it.firstNodeCollisionOrNull?.let { collision ->
                     _uiState.updateEventAndClearProgress(
                         FileInfoOneOffViewEvent.CollisionDetected(collision)
                     )

@@ -3,11 +3,11 @@ package mega.privacy.android.app.presentation.qrcode.model
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import java.io.File
 
@@ -33,7 +33,7 @@ data class QRCodeUIState(
     val scannedContactLinkResult: StateEventWithContent<ScannedContactLinkResult> = consumed(),
     val scannedContactEmail: String? = null,
     val scannedContactAvatarContent: AvatarContent? = null,
-    val showCollision: StateEventWithContent<NameCollisionUiEntity> = consumed(),
+    val showCollision: StateEventWithContent<NameCollision> = consumed(),
     val uploadFile: StateEventWithContent<Pair<File, Long>> = consumed(),
     val finishActivityOnScanComplete: Boolean = false,
     val scanCancel: StateEvent = consumed,

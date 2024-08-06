@@ -530,6 +530,7 @@ class NameCollisionViewModel @Inject constructor(
             uploadFiles(
                 mapOf(path to name),
                 NodeId(parentId),
+                choice
             )
         }
     }
@@ -733,7 +734,7 @@ class NameCollisionViewModel @Inject constructor(
         }
     }
 
-    fun uploadFiles(
+    internal fun uploadFiles(
         pathsAndNames: Map<String, String?>,
         destinationId: NodeId,
         choice: NameCollisionChoice? = null,

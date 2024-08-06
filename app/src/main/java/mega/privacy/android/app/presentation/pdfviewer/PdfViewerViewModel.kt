@@ -10,9 +10,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.namecollision.data.toLegacyCopy
-import mega.privacy.android.app.namecollision.data.toLegacyImport
-import mega.privacy.android.app.namecollision.data.toLegacyMove
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -70,7 +67,7 @@ class PdfViewerViewModel @Inject constructor(
                 newNodeParent = newParentHandle,
             )
         }.onSuccess { result ->
-            result.firstChatNodeCollisionOrNull?.toLegacyImport()?.let { item ->
+            result.firstChatNodeCollisionOrNull?.let { item ->
                 _state.update {
                     it.copy(nameCollision = item)
                 }
@@ -107,7 +104,7 @@ class PdfViewerViewModel @Inject constructor(
                     type = NodeNameCollisionType.COPY,
                 )
             }.onSuccess { result ->
-                result.firstNodeCollisionOrNull?.toLegacyCopy()?.let { item ->
+                result.firstNodeCollisionOrNull?.let { item ->
                     _state.update { it.copy(nameCollision = item) }
                 }
                 result.moveRequestResult?.let { movementResult ->
@@ -143,7 +140,7 @@ class PdfViewerViewModel @Inject constructor(
                     type = NodeNameCollisionType.MOVE,
                 )
             }.onSuccess { result ->
-                result.firstNodeCollisionOrNull?.toLegacyMove()?.let { item ->
+                result.firstNodeCollisionOrNull?.let { item ->
                     _state.update { it.copy(nameCollision = item) }
                 }
                 result.moveRequestResult?.let { movementResult ->

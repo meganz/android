@@ -20,19 +20,22 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileStorageActivity
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -71,6 +74,14 @@ class QRCodeComposeActivity : PasscodeActivity() {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    private val nameCollisionActivityLauncher = registerForActivityResult(
+        NameCollisionActivityContract()
+    ) { result ->
+        result?.let {
+            showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
+        }
+    }
 
     private val selectStorageDestinationLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
@@ -168,8 +179,8 @@ class QRCodeComposeActivity : PasscodeActivity() {
         selectStorageDestinationLauncher.launch(intent)
     }
 
-    private fun showCollision(collision: NameCollisionUiEntity) {
-        legacyNameCollisionActivityContract?.launch(arrayListOf(collision))
+    private fun showCollision(collision: NameCollision) {
+        nameCollisionActivityLauncher.launch(arrayListOf(collision))
     }
 }
 

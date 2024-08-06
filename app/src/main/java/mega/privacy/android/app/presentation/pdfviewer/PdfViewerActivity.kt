@@ -45,10 +45,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityPdfviewerBinding
@@ -72,6 +72,7 @@ import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showTakenDownAlert
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.HANDLE
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
@@ -91,6 +92,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.mobile.analytics.event.DocumentPreviewHideNodeMenuItemEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaContactRequest
@@ -115,7 +117,6 @@ import javax.inject.Inject
  * PDF viewer.
  *
  * @property passCodeFacade            [PasscodeCheck]
- * @property dbH                       [LegacyDatabaseHandler]
  * @property password                  Typed password
  * @property maxIntents                Max of intents for a wrong password.
  * @property pdfFileName               Name of the PDF.
@@ -191,6 +192,14 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
     private var isHiddenNodesEnabled: Boolean = false
     private var tempNodeId: NodeId? = null
+
+    private val nameCollisionActivityContract = registerForActivityResult(
+        NameCollisionActivityContract()
+    ) { result ->
+        result?.let {
+            showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
+        }
+    }
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
@@ -313,7 +322,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     }
                     if (node == null || url == null || uri == null) {
                         showSnackbar(
-                            Constants.SNACKBAR_TYPE,
+                            SNACKBAR_TYPE,
                             getString(R.string.error_streaming),
                             MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                         )
@@ -326,7 +335,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 if (node == null) {
                     Timber.w("CurrentDocumentAuth is null")
                     showSnackbar(
-                        Constants.SNACKBAR_TYPE,
+                        SNACKBAR_TYPE,
                         getString(R.string.error_streaming) + ": node not authorized",
                         -1
                     )
@@ -372,7 +381,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 if (snackBarMessage != null) {
                     dismissAlertDialogIfExists(statusDialog)
                     showSnackbar(
-                        Constants.SNACKBAR_TYPE,
+                        SNACKBAR_TYPE,
                         getString(snackBarMessage),
                         MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                     )
@@ -391,7 +400,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 }
                 if (nameCollision != null) {
                     dismissAlertDialogIfExists(statusDialog)
-                    legacyNameCollisionActivityContract?.launch(arrayListOf(nameCollision))
+                    nameCollisionActivityContract.launch(arrayListOf(nameCollision))
                 }
                 if (pdfStreamData != null) {
                     try {
@@ -421,7 +430,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         dismissAlertDialogIfExists(statusDialog)
         if (!manageCopyMoveException(copyMoveError)) {
             showSnackbar(
-                Constants.SNACKBAR_TYPE,
+                SNACKBAR_TYPE,
                 getString(if (isCopy) R.string.context_no_copied else R.string.context_no_moved),
                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
             )
@@ -1493,7 +1502,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         if (requestCode == Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE && resultCode == RESULT_OK) {
             if (!Util.isOnline(this)) {
                 showSnackbar(
-                    Constants.SNACKBAR_TYPE,
+                    SNACKBAR_TYPE,
                     getString(R.string.error_server_connection_problem),
                     -1
                 )
@@ -1514,7 +1523,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         } else if (requestCode == Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK) {
             if (!Util.isOnline(this)) {
                 showSnackbar(
-                    Constants.SNACKBAR_TYPE,
+                    SNACKBAR_TYPE,
                     getString(R.string.error_server_connection_problem),
                     -1
                 )
@@ -1541,7 +1550,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     ex.printStackTrace()
                 }
                 showSnackbar(
-                    Constants.SNACKBAR_TYPE,
+                    SNACKBAR_TYPE,
                     getString(R.string.error_server_connection_problem),
                     -1
                 )
