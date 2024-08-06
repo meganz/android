@@ -9,6 +9,7 @@ import mega.privacy.android.app.activities.ManageChatHistoryActivity
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
+import mega.privacy.android.app.mediaplayer.VideoPlayerComposeActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivityV2
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
@@ -222,7 +223,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         )
     }
 
-    private fun manageMediaIntent(
+    private suspend fun manageMediaIntent(
         context: Context,
         contentUri: NodeContentUri,
         fileTypeInfo: FileTypeInfo,
@@ -275,9 +276,15 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(intent)
     }
 
-    private fun getIntent(context: Context, fileTypeInfo: FileTypeInfo) = when {
+    private suspend fun getIntent(context: Context, fileTypeInfo: FileTypeInfo) = when {
         fileTypeInfo.isSupported && fileTypeInfo is VideoFileTypeInfo ->
-            Intent(context, LegacyVideoPlayerActivity::class.java)
+            Intent(
+                context,
+                if (getFeatureFlagValueUseCase(AppFeatures.NewVideoPlayer))
+                    VideoPlayerComposeActivity::class.java
+                else
+                    LegacyVideoPlayerActivity::class.java
+            )
 
         fileTypeInfo.isSupported && fileTypeInfo is AudioFileTypeInfo ->
             Intent(context, AudioPlayerActivity::class.java)
@@ -344,7 +351,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         handle: Long,
         messageId: Long,
         chatId: Long,
-        name: String
+        name: String,
     ) {
         val fileType = getFileTypeInfoByNameUseCase(name)
         val intent = getIntent(context, fileType).apply {

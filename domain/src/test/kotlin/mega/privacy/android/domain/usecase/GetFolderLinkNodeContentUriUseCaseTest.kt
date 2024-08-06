@@ -22,8 +22,8 @@ import org.mockito.kotlin.whenever
 class GetFolderLinkNodeContentUriUseCaseTest {
     private lateinit var underTest: GetFolderLinkNodeContentUriUseCase
 
-    private val httpServerStart = mock<MegaApiHttpServerStartUseCase>()
-    private val httpServerIsRunning = mock<MegaApiHttpServerIsRunningUseCase>()
+    private val megaApiHttpServerStartUseCase = mock<MegaApiHttpServerStartUseCase>()
+    private val megaApiHttpServerIsRunningUseCase = mock<MegaApiHttpServerIsRunningUseCase>()
     private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
     private val hasCredentialsUseCase = mock<HasCredentialsUseCase>()
     private val getLocalFolderLinkFromMegaApiUseCase = mock<GetLocalFolderLinkFromMegaApiUseCase>()
@@ -35,8 +35,8 @@ class GetFolderLinkNodeContentUriUseCaseTest {
     @BeforeAll
     fun setup() {
         underTest = GetFolderLinkNodeContentUriUseCase(
-            httpServerStart = httpServerStart,
-            httpServerIsRunning = httpServerIsRunning,
+            megaApiHttpServerStartUseCase = megaApiHttpServerStartUseCase,
+            megaApiHttpServerIsRunningUseCase = megaApiHttpServerIsRunningUseCase,
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             hasCredentialsUseCase = hasCredentialsUseCase,
             getLocalFolderLinkFromMegaApiUseCase = getLocalFolderLinkFromMegaApiUseCase,
@@ -47,8 +47,8 @@ class GetFolderLinkNodeContentUriUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            httpServerStart,
-            httpServerIsRunning,
+            megaApiHttpServerStartUseCase,
+            megaApiHttpServerIsRunningUseCase,
             getNodeContentUriUseCase,
             hasCredentialsUseCase,
             getLocalFolderLinkFromMegaApiUseCase,
@@ -61,7 +61,7 @@ class GetFolderLinkNodeContentUriUseCaseTest {
         runTest {
             whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(getLocalFolderLinkFromMegaApiUseCase(any())).thenReturn(expectedUrl)
-            whenever(httpServerIsRunning()).thenReturn(0)
+            whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(0)
             assertThat(underTest(mock())).isEqualTo(
                 NodeContentUri.RemoteContentUri(url = expectedUrl, shouldStopHttpSever = true)
             )
@@ -72,7 +72,7 @@ class GetFolderLinkNodeContentUriUseCaseTest {
         runTest {
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(getLocalFolderLinkFromMegaApiFolderUseCase(any())).thenReturn(expectedUrl)
-            whenever(httpServerIsRunning()).thenReturn(0)
+            whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(0)
             assertThat(underTest(mock())).isEqualTo(
                 NodeContentUri.RemoteContentUri(url = expectedUrl, shouldStopHttpSever = true)
             )
@@ -83,7 +83,7 @@ class GetFolderLinkNodeContentUriUseCaseTest {
         runTest {
             whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(getLocalFolderLinkFromMegaApiUseCase(any())).thenReturn(expectedUrl)
-            whenever(httpServerIsRunning()).thenReturn(1)
+            whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(1)
             assertThat(underTest(mock())).isEqualTo(
                 NodeContentUri.RemoteContentUri(url = expectedUrl, shouldStopHttpSever = false)
             )
@@ -94,7 +94,7 @@ class GetFolderLinkNodeContentUriUseCaseTest {
         runTest {
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(getLocalFolderLinkFromMegaApiFolderUseCase(any())).thenReturn(expectedUrl)
-            whenever(httpServerIsRunning()).thenReturn(1)
+            whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(1)
             assertThat(underTest(mock())).isEqualTo(
                 NodeContentUri.RemoteContentUri(url = expectedUrl, shouldStopHttpSever = false)
             )
@@ -106,7 +106,7 @@ class GetFolderLinkNodeContentUriUseCaseTest {
             val fileNode = mock<TypedFileNode>()
             whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(getLocalFolderLinkFromMegaApiUseCase(any())).thenReturn(null)
-            whenever(httpServerIsRunning()).thenReturn(1)
+            whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(1)
             underTest(fileNode)
             verify(getNodeContentUriUseCase).invoke(fileNode)
         }
@@ -117,7 +117,7 @@ class GetFolderLinkNodeContentUriUseCaseTest {
             val fileNode = mock<TypedFileNode>()
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(getLocalFolderLinkFromMegaApiFolderUseCase(any())).thenReturn(null)
-            whenever(httpServerIsRunning()).thenReturn(1)
+            whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(1)
             underTest(fileNode)
             verify(getNodeContentUriUseCase).invoke(fileNode)
         }

@@ -17,8 +17,8 @@ import javax.inject.Inject
  * Get NodeContentUri By Id Use Case
  */
 class GetNodeContentUriByHandleUseCase @Inject constructor(
-    private val httpServerStart: MegaApiHttpServerStartUseCase,
-    private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase,
+    private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
+    private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
@@ -33,8 +33,8 @@ class GetNodeContentUriByHandleUseCase @Inject constructor(
      * Invoke
      */
     suspend operator fun invoke(handle: Long): NodeContentUri {
-        val shouldStopHttpSever = if (httpServerIsRunning() == 0) {
-            httpServerStart()
+        val shouldStopHttpSever = if (megaApiHttpServerIsRunningUseCase() == 0) {
+            megaApiHttpServerStartUseCase()
             true
         } else false
         return getFileUrlByNodeHandleUseCase(handle)?.let { url ->

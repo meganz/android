@@ -13,8 +13,8 @@ import javax.inject.Inject
  * The Use case is used to get the node content uri of a folder link
  */
 class GetFolderLinkNodeContentUriUseCase @Inject constructor(
-    private val httpServerStart: MegaApiHttpServerStartUseCase,
-    private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase,
+    private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
+    private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
@@ -28,8 +28,8 @@ class GetFolderLinkNodeContentUriUseCase @Inject constructor(
      *
      */
     suspend operator fun invoke(fileNode: TypedFileNode): NodeContentUri {
-        val shouldStopHttpSever = if (httpServerIsRunning() == 0) {
-            httpServerStart()
+        val shouldStopHttpSever = if (megaApiHttpServerIsRunningUseCase() == 0) {
+            megaApiHttpServerStartUseCase()
             true
         } else false
         return if (hasCredentialsUseCase()) {

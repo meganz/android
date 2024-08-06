@@ -116,12 +116,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.mediaplayer.AudioPlayerActivity;
-import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.model.MegaPreferences;
