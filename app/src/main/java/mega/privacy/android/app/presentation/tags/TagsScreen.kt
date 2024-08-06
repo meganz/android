@@ -65,6 +65,7 @@ fun TagsScreen(
     onBackPressed: () -> Unit,
     consumeMaxTagsError: () -> Unit,
     uiState: TagsUiState,
+    consumeTagsUpdated: () -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
     val context = LocalContext.current
@@ -104,6 +105,7 @@ fun TagsScreen(
                 .testTag(TAGS_SCREEN_CONTENTS_LABEL),
             validateTagName = validateTagName,
             addOrRemoveTag = addOrRemoveTag,
+            consumeTagsUpdated = consumeTagsUpdated,
             uiState = uiState,
         )
     }
@@ -116,16 +118,32 @@ private fun TagsContent(
     addOrRemoveTag: (String) -> Unit,
     uiState: TagsUiState,
     modifier: Modifier = Modifier,
+    consumeTagsUpdated: () -> Unit,
 ) {
 
     var tag by rememberSaveable { mutableStateOf("") }
 
-    fun addTag(selectedTag: String) {
-        if (selectedTag.isNotBlank() && uiState.isError.not()) {
+    /**
+     * Define a function addTag that takes selectedTag and an optional newTag parameter.
+     * Check if selectedTag is not blank.
+     * If newTag is true, ensure uiState.isError is false.
+     * Call addOrRemoveTag with selectedTag.
+     */
+    fun addTag(selectedTag: String, newTag: Boolean = false) {
+        if (selectedTag.isNotBlank() && (!newTag || !uiState.isError)) {
             addOrRemoveTag(selectedTag)
-            tag = ""
-            Analytics.tracker.trackEvent(NodeInfoTagsAddedEvent)
         }
+    }
+
+    /**
+     * Use EventEffect to handle uiState.tagsUpdated.
+     * Reset tag to an empty string.
+     * Track the event using Analytics.tracker
+     */
+    EventEffect(event = uiState.tagsUpdatedEvent, onConsumed = { consumeTagsUpdated() }) {
+        tag = ""
+        val event = if (it == TagUpdate.ADD) NodeInfoTagsAddedEvent else NodeInfoTagsRemovedEvent
+        Analytics.tracker.trackEvent(event)
     }
 
     Column(
@@ -153,7 +171,7 @@ private fun TagsContent(
             showError = uiState.isError,
             onValueChange = {
                 tag = it.removePrefix("#").lowercase()
-                validateTagName(it)
+                validateTagName(tag)
             },
             showUnderline = true,
         )
@@ -171,7 +189,7 @@ private fun TagsContent(
                     tag
                 ),
                 onClick = {
-                    addTag(selectedTag = tag)
+                    addTag(selectedTag = tag, newTag = true)
                 },
                 textAlign = TextAlign.Start
             )
@@ -237,6 +255,7 @@ private fun TagsScreenPreview() {
                 tags = persistentListOf("tag1", "tag2"),
                 nodeTags = persistentListOf("tag1")
             ),
+            consumeTagsUpdated = {},
         )
     }
 }

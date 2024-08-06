@@ -24,10 +24,11 @@ class TagsScreenTest {
             TagsScreen(
                 consumeInfoMessage = {},
                 validateTagName = { _ -> },
-                onBackPressed = {},
-                uiState = TagsUiState(),
                 addOrRemoveTag = { _ -> },
+                onBackPressed = {},
                 consumeMaxTagsError = {},
+                uiState = TagsUiState(),
+                consumeTagsUpdated = {},
             )
         }
 
@@ -48,10 +49,11 @@ class TagsScreenTest {
             TagsScreen(
                 consumeInfoMessage = {},
                 validateTagName = { _ -> },
-                onBackPressed = {},
-                uiState = TagsUiState(tags = persistentListOf("tag1", "tag2")),
                 addOrRemoveTag = { _ -> },
-                consumeMaxTagsError = {}
+                onBackPressed = {},
+                consumeMaxTagsError = {},
+                uiState = TagsUiState(tags = persistentListOf("tag1", "tag2")),
+                consumeTagsUpdated = {}
             )
         }
 

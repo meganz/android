@@ -52,8 +52,7 @@ class TagsValidationMessageMapper @Inject constructor(@ApplicationContext privat
                 Analytics.tracker.trackEvent(NodeInfoTagsLengthErrorDisplayedEvent)
             }
 
-            nodeTags.size >= TagsActivity.MAX_TAGS_PER_NODE
-                    && userTags.contains(tag).not() -> {
+            nodeTags.size >= TagsActivity.MAX_TAGS_PER_NODE -> {
                 message = context.getString(
                     R.string.add_tags_error_max_tags,
                     TagsActivity.MAX_TAGS_PER_NODE

@@ -129,7 +129,7 @@ class TagsViewModel @Inject constructor(
         viewModelScope.launch {
             // Step 1: Validate the tag
             val isTagPresent = uiState.value.nodeTags.contains(tag)
-            if (!isTagPresent && uiState.value.nodeTags.size >= MAX_TAGS_PER_NODE) {
+            if (uiState.value.nodeTags.size >= MAX_TAGS_PER_NODE) {
                 _uiState.update { it.copy(showMaxTagsError = triggered) }
                 Timber.e("Cannot add more tags. Maximum limit reached for tag: $tag")
                 return@launch
@@ -141,21 +141,24 @@ class TagsViewModel @Inject constructor(
                     oldTag = tag.takeIf { isTagPresent },
                     newTag = tag.takeUnless { isTagPresent },
                 )
-                onTagUpdateSuccess()
-                validateTagName()
+                onTagUpdateSuccess(event = if (isTagPresent) TagUpdate.REMOVE else TagUpdate.ADD)
                 Timber.d("Tag updated successfully $tag already exists: $isTagPresent")
             }.onFailure {
                 Timber.e(it)
             }
+
+            // Step 3: Update the UI & revalidate the tag
+            validateTagName()
         }
     }
 
-    private fun onTagUpdateSuccess() {
+    private fun onTagUpdateSuccess(event: TagUpdate) {
         _uiState.update {
             it.copy(
                 message = null,
                 isError = false,
-                searchText = ""
+                searchText = "",
+                tagsUpdatedEvent = triggered(event)
             )
         }
     }
@@ -165,5 +168,12 @@ class TagsViewModel @Inject constructor(
      */
     fun consumeMaxTagsError() {
         _uiState.update { it.copy(showMaxTagsError = consumed) }
+    }
+
+    /**
+     * Consume the tags updated event.
+     */
+    fun consumeTagsUpdatedEvent() {
+        _uiState.update { it.copy(tagsUpdatedEvent = consumed()) }
     }
 }

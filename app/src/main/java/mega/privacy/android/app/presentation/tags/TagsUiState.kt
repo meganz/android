@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
  * @property isError If there is an error.
  * @property message Message to show.
  * @property showMaxTagsError If the maximum number of tags has been reached.
+ * @property tagsUpdatedEvent If the tags have been updated.
  * @property searchText Search text.
  * @property informationMessage Information message.
  */
@@ -24,6 +25,7 @@ data class TagsUiState(
     val isError: Boolean = false,
     val message: String? = null,
     val showMaxTagsError: StateEvent = consumed,
+    val tagsUpdatedEvent: StateEventWithContent<TagUpdate> = consumed(),
     val searchText: String = "",
     val informationMessage: StateEventWithContent<InfoToShow> = consumed(),
 )

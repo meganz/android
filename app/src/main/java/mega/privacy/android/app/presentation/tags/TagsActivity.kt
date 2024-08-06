@@ -57,6 +57,7 @@ class TagsActivity : AppCompatActivity() {
                         onBackPressed = onBackPressedDispatcher::onBackPressed,
                         addOrRemoveTag = viewModel::addOrRemoveTag,
                         consumeMaxTagsError = viewModel::consumeMaxTagsError,
+                        consumeTagsUpdated = viewModel::consumeTagsUpdatedEvent,
                         uiState = uiState
                     )
                 }

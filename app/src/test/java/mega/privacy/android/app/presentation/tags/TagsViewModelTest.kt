@@ -165,4 +165,10 @@ class TagsViewModelTest {
         assertThat(underTest.uiState.value.showMaxTagsError).isEqualTo(consumed)
     }
 
+    @Test
+    fun `test that consumeTagsUpdatedEvent updates the tags`() = runTest {
+        underTest.consumeTagsUpdatedEvent()
+        assertThat(underTest.uiState.value.tagsUpdatedEvent).isEqualTo(consumed())
+    }
+
 }
