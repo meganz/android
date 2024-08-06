@@ -131,8 +131,12 @@ class TagsViewModel @Inject constructor(
             val isTagPresent = uiState.value.nodeTags.contains(tag)
             if (uiState.value.nodeTags.size >= MAX_TAGS_PER_NODE) {
                 _uiState.update { it.copy(showMaxTagsError = triggered) }
-                Timber.e("Cannot add more tags. Maximum limit reached for tag: $tag")
-                return@launch
+
+                // If the tag is not present and max tags limit is reached, return
+                if (!isTagPresent) {
+                    Timber.e("Cannot add more tags. Maximum limit reached for tag: $tag")
+                    return@launch
+                }
             }
             // Step 2: Add or remove the tag
             runCatching {
