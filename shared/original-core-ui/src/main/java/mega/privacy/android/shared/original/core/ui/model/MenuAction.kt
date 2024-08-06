@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.original.core.ui.model
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
@@ -8,6 +9,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.menus.MenuActions
 
 
@@ -107,4 +109,20 @@ abstract class MenuActionPlural(
 
     @Composable
     override fun getIconPainter() = painterResource(id = iconRes)
+}
+
+/**
+ * Utility abstract class for drop down actions
+ */
+abstract class MenuActionDropDown(
+    override val testTag: String,
+) : MenuActionWithIcon {
+
+    @Composable
+    override fun getDescription() =
+        stringResource(id = R.string.label_more)
+
+    @Composable
+    override fun getIconPainter() =
+        painterResource(id = iconPackR.drawable.ic_more_vertical_medium_regular_outline)
 }

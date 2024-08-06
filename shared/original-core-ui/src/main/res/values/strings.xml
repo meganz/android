@@ -26,4 +26,5 @@
     <string name="manual_resume_alert">Transfers paused. Tap to resume.</string>
     <string name="action_play">Play</string>
     <string name="action_pause">Pause</string>
+    <string name="label_more">More</string>
 </resources>
