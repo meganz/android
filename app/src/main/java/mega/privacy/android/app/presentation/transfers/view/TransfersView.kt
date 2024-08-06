@@ -22,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
 import mega.privacy.android.app.presentation.transfers.view.inprogress.InProgressTransfersView
@@ -42,16 +43,20 @@ internal fun TransfersView(
     TransfersView(
         selectedTabIndex = tabIndexToSelect,
         uiState = uiState,
-        onPlayPauseTransfer = viewModel::playOrPauseTransfer
+        onPlayPauseTransfer = viewModel::playOrPauseTransfer,
+        onResumeTransfers = viewModel::resumeTransfers,
+        onPauseTransfers = viewModel::pauseTransfers,
     )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun TransfersView(
+internal fun TransfersView(
     selectedTabIndex: Int,
     uiState: TransfersUiState,
     onPlayPauseTransfer: (Int) -> Unit,
+    onResumeTransfers: () -> Unit,
+    onPauseTransfers: () -> Unit,
 ) = with(uiState) {
     val scaffoldState = rememberScaffoldState()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -68,6 +73,13 @@ private fun TransfersView(
                 appBarType = AppBarType.BACK_NAVIGATION,
                 title = stringResource(id = R.string.section_transfers),
                 onNavigationPressed = { onBackPressedDispatcher?.onBackPressed() },
+                actions = getTransferActions(areTransfersPaused),
+                onActionPressed = { action ->
+                    when (action) {
+                        is TransferMenuAction.Pause -> onPauseTransfers()
+                        is TransferMenuAction.Resume -> onResumeTransfers()
+                    }
+                },
                 elevation = 0.dp,
             )
         },
@@ -98,6 +110,14 @@ private fun TransfersView(
                 selectedIndex = selectedTabIndex,
             )
         }
+    }
+}
+
+private fun getTransferActions(areTransfersPaused: Boolean) = buildList<TransferMenuAction> {
+    if (areTransfersPaused) {
+        add(TransferMenuAction.Resume())
+    } else {
+        add(TransferMenuAction.Pause())
     }
 }
 

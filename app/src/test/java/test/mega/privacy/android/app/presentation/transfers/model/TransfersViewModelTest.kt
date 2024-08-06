@@ -20,6 +20,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -48,10 +49,11 @@ class TransfersViewModelTest {
     private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase>()
     private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase>()
     private val pauseTransferByTagUseCase = mock<PauseTransferByTagUseCase>()
+    private val pauseAllTransfersUseCase = mock<PauseAllTransfersUseCase>()
 
     @BeforeEach
     fun resetMocks() {
-        reset(pauseTransferByTagUseCase)
+        reset(pauseTransferByTagUseCase, pauseAllTransfersUseCase)
         wheneverBlocking { monitorInProgressTransfersUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
             StorageStateEvent(1L, "", 0L, "", EventType.Unknown, StorageState.Unknown)
@@ -67,6 +69,7 @@ class TransfersViewModelTest {
             monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
             monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
             pauseTransferByTagUseCase = pauseTransferByTagUseCase,
+            pauseAllTransfersUseCase = pauseAllTransfersUseCase,
         )
     }
 
@@ -203,7 +206,36 @@ class TransfersViewModelTest {
         runTest {
             initTestClass()
             underTest.playOrPauseTransfer(1)
+
             verifyNoInteractions(pauseTransferByTagUseCase)
+        }
+
+    @Test
+    fun `test that resumeTransfers invokes PauseTransfersQueueUseCase with pause = false and updates state correctly`() =
+        runTest {
+            whenever(pauseAllTransfersUseCase(false)).thenReturn(false)
+
+            initTestClass()
+            underTest.resumeTransfers()
+
+            underTest.uiState.map { it.areTransfersPaused }.test {
+                assertThat(awaitItem()).isFalse()
+            }
+            verify(pauseAllTransfersUseCase).invoke(false)
+        }
+
+    @Test
+    fun `test that pauseTransfers invokes PauseTransfersQueueUseCase with pause = true and updates state correctly`() =
+        runTest {
+            whenever(pauseAllTransfersUseCase(true)).thenReturn(true)
+
+            initTestClass()
+            underTest.pauseTransfers()
+
+            underTest.uiState.map { it.areTransfersPaused }.test {
+                assertThat(awaitItem()).isTrue()
+            }
+            verify(pauseAllTransfersUseCase).invoke(true)
         }
 
     companion object {

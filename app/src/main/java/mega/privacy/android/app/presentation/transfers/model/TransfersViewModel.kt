@@ -14,6 +14,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -30,6 +31,7 @@ class TransfersViewModel @Inject constructor(
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase,
+    private val pauseAllTransfersUseCase: PauseAllTransfersUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TransfersUiState())
@@ -101,5 +103,32 @@ class TransfersViewModel @Inject constructor(
                         .onFailure { Timber.e(it) }
                 }
             }
+    }
+
+    /**
+     * Resume transfers queue.
+     */
+    fun resumeTransfers() {
+        pauseAllTransfers(pause = false)
+    }
+
+    /**
+     * Pause transfers queue.
+     */
+    fun pauseTransfers() {
+        pauseAllTransfers(pause = true)
+    }
+
+    private fun pauseAllTransfers(pause: Boolean) {
+        viewModelScope.launch {
+            runCatching { pauseAllTransfersUseCase(pause) }
+                .onSuccess { paused ->
+                    _uiState.update { state ->
+                        state.copy(areTransfersPaused = paused)
+                    }
+                }.onFailure {
+                    Timber.e(it)
+                }
+        }
     }
 }
