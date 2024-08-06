@@ -166,7 +166,7 @@ private fun TagsContent(
             imeAction = ImeAction.Done,
             supportingText = uiState.message,
             keyboardActions = KeyboardActions(
-                onDone = { addTag(tag) }
+                onDone = { addTag(tag, newTag = true) }
             ),
             showError = uiState.isError,
             onValueChange = {
