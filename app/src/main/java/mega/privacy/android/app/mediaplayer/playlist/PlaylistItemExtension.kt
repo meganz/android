@@ -2,7 +2,7 @@ package mega.privacy.android.app.mediaplayer.playlist
 
 import android.content.Context
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_PREVIOUS
+import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_PREVIOUS
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds

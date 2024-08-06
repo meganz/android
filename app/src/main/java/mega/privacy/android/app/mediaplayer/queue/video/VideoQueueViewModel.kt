@@ -6,9 +6,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
+import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_PLAYING
+import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_PREVIOUS
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.mapper.MediaQueueItemUiEntityMapper
-import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemUiEntity
@@ -73,8 +74,8 @@ class VideoQueueViewModel @Inject constructor(
                 NodeId(item.nodeHandle),
                 item.nodeName,
                 when (item.type) {
-                    PlaylistAdapter.TYPE_PREVIOUS -> MediaQueueItemType.Previous
-                    PlaylistAdapter.TYPE_PLAYING -> MediaQueueItemType.Playing
+                    TYPE_PREVIOUS -> MediaQueueItemType.Previous
+                    TYPE_PLAYING -> MediaQueueItemType.Playing
                     else -> MediaQueueItemType.Next
                 },
                 item.duration,

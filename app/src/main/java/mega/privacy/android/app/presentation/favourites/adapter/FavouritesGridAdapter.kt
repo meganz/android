@@ -19,7 +19,7 @@ import mega.privacy.android.app.databinding.ItemFavouriteBinding
 import mega.privacy.android.app.databinding.ItemFavouriteGridBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter
+import mega.privacy.android.app.presentation.favourites.adapter.FavouritesAdapter.Companion.ANIMATION_DURATION
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.app.presentation.favourites.model.FavouriteHeaderItem
@@ -266,7 +266,7 @@ class FavouritesGridViewHolder(
             val animationId =
                 if (isSelected) R.anim.multiselect_flip_reverse else R.anim.multiselect_flip
             val flipAnimation = AnimationUtils.loadAnimation(binding.root.context, animationId)
-            flipAnimation.duration = PlaylistAdapter.ANIMATION_DURATION
+            flipAnimation.duration = ANIMATION_DURATION
             flipAnimation.setAnimationListener(listener)
             it.imageSelected.startAnimation(flipAnimation)
         }

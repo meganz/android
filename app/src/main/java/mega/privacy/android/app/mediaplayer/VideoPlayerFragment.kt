@@ -49,7 +49,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
@@ -340,12 +339,7 @@ class VideoPlayerFragment : Fragment() {
                     findNavController().let {
                         viewLifecycleOwner.lifecycleScope.launch {
                             if (it.currentDestination?.id == R.id.video_main_player) {
-                                it.navigate(
-                                    if (getFeatureFlagValueUseCase(AppFeatures.NewVideoQueue))
-                                        VideoPlayerFragmentDirections.actionVideoPlayerToQueue()
-                                    else
-                                        VideoPlayerFragmentDirections.actionVideoPlayerToPlaylist()
-                                )
+                                it.navigate(VideoPlayerFragmentDirections.actionVideoPlayerToQueue())
                             }
                         }
                     }

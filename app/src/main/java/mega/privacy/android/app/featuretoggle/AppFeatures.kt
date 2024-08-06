@@ -40,14 +40,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables new video queue
-     */
-    NewVideoQueue(
-        "Enable new video queue",
-        true,
-    ),
-
-    /**
      * Enables report issue via email in login screen
      */
     ReportIssueViaEmail(

@@ -959,9 +959,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                     }
                 }
 
-                R.id.video_playlist,
-                R.id.video_queue,
-                -> {
+                R.id.video_queue -> {
                     // Pause the video when the playlist page is opened, and allow the video to
                     // revert to playing after back to the video player page.
                     mediaPlayerGateway.setPlayWhenReady(false)
@@ -1088,13 +1086,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                 LINKS_ADAPTER
             )
             when (currentFragmentId) {
-                R.id.video_playlist -> {
-                    menu.toggleAllMenuItemsVisibility(false)
-                    searchMenuItem?.isVisible = true
-                    // Display the select option
-                    menu.findItem(R.id.select).isVisible = true
-                }
-
                 R.id.video_main_player -> {
                     when {
                         adapterType == OFFLINE_ADAPTER -> {
@@ -1428,8 +1419,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
     override fun setupToolbarColors(showElevation: Boolean) {
         val isDarkMode = isDarkMode(this)
         val isMainPlayer = navController.currentDestination?.id == R.id.video_main_player
-        val isPlaylist = navController.currentDestination?.id == R.id.video_playlist ||
-                navController.currentDestination?.id == R.id.video_queue
+        val isPlaylist = navController.currentDestination?.id == R.id.video_queue
         @ColorRes val toolbarBackgroundColor: Int
         val toolbarElevation: Float
 
@@ -1517,8 +1507,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
             ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { v, windowInsets ->
                 val isVideoPlayerMainView =
                     navController.currentDestination?.id == R.id.video_main_player
-                val isVideoPlaylist = navController.currentDestination?.id == R.id.video_playlist ||
-                        navController.currentDestination?.id == R.id.video_queue
+                val isVideoPlaylist = navController.currentDestination?.id == R.id.video_queue
                 if (isVideoPlayerMainView || isVideoPlaylist) {
                     windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()).let { insets ->
                         val horizontalInsets: Pair<Int, Int> =

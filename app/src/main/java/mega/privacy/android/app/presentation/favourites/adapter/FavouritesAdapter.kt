@@ -19,7 +19,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFavouriteBinding
 import mega.privacy.android.app.databinding.SortByHeaderBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter
+import mega.privacy.android.app.presentation.favourites.adapter.FavouritesAdapter.Companion.ANIMATION_DURATION
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteHeaderItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteItem
@@ -37,7 +37,6 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
  * @param onItemClicked The item clicked listener
  * @param onLongClicked The item long clicked listener
  * @param onThreeDotsClicked The three dots view clicked listener
- * @param getThumbnail the function that get Thumbnail
  */
 class FavouritesAdapter(
     private val sortByHeaderViewModel: SortByHeaderViewModel? = null,
@@ -92,6 +91,12 @@ class FavouritesAdapter(
         this.accountType = accountType
     }
 
+    companion object {
+        /**
+         * Animation duration
+         */
+        const val ANIMATION_DURATION = 250L
+    }
 }
 
 /**
@@ -214,7 +219,7 @@ class FavouritesViewHolder(
                 context,
                 R.anim.multiselect_flip
             )
-            flipAnimation.duration = PlaylistAdapter.ANIMATION_DURATION
+            flipAnimation.duration = ANIMATION_DURATION
             flipAnimation.setAnimationListener(listener)
             it.imageSelected.startAnimation(flipAnimation)
         }

@@ -241,5 +241,20 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
 
         internal const val TIMEOUT_FOR_DEFAULT_MENU_ITEM: Long = 100
         internal const val TIMEOUT_FOR_SHARED_MENU_ITEM: Long = 500
+
+        /**
+         * The previous type of media item
+         */
+        const val TYPE_PREVIOUS = 1
+
+        /**
+         * The playing type playing media item
+         */
+        const val TYPE_PLAYING = 2
+
+        /**
+         * The next type next media item
+         */
+        const val TYPE_NEXT = 3
     }
 }

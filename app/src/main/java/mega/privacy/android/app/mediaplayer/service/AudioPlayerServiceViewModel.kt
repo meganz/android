@@ -27,9 +27,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
-import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_NEXT
-import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_PLAYING
-import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_PREVIOUS
+import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_NEXT
+import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_PLAYING
+import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_PREVIOUS
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.playlist.finalizeItem
 import mega.privacy.android.app.mediaplayer.playlist.updateNodeName

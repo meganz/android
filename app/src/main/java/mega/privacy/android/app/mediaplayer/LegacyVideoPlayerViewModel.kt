@@ -41,10 +41,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
-import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_NEXT
+import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_PLAYING
+import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_PREVIOUS
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
@@ -53,15 +54,11 @@ import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
 import mega.privacy.android.app.mediaplayer.model.VideoControllerPadding
 import mega.privacy.android.app.mediaplayer.model.VideoPlayerUiState
-import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_NEXT
-import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_PLAYING
-import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_PREVIOUS
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.playlist.finalizeItem
 import mega.privacy.android.app.mediaplayer.playlist.updateNodeName
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.extensions.getStateFlow
-import mega.privacy.android.app.presentation.extensions.parcelableArrayList
 import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
@@ -76,7 +73,6 @@ import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
 import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FROM_DOWNLOAD_SERVICE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -104,8 +100,6 @@ import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.SortOrder
