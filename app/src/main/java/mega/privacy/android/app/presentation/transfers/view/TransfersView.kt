@@ -44,8 +44,8 @@ internal fun TransfersView(
         selectedTabIndex = tabIndexToSelect,
         uiState = uiState,
         onPlayPauseTransfer = viewModel::playOrPauseTransfer,
-        onResumeTransfers = viewModel::resumeTransfers,
-        onPauseTransfers = viewModel::pauseTransfers,
+        onResumeTransfers = viewModel::resumeTransfersQueue,
+        onPauseTransfers = viewModel::pauseTransfersQueue,
     )
 }
 

@@ -6,10 +6,11 @@ import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBack
 import javax.inject.Inject
 
 /**
- * Pause All Transfers Use Case
- *
+ * Pause Transfers Queue Use Case:
+ * - If queue is paused: Nothing will be transferred, even if the individual state of the transfers is resumed.
+ * - If queue is resumed: Only transfers with individual state resumed will be transferred.
  */
-class PauseAllTransfersUseCase @Inject constructor(
+class PauseTransfersQueueUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
     private val updateCameraUploadsBackupStatesUseCase: UpdateCameraUploadsBackupStatesUseCase,
 ) {

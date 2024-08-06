@@ -14,14 +14,14 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.DeleteFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteAllCompletedTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 internal class TransferPageViewModel @Inject constructor(
-    private val pauseAllTransfersUseCase: PauseAllTransfersUseCase,
+    private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
     private val cancelTransfersUseCase: CancelTransfersUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val deleteAllCompletedTransfersUseCase: DeleteAllCompletedTransfersUseCase,
@@ -60,7 +60,7 @@ internal class TransferPageViewModel @Inject constructor(
         if (pauseOrResumeJob?.isActive == true) return
         pauseOrResumeJob = viewModelScope.launch {
             val result = runCatching {
-                pauseAllTransfersUseCase(isPause)
+                pauseTransfersQueueUseCase(isPause)
             }.onFailure {
                 Timber.e(it)
             }

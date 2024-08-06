@@ -14,8 +14,8 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -31,7 +31,7 @@ class TransfersViewModel @Inject constructor(
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase,
-    private val pauseAllTransfersUseCase: PauseAllTransfersUseCase,
+    private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TransfersUiState())
@@ -108,20 +108,20 @@ class TransfersViewModel @Inject constructor(
     /**
      * Resume transfers queue.
      */
-    fun resumeTransfers() {
-        pauseAllTransfers(pause = false)
+    fun resumeTransfersQueue() {
+        pauseTransfersQueue(pause = false)
     }
 
     /**
      * Pause transfers queue.
      */
-    fun pauseTransfers() {
-        pauseAllTransfers(pause = true)
+    fun pauseTransfersQueue() {
+        pauseTransfersQueue(pause = true)
     }
 
-    private fun pauseAllTransfers(pause: Boolean) {
+    private fun pauseTransfersQueue(pause: Boolean) {
         viewModelScope.launch {
-            runCatching { pauseAllTransfersUseCase(pause) }
+            runCatching { pauseTransfersQueueUseCase(pause) }
                 .onSuccess { paused ->
                     _uiState.update { state ->
                         state.copy(areTransfersPaused = paused)

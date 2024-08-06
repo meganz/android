@@ -50,7 +50,7 @@ import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSav
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWithWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -102,7 +102,7 @@ class StartTransfersComponentViewModelTest {
     private val sendChatAttachmentsUseCase = mock<SendChatAttachmentsUseCase>()
     private val shouldAskForResumeTransfersUseCase = mock<ShouldAskForResumeTransfersUseCase>()
     private val setAskedResumeTransfersUseCase = mock<SetAskedResumeTransfersUseCase>()
-    private val pauseAllTransfersUseCase = mock<PauseAllTransfersUseCase>()
+    private val pauseTransfersQueueUseCase = mock<PauseTransfersQueueUseCase>()
     private val startUploadWithWorkerUseCase = mock<StartUploadsWithWorkerUseCase>()
     private val saveOfflineNodesToDevice = mock<SaveOfflineNodesToDevice>()
     private val saveUriToDeviceUseCase = mock<SaveUriToDeviceUseCase>()
@@ -150,7 +150,7 @@ class StartTransfersComponentViewModelTest {
             sendChatAttachmentsUseCase = sendChatAttachmentsUseCase,
             shouldAskForResumeTransfersUseCase = shouldAskForResumeTransfersUseCase,
             setAskedResumeTransfersUseCase = setAskedResumeTransfersUseCase,
-            pauseAllTransfersUseCase = pauseAllTransfersUseCase,
+            pauseTransfersQueueUseCase = pauseTransfersQueueUseCase,
             startUploadWithWorkerUseCase = startUploadWithWorkerUseCase,
             saveOfflineNodesToDevice = saveOfflineNodesToDevice,
             saveUriToDeviceUseCase = saveUriToDeviceUseCase,
@@ -182,7 +182,7 @@ class StartTransfersComponentViewModelTest {
             sendChatAttachmentsUseCase,
             shouldAskForResumeTransfersUseCase,
             setAskedResumeTransfersUseCase,
-            pauseAllTransfersUseCase,
+            pauseTransfersQueueUseCase,
             startUploadWithWorkerUseCase,
             node,
             parentNode,

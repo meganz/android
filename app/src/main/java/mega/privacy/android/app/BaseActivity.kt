@@ -120,7 +120,7 @@ import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.mobile.analytics.event.TransferOverQuotaDialogEvent
 import mega.privacy.mobile.analytics.event.TransferOverQuotaUpgradeAccountButtonEvent
 import nz.mega.sdk.MegaAccountDetails
@@ -153,7 +153,7 @@ import kotlin.time.Duration.Companion.seconds
  * @property billingViewModel
  * @property monitorTransferOverQuotaUseCase
  * @property fetchPsaUseCase
- * @property pauseAllTransfersUseCase
+ * @property pauseTransfersQueueUseCase
  */
 @AndroidEntryPoint
 abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionRequester,
@@ -211,7 +211,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     lateinit var monitorChatSignalPresenceUseCase: MonitorChatSignalPresenceUseCase
 
     @Inject
-    lateinit var pauseAllTransfersUseCase: PauseAllTransfersUseCase
+    lateinit var pauseTransfersQueueUseCase: PauseTransfersQueueUseCase
 
     @JvmField
     var legacyNameCollisionActivityContract: ActivityResultLauncher<ArrayList<NameCollisionUiEntity>>? =
@@ -358,7 +358,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             showResumeTransfersWarning(this@BaseActivity) {
                 lifecycleScope.launch {
                     runCatching {
-                        pauseAllTransfersUseCase(false)
+                        pauseTransfersQueueUseCase(false)
                     }.onFailure {
                         Timber.e(it)
                     }
@@ -481,7 +481,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             if (isResumeTransfersWarningShown) {
                 showResumeTransfersWarning(this@BaseActivity) {
                     lifecycleScope.launch {
-                        pauseAllTransfersUseCase(false)
+                        pauseTransfersQueueUseCase(false)
                     }
                 }
             }

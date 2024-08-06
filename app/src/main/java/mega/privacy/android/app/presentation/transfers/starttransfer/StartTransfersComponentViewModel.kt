@@ -57,7 +57,7 @@ import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSav
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.PauseAllTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWithWorkerUseCase
 import timber.log.Timber
@@ -89,7 +89,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val sendChatAttachmentsUseCase: SendChatAttachmentsUseCase,
     private val shouldAskForResumeTransfersUseCase: ShouldAskForResumeTransfersUseCase,
     private val setAskedResumeTransfersUseCase: SetAskedResumeTransfersUseCase,
-    private val pauseAllTransfersUseCase: PauseAllTransfersUseCase,
+    private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
     private val startUploadWithWorkerUseCase: StartUploadsWithWorkerUseCase,
     private val saveOfflineNodesToDevice: SaveOfflineNodesToDevice,
     private val saveUriToDeviceUseCase: SaveUriToDeviceUseCase,
@@ -636,7 +636,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
      */
     fun resumeTransfers() {
         viewModelScope.launch {
-            runCatching { pauseAllTransfersUseCase(false) }
+            runCatching { pauseTransfersQueueUseCase(false) }
                 .onFailure { Timber.e(it) }
         }
     }
