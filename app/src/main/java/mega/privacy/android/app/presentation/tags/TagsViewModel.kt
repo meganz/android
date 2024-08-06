@@ -127,18 +127,17 @@ class TagsViewModel @Inject constructor(
      */
     fun addOrRemoveTag(tag: String) {
         viewModelScope.launch {
-            // Step 1: Validate the tag
+            // Validate the tag
             val isTagPresent = uiState.value.nodeTags.contains(tag)
-            if (uiState.value.nodeTags.size >= MAX_TAGS_PER_NODE) {
-                _uiState.update { it.copy(showMaxTagsError = triggered) }
 
-                // If the tag is not present and max tags limit is reached, return
-                if (!isTagPresent) {
-                    Timber.e("Cannot add more tags. Maximum limit reached for tag: $tag")
-                    return@launch
-                }
+            //Check if the tag is already present and if the maximum tag limit is reached.
+            if (!isTagPresent && uiState.value.nodeTags.size >= MAX_TAGS_PER_NODE) {
+                Timber.e("Cannot add more tags. Maximum limit reached for tag: $tag")
+                _uiState.update { it.copy(showMaxTagsError = triggered) }
+                return@launch
             }
-            // Step 2: Add or remove the tag
+
+            // Add or remove the tag
             runCatching {
                 manageNodeTagUseCase(
                     nodeHandle = nodeId,
@@ -151,7 +150,7 @@ class TagsViewModel @Inject constructor(
                 Timber.e(it)
             }
 
-            // Step 3: Update the UI & revalidate the tag
+            // Update the UI & revalidate the tag
             validateTagName()
         }
     }
