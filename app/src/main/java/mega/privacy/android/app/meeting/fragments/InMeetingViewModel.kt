@@ -316,16 +316,6 @@ class InMeetingViewModel @Inject constructor(
         MutableStateFlow<Pair<Int, ((Context) -> String)?>>(Pair(TYPE_JOIN, null))
     val getParticipantsChanges: StateFlow<Pair<Int, ((Context) -> String)?>> get() = _getParticipantsChanges
 
-    private val noOutgoingCallObserver = Observer<Long> {
-        _state.value.call?.apply {
-            if (it == chatId) {
-                status?.let {
-                    checkSubtitleToolbar()
-                }
-            }
-        }
-    }
-
     private val waitingForOthersBannerObserver =
         Observer<Pair<Long, Boolean>> { result ->
             val chatId: Long = result.first
@@ -425,9 +415,6 @@ class InMeetingViewModel @Inject constructor(
             )
             .addTo(composite)
 
-        LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
-            .observeForever(noOutgoingCallObserver)
-
         LiveEventBus.get<Pair<Long, Boolean>>(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
             .observeForever(waitingForOthersBannerObserver)
     }
@@ -490,8 +477,9 @@ class InMeetingViewModel @Inject constructor(
                     Timber.d("Call user limit ${call.callUsersLimit} and users in call ${call.peerIdParticipants?.size}")
 
                     _state.update { it.copy(call = call) }
+                    checkSubtitleToolbar()
+
                     call.status?.let { status ->
-                        checkSubtitleToolbar()
                         if (_updateCallId.value != call.callId) {
                             _updateCallId.value = call.callId
                             checkParticipantsList()
@@ -2715,9 +2703,6 @@ class InMeetingViewModel @Inject constructor(
         super.onCleared()
 
         composite.clear()
-
-        LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
-            .removeObserver(noOutgoingCallObserver)
 
         LiveEventBus.get<Pair<Long, Boolean>>(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
             .removeObserver(waitingForOthersBannerObserver)
