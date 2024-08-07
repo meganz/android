@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.model
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.transfers.view.navigation.compose.TransfersArgs
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTransfersUseCase
@@ -32,12 +34,16 @@ class TransfersViewModel @Inject constructor(
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase,
     private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TransfersUiState())
     val uiState = _uiState.asStateFlow()
 
+    private val transfersArgs = TransfersArgs(savedStateHandle)
+
     init {
+        updateSelectedTab(transfersArgs.tabIndex)
         monitorInProgressTransfers()
         monitorStorageOverQuota()
         monitorTransferOverQuota()
@@ -129,6 +135,15 @@ class TransfersViewModel @Inject constructor(
                 }.onFailure {
                     Timber.e(it)
                 }
+        }
+    }
+
+    /**
+     * Update selected tab.
+     */
+    fun updateSelectedTab(tabIndex: Int) {
+        _uiState.update { state ->
+            state.copy(selectedTab = tabIndex)
         }
     }
 }

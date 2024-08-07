@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.view.inprogress
 
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -28,7 +28,11 @@ internal fun InProgressTransfersView(
     onPlayPauseClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(modifier = modifier.testTag(TEST_TAG_IN_PROGRESS_TRANSFERS_VIEW).fillMaxWidth()) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .testTag(TEST_TAG_IN_PROGRESS_TRANSFERS_VIEW)
+    ) {
         items(
             items = inProgressTransfers,
             key = { it.tag },

@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.transfers.model
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -11,6 +12,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
+import mega.privacy.android.app.presentation.transfers.view.navigation.compose.tabIndexArg
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
@@ -53,7 +55,10 @@ class TransfersViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(pauseTransferByTagUseCase, pauseTransfersQueueUseCase)
+        reset(
+            pauseTransferByTagUseCase,
+            pauseTransfersQueueUseCase,
+        )
         wheneverBlocking { monitorInProgressTransfersUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
             StorageStateEvent(1L, "", 0L, "", EventType.Unknown, StorageState.Unknown)
@@ -63,6 +68,7 @@ class TransfersViewModelTest {
     }
 
     private fun initTestClass() {
+        val savedStateHandle = SavedStateHandle(mapOf(tabIndexArg to 0.toString()))
         underTest = TransfersViewModel(
             monitorInProgressTransfersUseCase = monitorInProgressTransfersUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
@@ -70,6 +76,7 @@ class TransfersViewModelTest {
             monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
             pauseTransferByTagUseCase = pauseTransferByTagUseCase,
             pauseTransfersQueueUseCase = pauseTransfersQueueUseCase,
+            savedStateHandle = savedStateHandle,
         )
     }
 
