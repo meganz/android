@@ -133,7 +133,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
         return entities.map { contactModelMapper(it) }
     }
 
-    override fun getAllCompletedTransfers(size: Int?) =
+    override fun getCompletedTransfers(size: Int?) =
         completedTransferDao.getAllCompletedTransfers()
             .map { list ->
                 list.map { completedTransferModelMapper(it) }

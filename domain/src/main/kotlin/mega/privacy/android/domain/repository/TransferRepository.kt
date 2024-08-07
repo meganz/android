@@ -196,11 +196,11 @@ interface TransferRepository {
     fun monitorCompletedTransfer(): Flow<Unit>
 
     /**
-     * Get the list of completed transfers
+     * Monitors list of completed transfers
      *
      * @param size the limit size of the list. If null, the limit does not apply
      */
-    fun getAllCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
+    fun monitorCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
 
     /**
      * Add a completed transfer to local storage

@@ -447,8 +447,8 @@ internal class DefaultTransfersRepository @Inject constructor(
     override fun monitorCompletedTransfer(): Flow<Unit> =
         appEventGateway.monitorCompletedTransfer
 
-    override fun getAllCompletedTransfers(size: Int?): Flow<List<CompletedTransfer>> =
-        megaLocalRoomGateway.getAllCompletedTransfers(size)
+    override fun monitorCompletedTransfers(size: Int?): Flow<List<CompletedTransfer>> =
+        megaLocalRoomGateway.getCompletedTransfers(size)
             .flowOn(ioDispatcher)
 
     override suspend fun addCompletedTransfer(
@@ -481,7 +481,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         withContext(ioDispatcher) {
             // remove id field before comparison
             val existingTransfers =
-                megaLocalRoomGateway.getAllCompletedTransfers().firstOrNull()
+                megaLocalRoomGateway.getCompletedTransfers().firstOrNull()
                     .orEmpty().map { it.copy(id = null) }
             transfers
                 .map { it.copy(id = null) }

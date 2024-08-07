@@ -178,7 +178,7 @@ internal class MegaLocalRoomFacadeTest {
             val expected =
                 listOf(completedTransfers[1], completedTransfers[0], completedTransfers[2])
 
-            assertThat(underTest.getAllCompletedTransfers().single()).isEqualTo(expected)
+            assertThat(underTest.getCompletedTransfers().single()).isEqualTo(expected)
         }
 
 
@@ -200,7 +200,7 @@ internal class MegaLocalRoomFacadeTest {
                 whenever(completedTransferModelMapper(entity)).thenReturn(completedTransfer)
             }
 
-            assertThat(underTest.getAllCompletedTransfers(expectedSize).single().size)
+            assertThat(underTest.getCompletedTransfers(expectedSize).single().size)
                 .isEqualTo(expectedSize)
         }
 
@@ -221,7 +221,7 @@ internal class MegaLocalRoomFacadeTest {
                 whenever(completedTransferModelMapper(entity)).thenReturn(completedTransfer)
             }
 
-            assertThat(underTest.getAllCompletedTransfers().single().size)
+            assertThat(underTest.getCompletedTransfers().single().size)
                 .isEqualTo(completedTransferEntities.size)
         }
 
