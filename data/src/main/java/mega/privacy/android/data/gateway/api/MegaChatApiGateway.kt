@@ -1096,6 +1096,21 @@ interface MegaChatApiGateway {
     fun getChatLocalVideoUpdates(chatId: Long): Flow<ChatVideoUpdate>
 
     /**
+     * Register a listener to receive video from remote device for an specific chat room.
+     * This listener will be deregistered automatically.
+     *
+     * @param chatId    Chat Room Id
+     * @param clientId  Client Id
+     * @param
+     * @return          Flow of [ChatVideoUpdate]
+     */
+    fun getChatRemoteVideoUpdates(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+    ): Flow<ChatVideoUpdate>
+
+    /**
      * Open video device
      *
      * The associated request type with this request is MegaChatRequest::TYPE_OPEN_VIDEO_DEVICE

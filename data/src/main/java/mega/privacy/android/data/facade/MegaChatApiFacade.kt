@@ -648,6 +648,23 @@ internal class MegaChatApiFacade @Inject constructor(
         chatApi.openVideoDevice(listener)
     }
 
+    override fun getChatRemoteVideoUpdates(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+    ): Flow<ChatVideoUpdate> =
+        callbackFlow {
+            val listener = MegaChatVideoListenerInterface { _, _, width, height, byteBuffer ->
+                trySend(ChatVideoUpdate(width, height, byteBuffer))
+            }
+
+            chatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
+
+            awaitClose {
+                chatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
+            }
+        }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
+
     override fun releaseVideoDevice(listener: MegaChatRequestListenerInterface) {
         chatApi.releaseVideoDevice(listener)
     }
@@ -906,7 +923,7 @@ internal class MegaChatApiFacade @Inject constructor(
         speakRequest: Boolean,
         waitingRoom: Boolean,
         openInvite: Boolean,
-        listener: MegaChatRequestListenerInterface
+        listener: MegaChatRequestListenerInterface,
     ) {
         chatApi.createMeeting(title, speakRequest, waitingRoom, openInvite, listener)
     }

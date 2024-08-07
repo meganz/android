@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.FileConstant
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.CacheGateway
@@ -52,7 +51,6 @@ internal class DefaultAvatarRepository @Inject constructor(
     private val cacheGateway: CacheGateway,
     private val avatarWrapper: AvatarWrapper,
     private val bitmapFactoryWrapper: BitmapFactoryWrapper,
-    private val databaseHandler: DatabaseHandler,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AvatarRepository {

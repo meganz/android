@@ -14,7 +14,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.constant.FileConstant
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -61,7 +60,6 @@ internal class DefaultAvatarRepositoryTest {
     private val sharedFlow = MutableSharedFlow<GlobalUpdate>()
     private val avatarWrapper = mock<AvatarWrapper>()
     private val bitmapFactoryWrapper = mock<BitmapFactoryWrapper>()
-    private val databaseHandler = mock<DatabaseHandler>()
 
     @Before
     fun setUp() {
@@ -75,7 +73,6 @@ internal class DefaultAvatarRepositoryTest {
             contactsRepository = contactsRepository,
             sharingScope = TestScope(),
             ioDispatcher = UnconfinedTestDispatcher(),
-            databaseHandler = databaseHandler
         )
     }
 

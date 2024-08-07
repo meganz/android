@@ -503,6 +503,13 @@ internal class CallRepositoryImpl @Inject constructor(
     override fun getChatLocalVideoUpdates(chatId: Long): Flow<ChatVideoUpdate> =
         megaChatApiGateway.getChatLocalVideoUpdates(chatId).flowOn(dispatcher)
 
+    override fun getChatRemoteVideoUpdates(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+    ): Flow<ChatVideoUpdate> = megaChatApiGateway.getChatRemoteVideoUpdates(chatId, clientId, hiRes)
+        .flowOn(dispatcher)
+
     override suspend fun openVideoDevice(): ChatRequest = withContext(dispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getChatRequestListener(

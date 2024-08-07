@@ -4,14 +4,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
 import mega.privacy.android.domain.entity.featureflag.Flag
-import mega.privacy.android.domain.entity.call.ChatCallStatus
-import mega.privacy.android.domain.entity.call.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 
 /**
@@ -340,6 +340,21 @@ interface CallRepository {
      * @return          Flow of [ChatVideoUpdate]
      */
     fun getChatLocalVideoUpdates(chatId: Long): Flow<ChatVideoUpdate>
+
+    /**
+     * Register a listener to receive video from remote device for an specific chat room.
+     * This listener will be deregistered automatically.
+     *
+     * @param chatId    Chat Room Id
+     * @param clientId  Client Id
+     * @param hiRes    True if high resolution video is requested, false otherwise
+     * @return          Flow of [ChatVideoUpdate]
+     */
+    fun getChatRemoteVideoUpdates(
+        chatId: Long,
+        clientId: Long,
+        hiRes: Boolean,
+    ): Flow<ChatVideoUpdate>
 
     /**
      * Open video device
