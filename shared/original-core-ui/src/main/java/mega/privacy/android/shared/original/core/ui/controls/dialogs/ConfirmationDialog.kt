@@ -58,6 +58,40 @@ fun ConfirmationDialog(
 )
 
 /**
+ * Confirmation dialog with only a message and 2 buttons.
+ * The 2 buttons have short text and are in a horizontal row.
+ *
+ * @param text message body
+ * @param cancelButtonText cancel button text
+ * @param confirmButtonText confirmation button text
+ * @param onDismiss to be triggered when dialog is hidden, whether with cancel button, confirm button, back or outside press.
+ * @param onConfirm to be triggered when confirmation button is pressed
+ * @param dismissOnBackPress if true, the dialog will be dismiss when the user does back action, default to true.
+ * @param dismissOnClickOutside if true, the dialog will be dismiss when the user taps outside of the dialog, default to true.
+ */
+@Composable
+fun ConfirmationDialog(
+    text: String,
+    confirmButtonText: String,
+    cancelButtonText: String?,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    dismissOnClickOutside: Boolean = true,
+    dismissOnBackPress: Boolean = true,
+) = BaseMegaAlertDialog(
+    modifier = modifier,
+    text = text,
+    confirmButtonText = confirmButtonText,
+    cancelButtonText = cancelButtonText,
+    onConfirm = onConfirm,
+    onDismiss = onDismiss,
+    onCancel = onDismiss,
+    dismissOnBackPress = dismissOnBackPress,
+    dismissOnClickOutside = dismissOnClickOutside,
+)
+
+/**
  * Confirmation dialog with only title and 2 buttons.
  * The 2 buttons have short text and are in a horizontal row.
  *
