@@ -27,8 +27,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
-import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
@@ -37,7 +35,9 @@ import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -76,7 +76,7 @@ class UploadFolderViewModel @Inject constructor(
     private val currentFolder: MutableLiveData<FolderContent.Data> = MutableLiveData()
     private val folderItems: MutableLiveData<MutableList<FolderContent>> = MutableLiveData()
     private val selectedItems: MutableLiveData<MutableList<Int>> = MutableLiveData()
-    private val collisions: MutableLiveData<ArrayList<NameCollisionUiEntity>> = MutableLiveData()
+    private val collisions: MutableLiveData<ArrayList<NameCollision>> = MutableLiveData()
     private val actionResult: MutableLiveData<String?> = MutableLiveData()
 
     private lateinit var parentFolder: String
@@ -94,7 +94,7 @@ class UploadFolderViewModel @Inject constructor(
     fun getCurrentFolder(): LiveData<FolderContent.Data> = currentFolder
     fun getFolderItems(): LiveData<MutableList<FolderContent>> = folderItems
     fun getSelectedItems(): LiveData<MutableList<Int>> = selectedItems
-    fun getCollisions(): LiveData<ArrayList<NameCollisionUiEntity>> = collisions
+    fun getCollisions(): LiveData<ArrayList<NameCollision>> = collisions
     fun onActionResult(): LiveData<String?> = actionResult
 
     /**
@@ -386,9 +386,7 @@ class UploadFolderViewModel @Inject constructor(
                     parentNodeId = NodeId(parentHandle)
                 )
             }.onSuccess { fileCollisions ->
-                collisions.value = ArrayList(fileCollisions.map {
-                    NameCollisionUiEntity.Upload.getUploadCollision(it)
-                })
+                collisions.value = ArrayList(fileCollisions)
                 pendingUploads.addAll(files)
             }.onFailure {
                 Timber.e(it, "Cannot check name collisions")

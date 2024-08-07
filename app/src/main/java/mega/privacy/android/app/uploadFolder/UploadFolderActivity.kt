@@ -36,9 +36,9 @@ import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
-import mega.privacy.android.app.namecollision.LegacyNameCollisionActivity
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
+import mega.privacy.android.app.namecollision.NameCollisionActivity
 import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -52,6 +52,7 @@ import mega.privacy.android.app.utils.Constants.LONG_SNACKBAR_DURATION
 import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
@@ -408,12 +409,12 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
      *
      * @param collisions    List of [NameCollisionUiEntity] to manage.
      */
-    private fun manageCollisions(collisions: ArrayList<NameCollisionUiEntity>) {
+    private fun manageCollisions(collisions: ArrayList<NameCollision>) {
         if (collisions.isEmpty()) {
             viewModel.proceedWithUpload(this)
         } else {
             collisionsForResult.launch(
-                LegacyNameCollisionActivity.getIntentForFolderUpload(
+                NameCollisionActivity.getIntentForFolderUpload(
                     this,
                     collisions = collisions
                 )

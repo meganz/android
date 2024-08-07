@@ -1,12 +1,11 @@
 package mega.privacy.android.app.namecollision.data
 
-import mega.privacy.android.app.ShareInfo
+import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity.Upload.Companion.toFileNameCollision
 import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.uri.UriPath
-import java.io.File
 import java.io.Serializable
 
 /**
@@ -51,60 +50,13 @@ sealed class NameCollisionUiEntity : Serializable {
     ) : NameCollisionUiEntity() {
 
         companion object {
-
-            /**
-             * Gets a [NameCollisionUiEntity.Upload] from a [File].
-             *
-             * @param collisionHandle   The node handle with which there is a name collision.
-             * @param file              The file from which the [NameCollisionUiEntity.Upload] will be get.
-             * @param parentHandle      The parent handle of the node in which the file has to be uploaded.
-             */
-            @JvmStatic
-            fun getUploadCollision(
-                collisionHandle: Long,
-                file: File,
-                parentHandle: Long?,
-            ): Upload =
-                Upload(
-                    collisionHandle = collisionHandle,
-                    absolutePath = file.absolutePath,
-                    name = file.name,
-                    size = if (file.isFile) file.length() else null,
-                    childFolderCount = file.listFiles()?.count { it.isDirectory } ?: 0,
-                    childFileCount = file.listFiles()?.count { it.isFile } ?: 0,
-                    lastModified = file.lastModified(),
-                    parentHandle = parentHandle
-                )
-
-            /**
-             * Gets a [NameCollisionUiEntity.Upload] from a [ShareInfo].
-             *
-             * @param collisionHandle   The node handle with which there is a name collision.
-             * @param shareInfo         The file from which the [NameCollisionUiEntity.Upload] will be get.
-             * @param parentHandle      The parent handle of the node in which the file has to be uploaded.
-             */
-            @JvmStatic
-            fun getUploadCollision(
-                collisionHandle: Long,
-                shareInfo: ShareInfo,
-                parentHandle: Long,
-            ): Upload = Upload(
-                collisionHandle = collisionHandle,
-                absolutePath = shareInfo.fileAbsolutePath,
-                name = shareInfo.originalFileName,
-                size = shareInfo.size,
-                lastModified = shareInfo.lastModified,
-                parentHandle = parentHandle
-            )
-
             /**
              * Get upload collision
              *
              * @param collision The [FileNameCollision] from which the [NameCollisionUiEntity.Upload] will be get.
              * @return
              */
-            @JvmStatic
-            fun getUploadCollision(
+            fun fromFileNameCollision(
                 collision: FileNameCollision,
             ): Upload = Upload(
                 collisionHandle = collision.collisionHandle,
@@ -116,6 +68,21 @@ sealed class NameCollisionUiEntity : Serializable {
                 lastModified = collision.lastModified,
                 parentHandle = collision.parentHandle,
                 isFile = collision.isFile
+            )
+
+            /**
+             * Creates a [FileNameCollision] from a [NameCollisionUiEntity.Upload]
+             */
+            fun Upload.toFileNameCollision() = FileNameCollision(
+                collisionHandle = collisionHandle,
+                name = name,
+                size = size ?: 0L,
+                childFolderCount = childFileCount,
+                childFileCount = childFileCount,
+                lastModified = lastModified,
+                parentHandle = parentHandle ?: -1L,
+                isFile = isFile,
+                path = UriPath(absolutePath)
             )
         }
     }
@@ -143,7 +110,6 @@ sealed class NameCollisionUiEntity : Serializable {
             /**
              * Creates a [NameCollisionUiEntity.Copy] from a [NodeNameCollision].
              */
-            @JvmStatic
             fun fromNodeNameCollision(
                 nameCollision: NodeNameCollision,
             ): Copy = Copy(
@@ -159,6 +125,24 @@ sealed class NameCollisionUiEntity : Serializable {
                 serializedNode = nameCollision.serializedData
             )
         }
+
+        /**
+         * Creates a [NodeNameCollision.Default] from a [NameCollisionUiEntity.Copy]
+         */
+        fun Copy.toNodeNameCollision() = NodeNameCollision.Default(
+            collisionHandle = collisionHandle,
+            nodeHandle = nodeHandle,
+            name = name,
+            size = size ?: -1L,
+            childFolderCount = childFolderCount,
+            childFileCount = childFileCount,
+            lastModified = lastModified,
+            parentHandle = parentHandle,
+            isFile = isFile,
+            serializedData = serializedNode,
+            renameName = null,
+            type = NodeNameCollisionType.COPY
+        )
     }
 
     /**
@@ -186,7 +170,6 @@ sealed class NameCollisionUiEntity : Serializable {
             /**
              * Creates a [NameCollisionUiEntity.Import] from a [NodeNameCollision.Chat].
              */
-            @JvmStatic
             fun fromNodeNameCollision(
                 nameCollision: NodeNameCollision.Chat,
             ): Import = Import(
@@ -203,6 +186,25 @@ sealed class NameCollisionUiEntity : Serializable {
                 isFile = nameCollision.isFile
             )
         }
+
+        /**
+         * Creates a [NodeNameCollision.Chat] from a [NameCollisionUiEntity.Import].
+         */
+        fun Import.toNodeNameCollision() = NodeNameCollision.Chat(
+            collisionHandle = collisionHandle,
+            nodeHandle = nodeHandle,
+            name = name,
+            size = size ?: -1L,
+            childFolderCount = childFolderCount,
+            childFileCount = childFileCount,
+            lastModified = lastModified,
+            parentHandle = parentHandle,
+            isFile = isFile,
+            serializedData = null,
+            renameName = null,
+            chatId = chatId,
+            messageId = messageId
+        )
     }
 
     /**
@@ -226,7 +228,6 @@ sealed class NameCollisionUiEntity : Serializable {
             /**
              * Creates a [NameCollisionUiEntity.Movement] from a [NodeNameCollision].
              */
-            @JvmStatic
             fun fromNodeNameCollision(
                 nameCollision: NodeNameCollision,
             ): Movement = Movement(
@@ -241,56 +242,16 @@ sealed class NameCollisionUiEntity : Serializable {
                 isFile = nameCollision.isFile
             )
         }
-    }
-}
 
-/**
- * Temporary mapper to create a [NameCollisionUiEntity.Import] from domain module's [NodeNameCollision]
- * Should be removed when [GetNameCollisionResultUseCase] is refactored
- */
-fun NodeNameCollision.Chat.toLegacyImport() =
-    NameCollisionUiEntity.Import.fromNodeNameCollision(this)
-
-/**
- * Temporary mapper to create a [NameCollisionUiEntity.Movement] from domain module's [NodeNameCollision]
- * Should be removed when [GetNameCollisionResultUseCase] is refactored
- */
-fun NodeNameCollision.toLegacyMove() = NameCollisionUiEntity.Movement.fromNodeNameCollision(this)
-
-/**
- * Temporary mapper to create a [NameCollisionUiEntity.Copy] from domain module's [NodeNameCollision]
- * Should be removed when [GetNameCollisionResultUseCase] is refactored
- */
-fun NodeNameCollision.toLegacyCopy() = NameCollisionUiEntity.Copy.fromNodeNameCollision(this)
-
-
-/**
- * Temporary mapper to create a domain module's [mega.privacy.android.domain.entity.node.NameCollision] from app module's [NameCollisionUiEntity]
- * Should be removed when all features are refactored
- */
-fun NameCollisionUiEntity.toDomainEntity(): NameCollision =
-    when (this) {
-        is NameCollisionUiEntity.Copy -> NodeNameCollision.Default(
+        /**
+         * Creates a [NodeNameCollision.Default] from a [NameCollisionUiEntity.Movement].
+         */
+        fun Movement.toNodeNameCollision() = NodeNameCollision.Default(
             collisionHandle = collisionHandle,
             nodeHandle = nodeHandle,
             name = name,
             size = size ?: -1L,
-            childFolderCount = childFileCount,
-            childFileCount = childFileCount,
-            lastModified = lastModified,
-            parentHandle = parentHandle,
-            isFile = isFile,
-            serializedData = serializedNode,
-            renameName = null,
-            type = NodeNameCollisionType.COPY
-        )
-
-        is NameCollisionUiEntity.Movement -> NodeNameCollision.Default(
-            collisionHandle = collisionHandle,
-            nodeHandle = nodeHandle,
-            name = name,
-            size = size ?: -1L,
-            childFolderCount = childFileCount,
+            childFolderCount = childFolderCount,
             childFileCount = childFileCount,
             lastModified = lastModified,
             parentHandle = parentHandle,
@@ -299,34 +260,23 @@ fun NameCollisionUiEntity.toDomainEntity(): NameCollision =
             renameName = null,
             type = NodeNameCollisionType.MOVE
         )
+    }
+}
 
-        is NameCollisionUiEntity.Import -> NodeNameCollision.Chat(
-            collisionHandle = collisionHandle,
-            nodeHandle = nodeHandle,
-            name = name,
-            size = size ?: -1L,
-            childFolderCount = childFileCount,
-            childFileCount = childFileCount,
-            lastModified = lastModified,
-            parentHandle = parentHandle,
-            isFile = isFile,
-            serializedData = null,
-            renameName = null,
-            chatId = chatId,
-            messageId = messageId
-        )
 
-        is NameCollisionUiEntity.Upload -> FileNameCollision(
-            collisionHandle = collisionHandle,
-            name = name,
-            size = size ?: 0L,
-            childFolderCount = childFileCount,
-            childFileCount = childFileCount,
-            lastModified = lastModified,
-            parentHandle = parentHandle ?: -1L,
-            isFile = isFile,
-            path = UriPath(absolutePath)
-        )
+/**
+ * Temporary mapper to create a domain module's [mega.privacy.android.domain.entity.node.NameCollision] from app module's [NameCollisionUiEntity]
+ * Should be removed when all features are refactored
+ */
+fun NameCollisionUiEntity.toDomainEntity(): NameCollision =
+    when (this) {
+        is NameCollisionUiEntity.Copy -> this.toNodeNameCollision()
+
+        is NameCollisionUiEntity.Movement -> this.toNodeNameCollision()
+
+        is NameCollisionUiEntity.Import -> this.toNodeNameCollision()
+
+        is NameCollisionUiEntity.Upload -> this.toFileNameCollision()
     }
 
 /**
@@ -339,5 +289,5 @@ fun NameCollision.toUiEntity() = when (this) {
     }
 
     is NodeNameCollision.Chat -> NameCollisionUiEntity.Import.fromNodeNameCollision(this)
-    is FileNameCollision -> NameCollisionUiEntity.Upload.getUploadCollision(this)
+    is FileNameCollision -> NameCollisionUiEntity.Upload.fromFileNameCollision(this)
 }

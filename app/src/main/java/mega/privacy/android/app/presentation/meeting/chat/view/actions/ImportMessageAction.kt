@@ -16,7 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.namecollision.LegacyNameCollisionActivity
+import mega.privacy.android.app.namecollision.NameCollisionActivity
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
@@ -62,7 +62,7 @@ internal class ImportMessageAction(
         val collisionsLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartActivityForResult()
         ) { result ->
-            collisionsResult = result.data?.getStringExtra(LegacyNameCollisionActivity.MESSAGE_RESULT)
+            collisionsResult = result.data?.getStringExtra(NameCollisionActivity.MESSAGE_RESULT)
                 .takeIf { !it.isNullOrEmpty() }
 
             if (collisionsResult.isNullOrEmpty()) {

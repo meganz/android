@@ -2,14 +2,12 @@ package mega.privacy.android.domain.usecase.node.namecollision
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
-import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.node.GetChildNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
@@ -37,8 +35,6 @@ class GetNodeNameCollisionsResultUseCaseTest {
     private val getNodeNameCollisionRenameNameUseCase =
         mock<GetNodeNameCollisionRenameNameUseCase>()
     private val getChildNodeUseCase = mock<GetChildNodeUseCase>()
-    private val nodeRepository = mock<NodeRepository>()
-
     private val defaultNodeNameCollision = NodeNameCollision.Default(
         collisionHandle = 123L,
         nodeHandle = 456L,
@@ -60,7 +56,6 @@ class GetNodeNameCollisionsResultUseCaseTest {
             getNodeByHandleUseCase = getNodeByHandleUseCase,
             getThumbnailUseCase = getThumbnailUseCase,
             getNodeNameCollisionRenameNameUseCase = getNodeNameCollisionRenameNameUseCase,
-            nodeRepository = nodeRepository
         )
     }
 
@@ -158,7 +153,6 @@ class GetNodeNameCollisionsResultUseCaseTest {
                     "${defaultNodeNameCollision.name} (1)"
                 )
             ) doReturn null
-            whenever(nodeRepository.getFolderTreeInfo(folderNode)) doReturn mock<FolderTreeInfo>()
             whenever(getNodeNameCollisionRenameNameUseCase(defaultNodeNameCollision)) doReturn
                     "${defaultNodeNameCollision.name} (1)"
 

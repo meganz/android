@@ -47,6 +47,7 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getSizeString
+import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
 import timber.log.Timber
@@ -69,6 +70,7 @@ class NameCollisionActivity : PasscodeActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        Timber.e("hmt new NameCollisionActivity")
         if (savedInstanceState == null) {
             @Suppress("UNCHECKED_CAST")
             val collisionsList = with(intent) {
@@ -332,7 +334,7 @@ class NameCollisionActivity : PasscodeActivity() {
                     collisionResult.collisionSize ?: 0,
                     this@NameCollisionActivity
                 )
-                else collisionResult.collisionFolderContent
+                else nodeCollisionResult.collisionFolderContent?.let { getFolderContentString(it) }
             date.text = formatLongDateTime(collisionResult.collisionLastModified ?: 0)
 
             val thumbnailView = if (hasThumbnail) R.id.thumbnail else R.id.thumbnail_icon
@@ -406,6 +408,9 @@ class NameCollisionActivity : PasscodeActivity() {
             }
         }
     }
+
+    private fun getFolderContentString(collision: FolderTreeInfo) =
+        TextUtil.getFolderInfo(collision.numberOfFolders, collision.numberOfFiles, this)
 
     private fun getFolderContentString(collision: NameCollisionUiEntity) =
         TextUtil.getFolderInfo(collision.childFolderCount, collision.childFileCount, this)

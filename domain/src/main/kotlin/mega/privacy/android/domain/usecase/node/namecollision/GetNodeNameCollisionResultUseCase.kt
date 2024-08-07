@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.node.namecollision
 
+import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -8,7 +9,6 @@ import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
-import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import javax.inject.Inject
@@ -20,7 +20,6 @@ class GetNodeNameCollisionResultUseCase @Inject constructor(
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getNodeNameCollisionRenameNameUseCase: GetNodeNameCollisionRenameNameUseCase,
-    private val nodeRepository: NodeRepository,
 ) {
 
     /**
@@ -57,7 +56,13 @@ class GetNodeNameCollisionResultUseCase @Inject constructor(
                 collisionName = name,
                 collisionSize = (this as? FileNode)?.size,
                 collisionFolderContent = (this as? FolderNode)?.let {
-                    nodeRepository.getFolderTreeInfo(it)
+                    FolderTreeInfo(
+                        numberOfFolders = it.childFolderCount,
+                        numberOfFiles = it.childFileCount,
+                        numberOfVersions = it.versionCount,
+                        totalCurrentSizeInBytes = 0,
+                        sizeOfPreviousVersionsInBytes = 0
+                    )
                 },
                 collisionLastModified = if (this is FileNode) modificationTime else creationTime,
                 collisionThumbnail = collisionNodeThumbnail,
