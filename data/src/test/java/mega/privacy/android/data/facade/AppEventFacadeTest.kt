@@ -90,4 +90,12 @@ class AppEventFacadeTest {
             assertThat(expectMostRecentItem()).isEqualTo(Unit)
         }
     }
+
+    @Test
+    fun `test that broadcast call screen opened fires an event`() = runTest {
+        underTest.monitorCallScreenOpened().test {
+            underTest.broadcastCallScreenOpened(true)
+            assertThat(awaitItem()).isEqualTo(true)
+        }
+    }
 }

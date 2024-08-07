@@ -349,6 +349,20 @@ internal interface AppEventGateway {
     suspend fun broadcastCallEnded(chatId: Long)
 
     /**
+     * Monitor that a specific call has opened.
+     *
+     * @return Flow of Boolean. True, if it's opened. False if not.
+     */
+    fun monitorCallScreenOpened(): Flow<Boolean>
+
+    /**
+     * Broadcast that a specific call has opened.
+     *
+     * @param isOpened    True, if it's opened. False if not.
+     */
+    suspend fun broadcastCallScreenOpened(isOpened: Boolean)
+
+    /**
      * Monitor that a specific call has ended.
      *
      * @return Flow of Boolean. ID of the chat to which the call corresponded.

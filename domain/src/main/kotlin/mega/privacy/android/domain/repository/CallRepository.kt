@@ -524,6 +524,20 @@ interface CallRepository {
     suspend fun broadcastCallEnded(chatId: Long)
 
     /**
+     * Monitor that a specific call has ended.
+     *
+     * @return Flow of Boolean. ID of the call.
+     */
+    fun monitorCallScreenOpened(): Flow<Boolean>
+
+    /**
+     * Broadcast that a specific call has ended.
+     *
+     * @param isOpened  True, the call is opened. False, if the call is not opened.
+     */
+    suspend fun broadcastCallScreenOpened(isOpened: Boolean)
+
+    /**
      * Mute peers
      *
      * @param chatId            The chat id.

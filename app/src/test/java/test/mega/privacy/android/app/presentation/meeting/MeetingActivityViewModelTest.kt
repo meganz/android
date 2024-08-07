@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityRepository
@@ -47,6 +48,7 @@ import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCas
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastCallScreenOpenedUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
@@ -64,8 +66,10 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
+import kotlin.test.Test
 
 @ExperimentalCoroutinesApi
 @ExtendWith(value = [CoroutineMainDispatcherExtension::class, InstantTaskExecutorExtension::class])
@@ -104,6 +108,7 @@ class MeetingActivityViewModelTest {
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val hangChatCallUseCase: HangChatCallUseCase = mock()
     private val broadcastCallEndedUseCase: BroadcastCallEndedUseCase = mock()
+    private val broadcastCallScreenOpenedUseCase: BroadcastCallScreenOpenedUseCase = mock()
     private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase = mock()
     private val getMyFullNameUseCase: GetMyFullNameUseCase = mock()
     private val monitorUserUpdates: MonitorUserUpdates = mock()
@@ -170,6 +175,7 @@ class MeetingActivityViewModelTest {
             monitorStorageStateEventUseCase,
             hangChatCallUseCase,
             broadcastCallEndedUseCase,
+            broadcastCallScreenOpenedUseCase,
             getScheduledMeetingByChatUseCase,
             getMyFullNameUseCase,
             monitorUserUpdates,
@@ -228,6 +234,7 @@ class MeetingActivityViewModelTest {
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             hangChatCallUseCase = hangChatCallUseCase,
             broadcastCallEndedUseCase = broadcastCallEndedUseCase,
+            broadcastCallScreenOpenedUseCase = broadcastCallScreenOpenedUseCase,
             getScheduledMeetingByChatUseCase = getScheduledMeetingByChatUseCase,
             getMyFullNameUseCase = getMyFullNameUseCase,
             monitorUserUpdates = monitorUserUpdates,

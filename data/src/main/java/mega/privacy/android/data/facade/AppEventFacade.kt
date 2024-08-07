@@ -67,6 +67,7 @@ internal class AppEventFacade @Inject constructor(
         _monitorCompletedTransfer.toSharedFlow(appScope)
 
     private val callEnded = MutableSharedFlow<Long>()
+    private val callScreenOpened = MutableSharedFlow<Boolean>()
 
     private val updateUserData = MutableSharedFlow<Unit>()
 
@@ -214,7 +215,12 @@ internal class AppEventFacade @Inject constructor(
 
     override fun monitorCallEnded() = callEnded.asSharedFlow()
 
-    override suspend fun broadcastCallEnded(chatId: Long) = callEnded.emit(chatId)
+    override suspend fun broadcastCallEnded(callId: Long) = callEnded.emit(callId)
+
+    override fun monitorCallScreenOpened() = callScreenOpened.asSharedFlow()
+
+    override suspend fun broadcastCallScreenOpened(isOpened: Boolean) =
+        callScreenOpened.emit(isOpened)
 
     override suspend fun broadcastUpdateUserData() {
         updateUserData.emit(Unit)

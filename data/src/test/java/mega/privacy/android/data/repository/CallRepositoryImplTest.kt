@@ -488,4 +488,19 @@ class CallRepositoryImplTest {
         val actual = underTest.getCallHandleList(ChatCallStatus.Initial)
         assertThat(actual.size).isEqualTo(2)
     }
+
+
+    @Test
+    fun `test that appEventGateway broadcastCallScreenOpened invoke when calling broadcastCallScreenOpened`() =
+        runTest {
+            underTest.broadcastCallScreenOpened(true)
+            verify(appEventGateway).broadcastCallScreenOpened(true)
+        }
+
+    @Test
+    fun `test that appEventGateway monitorCallScreenOpened invoke when calling monitorCallScreenOpened`() =
+        runTest {
+            underTest.monitorCallScreenOpened()
+            verify(appEventGateway).monitorCallScreenOpened()
+        }
 }

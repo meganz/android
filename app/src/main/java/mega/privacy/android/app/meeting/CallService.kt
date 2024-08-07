@@ -19,9 +19,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
@@ -29,7 +27,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.utils.AvatarUtil
@@ -46,6 +43,7 @@ import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.call.HangChatCallByChatIdUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorCallScreenOpenedUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -66,6 +64,7 @@ import javax.inject.Inject
  * @property app                            [MegaApplication]
  * @property monitorChatCallUpdatesUseCase  [MonitorChatCallUpdatesUseCase]
  * @property monitorChatListItemUpdates     [MonitorChatListItemUpdates]
+ * @property monitorCallScreenOpenedUseCase [MonitorCallScreenOpenedUseCase]
  * @property getMyUserHandleUseCase         [GetMyUserHandleUseCase]
  */
 @AndroidEntryPoint
@@ -93,8 +92,12 @@ class CallService : LifecycleService() {
     @Inject
     lateinit var monitorChatListItemUpdates: MonitorChatListItemUpdates
 
+    @Inject
+    lateinit var monitorCallScreenOpenedUseCase: MonitorCallScreenOpenedUseCase
+
     private var monitorChatListItemUpdatesJob: Job? = null
     private var monitorChatCallUpdatesJob: Job? = null
+    private var monitorCallScreenOpenedUpdatesJob: Job? = null
 
     var app: MegaApplication? = null
 
@@ -110,11 +113,6 @@ class CallService : LifecycleService() {
      */
     private var isInMeeting = true
 
-    private val isInMeetingObserver = Observer { isOpened: Boolean ->
-        isInMeeting = isOpened
-        updateNotificationContent()
-    }
-
     /**
      * Service starts
      */
@@ -129,10 +127,8 @@ class CallService : LifecycleService() {
 
         startMonitoringChatCallUpdates()
         startMonitorChatListItemUpdatesUpdates()
+        startMonitorCallScreenOpenedUpdates()
         getMyUserHandle()
-
-        LiveEventBus.get(EVENT_ENTER_IN_MEETING, Boolean::class.java)
-            .observeForever(isInMeetingObserver)
     }
 
     /**
@@ -243,6 +239,21 @@ class CallService : LifecycleService() {
                         Timber.d("Changes in title")
                         updateNotificationContent()
                     }
+                }
+        }
+    }
+
+    /**
+     * Monitor if calls screen is opened
+     */
+    private fun startMonitorCallScreenOpenedUpdates() {
+        monitorCallScreenOpenedUpdatesJob?.cancel()
+        monitorCallScreenOpenedUpdatesJob = lifecycleScope.launch {
+            monitorCallScreenOpenedUseCase()
+                .catch { Timber.e(it) }
+                .collectLatest { isOpened ->
+                    isInMeeting = isOpened
+                    updateNotificationContent()
                 }
         }
     }
@@ -591,8 +602,6 @@ class CallService : LifecycleService() {
      * Service ends
      */
     override fun onDestroy() {
-        LiveEventBus.get(EVENT_ENTER_IN_MEETING, Boolean::class.java)
-            .removeObserver(isInMeetingObserver)
         cancelNotification()
 
         callChangesObserver.setOpenCallChatId(MEGACHAT_INVALID_HANDLE)

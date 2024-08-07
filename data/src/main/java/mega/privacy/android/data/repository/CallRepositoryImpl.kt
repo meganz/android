@@ -812,6 +812,12 @@ internal class CallRepositoryImpl @Inject constructor(
     override suspend fun broadcastCallEnded(chatId: Long) =
         appEventGateway.broadcastCallEnded(chatId)
 
+    override fun monitorCallScreenOpened(): Flow<Boolean> =
+        appEventGateway.monitorCallScreenOpened()
+
+    override suspend fun broadcastCallScreenOpened(isOpened: Boolean) =
+        appEventGateway.broadcastCallScreenOpened(isOpened)
+
     override suspend fun mutePeers(
         chatId: Long,
         clientId: Long,

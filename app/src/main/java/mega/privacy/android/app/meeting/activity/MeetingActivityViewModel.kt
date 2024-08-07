@@ -31,7 +31,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHANGE
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.ApiFeatures
@@ -89,6 +88,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.call.AllowUsersJoinCallUseCase
 import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.call.BroadcastCallEndedUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastCallScreenOpenedUseCase
 import mega.privacy.android.domain.usecase.call.CreateMeetingUseCase
 import mega.privacy.android.domain.usecase.call.GetCallIdsOfOthersCallsUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
@@ -159,6 +159,7 @@ import javax.inject.Inject
  * @property monitorStorageStateEventUseCase                [MonitorStorageStateEventUseCase]
  * @property hangChatCallUseCase                            [HangChatCallUseCase]
  * @property broadcastCallEndedUseCase                      [BroadcastCallEndedUseCase]
+ * @property broadcastCallScreenOpenedUseCase               [BroadcastCallScreenOpenedUseCase]
  * @property monitorScheduledMeetingUpdatesUseCase          [MonitorScheduledMeetingUpdatesUseCase]
  * @property getMyFullNameUseCase                           [GetMyFullNameUseCase]
  * @property deviceGateway                                  [DeviceGateway]
@@ -202,6 +203,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val broadcastCallEndedUseCase: BroadcastCallEndedUseCase,
+    private val broadcastCallScreenOpenedUseCase: BroadcastCallScreenOpenedUseCase,
     private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
     private val getMyFullNameUseCase: GetMyFullNameUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
@@ -328,16 +330,6 @@ class MeetingActivityViewModel @Inject constructor(
     fun setAction(action: String?) {
         _state.update { it.copy(action = action) }
     }
-
-    /**
-     * Send event that in Meeting fragment is visible or not
-     *
-     * @param isVisible True if the fragment it visible, false otherwise.
-     */
-    fun sendEnterCallEvent(isVisible: Boolean) = LiveEventBus.get(
-        EventConstants.EVENT_ENTER_IN_MEETING,
-        Boolean::class.java
-    ).post(isVisible)
 
     init {
         viewModelScope.launch {
@@ -1082,6 +1074,15 @@ class MeetingActivityViewModel @Inject constructor(
                 checkShowHandRaisedSnackbar()
             }
         }
+    }
+
+    /**
+     * Send event that in Meeting fragment is visible or not
+     *
+     * @param isVisible True if the fragment it visible, false otherwise.
+     */
+    fun sendEnterCallEvent(isVisible: Boolean) = viewModelScope.launch {
+        broadcastCallScreenOpenedUseCase(isVisible)
     }
 
     /**
