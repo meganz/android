@@ -17,6 +17,7 @@ import kotlinx.coroutines.yield
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.ConfirmLargeDownloadInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -384,28 +385,28 @@ class StartTransfersComponentViewModelTest {
         val size = "x MB"
         whenever(fileSizeStringMapper(any())).thenReturn(size)
         underTest.startTransfer(startEvent)
-        assertCurrentEventIsEqualTo(
-            StartTransferEvent.ConfirmLargeDownload(size, startEvent)
+        assertThat(underTest.uiState.value.confirmLargeDownload).isEqualTo(
+            ConfirmLargeDownloadInfo(size, startEvent)
         )
     }
 
     @ParameterizedTest
     @MethodSource("provideStartDownloadEvents")
-    fun `test that setAskBeforeLargeDownloadsSettingUseCase is invoked when specified in start download`(
+    fun `test that setAskBeforeLargeDownloadsSettingUseCase is invoked when specified in largeDownloadAnswered`(
         startEvent: TransferTriggerEvent.DownloadTriggerEvent,
     ) = runTest {
         commonStub()
-        underTest.startDownloadWithoutConfirmation(startEvent, true)
+        underTest.largeDownloadAnswered(startEvent, true)
         verify(setAskBeforeLargeDownloadsSettingUseCase).invoke(false)
     }
 
     @ParameterizedTest
     @MethodSource("provideStartDownloadEvents")
-    fun `test that setAskBeforeLargeDownloadsSettingUseCase is not invoked when not specified in start download`(
+    fun `test that setAskBeforeLargeDownloadsSettingUseCase is not invoked when not specified in largeDownloadAnswered`(
         startEvent: TransferTriggerEvent.DownloadTriggerEvent,
     ) = runTest {
         commonStub()
-        underTest.startDownloadWithoutConfirmation(startEvent, false)
+        underTest.largeDownloadAnswered(startEvent, false)
         verifyNoInteractions(setAskBeforeLargeDownloadsSettingUseCase)
     }
 
@@ -416,7 +417,9 @@ class StartTransfersComponentViewModelTest {
             whenever(shouldAskDownloadDestinationUseCase()).thenReturn(true)
             val event = TransferTriggerEvent.StartDownloadNode(nodes)
             underTest.startDownloadWithoutConfirmation(event)
-            assertCurrentEventIsEqualTo(StartTransferEvent.AskDestination(event))
+            assertThat(underTest.uiState.value.askDestinationForDownload).isEqualTo(
+                event
+            )
         }
 
     @Test
@@ -428,9 +431,11 @@ class StartTransfersComponentViewModelTest {
                 on { toString() } doReturn uriString
             }
             val startDownloadNode = TransferTriggerEvent.StartDownloadNode(nodes)
+            whenever(shouldAskDownloadDestinationUseCase()).thenReturn(true)
+            underTest.startDownloadWithoutConfirmation(startDownloadNode)
             whenever(shouldPromptToSaveDestinationUseCase()).thenReturn(true)
 
-            underTest.startDownloadWithDestination(startDownloadNode, destinationUri)
+            underTest.startDownloadWithDestination(destinationUri)
 
             assertThat(underTest.uiState.value.promptSaveDestination)
                 .isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -605,8 +610,11 @@ class StartTransfersComponentViewModelTest {
                 on { toString() } doReturn DESTINATION
             }
             val nodeId = NodeId(1)
+            whenever(shouldAskDownloadDestinationUseCase()).thenReturn(true)
+            underTest.startDownloadWithoutConfirmation(
+                TransferTriggerEvent.CopyOfflineNode(listOf(nodeId))
+            )
             underTest.startDownloadWithDestination(
-                TransferTriggerEvent.CopyOfflineNode(listOf(nodeId)),
                 uri
             )
             verify(saveOfflineNodesToDevice).invoke(listOf(nodeId), UriPath(DESTINATION))
@@ -622,7 +630,6 @@ class StartTransfersComponentViewModelTest {
             val nodeId = NodeId(1)
             underTest.startDownloadWithoutConfirmation(
                 TransferTriggerEvent.CopyOfflineNode(listOf(nodeId)),
-                false
             )
             verify(saveOfflineNodesToDevice).invoke(listOf(nodeId), UriPath(DESTINATION))
             verifyNoInteractions(startDownloadsWithWorkerUseCase)
@@ -642,8 +649,7 @@ class StartTransfersComponentViewModelTest {
                 TransferTriggerEvent.CopyUri(
                     "name",
                     uri
-                ),
-                false
+                )
             )
             verify(saveUriToDeviceUseCase).invoke("name", UriPath(sourceUri), UriPath(DESTINATION))
             verifyNoInteractions(startDownloadsWithWorkerUseCase)

@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.ConfirmLargeDownloadInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
@@ -157,18 +158,10 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     /**
      * It starts downloading the related nodes, without asking confirmation for large transfers (because it's already asked)
      * @param transferTriggerEvent the event that triggered this download
-     * @param saveDoNotAskAgainForLargeTransfers if true, it will save in settings to don't ask again for confirmation on large files
      */
     fun startDownloadWithoutConfirmation(
         transferTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent,
-        saveDoNotAskAgainForLargeTransfers: Boolean = false,
     ) {
-        if (saveDoNotAskAgainForLargeTransfers) {
-            viewModelScope.launch {
-                runCatching { setAskBeforeLargeDownloadsSettingUseCase(askForConfirmation = false) }
-                    .onFailure { Timber.e(it) }
-            }
-        }
         val node = transferTriggerEvent.nodes.firstOrNull()
         val isCopyEvent = transferTriggerEvent is TransferTriggerEvent.CopyTriggerEvent
         if (node == null && !isCopyEvent) {
@@ -184,11 +177,12 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 is TransferTriggerEvent.StartDownloadNode, is TransferTriggerEvent.CopyOfflineNode, is TransferTriggerEvent.CopyUri -> {
                     viewModelScope.launch {
                         if (runCatching { shouldAskDownloadDestinationUseCase() }.getOrDefault(false)) {
-                            _uiState.updateEventAndClearProgress(
-                                StartTransferEvent.AskDestination(
-                                    transferTriggerEvent
+                            _uiState.update {
+                                it.copy(
+                                    askDestinationForDownload = transferTriggerEvent,
+                                    jobInProgressState = null,
                                 )
-                            )
+                            }
                         } else {
                             runCatching { getOrCreateStorageDownloadLocationUseCase() }
                                 .onFailure { Timber.e(it) }
@@ -208,21 +202,32 @@ internal class StartTransfersComponentViewModel @Inject constructor(
 
     /**
      * Start download with the destination manually set by the user
-     * @param startDownloadNode initial event that triggered this download
-     * @param destinationUri the chosen destination
+     * @param destinationUri the chosen destination or null if cancelled
      */
     fun startDownloadWithDestination(
-        startDownloadNode: TransferTriggerEvent,
-        destinationUri: Uri,
+        destinationUri: Uri?,
     ) {
         Timber.d("Selected destination $destinationUri")
-        viewModelScope.launch {
-            startDownloadNodes(startDownloadNode, destinationUri.toString())
-            if (runCatching { shouldPromptToSaveDestinationUseCase() }.getOrDefault(false)) {
-                _uiState.update {
-                    it.copy(promptSaveDestination = triggered(destinationUri.toString()))
+        val originalEvent = uiState.value.askDestinationForDownload
+        consumeAskDestination()
+        if (destinationUri != null && originalEvent != null) {
+            viewModelScope.launch {
+                startDownloadNodes(originalEvent, destinationUri.toString())
+                if (runCatching { shouldPromptToSaveDestinationUseCase() }.getOrDefault(false)) {
+                    _uiState.update {
+                        it.copy(promptSaveDestination = triggered(destinationUri.toString()))
+                    }
                 }
             }
+        }
+    }
+
+    private fun consumeAskDestination() {
+        _uiState.update {
+            it.copy(
+                askDestinationForDownload = null,
+                jobInProgressState = null,
+            )
         }
     }
 
@@ -535,6 +540,31 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Large download confirmation has been answered
+     * @param downloadTriggerEvent the event that has been confirmed, or null if is not confirmed
+     * @param saveDoNotAskAgain if true, future large downloads won't need confirmation
+     */
+    fun largeDownloadAnswered(
+        downloadTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent?,
+        saveDoNotAskAgain: Boolean,
+    ) {
+        if (downloadTriggerEvent != null) {
+            if (saveDoNotAskAgain) {
+                viewModelScope.launch {
+                    runCatching { setAskBeforeLargeDownloadsSettingUseCase(askForConfirmation = false) }
+                        .onFailure { Timber.e(it) }
+                }
+            }
+            startDownloadWithoutConfirmation(
+                downloadTriggerEvent,
+            )
+        }
+        _uiState.update {
+            it.copy(confirmLargeDownload = null)
+        }
+    }
+
     private fun checkAndHandleDeviceIsNotConnected() =
         if (runCatching { isConnectedToInternetUseCase() }.getOrDefault(true)) {
             false
@@ -553,11 +583,14 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             val size = runCatching { totalFileSizeOfNodesUseCase(transferTriggerEvent.nodes) }
                 .getOrDefault(0L)
             if (size > TransfersConstants.CONFIRM_SIZE_MIN_BYTES) {
-                _uiState.updateEventAndClearProgress(
-                    StartTransferEvent.ConfirmLargeDownload(
-                        fileSizeStringMapper(size), transferTriggerEvent
+                _uiState.update {
+                    it.copy(
+                        confirmLargeDownload = ConfirmLargeDownloadInfo(
+                            fileSizeStringMapper(size), transferTriggerEvent
+                        ),
+                        jobInProgressState = null,
                     )
-                )
+                }
                 return true
             }
         }

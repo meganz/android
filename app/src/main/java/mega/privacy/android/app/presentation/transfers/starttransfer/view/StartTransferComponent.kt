@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
@@ -135,12 +136,7 @@ internal fun StartTransferComponent(
         uiState = uiState,
         onOneOffEventConsumed = viewModel::consumeOneOffEvent,
         onCancelled = viewModel::cancelCurrentTransfersJob,
-        onDownloadConfirmed = { transferTriggerEventPrimary, saveDoNotAskAgain ->
-            viewModel.startDownloadWithoutConfirmation(
-                transferTriggerEventPrimary,
-                saveDoNotAskAgain
-            )
-        },
+        onLargeDownloadAnswered = viewModel::largeDownloadAnswered,
         onDestinationSet = viewModel::startDownloadWithDestination,
         onPromptSaveDestinationConsumed = viewModel::consumePromptSaveDestination,
         onSaveDestination = viewModel::saveDestination,
@@ -190,8 +186,8 @@ private fun StartTransferComponent(
     uiState: StartTransferViewState,
     onOneOffEventConsumed: () -> Unit,
     onCancelled: () -> Unit,
-    onDownloadConfirmed: (TransferTriggerEvent.DownloadTriggerEvent, saveDoNotAskAgain: Boolean) -> Unit,
-    onDestinationSet: (TransferTriggerEvent, destination: Uri) -> Unit,
+    onLargeDownloadAnswered: (TransferTriggerEvent.DownloadTriggerEvent?, saveDoNotAskAgain: Boolean) -> Unit,
+    onDestinationSet: (destination: Uri?) -> Unit,
     onPromptSaveDestinationConsumed: () -> Unit,
     onSaveDestination: (String) -> Unit,
     onDoNotPromptToSaveDestinationAgain: () -> Unit,
@@ -201,24 +197,22 @@ private fun StartTransferComponent(
     onScanningFinished: (StartTransferEvent) -> Unit = {},
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     var showOfflineAlertDialog by rememberSaveable { mutableStateOf(false) }
     var showResumeTransfersAlertDialog by rememberSaveable { mutableStateOf(false) }
-    val showQuotaExceededDialog = remember { mutableStateOf<StorageState?>(null) }
-    var showConfirmLargeTransfer by remember {
-        mutableStateOf<StartTransferEvent.ConfirmLargeDownload?>(null)
+    val showQuotaExceededDialog = rememberSaveable(stateSaver = storageStateSaver) {
+        mutableStateOf(null)
     }
-    var showAskDestinationDialog by remember {
-        mutableStateOf<TransferTriggerEvent?>(null)
+    var launchFolderPickerForDownloadDestination by rememberSaveable(uiState.askDestinationForDownload != null) {
+        mutableStateOf(uiState.askDestinationForDownload != null)
     }
+
     val folderPicker = launchFolderPicker(
         onCancel = {
-            showAskDestinationDialog = null
+            onDestinationSet(null)
         },
         onFolderSelected = { uri ->
-            showAskDestinationDialog?.let { event ->
-                onDestinationSet(event, uri)
-                showAskDestinationDialog = null
-            }
+            onDestinationSet(uri)
         },
     )
 
@@ -257,14 +251,6 @@ private fun StartTransferComponent(
 
                 StartTransferEvent.PausedTransfers -> {
                     showResumeTransfersAlertDialog = true
-                }
-
-                is StartTransferEvent.ConfirmLargeDownload -> {
-                    showConfirmLargeTransfer = it
-                }
-
-                is StartTransferEvent.AskDestination -> {
-                    showAskDestinationDialog = it.originalEvent
                 }
             }
         })
@@ -312,7 +298,7 @@ private fun StartTransferComponent(
             onClose = { showQuotaExceededDialog.value = null },
         )
     }
-    showConfirmLargeTransfer?.let {
+    uiState.confirmLargeDownload?.let {
         ConfirmationDialog(
             title = stringResource(id = R.string.transfers_confirm_large_download_title),
             text = stringResource(id = R.string.alert_larger_file, it.sizeString),
@@ -320,21 +306,20 @@ private fun StartTransferComponent(
             buttonOption2Text = stringResource(id = R.string.transfers_confirm_large_download_button_start_always),
             cancelButtonText = stringResource(id = R.string.general_cancel),
             onOption1 = {
-                onDownloadConfirmed(it.transferTriggerEvent, false)
-                showConfirmLargeTransfer = null
+                onLargeDownloadAnswered(it.transferTriggerEvent, false)
             },
             onOption2 = {
-                onDownloadConfirmed(it.transferTriggerEvent, true)
-                showConfirmLargeTransfer = null
+                onLargeDownloadAnswered(it.transferTriggerEvent, true)
             },
-            onDismiss = { showConfirmLargeTransfer = null },
+            onDismiss = { onLargeDownloadAnswered(null, false) },
         )
     }
-    LaunchedEffect(showAskDestinationDialog) {
-        if (showAskDestinationDialog != null) {
-            runCatching {
-                folderPicker.launch(null)
-            }.onFailure {
+    if (launchFolderPickerForDownloadDestination) {
+        launchFolderPickerForDownloadDestination = false
+        runCatching {
+            folderPicker.launch(null)
+        }.onFailure {
+            coroutineScope.launch {
                 snackBarHostState.showAutoDurationSnackbar(context.getString(R.string.general_warning_no_picker))
             }
         }
@@ -374,6 +359,11 @@ private fun StartTransferComponent(
         })
     }
 }
+
+private val storageStateSaver = Saver<StorageState?, Int>(
+    save = { it?.ordinal },
+    restore = { StorageState.entries.getOrNull(it) }
+)
 
 private suspend fun consumeFinishProcessing(
     event: StartTransferEvent.FinishDownloadProcessing,

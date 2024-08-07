@@ -49,23 +49,6 @@ sealed interface StartTransferEvent {
     data object PausedTransfers : StartTransferEvent
 
     /**
-     * User needs to confirm large download
-     * @param sizeString: the size of the download
-     * @param transferTriggerEvent: the event to start again the download if confirmed
-     */
-    data class ConfirmLargeDownload(
-        val sizeString: String,
-        val transferTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent,
-    ) : StartTransferEvent
-
-    /**
-     * Depending on Android version and user settings, download destination should be asked for each new download
-     * @param originalEvent original [TransferTriggerEvent.StartDownloadNode] event that triggered this event
-     */
-    data class AskDestination(val originalEvent: TransferTriggerEvent) :
-        StartTransferEvent
-
-    /**
      * A message should be shown
      * @param message the [StringRes] of the message to be shown
      * @param action the [StringRes] of the action, if any
