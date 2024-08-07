@@ -81,6 +81,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
+import mega.privacy.android.app.meeting.pip.PictureInPictureCallFragment
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
@@ -1822,20 +1823,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 it.removeTextureView()
             }
         }
-        removePictureInPictureListener()
         inMeetingViewModel.removeListeners()
-    }
-
-    private fun removePictureInPictureListener() {
-        inMeetingViewModel.state.value.run {
-            if (isPictureInPictureFeatureFlagEnabled && !isInPipMode) {
-                pictureCallFragment?.let {
-                    if (it.isAdded) {
-                        it.removeChatVideoListener()
-                    }
-                }
-            }
-        }
     }
 
     /**

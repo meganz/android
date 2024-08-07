@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,13 +47,14 @@ fun MegaVideoTextureView(
     videoStream: Flow<Pair<Size, ByteArray>>,
     modifier: Modifier = Modifier,
     mirrorEffect: Boolean = false,
+    lifecycleState: Lifecycle.State = Lifecycle.State.RESUMED,
 ) {
     val lifecycle = LocalLifecycleOwner.current
     var textureView by remember { mutableStateOf<TextureView?>(null) }
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     var bitmapRect by remember { mutableStateOf<Rect?>(null) }
-    var frameWidth by remember { mutableStateOf(0) }
-    var frameHeight by remember { mutableStateOf(0) }
+    var frameWidth by remember { mutableIntStateOf(0) }
+    var frameHeight by remember { mutableIntStateOf(0) }
 
     AndroidView(
         modifier = modifier,
@@ -91,7 +93,7 @@ fun MegaVideoTextureView(
 
     // Collects frames from videoStream, updates bitmap, and draws it on TextureView's canvas.
     LaunchedEffect(videoStream) {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+        lifecycle.repeatOnLifecycle(lifecycleState) {
             videoStream.collectLatest { videoFrame ->
                 // Update frame dimensions from the latest video stream
                 frameWidth = videoFrame.first.width
