@@ -35,6 +35,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE
@@ -46,8 +47,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity.Upload.Companion.getUploadCollision
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
@@ -59,6 +58,7 @@ import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN
@@ -82,6 +82,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermissi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -91,6 +92,7 @@ import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import nz.mega.documentscanner.DocumentScannerActivity
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
@@ -179,6 +181,14 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                 type = NodeNameCollisionType.COPY
             )
         }
+
+    private val nameCollisionActivityLauncher = registerForActivityResult(
+        NameCollisionActivityContract()
+    ) { result ->
+        result?.let {
+            showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
+        }
+    }
 
     public override fun onSaveInstanceState(outState: Bundle) {
         outState.putLong(PARENT_HANDLE, parentHandle)
@@ -440,10 +450,10 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         }
     }
 
-    private fun handleNodesNameCollisionResult(conflictNodes: List<NameCollisionUiEntity>) {
+    private fun handleNodesNameCollisionResult(conflictNodes: List<NameCollision>) {
         if (conflictNodes.isNotEmpty()) {
             dismissAlertDialogIfExists(statusDialog)
-            legacyNameCollisionActivityContract?.launch(ArrayList(conflictNodes))
+            nameCollisionActivityLauncher.launch(ArrayList(conflictNodes))
         }
     }
 
@@ -641,11 +651,9 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                                 parentNodeId = NodeId(parentHandle)
                             )
                         }.onSuccess { fileCollisions ->
-                            val collision = fileCollisions.map {
-                                getUploadCollision(it)
-                            }.firstOrNull()
+                            val collision = fileCollisions.firstOrNull()
                             if (collision != null) {
-                                legacyNameCollisionActivityContract?.launch(arrayListOf(collision))
+                                nameCollisionActivityLauncher.launch(arrayListOf(collision))
                             } else {
                                 applicationScope.launch uploadCoroutine@{
                                     if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
@@ -745,11 +753,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             }.onSuccess { collisions ->
                 dismissAlertDialogIfExists(statusDialog)
                 if (collisions.isNotEmpty()) {
-                    collisions.map {
-                        getUploadCollision(it)
-                    }.let {
-                        legacyNameCollisionActivityContract?.launch(ArrayList(it))
-                    }
+                    nameCollisionActivityLauncher.launch(collisions.toCollection(ArrayList()))
                 }
                 val collidedSharesPath = collisions.map { it.path.value }.toSet()
                 val sharesWithoutCollision = infos.filter {

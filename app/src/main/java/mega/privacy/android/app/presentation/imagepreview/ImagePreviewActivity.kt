@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
@@ -49,6 +50,7 @@ import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -56,6 +58,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
@@ -63,6 +66,7 @@ import mega.privacy.mobile.analytics.event.PhotoPreviewSaveToDeviceMenuToolbarEv
 import mega.privacy.mobile.analytics.event.PhotoPreviewScreenEvent
 import mega.privacy.mobile.analytics.event.PlaySlideshowMenuToolbarEvent
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -100,6 +104,14 @@ class ImagePreviewActivity : BaseActivity() {
             ActivityResultContracts.StartActivityForResult(),
             ::handleHiddenNodesOnboardingResult,
         )
+
+    private val nameCollisionActivityLauncher = registerForActivityResult(
+        NameCollisionActivityContract()
+    ) { result ->
+        result?.let {
+            showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
+        }
+    }
 
     private val viewModel: ImagePreviewViewModel by viewModels()
     private val nodeAttachmentViewModel: NodeAttachmentViewModel by viewModels()
@@ -171,9 +183,9 @@ class ImagePreviewActivity : BaseActivity() {
         manageNameCollision(state.nameCollision)
     }
 
-    private fun manageNameCollision(nameCollision: NameCollisionUiEntity?) {
+    private fun manageNameCollision(nameCollision: NameCollision?) {
         nameCollision ?: return
-        legacyNameCollisionActivityContract?.launch(arrayListOf(nameCollision))
+        nameCollisionActivityLauncher.launch(arrayListOf(nameCollision))
         viewModel.onNameCollisionConsumed()
     }
 

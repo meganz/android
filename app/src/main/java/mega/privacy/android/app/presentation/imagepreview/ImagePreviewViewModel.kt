@@ -26,9 +26,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
-import mega.privacy.android.app.namecollision.data.toLegacyCopy
-import mega.privacy.android.app.namecollision.data.toLegacyImport
-import mega.privacy.android.app.namecollision.data.toLegacyMove
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -525,7 +522,7 @@ class ImagePreviewViewModel @Inject constructor(
                     type = NodeNameCollisionType.MOVE,
                 )
             }.onSuccess { result ->
-                result.firstNodeCollisionOrNull?.toLegacyMove()?.let { item ->
+                result.firstNodeCollisionOrNull?.let { item ->
                     _state.update {
                         it.copy(nameCollision = item)
                     }
@@ -563,7 +560,7 @@ class ImagePreviewViewModel @Inject constructor(
                     type = NodeNameCollisionType.COPY,
                 )
             }.onSuccess { result ->
-                result.firstNodeCollisionOrNull?.toLegacyCopy()?.let { item ->
+                result.firstNodeCollisionOrNull?.let { item ->
                     _state.update {
                         it.copy(nameCollision = item)
                     }
@@ -635,7 +632,7 @@ class ImagePreviewViewModel @Inject constructor(
                     newNodeParent = NodeId(newParentHandle),
                 )
             }.onSuccess { result ->
-                result.firstChatNodeCollisionOrNull?.toLegacyImport()?.let { item ->
+                result.firstChatNodeCollisionOrNull?.let { item ->
                     _state.update {
                         it.copy(nameCollision = item)
                     }

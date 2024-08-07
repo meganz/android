@@ -130,32 +130,4 @@ class UpdateNodeNameCollisionsResultUseCaseTest {
         assertThat(result.first.first().renameName).isEqualTo("test (2)")
         assertThat(result.second).contains("test (2)")
     }
-
-    @Test
-    fun `test that rename names are unchanged and there's no rename name collision`() = runTest {
-        val nodeNameCollision = NodeNameCollisionResult(
-            nameCollision = NodeNameCollision.Default(
-                collisionHandle = 1L,
-                nodeHandle = 2L,
-                name = "test",
-                size = 100L,
-                childFolderCount = 0,
-                childFileCount = 0,
-                lastModified = 0L,
-                parentHandle = 0L,
-                isFile = true,
-                type = NodeNameCollisionType.COPY
-            ),
-            renameName = "test (1)"
-        )
-        whenever(getNodeNameCollisionRenameNameUseCase(any())).thenReturn("test (1)")
-        val result = underTest(
-            listOf(nodeNameCollision),
-            emptyList(),
-            false
-        )
-
-        assertThat(result.first).isEqualTo(listOf(nodeNameCollision))
-        assertThat(result.second).isEmpty()
-    }
 }

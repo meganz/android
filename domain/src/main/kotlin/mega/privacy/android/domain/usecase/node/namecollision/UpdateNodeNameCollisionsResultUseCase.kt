@@ -7,6 +7,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
+import mega.privacy.android.domain.entity.node.FileNameCollision
+import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
 import javax.inject.Inject
 
@@ -37,25 +39,32 @@ class UpdateNodeNameCollisionsResultUseCase @Inject constructor(
         nameCollisionResults
             .map { collision ->
                 async {
-                    if (!collision.nameCollision.isFile || collision.renameName == null)
+                    val nameCollision = collision.nameCollision
+                    if (!nameCollision.isFile || collision.renameName == null)
                         return@async collision
                     semaphore.withPermit {
-                        val expectedRenameName =
+                        var newRenameName =
                             getNodeNameCollisionRenameNameUseCase(collision.nameCollision)
-                        if (renameNamesSet.contains(expectedRenameName)) {
-                            val newRenameName = generateSequence(expectedRenameName) {
+                        if (renameNamesSet.contains(newRenameName)) {
+                            newRenameName = generateSequence(newRenameName) {
                                 it.getPossibleRenameName()
                             }.first { !renameNamesSet.contains(it) }
-                            if (applyOnNext) {
-                                mutex.withLock {
-                                    renameNamesSet.add(newRenameName)
-                                }
-                            }
-                            return@withPermit collision.copy(
-                                renameName = newRenameName
-                            )
                         }
-                        collision
+                        if (applyOnNext) {
+                            mutex.withLock {
+                                renameNamesSet.add(newRenameName)
+                            }
+                        }
+                        collision.copy(
+                            nameCollision = when (nameCollision) {
+                                is NodeNameCollision.Default -> nameCollision.copy(renameName = newRenameName)
+
+                                is NodeNameCollision.Chat -> nameCollision.copy(renameName = newRenameName)
+
+                                is FileNameCollision -> nameCollision
+                            },
+                            renameName = newRenameName
+                        )
                     }
                 }
             }

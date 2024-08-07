@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.getState
@@ -23,17 +22,17 @@ import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.call.ChatCall
-import mega.privacy.android.domain.entity.chat.ChatRoom
-import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.call.CallNotificationType
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallChanges.OnHold
 import mega.privacy.android.domain.entity.call.ChatCallChanges.Status
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.call.ChatSessionChanges
+import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -45,6 +44,8 @@ import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.call.IsChatConnectedToInitiateCallUseCase
+import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
@@ -58,10 +59,8 @@ import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenU
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
-import mega.privacy.android.domain.usecase.call.IsChatConnectedToInitiateCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
-import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
@@ -735,9 +734,7 @@ class ContactInfoViewModel @Inject constructor(
                 type = NodeNameCollisionType.COPY
             )
         }.onSuccess { result ->
-            val collisions = result.conflictNodes.values.map {
-                NameCollisionUiEntity.Copy.fromNodeNameCollision(it)
-            }
+            val collisions = result.conflictNodes.values.toList()
             _uiState.update {
                 it.copy(isCopyInProgress = false, nameCollisions = collisions)
             }

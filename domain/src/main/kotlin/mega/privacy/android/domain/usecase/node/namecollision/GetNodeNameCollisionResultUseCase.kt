@@ -31,14 +31,17 @@ class GetNodeNameCollisionResultUseCase @Inject constructor(
         val collidedNode = getNodeByHandleUseCase(nameCollision.collisionHandle, true)
             ?: throw NodeDoesNotExistsException()
 
-        val currentNodeThumbnail = if (nameCollision is NodeNameCollision && nameCollision.isFile)
-            getThumbnailUseCase(
+        val currentNodeThumbnail = runCatching {
+            if (nameCollision is NodeNameCollision && nameCollision.isFile) getThumbnailUseCase(
                 nameCollision.nodeHandle
-            )?.let { UriPath(it.absolutePath) } else null
+            )?.let { UriPath(it.toURI().toString()) } else null
+        }.getOrNull()
 
-        val collisionNodeThumbnail = if (collidedNode is FileNode) getThumbnailUseCase(
-            collidedNode.id.longValue
-        )?.let { UriPath(it.absolutePath) } else null
+        val collisionNodeThumbnail = runCatching {
+            if (collidedNode is FileNode) getThumbnailUseCase(
+                collidedNode.id.longValue
+            )?.let { UriPath(it.toURI().toString()) } else null
+        }.getOrNull()
 
         val renameName = getNodeNameCollisionRenameNameUseCase(nameCollision)
 

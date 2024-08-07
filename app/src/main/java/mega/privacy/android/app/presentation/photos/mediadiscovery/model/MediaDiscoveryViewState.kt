@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.photos.mediadiscovery.model
 import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
@@ -12,6 +11,7 @@ import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.photos.Photo
 
 /**
@@ -64,7 +64,7 @@ data class MediaDiscoveryViewState(
     val showSortByDialog: Boolean = false,
     val showFilterDialog: Boolean = false,
     val showSlidersPopup: Boolean = false,
-    val collisions: List<NameCollisionUiEntity> = emptyList(),
+    val collisions: List<NameCollision> = emptyList(),
     val copyThrowable: Throwable? = null,
     val copyResultText: String? = null,
     val isConnectedToNetwork: Boolean = true,

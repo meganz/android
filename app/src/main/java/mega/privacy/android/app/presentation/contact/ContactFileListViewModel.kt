@@ -11,13 +11,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
@@ -126,13 +125,7 @@ class ContactFileListViewModel @Inject constructor(
     }
 
     private fun updateStateWithConflictNodes(result: NodeNameCollisionsResult) = runCatching {
-        result.conflictNodes.values.map {
-            when (result.type) {
-                NodeNameCollisionType.MOVE -> NameCollisionUiEntity.Movement.fromNodeNameCollision(it)
-                NodeNameCollisionType.COPY -> NameCollisionUiEntity.Copy.fromNodeNameCollision(it)
-                else -> throw UnsupportedOperationException("Invalid collision result")
-            }
-        }
+        result.conflictNodes.values.toList()
     }.onSuccess { collisions ->
         _state.update {
             it.copy(copyMoveAlertTextId = null, nodeNameCollisionResult = collisions)

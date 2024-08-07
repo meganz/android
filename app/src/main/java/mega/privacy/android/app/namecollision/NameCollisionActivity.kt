@@ -193,7 +193,7 @@ class NameCollisionActivity : PasscodeActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.getCurrentCollision().observe(this, ::showCollision)
+        viewModel.updateCurrentCollision().observe(this, ::showCollision)
         viewModel.getFileVersioningInfo().observe(this, ::updateFileVersioningData)
         viewModel.onActionResult().observe(this, this::setResult)
         viewModel.onExceptionThrown().observe(this) { error ->

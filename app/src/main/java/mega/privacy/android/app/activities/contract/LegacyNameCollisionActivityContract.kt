@@ -12,7 +12,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 /**
  * A contract to start NameCollisionActivity and manage its result.
  */
-@Deprecated("Use NameCollisionActivityContract instead")
+@Deprecated("Use NameCollisionActivityContract instead, should be removed during NameCollisionActivity cleanup")
 class LegacyNameCollisionActivityContract : ActivityResultContract<ArrayList<NameCollisionUiEntity>, String?>() {
 
     @Suppress("UNCHECKED_CAST")

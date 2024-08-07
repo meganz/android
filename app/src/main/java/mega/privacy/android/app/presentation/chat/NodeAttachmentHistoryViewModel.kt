@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
-import mega.privacy.android.app.namecollision.data.toLegacyImport
 import mega.privacy.android.app.presentation.chat.model.MediaPlayerOpenedErrorState
 import mega.privacy.android.app.presentation.copynode.CopyRequestState
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -52,7 +52,7 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
      */
     val mediaPlayerOpenedErrorFlow = _mediaPlayerOpenedErrorFlow.asStateFlow()
 
-    private val _collisionsFlow = MutableStateFlow<List<NameCollisionUiEntity>>(emptyList())
+    private val _collisionsFlow = MutableStateFlow<List<NameCollision>>(emptyList())
 
     /**
      * Flow of [NameCollisionUiEntity] to notify the name collisions
@@ -94,7 +94,6 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
             }.onSuccess { result ->
                 result.collisionResult.conflictNodes.values
                     .filterIsInstance<NodeNameCollision.Chat>()
-                    .map { it.toLegacyImport() }
                     .takeIf { it.isNotEmpty() }
                     ?.let { _collisionsFlow.update { _ -> it } }
 

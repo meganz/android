@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.isClosedChat
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
@@ -48,11 +49,13 @@ import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -82,6 +85,14 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
         ActivityResultContracts.StartActivityForResult(),
         selectImportFolderResult
     )
+
+    private val nameCollisionActivityLauncher = registerForActivityResult(
+        NameCollisionActivityContract()
+    ) { result ->
+        result?.let {
+            showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate()")
@@ -182,7 +193,7 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
                 }
 
                 it.collision != null -> {
-                    legacyNameCollisionActivityContract?.launch(arrayListOf(it.collision))
+                    nameCollisionActivityLauncher.launch(arrayListOf(it.collision))
                     viewModel.resetCollision()
                 }
 

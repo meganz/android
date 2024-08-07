@@ -21,7 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.contract.LegacyNameCollisionActivityContract
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -73,6 +73,13 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
 
     private lateinit var selectImportFolderLauncher: ActivityResultLauncher<Intent>
     private var statusDialog: AlertDialog? = null
+    private val nameCollisionActivityLauncher = registerForActivityResult(
+        NameCollisionActivityContract()
+    ) { result ->
+        result?.let {
+            showSnackbar(this@MediaDiscoveryActivity, it)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -108,7 +115,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
                     mediaDiscoveryViewModel.state.collect {
                         if (it.collisions.isNotEmpty()) {
                             AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
-                            legacyNameCollisionActivityContract?.launch(ArrayList(it.collisions))
+                            nameCollisionActivityLauncher.launch(ArrayList(it.collisions))
                             mediaDiscoveryViewModel.resetLaunchCollisionActivity()
                         } else if (it.copyResultText != null || it.copyThrowable != null) {
                             showCopyResult(it.copyResultText, it.copyThrowable)
@@ -134,16 +141,6 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
 
 
     private fun setupLauncher() {
-        legacyNameCollisionActivityContract =
-            registerForActivityResult(LegacyNameCollisionActivityContract()) { result: String? ->
-                result?.let {
-                    showSnackbar(
-                        this@MediaDiscoveryActivity,
-                        it
-                    )
-                }
-            }
-
         selectImportFolderLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
             selectImportFolderResult

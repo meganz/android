@@ -22,7 +22,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -39,7 +38,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.activities.contract.LegacyNameCollisionActivityContract
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.AutoPlayInfo
@@ -54,7 +52,6 @@ import mega.privacy.android.app.listeners.ChatLogoutListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.advertisements.AdsViewModel
 import mega.privacy.android.app.presentation.base.BaseViewModel
 import mega.privacy.android.app.presentation.billing.BillingViewModel
@@ -144,7 +141,6 @@ import kotlin.time.Duration.Companion.seconds
  * @property transfersManagement            [TransfersManagement]
  * @property loggingSettings                [LegacyLoggingSettings]
  * @property composite                      [CompositeDisposable]
- * @property legacyNameCollisionActivityContract  [LegacyNameCollisionActivityContract]
  * @property app                            [MegaApplication]
  * @property outMetrics                     [DisplayMetrics]
  * @property isResumeTransfersWarningShown  True if the warning should be shown, false otherwise.
@@ -213,9 +209,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     @Inject
     lateinit var pauseTransfersQueueUseCase: PauseTransfersQueueUseCase
 
-    @JvmField
-    var legacyNameCollisionActivityContract: ActivityResultLauncher<ArrayList<NameCollisionUiEntity>>? =
-        null
     protected val billingViewModel by viewModels<BillingViewModel>()
     protected val adsViewModel: AdsViewModel by viewModels()
     private val viewModel by viewModels<BaseViewModel>()
@@ -376,13 +369,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        legacyNameCollisionActivityContract =
-            registerForActivityResult(LegacyNameCollisionActivityContract()) { result: String? ->
-                if (result != null) {
-                    showSnackbar(SNACKBAR_TYPE, result, MEGACHAT_INVALID_HANDLE)
-                }
-            }
-
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         collectFlow(billingViewModel.billingUpdateEvent) {

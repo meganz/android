@@ -28,6 +28,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityFolderLinkComposeBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
@@ -63,6 +64,7 @@ import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
@@ -73,6 +75,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -105,6 +108,14 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             viewModel.handleBackPress()
+        }
+    }
+
+    private val nameCollisionActivityLauncher = registerForActivityResult(
+        NameCollisionActivityContract()
+    ) { result ->
+        result?.let {
+            showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
         }
     }
 
@@ -435,7 +446,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
 
                         it.collisions != null -> {
                             AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
-                            legacyNameCollisionActivityContract?.launch(ArrayList(it.collisions))
+                            nameCollisionActivityLauncher.launch(ArrayList(it.collisions))
                             viewModel.resetLaunchCollisionActivity()
                             viewModel.clearAllSelection()
                         }

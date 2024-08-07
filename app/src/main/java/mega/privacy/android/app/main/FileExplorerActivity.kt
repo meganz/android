@@ -36,7 +36,7 @@ import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
-import mega.privacy.android.app.activities.contract.LegacyNameCollisionActivityContract
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
@@ -87,6 +87,7 @@ import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_FOLDER_DIALOG_TEXT
@@ -246,6 +247,16 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         ContextCompat.getColor(
             this,
             android.R.color.transparent
+        )
+    }
+
+    private val nameCollisionActivityLauncher = registerForActivityResult(
+        NameCollisionActivityContract()
+    ) { result ->
+        backToCloud(
+            if (result != null) parentHandle else INVALID_HANDLE,
+            0,
+            result
         )
     }
 
@@ -630,15 +641,6 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     }
 
     private fun setupObservers() {
-        legacyNameCollisionActivityContract =
-            registerForActivityResult(LegacyNameCollisionActivityContract()) { result: String? ->
-                backToCloud(
-                    if (result != null) parentHandle else INVALID_HANDLE,
-                    0,
-                    result
-                )
-            }
-
         viewModel.filesInfo.observe(this) { info: List<ShareInfo>? ->
             onProcessAsyncInfo(info)
         }
@@ -1654,11 +1656,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 }.onSuccess { collisions ->
                     dismissAlertDialogIfExists(statusDialog)
                     if (collisions.isNotEmpty()) {
-                        collisions.map {
-                            getUploadCollision(it)
-                        }.let {
-                            legacyNameCollisionActivityContract?.launch(ArrayList(it))
-                        }
+                        nameCollisionActivityLauncher.launch(ArrayList(collisions))
                     }
                     val collidedSharesPath = collisions.map { it.path.value }.toSet()
                     val sharesWithoutCollision = infos.filter {
@@ -1953,10 +1951,8 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     parentNodeId = NodeId(parentHandle)
                 )
             }.onSuccess { collisions ->
-                collisions.map {
-                    getUploadCollision(it)
-                }.firstOrNull()?.let {
-                    legacyNameCollisionActivityContract?.launch(arrayListOf(it))
+                collisions.firstOrNull()?.let {
+                    nameCollisionActivityLauncher.launch(arrayListOf(it))
                 } ?: uploadFile(file)
             }.onFailure {
                 Timber.e(it, "Cannot check name collisions")

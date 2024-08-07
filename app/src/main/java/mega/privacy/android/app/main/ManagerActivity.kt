@@ -110,6 +110,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.UploadService
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
@@ -263,6 +264,7 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
@@ -395,6 +397,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 openSearchFolder(handle)
             }
         }
+
+    private val nameCollisionActivityLauncher = registerForActivityResult(
+        NameCollisionActivityContract()
+    ) { result ->
+        result?.let {
+            showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
+        }
+    }
 
     @Inject
     lateinit var cookieDialogHandler: CookieDialogHandler
@@ -2045,17 +2055,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun handleNodesNameCollisionResult(result: NodeNameCollisionsResult) {
         if (result.conflictNodes.isNotEmpty()) {
-            legacyNameCollisionActivityContract
-                ?.launch(ArrayList(result.conflictNodes.values.map {
-                    when (result.type) {
-                        NodeNameCollisionType.RESTORE,
-                        NodeNameCollisionType.MOVE,
-                        -> NameCollisionUiEntity.Movement.fromNodeNameCollision(it)
-
-                        NodeNameCollisionType.COPY,
-                        -> NameCollisionUiEntity.Copy.fromNodeNameCollision(it)
-                    }
-                }))
+            nameCollisionActivityLauncher.launch(result.conflictNodes.values.toCollection(ArrayList()))
         }
         if (result.noConflictNodes.isNotEmpty()) {
             when (result.type) {
@@ -6158,10 +6158,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     parentNodeId = NodeId(parentHandle)
                 )
             }.onSuccess { collisions ->
-                collisions.map {
-                    getUploadCollision(it)
-                }.firstOrNull()?.let {
-                    legacyNameCollisionActivityContract?.launch(arrayListOf(it))
+                collisions.firstOrNull()?.let {
+                    nameCollisionActivityLauncher.launch(arrayListOf(it))
                 } ?: uploadFile(file, parentHandle)
             }.onFailure { throwable: Throwable? ->
                 Timber.e(throwable)
@@ -6464,10 +6462,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 dismissAlertDialogIfExists(statusDialog)
                 dismissAlertDialogIfExists(processFileDialog)
                 if (collisions.isNotEmpty()) {
-                    collisions.map {
-                        getUploadCollision(it)
-                    }.let {
-                        legacyNameCollisionActivityContract?.launch(ArrayList(it))
+                    collisions.let {
+                        nameCollisionActivityLauncher.launch(ArrayList(it))
                     }
                 }
                 val collidedSharesPath = collisions.map { it.path.value }.toSet()
@@ -6650,10 +6646,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     parentNodeId = NodeId(parentHandle)
                 )
             }.onSuccess { collisions ->
-                collisions.map {
-                    getUploadCollision(it)
-                }.firstOrNull()?.let {
-                    legacyNameCollisionActivityContract?.launch(arrayListOf(it))
+                collisions.firstOrNull()?.let {
+                    nameCollisionActivityLauncher.launch(arrayListOf(it))
                 } ?: uploadFile(file, parentHandle)
             }.onFailure { throwable: Throwable? ->
                 Timber.e(throwable)

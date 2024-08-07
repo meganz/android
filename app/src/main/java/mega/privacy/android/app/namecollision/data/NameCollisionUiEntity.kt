@@ -280,7 +280,7 @@ fun NameCollisionUiEntity.toDomainEntity(): NameCollision =
             lastModified = lastModified,
             parentHandle = parentHandle,
             isFile = isFile,
-            serializedData = null,
+            serializedData = serializedNode,
             renameName = null,
             type = NodeNameCollisionType.COPY
         )

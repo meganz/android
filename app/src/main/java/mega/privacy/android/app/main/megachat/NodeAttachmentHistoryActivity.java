@@ -51,6 +51,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
@@ -80,6 +81,7 @@ import kotlin.Unit;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -102,6 +104,7 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.domain.entity.StorageState;
+import mega.privacy.android.domain.entity.node.NameCollision;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiJava;
@@ -179,6 +182,15 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     private ArrayList<MegaChatMessage> preservedMessagesToImport;
 
     private NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment;
+
+    private final ActivityResultLauncher<ArrayList<NameCollision>> nameCollisionActivityLauncher = registerForActivityResult(
+            new NameCollisionActivityContract(),
+            result -> {
+                if (result != null) {
+                    showSnackbar(SNACKBAR_TYPE, result, INVALID_HANDLE);
+                }
+            }
+    );
 
     private final BroadcastReceiver errorCopyingNodesReceiver = new BroadcastReceiver() {
         @Override
@@ -383,9 +395,8 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         ViewExtensionsKt.collectFlow(this, viewModel.getCollisionsFlow(), Lifecycle.State.STARTED, collisions -> {
             if (collisions == null) return Unit.INSTANCE;
             dismissAlertDialogIfExists(statusDialog);
-
-            if (!collisions.isEmpty() && legacyNameCollisionActivityContract != null) {
-                legacyNameCollisionActivityContract.launch(new ArrayList<>(collisions));
+            if (!collisions.isEmpty() && nameCollisionActivityLauncher != null) {
+                nameCollisionActivityLauncher.launch(new ArrayList<>(collisions));
                 viewModel.nodeCollisionsConsumed();
             }
             return Unit.INSTANCE;

@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.io.TempDir
 import org.mockito.Mockito.reset
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -50,12 +51,8 @@ class GetNodeNameCollisionsResultUseCaseTest {
         isFile = true,
     )
 
-    private val thumbFile = mock<File> {
-        on { absolutePath } doReturn "path1"
-    }
-    private val thumbFile2 = mock<File> {
-        on { absolutePath } doReturn "path2"
-    }
+    @TempDir
+    lateinit var temporaryFolder: File
 
     @BeforeAll
     fun setUp() {
@@ -88,6 +85,8 @@ class GetNodeNameCollisionsResultUseCaseTest {
     @Test
     fun `test that collision result is returned correctly when collided node is a file`() =
         runTest {
+            val thumbFile = File(temporaryFolder.path, "thumb1.jpg").also { it.createNewFile() }
+            val thumbFile2 = File(temporaryFolder.path, "thumb2.jpg").also { it.createNewFile() }
             val collidedNode = mock<FileNode> {
                 on { name } doReturn defaultNodeNameCollision.name
                 on { id.longValue } doReturn defaultNodeNameCollision.collisionHandle
@@ -97,6 +96,7 @@ class GetNodeNameCollisionsResultUseCaseTest {
             val folderNode = mock<FolderNode> {
                 on { id } doReturn NodeId(defaultNodeNameCollision.parentHandle)
             }
+
             whenever(
                 getNodeByHandleUseCase(
                     defaultNodeNameCollision.collisionHandle,
@@ -124,8 +124,8 @@ class GetNodeNameCollisionsResultUseCaseTest {
             val result = underTest(nameCollision = defaultNodeNameCollision)
 
             assertThat(result.renameName).isEqualTo("${defaultNodeNameCollision.name} (1)")
-            assertThat(result.thumbnail?.value).isEqualTo("path1")
-            assertThat(result.collisionThumbnail?.value).isEqualTo("path2")
+            assertThat(result.thumbnail?.value).contains("thumb1.jpg")
+            assertThat(result.collisionThumbnail?.value).contains("thumb2.jpg")
             assertThat(result.collisionSize).isEqualTo(100L)
             assertThat(result.nameCollision.collisionHandle).isEqualTo(defaultNodeNameCollision.collisionHandle)
             assertThat(result.collisionLastModified).isEqualTo(123456L)

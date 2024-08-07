@@ -38,7 +38,7 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.activities.contract.LegacyNameCollisionActivityContract
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -46,7 +46,6 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
@@ -148,14 +147,15 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
-    private val legacyNameCollisionActivityContract =
-        registerForActivityResult(LegacyNameCollisionActivityContract()) { result: String? ->
-            if (result != null) {
-                lifecycleScope.launch {
-                    snackbarHostState.showAutoDurationSnackbar(result)
-                }
+    private val nameCollisionActivityLauncher = registerForActivityResult(
+        NameCollisionActivityContract()
+    ) { result ->
+        if (result != null) {
+            lifecycleScope.launch {
+                snackbarHostState.showAutoDurationSnackbar(result)
             }
         }
+    }
 
     /**
      * Move request message mapper
@@ -656,22 +656,8 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
     private fun handleNodesNameCollisionResult(result: NodeNameCollisionsResult) {
         if (result.conflictNodes.isNotEmpty()) {
-            legacyNameCollisionActivityContract
-                .launch(
-                    ArrayList(
-                        result.conflictNodes.values.map {
-                            when (result.type) {
-                                NodeNameCollisionType.RESTORE,
-                                NodeNameCollisionType.MOVE,
-                                -> NameCollisionUiEntity.Movement.fromNodeNameCollision(it)
-
-                                NodeNameCollisionType.COPY -> NameCollisionUiEntity.Copy.fromNodeNameCollision(
-                                    it
-                                )
-                            }
-                        },
-                    )
-                )
+            nameCollisionActivityLauncher
+                .launch(result.conflictNodes.values.toCollection(ArrayList()))
         }
         if (result.noConflictNodes.isNotEmpty()) {
             when (result.type) {

@@ -620,7 +620,7 @@ class MediaDiscoveryViewModel @Inject constructor(
         }.onSuccess { result ->
             _state.update { state ->
                 state.copy(
-                    collisions = result.collisionResult.conflictNodes.values.map { it.toLegacyCopy() },
+                    collisions = result.collisionResult.conflictNodes.values.toList(),
                     copyResultText = result.moveRequestResult?.let {
                         copyRequestMessageMapper(it.toCopyRequestResult())
                     }

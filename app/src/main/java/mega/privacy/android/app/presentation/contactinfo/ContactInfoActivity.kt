@@ -46,6 +46,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFileToShareActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToShareActivityContract
@@ -69,7 +70,6 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
@@ -93,6 +93,7 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
@@ -101,12 +102,14 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -184,6 +187,13 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private lateinit var selectFolderResultLauncher: ActivityResultLauncher<String>
     private lateinit var selectFileResultLauncher: ActivityResultLauncher<String>
     private lateinit var selectFolderToCopyLauncher: ActivityResultLauncher<LongArray>
+    private val nameCollisionActivityLauncher = registerForActivityResult(
+        NameCollisionActivityContract()
+    ) { result ->
+        result?.let {
+            showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
+        }
+    }
     private val manageShareReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             hideSelectMode()
@@ -975,10 +985,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
-    private fun handleNodesNameCollisionResult(conflictNodes: List<NameCollisionUiEntity>) {
+    private fun handleNodesNameCollisionResult(conflictNodes: List<NameCollision>) {
         if (conflictNodes.isNotEmpty()) {
             statusDialog?.dismiss()
-            legacyNameCollisionActivityContract?.launch(ArrayList(conflictNodes))
+            nameCollisionActivityLauncher.launch(ArrayList(conflictNodes))
         }
     }
 

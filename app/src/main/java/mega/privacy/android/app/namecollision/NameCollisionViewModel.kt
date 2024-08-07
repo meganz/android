@@ -132,8 +132,8 @@ class NameCollisionViewModel @Inject constructor(
         }.getOrNull()?.let {
             isCopyToOrigin = it.parentId.longValue == collision.parentHandle
         } ?: runCatching {
-            MegaNode.unserialize(collision.serializedData)
-        }.onSuccess { node ->
+            val node = MegaNode.unserialize(collision.serializedData)
+            requireNotNull(node)
             if (!node.isForeign) {
                 node.fingerprint?.let { fingerprint ->
                     getNodeByFingerprintAndParentNodeUseCase(
@@ -160,37 +160,35 @@ class NameCollisionViewModel @Inject constructor(
                 if (collision is NodeNameCollision.Default) {
                     checkCopyToOrigin(collision)
                 }
-                getCurrentCollision(collision, context, true)
+                updateCurrentCollision(collision, context, true)
             }.onFailure { Timber.e("Exception setting single data $it") }
         }
     }
 
     /**
-     * Gets the complete collision data.
+     * Update current name collision result
      *
      * @param collision [NameCollision] to resolve.
      * @param context   Required Context for uploads.
      * @param rename    Whether to call rename() or not
      */
-    private fun getCurrentCollision(
+    private suspend fun updateCurrentCollision(
         collision: NameCollision,
         context: Context,
         rename: Boolean,
     ) {
-        viewModelScope.launch {
-            runCatching {
-                getNodeNameCollisionResultUseCase(collision)
-            }.onSuccess {
-                currentCollision.value = it
-                updateFileVersioningInfo()
-                currentCollision.value?.let {
-                    if (isCopyToOrigin && rename)
-                        rename(context, true)
-                }
-            }.onFailure {
-                Timber.e(it, "Error getting collisionResult")
-                currentCollision.value = null
+        runCatching {
+            getNodeNameCollisionResultUseCase(collision)
+        }.onSuccess {
+            currentCollision.value = it
+            updateFileVersioningInfo()
+            currentCollision.value?.let {
+                if (isCopyToOrigin && rename)
+                    rename(context, true)
             }
+        }.onFailure {
+            Timber.e(it, "Error getting collisionResult")
+            currentCollision.value = null
         }
     }
 
@@ -215,7 +213,7 @@ class NameCollisionViewModel @Inject constructor(
                 val reorderedCollisions = collisions.toMutableList()
                 pendingFileCollisions = pendingFiles
                 pendingFolderCollisions = pendingFolders
-                getCurrentCollision(reorderedCollisions.first(), context, false)
+                updateCurrentCollision(reorderedCollisions.first(), context, false)
                 reorderedCollisions.removeAt(0)
                 if (reorderedCollisions.isNotEmpty()) {
                     getPendingCollisions(reorderedCollisions, context)
@@ -770,7 +768,7 @@ class NameCollisionViewModel @Inject constructor(
     /**
      * Gets the current collision.
      */
-    fun getCurrentCollision(): LiveData<NodeNameCollisionResult?> = currentCollision
+    fun updateCurrentCollision(): LiveData<NodeNameCollisionResult?> = currentCollision
 
     /**
      * Gets the file versioning info.
