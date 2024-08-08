@@ -790,7 +790,7 @@ class DefaultTransfersRepositoryTest {
                 parentHandle = 2L,
                 appData = null,
             )
-            whenever(megaLocalRoomGateway.getAllCompletedTransfers())
+            whenever(megaLocalRoomGateway.getCompletedTransfers())
                 .thenReturn(flowOf(listOf(existingTransfer1)))
             underTest.addCompletedTransfersIfNotExist(listOf(transfer1, transfer2))
             verify(megaLocalRoomGateway).addCompletedTransfers(listOf(transfer2.copy(id = null)))

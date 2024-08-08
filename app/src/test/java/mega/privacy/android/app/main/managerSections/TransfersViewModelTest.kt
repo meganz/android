@@ -35,8 +35,8 @@ import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseC
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.GetAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import nz.mega.sdk.MegaTransfer
@@ -67,7 +67,7 @@ internal class TransfersViewModelTest {
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
     private val monitorCompletedTransferEventUseCase: MonitorCompletedTransferEventUseCase = mock()
     private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase>()
-    private val getAllCompletedTransfersUseCase: GetAllCompletedTransfersUseCase = mock()
+    private val monitorCompletedTransfersUseCase: MonitorCompletedTransfersUseCase = mock()
     private val getFailedOrCanceledTransfersUseCase: GetFailedOrCanceledTransfersUseCase = mock()
     private val deleteCompletedTransferUseCase: DeleteCompletedTransferUseCase = mock()
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase = mock()
@@ -91,7 +91,7 @@ internal class TransfersViewModelTest {
             moveTransferToLastByTagUseCase = moveTransferToLastByTagUseCase,
             getTransferByTagUseCase = getTransferByTagUseCase,
             getInProgressTransfersUseCase = getInProgressTransfersUseCase,
-            getAllCompletedTransfersUseCase = getAllCompletedTransfersUseCase,
+            monitorCompletedTransfersUseCase = monitorCompletedTransfersUseCase,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             monitorCompletedTransferEventUseCase = monitorCompletedTransferEventUseCase,
             getFailedOrCanceledTransfersUseCase = getFailedOrCanceledTransfersUseCase,
@@ -181,7 +181,7 @@ internal class TransfersViewModelTest {
         runTest {
             val completedTransfer = mock<CompletedTransfer>()
             val completedTransfers = listOf(completedTransfer)
-            whenever(getAllCompletedTransfersUseCase(TransfersViewModel.MAX_TRANSFERS)).thenReturn(
+            whenever(monitorCompletedTransfersUseCase(TransfersViewModel.MAX_TRANSFERS)).thenReturn(
                 flowOf(completedTransfers)
             )
             initViewModel()

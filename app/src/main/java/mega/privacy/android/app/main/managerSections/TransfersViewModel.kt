@@ -41,8 +41,8 @@ import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseC
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
-import mega.privacy.android.domain.usecase.transfers.completed.GetAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import nz.mega.sdk.MegaTransfer
@@ -64,7 +64,7 @@ class TransfersViewModel @Inject constructor(
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase,
     private val getTransferByTagUseCase: GetTransferByTagUseCase,
     private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase,
-    private val getAllCompletedTransfersUseCase: GetAllCompletedTransfersUseCase,
+    private val monitorCompletedTransfersUseCase: MonitorCompletedTransfersUseCase,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     monitorCompletedTransferEventUseCase: MonitorCompletedTransferEventUseCase,
     private val getFailedOrCanceledTransfersUseCase: GetFailedOrCanceledTransfersUseCase,
@@ -158,7 +158,7 @@ class TransfersViewModel @Inject constructor(
                 }
         }
         viewModelScope.launch {
-            getAllCompletedTransfersUseCase(MAX_TRANSFERS)
+            monitorCompletedTransfersUseCase(MAX_TRANSFERS)
                 .catch {
                     Timber.e(it)
                 }.collect { completedTransfers ->

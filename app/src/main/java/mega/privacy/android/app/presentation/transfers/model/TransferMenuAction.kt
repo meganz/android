@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.transfers.model
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.model.MenuActionDropDown
 import mega.privacy.android.shared.original.core.ui.model.MenuActionString
 
 /**
@@ -14,24 +15,27 @@ sealed interface TransferMenuAction : MenuAction {
     /**
      * Resume transfers
      */
-    class Resume : MenuActionString(
+    data object Resume : MenuActionString(
         iconRes = iconPackR.drawable.ic_play_medium_regular_outline,
         descriptionRes = R.string.action_play,
         testTag = TEST_TAG_RESUME_ACTION,
-    ), TransferMenuAction {
-        override val orderInCategory = 100
-    }
+    ), TransferMenuAction
 
     /**
      * Pause transfers
      */
-    class Pause : MenuActionString(
+    data object Pause : MenuActionString(
         iconRes = iconPackR.drawable.ic_pause_medium_regular_outline,
         descriptionRes = R.string.action_pause,
         testTag = TEST_TAG_PAUSE_ACTION,
-    ), TransferMenuAction {
-        override val orderInCategory = 100
-    }
+    ), TransferMenuAction
+
+    /**
+     * More
+     */
+    data object More : MenuActionDropDown(
+        testTag = TEST_TAG_MORE_ACTION,
+    ), TransferMenuAction
 
     companion object {
         /**
@@ -43,5 +47,10 @@ sealed interface TransferMenuAction : MenuAction {
          * Test Tag pause transfers Action
          */
         const val TEST_TAG_PAUSE_ACTION = "transfers_view:action_pause_transfers"
+
+        /**
+         * Test Tag cancel all transfers Action
+         */
+        const val TEST_TAG_MORE_ACTION = "transfers_view:action_more"
     }
 }

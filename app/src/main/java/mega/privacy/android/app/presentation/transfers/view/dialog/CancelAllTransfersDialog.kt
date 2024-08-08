@@ -23,9 +23,9 @@ fun CancelAllTransfersDialog(
     ConfirmationDialog(
         modifier = modifier.testTag(TEST_TAG_CANCEL_ALL_TRANSFERS_DIALOG),
         text = stringResource(id = R.string.cancel_all_transfer_confirmation),
-        confirmButtonText = stringResource(id = R.string.general_dismiss),
+        confirmButtonText = stringResource(id = R.string.cancel_all_action),
         onDismiss = onDismiss,
-        cancelButtonText = stringResource(id = R.string.cancel_all_action),
+        cancelButtonText = stringResource(id = R.string.general_dismiss),
         onConfirm = {
             onCancelAllTransfers()
             onDismiss()

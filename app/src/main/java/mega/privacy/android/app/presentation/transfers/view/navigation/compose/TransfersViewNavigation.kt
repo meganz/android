@@ -12,7 +12,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compos
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
 import mega.privacy.android.app.presentation.transfers.view.TransfersView
 
-internal const val TransfersRoute = "transfers"
+internal const val transfersRoute = "transfers"
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.transfersScreen(
@@ -20,11 +20,11 @@ internal fun NavGraphBuilder.transfersScreen(
     bottomSheetNavigator: BottomSheetNavigator,
     scaffoldState: ScaffoldState,
     onBackPress: () -> Unit,
+    showInProgressModal: () -> Unit,
 ) {
     composable(
-        route = TransfersRoute
+        route = transfersRoute
     ) { backStackEntry ->
-
         val viewModel =
             backStackEntry.sharedViewModel<TransfersViewModel>(navController = navHostController)
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -37,6 +37,7 @@ internal fun NavGraphBuilder.transfersScreen(
             onPlayPauseTransfer = viewModel::playOrPauseTransfer,
             onResumeTransfers = viewModel::resumeTransfersQueue,
             onPauseTransfers = viewModel::pauseTransfersQueue,
+            onMoreInProgressActions = showInProgressModal,
         )
     }
 }

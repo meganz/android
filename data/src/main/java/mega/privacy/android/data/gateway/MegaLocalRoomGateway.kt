@@ -111,11 +111,11 @@ interface MegaLocalRoomGateway {
     suspend fun getAllContacts(): List<Contact>
 
     /**
-     * Get all completed transfers
+     * Get completed transfers
      *
-     * @param size the limit size of the list. If null, the limit does not apply
+     * @param size the limit size of the list. If null, the limit does not apply and gets all.
      */
-    fun getAllCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
+    fun getCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
 
     /**
      * Add a completed transfer

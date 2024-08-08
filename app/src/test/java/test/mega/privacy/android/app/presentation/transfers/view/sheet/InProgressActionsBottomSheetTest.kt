@@ -23,7 +23,6 @@ class InProgressActionsBottomSheetTest {
     val composeTestRule = createComposeRule()
 
     private val onCancelAllTransfers = mock<() -> Unit>()
-    private val hideSheet = mock<() -> Unit>()
 
     @Test
     fun `test that sheet shows cancel all transfers option`() {
@@ -37,20 +36,18 @@ class InProgressActionsBottomSheetTest {
     }
 
     @Test
-    fun `test that clicking on cancel all transfers option invokes onCancelAllTransfers and hideSheet`() {
+    fun `test that clicking on cancel all transfers option invokes onCancelAllTransfers`() {
         initComposeTestRule()
 
         composeTestRule.onNodeWithTag(TEST_TAG_CANCEL_ALL_ACTION).performClick()
 
         verify(onCancelAllTransfers).invoke()
-        verify(hideSheet).invoke()
     }
 
     private fun initComposeTestRule() {
         composeTestRule.setContent {
             InProgressActionsBottomSheet(
                 onCancelAllTransfers = onCancelAllTransfers,
-                hideSheet = hideSheet,
             )
         }
     }

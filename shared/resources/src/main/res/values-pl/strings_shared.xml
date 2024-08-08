@@ -317,7 +317,7 @@
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_list_empty_state_title">Brak ustawień synchronizacji</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Sync a folder on your device with a folder on MEGA.</string>
+    <string name="device_center_sync_list_empty_state_message">Synchronizuj katalog na urządzeniu z katalogiem w MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Dodaj nową synchronizację</string>
     <!-- Text for the Sync solved issues chip -->
@@ -583,8 +583,10 @@
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
-        <item quantity="one">%1$d folder</item>
-        <item quantity="other">%1$d folders</item>
+        <item quantity="one">%1$d katalog</item>
+        <item quantity="few">%1$d katalogów</item>
+        <item quantity="many">%1$d katalogów</item>
+        <item quantity="other">%1$d katalogów</item>
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
     <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
@@ -607,15 +609,17 @@
     <string name="settings_sync_debris_cleared_message">Katalog .debris pomyślnie wyczyszczony</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="one">Found %1$s folder and %2$d file.</item>
-        <item quantity="other">Found %1$s and %2$d files.</item>
+        <item quantity="one">Znaleziono %1$s katalog i %2$d plik.</item>
+        <item quantity="few">Znaleziono %1$s i %2$d plików.</item>
+        <item quantity="many">Znaleziono %1$s i %2$d plików.</item>
+        <item quantity="other">Znaleziono %1$s i %2$d plików.</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">No tags</string>
+    <string name="file_info_information_no_tags_label">Brak tagów</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Anulowanie transferów...</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Enquiries must be at least 10 characters</string>
+    <string name="report_issue_error_minimum_characters">Zapytania muszą zawierać co najmniej 10 znaków</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Describe the issue with at least 10 characters</string>
+    <string name="report_issue_description_placeholder_message">Opisz problem z co najmniej 10 znakami</string>
 </resources>

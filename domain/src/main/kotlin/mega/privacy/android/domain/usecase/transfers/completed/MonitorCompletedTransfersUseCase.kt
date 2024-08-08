@@ -4,12 +4,12 @@ import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
 
 /**
- * Get the list of completed transfers
+ * Monitor completed transfers use case.
  *
- * @param transferRepository
+ * @param transferRepository [TransferRepository].
  */
-class GetAllCompletedTransfersUseCase @Inject constructor(
-    private val transferRepository: TransferRepository
+class MonitorCompletedTransfersUseCase @Inject constructor(
+    private val transferRepository: TransferRepository,
 ) {
 
     /**
@@ -18,5 +18,5 @@ class GetAllCompletedTransfersUseCase @Inject constructor(
      * @param size the limit size of the list. If null, the limit does not apply
      */
     operator fun invoke(size: Int? = null) =
-        transferRepository.getAllCompletedTransfers(size)
+        transferRepository.monitorCompletedTransfers(size)
 }

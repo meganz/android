@@ -14,6 +14,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
+import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_MORE_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_PAUSE_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_RESUME_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
@@ -43,6 +44,7 @@ class TransfersViewTest {
     private val onPlayPauseTransfer: (Int) -> Unit = mock()
     private val onResumeTransfers: () -> Unit = mock()
     private val onPauseTransfers: () -> Unit = mock()
+    private val showInProgressModal: () -> Unit = mock()
     private val tag1 = 1
     private val tag2 = 2
     private val state = TransferImageUiState(fileTypeResId = R.drawable.ic_text_medium_solid)
@@ -95,6 +97,18 @@ class TransfersViewTest {
         }
     }
 
+    @Test
+    fun `test that cancel all transfers TransferMenuAction is displayed if transfers are already paused and click action invokes correctly`() {
+        initComposeTestRule(uiState = TransfersUiState(inProgressTransfers = inProgressTransfers))
+        with(composeTestRule) {
+            onNodeWithTag(TEST_TAG_MORE_ACTION).apply {
+                assertIsDisplayed()
+                performClick()
+                verify(showInProgressModal).invoke()
+            }
+        }
+    }
+
     @OptIn(ExperimentalMaterialNavigationApi::class)
     private fun initComposeTestRule(uiState: TransfersUiState) {
         composeTestRule.setContent {
@@ -107,6 +121,7 @@ class TransfersViewTest {
                     onPlayPauseTransfer = onPlayPauseTransfer,
                     onResumeTransfers = onResumeTransfers,
                     onPauseTransfers = onPauseTransfers,
+                    onMoreInProgressActions = showInProgressModal,
                 )
             }
         }
