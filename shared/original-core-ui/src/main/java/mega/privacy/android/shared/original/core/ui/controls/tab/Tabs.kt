@@ -10,6 +10,7 @@ import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -32,6 +33,7 @@ fun Tabs(
     cells: ImmutableList<TextCell>,
     modifier: Modifier = Modifier,
     selectedIndex: Int = 0,
+    onTabSelected: (Int) -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
     val pagerState =
@@ -57,6 +59,10 @@ fun Tabs(
 
     HorizontalPager(state = pagerState, modifier = modifier) { page ->
         cells[page].view()
+    }
+
+    LaunchedEffect(pagerState.currentPage) {
+        onTabSelected(pagerState.currentPage)
     }
 }
 

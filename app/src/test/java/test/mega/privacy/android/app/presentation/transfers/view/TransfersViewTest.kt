@@ -118,6 +118,7 @@ class TransfersViewTest {
                     scaffoldState = rememberScaffoldState(),
                     onBackPress = {},
                     uiState = uiState,
+                    onTabSelected = {},
                     onPlayPauseTransfer = onPlayPauseTransfer,
                     onResumeTransfers = onResumeTransfers,
                     onPauseTransfers = onPauseTransfers,

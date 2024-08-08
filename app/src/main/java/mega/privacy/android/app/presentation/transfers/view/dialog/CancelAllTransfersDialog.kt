@@ -19,26 +19,26 @@ fun CancelAllTransfersDialog(
     onCancelAllTransfers: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-) {
-    ConfirmationDialog(
-        modifier = modifier.testTag(TEST_TAG_CANCEL_ALL_TRANSFERS_DIALOG),
-        text = stringResource(id = R.string.cancel_all_transfer_confirmation),
-        confirmButtonText = stringResource(id = R.string.cancel_all_action),
-        onDismiss = onDismiss,
-        cancelButtonText = stringResource(id = R.string.general_dismiss),
-        onConfirm = {
-            onCancelAllTransfers()
-            onDismiss()
-        },
-    )
-}
+) = ConfirmationDialog(
+    modifier = modifier.testTag(TEST_TAG_CANCEL_ALL_TRANSFERS_DIALOG),
+    text = stringResource(id = R.string.cancel_all_transfer_confirmation),
+    confirmButtonText = stringResource(id = R.string.cancel_all_action),
+    onDismiss = onDismiss,
+    cancelButtonText = stringResource(id = R.string.general_dismiss),
+    onConfirm = {
+        onCancelAllTransfers()
+        onDismiss()
+    },
+)
 
 @CombinedThemePreviews
 @Composable
 private fun CancelAllTransfersDialogPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
-        CancelAllTransfersDialog(onCancelAllTransfers = {}, onDismiss = {})
+        CancelAllTransfersDialog(
+            onCancelAllTransfers = {}, onDismiss = {})
     }
 }
 
-internal const val TEST_TAG_CANCEL_ALL_TRANSFERS_DIALOG = "transfers_view:cancel_all_transfers_dialog"
+internal const val TEST_TAG_CANCEL_ALL_TRANSFERS_DIALOG =
+    "transfers_view:cancel_all_transfers_dialog"

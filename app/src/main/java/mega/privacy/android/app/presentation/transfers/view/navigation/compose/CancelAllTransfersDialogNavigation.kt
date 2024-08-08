@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.transfers.view.navigation.compose
 
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
@@ -14,13 +16,16 @@ internal fun NavGraphBuilder.cancelAllTransfersDialog(navHostController: NavHost
     dialog(route = cancelAllTransfersDialogRoute) { backStackEntry ->
         val viewModel =
             backStackEntry.sharedViewModel<TransfersViewModel>(navController = navHostController)
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        CancelAllTransfersDialog(
-            onCancelAllTransfers = viewModel::cancelAllTransfers,
-            onDismiss = {
-                navHostController.popBackStack()
-            },
-        )
+        if (uiState.inProgressTransfers.isEmpty()) {
+            navHostController.popBackStack()
+        } else {
+            CancelAllTransfersDialog(
+                onCancelAllTransfers = viewModel::cancelAllTransfers,
+                onDismiss = navHostController::popBackStack,
+            )
+        }
     }
 }
 

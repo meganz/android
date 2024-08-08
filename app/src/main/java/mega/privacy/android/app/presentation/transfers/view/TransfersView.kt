@@ -40,6 +40,7 @@ internal fun TransfersView(
     scaffoldState: ScaffoldState,
     onBackPress: () -> Unit,
     uiState: TransfersUiState,
+    onTabSelected: (Int) -> Unit,
     onPlayPauseTransfer: (Int) -> Unit,
     onResumeTransfers: () -> Unit,
     onPauseTransfers: () -> Unit,
@@ -99,6 +100,7 @@ internal fun TransfersView(
                         ) { CompletedTransfersView() }
                     ),
                     selectedIndex = selectedTab,
+                    onTabSelected = onTabSelected,
                 )
             }
         }
@@ -114,8 +116,8 @@ private fun getTransferActions(uiState: TransfersUiState) = with(uiState) {
                 } else {
                     add(TransferMenuAction.Pause)
                 }
+                add(TransferMenuAction.More)
             }
-            add(TransferMenuAction.More)
         }
     }
 }
@@ -136,6 +138,7 @@ private fun TransfersViewPreview() {
             scaffoldState = rememberScaffoldState(),
             onBackPress = {},
             uiState = TransfersUiState(),
+            onTabSelected = {},
             onPlayPauseTransfer = {},
             onResumeTransfers = {},
             onPauseTransfers = {},

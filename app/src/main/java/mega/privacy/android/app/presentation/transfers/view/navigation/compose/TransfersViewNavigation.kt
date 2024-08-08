@@ -34,6 +34,7 @@ internal fun NavGraphBuilder.transfersScreen(
             scaffoldState = scaffoldState,
             onBackPress = onBackPress,
             uiState = uiState,
+            onTabSelected = viewModel::updateSelectedTab,
             onPlayPauseTransfer = viewModel::playOrPauseTransfer,
             onResumeTransfers = viewModel::resumeTransfersQueue,
             onPauseTransfers = viewModel::pauseTransfersQueue,

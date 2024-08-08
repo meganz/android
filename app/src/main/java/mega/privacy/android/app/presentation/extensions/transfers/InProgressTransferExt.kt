@@ -68,7 +68,7 @@ internal fun InProgressTransfer.getProgressString(context: Context, isOverQuota:
         val totalSizeString = getTotalSizeString(context)
         val progressString = getString(
             R.string.progress_size_indicator,
-            progress.floatValue.toInt(),
+            progress.intValue,
             totalSizeString
         )
 

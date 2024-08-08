@@ -21,20 +21,18 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 fun InProgressActionsBottomSheet(
     onCancelAllTransfers: () -> Unit,
     modifier: Modifier = Modifier,
+) = Column(
+    modifier = modifier
+        .fillMaxWidth()
+        .testTag(TEST_TAG_IN_PROGRESS_ACTIONS_PANEL)
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .testTag(TEST_TAG_IN_PROGRESS_ACTIONS_PANEL)
-    ) {
-        MenuActionListTile(
-            modifier = Modifier.testTag(TEST_TAG_CANCEL_ALL_ACTION),
-            text = stringResource(id = R.string.menu_cancel_all_transfers),
-            icon = painterResource(id = iconPack.ic_x_circle_medium_regular_outline),
-            dividerType = null,
-            onActionClicked = onCancelAllTransfers,
-        )
-    }
+    MenuActionListTile(
+        modifier = Modifier.testTag(TEST_TAG_CANCEL_ALL_ACTION),
+        text = stringResource(id = R.string.menu_cancel_all_transfers),
+        icon = painterResource(id = iconPack.ic_x_circle_medium_regular_outline),
+        dividerType = null,
+        onActionClicked = onCancelAllTransfers,
+    )
 }
 
 @CombinedThemePreviews
