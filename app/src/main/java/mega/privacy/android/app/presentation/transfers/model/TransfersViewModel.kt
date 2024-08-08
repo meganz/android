@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.transfers.view.navigation.compose.TransfersArgs
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
@@ -34,6 +35,7 @@ class TransfersViewModel @Inject constructor(
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase,
     private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
+    private val cancelTransfersUseCase: CancelTransfersUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -144,6 +146,16 @@ class TransfersViewModel @Inject constructor(
     fun updateSelectedTab(tabIndex: Int) {
         _uiState.update { state ->
             state.copy(selectedTab = tabIndex)
+        }
+    }
+
+    /**
+     * Cancel all transfers.
+     */
+    fun cancelAllTransfers() {
+        viewModelScope.launch {
+            runCatching { cancelTransfersUseCase() }
+                .onFailure { Timber.e(it) }
         }
     }
 }

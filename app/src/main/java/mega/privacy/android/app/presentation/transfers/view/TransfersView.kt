@@ -43,6 +43,7 @@ internal fun TransfersView(
     onPlayPauseTransfer: (Int) -> Unit,
     onResumeTransfers: () -> Unit,
     onPauseTransfers: () -> Unit,
+    onMoreInProgressActions: () -> Unit,
 ) = with(uiState) {
     MegaBottomSheetLayout(
         modifier = Modifier.semantics {
@@ -65,8 +66,9 @@ internal fun TransfersView(
                     actions = getTransferActions(uiState),
                     onActionPressed = { action ->
                         when (action) {
-                            is TransferMenuAction.Pause -> onPauseTransfers()
-                            is TransferMenuAction.Resume -> onResumeTransfers()
+                            TransferMenuAction.Pause -> onPauseTransfers()
+                            TransferMenuAction.Resume -> onResumeTransfers()
+                            TransferMenuAction.More -> onMoreInProgressActions()
                         }
                     },
                     elevation = 0.dp,
@@ -108,11 +110,12 @@ private fun getTransferActions(uiState: TransfersUiState) = with(uiState) {
         if (inProgressTransfers.isNotEmpty()) {
             if (selectedTab == IN_PROGRESS_TAB_INDEX) {
                 if (areTransfersPaused) {
-                    add(TransferMenuAction.Resume())
+                    add(TransferMenuAction.Resume)
                 } else {
-                    add(TransferMenuAction.Pause())
+                    add(TransferMenuAction.Pause)
                 }
             }
+            add(TransferMenuAction.More)
         }
     }
 }
@@ -136,6 +139,7 @@ private fun TransfersViewPreview() {
             onPlayPauseTransfer = {},
             onResumeTransfers = {},
             onPauseTransfers = {},
+            onMoreInProgressActions = {},
         )
     }
 }

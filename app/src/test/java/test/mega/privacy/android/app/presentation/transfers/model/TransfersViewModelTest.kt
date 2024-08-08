@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
@@ -52,6 +53,7 @@ class TransfersViewModelTest {
     private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase>()
     private val pauseTransferByTagUseCase = mock<PauseTransferByTagUseCase>()
     private val pauseTransfersQueueUseCase = mock<PauseTransfersQueueUseCase>()
+    private val cancelTransfersUseCase = mock<CancelTransfersUseCase>()
 
     @BeforeEach
     fun resetMocks() {
@@ -76,6 +78,7 @@ class TransfersViewModelTest {
             monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
             pauseTransferByTagUseCase = pauseTransferByTagUseCase,
             pauseTransfersQueueUseCase = pauseTransfersQueueUseCase,
+            cancelTransfersUseCase = cancelTransfersUseCase,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -244,6 +247,16 @@ class TransfersViewModelTest {
             }
             verify(pauseTransfersQueueUseCase).invoke(true)
         }
+
+    @Test
+    fun `test that cancelAllTransfers invokes CancelTransfersUseCase`() = runTest {
+        whenever(cancelTransfersUseCase()).thenReturn(Unit)
+
+        initTestClass()
+        underTest.cancelAllTransfers()
+
+        verify(cancelTransfersUseCase).invoke()
+    }
 
     companion object {
         private val testDispatcher = UnconfinedTestDispatcher()

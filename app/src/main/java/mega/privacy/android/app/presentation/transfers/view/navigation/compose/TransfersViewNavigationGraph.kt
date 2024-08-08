@@ -27,7 +27,7 @@ internal fun NavGraphBuilder.transfersViewNavigationGraph(
     onBackPress: () -> Unit,
 ) {
     navigation(
-        startDestination = TransfersRoute,
+        startDestination = transfersRoute,
         route = transfersNavigationRoutePattern,
         arguments = listOf(
             navArgument(tabIndexArg) { NavType.IntType })
@@ -37,7 +37,12 @@ internal fun NavGraphBuilder.transfersViewNavigationGraph(
             bottomSheetNavigator = bottomSheetNavigator,
             scaffoldState = scaffoldState,
             onBackPress = onBackPress,
+            showInProgressModal = navHostController::navigateToInProgressActionsModal,
         )
+
+        inProgressActionsModal(navHostController = navHostController)
+
+        cancelAllTransfersDialog(navHostController = navHostController)
     }
 }
 

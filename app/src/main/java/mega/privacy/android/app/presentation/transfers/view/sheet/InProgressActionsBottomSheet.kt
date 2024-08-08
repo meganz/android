@@ -20,7 +20,6 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 @Composable
 fun InProgressActionsBottomSheet(
     onCancelAllTransfers: () -> Unit,
-    hideSheet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -33,10 +32,7 @@ fun InProgressActionsBottomSheet(
             text = stringResource(id = R.string.menu_cancel_all_transfers),
             icon = painterResource(id = iconPack.ic_x_circle_medium_regular_outline),
             dividerType = null,
-            onActionClicked = {
-                onCancelAllTransfers()
-                hideSheet()
-            },
+            onActionClicked = onCancelAllTransfers,
         )
     }
 }
@@ -47,7 +43,6 @@ private fun InProgressActionsBottomSheetPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         InProgressActionsBottomSheet(
             onCancelAllTransfers = {},
-            hideSheet = {},
         )
     }
 }
