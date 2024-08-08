@@ -3,7 +3,7 @@
     <!-- Sync title for toolbar when inside sync screen-->
     <string name="sync_toolbar_title">Synchronisations</string>
     <!-- Sync text for the the button to begin sync-->
-    <string name="sync_button_label">Synchronisations</string>
+    <string name="sync_button_label">Synchroniser</string>
     <!-- Sync text of sync-->
     <string name="sync">Synchronisations</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->

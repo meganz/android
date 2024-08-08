@@ -615,7 +615,7 @@
         <item quantity="other">Найдены %1$s и %2$d файла.</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">No tags</string>
+    <string name="file_info_information_no_tags_label">Нет меток</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Отмена передач&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->

@@ -574,8 +574,9 @@
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
-        <item quantity="one">%1$d folder</item>
-        <item quantity="other">%1$d folders</item>
+        <item quantity="one">%1$d pasta</item>
+        <item quantity="many">%1$d de pastas</item>
+        <item quantity="other">%1$d pastas</item>
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
     <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
@@ -602,7 +603,7 @@
         <item quantity="other">%1$s e %2$d arquivos encontrados.</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">No tags</string>
+    <string name="file_info_information_no_tags_label">Não há etiquetas</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Cancelando transferências&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->

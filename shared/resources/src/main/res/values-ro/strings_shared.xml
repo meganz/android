@@ -309,7 +309,7 @@
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_list_empty_state_title">Nu este configurată nicio sincronizare</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Sync a folder on your device with a folder on MEGA.</string>
+    <string name="device_center_sync_list_empty_state_message">Sincronizați un folder de pe dispozitiv cu un folder de pe MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Adăugați o nouă sincronizare</string>
     <!-- Text for the Sync solved issues chip -->
@@ -427,7 +427,7 @@
     <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
     <string name="video_to_playlist_new_playlist_text">Listă de redare nouă</string>
     <!-- Text of the done button in the page that adds the video to the video playlist -->
-    <string name="video_to_playlist_done_button">Gata</string>
+    <string name="video_to_playlist_done_button">Terminat</string>
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">Nu veți beneficia de următoarele funcții</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
@@ -574,8 +574,9 @@
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
-        <item quantity="one">%1$d folder</item>
-        <item quantity="other">%1$d folders</item>
+        <item quantity="one">%1$d&#160;folder</item>
+        <item quantity="few">%1$d&#160;foldere</item>
+        <item quantity="other">%1$d de foldere</item>
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
     <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
@@ -597,15 +598,16 @@
     <string name="settings_sync_debris_cleared_message">Folderul .debris a fost șters</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="one">Found %1$s folder and %2$d file.</item>
-        <item quantity="other">Found %1$s and %2$d files.</item>
+        <item quantity="one">Au fost găsite %1$s și %2$d&#160;fișier.</item>
+        <item quantity="few">Au fost găsite %1$s și %2$d&#160;fișiere.</item>
+        <item quantity="other">Au fost găsite %1$s și %2$d de fișiere.</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">No tags</string>
+    <string name="file_info_information_no_tags_label">Nicio etichetă</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Se anulează transferurile&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Enquiries must be at least 10 characters</string>
+    <string name="report_issue_error_minimum_characters">Întrebările trebuie să aibă cel puțin 10&#160;caractere</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Describe the issue with at least 10 characters</string>
+    <string name="report_issue_description_placeholder_message">Descrieți problema cu cel puțin 10&#160;caractere</string>
 </resources>
