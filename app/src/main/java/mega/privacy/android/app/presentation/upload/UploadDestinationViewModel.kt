@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.transfers.GetFileForUploadUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -19,6 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UploadDestinationViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getFileForUploadUseCase: GetFileForUploadUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UploadDestinationUiState())
@@ -45,8 +47,14 @@ class UploadDestinationViewModel @Inject constructor(
      * Update the list of [Uri] of the files to upload
      */
     fun updateUri(fileUriList: List<Uri>) = viewModelScope.launch {
-        Timber.d("Uri updated $fileUriList")
-        _uiState.update { it.copy(fileUriList = fileUriList) }
+        val importableItems = fileUriList.mapNotNull {
+            runCatching { getFileForUploadUseCase(it.toString(), false) }
+                .onFailure { error -> Timber.e(error) }
+                .getOrNull()?.let { file ->
+                    ImportUiItem(filePath = file.path, fileName = file.name)
+                }
+        }
+        _uiState.update { it.copy(fileUriList = fileUriList, importUiItems = importableItems) }
     }
 
     /**

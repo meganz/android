@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -28,7 +29,6 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericT
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import java.io.File
 
 /**
  * Upload Row Item
@@ -45,7 +45,8 @@ fun UploadDestinationRowItem(
             .padding(8.dp)
     ) {
         ThumbnailView(
-            data = File(filePath),
+            data = filePath,
+            contentScale = ContentScale.Crop,
             defaultImage = iconPackR.drawable.ic_generic_medium_solid,
             modifier = Modifier
                 .padding(end = 16.dp)
@@ -58,9 +59,11 @@ fun UploadDestinationRowItem(
                 placeholder = fileName,
                 textFieldValue = TextFieldValue(fileName),
                 onTextChange = {},
-                keyboardActions = KeyboardActions(onDone = {
-                    //handle edit operation
-                }),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        //handle edit operation
+                    },
+                ),
                 imeAction = ImeAction.Done,
             )
         } else {
@@ -79,8 +82,8 @@ fun UploadDestinationRowItem(
                 )
                 Icon(
                     modifier = Modifier
-                        .size(24.dp)
-                        .padding(4.dp),
+                        .padding(horizontal = 8.dp)
+                        .size(16.dp),
                     painter = painterResource(iconPackR.drawable.ic_pen_2_medium_regular_solid),
                     contentDescription = "Edit",
                     tint = MaterialTheme.colors.onPrimary,

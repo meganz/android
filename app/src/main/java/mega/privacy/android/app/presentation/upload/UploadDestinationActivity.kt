@@ -70,9 +70,7 @@ class UploadDestinationActivity : AppCompatActivity() {
                                 passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                                 content = {
                                     UploadDestinationView(
-                                        fileList = uploadActivityUiState.fileUriList.map { uri ->
-                                            Pair(uri.toString(), uri.path.orEmpty())
-                                        },
+                                        importUiItems = uploadActivityUiState.importUiItems
                                     )
                                 }
                             )

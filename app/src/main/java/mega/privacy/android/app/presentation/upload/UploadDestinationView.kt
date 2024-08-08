@@ -41,7 +41,7 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 @Composable
 fun UploadDestinationView(
     editableFile: String = "",
-    fileList: List<Pair<String, String>> = emptyList(),
+    importUiItems: List<ImportUiItem> = emptyList(),
     isUrl: Boolean = false,
 ) {
     MegaScaffold(
@@ -57,7 +57,7 @@ fun UploadDestinationView(
         val showMore = rememberSaveable {
             mutableStateOf(false)
         }
-        val itemsToShow = if (showMore.value) fileList else fileList.take(4)
+        val itemsToShow = if (showMore.value) importUiItems else importUiItems.take(4)
 
 
         LazyColumn(
@@ -70,7 +70,7 @@ fun UploadDestinationView(
                     } else {
                         pluralStringResource(
                             id = R.plurals.general_num_files,
-                            count = fileList.size
+                            count = importUiItems.size
                         )
                     },
                     modifier = Modifier
@@ -81,16 +81,16 @@ fun UploadDestinationView(
             }
             items(itemsToShow.size) { item ->
                 UploadDestinationRowItem(
-                    fileName = fileList[item].first,
-                    filePath = fileList[item].second,
-                    isEditMode = editableFile == fileList[item].first,
+                    fileName = importUiItems[item].fileName,
+                    filePath = importUiItems[item].filePath,
+                    isEditMode = editableFile == importUiItems[item].fileName,
                 )
                 if (item < itemsToShow.size - 1) {
                     MegaDivider(dividerType = DividerType.FullSize)
                 }
             }
             item {
-                UploadDestinationFooterView(fileList, showMore)
+                UploadDestinationFooterView(importUiItems, showMore)
             }
         }
     }
@@ -98,7 +98,7 @@ fun UploadDestinationView(
 
 @Composable
 private fun UploadDestinationFooterView(
-    fileList: List<Pair<String, String>>,
+    fileList: List<ImportUiItem>,
     showMore: MutableState<Boolean>,
 ) {
     if (fileList.size > 4) {
@@ -179,11 +179,11 @@ private fun UploadDestinationFooterView(
 private fun UploadViewPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         UploadDestinationView(
-            fileList = listOf(
-                "file1" to "path1",
-                "file2" to "path2",
-                "file3" to "path3",
-                "file4" to "path4",
+            importUiItems = listOf(
+                ImportUiItem(fileName = "file1", filePath = "path1"),
+                ImportUiItem(fileName = "file2", filePath = "path2"),
+                ImportUiItem(fileName = "file3", filePath = "path3"),
+                ImportUiItem(fileName = "file4", filePath = "path4"),
             )
         )
     }
@@ -194,22 +194,16 @@ private fun UploadViewPreview() {
 private fun UploadViewInEditModePreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         UploadDestinationView(
-            fileList = listOf(
-                "file1" to "path1",
-                "file2" to "path2",
-                "file3" to "path3",
-                "file4" to "path4",
-                "file5" to "path5",
-                "file6" to "path6",
-                "file7" to "path7",
-                "file8" to "path8",
-                "file9" to "path9",
-                "file10" to "path10",
-                "file11" to "path11",
-                "file12" to "path12",
-                "file13" to "path13",
-                "file14" to "path14",
-                "file15" to "path15",
+            importUiItems = listOf(
+                ImportUiItem(fileName = "file1", filePath = "path1"),
+                ImportUiItem(fileName = "file2", filePath = "path2"),
+                ImportUiItem(fileName = "file3", filePath = "path3"),
+                ImportUiItem(fileName = "file4", filePath = "path4"),
+                ImportUiItem(fileName = "file5", filePath = "path5"),
+                ImportUiItem(fileName = "file6", filePath = "path6"),
+                ImportUiItem(fileName = "file7", filePath = "path7"),
+                ImportUiItem(fileName = "file8", filePath = "path8"),
+                ImportUiItem(fileName = "file9", filePath = "path9"),
             ),
             editableFile = "path5",
         )

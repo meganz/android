@@ -18,7 +18,7 @@ class UploadDestinationViewTest {
         composeTestRule.setContent {
             UploadDestinationView(
                 editableFile = "",
-                fileList = emptyList(),
+                importUiItems = emptyList(),
                 isUrl = false
             )
         }
@@ -42,10 +42,10 @@ class UploadDestinationViewTest {
         composeTestRule.setContent {
             UploadDestinationView(
                 editableFile = "",
-                fileList = listOf(
-                    Pair("file1", "path1"),
-                    Pair("file2", "path2"),
-                    Pair("file3", "path3")
+                importUiItems = listOf(
+                    ImportUiItem("file1", "path1"),
+                    ImportUiItem("file2", "path2"),
+                    ImportUiItem("file3", "path3"),
                 ),
                 isUrl = false
             )
@@ -70,22 +70,16 @@ class UploadDestinationViewTest {
         composeTestRule.setContent {
             UploadDestinationView(
                 editableFile = "",
-                fileList = listOf(
-                    Pair("file1", "path1"),
-                    Pair("file2", "path2"),
-                    Pair("file3", "path3"),
-                    Pair("file4", "path4"),
-                    Pair("file5", "path5"),
-                    Pair("file6", "path6"),
-                    Pair("file7", "path7"),
-                    Pair("file8", "path8"),
-                    Pair("file9", "path9"),
-                    Pair("file10", "path10"),
-                    Pair("file11", "path11"),
-                    Pair("file12", "path12"),
-                    Pair("file13", "path13"),
-                    Pair("file14", "path14"),
-                    Pair("file15", "path15")
+                importUiItems = listOf(
+                    ImportUiItem(fileName = "file1", filePath = "path1"),
+                    ImportUiItem(fileName = "file2", filePath = "path2"),
+                    ImportUiItem(fileName = "file3", filePath = "path3"),
+                    ImportUiItem(fileName = "file4", filePath = "path4"),
+                    ImportUiItem(fileName = "file5", filePath = "path5"),
+                    ImportUiItem(fileName = "file6", filePath = "path6"),
+                    ImportUiItem(fileName = "file7", filePath = "path7"),
+                    ImportUiItem(fileName = "file8", filePath = "path8"),
+                    ImportUiItem(fileName = "file9", filePath = "path9"),
                 ),
                 isUrl = false
             )
@@ -110,8 +104,9 @@ class UploadDestinationViewTest {
         composeTestRule.setContent {
             UploadDestinationView(
                 editableFile = "",
-                fileList = listOf(
-                    Pair("file1", "path1"),
+                importUiItems = listOf(
+                    ImportUiItem("file1", "path1"),
+                    ImportUiItem("file2", "path2"),
                 ),
                 isUrl = true
             )
