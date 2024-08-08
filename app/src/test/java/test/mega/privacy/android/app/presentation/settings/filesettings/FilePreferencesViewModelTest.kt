@@ -4,7 +4,6 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel
@@ -37,7 +36,7 @@ internal class FilePreferencesViewModelTest {
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val getFileVersionsOption: GetFileVersionsOption = mock {
-        on { runBlocking { invoke(any()) } }.thenReturn(false)
+        onBlocking { invoke(any()) }.thenReturn(false)
     }
     private val fakeMonitorUserUpdates = MutableSharedFlow<UserChanges>()
     private val monitorUserUpdates: MonitorUserUpdates = mock {

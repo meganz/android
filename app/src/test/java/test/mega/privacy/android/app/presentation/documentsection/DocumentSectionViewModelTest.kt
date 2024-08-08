@@ -8,7 +8,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
@@ -77,7 +76,7 @@ class DocumentSectionViewModelTest {
     private val getFileUrlByNodeHandleUseCase = mock<GetFileUrlByNodeHandleUseCase>()
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
-    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>{
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase> {
         on {
             invoke()
         }.thenReturn(flowOf(false))
@@ -90,8 +89,8 @@ class DocumentSectionViewModelTest {
         }.thenReturn(flowOf(AccountDetail()))
     }
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
-        on {
-            runBlocking { invoke() }
+        onBlocking {
+            invoke()
         }.thenReturn(false)
     }
 

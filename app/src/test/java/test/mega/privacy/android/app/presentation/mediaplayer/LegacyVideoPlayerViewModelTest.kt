@@ -6,7 +6,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -66,8 +65,8 @@ internal class LegacyVideoPlayerViewModelTest {
         }.thenReturn(flowOf(AccountDetail()))
     }
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
-        on {
-            runBlocking { invoke() }
+        onBlocking {
+            invoke()
         }.thenReturn(false)
     }
 

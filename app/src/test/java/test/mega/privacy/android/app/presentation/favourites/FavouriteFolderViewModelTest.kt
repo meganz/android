@@ -6,7 +6,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.favourites.FavouriteFolderViewModel
@@ -62,12 +61,12 @@ class FavouriteFolderViewModelTest {
     }
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase> {
         on {
-            runBlocking { invoke() }
+            invoke()
         }.thenReturn(flowOf(false))
     }
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-        on {
-            runBlocking { invoke(any()) }
+        onBlocking {
+            invoke(any())
         }.thenReturn(false)
     }
     private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()

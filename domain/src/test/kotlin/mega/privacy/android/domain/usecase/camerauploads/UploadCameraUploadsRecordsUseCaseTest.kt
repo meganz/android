@@ -1181,34 +1181,31 @@ internal class UploadCameraUploadsRecordsUseCaseTest {
                     it is VideoCompressionState.Finished
                             || it is VideoCompressionState.Successful
                             || it is VideoCompressionState.Failed
-                }
-                    .forEach {
-                        assertThat(awaitItem())
-                            .isEqualTo(
-                                when (it) {
-                                    is VideoCompressionState.Progress -> {
-                                        CameraUploadsTransferProgress.Compressing.Progress(
-                                            record = record,
-                                            progress = it.progress,
-                                        )
-                                    }
-
-                                    is VideoCompressionState.Successful -> {
-                                        CameraUploadsTransferProgress.Compressing.Successful(
-                                            record = record,
-                                        )
-                                    }
-
-                                    is VideoCompressionState.InsufficientStorage -> {
-                                        CameraUploadsTransferProgress.Compressing.InsufficientStorage(
-                                            record = record,
-                                        )
-                                    }
-
-                                    else -> {}
-                                }
+                }.forEach {
+                    val expectedEvent = when (it) {
+                        is VideoCompressionState.Progress -> {
+                            CameraUploadsTransferProgress.Compressing.Progress(
+                                record = record,
+                                progress = it.progress
                             )
+                        }
+
+                        is VideoCompressionState.Successful -> {
+                            CameraUploadsTransferProgress.Compressing.Successful(
+                                record = record
+                            )
+                        }
+
+                        is VideoCompressionState.InsufficientStorage -> {
+                            CameraUploadsTransferProgress.Compressing.InsufficientStorage(
+                                record = record
+                            )
+                        }
+
+                        else -> throw IllegalStateException("Unexpected state: $it")
                     }
+                    assertThat(awaitItem()).isEqualTo(expectedEvent)
+                }
                 cancelAndConsumeRemainingEvents()
             }
         }

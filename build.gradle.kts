@@ -1,13 +1,14 @@
 import mega.privacy.android.build.isServerBuild
 
 plugins {
+    alias(plugin.plugins.kotlin.compose) apply false
     alias(plugin.plugins.ksp) apply false
     alias(plugin.plugins.mega.android.cicd)
     alias(plugin.plugins.mega.android.release)
     alias(plugin.plugins.jfrog.artifactory) apply false
     alias(plugin.plugins.mega.artifactory.publish.convention) apply false
     alias(plugin.plugins.de.mannodermaus.android.junit5) apply false
-    id("org.jetbrains.kotlin.android") version "1.9.24" apply false
+    alias(plugin.plugins.jetbrains.kotlin.android) apply false
 }
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.

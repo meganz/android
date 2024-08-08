@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -156,7 +155,7 @@ class SettingsViewModelTest {
             canDeleteAccount = mock { on { invoke(TEST_USER_ACCOUNT) }.thenReturn(true) },
             refreshPasscodeLockPreference = refreshPasscodeLockPreference,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
-            rootNodeExistsUseCase = mock { on { runBlocking { invoke() } }.thenReturn(true) },
+            rootNodeExistsUseCase = mock { onBlocking { invoke() }.thenReturn(true) },
             isMultiFactorAuthAvailable = isMultiFactorAuthAvailable,
             monitorAutoAcceptQRLinks = monitorAutoAcceptQRLinks,
             isMultiFactorAuthEnabledUseCase = isMultiFactorAuthEnabledUseCase,

@@ -1,6 +1,7 @@
 import com.android.build.api.dsl.ManagedVirtualDevice
 import mega.privacy.android.build.getTestAccountPassword
 import mega.privacy.android.build.getTestAccountUserName
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.android.test")
@@ -13,16 +14,22 @@ android {
     compileSdk = 34
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {
         buildConfig = true
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlin {
+        val jdk: String by rootProject.extra
+        jvmToolchain(jdk.toInt())
+
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
+        }
     }
 
     defaultConfig {

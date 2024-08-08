@@ -44,6 +44,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 internal class PasscodeViewTest {
@@ -249,9 +250,7 @@ internal class PasscodeViewTest {
 
     @Test
     fun `test that biometric auth is launched if available and enabled`() {
-        biometricAuthIsAvailable.stub {
-            on { invoke(any()) }.thenReturn(true)
-        }
+        whenever(biometricAuthIsAvailable.invoke(any())).thenReturn(true)
 
         displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
@@ -267,9 +266,7 @@ internal class PasscodeViewTest {
 
     @Test
     fun `test that biometric error falls back to passcode`() {
-        biometricAuthIsAvailable.stub {
-            on { invoke(any()) }.thenReturn(true)
-        }
+        whenever(biometricAuthIsAvailable(any())).thenReturn(true)
 
         displayPasscodeViewWithState(
             PasscodeUnlockState.Data(
@@ -312,9 +309,7 @@ internal class PasscodeViewTest {
 
     @Test
     fun `test that biometric dialog event is emitted when biometric dialog is displayed`() {
-        biometricAuthIsAvailable.stub {
-            on { invoke(any()) }.thenReturn(true)
-        }
+        whenever(biometricAuthIsAvailable.invoke(any())).thenReturn(true)
 
         displayPasscodeViewWithState(
             PasscodeUnlockState.Data(

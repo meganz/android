@@ -5,10 +5,11 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.BottomSheetClickHandler
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.NodeBottomSheetMenuItem
-import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.shared.original.core.ui.model.MenuActionWithIcon
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
@@ -26,10 +27,11 @@ class NodeBottomSheetActionMapperTest {
     @Test
     fun `test that group id matches menu item group id`() = runTest {
         val expectedGroup = 22
+        val mockBuildComposeControl = mock<BottomSheetClickHandler>()
         val bottomSheetMenuItem = mock<NodeBottomSheetMenuItem<*>> {
             on { menuAction }.thenReturn(getMenuAction(10))
             on { groupId }.thenReturn(expectedGroup)
-            on { buildComposeControl(any()) }.thenReturn { _, _, _, _ -> }
+            on { buildComposeControl(any()) }.thenReturn(mockBuildComposeControl)
             onBlocking { shouldDisplay(any(), any(), any(), any(), any()) }.thenReturn(true)
         }
         val actual = underTest(
@@ -49,10 +51,11 @@ class NodeBottomSheetActionMapperTest {
     @Test
     fun `test that the order id matches the order in category id`() = runTest {
         val expectedOrderInGroup = 55
+        val mockBuildComposeControl = mock<BottomSheetClickHandler>()
         val bottomSheetMenuItem = mock<NodeBottomSheetMenuItem<*>> {
             on { menuAction }.thenReturn(getMenuAction(expectedOrderInGroup))
             on { groupId }.thenReturn(10)
-            on { buildComposeControl(any()) }.thenReturn { _, _, _, _ -> }
+            on { buildComposeControl(any()) }.thenReturn(mockBuildComposeControl)
             onBlocking { shouldDisplay(any(), any(), any(), any(), any()) }.thenReturn(true)
         }
         val actual = underTest(
@@ -71,10 +74,11 @@ class NodeBottomSheetActionMapperTest {
 
     @Test
     fun `test that the build compose control function is called`() = runTest {
+        val mockBuildComposeControl = mock<BottomSheetClickHandler>()
         val bottomSheetMenuItem = mock<NodeBottomSheetMenuItem<*>> {
             on { menuAction }.thenReturn(getMenuAction(10))
             on { groupId }.thenReturn(10)
-            on { buildComposeControl(any()) }.thenReturn { _, _, _, _ -> }
+            on { buildComposeControl(any()) }.thenReturn(mockBuildComposeControl)
             onBlocking { shouldDisplay(any(), any(), any(), any(), any()) }.thenReturn(true)
         }
         val selectedNode = mock<TypedFileNode>()

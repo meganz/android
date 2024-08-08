@@ -3,11 +3,9 @@ package mega.privacy.android.domain.usecase.offline
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -18,11 +16,16 @@ import org.mockito.kotlin.whenever
 class GetOfflineFileInformationByIdUseCaseTest {
     private lateinit var underTest: GetOfflineFileInformationByIdUseCase
 
-    private val getOfflineNodeInformationByNodeIdUseCase: GetOfflineNodeInformationByNodeIdUseCase = mock()
+    private val getOfflineNodeInformationByNodeIdUseCase: GetOfflineNodeInformationByNodeIdUseCase =
+        mock()
     private val getOfflineFileInformationUseCase: GetOfflineFileInformationUseCase = mock()
 
     @BeforeEach
     fun setUp() {
+        reset(
+            getOfflineNodeInformationByNodeIdUseCase,
+            getOfflineFileInformationUseCase
+        )
         underTest = GetOfflineFileInformationByIdUseCase(
             getOfflineNodeInformationByNodeIdUseCase,
             getOfflineFileInformationUseCase
@@ -33,7 +36,9 @@ class GetOfflineFileInformationByIdUseCaseTest {
     fun `test that invoke with valid NodeId should call both use cases`() = runTest {
         val nodeId = NodeId(11)
         val offlineNodeInformation = mock<OtherOfflineNodeInformation>()
-        whenever(getOfflineNodeInformationByNodeIdUseCase.invoke(nodeId)) doReturn offlineNodeInformation
+        whenever(getOfflineNodeInformationByNodeIdUseCase.invoke(nodeId)).thenReturn(
+            offlineNodeInformation
+        )
 
         underTest.invoke(nodeId)
 
@@ -45,18 +50,10 @@ class GetOfflineFileInformationByIdUseCaseTest {
     fun `test that getOfflineFileInformationUseCase is not called when GetOfflineNodeInformationByIdUseCase returns null`() =
         runTest {
             val nodeId = NodeId(11)
-            whenever(getOfflineNodeInformationByNodeIdUseCase.invoke(nodeId)) doReturn null
+            whenever(getOfflineNodeInformationByNodeIdUseCase.invoke(nodeId)).thenReturn(null)
 
             underTest.invoke(nodeId)
 
             verifyNoInteractions(getOfflineFileInformationUseCase)
         }
-
-    @AfterEach
-    fun reset() {
-        reset(
-            getOfflineNodeInformationByNodeIdUseCase,
-            getOfflineFileInformationUseCase
-        )
-    }
 }

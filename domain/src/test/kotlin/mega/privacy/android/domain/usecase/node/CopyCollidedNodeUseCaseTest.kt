@@ -54,10 +54,10 @@ internal class CopyCollidedNodeUseCaseTest {
             }
             whenever(
                 nodeRepository.copyNode(
-                    NodeId(any()),
-                    any(),
-                    NodeId(any()),
-                    anyOrNull()
+                    NodeId(1L),
+                    null,
+                    NodeId(2L),
+                    "new name"
                 )
             ).thenReturn(
                 NodeId(

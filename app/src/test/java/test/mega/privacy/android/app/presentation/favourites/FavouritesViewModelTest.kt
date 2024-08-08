@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.favourites.FavouritesViewModel
@@ -121,26 +120,26 @@ class FavouritesViewModelTest {
     }
 
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
-        on {
-            runBlocking { invoke() }
+        onBlocking {
+            invoke()
         }.thenReturn(false)
     }
 
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase> {
         on {
-            runBlocking { invoke() }
+            invoke()
         }.thenReturn(flowOf(false))
     }
 
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-        on {
-            runBlocking { invoke(any()) }
+        onBlocking {
+            invoke(any())
         }.thenReturn(false)
     }
 
     private val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-        on {
-            runBlocking { invoke(NodeId(any())) }
+        onBlocking {
+            invoke(NodeId(any()))
         }.thenReturn(false)
     }
 

@@ -45,10 +45,10 @@ import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
-import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
@@ -101,13 +101,13 @@ class FileBrowserViewModelTest {
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
-        on {
-            runBlocking { invoke() }
+        onBlocking {
+            invoke()
         }.thenReturn(false)
     }
     private val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase>() {
-        on {
-            runBlocking { invoke(NodeId(any())) }
+        onBlocking {
+            invoke(NodeId(any()))
         }.thenReturn(false)
     }
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()

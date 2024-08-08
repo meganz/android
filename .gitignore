@@ -62,3 +62,4 @@ captures
 wget-log
 
 credentials.properties
+.kotlin

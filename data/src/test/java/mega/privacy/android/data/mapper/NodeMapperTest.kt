@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.node.FetchChildrenMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.FolderNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
@@ -13,7 +14,9 @@ import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.node.DefaultFolderNode
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -24,7 +27,6 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 
 class NodeMapperTest {
@@ -62,10 +64,13 @@ class NodeMapperTest {
     private val offlineAvailabilityMapper: OfflineAvailabilityMapper = mock()
     private val stringListMapper: StringListMapper = mock()
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
+    private val fetChildrenMapper: FetchChildrenMapper = mock()
 
     @BeforeEach
     internal fun setUp() {
+        val fetChildrenMapperResult = mock<suspend (SortOrder) -> List<UnTypedNode>>()
         whenever(fileTypeInfoMapper(anyOrNull(), anyOrNull())).thenReturn(PdfFileTypeInfo)
+        whenever(fetChildrenMapper(any(), any())).thenReturn(fetChildrenMapperResult)
         underTest = NodeMapper(
             fileNodeMapper = FileNodeMapper(
                 cacheGateway = mock(),
@@ -77,7 +82,7 @@ class NodeMapperTest {
             folderNodeMapper = FolderNodeMapper(
                 megaApiGateway = megaApiGateway,
                 megaApiFolderGateway = megaApiFolderGateway,
-                fetChildrenMapper = mock { on { invoke(any(), any()) }.thenReturn { emptyList() } },
+                fetChildrenMapper = fetChildrenMapper,
                 stringListMapper = stringListMapper,
             )
         )
@@ -116,13 +121,11 @@ class NodeMapperTest {
         val expectedNumberVersion = 2
         val expectedNumChildFolders = 2
         val expectedNumChildFiles = 3
-        megaApiGateway.stub {
-            onBlocking { getNumVersions(node) }.thenReturn(expectedNumberVersion)
-            onBlocking { getNumChildFolders(node) }.thenReturn(expectedNumChildFolders)
-            onBlocking { getNumChildFiles(node) }.thenReturn(expectedNumChildFiles)
-            onBlocking { isInRubbish(node) }.thenReturn(true)
-            onBlocking { isPendingShare(node) }.thenReturn(true)
-        }
+        whenever(megaApiGateway.getNumVersions(node)).thenReturn(expectedNumberVersion)
+        whenever(megaApiGateway.getNumChildFolders(node)).thenReturn(expectedNumChildFolders)
+        whenever(megaApiGateway.getNumChildFiles(node)).thenReturn(expectedNumChildFiles)
+        whenever(megaApiGateway.isInRubbish(node)).thenReturn(true)
+        whenever(megaApiGateway.isPendingShare(node)).thenReturn(true)
         whenever(megaLocalRoomGateway.getOfflineInformation(node.handle)).thenReturn(null)
         whenever(megaLocalRoomGateway.isOfflineInformationAvailable(node.handle)).thenReturn(true)
         val actual = underTest(
