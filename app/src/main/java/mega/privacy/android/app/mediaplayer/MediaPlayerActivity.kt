@@ -1,6 +1,5 @@
 package mega.privacy.android.app.mediaplayer
 
-import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
@@ -9,8 +8,10 @@ import androidx.activity.viewModels
 import androidx.navigation.NavController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.components.attacher.MegaAttacher
+import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.controllers.ChatController
+import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
+import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
@@ -32,14 +33,12 @@ import nz.mega.sdk.MegaNode
 abstract class MediaPlayerActivity : PasscodeActivity() {
     internal val viewModel: MediaPlayerViewModel by viewModels()
     internal val startDownloadViewModel: StartDownloadViewModel by viewModels()
+    internal val nodeAttachmentViewModel: NodeAttachmentViewModel by viewModels()
 
     internal var searchMenuItem: MenuItem? = null
     internal var optionsMenu: Menu? = null
 
     internal lateinit var navController: NavController
-
-    internal val nodeAttacher by lazy { MegaAttacher(this) }
-    private var currentRequestCode: Int? = null
 
     protected fun addStartDownloadTransferView(root: ViewGroup) {
         root.addView(
@@ -51,21 +50,17 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
         )
     }
 
-    private val nodeAttacherLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            currentRequestCode?.let {
-                if (nodeAttacher.handleActivityResult(
-                        requestCode = it,
-                        resultCode = result.resultCode,
-                        data = result.data,
-                        snackbarShower = this
-                    )
-                ) {
-                    currentRequestCode = null
+    protected fun addNodeAttachmentView(root: ViewGroup) {
+        root.addView(
+            createNodeAttachmentView(
+                activity = this,
+                viewModel = nodeAttachmentViewModel,
+                showMessage = { message, id ->
+                    showSnackbarWithChat(message, id)
                 }
-            }
-
-        }
+            )
+        )
+    }
 
     internal val selectImportFolderLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -172,17 +167,6 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
      */
     fun closeSearch() {
         searchMenuItem?.collapseActionView()
-    }
-
-    /**
-     * launch activity for result
-     *
-     * @param intent
-     * @param requestCode
-     */
-    override fun launchActivityForResult(intent: Intent, requestCode: Int) {
-        currentRequestCode = requestCode
-        nodeAttacherLauncher.launch(intent)
     }
 
     internal abstract fun setupToolbar()

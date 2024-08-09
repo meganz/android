@@ -63,17 +63,6 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
     /**
      * Attach a node to chats.
      *
-     * @param handle handle of the node
-     */
-    fun attachNode(handle: Long) {
-        val node = megaApi.getNodeByHandle(handle) ?: return
-
-        attachNodes(listOf(node))
-    }
-
-    /**
-     * Attach a node to chats.
-     *
      * @param node node to attach
      */
     fun attachNode(node: MegaNode) {

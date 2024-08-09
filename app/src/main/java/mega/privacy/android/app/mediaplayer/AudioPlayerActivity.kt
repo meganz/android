@@ -227,10 +227,6 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             return
         }
 
-        if (savedInstanceState != null) {
-            nodeAttacher.restoreState(savedInstanceState)
-        }
-
         binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
 
         lifecycleScope.launch {
@@ -242,6 +238,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
         setContentView(binding.root)
         addStartDownloadTransferView(binding.root)
+        addNodeAttachmentView(binding.root)
         binding.toolbar.setBackgroundColor(Color.TRANSPARENT)
 
         val navHostFragment =
@@ -412,7 +409,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 }
 
                 R.id.send_to_chat -> {
-                    nodeAttacher.attachNode(handle = playingHandle)
+                    nodeAttachmentViewModel.startAttachNodes(listOf(NodeId(playingHandle)))
                 }
 
                 R.id.get_link -> {
@@ -537,15 +534,6 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         window.setFormat(PixelFormat.RGBA_8888) // Needed to fix bg gradient banding
-    }
-
-    /**
-     * onSaveInstanceState
-     */
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        nodeAttacher.saveState(outState)
     }
 
     override fun showSystemUI() {

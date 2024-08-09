@@ -34,6 +34,7 @@ import androidx.activity.viewModels
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
@@ -242,6 +243,11 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         }
     }
 
+    override fun attachBaseContext(newBase: Context?) {
+        delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
+        super.attachBaseContext(newBase)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Analytics.tracker.trackEvent(VideoPlayerScreenEvent)
@@ -269,10 +275,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
             }.onFailure { Timber.e(it) }
         }
 
-        if (savedInstanceState != null) {
-            nodeAttacher.restoreState(savedInstanceState)
-        }
-
         currentOrientation = resources.configuration.orientation
         observeRotationSettingsChange()
 
@@ -280,6 +282,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
 
         setContentView(dragToExit.wrapContentView(binding.root))
         addStartDownloadTransferView(binding.root)
+        addNodeAttachmentView(binding.root)
         dragToExit.observeThumbnailLocation(this, intent)
 
         binding.toolbar.apply {
@@ -624,7 +627,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
 
                 R.id.send_to_chat -> {
                     Analytics.tracker.trackEvent(VideoPlayerSendToChatMenuToolbarEvent)
-                    nodeAttacher.attachNode(handle = playingHandle)
+                    nodeAttachmentViewModel.startAttachNodes(listOf(NodeId(playingHandle)))
                 }
 
                 R.id.get_link -> {
@@ -951,12 +954,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                 videoViewModel.updateIsVideoOptionPopupShown(false)
             }
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        nodeAttacher.saveState(outState)
     }
 
     private fun setupNavDestListener() {
@@ -1572,18 +1569,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
             navHostId = R.id.nav_host_fragment,
             fragmentClass = VideoPlayerFragment::class.java
         )?.onDragActivated(dragToExit = dragToExit, activated = activated)
-    }
-
-    /**
-     * Show snack bar
-     * @param type
-     * @param content
-     * @param chatId
-     */
-    override fun showSnackbar(type: Int, content: String?, chatId: Long) {
-        content?.let {
-            showSnackBarForVideoPlayer(it)
-        }
     }
 
     private fun onError(megaException: mega.privacy.android.domain.exception.MegaException) {
