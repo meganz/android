@@ -349,7 +349,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         getUri: suspend () -> String?,
         transferTriggerEvent: TransferTriggerEvent,
     ) {
-        runCatching { clearActiveTransfersIfFinishedUseCase(TransferType.DOWNLOAD) }
+        runCatching { clearActiveTransfersIfFinishedUseCase() }
             .onFailure { Timber.e(it) }
         _uiState.update {
             it.copy(
@@ -454,7 +454,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         uris: List<Uri>,
         isVoiceClip: Boolean = false,
     ) {
-        runCatching { clearActiveTransfersIfFinishedUseCase(TransferType.CHAT_UPLOAD) }
+        runCatching { clearActiveTransfersIfFinishedUseCase() }
             .onFailure { Timber.e(it) }
         runCatching {
             sendChatAttachmentsUseCase(
@@ -685,7 +685,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         destinationId: NodeId,
         transferTriggerEvent: TransferTriggerEvent.StartUpload,
     ) {
-        runCatching { clearActiveTransfersIfFinishedUseCase(TransferType.GENERAL_UPLOAD) }
+        runCatching { clearActiveTransfersIfFinishedUseCase() }
             .onFailure { Timber.e(it) }
 
         if (pathsAndNames.isEmpty()) {

@@ -3,14 +3,11 @@ package mega.privacy.android.domain.usecase.transfers.active
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
-import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.repository.TransferRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -48,55 +45,46 @@ internal class ClearActiveTransfersIfFinishedUseCaseTest {
         mockedActiveTransfers.forEachIndexed { index, activeTransfer ->
             whenever(activeTransfer.isFinished).thenReturn(allFinished || index != 0)
         }
-        whenever(transferRepository.getCurrentActiveTransfersByType(any())).thenReturn(
+        whenever(transferRepository.getCurrentActiveTransfers()).thenReturn(
             mockedActiveTransfers
         )
     }
 
     private fun stubEmptyActiveTransfers() = runTest {
-        whenever(transferRepository.getCurrentActiveTransfersByType(any())).thenReturn(
+        whenever(transferRepository.getCurrentActiveTransfers()).thenReturn(
             emptyList()
         )
     }
 
-    @ParameterizedTest
-    @EnumSource(TransferType::class)
-    fun `test that correctActiveTransfersUseCase is invoked when this is invoked`(
-        transferType: TransferType,
-    ) = runTest {
+    @Test
+    fun `test that correctActiveTransfersUseCase is invoked when this is invoked`() = runTest {
         stubEmptyActiveTransfers()
-        underTest(transferType)
-        verify(correctActiveTransfersUseCase).invoke(transferType)
+        underTest()
+        verify(correctActiveTransfersUseCase).invoke(null)
     }
 
-    @ParameterizedTest
-    @EnumSource(TransferType::class)
-    fun `test that transferRepository deleteAllActiveTransfersByType is invoked if all transfers are finished`(
-        transferType: TransferType,
-    ) = runTest {
-        stubActiveTransfers(true)
+    @Test
+    fun `test that transferRepository deleteAllActiveTransfers is invoked if all transfers are finished`() =
+        runTest {
+            stubActiveTransfers(true)
 
-        underTest(transferType)
-        verify(transferRepository).deleteAllActiveTransfersByType(transferType)
-    }
+            underTest()
+            verify(transferRepository).deleteAllActiveTransfers()
+        }
 
-    @ParameterizedTest
-    @EnumSource(TransferType::class)
-    fun `test that transferRepository deleteAllActiveTransfersByType is not invoked if not all transfers are finished`(
-        transferType: TransferType,
-    ) = runTest {
-        stubActiveTransfers(false)
-        underTest(transferType)
-        verify(transferRepository, never()).deleteAllActiveTransfersByType(transferType)
-    }
+    @Test
+    fun `test that transferRepository deleteAllActiveTransfers is not invoked if not all transfers are finished`() =
+        runTest {
+            stubActiveTransfers(false)
+            underTest()
+            verify(transferRepository, never()).deleteAllActiveTransfers()
+        }
 
-    @ParameterizedTest
-    @EnumSource(TransferType::class)
-    fun `test that transferRepository deleteAllActiveTransfersByType is not invoked if active transfers are empty`(
-        transferType: TransferType,
-    ) = runTest {
-        stubEmptyActiveTransfers()
-        underTest(transferType)
-        verify(transferRepository, never()).deleteAllActiveTransfersByType(transferType)
-    }
+    @Test
+    fun `test that transferRepository deleteAllActiveTransfers is not invoked if active transfers are empty`() =
+        runTest {
+            stubEmptyActiveTransfers()
+            underTest()
+            verify(transferRepository, never()).deleteAllActiveTransfers()
+        }
 }

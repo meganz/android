@@ -17,10 +17,14 @@ class CorrectActiveTransfersUseCase @Inject constructor(
 ) {
     /**
      * Invoke.
-     * @param transferType the transfer type we want to check
+     * @param transferType the transfer type we want to check, or null if we want to check all of them
      */
-    suspend operator fun invoke(transferType: TransferType) {
-        val activeTransfers = transferRepository.getCurrentActiveTransfersByType(transferType)
+    suspend operator fun invoke(transferType: TransferType?) {
+        val activeTransfers = if (transferType == null) {
+            transferRepository.getCurrentActiveTransfers()
+        } else {
+            transferRepository.getCurrentActiveTransfersByType(transferType)
+        }
         val inProgressTransfers = getInProgressTransfersUseCase()
 
         //update transferred bytes for each transfer

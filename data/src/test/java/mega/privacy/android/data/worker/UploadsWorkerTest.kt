@@ -322,7 +322,7 @@ class UploadsWorkerTest {
             val transferTotal = mockActiveTransferTotals(true)
             commonStub(transferTotals = listOf(transferTotal))
             underTest.doWork()
-            verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.GENERAL_UPLOAD)
+            verify(clearActiveTransfersIfFinishedUseCase).invoke()
         }
 
     @Test

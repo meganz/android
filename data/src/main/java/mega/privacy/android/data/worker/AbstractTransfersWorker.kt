@@ -232,7 +232,7 @@ abstract class AbstractTransfersWorker(
 
     private suspend fun stopWork(performWorkJob: Job) {
         notificationManager.cancel(updateNotificationId)
-        clearActiveTransfersIfFinishedUseCase(type)
+        clearActiveTransfersIfFinishedUseCase()
         performWorkJob.cancel()
     }
 

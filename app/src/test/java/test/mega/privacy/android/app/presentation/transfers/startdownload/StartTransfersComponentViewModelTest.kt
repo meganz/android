@@ -213,7 +213,7 @@ class StartTransfersComponentViewModelTest {
     ) = runTest {
         commonStub()
         underTest.startTransfer(startEvent)
-        verify(clearActiveTransfersIfFinishedUseCase).invoke(startEvent.type)
+        verify(clearActiveTransfersIfFinishedUseCase).invoke()
     }
 
     @ParameterizedTest
