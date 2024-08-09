@@ -576,10 +576,11 @@
     <string name="settings_sync_debris_cleared_message">.Debris資料夾已成功清除</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="other">找到%1$s個和%2$d檔案。</item>
+        <item quantity="one">Found %1$s and %2$d file.</item>
+        <item quantity="other">Found %1$s and %2$d files.</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">No tags</string>
+    <string name="file_info_information_no_tags_label">沒有標籤</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">正在取消傳輸⋯</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
