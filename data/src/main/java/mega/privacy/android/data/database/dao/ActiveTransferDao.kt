@@ -21,6 +21,9 @@ internal interface ActiveTransferDao {
     @Query("SELECT * FROM active_transfers WHERE transfer_type = :transferType")
     suspend fun getCurrentActiveTransfersByType(transferType: TransferType): List<ActiveTransferEntity>
 
+    @Query("SELECT * FROM active_transfers ")
+    suspend fun getCurrentActiveTransfers(): List<ActiveTransferEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateActiveTransfer(entity: ActiveTransferEntity)
 
@@ -42,6 +45,9 @@ internal interface ActiveTransferDao {
 
     @Query("DELETE FROM active_transfers WHERE transfer_type = :transferType")
     suspend fun deleteAllActiveTransfersByType(transferType: TransferType)
+
+    @Query("DELETE FROM active_transfers")
+    suspend fun deleteAllActiveTransfers()
 
     @Query("UPDATE active_transfers SET is_finished = 1 WHERE tag IN (:tags)")
     suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>)

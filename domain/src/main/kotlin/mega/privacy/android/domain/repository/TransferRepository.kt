@@ -353,9 +353,15 @@ interface TransferRepository {
 
     /**
      * Get current active transfers by type
-     * @return all active transfers list
+     * @return A list of all active transfers of this type
      */
     suspend fun getCurrentActiveTransfersByType(transferType: TransferType): List<ActiveTransfer>
+
+    /**
+     * Get current active transfers
+     * @return all active transfers list
+     */
+    suspend fun getCurrentActiveTransfers(): List<ActiveTransfer>
 
     /**
      * Insert a new active transfer or replace it if there's already an active transfer with the same tag
@@ -373,9 +379,14 @@ interface TransferRepository {
     suspend fun updateTransferredBytes(transfer: Transfer)
 
     /**
-     * Delete all active transfer
+     * Delete all active transfer of this type
      */
     suspend fun deleteAllActiveTransfersByType(transferType: TransferType)
+
+    /**
+     * Delete all active transfer
+     */
+    suspend fun deleteAllActiveTransfers()
 
     /**
      * Set an active transfer as finished by its tag

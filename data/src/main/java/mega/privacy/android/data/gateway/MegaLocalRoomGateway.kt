@@ -187,9 +187,15 @@ interface MegaLocalRoomGateway {
 
     /**
      * Get active transfers by type
-     * @return all active transfers list
+     * @return A list of all active transfers of this type
      */
     suspend fun getCurrentActiveTransfersByType(transferType: TransferType): List<ActiveTransfer>
+
+    /**
+     * Get all active transfers
+     * @return A list of all active transfers
+     */
+    suspend fun getCurrentActiveTransfers(): List<ActiveTransfer>
 
     /**
      * Insert a new active transfer or replace it if there's already an active transfer with the same tag
@@ -205,6 +211,11 @@ interface MegaLocalRoomGateway {
      * Delete all active transfer by type
      */
     suspend fun deleteAllActiveTransfersByType(transferType: TransferType)
+
+    /**
+     * Delete all active transfer by type
+     */
+    suspend fun deleteAllActiveTransfers()
 
     /**
      * Delete an active transfer by its tag

@@ -543,6 +543,11 @@ internal class DefaultTransfersRepository @Inject constructor(
             megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType)
         }
 
+    override suspend fun getCurrentActiveTransfers(): List<ActiveTransfer> =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.getCurrentActiveTransfers()
+        }
+
     override suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer) =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.insertOrUpdateActiveTransfer(activeTransfer)
@@ -564,6 +569,14 @@ internal class DefaultTransfersRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaLocalRoomGateway.deleteAllActiveTransfersByType(transferType)
             transferredBytesFlow(transferType).value = mapOf()
+        }
+
+    override suspend fun deleteAllActiveTransfers() =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.deleteAllActiveTransfers()
+            TransferType.entries.forEach {
+                transferredBytesFlow(it).value = mapOf()
+            }
         }
 
     override suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>) =

@@ -219,6 +219,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun getCurrentActiveTransfersByType(transferType: TransferType) =
         activeTransferDao.getCurrentActiveTransfersByType(transferType).map { it }
 
+    override suspend fun getCurrentActiveTransfers(): List<ActiveTransfer> =
+        activeTransferDao.getCurrentActiveTransfers()
+
     override suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer) =
         activeTransferDao.insertOrUpdateActiveTransfer(activeTransferEntityMapper(activeTransfer))
 
@@ -232,6 +235,8 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun deleteAllActiveTransfersByType(transferType: TransferType) =
         activeTransferDao.deleteAllActiveTransfersByType(transferType)
+
+    override suspend fun deleteAllActiveTransfers() = activeTransferDao.deleteAllActiveTransfers()
 
     override suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>) =
         activeTransferDao.setActiveTransferAsFinishedByTag(tags)

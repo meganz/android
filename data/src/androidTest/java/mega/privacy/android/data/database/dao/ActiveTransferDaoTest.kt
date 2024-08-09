@@ -103,7 +103,14 @@ class ActiveTransferDaoTest {
     }
 
     @Test
-    fun test_deleteAllActiveTransfersByType_deletes_all_transfers_of_that_type() = runTest {
+    fun test_that_getCurrentActiveTransfers_returns_all_transfers() = runTest {
+        val expected = entities
+        val actual = activeTransferDao.getCurrentActiveTransfers()
+        assertThat(actual).containsExactlyElementsIn(expected)
+    }
+
+    @Test
+    fun test_that_deleteAllActiveTransfersByType_deletes_all_transfers_of_that_type() = runTest {
         TransferType.entries.forEach { type ->
             val initial = activeTransferDao.getCurrentActiveTransfersByType(type)
             assertThat(initial).isNotEmpty()
@@ -114,17 +121,27 @@ class ActiveTransferDaoTest {
     }
 
     @Test
-    fun test_deleteActiveTransferByTag_deletes_all_transfers_with_given_tags() = runTest {
-        TransferType.entries.forEach { type ->
-            val initial = activeTransferDao.getCurrentActiveTransfersByType(type)
-            val toFinish = initial.take(initial.size / 2).filter { !it.isFinished }
-            assertThat(initial).isNotEmpty()
-            assertThat(toFinish).isNotEmpty()
-            activeTransferDao.setActiveTransferAsFinishedByTag(toFinish.map { it.tag })
-            val actual = activeTransferDao.getCurrentActiveTransfersByType(type)
-            toFinish.forEach { finished ->
-                assertThat(actual.first { it.tag == finished.tag }.isFinished).isTrue()
+    fun test_that_deleteAllActiveTransfers_deletes_all_transfers() = runTest {
+        val initial = activeTransferDao.getCurrentActiveTransfers()
+        assertThat(initial).isNotEmpty()
+        activeTransferDao.deleteAllActiveTransfers()
+        val actual = activeTransferDao.getCurrentActiveTransfers()
+        assertThat(actual).isEmpty()
+    }
+
+    @Test
+    fun test_that_setActiveTransferAsFinishedByTag_set_as_finished_all_transfers_with_given_tags() =
+        runTest {
+            TransferType.entries.forEach { type ->
+                val initial = activeTransferDao.getCurrentActiveTransfersByType(type)
+                val toFinish = initial.take(initial.size / 2).filter { !it.isFinished }
+                assertThat(initial).isNotEmpty()
+                assertThat(toFinish).isNotEmpty()
+                activeTransferDao.setActiveTransferAsFinishedByTag(toFinish.map { it.tag })
+                val actual = activeTransferDao.getCurrentActiveTransfersByType(type)
+                toFinish.forEach { finished ->
+                    assertThat(actual.first { it.tag == finished.tag }.isFinished).isTrue()
+                }
             }
         }
-    }
 }
