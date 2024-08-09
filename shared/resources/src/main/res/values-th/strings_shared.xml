@@ -577,7 +577,7 @@
     <string name="settings_sync_debris_cleared_message">ลบโฟลเดอร์ .debris เรียบร้อยแล้ว</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="one">Found %1$s folder and %2$d file.</item>
+        <item quantity="one">Found %1$s and %2$d file.</item>
         <item quantity="other">Found %1$s and %2$d files.</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->

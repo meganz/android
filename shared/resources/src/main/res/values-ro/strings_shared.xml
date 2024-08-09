@@ -598,9 +598,8 @@
     <string name="settings_sync_debris_cleared_message">Folderul .debris a fost șters</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="one">Au fost găsite %1$s și %2$d&#160;fișier.</item>
-        <item quantity="few">Au fost găsite %1$s și %2$d&#160;fișiere.</item>
-        <item quantity="other">Au fost găsite %1$s și %2$d de fișiere.</item>
+        <item quantity="one">Found %1$s and %2$d file.</item>
+        <item quantity="other">Found %1$s and %2$d files.</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->
     <string name="file_info_information_no_tags_label">Nicio etichetă</string>
