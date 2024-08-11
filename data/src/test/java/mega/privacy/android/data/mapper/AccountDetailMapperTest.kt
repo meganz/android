@@ -1,24 +1,27 @@
 package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.mapper.AccountDetailMapper.Companion.HAS_PRO_DETAILS
 import mega.privacy.android.data.mapper.AccountDetailMapper.Companion.HAS_SESSIONS_DETAILS
+import mega.privacy.android.data.mapper.account.AccountPlanDetailMapper
+import mega.privacy.android.data.mapper.account.AccountSubscriptionDetailListMapper
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.AccountSessionDetail
 import nz.mega.sdk.MegaAccountDetails
+import nz.mega.sdk.MegaAccountPlan
 import nz.mega.sdk.MegaAccountSession
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaStringList
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class AccountDetailMapperTest {
     private val accountStorageDetailMapper: AccountStorageDetailMapper = mock()
@@ -29,6 +32,8 @@ internal class AccountDetailMapperTest {
     private val subscriptionStatusMapper: SubscriptionStatusMapper = mock()
     private val accountSubscriptionCycleMapper: AccountSubscriptionCycleMapper = mock()
     private val megaAccountSession: MegaAccountSession = mock()
+    private val accountSubscriptionDetailListMapper: AccountSubscriptionDetailListMapper = mock()
+    private val accountPlanDetailMapper: AccountPlanDetailMapper = mock()
 
     private val underTest: AccountDetailMapper = AccountDetailMapper(
         accountStorageDetailMapper,
@@ -38,6 +43,8 @@ internal class AccountDetailMapperTest {
         accountTypeMapper,
         subscriptionStatusMapper,
         accountSubscriptionCycleMapper,
+        accountPlanDetailMapper,
+        accountSubscriptionDetailListMapper
     )
 
     private val expectedUsedStorage: Long = 1003L
@@ -50,6 +57,25 @@ internal class AccountDetailMapperTest {
     private val expectedProExpirationTime: Long = 378672463728467L
     private val expectedSubscriptionRenewCycle = "1 Y"
     private val expectedAccountSubscriptionCycle = AccountSubscriptionCycle.YEARLY
+    private val expectedSubscriptionId = "test123"
+    private val expectedAccountPlanLevel = 1L
+    private val expectedAccountLevel = MegaAccountDetails.ACCOUNT_TYPE_PROI
+    private val subscriptionStatusSdk = MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
+
+    private val megaStringList = mock<MegaStringList> {
+        on { size() } doReturn 2
+        on { get(0) } doReturn "vpn"
+        on { get(1) } doReturn "pwm"
+    }
+
+    private val megaAccountPlan = mock<MegaAccountPlan> {
+        on { this.accountLevel }.thenReturn(expectedAccountPlanLevel)
+        on { this.isProPlan }.thenReturn(true)
+        on { this.expirationTime }.thenReturn(expectedProExpirationTime)
+        on { this.id }.thenReturn(expectedSubscriptionId)
+        on { this.features }.thenReturn(megaStringList)
+        on { this.isTrial }.thenReturn(false)
+    }
 
     private val megaAccountDetails = mock<MegaAccountDetails> {
         on { this.storageUsed }.thenReturn(expectedUsedStorage)
@@ -59,9 +85,11 @@ internal class AccountDetailMapperTest {
         on { this.subscriptionRenewTime }.thenReturn(expectedSubscriptionRenewTime)
         on { this.subscriptionCycle }.thenReturn(expectedSubscriptionRenewCycle)
         on { this.proExpiration }.thenReturn(expectedProExpirationTime)
-        on { this.proLevel }.thenReturn(MegaAccountDetails.ACCOUNT_TYPE_FREE)
-        on { this.subscriptionStatus }.thenReturn(MegaAccountDetails.SUBSCRIPTION_STATUS_NONE)
+        on { this.proLevel }.thenReturn(expectedAccountLevel)
+        on { this.subscriptionStatus }.thenReturn(subscriptionStatusSdk)
         on { this.getSession(0) }.thenReturn(megaAccountSession)
+        on { this.numPlans }.thenReturn(1)
+        on { this.getPlan(0) }.thenReturn(megaAccountPlan)
     }
 
     @Test
@@ -71,11 +99,20 @@ internal class AccountDetailMapperTest {
             val rubbishNode = mock<MegaNode>()
             val inShareNodes = listOf(mock<MegaNode>())
             val numDetails = HAS_PRO_DETAILS
-            whenever(accountTypeMapper(MegaAccountDetails.ACCOUNT_TYPE_FREE)).thenReturn(
+            whenever(accountTypeMapper(expectedAccountLevel)).thenReturn(
                 expectedAccountType
             )
-            whenever(subscriptionStatusMapper(MegaAccountDetails.SUBSCRIPTION_STATUS_NONE)).thenReturn(
+            whenever(subscriptionStatusMapper(subscriptionStatusSdk)).thenReturn(
                 expectedSubscriptionStatus
+            )
+            whenever(accountSubscriptionCycleMapper(expectedSubscriptionRenewCycle)).thenReturn(
+                expectedAccountSubscriptionCycle
+            )
+            whenever(accountPlanDetailMapper.invoke(megaAccountPlan)).thenReturn(
+                null
+            )
+            whenever(accountSubscriptionDetailListMapper(megaAccountDetails)).thenReturn(
+                listOf()
             )
             whenever(
                 accountLevelDetailMapper.invoke(
@@ -83,7 +120,9 @@ internal class AccountDetailMapperTest {
                     expectedProExpirationTime,
                     expectedAccountType,
                     expectedSubscriptionStatus,
-                    accountSubscriptionCycleMapper(expectedSubscriptionRenewCycle)
+                    accountSubscriptionCycleMapper(expectedSubscriptionRenewCycle),
+                    accountPlanDetailMapper(megaAccountPlan),
+                    accountSubscriptionDetailListMapper(megaAccountDetails),
                 ),
             ).thenReturn(
                 AccountLevelDetail(
@@ -91,7 +130,9 @@ internal class AccountDetailMapperTest {
                     subscriptionStatus = expectedSubscriptionStatus,
                     subscriptionRenewTime = expectedSubscriptionRenewTime,
                     proExpirationTime = expectedProExpirationTime,
-                    accountSubscriptionCycle = expectedAccountSubscriptionCycle
+                    accountSubscriptionCycle = expectedAccountSubscriptionCycle,
+                    accountPlanDetail = null,
+                    accountSubscriptionDetailList = listOf(),
                 )
             )
             val actual = underTest(
@@ -111,6 +152,8 @@ internal class AccountDetailMapperTest {
                 .isEqualTo(expectedSubscriptionStatus)
             assertThat(actual.levelDetail?.accountSubscriptionCycle)
                 .isEqualTo(expectedAccountSubscriptionCycle)
+            assertThat(actual.levelDetail?.accountPlanDetail).isNull()
+            assertThat(actual.levelDetail?.accountSubscriptionDetailList).isEmpty()
             assertThat(actual.sessionDetail).isNull()
             assertThat(actual.transferDetail).isNull()
             assertThat(actual.storageDetail).isNull()

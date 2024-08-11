@@ -429,6 +429,8 @@ class RubbishBinViewModelTest {
                 subscriptionRenewTime = 0,
                 accountSubscriptionCycle = AccountSubscriptionCycle.YEARLY,
                 proExpirationTime = 0L,
+                accountPlanDetail = null,
+                accountSubscriptionDetailList = listOf(),
             )
         )
         accountDetailFakeFlow.emit(newAccountDetail)

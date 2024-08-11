@@ -160,6 +160,8 @@ class AlbumCoverSelectionViewModelTest {
                                 subscriptionRenewTime = 0L,
                                 accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
                                 proExpirationTime = 0L,
+                                accountPlanDetail = null,
+                                accountSubscriptionDetailList = listOf(),
                             )
                         )
                     )

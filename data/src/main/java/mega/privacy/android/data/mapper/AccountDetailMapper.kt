@@ -1,7 +1,10 @@
 package mega.privacy.android.data.mapper
 
+import mega.privacy.android.data.mapper.account.AccountPlanDetailMapper
+import mega.privacy.android.data.mapper.account.AccountSubscriptionDetailListMapper
 import mega.privacy.android.domain.entity.account.AccountDetail
 import nz.mega.sdk.MegaAccountDetails
+import nz.mega.sdk.MegaAccountPlan
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -16,6 +19,8 @@ internal class AccountDetailMapper @Inject constructor(
     private val accountTypeMapper: AccountTypeMapper,
     private val subscriptionStatusMapper: SubscriptionStatusMapper,
     private val accountSubscriptionCycleMapper: AccountSubscriptionCycleMapper,
+    private val accountPlanDetailMapper: AccountPlanDetailMapper,
+    private val accountSubscriptionDetailListMapper: AccountSubscriptionDetailListMapper,
 ) {
     operator fun invoke(
         details: MegaAccountDetails,
@@ -32,12 +37,23 @@ internal class AccountDetailMapper @Inject constructor(
         transferDetail = details.takeIf { numDetails and HAS_TRANSFER_DETAILS != 0 }
             ?.let { accountTransferDetailMapper(it.transferMax, it.transferUsed) },
         levelDetail = details.takeIf { numDetails and HAS_PRO_DETAILS != 0 }?.let {
+            val megaAccountPlanList = mutableListOf<MegaAccountPlan>()
+            for (i in 0 until details.numPlans) {
+                megaAccountPlanList.add(details.getPlan(i))
+            }
+            val megaAccountProPlan = megaAccountPlanList.first { plan -> plan.isProPlan }
             accountLevelDetailMapper(
-                it.subscriptionRenewTime,
-                it.proExpiration,
-                accountTypeMapper(it.proLevel),
-                subscriptionStatusMapper(it.subscriptionStatus),
-                accountSubscriptionCycleMapper(it.subscriptionCycle)
+                subscriptionRenewTime = it.subscriptionRenewTime,
+                proExpirationTime = it.proExpiration,
+                accountType = if (details.numPlans > 0 && megaAccountProPlan.isProPlan) {
+                    accountTypeMapper(megaAccountProPlan.accountLevel.toInt())
+                } else accountTypeMapper(it.proLevel),
+                subscriptionStatus = subscriptionStatusMapper(it.subscriptionStatus),
+                subscriptionRenewCycleType = accountSubscriptionCycleMapper(it.subscriptionCycle),
+                planDetail = if (details.numPlans > 0) {
+                    accountPlanDetailMapper(megaAccountProPlan)
+                } else null,
+                subscriptionListDetail = accountSubscriptionDetailListMapper(details),
             )
         },
         storageDetail = details.takeIf { numDetails and HAS_STORAGE_DETAILS != 0 }?.let {

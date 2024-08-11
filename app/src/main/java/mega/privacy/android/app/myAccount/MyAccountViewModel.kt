@@ -287,6 +287,8 @@ class MyAccountViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             subscriptionDetails = accountDetail.levelDetail,
+                            accountType = accountDetail.levelDetail?.accountType
+                                ?: AccountType.FREE,
                         )
                     }
                 }
@@ -498,13 +500,7 @@ class MyAccountViewModel @Inject constructor(
      *
      * @return
      */
-    fun getAccountType(): AccountType = when (myAccountInfo.accountType) {
-        Constants.PRO_LITE -> AccountType.PRO_LITE
-        Constants.PRO_I -> AccountType.PRO_I
-        Constants.PRO_II -> AccountType.PRO_II
-        Constants.PRO_III -> AccountType.PRO_III
-        else -> AccountType.UNKNOWN
-    }
+    fun getAccountType(): AccountType = state.value.accountType
 
     /**
      * Is free account

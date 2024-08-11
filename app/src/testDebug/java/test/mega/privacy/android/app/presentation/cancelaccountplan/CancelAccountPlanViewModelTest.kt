@@ -123,6 +123,8 @@ internal class CancelAccountPlanViewModelTest {
             subscriptionRenewTime = 0L,
             accountSubscriptionCycle = AccountSubscriptionCycle.MONTHLY,
             proExpirationTime = 378672463728467L,
+            accountPlanDetail = null,
+            accountSubscriptionDetailList = listOf(),
         )
     )
     private val expectedAccountDetailWithYearlySubscription = AccountDetail(
@@ -135,6 +137,8 @@ internal class CancelAccountPlanViewModelTest {
             subscriptionRenewTime = 0L,
             accountSubscriptionCycle = AccountSubscriptionCycle.YEARLY,
             proExpirationTime = 0L,
+            accountPlanDetail = null,
+            accountSubscriptionDetailList = listOf(),
         )
     )
 }

@@ -72,6 +72,8 @@ internal class SelectSubtitleFileViewModelTest {
                 subscriptionRenewTime = 0L,
                 accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
                 proExpirationTime = 0L,
+                accountPlanDetail = null,
+                accountSubscriptionDetailList = listOf(),
             )
         )
         accountDetailFakeFlow.emit(accountDetail)
@@ -90,6 +92,8 @@ internal class SelectSubtitleFileViewModelTest {
                 subscriptionRenewTime = 0L,
                 accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
                 proExpirationTime = 0L,
+                accountPlanDetail = null,
+                accountSubscriptionDetailList = listOf(),
             )
         )
         accountDetailFakeFlow.emit(accountDetail)

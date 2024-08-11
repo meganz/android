@@ -421,6 +421,8 @@ class SearchActivityViewModelTest {
                 subscriptionRenewTime = 0L,
                 accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
                 proExpirationTime = 0L,
+                accountPlanDetail = null,
+                accountSubscriptionDetailList = listOf(),
             )
         )
         accountDetailFakeFlow.emit(accountDetail)
@@ -469,6 +471,8 @@ class SearchActivityViewModelTest {
                 subscriptionRenewTime = 0L,
                 accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
                 proExpirationTime = 0L,
+                accountPlanDetail = null,
+                accountSubscriptionDetailList = listOf(),
             )
         )
         accountDetailFakeFlow.emit(accountDetail)

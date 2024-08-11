@@ -347,6 +347,8 @@ class UpgradeAccountViewModelTest {
             subscriptionRenewTime = 1873874783274L,
             accountSubscriptionCycle = AccountSubscriptionCycle.MONTHLY,
             proExpirationTime = 378672463728467L,
+            accountPlanDetail = null,
+            accountSubscriptionDetailList = listOf(),
         )
     )
     private val expectedAccountDetailWithYearlySubscription = AccountDetail(
@@ -359,6 +361,8 @@ class UpgradeAccountViewModelTest {
             subscriptionRenewTime = 1873874783274L,
             accountSubscriptionCycle = AccountSubscriptionCycle.YEARLY,
             proExpirationTime = 378672463728467L,
+            accountPlanDetail = null,
+            accountSubscriptionDetailList = listOf(),
         )
     )
 

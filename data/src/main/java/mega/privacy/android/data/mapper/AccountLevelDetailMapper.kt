@@ -4,6 +4,8 @@ import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.account.AccountPlanDetail
+import mega.privacy.android.domain.entity.account.AccountSubscriptionDetail
 import javax.inject.Inject
 
 /**
@@ -18,6 +20,10 @@ internal class AccountLevelDetailMapper @Inject constructor() {
      * @param  accountType
      * @param  subscriptionStatus
      * @param  subscriptionRenewCycleType
+     * @param  planDetail
+     * @param  subscriptionListDetail
+     *
+     * @return [AccountLevelDetail]
      */
     operator fun invoke(
         subscriptionRenewTime: Long,
@@ -25,11 +31,15 @@ internal class AccountLevelDetailMapper @Inject constructor() {
         accountType: AccountType?,
         subscriptionStatus: SubscriptionStatus?,
         subscriptionRenewCycleType: AccountSubscriptionCycle,
+        planDetail: AccountPlanDetail?,
+        subscriptionListDetail: List<AccountSubscriptionDetail>,
     ) = AccountLevelDetail(
         subscriptionStatus = subscriptionStatus,
         accountType = accountType,
         proExpirationTime = proExpirationTime,
         subscriptionRenewTime = subscriptionRenewTime,
-        accountSubscriptionCycle = subscriptionRenewCycleType
+        accountSubscriptionCycle = subscriptionRenewCycleType,
+        accountPlanDetail = planDetail,
+        accountSubscriptionDetailList = subscriptionListDetail,
     )
 }
