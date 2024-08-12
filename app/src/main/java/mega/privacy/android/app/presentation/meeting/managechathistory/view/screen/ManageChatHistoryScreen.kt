@@ -18,8 +18,8 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -102,12 +102,8 @@ internal fun ManageChatHistoryRoute(
             uiState = uiState,
             onNavigateUp = onNavigateUp,
             onConfirmClearChatClick = viewModel::clearChatHistory,
-            onSetChatRetentionTime = viewModel::setChatRetentionTime
-        )
-
-        SnackbarHost(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            hostState = snackBarHostState
+            onSetChatRetentionTime = viewModel::setChatRetentionTime,
+            snackbarHostState = snackBarHostState
         )
     }
 }
@@ -119,6 +115,7 @@ internal fun ManageChatHistoryScreen(
     onConfirmClearChatClick: (chatRoomId: Long) -> Unit,
     onSetChatRetentionTime: (period: Long) -> Unit,
     modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     var shouldShowCustomTimePicker by rememberSaveable { mutableStateOf(false) }
     var shouldShowClearChatConfirmation by rememberSaveable { mutableStateOf(false) }
@@ -127,6 +124,7 @@ internal fun ManageChatHistoryScreen(
 
     Scaffold(
         modifier = modifier,
+        scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState),
         topBar = {
             MegaAppBar(
                 appBarType = AppBarType.BACK_NAVIGATION,
