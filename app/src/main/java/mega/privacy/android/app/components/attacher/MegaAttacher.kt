@@ -15,7 +15,6 @@ import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.listeners.AttachNodesListener
 import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerActivity
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants.EXTRA_KEY
@@ -59,51 +58,6 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
      * Record if an attach is ongoing.
      */
     private var attaching = false
-
-    /**
-     * Attach a node to chats.
-     *
-     * @param node node to attach
-     */
-    fun attachNode(node: MegaNode) {
-        attachNodes(listOf(node))
-    }
-
-    /**
-     * Attach nodes to chats.
-     *
-     * @param nodes nodes to attach
-     */
-    fun attachNodes(nodes: List<MegaNode>) {
-        if (attaching) {
-            return
-        }
-
-        if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
-            AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
-            return
-        }
-
-        val ownerNodes = ArrayList<MegaNode>()
-        val notOwnerNodes = ArrayList<MegaNode>()
-        NodeController(app).checkIfNodesAreMine(nodes, ownerNodes, notOwnerNodes)
-
-        attaching = true
-
-        if (notOwnerNodes.isEmpty()) {
-            selectChatsToAttach(ownerNodes)
-            return
-        }
-
-        AttachmentsCopier(megaApi = megaApi, nodes = nodes, context = app) { successNodes, _ ->
-            val nodesToAttach = ownerNodes + successNodes
-            if (nodesToAttach.isNotEmpty()) {
-                selectChatsToAttach(nodesToAttach)
-            } else {
-                attaching = false
-            }
-        }
-    }
 
     /**
      * Save instance state, should be called from onSaveInstanceState of the owning
@@ -316,24 +270,6 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
                 )
             }
         }
-    }
-
-    /**
-     * Select chats to attach nodes.
-     *
-     * @param nodes nodes to attach
-     */
-    private fun selectChatsToAttach(nodes: List<MegaNode>) {
-        val handles = LongArray(nodes.size)
-
-        for (i in nodes.indices) {
-            handles[i] = nodes[i].handle
-        }
-
-        val intent = Intent(app, ChatExplorerActivity::class.java)
-        intent.putExtra(NODE_HANDLES, handles)
-
-        activityLauncher.launchActivityForResult(intent, REQUEST_CODE_SELECT_CHAT)
     }
 
     /**

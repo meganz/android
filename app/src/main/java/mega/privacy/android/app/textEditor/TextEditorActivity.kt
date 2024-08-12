@@ -40,7 +40,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
-import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -48,9 +47,12 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
+import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
+import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.usecase.exception.MegaException
@@ -125,6 +127,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
     private val viewModel by viewModels<TextEditorViewModel>()
+    private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>()
     private lateinit var binding: ActivityTextFileEditorBinding
     private var menu: Menu? = null
     private var discardChangesDialog: AlertDialog? = null
@@ -139,7 +142,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     private var originalNameTextSize: Float = 0f
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private val toolbarElevationColor by lazy { getColorForElevation(this, elevation) }
-    private val nodeAttacher by lazy { MegaAttacher(this) }
     private val transparentColor by lazy {
         ContextCompat.getColor(this, android.R.color.transparent)
     }
@@ -208,10 +210,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         setUpObservers()
         setUpView(savedInstanceState)
         addStartTransferView()
+        addNodeAttachmentView()
 
         if (savedInstanceState != null) {
-            nodeAttacher.restoreState(savedInstanceState)
-
             if (savedInstanceState.getBoolean(DISCARD_CHANGES_SHOWN, false)) {
                 showDiscardChangesConfirmationDialog()
             }
@@ -230,8 +231,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         outState.putInt(CURSOR_POSITION, binding.contentEditText.selectionStart)
         outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
         outState.putBoolean(RENAME_SHOWN, isRenameDialogShown())
-
-        nodeAttacher.saveState(outState)
 
         super.onSaveInstanceState(outState)
     }
@@ -300,7 +299,10 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             }
 
             R.id.action_get_link, R.id.action_remove_link -> viewModel.manageLink(this)
-            R.id.action_send_to_chat -> nodeAttacher.attachNode(viewModel.getNode()!!)
+            R.id.action_send_to_chat -> viewModel.getNode()?.let { node ->
+                nodeAttachmentViewModel.startAttachNodes(listOf(NodeId(node.handle)))
+            }
+
             R.id.action_share -> {
                 viewModel.share(this, intent.getStringExtra(URL_FILE_LINK) ?: "")
             }
@@ -352,10 +354,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     @Suppress("deprecation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
-
-        if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
-            return
-        }
 
         when (requestCode) {
             REQUEST_CODE_SELECT_IMPORT_FOLDER -> {
@@ -672,6 +670,17 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 viewModel::consumeTransferEvent
             ) {
                 finish()
+            }
+        )
+    }
+
+    private fun addNodeAttachmentView() {
+        binding.root.addView(
+            createNodeAttachmentView(
+                this,
+                nodeAttachmentViewModel,
+            ) { message, chatId ->
+                showSnackbarWithChat(message, chatId)
             }
         )
     }
