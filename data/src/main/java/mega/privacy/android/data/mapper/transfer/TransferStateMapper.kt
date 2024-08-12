@@ -7,7 +7,7 @@ import javax.inject.Inject
 /**
  * [TransferState] mapper from SDK int values
  */
-internal class TransferStateMapper @Inject constructor() {
+class TransferStateMapper @Inject constructor() {
 
     /**
      * Invoke

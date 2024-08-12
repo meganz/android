@@ -8,7 +8,7 @@ import javax.inject.Inject
 /**
  * [TransferType] mapper
  */
-internal class TransferTypeMapper @Inject constructor() {
+class TransferTypeMapper @Inject constructor() {
 
     /**
      * Invoke

@@ -14,7 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
 import mega.privacy.android.app.presentation.extensions.transfers.getProgressString
 import mega.privacy.android.app.presentation.extensions.transfers.getSpeedString
-import mega.privacy.android.app.presentation.transfers.model.image.TransferImageViewModel
+import mega.privacy.android.app.presentation.transfers.model.image.InProgressTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_IN_PROGRESS_TAB
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -53,13 +53,13 @@ internal fun InProgressTransferItem(
     isOverQuota: Boolean,
     areTransfersPaused: Boolean,
     onPlayPauseClicked: (Int) -> Unit,
-    viewModel: TransferImageViewModel = hiltViewModel(),
+    viewModel: InProgressTransferImageViewModel = hiltViewModel(),
 ) = with(inProgressTransfer) {
     val context = LocalContext.current
     val uiState by viewModel.getUiStateFlow(tag).collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = tag) {
-        viewModel.addInProgressTransfer(inProgressTransfer)
+        viewModel.addTransfer(inProgressTransfer)
     }
 
     InProgressTransferItem(

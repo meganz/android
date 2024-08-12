@@ -4,16 +4,13 @@ import androidx.core.net.toUri
 import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.presentation.transfers.model.image.InProgressTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
-import mega.privacy.android.app.presentation.transfers.model.image.TransferImageViewModel
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
@@ -21,11 +18,10 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.icon.pack.R
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -35,11 +31,9 @@ import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TransferImageViewModelTest {
+class InProgressTransferImageViewModelTest {
 
-    private lateinit var underTest: TransferImageViewModel
-
-    private val testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
+    private lateinit var underTest: InProgressTransferImageViewModel
 
     private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
@@ -51,24 +45,13 @@ class TransferImageViewModelTest {
     private val nodeHandle = 1L
     private val fileTypeResId = R.drawable.ic_text_medium_solid
 
-    @BeforeAll
-    fun setup() {
-        Dispatchers.setMain(testDispatcher)
-        initTestClass()
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
     @BeforeEach
     fun resetMocks() {
         reset(getThumbnailUseCase, fileTypeIconMapper)
     }
 
     private fun initTestClass() {
-        underTest = TransferImageViewModel(
+        underTest = InProgressTransferImageViewModel(
             getThumbnailUseCase = getThumbnailUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
         )
@@ -83,11 +66,11 @@ class TransferImageViewModelTest {
         }
 
     @Test
-    fun `test that addInProgressTransfer invokes FileTypeIconMapper and GetThumbnailUseCase when ads a new in progress download`() =
+    fun `test that addTransfer invokes FileTypeIconMapper and GetThumbnailUseCase when ads a new in progress download`() =
         runTest {
             initTestClass()
 
-            underTest.addInProgressTransfer(
+            underTest.addTransfer(
                 InProgressTransfer.Download(
                     tag = tag,
                     totalBytes = 100,
@@ -106,7 +89,7 @@ class TransferImageViewModelTest {
         }
 
     @Test
-    fun `test that addInProgressTransfer adds a new in progress download transfer to the UI state`() =
+    fun `test that addTransfer adds a new in progress download transfer to the UI state`() =
         runTest {
             val file = File("file")
 
@@ -115,7 +98,7 @@ class TransferImageViewModelTest {
 
             initTestClass()
 
-            underTest.addInProgressTransfer(
+            underTest.addTransfer(
                 InProgressTransfer.Download(
                     tag = tag,
                     totalBytes = 100,
@@ -139,11 +122,11 @@ class TransferImageViewModelTest {
         }
 
     @Test
-    fun `test that addInProgressTransfer invokes FileTypeIconMapper and does not invoke GetThumbnailUseCase when adds a new in progress upload`() =
+    fun `test that addTransfer invokes FileTypeIconMapper and does not invoke GetThumbnailUseCase when adds a new in progress upload`() =
         runTest {
             initTestClass()
 
-            underTest.addInProgressTransfer(
+            underTest.addTransfer(
                 InProgressTransfer.Upload(
                     tag = tag,
                     totalBytes = 100,
@@ -162,13 +145,13 @@ class TransferImageViewModelTest {
         }
 
     @Test
-    fun `test that addInProgressTransfer adds a new in progress upload transfer to the UI state`() =
+    fun `test that addTransfer adds a new in progress upload transfer to the UI state`() =
         runTest {
             whenever(fileTypeIconMapper(extension)).thenReturn(fileTypeResId)
 
             initTestClass()
 
-            underTest.addInProgressTransfer(
+            underTest.addTransfer(
                 InProgressTransfer.Upload(
                     tag = tag,
                     totalBytes = 100,
@@ -190,4 +173,12 @@ class TransferImageViewModelTest {
                 }
             }
         }
+
+    companion object {
+        private val testDispatcher = UnconfinedTestDispatcher()
+
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(testDispatcher)
+    }
 }

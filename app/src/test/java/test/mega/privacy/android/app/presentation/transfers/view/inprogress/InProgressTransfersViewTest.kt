@@ -11,8 +11,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
+import mega.privacy.android.app.presentation.transfers.model.image.InProgressTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
-import mega.privacy.android.app.presentation.transfers.model.image.TransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.inprogress.InProgressTransfersView
 import mega.privacy.android.app.presentation.transfers.view.inprogress.TEST_TAG_IN_PROGRESS_TRANSFERS_VIEW
 import mega.privacy.android.domain.entity.Progress
@@ -40,12 +40,12 @@ class InProgressTransfersViewTest {
 
     private val state = TransferImageUiState(fileTypeResId = R.drawable.ic_text_medium_solid)
 
-    private val viewModel = mock<TransferImageViewModel> {
+    private val viewModel = mock<InProgressTransferImageViewModel> {
         on { getUiStateFlow(tag1) } doReturn MutableStateFlow(state)
         on { getUiStateFlow(tag2) } doReturn MutableStateFlow(state)
     }
     private val viewModelStore = mock<ViewModelStore> {
-        on { get(argThat<String> { contains(TransferImageViewModel::class.java.canonicalName.orEmpty()) }) } doReturn viewModel
+        on { get(argThat<String> { contains(InProgressTransferImageViewModel::class.java.canonicalName.orEmpty()) }) } doReturn viewModel
     }
     private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
         on { viewModelStore } doReturn viewModelStore

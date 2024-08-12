@@ -18,8 +18,8 @@ import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_PAUSE_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransferMenuAction.Companion.TEST_TAG_RESUME_ACTION
 import mega.privacy.android.app.presentation.transfers.model.TransfersUiState
+import mega.privacy.android.app.presentation.transfers.model.image.InProgressTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
-import mega.privacy.android.app.presentation.transfers.model.image.TransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.TransfersView
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
@@ -48,12 +48,12 @@ class TransfersViewTest {
     private val tag1 = 1
     private val tag2 = 2
     private val state = TransferImageUiState(fileTypeResId = R.drawable.ic_text_medium_solid)
-    private val viewModel = mock<TransferImageViewModel> {
+    private val viewModel = mock<InProgressTransferImageViewModel> {
         on { getUiStateFlow(tag1) } doReturn MutableStateFlow(state)
         on { getUiStateFlow(tag2) } doReturn MutableStateFlow(state)
     }
     private val viewModelStore = mock<ViewModelStore> {
-        on { get(argThat<String> { contains(TransferImageViewModel::class.java.canonicalName.orEmpty()) }) } doReturn viewModel
+        on { get(argThat<String> { contains(InProgressTransferImageViewModel::class.java.canonicalName.orEmpty()) }) } doReturn viewModel
     }
     private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
         on { viewModelStore } doReturn viewModelStore
