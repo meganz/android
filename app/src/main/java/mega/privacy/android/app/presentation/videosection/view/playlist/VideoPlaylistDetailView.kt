@@ -52,7 +52,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
@@ -387,7 +386,7 @@ internal fun VideoPlaylistEmptyView(
             modifier = Modifier
                 .fillMaxSize(),
             text = stringResource(id = sharedR.string.video_section_playlist_detail_empty_hint_videos),
-            imagePainter = painterResource(id = R.drawable.ic_homepage_empty_video)
+            imagePainter = painterResource(id = iconPackR.drawable.ic_video_section_empty_video)
         )
     }
 }
@@ -408,12 +407,12 @@ internal fun VideoPlaylistHeaderView(
         ) {
             val thumbnailModifier = Modifier
                 .width(126.dp)
-                .aspectRatio(1.6f)
+                .aspectRatio(1.77f)
                 .clip(RoundedCornerShape(10.dp))
                 .background(MaterialTheme.colors.grey_050_grey_800)
 
             ThumbnailListView(
-                icon = R.drawable.ic_playlist_item_empty,
+                icon = iconPackR.drawable.ic_video_playlist_default_thumbnail,
                 modifier = thumbnailModifier,
                 thumbnailList = thumbnailList
             )

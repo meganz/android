@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.videosection.view.videotoplaylist
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -138,7 +139,7 @@ internal fun VideoToPlaylistView(
                 items.isEmpty() -> LegacyMegaEmptyView(
                     modifier = Modifier.testTag(VIDEO_TO_PLAYLIST_EMPTY_VIEW_TEST_TAG),
                     text = stringResource(id = sharedR.string.video_section_playlists_empty_hint_playlist),
-                    imagePainter = painterResource(id = R.drawable.ic_homepage_empty_playlists)
+                    imagePainter = painterResource(id = iconPackR.drawable.ic_homepage_empty_playlists)
                 )
 
                 else -> LazyColumn(

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.videosection.view.videoselected
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
@@ -145,7 +146,7 @@ internal fun VideoSelectedView(
             uiState.nodesList.isEmpty() -> LegacyMegaEmptyView(
                 modifier = Modifier.testTag(VIDEO_SELECTED_EMPTY_VIEW_TEST_TAG),
                 text = stringResource(id = R.string.homepage_empty_hint_video),
-                imagePainter = painterResource(id = R.drawable.ic_homepage_empty_video)
+                imagePainter = painterResource(id = iconPackR.drawable.ic_video_section_empty_video)
             )
 
             else -> {

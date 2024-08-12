@@ -12,6 +12,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -129,9 +130,8 @@ internal fun VideoThumbnailView(
     duration: String?,
     isFavourite: Boolean,
 ) {
-    Box(modifier = modifier) {
+    Box(modifier = modifier.width(126.dp).aspectRatio(1.77f)) {
         val thumbnailModifier = Modifier
-            .width(126.dp)
             .fillMaxHeight()
             .clip(RoundedCornerShape(5.dp))
             .background(colorResource(id = R.color.white_045_grey_045))

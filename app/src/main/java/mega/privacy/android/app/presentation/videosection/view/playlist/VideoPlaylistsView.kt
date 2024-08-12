@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.videosection.view.playlist
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -265,7 +266,7 @@ internal fun VideoPlaylistsView(
                 items.isEmpty() -> LegacyMegaEmptyView(
                     modifier = Modifier.testTag(VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG),
                     text = stringResource(id = sharedR.string.video_section_playlists_empty_hint_playlist),
-                    imagePainter = painterResource(id = R.drawable.ic_homepage_empty_playlists)
+                    imagePainter = painterResource(id = iconPackR.drawable.ic_homepage_empty_playlists)
                 )
 
                 else -> {
@@ -294,7 +295,7 @@ internal fun VideoPlaylistsView(
                         items(count = items.size, key = { items[it].id.longValue }) {
                             val videoPlaylistItem = items[it]
                             VideoPlaylistItemView(
-                                icon = R.drawable.ic_playlist_item_empty,
+                                icon = iconPackR.drawable.ic_video_playlist_default_thumbnail,
                                 title = videoPlaylistItem.title,
                                 numberOfVideos = videoPlaylistItem.numberOfVideos,
                                 thumbnailList = videoPlaylistItem.thumbnailList?.map { id ->
