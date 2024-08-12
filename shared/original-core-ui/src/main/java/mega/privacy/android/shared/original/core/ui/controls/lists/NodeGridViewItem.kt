@@ -42,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.icon.pack.R
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaRadioButton
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
@@ -49,11 +50,10 @@ import mega.privacy.android.shared.original.core.ui.controls.images.GridThumbnai
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.color_button_brand
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.icon.pack.R
 
 /**
  * Node grid view item
@@ -85,7 +85,7 @@ fun NodeGridViewItem(
     onMenuClick: (() -> Unit)? = null,
     inVisible: Boolean = false,
     isSensitive: Boolean = false,
-    isMediaType: Boolean = false,
+    showBlurEffect: Boolean = false,
 ) {
 
     if (inVisible) {
@@ -121,18 +121,19 @@ fun NodeGridViewItem(
                         data = thumbnailData,
                         defaultImage = iconRes,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxSize()
                             .align(Alignment.Center)
-                            .then(
-                                if (!isMediaType) {
-                                    Modifier
-                                } else {
-                                    Modifier.blur(16.dp.takeIf { isSensitive } ?: 0.dp)
-                                }
-                            )
                             .testTag(THUMBNAIL_FILE_TEST_TAG),
                         contentDescription = name,
                         contentScale = ContentScale.Crop,
+                        onSuccess = { modifier ->
+                            if (!showBlurEffect) {
+                                modifier
+                            } else {
+                                modifier
+                                    .blur(16.dp.takeIf { isSensitive } ?: 0.dp)
+                            }
+                        }
                     )
                     if (isVideoNode) {
                         Box(

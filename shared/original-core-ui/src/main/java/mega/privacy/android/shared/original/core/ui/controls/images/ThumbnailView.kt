@@ -20,6 +20,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
@@ -69,6 +71,7 @@ fun ThumbnailView(
 ) {
     var padding by remember { mutableStateOf(0.dp) }
     var cornerRadius by remember { mutableStateOf(0.dp) }
+
     data?.let {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -91,6 +94,68 @@ fun ThumbnailView(
                 padding = 4.dp
                 cornerRadius = 4.dp
             }
+        )
+    } ?: run {
+        Image(
+            modifier = modifier,
+            painter = painterResource(id = defaultImage),
+            contentDescription = contentDescription,
+            contentScale = contentScale,
+        )
+    }
+}
+
+/**
+ * Thumbnail view
+ *
+ * @param contentDescription content description
+ * @param data any data [File], [Uri], [Bitmap], [ThumbnailRequest]
+ * @param defaultImage default image
+ * @param modifier
+ * @param contentScale content scale
+ */
+@Composable
+fun ThumbnailView(
+    contentDescription: String?,
+    data: Any?,
+    @DrawableRes defaultImage: Int,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Fit,
+    onSuccess: (Modifier) -> Modifier,
+) {
+    data?.let {
+        var padding by remember { mutableStateOf(0.dp) }
+        var cornerRadius by remember { mutableStateOf(0.dp) }
+
+        val painter = rememberAsyncImagePainter(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(data)
+                .crossfade(true)
+                .error(defaultImage)
+                .placeholder(defaultImage)
+                .build()
+        )
+
+        var finalModifier: Modifier = modifier
+
+        val state = painter.state
+        if (state is AsyncImagePainter.State.Success) {
+            finalModifier = onSuccess(modifier)
+            padding = 4.dp
+            cornerRadius = 4.dp
+        } else if (state is AsyncImagePainter.State.Error) {
+            padding = 0.dp
+            cornerRadius = 0.dp
+        }
+
+        Image(
+            painter = painter,
+            modifier = finalModifier
+                .aspectRatio(1f)
+                .padding(padding)
+                .clip(RoundedCornerShape(cornerRadius)),
+            contentScale = contentScale,
+            contentDescription = contentDescription
         )
     } ?: run {
         Image(

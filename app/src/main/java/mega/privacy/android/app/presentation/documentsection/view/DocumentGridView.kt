@@ -12,10 +12,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
-import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewItem
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
+import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewItem
 
 @Composable
 internal fun DocumentGridView(
@@ -67,6 +67,7 @@ internal fun DocumentGridView(
                         accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited)
                     } ?: 1f),
                 isSensitive = accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited),
+                showBlurEffect = true,
                 isSelected = documentItem.isSelected,
                 name = documentItem.name,
                 iconRes = documentItem.icon,

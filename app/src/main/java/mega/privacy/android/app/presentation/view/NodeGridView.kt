@@ -17,7 +17,9 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.getIcon
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -127,8 +129,8 @@ fun <T : TypedNode> NodeGridView(
                         && nodeSourceType != NodeSourceType.OUTGOING_SHARES
                         && nodeSourceType != NodeSourceType.LINKS
                         && accountType?.isPaid == true && (node.isMarkedSensitive || node.isSensitiveInherited),
-                isMediaType = (nodeUIItems[it].node as? FileNode)?.type?.let {
-                    it is ImageFileTypeInfo || it is VideoFileTypeInfo
+                showBlurEffect = (nodeUIItems[it].node as? FileNode)?.type?.let { fileTypeInfo ->
+                    fileTypeInfo is ImageFileTypeInfo || fileTypeInfo is VideoFileTypeInfo || fileTypeInfo is PdfFileTypeInfo || fileTypeInfo is AudioFileTypeInfo
                 } ?: false,
             )
         }

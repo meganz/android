@@ -1,6 +1,9 @@
 package mega.privacy.android.app.presentation.favourites.adapter
 
 import android.content.Context
+import android.graphics.RenderEffect
+import android.graphics.Shader
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,7 +31,6 @@ import mega.privacy.android.app.utils.Constants.ITEM_VIEW_TYPE
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 
 /**
@@ -129,7 +131,23 @@ class FavouritesViewHolder(
             when (this) {
                 is ItemFavouriteBinding -> {
                     item.favourite?.let { favourite: Favourite ->
+                        val isSensitive =
+                            accountType?.isPaid == true
+                                    && (favourite.typedNode.isMarkedSensitive
+                                    || favourite.typedNode.isSensitiveInherited)
                         itemThumbnail.load(ThumbnailRequest(NodeId(favourite.node.handle))) {
+
+                            listener(
+                                onSuccess = { _, _ ->
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && isSensitive) {
+                                        val blurRenderEffect = RenderEffect.createBlurEffect(
+                                            Util.dp2px(16f).toFloat(), Util.dp2px(16f).toFloat(),
+                                            Shader.TileMode.MIRROR
+                                        )
+                                        itemThumbnail.setRenderEffect(blurRenderEffect)
+                                    }
+                                }
+                            )
                             transformations(
                                 RoundedCornersTransformation(
                                     Util.dp2px(Constants.THUMB_CORNER_RADIUS_DP).toFloat()
@@ -138,7 +156,10 @@ class FavouritesViewHolder(
                             placeholder(favourite.icon)
                             error(favourite.icon)
                         }
-                        textViewSettings(textView = itemFilename, favourite = favourite)
+                        textViewSettings(
+                            textView = itemFilename,
+                            favourite = favourite
+                        )
                         itemImgLabel.setImageDrawable(
                             ResourcesCompat.getDrawable(
                                 context.resources,
@@ -164,12 +185,7 @@ class FavouritesViewHolder(
                         itemImgLabel.isVisible = favourite.showLabel
                         fileListSavedOffline.isVisible = favourite.isAvailableOffline
                         itemImgFavourite.isVisible = favourite.typedNode.isFavourite
-                        handleSensitiveEffect(
-                            view = itemFavouriteLayout,
-                            accountType = accountType,
-                            favouriteNode = favourite.typedNode
-                        )
-
+                        itemFavouriteLayout.alpha = if (isSensitive) 0.5f else 1f
                         itemPublicLink.isVisible = favourite.typedNode.exportedData != null
                         itemTakenDown.isVisible = favourite.typedNode.isTakenDown
                         itemVersionsIcon.isVisible = favourite.typedNode.hasVersion
@@ -198,16 +214,6 @@ class FavouritesViewHolder(
                 else -> {}
             }
         }
-    }
-
-    private fun handleSensitiveEffect(
-        view: View,
-        accountType: AccountType?,
-        favouriteNode: TypedNode,
-    ) {
-        val isSensitive =
-            accountType?.isPaid == true && (favouriteNode.isMarkedSensitive || favouriteNode.isSensitiveInherited)
-        view.setAlpha(if (isSensitive) 0.5f else 1f)
     }
 
     override fun animate(listener: Animation.AnimationListener, isSelected: Boolean) {

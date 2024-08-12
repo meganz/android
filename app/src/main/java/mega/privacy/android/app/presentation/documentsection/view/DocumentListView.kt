@@ -71,6 +71,7 @@ internal fun DocumentListView(
                         accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited)
                     } ?: 1f),
                 isSensitive = accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited),
+                showBlurEffect = true,
                 isSelected = documentItem.isSelected,
                 icon = documentItem.icon,
                 showVersion = documentItem.hasVersions,

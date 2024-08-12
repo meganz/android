@@ -95,6 +95,7 @@ internal fun AudioListView(
                         accountType?.isPaid == true && (audioItem.isMarkedSensitive || audioItem.isSensitiveInherited)
                     } ?: 1f),
                 isSensitive = accountType?.isPaid == true && (audioItem.isMarkedSensitive || audioItem.isSensitiveInherited),
+                showBlurEffect = true,
             )
             Divider(
                 modifier = Modifier

@@ -19,9 +19,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.icon.pack.R
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import java.io.File
 
 
@@ -65,6 +67,59 @@ fun GridThumbnailView(
                 imageLoaded = true
                 cornerRadius = 4.dp
             }
+        )
+    } ?: Image(
+        modifier = modifier
+            .height(172.dp)
+            .fillMaxWidth()
+            .padding(vertical = 34.dp),
+        painter = painterResource(id = defaultImage),
+        contentDescription = contentDescription,
+        contentScale = ContentScale.Fit,
+    )
+}
+
+@Composable
+fun GridThumbnailView(
+    contentDescription: String?,
+    data: Any?,
+    @DrawableRes defaultImage: Int,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Fit,
+    onSuccess: (Modifier) -> Modifier,
+) {
+    data?.let {
+        var imageLoaded by remember { mutableStateOf(false) }
+        var cornerRadius by remember { mutableStateOf(0.dp) }
+
+        val painter = rememberAsyncImagePainter(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(data)
+                .crossfade(true)
+                .error(defaultImage)
+                .placeholder(defaultImage)
+                .build()
+        )
+
+        var finalModifier: Modifier = modifier
+            .clip(RoundedCornerShape(cornerRadius))
+            .padding(vertical = if (imageLoaded) 0.dp else 34.dp)
+
+        val state = painter.state
+        if (state is AsyncImagePainter.State.Success) {
+            finalModifier = onSuccess(modifier)
+            imageLoaded = true
+            cornerRadius = 4.dp
+        } else if (state is AsyncImagePainter.State.Error) {
+            imageLoaded = false
+            cornerRadius = 0.dp
+        }
+
+        Image(
+            painter = painter,
+            modifier = finalModifier,
+            contentScale = if (imageLoaded) contentScale else ContentScale.Fit,
+            contentDescription = contentDescription
         )
     } ?: Image(
         modifier = modifier
