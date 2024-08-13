@@ -2,7 +2,6 @@ package mega.privacy.android.data.mapper.apiserver
 
 import com.google.common.truth.Truth
 import mega.privacy.android.domain.entity.apiserver.ApiServer
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -29,7 +28,7 @@ class ApiServerMapperTest {
     private fun provideParameters(): Stream<Arguments> = Stream.of(
         Arguments.of(0, ApiServer.Production),
         Arguments.of(1, ApiServer.Staging),
-        Arguments.of(2, ApiServer.Staging444),
+        Arguments.of(2, ApiServer.Bt1444),
         Arguments.of(3, ApiServer.Sandbox3),
         Arguments.of(4, ApiServer.Production),
         Arguments.of(-1, ApiServer.Production),

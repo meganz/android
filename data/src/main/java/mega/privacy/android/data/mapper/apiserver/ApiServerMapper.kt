@@ -11,7 +11,7 @@ internal class ApiServerMapper @Inject constructor() {
     operator fun invoke(apiValue: Int) = when (apiValue) {
         0 -> ApiServer.Production
         1 -> ApiServer.Staging
-        2 -> ApiServer.Staging444
+        2 -> ApiServer.Bt1444
         3 -> ApiServer.Sandbox3
         else -> ApiServer.Production
     }

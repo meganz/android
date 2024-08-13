@@ -30,11 +30,11 @@ class UpdateApiServerUseCase @Inject constructor(
         var setPkp: Boolean? = null
 
         when {
-            newApi != null && (storedApi == ApiServer.Sandbox3 || storedApi == ApiServer.Staging444) -> {
+            newApi != null && (storedApi == ApiServer.Sandbox3 || storedApi == ApiServer.Bt1444) -> {
                 setPkp = true
             }
 
-            newApi == ApiServer.Sandbox3 || newApi == ApiServer.Staging444 -> {
+            newApi == ApiServer.Sandbox3 || newApi == ApiServer.Bt1444 -> {
                 setPkp = false
                 disablePkp = true
             }

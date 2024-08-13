@@ -21,9 +21,9 @@ enum class ApiServer(
     Staging(value = 1, url = "https://staging.api.mega.co.nz/"),
 
     /**
-     * Staging 444 server.
+     * Bt1 444 server.
      */
-    Staging444(value = 2, url = "https://staging.api.mega.co.nz:444/"),
+    Bt1444(value = 2, url = "https://bt1.api.mega.co.nz:444/"),
 
     /**
      * Staging server.

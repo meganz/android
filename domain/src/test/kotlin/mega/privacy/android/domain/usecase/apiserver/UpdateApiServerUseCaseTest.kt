@@ -4,7 +4,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.apiserver.ApiServer
 import mega.privacy.android.domain.repository.apiserver.ApiServerRepository
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -58,11 +57,11 @@ class UpdateApiServerUseCaseTest {
             var setPkp: Boolean? = null
 
             when {
-                newApi != null && (expectedStoredApi == ApiServer.Sandbox3 || expectedStoredApi == ApiServer.Staging444) -> {
+                newApi != null && (expectedStoredApi == ApiServer.Sandbox3 || expectedStoredApi == ApiServer.Bt1444) -> {
                     setPkp = true
                 }
 
-                newApi == ApiServer.Sandbox3 || newApi == ApiServer.Staging444 -> {
+                newApi == ApiServer.Sandbox3 || newApi == ApiServer.Bt1444 -> {
                     setPkp = false
                     disablePkp = true
                 }
@@ -78,27 +77,27 @@ class UpdateApiServerUseCaseTest {
     private fun provideParameters(): Stream<Arguments> = Stream.of(
         Arguments.of(ApiServer.Production, ApiServer.Production, ApiServer.Production),
         Arguments.of(ApiServer.Production, ApiServer.Production, ApiServer.Staging),
-        Arguments.of(ApiServer.Production, ApiServer.Production, ApiServer.Staging444),
+        Arguments.of(ApiServer.Production, ApiServer.Production, ApiServer.Bt1444),
         Arguments.of(ApiServer.Production, ApiServer.Production, ApiServer.Sandbox3),
         Arguments.of(ApiServer.Production, ApiServer.Production, null),
         Arguments.of(ApiServer.Staging, ApiServer.Staging, ApiServer.Production),
         Arguments.of(ApiServer.Staging, ApiServer.Staging, ApiServer.Staging),
-        Arguments.of(ApiServer.Staging, ApiServer.Staging, ApiServer.Staging444),
+        Arguments.of(ApiServer.Staging, ApiServer.Staging, ApiServer.Bt1444),
         Arguments.of(ApiServer.Staging, ApiServer.Staging, ApiServer.Sandbox3),
         Arguments.of(ApiServer.Staging, ApiServer.Staging, null),
-        Arguments.of(ApiServer.Staging444, ApiServer.Staging444, ApiServer.Production),
-        Arguments.of(ApiServer.Staging444, ApiServer.Staging444, ApiServer.Staging),
-        Arguments.of(ApiServer.Staging444, ApiServer.Staging444, ApiServer.Staging444),
-        Arguments.of(ApiServer.Staging444, ApiServer.Staging444, ApiServer.Sandbox3),
-        Arguments.of(ApiServer.Staging444, ApiServer.Staging444, null),
+        Arguments.of(ApiServer.Bt1444, ApiServer.Bt1444, ApiServer.Production),
+        Arguments.of(ApiServer.Bt1444, ApiServer.Bt1444, ApiServer.Staging),
+        Arguments.of(ApiServer.Bt1444, ApiServer.Bt1444, ApiServer.Bt1444),
+        Arguments.of(ApiServer.Bt1444, ApiServer.Bt1444, ApiServer.Sandbox3),
+        Arguments.of(ApiServer.Bt1444, ApiServer.Bt1444, null),
         Arguments.of(ApiServer.Sandbox3, ApiServer.Sandbox3, ApiServer.Production),
         Arguments.of(ApiServer.Sandbox3, ApiServer.Sandbox3, ApiServer.Staging),
-        Arguments.of(ApiServer.Sandbox3, ApiServer.Sandbox3, ApiServer.Staging444),
+        Arguments.of(ApiServer.Sandbox3, ApiServer.Sandbox3, ApiServer.Bt1444),
         Arguments.of(ApiServer.Sandbox3, ApiServer.Sandbox3, ApiServer.Sandbox3),
         Arguments.of(ApiServer.Sandbox3, ApiServer.Sandbox3, null),
         Arguments.of(null, ApiServer.Production, null),
         Arguments.of(null, ApiServer.Staging, null),
-        Arguments.of(null, ApiServer.Staging444, null),
+        Arguments.of(null, ApiServer.Bt1444, null),
         Arguments.of(null, ApiServer.Sandbox3, null),
     )
 }

@@ -11,6 +11,6 @@
     <string name="audio_player_notification_channel_name" context="Name of audio player notification channel" translatable="false">MEGA Audio Player</string>
 
     <string name="staging_api_server" context="Text to show as staging api server option" translatable="false">Staging</string>
-    <string name="staging444_api_server" context="Text to show as staging, port 444, api server option" translatable="false">Staging:444</string>
+    <string name="bt1444_api_server" context="Text to show as bt1, port 444, api server option" translatable="false">Bt1:444</string>
     <string name="sandbox3_api_server" context="Text to show as sandbox3 api server option" translatable="false">Sandbox3</string>
 </resources>

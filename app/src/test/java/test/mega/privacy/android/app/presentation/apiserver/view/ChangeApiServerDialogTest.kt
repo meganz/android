@@ -49,7 +49,7 @@ class ChangeApiServerDialogTest {
     @Test
     fun `test that staging 444 option is displayed`() {
         initComposeRuleContent()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.staging444_api_server))
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.bt1444_api_server))
             .assertIsDisplayed()
     }
 

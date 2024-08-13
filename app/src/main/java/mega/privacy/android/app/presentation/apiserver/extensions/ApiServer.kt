@@ -11,6 +11,6 @@ import mega.privacy.android.domain.entity.apiserver.ApiServer
 fun ApiServer.getTextId(): Int = when (this) {
     ApiServer.Production -> R.string.production_api_server
     ApiServer.Staging -> R.string.staging_api_server
-    ApiServer.Staging444 -> R.string.staging444_api_server
+    ApiServer.Bt1444 -> R.string.bt1444_api_server
     ApiServer.Sandbox3 -> R.string.sandbox3_api_server
 }
