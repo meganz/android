@@ -321,7 +321,7 @@ private suspend fun openVideoOrAudioFile(
                     fileTypeInfo = content.fileTypeInfo,
                     viewType = Constants.OFFLINE_ADAPTER,
                     handle = content.nodeId.longValue,
-                    parentId = content.parentId.toLong(),
+                    offlineParentId = content.parentId,
                     sortOrder = sortOrder,
                 )
         }.onFailure {

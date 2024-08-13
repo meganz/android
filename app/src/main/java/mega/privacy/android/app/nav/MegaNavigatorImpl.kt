@@ -38,6 +38,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MEDIA_QUEUE_TIT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
@@ -235,6 +236,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         isMediaQueueAvailable: Boolean,
         viewType: Int? = null,
         path: String? = null,
+        offlineParentId: Int? = null,
         offlineParent: String? = null,
         searchedItems: List<Long>? = null,
         mediaQueueTitle: String? = null,
@@ -255,6 +257,9 @@ internal class MegaNavigatorImpl @Inject constructor(
             putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, isMediaQueueAvailable)
             path?.let {
                 putExtra(INTENT_EXTRA_KEY_PATH, path)
+            }
+            offlineParentId?.let {
+                putExtra(INTENT_EXTRA_KEY_PARENT_ID, it)
             }
             offlineParent?.let {
                 putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, offlineParent)
@@ -298,6 +303,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         handle: Long,
         viewType: Int?,
         parentId: Long,
+        offlineParentId: Int?,
         fileTypeInfo: FileTypeInfo?,
         sortOrder: SortOrder,
         isFolderLink: Boolean,
@@ -318,6 +324,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             isFolderLink = isFolderLink,
             isMediaQueueAvailable = isMediaQueueAvailable,
             path = localFile.absolutePath,
+            offlineParentId = offlineParentId,
             offlineParent = localFile.parent,
             searchedItems = searchedItems
         )

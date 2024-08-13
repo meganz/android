@@ -158,6 +158,7 @@ interface AppNavigator {
      * @param viewType the adapter type of the view
      * @param handle the handle of the node
      * @param parentId the parent id of the node
+     * @param offlineParentId the parent id of the offline
      * @param sortOrder SortOrder
      * @param isFolderLink whether the file is a folder link
      * @param isMediaQueueAvailable whether the media queue is available
@@ -169,6 +170,7 @@ interface AppNavigator {
         handle: Long,
         viewType: Int? = null,
         parentId: Long = -1L,
+        offlineParentId: Int? = null,
         fileTypeInfo: FileTypeInfo? = null,
         sortOrder: SortOrder = SortOrder.ORDER_NONE,
         isFolderLink: Boolean = false,
