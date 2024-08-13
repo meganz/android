@@ -5,13 +5,14 @@ import android.content.Intent
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
@@ -29,7 +30,7 @@ internal fun SessionContainer(
     viewModel: SessionViewModel = hiltViewModel(),
     content: @Composable () -> Unit,
 ) {
-    LaunchedEffect(Unit) {
+    LifecycleEventEffect(event = Lifecycle.Event.ON_RESUME) {
         viewModel.checkSdkSession(shouldCheckChatSession)
     }
     val context = LocalContext.current
