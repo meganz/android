@@ -31,6 +31,8 @@ import org.webrtc.ThreadUtils;
 import java.util.List;
 import java.util.Set;
 
+import mega.privacy.android.domain.entity.call.AudioDevice;
+
 /**
  * AppRTCProximitySensor manages functions related to Bluetoth devices in the
  * AppRTC demo.
@@ -407,7 +409,7 @@ public class AppRTCBluetoothManager {
             bluetoothState = State.HEADSET_AVAILABLE;
 
             if (isFirstConnection) {
-                apprtcAudioManager.changeUserSelectedAudioDeviceForHeadphone(AppRTCAudioManager.AudioDevice.BLUETOOTH);
+                apprtcAudioManager.changeUserSelectedAudioDeviceForHeadphone(AudioDevice.Bluetooth);
                 isFirstConnection = false;
             }
 

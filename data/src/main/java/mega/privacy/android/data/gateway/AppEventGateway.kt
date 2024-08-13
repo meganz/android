@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
@@ -361,6 +362,20 @@ internal interface AppEventGateway {
      * @param isOpened    True, if it's opened. False if not.
      */
     suspend fun broadcastCallScreenOpened(isOpened: Boolean)
+
+    /**
+     * Monitor that audio output has changed..
+     *
+     * @return Flow of AudioDevice.
+     */
+    fun monitorAudioOutput(): Flow<AudioDevice>
+
+    /**
+     * Broadcast that audio output has changed.
+     *
+     * @param audioDevice   [AudioDevice]
+     */
+    suspend fun broadcastAudioOutput(audioDevice: AudioDevice)
 
     /**
      * Monitor that a specific call has ended.

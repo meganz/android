@@ -6,11 +6,9 @@ import android.content.Intent
 import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
@@ -31,7 +29,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHANGE
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -39,7 +36,6 @@ import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.AddContactActivity
-import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
@@ -60,6 +56,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
+import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.call.CallType
@@ -93,6 +90,7 @@ import mega.privacy.android.domain.usecase.call.CreateMeetingUseCase
 import mega.privacy.android.domain.usecase.call.GetCallIdsOfOthersCallsUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorAudioOutputUseCase
 import mega.privacy.android.domain.usecase.call.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.call.RingIndividualInACallUseCase
 import mega.privacy.android.domain.usecase.call.StartCallUseCase
@@ -170,6 +168,7 @@ import javax.inject.Inject
  * @property muteAllPeersUseCase                            [MuteAllPeersUseCase]
  * @property getStringFromStringResMapper                   [GetStringFromStringResMapper]
  * @property getCurrentSubscriptionPlanUseCase              [GetCurrentSubscriptionPlanUseCase]
+ * @property monitorAudioOutputUseCase                      [MonitoraAudioOutputUseCase]
  * @property state                                          Current view state as [MeetingState]
  */
 @HiltViewModel
@@ -225,6 +224,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val createMeetingUseCase: CreateMeetingUseCase,
     private val startCallUseCase: StartCallUseCase,
     private val passcodeManagement: PasscodeManagement,
+    private val monitorAudioOutputUseCase: MonitorAudioOutputUseCase,
     savedStateHandle: SavedStateHandle,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
@@ -268,15 +268,15 @@ class MeetingActivityViewModel @Inject constructor(
     // OnOffFab
     private val _micLiveData: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
     private val _cameraLiveData: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
-    private val _speakerLiveData: MutableLiveData<AppRTCAudioManager.AudioDevice> =
-        MutableLiveData<AppRTCAudioManager.AudioDevice>().apply {
+    private val _speakerLiveData: MutableLiveData<AudioDevice> =
+        MutableLiveData<AudioDevice>().apply {
             val audioManager = rtcAudioManagerGateway.audioManager
-            value = audioManager?.selectedAudioDevice ?: AppRTCAudioManager.AudioDevice.NONE
+            value = audioManager?.selectedAudioDevice ?: AudioDevice.None
         }
 
     val micLiveData: LiveData<Boolean> = _micLiveData
     val cameraLiveData: LiveData<Boolean> = _cameraLiveData
-    val speakerLiveData: LiveData<AppRTCAudioManager.AudioDevice> = _speakerLiveData
+    val speakerLiveData: LiveData<AudioDevice> = _speakerLiveData
 
     // Permissions
     private val _cameraGranted = MutableStateFlow(false)
@@ -308,20 +308,6 @@ class MeetingActivityViewModel @Inject constructor(
     private val _finishMeetingActivity = MutableStateFlow(false)
     val finishMeetingActivity: StateFlow<Boolean> get() = _finishMeetingActivity
 
-    private val audioOutputStateObserver =
-        Observer<AppRTCAudioManager.AudioDevice> {
-            if (_speakerLiveData.value != it && it != AppRTCAudioManager.AudioDevice.NONE) {
-                Timber.d("Updating speaker $it")
-
-                _speakerLiveData.value = it
-                tips.value = when (it) {
-                    AppRTCAudioManager.AudioDevice.EARPIECE -> context.getString(R.string.general_speaker_off)
-                    AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> context.getString(R.string.general_speaker_on)
-                    else -> context.getString(R.string.general_headphone_on)
-                }
-            }
-        }
-
     /**
      * Set meeting action
      *
@@ -338,6 +324,21 @@ class MeetingActivityViewModel @Inject constructor(
                 .collect {
                     if (it == state.value.chatId) {
                         finishMeetingActivity()
+                    }
+                }
+
+            monitorAudioOutputUseCase()
+                .catch { Timber.e(it) }
+                .collect {
+                    if (_speakerLiveData.value != it && it != AudioDevice.None) {
+                        Timber.d("Updating speaker $it")
+
+                        _speakerLiveData.value = it
+                        tips.value = when (it) {
+                            AudioDevice.Earpiece -> context.getString(R.string.general_speaker_off)
+                            AudioDevice.SpeakerPhone -> context.getString(R.string.general_speaker_on)
+                            else -> context.getString(R.string.general_headphone_on)
+                        }
                     }
                 }
         }
@@ -381,9 +382,6 @@ class MeetingActivityViewModel @Inject constructor(
 
         getCurrentSubscriptionPlan()
         getApiFeatureFlag()
-
-        LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
-            .observeForever(audioOutputStateObserver)
 
         // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
         showDefaultAvatar().invokeOnCompletion {
@@ -1552,14 +1550,14 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun clickSpeaker() {
         when (_speakerLiveData.value) {
-            AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
+            AudioDevice.SpeakerPhone -> {
                 Timber.d("Trying to switch to EARPIECE")
-                meetingActivityRepository.switchSpeaker(AppRTCAudioManager.AudioDevice.EARPIECE)
+                meetingActivityRepository.switchSpeaker(AudioDevice.Earpiece)
             }
 
             else -> {
                 Timber.d("Trying to switch to SPEAKER_PHONE")
-                meetingActivityRepository.switchSpeaker(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)
+                meetingActivityRepository.switchSpeaker(AudioDevice.SpeakerPhone)
             }
         }
     }
@@ -1647,13 +1645,6 @@ class MeetingActivityViewModel @Inject constructor(
                 R.string.general_camera_disable
             )
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-
-        LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
-            .removeObserver(audioOutputStateObserver)
     }
 
     fun inviteToChat(context: Context, requestCode: Int, resultCode: Int, intent: Intent?) {

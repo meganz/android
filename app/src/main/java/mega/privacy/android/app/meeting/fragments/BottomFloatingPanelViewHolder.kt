@@ -31,6 +31,7 @@ import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsBottomPanelView
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 
@@ -68,8 +69,7 @@ class BottomFloatingPanelViewHolder(
      */
     private var savedMicState: Boolean = false
     private var savedCamState: Boolean = false
-    private var savedSpeakerState: AppRTCAudioManager.AudioDevice =
-        AppRTCAudioManager.AudioDevice.NONE
+    private var savedSpeakerState: AudioDevice = AudioDevice.None
 
     private var currentHeight = 0
 
@@ -513,10 +513,10 @@ class BottomFloatingPanelViewHolder(
      *
      * @param device Current device selected
      */
-    fun updateSpeakerIcon(device: AppRTCAudioManager.AudioDevice) {
+    fun updateSpeakerIcon(device: AudioDevice) {
         Timber.d("Update speaker icon. Audio device is $device")
         meetingActionButtons.currentAudioDevice = device
-        meetingActionButtons.isSpeakerOn = device != AppRTCAudioManager.AudioDevice.EARPIECE
+        meetingActionButtons.isSpeakerOn = device != AudioDevice.Earpiece
     }
 
     /**

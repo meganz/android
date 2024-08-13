@@ -30,6 +30,7 @@ import mega.privacy.android.data.mapper.meeting.MegaChatScheduledMeetingRulesMap
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.data.model.meeting.ChatCallUpdate
 import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatSessionUpdatesResult
@@ -824,6 +825,12 @@ internal class CallRepositoryImpl @Inject constructor(
 
     override suspend fun broadcastCallScreenOpened(isOpened: Boolean) =
         appEventGateway.broadcastCallScreenOpened(isOpened)
+
+    override fun monitorAudioOutput(): Flow<AudioDevice> =
+        appEventGateway.monitorAudioOutput()
+
+    override suspend fun broadcastAudioOutput(audioDevice: AudioDevice) =
+        appEventGateway.broadcastAudioOutput(audioDevice)
 
     override suspend fun mutePeers(
         chatId: Long,

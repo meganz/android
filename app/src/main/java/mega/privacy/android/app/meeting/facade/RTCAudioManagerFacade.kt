@@ -7,11 +7,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.interfaces.OnProximitySensorListener
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.meeting.BroadcastAudioOutputUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -23,7 +26,9 @@ import javax.inject.Inject
  */
 class RTCAudioManagerFacade @Inject constructor(
     private val application: Application,
-) : RTCAudioManagerGateway {
+    @ApplicationScope private val applicationScope: CoroutineScope,
+    private val broadcastAudioOutputUseCase: BroadcastAudioOutputUseCase,
+    ) : RTCAudioManagerGateway {
     private var rtcAudioManager: AppRTCAudioManager? = null
     private var rtcAudioManagerRingInCall: AppRTCAudioManager? = null
 
@@ -77,7 +82,13 @@ class RTCAudioManagerFacade @Inject constructor(
             )
             Timber.d("Creating RTC Audio Manager (ringing mode)")
             rtcAudioManagerRingInCall =
-                AppRTCAudioManager.create(application, false, Constants.AUDIO_MANAGER_CALL_RINGING)
+                AppRTCAudioManager.create(
+                    application,
+                    false,
+                    Constants.AUDIO_MANAGER_CALL_RINGING,
+                    applicationScope,
+                    broadcastAudioOutputUseCase
+                )
         } else {
             rtcAudioManager?.apply {
                 typeAudioManager = type
@@ -85,7 +96,13 @@ class RTCAudioManagerFacade @Inject constructor(
             }
             Timber.d("Creating RTC Audio Manager (%d mode)", type)
             removeRTCAudioManagerRingIn()
-            rtcAudioManager = AppRTCAudioManager.create(application, isSpeakerOn, type)
+            rtcAudioManager = AppRTCAudioManager.create(
+                application,
+                isSpeakerOn,
+                type,
+                applicationScope,
+                broadcastAudioOutputUseCase
+            )
             if (type != Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING) {
                 MegaApplication.getInstance().startProximitySensor()
             }

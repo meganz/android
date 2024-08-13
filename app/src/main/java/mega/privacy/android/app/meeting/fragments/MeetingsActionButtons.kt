@@ -51,6 +51,7 @@ import mega.privacy.android.app.meeting.fragments.MeetingActionButtonsTestTags.M
 import mega.privacy.android.app.meeting.fragments.MeetingActionButtonsTestTags.SPEAKER_BUTTON
 import mega.privacy.android.app.meeting.fragments.MeetingActionButtonsTestTags.TOOLTIP
 import mega.privacy.android.app.meeting.fragments.fab.OnOffFab
+import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -75,7 +76,7 @@ internal class MeetingsActionButtonsView : AbstractComposeView {
     private var isMoreOn by mutableStateOf(true)
     var buttonsEnabled by mutableStateOf(true)
     var isRaiseHandToolTipShown by mutableStateOf(false)
-    var currentAudioDevice by mutableStateOf(AppRTCAudioManager.AudioDevice.NONE)
+    var currentAudioDevice by mutableStateOf(AudioDevice.None)
 
     var onRaiseToRandTooltipDismissed by mutableStateOf<(() -> Unit)?>(null)
 
@@ -168,7 +169,7 @@ fun MeetingsActionButtons(
     backgroundTintAlpha: Float,
     isRaiseHandToolTipShown: Boolean,
     tooltipKey: Int,
-    currentAudioDevice: AppRTCAudioManager.AudioDevice,
+    currentAudioDevice: AudioDevice,
     modifier: Modifier = Modifier,
 ) {
 
@@ -310,8 +311,8 @@ fun MeetingsActionButtons(
                 ) {
                     val isOn = rememberSaveable(speakerEnabled) { mutableStateOf(speakerEnabled) }
                     val (onIcon, stringId) =
-                        if (currentAudioDevice == AppRTCAudioManager.AudioDevice.WIRED_HEADSET ||
-                            currentAudioDevice == AppRTCAudioManager.AudioDevice.BLUETOOTH
+                        if (currentAudioDevice == AudioDevice.WiredHeadset ||
+                            currentAudioDevice == AudioDevice.Bluetooth
                         ) Pair(
                             R.drawable.ic_headphone,
                             R.string.general_headphone
@@ -319,7 +320,7 @@ fun MeetingsActionButtons(
                     OnOffFab(
                         modifier = Modifier.testTag(SPEAKER_BUTTON),
                         isOn = isOn,
-                        enabled = if (currentAudioDevice == AppRTCAudioManager.AudioDevice.NONE) false else isEnabled,
+                        enabled = if (currentAudioDevice == AudioDevice.None) false else isEnabled,
                         onIcon = onIcon,
                         offIcon = IconR.drawable.ic_volume_off,
                         disableIcon = IconR.drawable.ic_volume_off,
@@ -455,7 +456,7 @@ private fun MeetingBottomFloatingPanelPreview() {
             backgroundTintAlpha = 1.0F,
             isRaiseHandToolTipShown = false,
             onRaiseToRandTooltipDismissed = {},
-            currentAudioDevice = AppRTCAudioManager.AudioDevice.SPEAKER_PHONE,
+            currentAudioDevice = AudioDevice.SpeakerPhone,
             tooltipKey = 0
         )
     }

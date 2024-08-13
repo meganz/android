@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatSessionUpdatesResult
@@ -551,6 +552,20 @@ interface CallRepository {
      * @param isOpened  True, the call is opened. False, if the call is not opened.
      */
     suspend fun broadcastCallScreenOpened(isOpened: Boolean)
+
+    /**
+     * Broadcast that audio output has changed.
+     *
+     * @param audioDevice  [AudioDevice]
+     */
+    suspend fun broadcastAudioOutput(audioDevice: AudioDevice)
+
+    /**
+     * Monitor that audio output has changed.
+     *
+     * @return Flow of AudioDevice.
+     */
+    fun monitorAudioOutput(): Flow<AudioDevice>
 
     /**
      * Mute peers

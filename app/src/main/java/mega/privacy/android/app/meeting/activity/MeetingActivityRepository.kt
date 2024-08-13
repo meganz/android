@@ -9,7 +9,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.main.controllers.ChatController
-import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.MeetingAvatarListener
@@ -19,6 +18,7 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.domain.entity.call.AudioDevice
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -114,7 +114,7 @@ class MeetingActivityRepository @Inject constructor(
      *
      * @param device AudioDevice
      */
-    fun switchSpeaker(device: AppRTCAudioManager.AudioDevice) {
+    fun switchSpeaker(device: AudioDevice) {
         Timber.d("Switch the speaker")
         rtcAudioManagerGateway.audioManager?.selectAudioDevice(
             device,

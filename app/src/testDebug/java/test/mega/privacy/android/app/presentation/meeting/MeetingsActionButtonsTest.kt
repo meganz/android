@@ -13,6 +13,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import test.mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.domain.entity.call.AudioDevice
 
 
 @RunWith(AndroidJUnit4::class)
@@ -90,7 +91,7 @@ class MeetingsActionButtonsTest {
                 isRaiseHandToolTipShown = false,
                 onRaiseToRandTooltipDismissed = {},
                 tooltipKey = 0,
-                currentAudioDevice = AppRTCAudioManager.AudioDevice.SPEAKER_PHONE,
+                currentAudioDevice = AudioDevice.None
             )
         }
     }

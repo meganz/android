@@ -118,6 +118,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.call.AnotherCallType
+import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.call.CallUIStatusType
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatSession
@@ -1389,7 +1390,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         sharedModel.speakerLiveData.observe(viewLifecycleOwner) {
             Timber.d("Speaker status has changed to $it")
-            speakerIsEnable = it == AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
+            speakerIsEnable = it == AudioDevice.SpeakerPhone
             updateSpeaker(it)
         }
 
@@ -2769,7 +2770,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      *
      * @param device The current device selected
      */
-    private fun updateSpeaker(device: AppRTCAudioManager.AudioDevice) {
+    private fun updateSpeaker(device: AudioDevice) {
         bottomFloatingPanelViewHolder?.updateSpeakerIcon(device)
     }
 

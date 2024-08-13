@@ -23,29 +23,37 @@ import android.media.RingtoneManager
 import android.os.Build
 import android.os.Looper
 import android.os.Vibrator
-import com.jeremyliao.liveeventbus.LiveEventBus
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHANGE
 import mega.privacy.android.app.interfaces.OnProximitySensorListener
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.domain.entity.call.AudioDevice
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.meeting.BroadcastAudioOutputUseCase
 import org.webrtc.ThreadUtils
 import timber.log.Timber
 import java.io.IOException
+import javax.inject.Inject
 
 /**
  * AppRTCAudioManager manages all audio related parts of the AppRTC demo.
  */
-class AppRTCAudioManager private constructor(
+class AppRTCAudioManager @Inject constructor(
     private val apprtcContext: Context,
     private var isSpeakerOn: Boolean,
     type: Int,
+    @ApplicationScope private val applicationScope: CoroutineScope,
+    private val broadcastAudioOutputUseCase: BroadcastAudioOutputUseCase,
 ) {
+
+
     /**
      * Proximity sensor listener
      */
@@ -87,7 +95,7 @@ class AppRTCAudioManager private constructor(
     // Contains the user-selected audio device which overrides the predefined
     // selection scheme.
     // Add support for explicit selection based on choice by userSelectedAudioDevice.
-    private var userSelectedAudioDevice = AudioDevice.NONE
+    private var userSelectedAudioDevice = AudioDevice.None
 
     // Proximity sensor object. It measures the proximity of an object in cm
     // relative to the view screen of a device and can therefore be used to
@@ -175,7 +183,7 @@ class AppRTCAudioManager private constructor(
                     (bluetoothManager?.state != AppRTCBluetoothManager.State.SCO_CONNECTED)
                 ) {
                     Timber.d("Disabling the speakerphone:")
-                    selectAudioDevice(AudioDevice.EARPIECE, true)
+                    selectAudioDevice(AudioDevice.Earpiece, true)
                 }
             }
         } else {
@@ -186,7 +194,7 @@ class AppRTCAudioManager private constructor(
                 (bluetoothManager?.state != AppRTCBluetoothManager.State.SCO_CONNECTED)
             ) {
                 Timber.d("Enabling the speakerphone: ")
-                selectAudioDevice(AudioDevice.SPEAKER_PHONE, true)
+                selectAudioDevice(AudioDevice.SpeakerPhone, true)
             }
         }
         proximitySensorListener?.needToUpdate(isNear)
@@ -426,7 +434,7 @@ class AppRTCAudioManager private constructor(
     }
 
     private fun speakerElements(isOn: Boolean) {
-        setDefaultAudioDevice(if (isOn) AudioDevice.SPEAKER_PHONE else AudioDevice.EARPIECE)
+        setDefaultAudioDevice(if (isOn) AudioDevice.SpeakerPhone else AudioDevice.Earpiece)
         isSpeakerOn = isOn
     }
 
@@ -440,7 +448,7 @@ class AppRTCAudioManager private constructor(
         typeAudioManager = type
         Timber.d("Speaker status is %s", speakerStatus)
         selectAudioDevice(
-            if (speakerStatus) AudioDevice.SPEAKER_PHONE else AudioDevice.EARPIECE,
+            if (speakerStatus) AudioDevice.SpeakerPhone else AudioDevice.Earpiece,
             false
         )
     }
@@ -546,11 +554,11 @@ class AppRTCAudioManager private constructor(
         // Set initial device states.
         userSelectedAudioDevice =
             if (typeAudioManager == Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP || typeAudioManager == Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING) {
-                AudioDevice.SPEAKER_PHONE
+                AudioDevice.SpeakerPhone
             } else {
-                AudioDevice.NONE
+                AudioDevice.None
             }
-        selectedAudioDevice = AudioDevice.NONE
+        selectedAudioDevice = AudioDevice.None
         audioDevices?.clear()
 
         // Do initial selection of audio device. This setting can later be changed
@@ -605,7 +613,7 @@ class AppRTCAudioManager private constructor(
         Timber.d("Audio device internal finally selected is $availableDevice")
         assert(audioDevices?.contains(availableDevice) == true) { "Expected audio devices to contain $availableDevice" }
         when (availableDevice) {
-            AudioDevice.SPEAKER_PHONE -> {
+            AudioDevice.SpeakerPhone -> {
                 if (typeAudioManager == Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP) {
                     audioManager?.mode = AudioManager.MODE_NORMAL
                 }
@@ -613,7 +621,7 @@ class AppRTCAudioManager private constructor(
                 setSpeakerphoneOn(true)
             }
 
-            AudioDevice.EARPIECE -> {
+            AudioDevice.Earpiece -> {
                 if (!isTemporary) {
                     isSpeakerOn = false
                 }
@@ -623,7 +631,7 @@ class AppRTCAudioManager private constructor(
                 setSpeakerphoneOn(false)
             }
 
-            AudioDevice.WIRED_HEADSET, AudioDevice.BLUETOOTH -> {
+            AudioDevice.WiredHeadset, AudioDevice.Bluetooth -> {
                 isSpeakerOn = false
                 setSpeakerphoneOn(false)
             }
@@ -636,9 +644,19 @@ class AppRTCAudioManager private constructor(
         if (selectedAudioDevice != availableDevice) {
             selectedAudioDevice = availableDevice
             Timber.d("New audio device selected is %s", selectedAudioDevice)
-            LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AudioDevice::class.java)
-                .post(selectedAudioDevice)
-            setValues()
+            val newAudioDevice = selectedAudioDevice
+            newAudioDevice?.let {
+                applicationScope.launch {
+                    runCatching {
+                        broadcastAudioOutputUseCase(it)
+                    }.onFailure { exception ->
+                        Timber.e(exception.message)
+                    }.onSuccess {
+                        Timber.d("Audio output has changed")
+                        setValues()
+                    }
+                }
+            }
         }
     }
 
@@ -648,11 +666,11 @@ class AppRTCAudioManager private constructor(
     private fun setDefaultAudioDevice(defaultDevice: AudioDevice) {
         ThreadUtils.checkIsOnMainThread()
         when (defaultDevice) {
-            AudioDevice.SPEAKER_PHONE -> defaultAudioDevice = AudioDevice.SPEAKER_PHONE
-            AudioDevice.EARPIECE -> defaultAudioDevice = if (hasEarpiece()) {
+            AudioDevice.SpeakerPhone -> defaultAudioDevice = AudioDevice.SpeakerPhone
+            AudioDevice.Earpiece -> defaultAudioDevice = if (hasEarpiece()) {
                 defaultDevice
             } else {
-                AudioDevice.SPEAKER_PHONE
+                AudioDevice.SpeakerPhone
             }
 
             else -> Timber.e("Invalid default audio device selection: %s", defaultDevice)
@@ -673,11 +691,11 @@ class AppRTCAudioManager private constructor(
 
     private fun getDeviceAvailable(device: AudioDevice?): AudioDevice? {
         if (isDeviceAvailable(device)) return device
-        var updatedDevice = AudioDevice.WIRED_HEADSET
+        var updatedDevice = AudioDevice.WiredHeadset
         if (isDeviceAvailable(updatedDevice)) return updatedDevice
-        updatedDevice = AudioDevice.BLUETOOTH
+        updatedDevice = AudioDevice.Bluetooth
         if (isDeviceAvailable(updatedDevice)) return updatedDevice
-        updatedDevice = AudioDevice.SPEAKER_PHONE
+        updatedDevice = AudioDevice.SpeakerPhone
         if (isDeviceAvailable(updatedDevice)) return updatedDevice
         Timber.e("Can not select $updatedDevice, from available %$audioDevices")
         return null
@@ -809,19 +827,19 @@ class AppRTCAudioManager private constructor(
             || bluetoothManager?.state == AppRTCBluetoothManager.State.SCO_CONNECTING
             || bluetoothManager?.state == AppRTCBluetoothManager.State.HEADSET_AVAILABLE
         ) {
-            newAudioDevices.add(AudioDevice.BLUETOOTH)
+            newAudioDevices.add(AudioDevice.Bluetooth)
         }
 
         if (hasWiredHeadset) {
             // If a wired headset is connected, then it is the only possible option.
-            newAudioDevices.add(AudioDevice.WIRED_HEADSET)
+            newAudioDevices.add(AudioDevice.WiredHeadset)
         }
 
         // No wired headset, hence the audio-device list can contain speaker
         // phone (on a tablet), or speaker phone and earpiece (on mobile phone).
-        newAudioDevices.add(AudioDevice.SPEAKER_PHONE)
+        newAudioDevices.add(AudioDevice.SpeakerPhone)
         if (hasEarpiece()) {
-            newAudioDevices.add(AudioDevice.EARPIECE)
+            newAudioDevices.add(AudioDevice.Earpiece)
         }
         var audioDeviceSetUpdated: Boolean
         // Store state which is set to true if the device list has changed.
@@ -834,42 +852,42 @@ class AppRTCAudioManager private constructor(
             audioDevices = newAudioDevices
             audioDeviceSetUpdated = true
         }
-        if (bluetoothManager?.state == AppRTCBluetoothManager.State.HEADSET_UNAVAILABLE && userSelectedAudioDevice == AudioDevice.BLUETOOTH) {
+        if (bluetoothManager?.state == AppRTCBluetoothManager.State.HEADSET_UNAVAILABLE && userSelectedAudioDevice == AudioDevice.Bluetooth) {
             Timber.w("Bluetooth is not available")
-            userSelectedAudioDevice = AudioDevice.EARPIECE
+            userSelectedAudioDevice = AudioDevice.Earpiece
         }
-        if (userSelectedAudioDevice == AudioDevice.NONE) {
+        if (userSelectedAudioDevice == AudioDevice.None) {
             userSelectedAudioDevice = if (isSpeakerOn) {
-                AudioDevice.SPEAKER_PHONE
+                AudioDevice.SpeakerPhone
             } else if (hasWiredHeadset) {
-                AudioDevice.WIRED_HEADSET
+                AudioDevice.WiredHeadset
             } else if (bluetoothManager != null && bluetoothManager?.state == AppRTCBluetoothManager.State.HEADSET_AVAILABLE) {
-                AudioDevice.BLUETOOTH
+                AudioDevice.Bluetooth
             } else {
-                AudioDevice.EARPIECE
+                AudioDevice.Earpiece
             }
-        } else if (hasWiredHeadset && userSelectedAudioDevice != AudioDevice.SPEAKER_PHONE) {
-            userSelectedAudioDevice = AudioDevice.WIRED_HEADSET
-        } else if (bluetoothManager?.state == AppRTCBluetoothManager.State.HEADSET_AVAILABLE && userSelectedAudioDevice != AudioDevice.SPEAKER_PHONE) {
-            userSelectedAudioDevice = AudioDevice.BLUETOOTH
-        } else if (userSelectedAudioDevice != AudioDevice.SPEAKER_PHONE) {
-            userSelectedAudioDevice = AudioDevice.EARPIECE
+        } else if (hasWiredHeadset && userSelectedAudioDevice != AudioDevice.SpeakerPhone) {
+            userSelectedAudioDevice = AudioDevice.WiredHeadset
+        } else if (bluetoothManager?.state == AppRTCBluetoothManager.State.HEADSET_AVAILABLE && userSelectedAudioDevice != AudioDevice.SpeakerPhone) {
+            userSelectedAudioDevice = AudioDevice.Bluetooth
+        } else if (userSelectedAudioDevice != AudioDevice.SpeakerPhone) {
+            userSelectedAudioDevice = AudioDevice.Earpiece
         }
 
         // Need to start Bluetooth if it is available and user either selected it explicitly or
         // user did not select any output device.
         val needBluetoothAudioStart =
             bluetoothManager?.state == AppRTCBluetoothManager.State.HEADSET_AVAILABLE
-                    && (userSelectedAudioDevice == AudioDevice.EARPIECE
-                    || userSelectedAudioDevice == AudioDevice.BLUETOOTH)
+                    && (userSelectedAudioDevice == AudioDevice.Earpiece
+                    || userSelectedAudioDevice == AudioDevice.Bluetooth)
 
         // Need to stop Bluetooth audio if user selected different device and
         // Bluetooth SCO connection is established or in the process.
         val needBluetoothAudioStop =
             (bluetoothManager?.state == AppRTCBluetoothManager.State.SCO_CONNECTED
                     || bluetoothManager?.state == AppRTCBluetoothManager.State.SCO_CONNECTING)
-                    && (userSelectedAudioDevice != AudioDevice.EARPIECE
-                    && userSelectedAudioDevice != AudioDevice.BLUETOOTH)
+                    && (userSelectedAudioDevice != AudioDevice.Earpiece
+                    && userSelectedAudioDevice != AudioDevice.Bluetooth)
         if (bluetoothManager?.state in listOf(
                 AppRTCBluetoothManager.State.HEADSET_AVAILABLE,
                 AppRTCBluetoothManager.State.SCO_CONNECTING,
@@ -890,7 +908,7 @@ class AppRTCAudioManager private constructor(
             // Attempt to start Bluetooth SCO audio (takes a few second to start).
             if (bluetoothManager?.startScoAudio() == false) {
                 // Remove BLUETOOTH from list of available devices since SCO failed.
-                audioDevices?.remove(AudioDevice.BLUETOOTH)
+                audioDevices?.remove(AudioDevice.Bluetooth)
                 audioDeviceSetUpdated = true
             }
         }
@@ -906,26 +924,26 @@ class AppRTCAudioManager private constructor(
                     // If a Bluetooth is connected, then it should be used as output audio
                     // device. Note that it is not sufficient that a headset is available;
                     // an active SCO channel must also be up and running.
-                    if (userSelectedAudioDevice == AudioDevice.SPEAKER_PHONE) {
-                        AudioDevice.SPEAKER_PHONE
+                    if (userSelectedAudioDevice == AudioDevice.SpeakerPhone) {
+                        AudioDevice.SpeakerPhone
                     } else {
-                        AudioDevice.BLUETOOTH
+                        AudioDevice.Bluetooth
                     }
                 }
 
                 hasWiredHeadset -> {
                     // If a wired headset is connected, but Bluetooth is not, then wired headset is used as
                     // audio device.
-                    if (userSelectedAudioDevice == AudioDevice.SPEAKER_PHONE) {
-                        AudioDevice.SPEAKER_PHONE
+                    if (userSelectedAudioDevice == AudioDevice.SpeakerPhone) {
+                        AudioDevice.SpeakerPhone
                     } else {
-                        AudioDevice.WIRED_HEADSET
+                        AudioDevice.WiredHeadset
                     }
                 }
 
-                userSelectedAudioDevice == AudioDevice.NONE -> {
+                userSelectedAudioDevice == AudioDevice.None -> {
                     if (typeAudioManager == Constants.AUDIO_MANAGER_CALL_RINGING) {
-                        AudioDevice.SPEAKER_PHONE
+                        AudioDevice.SpeakerPhone
                     } else {
                         defaultAudioDevice
                     }
@@ -946,37 +964,6 @@ class AppRTCAudioManager private constructor(
         Timber.d("Updated audio device state")
     }
 
-    /**
-     * Audio device
-     *
-     * @constructor Create empty Audio device
-     */
-    enum class AudioDevice {
-        /**
-         * Speaker Phone
-         */
-        SPEAKER_PHONE,
-
-        /**
-         * Wired Headset
-         */
-        WIRED_HEADSET,
-
-        /**
-         * Earpiece
-         */
-        EARPIECE,
-
-        /**
-         * Bluetooth
-         */
-        BLUETOOTH,
-
-        /**
-         * None
-         */
-        NONE
-    }
 
     /**
      * AudioManager state.
@@ -1010,7 +997,7 @@ class AppRTCAudioManager private constructor(
             )
             hasWiredHeadset = state == plugged
             if (state == plugged) {
-                changeUserSelectedAudioDeviceForHeadphone(AudioDevice.WIRED_HEADSET)
+                changeUserSelectedAudioDeviceForHeadphone(AudioDevice.WiredHeadset)
             }
             updateAudioDeviceState()
         }
@@ -1028,8 +1015,20 @@ class AppRTCAudioManager private constructor(
          * Construction.
          */
         @JvmStatic
-        fun create(context: Context, isSpeakerOn: Boolean, type: Int): AppRTCAudioManager {
-            return AppRTCAudioManager(context, isSpeakerOn, type)
+        fun create(
+            context: Context,
+            isSpeakerOn: Boolean,
+            type: Int,
+            applicationScope: CoroutineScope,
+            outputAudioUseCase: BroadcastAudioOutputUseCase,
+        ): AppRTCAudioManager {
+            return AppRTCAudioManager(
+                context,
+                isSpeakerOn,
+                type,
+                applicationScope,
+                outputAudioUseCase
+            )
         }
     }
 }

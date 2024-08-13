@@ -36,6 +36,7 @@ import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
 import mega.privacy.android.app.utils.OnSingleClickListener.Companion.setOnSingleClickListener
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.permissionsBuilder
+import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.mobile.analytics.event.ScheduledMeetingJoinGuestButtonEvent
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
@@ -244,7 +245,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 }
                 speakerLiveData.observe(viewLifecycleOwner) {
                     when (it) {
-                        AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
+                        AudioDevice.SpeakerPhone -> {
                             binding.onOffFab.fabSpeaker.enable = true
                             binding.onOffFab.fabSpeaker.isOn = true
                             binding.onOffFab.fabSpeaker.setOnIcon(IconR.drawable.ic_volume_max)
@@ -252,7 +253,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                                 getString(R.string.general_speaker)
                         }
 
-                        AppRTCAudioManager.AudioDevice.EARPIECE -> {
+                        AudioDevice.Earpiece -> {
                             binding.onOffFab.fabSpeaker.enable = true
                             binding.onOffFab.fabSpeaker.isOn = false
                             binding.onOffFab.fabSpeaker.setOnIcon(IconR.drawable.ic_volume_off)
@@ -260,8 +261,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                                 getString(R.string.general_speaker)
                         }
 
-                        AppRTCAudioManager.AudioDevice.WIRED_HEADSET,
-                        AppRTCAudioManager.AudioDevice.BLUETOOTH,
+                        AudioDevice.WiredHeadset,
+                        AudioDevice.Bluetooth,
                         -> {
                             binding.onOffFab.fabSpeaker.enable = true
                             binding.onOffFab.fabSpeaker.isOn = true

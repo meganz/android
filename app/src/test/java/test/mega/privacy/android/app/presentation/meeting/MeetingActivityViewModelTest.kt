@@ -5,7 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityRepository
@@ -34,6 +33,7 @@ import mega.privacy.android.domain.usecase.call.CreateMeetingUseCase
 import mega.privacy.android.domain.usecase.call.GetCallIdsOfOthersCallsUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorAudioOutputUseCase
 import mega.privacy.android.domain.usecase.call.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.call.RingIndividualInACallUseCase
 import mega.privacy.android.domain.usecase.call.StartCallUseCase
@@ -66,10 +66,8 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
-import kotlin.test.Test
 
 @ExperimentalCoroutinesApi
 @ExtendWith(value = [CoroutineMainDispatcherExtension::class, InstantTaskExecutorExtension::class])
@@ -114,6 +112,7 @@ class MeetingActivityViewModelTest {
     private val monitorUserUpdates: MonitorUserUpdates = mock()
     private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase =
         mock()
+
     private val deviceGateway: DeviceGateway = mock()
     private val ringIndividualInACallUseCase: RingIndividualInACallUseCase = mock()
     private val allowUsersJoinCallUseCase: AllowUsersJoinCallUseCase = mock()
@@ -127,6 +126,8 @@ class MeetingActivityViewModelTest {
     private val savedStateHandle: SavedStateHandle = mock()
     private val startVideoDeviceUseCase: StartVideoDeviceUseCase = mock()
     private val monitorCallEndedUseCase: MonitorCallEndedUseCase = mock()
+    private val monitorAudioOutputUseCase: MonitorAudioOutputUseCase = mock()
+
     private val enableOrDisableVideoUseCase: EnableOrDisableVideoUseCase = mock()
     private val enableOrDisableAudioUseCase: EnableOrDisableAudioUseCase = mock()
     private val createMeetingUseCase: CreateMeetingUseCase = mock()
@@ -197,6 +198,7 @@ class MeetingActivityViewModelTest {
             monitorCallEndedUseCase,
             enableOrDisableAudioUseCase,
             enableOrDisableVideoUseCase,
+            monitorAudioOutputUseCase,
             savedStateHandle
         )
     }
@@ -257,6 +259,7 @@ class MeetingActivityViewModelTest {
             createMeetingUseCase = createMeetingUseCase,
             startCallUseCase = startCallUseCase,
             passcodeManagement = passcodeManagement,
+            monitorAudioOutputUseCase = monitorAudioOutputUseCase
         )
     }
 

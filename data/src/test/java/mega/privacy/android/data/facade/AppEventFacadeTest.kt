@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.domain.entity.call.AudioDevice
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -96,6 +97,14 @@ class AppEventFacadeTest {
         underTest.monitorCallScreenOpened().test {
             underTest.broadcastCallScreenOpened(true)
             assertThat(awaitItem()).isEqualTo(true)
+        }
+    }
+
+    @Test
+    fun `test that broadcast audio output changed fires an event`() = runTest {
+        underTest.monitorAudioOutput().test {
+            underTest.broadcastAudioOutput(audioDevice = AudioDevice.SpeakerPhone)
+            assertThat(awaitItem()).isEqualTo(AudioDevice.SpeakerPhone)
         }
     }
 }

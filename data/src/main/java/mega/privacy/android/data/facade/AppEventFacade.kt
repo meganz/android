@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
@@ -68,6 +69,7 @@ internal class AppEventFacade @Inject constructor(
 
     private val callEnded = MutableSharedFlow<Long>()
     private val callScreenOpened = MutableSharedFlow<Boolean>()
+    private val audioOutput = MutableSharedFlow<AudioDevice>()
 
     private val updateUserData = MutableSharedFlow<Unit>()
 
@@ -221,6 +223,11 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadcastCallScreenOpened(isOpened: Boolean) =
         callScreenOpened.emit(isOpened)
+
+    override fun monitorAudioOutput() = audioOutput.asSharedFlow()
+
+    override suspend fun broadcastAudioOutput(audioDevice: AudioDevice) =
+        audioOutput.emit(audioDevice)
 
     override suspend fun broadcastUpdateUserData() {
         updateUserData.emit(Unit)
