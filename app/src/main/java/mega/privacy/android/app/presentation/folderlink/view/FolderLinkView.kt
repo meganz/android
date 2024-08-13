@@ -152,7 +152,6 @@ internal fun FolderLinkView(
     val coroutineScope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
-        confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded },
         skipHalfExpanded = true,
     )
 
