@@ -41,18 +41,17 @@ internal class AccountDetailMapper @Inject constructor(
             for (i in 0 until details.numPlans) {
                 megaAccountPlanList.add(details.getPlan(i))
             }
-            val megaAccountProPlan = megaAccountPlanList.first { plan -> plan.isProPlan }
+            val megaAccountProPlan = megaAccountPlanList.firstOrNull { plan -> plan.isProPlan }
             accountLevelDetailMapper(
                 subscriptionRenewTime = it.subscriptionRenewTime,
                 proExpirationTime = it.proExpiration,
-                accountType = if (details.numPlans > 0 && megaAccountProPlan.isProPlan) {
+                accountType = if (details.numPlans > 0 && megaAccountProPlan?.isProPlan == true) {
                     accountTypeMapper(megaAccountProPlan.accountLevel.toInt())
                 } else accountTypeMapper(it.proLevel),
                 subscriptionStatus = subscriptionStatusMapper(it.subscriptionStatus),
                 subscriptionRenewCycleType = accountSubscriptionCycleMapper(it.subscriptionCycle),
-                planDetail = if (details.numPlans > 0) {
-                    accountPlanDetailMapper(megaAccountProPlan)
-                } else null,
+                planDetail = megaAccountProPlan?.takeIf { details.numPlans > 0 }
+                    ?.let { proPlan -> accountPlanDetailMapper(proPlan) },
                 subscriptionListDetail = accountSubscriptionDetailListMapper(details),
             )
         },
