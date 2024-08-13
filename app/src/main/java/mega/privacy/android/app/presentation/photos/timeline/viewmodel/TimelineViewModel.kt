@@ -953,11 +953,11 @@ class TimelineViewModel @Inject constructor(
      *
      * @param hide true if the selected Nodes should be hidden
      */
-    fun hideOrUnhideNodes(hide: Boolean) = viewModelScope.launch {
-        for (node in getSelectedNodes()) {
+    fun hideOrUnhideNodes(hide: Boolean, handles: List<Long>) = viewModelScope.launch {
+        for (handle in handles) {
             async {
                 runCatching {
-                    updateNodeSensitiveUseCase(nodeId = NodeId(node.handle), isSensitive = hide)
+                    updateNodeSensitiveUseCase(nodeId = NodeId(handle), isSensitive = hide)
                 }.onFailure { Timber.e("Update sensitivity failed: $it") }
             }
         }

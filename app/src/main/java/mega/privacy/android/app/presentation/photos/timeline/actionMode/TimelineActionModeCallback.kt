@@ -93,7 +93,10 @@ class TimelineActionModeCallback(
             }
 
             R.id.cab_menu_unhide -> {
-                fragment.timelineViewModel.hideOrUnhideNodes(hide = false)
+                fragment.timelineViewModel.hideOrUnhideNodes(
+                    hide = false,
+                    handles = fragment.timelineViewModel.selectedPhotosIds.toList(),
+                )
                 fragment.destroyActionMode()
             }
 

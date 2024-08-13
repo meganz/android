@@ -868,13 +868,17 @@ class PhotosFragment : Fragment() {
         } else if (isHiddenNodesOnboarded) {
             timelineViewModel.hideOrUnhideNodes(
                 hide = true,
+                handles = timelineViewModel.selectedPhotosIds.toList(),
             )
         } else {
             showHiddenNodesOnboarding()
         }
     }
 
+    private var tempSelectedNodeHandles: List<Long> = listOf()
+
     private fun showHiddenNodesOnboarding() {
+        tempSelectedNodeHandles = timelineViewModel.selectedPhotosIds.toList()
         timelineViewModel.setHiddenNodesOnboarded()
 
         val intent = HiddenNodesOnboardingActivity.createScreen(
@@ -896,8 +900,9 @@ class PhotosFragment : Fragment() {
 
         timelineViewModel.hideOrUnhideNodes(
             hide = true,
+            handles = tempSelectedNodeHandles,
         )
-        val selectedSize = timelineViewModel.getSelectedIds().size
+        val selectedSize = tempSelectedNodeHandles.size
 
         val message =
             resources.getQuantityString(
@@ -906,6 +911,7 @@ class PhotosFragment : Fragment() {
                 selectedSize,
             )
         Util.showSnackbar(requireActivity(), message)
+        tempSelectedNodeHandles = listOf()
     }
 
     /**
