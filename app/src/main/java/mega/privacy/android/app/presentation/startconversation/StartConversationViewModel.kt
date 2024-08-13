@@ -17,7 +17,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.findItemByHandle
 import mega.privacy.android.app.data.extensions.replaceIfExists
 import mega.privacy.android.app.data.extensions.sortList
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -107,7 +106,6 @@ class StartConversationViewModel @Inject constructor(
         observeLastGreenUpdates()
         observeOnlineStatusUpdates()
         observeNewContacts()
-        getFeatureFlags()
     }
 
     /**
@@ -242,18 +240,6 @@ class StartConversationViewModel @Inject constructor(
                 val contactList = addNewContactsUseCase(_state.value.contactItemList, newContacts)
                 _state.update { it.copy(contactItemList = contactList.sortList()) }
             }
-        }
-    }
-
-    private fun getFeatureFlags() {
-        viewModelScope.launch {
-            runCatching { getFeatureFlagValueUseCase(AppFeatures.NewInviteContactActivity) }
-                .onSuccess { isEnabled ->
-                    _state.update {
-                        it.copy(isNewInviteContactActivityEnabled = isEnabled)
-                    }
-                }
-                .onFailure { Timber.e("Failed to retrieve feature flag value") }
         }
     }
 

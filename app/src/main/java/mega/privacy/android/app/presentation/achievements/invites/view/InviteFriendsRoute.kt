@@ -45,7 +45,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
-import mega.privacy.android.app.presentation.contact.invite.InviteContactActivityV2
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel.Companion.KEY_FROM
 import mega.privacy.android.app.presentation.contact.invite.navigation.InviteContactScreenResult.Companion.KEY_SENT_NUMBER
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
@@ -165,10 +164,12 @@ internal fun InviteFriendsView(
                         .align(Alignment.CenterHorizontally),
                     textId = R.string.invite_contacts,
                     onClick = {
-                        val activity = if (uiState.isNewInviteContactActivityEnabled) {
-                            InviteContactActivityV2::class.java
-                        } else InviteContactActivity::class.java
-                        val intent = Intent(context, activity).apply { putExtra(KEY_FROM, true) }
+                        val intent = Intent(context, InviteContactActivity::class.java).apply {
+                            putExtra(
+                                KEY_FROM,
+                                true
+                            )
+                        }
                         activityLauncher.launch(intent)
                     }
                 )

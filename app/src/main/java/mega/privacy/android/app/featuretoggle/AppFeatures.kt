@@ -225,14 +225,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables new invite contact compose page
-     */
-    NewInviteContactActivity(
-        "Enable new invite contact activity",
-        true
-    ),
-
-    /**
      * Enables new transfers section
      */
     TransfersSection(

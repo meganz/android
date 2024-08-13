@@ -353,9 +353,6 @@
             android:name=".presentation.contact.invite.InviteContactActivity"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".presentation.contact.invite.InviteContactActivityV2"
-            android:windowSoftInputMode="adjustNothing" />
-        <activity
             android:name=".presentation.meeting.chat.ChatHostActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden|adjustResize" />

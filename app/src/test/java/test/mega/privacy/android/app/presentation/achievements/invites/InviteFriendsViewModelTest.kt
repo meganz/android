@@ -11,7 +11,6 @@ import mega.privacy.android.domain.entity.achievement.Achievement
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -47,11 +46,10 @@ class InviteFriendsViewModelTest {
 
     private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase =
         mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     @BeforeEach
     fun resetMocks() {
-        reset(getAccountAchievementsOverviewUseCase, getFeatureFlagValueUseCase)
+        reset(getAccountAchievementsOverviewUseCase)
     }
 
     @Test
@@ -83,8 +81,7 @@ class InviteFriendsViewModelTest {
     private fun initTestClass() {
         underTest = InviteFriendsViewModel(
             savedStateHandle = savedStateHandle,
-            getAccountAchievementsOverviewUseCase = getAccountAchievementsOverviewUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+            getAccountAchievementsOverviewUseCase = getAccountAchievementsOverviewUseCase
         )
     }
 

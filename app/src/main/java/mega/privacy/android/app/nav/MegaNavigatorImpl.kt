@@ -11,7 +11,6 @@ import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerComposeActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
-import mega.privacy.android.app.presentation.contact.invite.InviteContactActivityV2
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
@@ -178,13 +177,7 @@ internal class MegaNavigatorImpl @Inject constructor(
 
     override fun openInviteContactActivity(context: Context, isFromAchievement: Boolean) {
         applicationScope.launch {
-            val activity =
-                if (getFeatureFlagValueUseCase(AppFeatures.NewInviteContactActivity)) {
-                    InviteContactActivityV2::class.java
-                } else {
-                    InviteContactActivity::class.java
-                }
-            val intent = Intent(context, activity).apply {
+            val intent = Intent(context, InviteContactActivity::class.java).apply {
                 putExtra(InviteContactViewModel.KEY_FROM, isFromAchievement)
             }
             context.startActivity(intent)

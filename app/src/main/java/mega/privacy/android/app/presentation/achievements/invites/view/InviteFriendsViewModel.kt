@@ -8,14 +8,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsArgs
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
 import mega.privacy.android.domain.entity.achievement.ReferralBonusAchievements
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -26,7 +24,6 @@ import javax.inject.Inject
 class InviteFriendsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
     private val inviteFriendsArgs = InviteFriendsArgs(savedStateHandle)
     private val _uiState = MutableStateFlow(InviteFriendsUIState())
@@ -40,7 +37,6 @@ class InviteFriendsViewModel @Inject constructor(
 
     init {
         getInviteReferralStorageValue()
-        getFeatureFlags()
     }
 
     /**
@@ -73,18 +69,6 @@ class InviteFriendsViewModel @Inject constructor(
             }.onFailure {
                 Timber.e(it)
             }
-        }
-    }
-
-    private fun getFeatureFlags() {
-        viewModelScope.launch {
-            runCatching { getFeatureFlagValueUseCase(AppFeatures.NewInviteContactActivity) }
-                .onSuccess { isEnabled ->
-                    _uiState.update {
-                        it.copy(isNewInviteContactActivityEnabled = isEnabled)
-                    }
-                }
-                .onFailure { Timber.e("Failed to retrieve feature flag value") }
         }
     }
 }

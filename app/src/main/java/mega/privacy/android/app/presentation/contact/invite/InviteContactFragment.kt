@@ -67,7 +67,7 @@ class InviteContactFragment : Fragment() {
                         content = {
                             // This is necessary to prevent the viewmodel class from being recreated when the configuration changes.
                             // This can be removed after we fully migrate to a single activity and Compose navigation.
-                            CompositionLocalProvider(LocalViewModelStoreOwner provides activity as InviteContactActivityV2) {
+                            CompositionLocalProvider(LocalViewModelStoreOwner provides activity as InviteContactActivity) {
                                 InviteContactRoute(
                                     modifier = Modifier.fillMaxSize(),
                                     isDarkMode = themeMode.isDarkMode(),
@@ -96,7 +96,7 @@ class InviteContactFragment : Fragment() {
     }
 
     private fun onBackPressed() {
-        (activity as? InviteContactActivityV2)?.onBackPressed()
+        (activity as? InviteContactActivity)?.onBackPressed()
     }
 
     private fun shareContactLink(contactLink: String) {

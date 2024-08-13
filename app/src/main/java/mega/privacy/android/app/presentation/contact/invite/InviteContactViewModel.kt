@@ -22,12 +22,12 @@ import mega.privacy.android.app.presentation.contact.invite.mapper.InvitationSta
 import mega.privacy.android.app.presentation.contact.invite.model.EmailValidationResult.InvalidResult
 import mega.privacy.android.app.presentation.contact.invite.model.EmailValidationResult.ValidResult
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.call.AreThereOngoingVideoCallsUseCase
 import mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithEmailsUseCase
 import mega.privacy.android.domain.usecase.contact.ValidateEmailInputForInvitationUseCase
-import mega.privacy.android.domain.usecase.call.AreThereOngoingVideoCallsUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -203,13 +203,6 @@ class InviteContactViewModel @Inject constructor(
         displayLabel: String,
         nameWithoutSpace: String,
     ) = name.contains(this) || displayLabel.contains(this) || nameWithoutSpace.contains(this)
-
-    /**
-     * Reset the onContactsInitialized state
-     */
-    internal fun resetOnContactsInitializedState() {
-        _uiState.update { it.copy(areContactsInitialized = false) }
-    }
 
     internal fun onOpenCameraConfirmationShown() {
         _uiState.update { it.copy(showOpenCameraConfirmation = false) }
