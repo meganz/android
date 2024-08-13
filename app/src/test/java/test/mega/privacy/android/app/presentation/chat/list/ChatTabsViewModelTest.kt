@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
@@ -15,6 +16,10 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
+import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
+import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
+import mega.privacy.android.domain.usecase.call.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUnreadStatusUseCase
@@ -25,14 +30,11 @@ import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
-import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
-import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingCanceledUseCase
-import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
-import mega.privacy.android.domain.usecase.call.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -77,11 +79,13 @@ internal class ChatTabsViewModelTest {
     private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase = mock()
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
     private val hasArchivedChatsUseCase: HasArchivedChatsUseCase = mock()
+    private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase = mock()
 
     @BeforeEach
     fun resetMocks() {
         whenever(monitorScheduledMeetingCanceledUseCase()).thenReturn(emptyFlow())
         wheneverBlocking { getMeetingTooltipsUseCase() }.thenReturn(MeetingTooltipItem.NONE)
+        whenever(monitorHasAnyContactUseCase()).thenReturn(flowOf(true))
         reset(
             archiveChatUseCase,
             leaveChatUseCase,
@@ -133,7 +137,8 @@ internal class ChatTabsViewModelTest {
             startMeetingInWaitingRoomChatUseCase,
             monitorLeaveChatUseCase,
             monitorChatCallUpdatesUseCase,
-            hasArchivedChatsUseCase
+            hasArchivedChatsUseCase,
+            monitorHasAnyContactUseCase
         )
     }
 

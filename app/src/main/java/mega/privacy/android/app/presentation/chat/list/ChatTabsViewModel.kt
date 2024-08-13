@@ -29,17 +29,21 @@ import mega.privacy.android.app.presentation.data.SnackBarItem
 import mega.privacy.android.app.usecase.chat.GetLastMessageUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.domain.entity.call.ChatCall
-import mega.privacy.android.domain.entity.chat.ChatRoomItem
-import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
-import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.domain.entity.call.CallNotificationType
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
+import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
+import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
+import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
+import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
+import mega.privacy.android.domain.usecase.call.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUnreadStatusUseCase
@@ -51,12 +55,9 @@ import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
-import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
-import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingCanceledUseCase
-import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
-import mega.privacy.android.domain.usecase.call.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import nz.mega.sdk.MegaChatError
 import timber.log.Timber
@@ -115,6 +116,7 @@ class ChatTabsViewModel @Inject constructor(
     private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val hasArchivedChatsUseCase: HasArchivedChatsUseCase,
+    private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
@@ -134,10 +136,19 @@ class ChatTabsViewModel @Inject constructor(
         retrieveTooltips()
         retrieveChatsUnreadStatus()
         monitorLeaveChat()
-
+        monitorHasAnyContact()
         viewModelScope.launch {
             monitorScheduledMeetingCanceledUseCase().conflate()
                 .collect { messageResId -> triggerSnackbarMessage(messageResId) }
+        }
+    }
+
+    private fun monitorHasAnyContact() {
+        viewModelScope.launch {
+            monitorHasAnyContactUseCase().conflate()
+                .collect { hasAnyContact ->
+                    state.update { state -> state.copy(hasAnyContact = hasAnyContact) }
+                }
         }
     }
 

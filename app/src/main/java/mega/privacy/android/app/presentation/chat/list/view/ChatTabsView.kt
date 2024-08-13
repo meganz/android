@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.chat.list.view
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Canvas
@@ -93,7 +92,7 @@ fun ChatTabsView(
         initialPage = initialPage,
         initialPageOffsetFraction = 0f
     ) {
-        ChatTab.values().size
+        ChatTab.entries.size
     }
     var scrollToTop by remember { mutableStateOf(false) }
     var showFabButton by remember { mutableStateOf(true) }
@@ -140,7 +139,7 @@ fun ChatTabsView(
                 backgroundColor = MaterialTheme.colors.surface,
                 contentColor = MaterialTheme.colors.red_600_red_300
             ) {
-                ChatTab.values().forEachIndexed { index, item ->
+                ChatTab.entries.forEachIndexed { index, item ->
                     Tab(
                         text = {
                             TabText(
@@ -190,6 +189,7 @@ fun ChatTabsView(
                     onScrollInProgress = { showFabButton = !it },
                     onEmptyButtonClick = onStartChatClick,
                     onShowNextTooltip = onShowNextTooltip,
+                    hasAnyContact = state.hasAnyContact
                 )
             }
 
@@ -223,7 +223,11 @@ fun ChatTabsView(
             EventEffect(
                 event = state.snackbarMessageContent, onConsumed = onResetStateSnackbarMessage
             ) { resId ->
-                scaffoldState.snackbarHostState.showAutoDurationSnackbar(context.resources.getString(resId))
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                    context.resources.getString(
+                        resId
+                    )
+                )
             }
 
             EventEffect(
@@ -267,7 +271,6 @@ private fun TabText(titleStringRes: Int, hasUnreadMessages: Boolean) {
 }
 
 @Composable
-@OptIn(ExperimentalAnimationApi::class)
 private fun FabButton(showFabButton: Boolean, onStartChatClick: () -> Unit) {
     AnimatedVisibility(
         visible = showFabButton,

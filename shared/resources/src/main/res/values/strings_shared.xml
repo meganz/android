@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
@@ -598,4 +598,16 @@
     <string name="report_issue_error_minimum_characters">Enquiries must be at least 10 characters</string>
     <!-- placeholder message for report issue-->
     <string name="report_issue_description_placeholder_message">Describe the issue with at least 10 characters</string>
+    <!--Title text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_title">Keep conversations private</string>
+    <!--Subtitle text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_subtitle">All your messages, group chats, and calls are        protected by our zero-knowledge encryption.[A] Learn more[/A]</string>
+    <!-- Label of the action button of inviting a friend from contact screen -->
+    <string name="chat_recent_invite_friend">Invite a friend</string>
+    <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_title">Invite friends with confidence</string>
+    <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_subtitle">With top notch security and verification codes, reach out without fear of scams, data mining, or stolen information.</string>
+    <!-- Label shown when the user wants to add contacts into his MEGA account -->
+    <string name="invite_contacts_action_label">Invite</string>
 </resources>

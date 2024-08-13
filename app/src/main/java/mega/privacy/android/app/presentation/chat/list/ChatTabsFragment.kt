@@ -42,6 +42,7 @@ import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragmen
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.view.ChatTabsView
+import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
@@ -61,6 +62,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.ChatScreenEvent
 import mega.privacy.mobile.analytics.event.ChatTabFABPressedEvent
 import mega.privacy.mobile.analytics.event.ChatsTabEvent
+import mega.privacy.mobile.analytics.event.InviteFriendsPressedEvent
 import mega.privacy.mobile.analytics.event.MeetingsTabEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -403,14 +405,26 @@ class ChatTabsFragment : Fragment() {
     }
 
     private fun startChatAction() {
-        Analytics.tracker.trackEvent(ChatTabFABPressedEvent)
         if (isMeetingTabShown()) {
+            Analytics.tracker.trackEvent(ChatTabFABPressedEvent)
             MeetingBottomSheetDialogFragment.newInstance(true).show(
                 childFragmentManager,
                 MeetingBottomSheetDialogFragment.TAG
             )
         } else {
-            startConversationLauncher.launch(StartConversationActivity.getChatIntent(requireContext()))
+            if (viewModel.getState().value.hasAnyContact) {
+                Analytics.tracker.trackEvent(ChatTabFABPressedEvent)
+                startConversationLauncher.launch(
+                    StartConversationActivity.getChatIntent(
+                        requireContext()
+                    )
+                )
+            } else {
+                Analytics.tracker.trackEvent(InviteFriendsPressedEvent)
+                val activity = InviteContactActivity::class.java
+                val intent = Intent(context, activity)
+                startActivity(intent)
+            }
         }
     }
 

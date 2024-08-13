@@ -1,10 +1,11 @@
 package test.mega.privacy.android.app.presentation.startconversation
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.presentation.startconversation.view.StartConversationView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
+import mega.privacy.android.app.presentation.startconversation.view.StartConversationView
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,7 +21,7 @@ class StartConversationViewTest {
     @Test
     fun test_that_invite_contacts_button_is_shown() {
         initComposeRuleContent()
-        composeRule.onNodeWithText(R.string.invite_contacts).assertExists()
+        composeRule.onNodeWithText(sharedR.string.invite_contacts_action_label).assertExists()
     }
 
     @Test

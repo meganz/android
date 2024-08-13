@@ -21,7 +21,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property isNewInviteContactActivityEnabled Whether the new invite contact activity flag is enabled.
  */
 data class StartConversationState(
-    val buttons: List<StartConversationAction> = StartConversationAction.values().asList(),
+    val buttons: List<StartConversationAction> = StartConversationAction.entries.toList(),
     val contactItemList: List<ContactItem> = emptyList(),
     val emptyViewVisible: Boolean = true,
     val searchAvailable: Boolean = false,
