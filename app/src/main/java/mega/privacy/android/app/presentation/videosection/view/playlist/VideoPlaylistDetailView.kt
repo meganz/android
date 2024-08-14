@@ -60,7 +60,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
-import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
@@ -382,9 +382,8 @@ internal fun VideoPlaylistEmptyView(
             dividerType = DividerType.Centered,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-        LegacyMegaEmptyView(
-            modifier = Modifier
-                .fillMaxSize(),
+        LegacyMegaEmptyViewWithImage(
+            modifier = Modifier.fillMaxSize(),
             text = stringResource(id = sharedR.string.video_section_playlist_detail_empty_hint_videos),
             imagePainter = painterResource(id = iconPackR.drawable.ic_video_section_empty_video)
         )

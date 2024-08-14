@@ -99,6 +99,28 @@ fun LegacyMegaEmptyView(
     }
 }
 
+/**
+ * Reusable EmptyView with Image & Text
+ * Pass imagePainter using painterResource(id = R.drawable.ic_xyz)
+ * @param modifier
+ * @param imagePainter
+ * @param text
+ */
+@Composable
+fun LegacyMegaEmptyViewWithImage(
+    modifier: Modifier = Modifier,
+    imagePainter: Painter,
+    text: String,
+) {
+    LegacyMegaEmptyView(modifier, text) {
+        Image(
+            modifier = Modifier.padding(bottom = 30.dp),
+            painter = imagePainter,
+            contentDescription = "Empty Image"
+        )
+    }
+}
+
 @Composable
 private fun LegacyMegaEmptyView(modifier: Modifier, text: Spanned, Icon: @Composable () -> Unit) {
     Column(

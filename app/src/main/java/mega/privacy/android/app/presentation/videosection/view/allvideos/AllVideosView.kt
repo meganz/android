@@ -38,7 +38,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
-import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -152,7 +152,7 @@ internal fun AllVideosView(
                     )
                 }
 
-                items.isEmpty() -> LegacyMegaEmptyView(
+                items.isEmpty() -> LegacyMegaEmptyViewWithImage(
                     modifier = Modifier.testTag(VIDEOS_EMPTY_VIEW_TEST_TAG),
                     text = stringResource(id = R.string.homepage_empty_hint_video),
                     imagePainter = painterResource(id = iconPackR.drawable.ic_video_section_empty_video)
