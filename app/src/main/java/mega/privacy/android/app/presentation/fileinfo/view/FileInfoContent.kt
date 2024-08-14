@@ -200,6 +200,7 @@ internal fun FileInfoContent(
 
             // Map location
             if (isPhoto && canEnableMapLocation()) {
+                FileInfoContentDivider()
                 FileInfoMapLocationView(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -208,6 +209,7 @@ internal fun FileInfoContent(
                     longitude = longitude,
                     getAddress = getAddress,
                 )
+                FileInfoContentDivider()
             }
 
             //description
