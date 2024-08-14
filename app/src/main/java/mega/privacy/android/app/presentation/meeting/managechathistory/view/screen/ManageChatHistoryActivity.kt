@@ -11,11 +11,9 @@ import timber.log.Timber
  * This activity displays a screen allowing the user to manage the chat history. Options:
  * - The user can clear the chat history
  * - The user can set the retention time for the chat history
- *
- * This activity will replace the [mega.privacy.android.app.activities.ManageChatHistoryActivity]
  */
 @AndroidEntryPoint
-class ManageChatHistoryActivityV2 : FragmentActivity() {
+class ManageChatHistoryActivity : FragmentActivity() {
 
     /**
      * Called when the activity is starting.

@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.activities.ManageChatHistoryActivity
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
@@ -16,7 +15,7 @@ import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
-import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivityV2
+import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
@@ -143,13 +142,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         email: String?,
     ) {
         applicationScope.launch {
-            val activity =
-                if (getFeatureFlagValueUseCase(AppFeatures.NewManageChatHistoryActivity)) {
-                    ManageChatHistoryActivityV2::class.java
-                } else {
-                    ManageChatHistoryActivity::class.java
-                }
-            val intent = Intent(context, activity).apply {
+            val intent = Intent(context, ManageChatHistoryActivity::class.java).apply {
                 putExtra(Constants.CHAT_ID, chatId)
                 email?.let { putExtra(Constants.EMAIL, it) }
             }

@@ -164,14 +164,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables new manage chat history compose page
-     */
-    NewManageChatHistoryActivity(
-        "Enable new manage chat history activity",
-        true
-    ),
-
-    /**
      * Raise to speak in a call
      */
     RaiseToSpeak("Raise to speak in a call or a meeting", true),

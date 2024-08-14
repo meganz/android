@@ -475,12 +475,7 @@
             android:name=".presentation.weakaccountprotection.WeakAccountProtectionAlertActivity"
             android:launchMode="singleTop" />
         <activity
-            android:name=".activities.ManageChatHistoryActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/title_properties_manage_chat"
-            android:launchMode="singleTop" />
-        <activity
-            android:name=".presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivityV2"
+            android:name=".presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_properties_manage_chat"
             android:launchMode="singleTop" />
