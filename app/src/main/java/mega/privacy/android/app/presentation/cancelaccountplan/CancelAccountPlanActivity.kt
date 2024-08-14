@@ -18,6 +18,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancellationInstructionsType
 import mega.privacy.android.app.presentation.cancelaccountplan.model.UIAccountDetails
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelAccountPlanView
+import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelSubscriptionSurveyView
 import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.CancellationInstructionsView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.resources.R
 import mega.privacy.mobile.analytics.event.CancelSubscriptionContinueCancellationButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CancelSubscriptionKeepPlanButtonPressedEvent
 import timber.log.Timber
@@ -70,6 +72,19 @@ class CancelAccountPlanActivity : AppCompatActivity() {
 
         val cancelAccountPlanRoute = "cancelAccount/plan"
         val cancellationInstructionsRoute = "cancelAccount/cancellationInstructions"
+        val cancellationSurveyRoute = "cancelAccount/cancellationSurvey"
+
+        val possibleCancellationReasons = listOf(
+            R.string.account_cancel_subscription_survey_option_expensive,
+            R.string.account_cancel_subscription_survey_option_cannot_afford,
+            R.string.account_cancel_subscription_survey_option_no_subscription,
+            R.string.account_cancel_subscription_survey_option_no_storage_need,
+            R.string.account_cancel_subscription_survey_option_missing_features,
+            R.string.account_cancel_subscription_survey_option_switch_provider,
+            R.string.account_cancel_subscription_survey_option_confusing,
+            R.string.account_cancel_subscription_survey_option_dissatisfied_support,
+            R.string.account_cancel_subscription_survey_option_temporary_use,
+        ).shuffled() + R.string.account_cancel_subscription_survey_option_other
 
         setContent {
             val navController = rememberNavController()
@@ -146,6 +161,32 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                             },
                             isAccountReactivationNeeded = false
                         )
+                    }
+                    composable(cancellationSurveyRoute) {
+                        CancelSubscriptionSurveyView(
+                            possibleCancellationReasons = possibleCancellationReasons,
+                            onCancelSubscriptionButtonClicked = {
+                                uiState.cancellationInstructionsType?.let { cancellationInstructionsType ->
+                                    when (cancellationInstructionsType) {
+                                        CancellationInstructionsType.AppStore,
+                                        CancellationInstructionsType.WebClient,
+                                        -> navController.navigate(
+                                            cancellationInstructionsRoute
+                                        )
+
+                                        CancellationInstructionsType.PlayStore ->
+                                            uiState.isMonthlySubscription?.let { isMonthlySubscription ->
+                                                redirectToCancelPlayStoreSubscription(
+                                                    accountType,
+                                                    isMonthlySubscription
+                                                )
+                                            }
+                                    }
+                                }
+                            },
+                            onDoNotCancelButtonClicked = {
+                                finish()
+                            })
                     }
                 }
             }

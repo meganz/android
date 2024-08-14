@@ -116,6 +116,7 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.extensions.isPortrait
+import mega.privacy.android.app.extensions.isTablet
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
@@ -2210,7 +2211,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         askPermissions = false
         showStorageAlertWithDelay = true
         //If mobile device, only portrait mode is allowed
-        if (!Util.isTablet(this)) {
+        if (isTablet().not()) {
             Timber.d("Mobile only portrait mode")
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
@@ -2262,7 +2263,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     fun destroyPermissionsFragment() {
         initialPermissionsAlreadyAsked = true
         //In mobile, allow all orientation after permission screen
-        if (!Util.isTablet(this)) {
+        if (isTablet().not()) {
             Timber.d("Mobile, all orientation")
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_USER
         }

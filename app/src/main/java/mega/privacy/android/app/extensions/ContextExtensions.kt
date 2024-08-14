@@ -41,3 +41,12 @@ fun Context.navigateToAppSettings() {
  */
 fun Context.isPortrait() =
     resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+
+/**
+ * Check if device is tablet or not
+ * @return true if device is tablet false otherwise
+ */
+fun Context.isTablet() =
+    ((resources.configuration.screenLayout
+            and Configuration.SCREENLAYOUT_SIZE_MASK)
+            >= Configuration.SCREENLAYOUT_SIZE_LARGE)

@@ -573,7 +573,6 @@ public class Util {
      *
      * @param speed the speed to show in the string
      * @return The speed string.
-     *
      * @deprecated Use [mega.privacy.android.app.presentation.mapper.file.FileSpeedMapper] instead
      */
     public static String getSpeedString(long speed, Context context) {
@@ -585,7 +584,6 @@ public class Util {
      *
      * @param size the size to show in the string
      * @return The size string.
-     *
      * @deprecated Use [mega.privacy.android.app.presentation.mapper.file.FileSizeMapper] instead
      */
     public static String getSizeString(long size, Context context) {
@@ -1172,16 +1170,6 @@ public class Util {
         }
     }
 
-    /**
-     * This method detects whether the android device is tablet
-     *
-     * @param context the passed Activity to be detected
-     */
-    public static boolean isTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }
 
     /**
      * This method detects whether the url matches certain URL regular expressions

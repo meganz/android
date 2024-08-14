@@ -23,6 +23,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityLoginBinding
+import mega.privacy.android.app.extensions.isTablet
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
@@ -283,7 +284,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
      */
     @SuppressLint("SourceLockedOrientationActivity")
     private fun restrictOrientation() {
-        if (Util.isTablet(this)) {
+        if (isTablet()) {
             requestedOrientation =
                 if (visibleFragment == Constants.TOUR_FRAGMENT) {
                     Timber.d("Tablet landscape mode allowed")

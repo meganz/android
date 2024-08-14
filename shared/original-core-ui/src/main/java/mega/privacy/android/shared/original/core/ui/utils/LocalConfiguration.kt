@@ -11,3 +11,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 @Composable
 fun isScreenOrientationLandscape() =
     LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+/**
+ * Check if device is tablet or not
+ * @return true if device is tablet false otherwise
+ */
+@Composable
+fun isTablet() =
+    ((LocalConfiguration.current.screenLayout
+            and Configuration.SCREENLAYOUT_SIZE_MASK)
+            >= Configuration.SCREENLAYOUT_SIZE_LARGE)

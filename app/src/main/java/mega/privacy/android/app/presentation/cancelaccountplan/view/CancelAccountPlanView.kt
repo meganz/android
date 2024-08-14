@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -32,6 +31,8 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.isScreenOrientationLandscape
+import mega.privacy.android.shared.original.core.ui.utils.isTablet
 
 @Composable
 internal fun CancelAccountPlanView(
@@ -42,219 +43,226 @@ internal fun CancelAccountPlanView(
     val context = LocalContext.current
 
     val scrollState = rememberScrollState()
+    val horizontalPadding = if (isTablet()) {
+        if (isScreenOrientationLandscape()) {
+            390.dp
+        } else {
+            190.dp
+        }
+    } else {
+        20.dp
+    }
+
     Column(
         modifier = Modifier
+            .systemBarsPadding()
             .fillMaxWidth()
-            .verticalScroll(state = scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .verticalScroll(scrollState)
+            .padding(
+                horizontal = horizontalPadding, vertical = 8.dp
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
+        MegaText(
+            text = stringResource(id = SharedR.string.account_cancel_account_screen_plan_miss_out_on_features),
+            textColor = TextColor.Primary,
+            style = MaterialTheme.typography.h6Medium,
             modifier = Modifier
-                .systemBarsPadding()
-                .width(390.dp)
-                .padding(horizontal = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            MegaText(
-                text = stringResource(id = SharedR.string.account_cancel_account_screen_plan_miss_out_on_features),
-                textColor = TextColor.Primary,
-                style = MaterialTheme.typography.h6Medium,
-                modifier = Modifier
-                    .padding(top = 30.dp)
-                    .testTag(CANCEL_ACCOUNT_PLAN_TITLE_TEST_TAG),
-            )
-            MegaText(
-                text = stringResource(id = SharedR.string.account_cancel_account_screen_plan_access_until_expiration),
-                textColor = TextColor.Secondary,
-                style = MaterialTheme.typography.subtitle1medium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(top = 20.dp)
-                    .testTag(CANCEL_ACCOUNT_PLAN_SUBTITLE_TEST_TAG),
-            )
-            MegaText(
-                text = stringResource(
-                    id = SharedR.string.account_cancel_account_screen_plan_current_storage_warning,
-                    accountDetailsUI.usedStorageSize
+                .padding(top = 30.dp)
+                .testTag(CANCEL_ACCOUNT_PLAN_TITLE_TEST_TAG),
+        )
+        MegaText(
+            text = stringResource(id = SharedR.string.account_cancel_account_screen_plan_access_until_expiration),
+            textColor = TextColor.Secondary,
+            style = MaterialTheme.typography.subtitle1medium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(top = 20.dp)
+                .testTag(CANCEL_ACCOUNT_PLAN_SUBTITLE_TEST_TAG),
+        )
+        MegaText(
+            text = stringResource(
+                id = SharedR.string.account_cancel_account_screen_plan_current_storage_warning,
+                accountDetailsUI.usedStorageSize
+            ),
+            textColor = TextColor.Secondary,
+            style = MaterialTheme.typography.subtitle1medium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(top = 20.dp)
+                .testTag(CANCEL_ACCOUNT_PLAN_STORAGE_HINT_TEST_TAG),
+        )
+
+
+        val cells = remember {
+            listOf(
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_screen_plan_feature),
+                    style = TableCell.TextCellStyle.Header,
+                    cellAlignment = TableCell.CellAlignment.Start,
                 ),
-                textColor = TextColor.Secondary,
-                style = MaterialTheme.typography.subtitle1medium,
-                textAlign = TextAlign.Center,
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_screen_plan_free_plan),
+                    style = TableCell.TextCellStyle.Header,
+                    cellAlignment = TableCell.CellAlignment.Center,
+                ),
+                TableCell.TextCell(
+                    text = accountDetailsUI.accountType, style = TableCell.TextCellStyle.Header,
+                    cellAlignment = TableCell.CellAlignment.Center,
+                ),
+
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_screen_plan_storage),
+                    style = TableCell.TextCellStyle.SubHeader,
+                    cellAlignment = TableCell.CellAlignment.Start,
+                ),
+                TableCell.TextCell(
+                    text = context.getString(
+                        SharedR.string.account_cancel_account_screen_plan_free_storage,
+                        accountDetailsUI.freeStorageQuota
+                    ),
+                    style = TableCell.TextCellStyle.Normal,
+                    cellAlignment = TableCell.CellAlignment.Center,
+                ),
+                TableCell.TextCell(
+                    text = accountDetailsUI.storageQuotaSize,
+                    style = TableCell.TextCellStyle.Normal,
+                    cellAlignment = TableCell.CellAlignment.Center,
+                ),
+
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_screen_plan_transfer),
+                    style = TableCell.TextCellStyle.SubHeader,
+                    cellAlignment = TableCell.CellAlignment.Start,
+                ),
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_screen_plan_free_limited_transfer),
+                    style = TableCell.TextCellStyle.Normal,
+                    cellAlignment = TableCell.CellAlignment.Center,
+                ),
+                TableCell.TextCell(
+                    text = accountDetailsUI.transferQuotaSize,
+                    style = TableCell.TextCellStyle.Normal,
+                    cellAlignment = TableCell.CellAlignment.Center,
+                ),
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_screen_plan_password_protected_links),
+                    style = TableCell.TextCellStyle.SubHeader,
+                    cellAlignment = TableCell.CellAlignment.Start,
+                ),
+                TableCell.IconCell(iconResId = drawable.ic_not_available),
+                TableCell.IconCell(iconResId = drawable.ic_available),
+
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_screen_plan_links_with_expiry_dates),
+                    style = TableCell.TextCellStyle.SubHeader,
+                    cellAlignment = TableCell.CellAlignment.Start,
+                ),
+                TableCell.IconCell(iconResId = drawable.ic_not_available),
+                TableCell.IconCell(iconResId = drawable.ic_available),
+
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_screen_plan_transfer_sharing),
+                    style = TableCell.TextCellStyle.SubHeader,
+                    cellAlignment = TableCell.CellAlignment.Start,
+                ),
+                TableCell.IconCell(iconResId = drawable.ic_not_available),
+                TableCell.IconCell(iconResId = drawable.ic_available),
+
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_screen_plan_rewind),
+                    style = TableCell.TextCellStyle.SubHeader,
+                    cellAlignment = TableCell.CellAlignment.Start,
+                ),
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_screen_plan_rewind_free),
+                    style = TableCell.TextCellStyle.Normal,
+                    cellAlignment = TableCell.CellAlignment.Center,
+                ),
+                TableCell.TextCell(
+                    text = context.getString(
+                        SharedR.string.account_cancel_account_screen_plan_rewind_current,
+                        accountDetailsUI.rewindDaysQuota
+                    ),
+                    style = TableCell.TextCellStyle.Normal,
+                    cellAlignment = TableCell.CellAlignment.Center,
+                ),
+
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_screen_plan_mega_vpn),
+                    style = TableCell.TextCellStyle.SubHeader,
+                    cellAlignment = TableCell.CellAlignment.Start,
+                ),
+                TableCell.IconCell(iconResId = drawable.ic_not_available),
+                TableCell.IconCell(iconResId = drawable.ic_available),
+
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_screen_plan_call_meeting_duration),
+                    style = TableCell.TextCellStyle.SubHeader,
+                    cellAlignment = TableCell.CellAlignment.Start,
+                ),
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_screen_plan_call_meeting_duration_free),
+                    style = TableCell.TextCellStyle.Normal,
+                    cellAlignment = TableCell.CellAlignment.Center,
+                ),
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.cancel_account_plan_call_meeting_duration_pro),
+                    style = TableCell.TextCellStyle.Normal,
+                    cellAlignment = TableCell.CellAlignment.Center,
+                ),
+
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_plan_call_meeting_participants),
+                    style = TableCell.TextCellStyle.SubHeader,
+                    cellAlignment = TableCell.CellAlignment.Start,
+                ),
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_free_plan_call_meeting_participants),
+                    style = TableCell.TextCellStyle.Normal,
+                    cellAlignment = TableCell.CellAlignment.Center,
+                ),
+                TableCell.TextCell(
+                    text = context.getString(SharedR.string.account_cancel_account_pro_plan_call_meeting_participants),
+                    style = TableCell.TextCellStyle.Normal,
+                    cellAlignment = TableCell.CellAlignment.Center,
+                ),
+            )
+        }
+
+
+        MegaTable(
+            modifier = Modifier
+                .height(550.dp)
+                .padding(top = 30.dp)
+                .testTag(CANCEL_ACCOUNT_PLAN_FEATURE_TABLE_TEST_TAG),
+            numOfColumn = 3,
+            tableCells = cells,
+        )
+        Column {
+            RaisedDefaultMegaButton(
                 modifier = Modifier
                     .padding(top = 20.dp)
-                    .testTag(CANCEL_ACCOUNT_PLAN_STORAGE_HINT_TEST_TAG),
+                    .fillMaxWidth()
+                    .testTag(KEEP_PRO_PLAN_BUTTON_TEST_TAG),
+                text = stringResource(
+                    id = SharedR.string.account_cancel_account_plan_keep_pro_plan,
+                    accountDetailsUI.accountType
+                ),
+                onClick = onKeepPlanButtonClicked,
             )
-
-
-            val cells = remember {
-                listOf(
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_screen_plan_feature),
-                        style = TableCell.TextCellStyle.Header,
-                        cellAlignment = TableCell.CellAlignment.Start,
-                    ),
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_screen_plan_free_plan),
-                        style = TableCell.TextCellStyle.Header,
-                        cellAlignment = TableCell.CellAlignment.Center,
-                    ),
-                    TableCell.TextCell(
-                        text = accountDetailsUI.accountType, style = TableCell.TextCellStyle.Header,
-                        cellAlignment = TableCell.CellAlignment.Center,
-                    ),
-
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_screen_plan_storage),
-                        style = TableCell.TextCellStyle.SubHeader,
-                        cellAlignment = TableCell.CellAlignment.Start,
-                    ),
-                    TableCell.TextCell(
-                        text = context.getString(
-                            SharedR.string.account_cancel_account_screen_plan_free_storage,
-                            accountDetailsUI.freeStorageQuota
-                        ),
-                        style = TableCell.TextCellStyle.Normal,
-                        cellAlignment = TableCell.CellAlignment.Center,
-                    ),
-                    TableCell.TextCell(
-                        text = accountDetailsUI.storageQuotaSize,
-                        style = TableCell.TextCellStyle.Normal,
-                        cellAlignment = TableCell.CellAlignment.Center,
-                    ),
-
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_screen_plan_transfer),
-                        style = TableCell.TextCellStyle.SubHeader,
-                        cellAlignment = TableCell.CellAlignment.Start,
-                    ),
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_screen_plan_free_limited_transfer),
-                        style = TableCell.TextCellStyle.Normal,
-                        cellAlignment = TableCell.CellAlignment.Center,
-                    ),
-                    TableCell.TextCell(
-                        text = accountDetailsUI.transferQuotaSize,
-                        style = TableCell.TextCellStyle.Normal,
-                        cellAlignment = TableCell.CellAlignment.Center,
-                    ),
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_screen_plan_password_protected_links),
-                        style = TableCell.TextCellStyle.SubHeader,
-                        cellAlignment = TableCell.CellAlignment.Start,
-                    ),
-                    TableCell.IconCell(iconResId = drawable.ic_not_available),
-                    TableCell.IconCell(iconResId = drawable.ic_available),
-
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_screen_plan_links_with_expiry_dates),
-                        style = TableCell.TextCellStyle.SubHeader,
-                        cellAlignment = TableCell.CellAlignment.Start,
-                    ),
-                    TableCell.IconCell(iconResId = drawable.ic_not_available),
-                    TableCell.IconCell(iconResId = drawable.ic_available),
-
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_screen_plan_transfer_sharing),
-                        style = TableCell.TextCellStyle.SubHeader,
-                        cellAlignment = TableCell.CellAlignment.Start,
-                    ),
-                    TableCell.IconCell(iconResId = drawable.ic_not_available),
-                    TableCell.IconCell(iconResId = drawable.ic_available),
-
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_screen_plan_rewind),
-                        style = TableCell.TextCellStyle.SubHeader,
-                        cellAlignment = TableCell.CellAlignment.Start,
-                    ),
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_screen_plan_rewind_free),
-                        style = TableCell.TextCellStyle.Normal,
-                        cellAlignment = TableCell.CellAlignment.Center,
-                    ),
-                    TableCell.TextCell(
-                        text = context.getString(
-                            SharedR.string.account_cancel_account_screen_plan_rewind_current,
-                            accountDetailsUI.rewindDaysQuota
-                        ),
-                        style = TableCell.TextCellStyle.Normal,
-                        cellAlignment = TableCell.CellAlignment.Center,
-                    ),
-
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_screen_plan_mega_vpn),
-                        style = TableCell.TextCellStyle.SubHeader,
-                        cellAlignment = TableCell.CellAlignment.Start,
-                    ),
-                    TableCell.IconCell(iconResId = drawable.ic_not_available),
-                    TableCell.IconCell(iconResId = drawable.ic_available),
-
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_screen_plan_call_meeting_duration),
-                        style = TableCell.TextCellStyle.SubHeader,
-                        cellAlignment = TableCell.CellAlignment.Start,
-                    ),
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_screen_plan_call_meeting_duration_free),
-                        style = TableCell.TextCellStyle.Normal,
-                        cellAlignment = TableCell.CellAlignment.Center,
-                    ),
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.cancel_account_plan_call_meeting_duration_pro),
-                        style = TableCell.TextCellStyle.Normal,
-                        cellAlignment = TableCell.CellAlignment.Center,
-                    ),
-
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_plan_call_meeting_participants),
-                        style = TableCell.TextCellStyle.SubHeader,
-                        cellAlignment = TableCell.CellAlignment.Start,
-                    ),
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_free_plan_call_meeting_participants),
-                        style = TableCell.TextCellStyle.Normal,
-                        cellAlignment = TableCell.CellAlignment.Center,
-                    ),
-                    TableCell.TextCell(
-                        text = context.getString(SharedR.string.account_cancel_account_pro_plan_call_meeting_participants),
-                        style = TableCell.TextCellStyle.Normal,
-                        cellAlignment = TableCell.CellAlignment.Center,
-                    ),
-                )
-            }
-
-
-            MegaTable(
+            OutlinedMegaButton(
+                textId = SharedR.string.account_cancel_account_plan_continue_cancellation,
+                onClick = onContinueCancellationButtonClicked,
+                rounded = false,
                 modifier = Modifier
-                    .height(550.dp)
-                    .padding(top = 30.dp)
-                    .testTag(CANCEL_ACCOUNT_PLAN_FEATURE_TABLE_TEST_TAG),
-                numOfColumn = 3,
-                tableCells = cells,
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .testTag(CONTINUE_CANCELLATION_BUTTON_TEST_TAG),
             )
-            Column {
-                RaisedDefaultMegaButton(
-                    modifier = Modifier
-                        .padding(top = 20.dp)
-                        .fillMaxWidth()
-                        .testTag(KEEP_PRO_PLAN_BUTTON_TEST_TAG),
-                    text = stringResource(
-                        id = SharedR.string.account_cancel_account_plan_keep_pro_plan,
-                        accountDetailsUI.accountType
-                    ),
-                    onClick = onKeepPlanButtonClicked,
-                )
-                OutlinedMegaButton(
-                    textId = SharedR.string.account_cancel_account_plan_continue_cancellation,
-                    onClick = onContinueCancellationButtonClicked,
-                    rounded = false,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp)
-                        .testTag(CONTINUE_CANCELLATION_BUTTON_TEST_TAG),
-                )
-            }
         }
     }
+
 }
 
 @Composable
