@@ -32,6 +32,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
@@ -61,7 +62,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
 import mega.privacy.android.app.main.AddContactActivity
-import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService.Companion.pauseAudioPlayer
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService.Companion.resumeAudioPlayerIfNotInCall
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
@@ -1041,7 +1041,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.call?.callId }
-            .distinctUntilChanged()) { callId ->
+            .distinctUntilChanged(), minActiveState = Lifecycle.State.CREATED) { callId ->
             callId?.run {
                 if (args.action == MEETING_ACTION_IN) {
                     if (arguments?.getBoolean(
