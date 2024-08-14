@@ -119,8 +119,6 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
                 checkSensitiveItems()
             } else {
-                initNode()
-
                 setupView()
                 setupObservers()
             }
