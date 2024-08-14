@@ -503,7 +503,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         val intent = Intent(this@PdfViewerActivity, FileExplorerActivity::class.java).apply {
             action = Intent.ACTION_SEND
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            setDataAndType(uri, "application/pdf")
+            putExtra(Intent.EXTRA_STREAM, intent.data)
+            type = "application/pdf"
         }
         startActivity(intent)
         finish()
