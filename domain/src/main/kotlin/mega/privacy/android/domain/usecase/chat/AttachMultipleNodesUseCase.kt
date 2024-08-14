@@ -22,7 +22,7 @@ class AttachMultipleNodesUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         nodeIds: List<NodeId>,
-        chatIds: LongArray,
+        chatIds: List<Long>,
     ): ChatRequestResult.ChatRequestAttachNode {
         val results = supervisorScope {
             nodeIds.map { nodeId ->

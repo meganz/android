@@ -32,8 +32,8 @@ import mega.privacy.android.domain.entity.node.ChatRequestResult
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
@@ -42,6 +42,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
+import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
@@ -93,6 +94,7 @@ class NodeActionsViewModelTest {
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase = mock()
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
+    private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
     private val sampleNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
     }
@@ -119,6 +121,7 @@ class NodeActionsViewModelTest {
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
             applicationScope = applicationScope,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
+            get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         )
     }
@@ -245,16 +248,20 @@ class NodeActionsViewModelTest {
             whenever(
                 attachMultipleNodesUseCase(
                     listOf(sampleNode.id),
-                    longArrayOf(1234L)
+                    listOf(1234L)
                 )
             ).thenReturn(request)
             whenever(chatRequestMessageMapper(request)).thenReturn("Some value")
 
-            viewModel.attachNodeToChats(nodeHandles = nodeIds, chatIds = chatIds)
+            viewModel.attachNodeToChats(
+                nodeHandles = nodeIds,
+                chatIds = chatIds,
+                userHandles = longArrayOf()
+            )
 
             verify(attachMultipleNodesUseCase).invoke(
                 listOf(sampleNode.id),
-                longArrayOf(1234L)
+                listOf(1234L)
             )
             verify(chatRequestMessageMapper).invoke(request)
             verify(snackBarHandler).postSnackbarMessage("Some value")

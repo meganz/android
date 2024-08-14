@@ -47,11 +47,12 @@ fun NodeAttachmentView(
         rememberLauncherForActivityResult(
             SendToChatActivityContract()
         ) { result ->
-            result?.let { (nodeHandles, chatIds) ->
-                if (nodeHandles != null && chatIds != null) {
+            result?.let { (nodeHandles, chatIds, userHandles) ->
+                if (nodeHandles.isNotEmpty() && (chatIds.isNotEmpty() || userHandles.isNotEmpty())) {
                     viewModel.attachNodesToChat(
-                        nodeHandles.map { NodeId(it) },
-                        chatIds
+                        nodeIds = nodeHandles.map { NodeId(it) },
+                        chatIds = chatIds,
+                        userHandles = userHandles
                     )
                 }
             }

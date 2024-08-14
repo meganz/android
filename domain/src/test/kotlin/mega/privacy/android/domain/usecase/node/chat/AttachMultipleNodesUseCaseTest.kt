@@ -25,7 +25,7 @@ class AttachMultipleNodesUseCaseTest {
     @MethodSource("provideParams")
     fun `test that attach Nodes to chat returns proper chat request`(
         nodeIds: List<NodeId>,
-        chatIds: LongArray,
+        chatIds: List<Long>,
         expected: ChatRequestResult,
     ) = runTest {
         whenever(
@@ -76,7 +76,7 @@ class AttachMultipleNodesUseCaseTest {
                 NodeId(SUCCESS_NODE_HANDLE_1),
                 NodeId(SUCCESS_NODE_HANDLE_2)
             ),
-            longArrayOf(CHAT_HANDLE_1, CHAT_HANDLE_2),
+            listOf(CHAT_HANDLE_1, CHAT_HANDLE_2),
             ChatRequestResult.ChatRequestAttachNode(count = 2, errorCount = 0)
         ),
         Arguments.of(
@@ -85,14 +85,14 @@ class AttachMultipleNodesUseCaseTest {
                 NodeId(SUCCESS_NODE_HANDLE_2),
                 NodeId(FAILED_NODE_HANDLE)
             ),
-            longArrayOf(CHAT_HANDLE_1, CHAT_HANDLE_2),
+            listOf(CHAT_HANDLE_1, CHAT_HANDLE_2),
             ChatRequestResult.ChatRequestAttachNode(count = 3, errorCount = 1)
         ),
         Arguments.of(
             listOf(
                 NodeId(FAILED_NODE_HANDLE)
             ),
-            longArrayOf(CHAT_HANDLE_1, CHAT_HANDLE_2),
+            listOf(CHAT_HANDLE_1, CHAT_HANDLE_2),
             ChatRequestResult.ChatRequestAttachNode(count = 1, errorCount = 1)
         )
     )

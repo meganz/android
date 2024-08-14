@@ -106,10 +106,11 @@ class NodeActionHandler(
         (activity as? AppCompatActivity)?.registerForActivityResult(
             SendToChatActivityContract()
         ) { result ->
-            result?.let { (nodeHandles, chatIds) ->
+            result?.let { (nodeHandles, chatIds, userHandles) ->
                 nodeActionsViewModel.attachNodeToChats(
                     nodeHandles = nodeHandles,
                     chatIds = chatIds,
+                    userHandles = userHandles
                 )
             }
         }

@@ -43,6 +43,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
+import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
@@ -95,6 +96,7 @@ class NodeActionsViewModel @Inject constructor(
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -276,16 +278,26 @@ class NodeActionsViewModel @Inject constructor(
     fun attachNodeToChats(
         nodeHandles: LongArray?,
         chatIds: LongArray?,
+        userHandles: LongArray,
     ) {
         if (nodeHandles != null && chatIds != null) {
             val nodeIds = nodeHandles.map {
                 NodeId(it)
             }
             viewModelScope.launch {
+                // ignore the user handles that create chat failed
+                val chatIdsFromUserHandles = userHandles.map { userHandle ->
+                    runCatching {
+                        get1On1ChatIdUseCase(userHandle)
+                    }.onFailure {
+                        Timber.e(it)
+                    }.getOrNull()
+                }.filterNotNull()
+                val allChatIds = chatIdsFromUserHandles + chatIds.toList()
                 val attachNodeRequest =
                     attachMultipleNodesUseCase(
                         nodeIds = nodeIds,
-                        chatIds = chatIds
+                        chatIds = allChatIds
                     )
                 val message = chatRequestMessageMapper(attachNodeRequest)
                 message?.let {

@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.StorageStatePayWallException
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
+import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.GetNodesToAttachUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -22,6 +23,7 @@ import javax.inject.Inject
 class NodeAttachmentViewModel @Inject constructor(
     private val getNodesToAttachUseCase: GetNodesToAttachUseCase,
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase,
+    private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(NodeAttachmentUiState())
 
@@ -74,13 +76,22 @@ class NodeAttachmentViewModel @Inject constructor(
      * @param nodeIds
      * @param chatIds
      */
-    fun attachNodesToChat(nodeIds: List<NodeId>, chatIds: LongArray) {
+    fun attachNodesToChat(nodeIds: List<NodeId>, chatIds: LongArray, userHandles: LongArray) {
         viewModelScope.launch {
+            // ignore the user handles that create chat failed
+            val chatIdsFromUserHandles = userHandles.map { userHandle ->
+                runCatching {
+                    get1On1ChatIdUseCase(userHandle)
+                }.onFailure {
+                    Timber.e(it)
+                }.getOrNull()
+            }.filterNotNull()
+            val allChatIds = chatIdsFromUserHandles + chatIds.toList()
             runCatching {
-                attachMultipleNodesUseCase(nodeIds, chatIds)
+                attachMultipleNodesUseCase(nodeIds, allChatIds)
             }.onSuccess {
                 _uiState.update { state ->
-                    state.copy(event = NodeAttachmentEvent.AttachNodeSuccess(chatIds.toList()))
+                    state.copy(event = NodeAttachmentEvent.AttachNodeSuccess(allChatIds))
                 }
                 Timber.d("Nodes attached to chat")
             }.onFailure {

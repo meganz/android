@@ -7,6 +7,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.StorageStatePayWallException
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
+import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.GetNodesToAttachUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -22,17 +24,22 @@ import org.mockito.kotlin.whenever
 class NodeAttachmentViewModelTest {
     private val getNodesToAttachUseCase: GetNodesToAttachUseCase = mock()
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase = mock()
+    private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
 
     private lateinit var underTest: NodeAttachmentViewModel
 
     @BeforeAll
     fun setup() {
-        underTest = NodeAttachmentViewModel(getNodesToAttachUseCase, attachMultipleNodesUseCase)
+        underTest = NodeAttachmentViewModel(
+            getNodesToAttachUseCase = getNodesToAttachUseCase,
+            attachMultipleNodesUseCase = attachMultipleNodesUseCase,
+            get1On1ChatIdUseCase = get1On1ChatIdUseCase
+        )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(getNodesToAttachUseCase, attachMultipleNodesUseCase)
+        reset(getNodesToAttachUseCase, attachMultipleNodesUseCase, get1On1ChatIdUseCase)
     }
 
     @Test
@@ -77,17 +84,37 @@ class NodeAttachmentViewModelTest {
         }
 
     @Test
-    fun `test that attach nodes to chat update state correctly when use case returns success`() =
+    fun `test that attach nodes to chat update state correctly when use case returns success and user handles is empty`() =
         runTest {
             val nodeIds = listOf(NodeId(1), NodeId(2))
             val chatIds = longArrayOf(1, 2)
-            underTest.attachNodesToChat(nodeIds, chatIds)
+            underTest.attachNodesToChat(nodeIds, chatIds, longArrayOf())
+            verifyNoInteractions(get1On1ChatIdUseCase)
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.event)
                     .isInstanceOf(NodeAttachmentEvent.AttachNodeSuccess::class.java)
                 assertThat((state.event as NodeAttachmentEvent.AttachNodeSuccess).chatIds).isEqualTo(
                     chatIds.toList()
+                )
+            }
+        }
+
+    @Test
+    fun `test that attach nodes to chat update state correctly when use case returns success and user handles is not empty`() =
+        runTest {
+            val nodeIds = listOf(NodeId(1), NodeId(2))
+            val chatIds = longArrayOf(1, 2)
+            val userHandles = longArrayOf(3, 4)
+            whenever(get1On1ChatIdUseCase(3)).thenReturn(5)
+            whenever(get1On1ChatIdUseCase(4)).thenReturn(6)
+            underTest.attachNodesToChat(nodeIds, chatIds, userHandles)
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.event)
+                    .isInstanceOf(NodeAttachmentEvent.AttachNodeSuccess::class.java)
+                assertThat((state.event as NodeAttachmentEvent.AttachNodeSuccess).chatIds).isEqualTo(
+                    listOf(5L, 6L, 1L, 2L)
                 )
             }
         }
