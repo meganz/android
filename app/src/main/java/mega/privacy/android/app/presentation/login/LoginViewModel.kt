@@ -34,7 +34,6 @@ import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
@@ -210,11 +209,6 @@ class LoginViewModel @Inject constructor(
                         state.copy(enabledFlags = if (enabled) state.enabledFlags + AppFeatures.LoginReportIssueButton else state.enabledFlags - AppFeatures.LoginReportIssueButton)
                     }
                 },
-                flowOf(getFeatureFlagValueUseCase(AppFeatures.NewConfirmEmailFragment)).map { enabled ->
-                    { state: LoginState ->
-                        state.copy(enabledFlags = if (enabled) state.enabledFlags + AppFeatures.NewConfirmEmailFragment else state.enabledFlags - AppFeatures.NewConfirmEmailFragment)
-                    }
-                },
             ).collect {
                 _state.update(it)
             }
@@ -232,11 +226,6 @@ class LoginViewModel @Inject constructor(
                 }.collectLatest { stopLogin() }
         }
     }
-
-    /**
-     * Check if given feature flag is enabled or not
-     */
-    fun isFeatureEnabled(feature: Feature) = state.value.enabledFlags.contains(feature)
 
     /**
      * Sets confirm email fragment as pending in state.

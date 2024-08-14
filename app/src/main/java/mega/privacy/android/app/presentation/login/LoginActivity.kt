@@ -24,13 +24,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityLoginBinding
 import mega.privacy.android.app.extensions.isTablet
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
 import mega.privacy.android.app.main.CreateAccountFragment
 import mega.privacy.android.app.presentation.extensions.toConstant
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragment
-import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragmentV2
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.onboarding.TourFragment
 import mega.privacy.android.app.presentation.login.reportissue.ReportIssueViaEmailFragment
@@ -244,14 +242,10 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
             Constants.CONFIRM_EMAIL_FRAGMENT -> {
                 val confirmEmailFragment =
-                    if (viewModel.isFeatureEnabled(AppFeatures.NewConfirmEmailFragment)) {
-                        ConfirmEmailFragmentV2.newInstance(emailTemp, firstNameTemp).apply {
-                            onShowPendingFragment = ::showFragment
-                            onSetTemporalEmail = ::setTemporalEmail
-                            onCancelConfirmationAccount = ::cancelConfirmationAccount
-                        }
-                    } else {
-                        ConfirmEmailFragment.newInstance(emailTemp, firstNameTemp)
+                    ConfirmEmailFragment.newInstance(emailTemp, firstNameTemp).apply {
+                        onShowPendingFragment = ::showFragment
+                        onSetTemporalEmail = ::setTemporalEmail
+                        onCancelConfirmationAccount = ::cancelConfirmationAccount
                     }
 
                 with(supportFragmentManager) {

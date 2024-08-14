@@ -1,51 +1,27 @@
 package mega.privacy.android.app.presentation.login.confirmemail
 
-import android.content.Context
 import android.os.Bundle
-import android.text.Html
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.res.stringResource
-import androidx.core.view.isVisible
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.databinding.FragmentConfirmEmailBinding
-import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragmentV2.Companion.TEMPORARY_EMAIL_ARG
-import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragmentV2.Companion.TEMPORARY_FIRST_NAME_ARG
-import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.presentation.login.confirmemail.view.ConfirmEmailRoute
+import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import nz.mega.sdk.MegaApiAndroid
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * Confirm email fragment.
- *
- * @property megaApi       [MegaApiAndroid].
- * @property emailTemp     Temporary email.
- * @property firstNameTemp Temporary first name.
  */
 @AndroidEntryPoint
 class ConfirmEmailFragment : Fragment() {
@@ -56,11 +32,9 @@ class ConfirmEmailFragment : Fragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
-    private val viewModel: ConfirmEmailViewModel by viewModels()
-
-    private var _binding: FragmentConfirmEmailBinding? = null
-
-    private val binding get() = _binding!!
+    internal var onShowPendingFragment: ((fragmentType: LoginFragmentType) -> Unit)? = null
+    internal var onSetTemporalEmail: ((email: String) -> Unit)? = null
+    internal var onCancelConfirmationAccount: (() -> Unit)? = null
 
     private var emailTemp: String? = null
     private var firstNameTemp: String? = null
@@ -81,168 +55,45 @@ class ConfirmEmailFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        Timber.d("onCreateView")
-        _binding = FragmentConfirmEmailBinding.inflate(inflater, container, false)
+    ) = ComposeView(requireContext()).apply {
+        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        setContent {
+            val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
-        binding.snackBarComposeView.apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                val snackBarHostState = remember { SnackbarHostState() }
-                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
-                    val successMessage =
-                        stringResource(id = R.string.confirm_email_misspelled_email_sent)
-                    LaunchedEffect(uiState.shouldShowSuccessMessage) {
-                        if (uiState.shouldShowSuccessMessage) {
-                            snackBarHostState.showAutoDurationSnackbar(
-                                message = successMessage
-                            )
-                            viewModel.onSuccessMessageDisplayed()
-                        }
+            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                ConfirmEmailRoute(
+                    modifier = Modifier
+                        .systemBarsPadding()
+                        .fillMaxSize(),
+                    email = emailTemp.orEmpty(),
+                    fullName = firstNameTemp,
+                    onShowPendingFragment = {
+                        onShowPendingFragment?.invoke(it)
+                    },
+                    onSetTemporalEmail = {
+                        onSetTemporalEmail?.invoke(it)
+                    },
+                    onCancelConfirmationAccount = {
+                        onCancelConfirmationAccount?.invoke()
                     }
-
-                    LaunchedEffect(uiState.errorMessage) {
-                        uiState.errorMessage?.let {
-                            snackBarHostState.showAutoDurationSnackbar(
-                                message = it
-                            )
-                            viewModel.onErrorMessageDisplayed()
-                        }
-                    }
-
-                    SnackbarHost(hostState = snackBarHostState)
-                }
-            }
-        }
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setupObservers()
-        setupView()
-    }
-
-    private fun setupObservers() {
-        viewLifecycleOwner.collectFlow(viewModel.uiState) { uiState ->
-            with(uiState) {
-                if (isPendingToShowFragment != null) {
-                    (requireActivity() as LoginActivity).showFragment(isPendingToShowFragment)
-                    viewModel.isPendingToShowFragmentConsumed()
-                }
-            }
-        }
-
-        viewLifecycleOwner.collectFlow(
-            viewModel.uiState.map { it.registeredEmail }.distinctUntilChanged()
-        ) { registeredEmail ->
-            registeredEmail?.let {
-                (requireActivity() as LoginActivity).setTemporalEmail(it)
-                viewModel.saveLastRegisteredEmail(it)
-            }
-        }
-    }
-
-    private fun setupView() = with(binding) {
-        confirmEmailNewEmail.apply {
-            doAfterTextChanged { quitEmailError() }
-            isCursorVisible = true
-            setText(emailTemp)
-            requestFocus()
-        }
-
-        confirmEmailNewEmailErrorIcon.isVisible = false
-
-        var textMisspelled =
-            String.format(requireContext().getFormattedStringOrDefault(R.string.confirm_email_misspelled))
-        try {
-            textMisspelled = textMisspelled.replace("[A]", "<b>")
-            textMisspelled = textMisspelled.replace("[/A]", "</b>")
-        } catch (e: Exception) {
-            Timber.w("Exception formatting string ${e.message}")
-        }
-
-        confirmEmailMisspelled.text = Html.fromHtml(textMisspelled, Html.FROM_HTML_MODE_LEGACY)
-        confirmEmailNewEmailResend.setOnClickListener { submitForm() }
-        confirmEmailCancel.setOnClickListener {
-            viewModel.cancelCreateAccount()
-            (requireActivity() as LoginActivity).cancelConfirmationAccount()
-        }
-    }
-
-    /**
-     * Launches the request if the typed email is correct.
-     */
-    private fun submitForm() {
-        if (!validateForm()) {
-            return
-        }
-
-        with(requireActivity() as LoginActivity) {
-            (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
-                .hideSoftInputFromWindow(binding.confirmEmailNewEmail.windowToken, 0)
-
-            if (!Util.isOnline(requireContext())) {
-                showSnackbar(requireContext().getFormattedStringOrDefault(R.string.error_server_connection_problem))
-                return
-            }
-
-            binding.confirmEmailNewEmail.text.toString().lowercase().trim { it <= ' ' }.let {
-                viewModel.resendSignUpLink(email = it, fullName = firstNameTemp)
+                )
             }
         }
     }
 
     /**
-     * Checks if the typed email is correct.
-     *
-     * @return True if the email is correct, false otherwise.
+     * Called when the view previously created by onCreateView has been detached from the fragment.
      */
-    private fun validateForm(): Boolean =
-        if (!emailError.isNullOrEmpty()) {
-            with(binding) {
-                confirmEmailNewEmailLayout.apply {
-                    error = emailError
-                    setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
-                }
-                confirmEmailNewEmailErrorIcon.isVisible = true
-            }
-
-            false
-        } else true
-
-    /**
-     * Error to show if the typed email is not correct.
-     */
-    private val emailError: String?
-        get() {
-            binding.confirmEmailNewEmail.text.toString().let {
-                return when {
-                    it.isEmpty() -> requireContext().getFormattedStringOrDefault(R.string.error_enter_email)
-                    !EMAIL_ADDRESS.matcher(it).matches() ->
-                        requireContext().getFormattedStringOrDefault(R.string.error_invalid_email)
-
-                    else -> null
-                }
-            }
-        }
-
-    /**
-     * Hides the email error.
-     */
-    private fun quitEmailError() = with(binding) {
-        confirmEmailNewEmailLayout.apply {
-            error = null
-            setHintTextAppearance(com.google.android.material.R.style.TextAppearance_Design_Hint)
-        }
-        confirmEmailNewEmailErrorIcon.isVisible = false
+    override fun onDestroyView() {
+        super.onDestroyView()
+        onShowPendingFragment = null
+        onSetTemporalEmail = null
+        onCancelConfirmationAccount = null
     }
 
     companion object {
+        internal const val TEMPORARY_EMAIL_ARG = "TEMPORARY_EMAIL_ARG"
+        internal const val TEMPORARY_FIRST_NAME_ARG = "TEMPORARY_FIRST_NAME_ARG"
 
         /**
          * Use this factory method to create a new instance of
@@ -250,7 +101,7 @@ class ConfirmEmailFragment : Fragment() {
          *
          * @param tempEmail The temporary email.
          * @param tempFirstName The temporary first name.
-         * @return A new instance of fragment ConfirmEmailFragment.
+         * @return A new instance of fragment ConfirmEmailFragmentV2.
          */
         @JvmStatic
         fun newInstance(tempEmail: String?, tempFirstName: String?) =

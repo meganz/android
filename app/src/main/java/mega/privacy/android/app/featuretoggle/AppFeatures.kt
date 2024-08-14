@@ -185,14 +185,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables new confirm email fragment compose page
-     */
-    NewConfirmEmailFragment(
-        "Enable new confirm email fragment",
-        true
-    ),
-
-    /**
      * To enable the new add and manage description feature to node
      */
     NodeWithTags(
