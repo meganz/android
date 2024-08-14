@@ -13,7 +13,7 @@ lint = "30.2.2"
 navigation = "2.7.7"
 paparazzi = "1.3.2"
 ksp = "2.0.0-1.0.21"
-megagradle = "0.43.20240730092603"
+megagradle = "0.46.20240814050318"
 jfrog-artifactory = "5.2.0"
 
 [libraries]

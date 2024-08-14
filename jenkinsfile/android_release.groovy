@@ -83,6 +83,9 @@ pipeline {
                     } else if (triggeredBySendCodeFreezeReminder()) {
                         message = sendCodeFreezeReminderFailureMessage() +
                                 "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${jenkinsLog})"
+                    } else if (triggeredByPostRelease()) {
+                        message = sendPostReleaseFailureMessage() +
+                                "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${jenkinsLog})"
                     }
                     common.sendToMR(message)
                 } else {
@@ -170,6 +173,10 @@ pipeline {
                         def message = sendCodeFreezeReminderSuccessMessage()
                         common.sendToMR(message)
                         slackSend color: "good", message: message
+                    } else if (triggeredByPostRelease()) {
+                        def message = sendPostReleaseSuccessMessage()
+                        common.sendToMR(message)
+                        slackSend color: "good", message: message
                     }
                 }
             }
@@ -193,7 +200,7 @@ pipeline {
         }
         stage('Clone transifex') {
             when {
-                expression { triggeredByDeliverAppStore() || triggeredByDeleteOldString() }
+                expression { triggeredByDeliverAppStore() || triggeredByDeleteOldString() || triggeredByPostRelease() }
             }
             steps {
                 script {
@@ -509,7 +516,39 @@ pipeline {
                 }
             }
         }
+        stage("Post Release") {
+            when {
+                expression { triggeredByPostRelease() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Post Release'
 
+                    def parameters = parsePostReleaseParameters(env.gitlabTriggerPhrase)
+                    def releaseVersion = parameters[0]
+
+                    withCredentials([
+                            string(credentialsId: 'ANDROID_TRANSIFIX_AUTHORIZATION_TOKEN', variable: 'TRANSIFEX_TOKEN'),
+                            string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN'),
+                            string(credentialsId: 'GITLAB_API_BASE_URL', variable: 'GITLAB_API_BASE_URL'),
+                            string(credentialsId: 'GITLAB_PERSONAL_ACCESS_TOKEN_TEXT', variable: 'GITLAB_PERSONAL_ACCESS_TOKEN_TEXT'),
+                            string(credentialsId: 'JIRA_API_URL', variable: 'JIRA_API_URL'),
+                            string(credentialsId: 'JIRA_BASE_URL', variable: 'JIRA_BASE_URL'),
+                            string(credentialsId: 'JIRA_TOKEN', variable: 'JIRA_TOKEN'),
+                            gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default'),
+                            // USERNAME and TOKEN are expected keywords to enable GPG Signing. Using
+                            // other keywords would fail GPG Signing
+                            usernamePassword(credentialsId: 'GitHub-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')
+                    ]) {
+                        util.useGpg() {
+                            sh("./gradlew postRelease --rv ${releaseVersion}")
+                            sh("./gradlew setReleaseStatus --rv ${releaseVersion}")
+                            sh("./gradlew createGitlabRelease --rv ${releaseVersion}")
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -626,6 +665,38 @@ private String sendCodeFreezeReminderSuccessMessage() {
     return ":white_check_mark: Code freeze remind message sent successfully!(${env.BUILD_NUMBER})"
 }
 
+private String sendPostReleaseSuccessMessage() {
+    return ":white_check_mark: Post Release successful!(${env.BUILD_NUMBER})"
+}
+
+private String sendPostReleaseFailureMessage() {
+    return ":x: Post Release failed!(${env.BUILD_NUMBER})"
+}
+
+private def parsePostReleaseParameters(String fullCommand) {
+    println("Parsing postRelease parameters")
+    String[] parameters = fullCommand.split("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*\$)")
+
+    Options options = new Options()
+    Option releaseVersionOption = Option
+            .builder("rv")
+            .longOpt("release-version")
+            .argName("Release Version")
+            .hasArg()
+            .desc("Release Version created in Jira")
+            .build()
+    options.addOption(releaseVersionOption)
+
+    CommandLineParser commandLineParser = new DefaultParserWrapper()
+    CommandLine commandLine = commandLineParser.parse(options, parameters)
+
+    String releaseVersion = commandLine.getOptionValue("rv")
+
+    println("releaseVersion: $releaseVersion")
+
+    return [releaseVersion]
+}
+
 private def parseCreateJiraVersionParameters(String fullCommand) {
     println("Parsing createJiraVersion parameters")
     String[] parameters = fullCommand.split("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*\$)")
@@ -735,8 +806,8 @@ private boolean triggeredByUploadSymbol() {
 }
 
 /**
- * Check if build is triggered by 'upload_symbol' command.
- * @return true if build is triggered by 'upload_symbol' command. Otherwise return false.
+ * Check if build is triggered by 'delete_oldStrings' command.
+ * @return true if build is triggered by 'delete_oldStrings' command. Otherwise return false.
  */
 private boolean triggeredByDeleteOldString() {
     return isOnReleaseBranch() &&
@@ -761,4 +832,13 @@ private boolean triggeredBySendCodeFreezeReminder() {
     return isOnReleaseBranch() &&
             env.gitlabTriggerPhrase != null &&
             env.gitlabTriggerPhrase.trim().startsWith("send_code_freeze_reminder")
+}
+
+/**
+ * Check if build is triggered by 'postRelease' command.
+ * @return true if build is triggered by 'postRelease' command. Otherwise return false.
+ */
+private boolean triggeredByPostRelease() {
+    return env.gitlabTriggerPhrase != null &&
+            env.gitlabTriggerPhrase.trim().startsWith("postRelease")
 }
