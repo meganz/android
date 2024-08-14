@@ -11,9 +11,15 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.model.AddContactState
+import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
@@ -34,9 +40,14 @@ class AddContactViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val hasSensitiveDescendantUseCase: HasSensitiveDescendantUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddContactState())
+
+    private val _sensitiveItemsCount: MutableStateFlow<Int?> = MutableStateFlow(null)
+    val sensitiveItemsCountFlow = _sensitiveItemsCount.asStateFlow()
 
     /**
      * Ui State
@@ -134,5 +145,24 @@ class AddContactViewModel @Inject constructor(
                     }
                 }
         }
+    }
+
+    fun checkSensitiveItems(handles: List<Long>) = viewModelScope.launch {
+        if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+            val hasSensitiveItems = handles.any { handle ->
+                val nodeId = NodeId(handle)
+                val node = getNodeByIdUseCase(nodeId)
+                node != null && node is FolderNode && !node.isOutShare() && (node.isMarkedSensitive || node.isSensitiveInherited || hasSensitiveDescendantUseCase(nodeId))
+            }
+
+            val count = 1.takeIf { hasSensitiveItems } ?: 0
+            _sensitiveItemsCount.value = if (handles.size > 1 && count > 0) count + 1 else count
+        } else {
+            _sensitiveItemsCount.value = 0
+        }
+    }
+
+    fun clearSensitiveItemsCheck() {
+        _sensitiveItemsCount.value = null
     }
 }

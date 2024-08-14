@@ -476,6 +476,10 @@
     <string name="share_hidden_item_link_description">This item is set to hidden. Once you share the item, anyone with the link will be able to see it. It will still be hidden in your Cloud drive.</string>
     <!-- Share hidden item links description -->
     <string name="share_hidden_item_links_description">One or more of these items is set to hidden. Once you share the hidden items, anyone with the link will be able to see them. The items will still be hidden in your Cloud drive.</string>
+    <!-- Share hidden folder description -->
+    <string name="share_hidden_folder_description">There are hidden items in this folder. Sharing the folder will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <!-- Share hidden folders description -->
+    <string name="share_hidden_folders_description">There are hidden items in one or more of these folders. Sharing the folders will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
     <!-- Title shown when cancelling the subscription -->
     <string name="account_cancellation_instructions_cancel_subscription_title">Cancel subscription</string>
     <!-- Title shown when reactivating the subscription -->

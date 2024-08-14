@@ -92,6 +92,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.ListIterator;
 
 import javax.inject.Inject;
@@ -1317,10 +1318,14 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         outState.putBoolean("searchExpand", searchExpand);
         if (searchExpand) {
             if (searchAutoComplete != null) {
-                outState.putString("inputString", searchAutoComplete.getText().toString());
+                if (searchAutoComplete != null) {
+                    outState.putString("inputString", searchAutoComplete.getText().toString());
+                }
             }
         } else {
-            outState.putString("inputString", typeContactEditText.getText().toString());
+            if (typeContactEditText != null) {
+                outState.putString("inputString", typeContactEditText.getText().toString());
+            }
         }
         outState.putBoolean("onNewGroup", onNewGroup);
         outState.putBoolean("isConfirmDeleteShown", isConfirmDeleteShown);
@@ -1465,6 +1470,32 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 }
             }
         }
+
+        ViewExtensionsKt.collectFlow(this, viewModel.getSensitiveItemsCountFlow(), Lifecycle.State.STARTED, count -> {
+            if (count != null) {
+                if (count == 0) {
+                    initialize(savedInstanceState);
+                } else {
+                    showSharingSensitiveItemsWarningDialog(savedInstanceState, count);
+                }
+                viewModel.clearSensitiveItemsCheck();
+            }
+            return Unit.INSTANCE;
+        });
+
+        List<Long> handles = new ArrayList<>();
+        if (nodeHandle != -1) {
+            handles.add(nodeHandle);
+        } else if (nodeHandles != null) {
+            for (long handle : nodeHandles) {
+                handles.add(handle);
+            }
+        }
+
+        viewModel.checkSensitiveItems(handles);
+    }
+
+    private void initialize(Bundle savedInstanceState) {
         viewModel.setChatId(chatId);
 
         Display display = getWindowManager().getDefaultDisplay();
@@ -1739,6 +1770,25 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             newGroup();
         }
         observeFlow();
+    }
+
+    private void showSharingSensitiveItemsWarningDialog(Bundle bundle, int count) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(AddContactActivity.this);
+
+        String title = count == 1 ?
+                getString(mega.privacy.android.shared.resources.R.string.hidden_item) :
+                getString(mega.privacy.android.shared.resources.R.string.hidden_items);
+        builder.setTitle(title);
+
+        String message = count == 1 ?
+                getString(mega.privacy.android.shared.resources.R.string.share_hidden_folder_description) :
+                getString(mega.privacy.android.shared.resources.R.string.share_hidden_folders_description);
+        builder.setMessage(message);
+
+        builder.setCancelable(false);
+        builder.setPositiveButton(getString(R.string.button_continue), (dialog, which) -> initialize(bundle));
+        builder.setNegativeButton(getString(R.string.general_cancel), (dialog, which) -> finish());
+        builder.show();
     }
 
     private void setEmptyStateVisibility(boolean visible) {
