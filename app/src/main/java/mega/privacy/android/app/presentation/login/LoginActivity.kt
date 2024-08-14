@@ -27,12 +27,11 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
 import mega.privacy.android.app.main.CreateAccountFragment
-import mega.privacy.android.app.main.TourFragment
 import mega.privacy.android.app.presentation.extensions.toConstant
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragment
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragmentV2
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
-import mega.privacy.android.app.presentation.login.onboarding.TourFragmentV2
+import mega.privacy.android.app.presentation.login.onboarding.TourFragment
 import mega.privacy.android.app.presentation.login.reportissue.ReportIssueViaEmailFragment
 import mega.privacy.android.app.presentation.meeting.view.dialog.ACTION_JOIN_AS_GUEST
 import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
@@ -225,45 +224,21 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
             Constants.TOUR_FRAGMENT -> {
                 Timber.d("Show TOUR_FRAGMENT")
-                // Need to make the call first, otherwise the TourFragment will be shown
-                // before we successfully fetch the flag
-                lifecycleScope.launch {
-                    var isNewTourFragmentEnabled = false
-                    runCatching { viewModel.isNewTourFragmentEnabled() }
-                        .onSuccess { isNewTourFragmentEnabled = it }
-                    val tourFragment =
-                        if (isNewTourFragmentEnabled) {
-                            TourFragmentV2().apply {
-                                onLoginClick = {
-                                    showFragment(LoginFragmentType.Login)
-                                }
-                                onCreateAccountClick = {
-                                    showFragment(LoginFragmentType.CreateAccount)
-                                }
-                                onOpenLink = ::startOpenLinkActivity
-                            }
-                        } else {
-                            when {
-                                Constants.ACTION_RESET_PASS == intent?.action -> {
-                                    TourFragment.newInstance(intent?.dataString, null)
-                                }
-
-                                Constants.ACTION_PARK_ACCOUNT == intent?.action -> {
-                                    TourFragment.newInstance(null, intent?.dataString)
-                                }
-
-                                else -> {
-                                    TourFragment.newInstance(null, null)
-                                }
-                            }
-                        }
-
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container_login, tourFragment)
-                        .commitNowAllowingStateLoss()
-
-                    Util.setDrawUnderStatusBar(this@LoginActivity, true)
+                val tourFragment = TourFragment().apply {
+                    onLoginClick = {
+                        showFragment(LoginFragmentType.Login)
+                    }
+                    onCreateAccountClick = {
+                        showFragment(LoginFragmentType.CreateAccount)
+                    }
+                    onOpenLink = ::startOpenLinkActivity
                 }
+
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container_login, tourFragment)
+                    .commitNowAllowingStateLoss()
+
+                Util.setDrawUnderStatusBar(this@LoginActivity, true)
             }
 
             Constants.CONFIRM_EMAIL_FRAGMENT -> {

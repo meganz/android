@@ -11,7 +11,6 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.main.TourFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.onboarding.view.TourRoute
 import mega.privacy.android.domain.entity.ThemeMode
@@ -21,10 +20,10 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * The new tour fragment to replace the old [TourFragment] until fully-tested.
+ * Tour/Onboarding Fragment.
  */
 @AndroidEntryPoint
-class TourFragmentV2 : Fragment() {
+class TourFragment : Fragment() {
 
     /**
      * Current theme

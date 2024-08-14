@@ -193,14 +193,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables new tour fragment compose page
-     */
-    NewTourFragment(
-        "Enable new tour fragment",
-        true
-    ),
-
-    /**
      * To enable the new add and manage description feature to node
      */
     NodeWithTags(

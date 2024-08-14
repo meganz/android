@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.TourFragment
+import mega.privacy.android.app.presentation.login.onboarding.TourFragment
 import mega.privacy.android.app.presentation.login.onboarding.model.TourUiState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.usecase.IsUrlMatchesRegexUseCase
