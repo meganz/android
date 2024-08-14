@@ -188,6 +188,7 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
                 viewModel.getExpirationTime(),
                 viewModel.hasRenewableSubscription(),
                 viewModel.hasExpirableSubscription(),
+                viewModel.isFreeAccount(),
                 ActiveFragment.MY_ACCOUNT_USAGE
             )
             binding.upgradeButton.isVisible = true

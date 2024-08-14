@@ -152,11 +152,12 @@ object MyAccountViewUtil {
         expirationTime: Long,
         hasRenewableSubscription: Boolean = false,
         hasExpirableSubscription: Boolean = false,
+        isFreeAccount: Boolean,
         fragment: ActiveFragment,
     ): Boolean {
         businessStatusText.isVisible = false
 
-        return if (hasRenewableSubscription || hasExpirableSubscription) {
+        return if ((hasRenewableSubscription || hasExpirableSubscription) && !isFreeAccount) {
             setRenewOrExpiryDate(renewTime, expirationTime, hasRenewableSubscription, fragment)
             true
         } else false

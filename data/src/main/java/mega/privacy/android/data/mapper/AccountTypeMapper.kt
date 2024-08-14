@@ -23,6 +23,7 @@ internal class AccountTypeMapper @Inject constructor() {
         MegaAccountDetails.ACCOUNT_TYPE_STARTER -> AccountType.STARTER
         MegaAccountDetails.ACCOUNT_TYPE_BASIC -> AccountType.BASIC
         MegaAccountDetails.ACCOUNT_TYPE_ESSENTIAL -> AccountType.ESSENTIAL
+        MegaAccountDetails.ACCOUNT_TYPE_FEATURE -> AccountType.FREE
         else -> AccountType.UNKNOWN
     }
 }

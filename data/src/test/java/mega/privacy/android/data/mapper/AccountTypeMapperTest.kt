@@ -29,6 +29,7 @@ internal class AccountTypeMapperTest {
         arrayOf(MegaAccountDetails.ACCOUNT_TYPE_STARTER, AccountType.STARTER),
         arrayOf(MegaAccountDetails.ACCOUNT_TYPE_BASIC, AccountType.BASIC),
         arrayOf(MegaAccountDetails.ACCOUNT_TYPE_ESSENTIAL, AccountType.ESSENTIAL),
+        arrayOf(MegaAccountDetails.ACCOUNT_TYPE_FEATURE, AccountType.FREE),
         arrayOf(999, AccountType.UNKNOWN)
     )
 }
