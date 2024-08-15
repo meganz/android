@@ -54,7 +54,7 @@ class HideDropdownMenuItem @Inject constructor(
             return false
         }
 
-        return selectedNodes.all { it.isMarkedSensitive } && selectedNodes.none { it.isSensitiveInherited }
+        return selectedNodes.any { !it.isMarkedSensitive } && selectedNodes.none { it.isSensitiveInherited }
     }
 
     override fun getOnClick(

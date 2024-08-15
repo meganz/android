@@ -61,12 +61,6 @@ fun PhotosGridView(
         }
     }
 
-    LaunchedEffect(timelineViewState.isCameraUploadsLimitedAccess) {
-        if (timelineViewState.isCameraUploadsLimitedAccess) {
-            lazyGridState.scrollToItem(0)
-        }
-    }
-
     val enableCameraUploadsBanner =
         timelineViewState.enableCameraUploadButtonShowing
                 && !timelineViewState.showCameraUploadsWarning

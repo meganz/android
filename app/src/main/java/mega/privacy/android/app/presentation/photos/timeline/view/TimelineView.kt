@@ -292,6 +292,12 @@ private fun HandlePhotosGridView(
             timelineViewState.scrollStartOffset
         )
     }
+
+    LaunchedEffect(timelineViewState.isCameraUploadsLimitedAccess) {
+        if (timelineViewState.isCameraUploadsLimitedAccess) {
+            lazyGridState.scrollToItem(0)
+        }
+    }
     // Load Photos
     Box {
         when (timelineViewState.selectedTimeBarTab) {
