@@ -411,7 +411,8 @@ internal fun VideoPlaylistHeaderView(
                 .background(MaterialTheme.colors.grey_050_grey_800)
 
             ThumbnailListView(
-                icon = iconPackR.drawable.ic_video_playlist_default_thumbnail,
+                emptyPlaylistIcon = iconPackR.drawable.ic_video_playlist_default_thumbnail,
+                noThumbnailIcon = iconPackR.drawable.ic_video_playlist_no_thumbnail,
                 modifier = thumbnailModifier,
                 thumbnailList = thumbnailList
             )

@@ -29,7 +29,9 @@ internal class VideoPlaylistMapper @Inject constructor() {
     )
 
     private fun getNodeIdListRelatedToThumbnail(videoNodeList: List<TypedVideoNode>) =
-        videoNodeList.take(
+        videoNodeList.filter {
+            it.hasThumbnail
+        }.take(
             if (videoNodeList.size > MAX_THUMBNAIL_COUNT) {
                 MAX_THUMBNAIL_COUNT
             } else {

@@ -295,7 +295,8 @@ internal fun VideoPlaylistsView(
                         items(count = items.size, key = { items[it].id.longValue }) {
                             val videoPlaylistItem = items[it]
                             VideoPlaylistItemView(
-                                icon = iconPackR.drawable.ic_video_playlist_default_thumbnail,
+                                emptyPlaylistIcon = iconPackR.drawable.ic_video_playlist_default_thumbnail,
+                                noThumbnailIcon = iconPackR.drawable.ic_video_playlist_no_thumbnail,
                                 title = videoPlaylistItem.title,
                                 numberOfVideos = videoPlaylistItem.numberOfVideos,
                                 thumbnailList = videoPlaylistItem.thumbnailList?.map { id ->

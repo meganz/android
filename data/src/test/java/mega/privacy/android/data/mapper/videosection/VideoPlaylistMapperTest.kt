@@ -36,6 +36,7 @@ class VideoPlaylistMapperTest {
         on { id }.thenReturn(nodeId)
         on { duration }.thenReturn(duration.seconds)
         on { thumbnailPath }.thenReturn("thumbnailPath")
+        on { hasThumbnail }.thenReturn(true)
     }
 
     @BeforeAll
