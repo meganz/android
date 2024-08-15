@@ -436,6 +436,10 @@
             android:label="@string/section_photo_sync"
             android:launchMode="singleTop" />
         <activity
+            android:name=".presentation.documentscanner.SaveScannedDocumentsActivity"
+            android:label="@string/scan_title_save_scan"
+            android:launchMode="singleTop" />
+        <activity
             android:name="mega.privacy.android.feature.sync.ui.settings.SettingsSyncActivity"
             android:label="@string/settings_section_sync"
             android:launchMode="singleTop" />
