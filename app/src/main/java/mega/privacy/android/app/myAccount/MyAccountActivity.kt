@@ -340,7 +340,7 @@ class MyAccountActivity : PasscodeActivity(),
                 menu.toggleAllMenuItemsVisibility(true)
 
                 if (viewModel.isNewCancelSubscriptionFeatureEnabled()) {
-                    if (!viewModel.isStandardProAccount()) {
+                    if (!viewModel.isProSubscription()) {
                         menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
                     }
                 } else {
@@ -484,7 +484,7 @@ class MyAccountActivity : PasscodeActivity(),
             if (state.isBusinessAccount || isProFlexiAccount) {
                 refreshMenuOptionsVisibility()
             }
-            if (state.isStandardProAccount) {
+            if (state.isProSubscription) {
                 refreshMenuOptionsVisibility()
             }
             if (state.showInvalidChangeEmailLinkPrompt) {

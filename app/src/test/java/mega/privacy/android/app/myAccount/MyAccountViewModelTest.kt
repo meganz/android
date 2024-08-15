@@ -21,11 +21,13 @@ import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.PaymentMethodType
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.AccountPlanDetail
+import mega.privacy.android.domain.entity.account.AccountSubscriptionDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.node.NodeId
@@ -605,7 +607,7 @@ internal class MyAccountViewModelTest {
         ),
         Arguments.of(
             AccountType.BUSINESS,
-            accountDetailsWithInvalidSubscription(AccountType.BUSINESS),
+            accountDetailsWithValidSubscription(AccountType.BUSINESS),
             false
         ),
         Arguments.of(
@@ -623,12 +625,32 @@ internal class MyAccountViewModelTest {
             accountDetailsWithValidSubscription(AccountType.ESSENTIAL),
             false
         ),
+        Arguments.of(
+            AccountType.PRO_I,
+            accountDetailsOneOffPlan(AccountType.PRO_I),
+            false
+        ),
+        Arguments.of(
+            AccountType.PRO_II,
+            accountDetailsOneOffPlan(AccountType.PRO_II),
+            false
+        ),
+        Arguments.of(
+            AccountType.PRO_III,
+            accountDetailsOneOffPlan(AccountType.PRO_III),
+            true
+        ),
+        Arguments.of(
+            AccountType.PRO_LITE,
+            accountDetailsOneOffPlan(AccountType.PRO_LITE),
+            false
+        ),
         Arguments.of(AccountType.UNKNOWN, AccountDetail(), false),
     )
 
-    @ParameterizedTest(name = "when account type is {0} and account details are {1}, then isStandardProAccount is {2}")
+    @ParameterizedTest(name = "when account type is {0} and account details are {1}, then isProSubscription is {2}")
     @MethodSource("provideAccountDetailParameters")
-    fun `test that isStandardProAccount is updated correctly when account details are provided`(
+    fun `test that isProSubscription is updated correctly when account details are provided`(
         accountType: AccountType,
         accountDetails: AccountDetail,
         expected: Boolean,
@@ -650,7 +672,7 @@ internal class MyAccountViewModelTest {
 
         underTest.refreshAccountInfo()
         underTest.state.test {
-            assertThat(awaitItem().isStandardProAccount).isEqualTo(expected)
+            assertThat(awaitItem().isProSubscription).isEqualTo(expected)
         }
     }
 
@@ -724,15 +746,36 @@ internal class MyAccountViewModelTest {
     private val expectedSubscriptionRenewTime = 1873874783274L
     private val expectedProExpirationTime = 378672463728467L
     private val expectedSubscriptionId = "subscriptionId"
-    private val expectedAccountType = AccountType.PRO_I
-    private val expectedAccountPlanDetail = AccountPlanDetail(
-        accountType = expectedAccountType,
+    private val expectedAccountType = AccountType.PRO_II
+    private fun expectedAccountPlanDetail(accountType: AccountType) = AccountPlanDetail(
+        accountType = accountType,
         isProPlan = true,
         expirationTime = expectedProExpirationTime,
         subscriptionId = expectedSubscriptionId,
         featuresList = listOf("vpn", "pwm"),
         isFreeTrial = false,
     )
+
+    private val expectedAccountPlanDetailOneOff = AccountPlanDetail(
+        accountType = AccountType.PRO_III,
+        isProPlan = true,
+        expirationTime = expectedProExpirationTime,
+        subscriptionId = "",
+        featuresList = listOf("vpn", "pwm"),
+        isFreeTrial = false,
+    )
+
+    private fun expectedAccountSubscriptionDetail(accountType: AccountType) =
+        AccountSubscriptionDetail(
+            subscriptionId = expectedSubscriptionId,
+            subscriptionStatus = SubscriptionStatus.VALID,
+            subscriptionCycle = AccountSubscriptionCycle.MONTHLY,
+            subscriptionLevel = accountType,
+            paymentMethodType = PaymentMethodType.STRIPE2,
+            renewalTime = expectedSubscriptionRenewTime,
+            featuresList = listOf("vpn", "pwm"),
+            isFreeTrial = false,
+        )
 
     private val expectedAccountDetails = AccountDetail(
         storageDetail = null,
@@ -759,8 +802,8 @@ internal class MyAccountViewModelTest {
             subscriptionRenewTime = expectedSubscriptionRenewTime,
             accountSubscriptionCycle = AccountSubscriptionCycle.MONTHLY,
             proExpirationTime = expectedProExpirationTime,
-            accountPlanDetail = expectedAccountPlanDetail,
-            accountSubscriptionDetailList = listOf()
+            accountPlanDetail = expectedAccountPlanDetail(accountType),
+            accountSubscriptionDetailList = listOf(expectedAccountSubscriptionDetail(accountType))
         )
     )
 
@@ -774,8 +817,23 @@ internal class MyAccountViewModelTest {
             subscriptionRenewTime = expectedSubscriptionRenewTime,
             accountSubscriptionCycle = AccountSubscriptionCycle.MONTHLY,
             proExpirationTime = expectedProExpirationTime,
-            accountPlanDetail = expectedAccountPlanDetail,
+            accountPlanDetail = expectedAccountPlanDetail(accountType),
             accountSubscriptionDetailList = listOf()
+        )
+    )
+
+    private fun accountDetailsOneOffPlan(accountType: AccountType) = AccountDetail(
+        storageDetail = null,
+        sessionDetail = null,
+        transferDetail = null,
+        levelDetail = AccountLevelDetail(
+            accountType = accountType,
+            subscriptionStatus = SubscriptionStatus.NONE,
+            subscriptionRenewTime = expectedSubscriptionRenewTime,
+            accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+            proExpirationTime = expectedProExpirationTime,
+            accountPlanDetail = expectedAccountPlanDetailOneOff,
+            accountSubscriptionDetailList = listOf(expectedAccountSubscriptionDetail(accountType))
         )
     )
 
