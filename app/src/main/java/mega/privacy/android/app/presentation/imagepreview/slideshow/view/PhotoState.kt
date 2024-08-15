@@ -21,6 +21,10 @@ import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.times
 
+
+private const val MINIMUM_SCALE = 1f
+private const val MAXIMUM_SCALE = 1000f
+
 /**
  * Creates a [PhotoState] that is remembered across compositions.
  *
@@ -33,10 +37,10 @@ import androidx.compose.ui.layout.times
  */
 @Composable
 fun rememberPhotoState(
-    @FloatRange(from = 1.0) initialScale: Float = 1f,
+    @FloatRange(from = 1.0) initialScale: Float = MINIMUM_SCALE,
     initialOffset: Offset = Offset.Zero,
-    minimumScale: Float = 1f,
-    maximumScale: Float = 3f,
+    minimumScale: Float = MINIMUM_SCALE,
+    maximumScale: Float = MAXIMUM_SCALE,
 ): PhotoState = rememberSaveable(saver = PhotoState.Saver) {
     PhotoState(
         currentScale = initialScale,
@@ -56,10 +60,10 @@ fun rememberPhotoState(
  */
 @Stable
 class PhotoState(
-    @FloatRange(from = 1.0) currentScale: Float = 1f,
+    @FloatRange(from = 1.0) currentScale: Float = MINIMUM_SCALE,
     currentOffset: Offset = Offset.Zero,
-    private val minimumScale: Float = 1f,
-    internal val maximumScale: Float = 3f,
+    private val minimumScale: Float = MINIMUM_SCALE,
+    internal val maximumScale: Float = MAXIMUM_SCALE,
 ) {
 
     internal var layoutSize: Size = Size.Zero
