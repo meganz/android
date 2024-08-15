@@ -50,7 +50,7 @@ class VideoItemViewTest {
     private val labelColor = Color.Red
 
     private fun setComposeContent(
-        @DrawableRes icon: Int = R.drawable.ic_video_medium_solid,
+        @DrawableRes icon: Int = R.drawable.ic_video_section_video_default_thumbnail,
         name: String = "",
         fileSize: String? = null,
         duration: String? = null,

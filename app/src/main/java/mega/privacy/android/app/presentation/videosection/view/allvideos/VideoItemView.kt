@@ -74,7 +74,7 @@ internal fun VideoItemView(
             )
             .padding(vertical = 8.dp, horizontal = 16.dp)
             .fillMaxWidth()
-            .height(87.dp)
+            .height(71.dp)
             .testTag(VIDEO_ITEM_VIEW_TEST_TAG)
     ) {
         VideoThumbnailView(
@@ -300,7 +300,7 @@ internal fun VideoSizeAndIconsView(
 private fun VideoItemViewWithFavouritePreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoItemView(
-            icon = iconPackR.drawable.ic_video_medium_solid,
+            icon = iconPackR.drawable.ic_video_section_video_default_thumbnail,
             name = "testing_video_file_name_long_name_testing.mp4",
             fileSize = "1.3MB",
             duration = "04:00",
@@ -320,7 +320,7 @@ private fun VideoItemViewWithFavouritePreview() {
 private fun VideoItemViewWithoutFavouritePreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoItemView(
-            icon = iconPackR.drawable.ic_video_medium_solid,
+            icon = iconPackR.drawable.ic_video_section_video_default_thumbnail,
             name = "name.mp4",
             fileSize = "1.3MB",
             duration = "04:00",

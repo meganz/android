@@ -189,7 +189,7 @@ internal fun AllVideosView(
                         items(count = items.size, key = { items[it].id.longValue }) {
                             val videoItem = items[it]
                             VideoItemView(
-                                icon = iconPackR.drawable.ic_video_medium_solid,
+                                icon = iconPackR.drawable.ic_video_section_video_default_thumbnail,
                                 name = videoItem.name,
                                 fileSize = formatFileSize(videoItem.size, LocalContext.current),
                                 duration = videoItem.durationString,
