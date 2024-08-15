@@ -125,9 +125,9 @@ class MyAccountHomeViewModel @Inject constructor(
                 .collectLatest { accountDetail ->
                     _uiState.update {
                         it.copy(
-                            hasRenewableSubscription = accountDetail.levelDetail?.subscriptionStatus == SubscriptionStatus.VALID
+                            hasRenewableSubscription = accountDetail.levelDetail?.accountType !== AccountType.FREE && accountDetail.levelDetail?.subscriptionStatus == SubscriptionStatus.VALID
                                     && (accountDetail.levelDetail?.subscriptionRenewTime ?: 0) > 0,
-                            hasExpireAbleSubscription = (accountDetail.levelDetail?.proExpirationTime
+                            hasExpireAbleSubscription = accountDetail.levelDetail?.accountType !== AccountType.FREE && (accountDetail.levelDetail?.proExpirationTime
                                 ?: 0) > 0,
                             lastSession = (accountDetail.sessionDetail?.mostRecentSessionTimeStamp)
                                 ?: 0,
