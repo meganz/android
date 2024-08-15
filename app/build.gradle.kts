@@ -236,6 +236,7 @@ dependencies {
     implementation(lib.billing.client.ktx)
     implementation(google.services.location)
     implementation(google.services.maps)
+    implementation(google.services.mlkit.document.scanner)
     implementation(google.maps.utils)
     implementation(google.maps.compose)
     implementation(google.code.scanner)
