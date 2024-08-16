@@ -603,6 +603,7 @@ class LoginViewModel @Inject constructor(
                 isLoginRequired = false,
                 is2FARequired = false,
                 isAlreadyLoggedIn = true,
+                isFastLoginInProgress = true,
                 fetchNodesUpdate = cleanFetchNodesUpdate
             )
         }
@@ -658,15 +659,20 @@ class LoginViewModel @Inject constructor(
         }
 
         LoginStatus.LoginSucceed -> {
-            //If fast login, state already updated.
+            // If fast login, state already updated.
             Timber.d("Login finished")
-            if (!isFastLogin) {
+            if (isFastLogin) {
+                _state.update {
+                    it.copy(isFastLoginInProgress = false)
+                }
+            } else {
                 _state.update {
                     it.copy(
                         isLoginInProgress = false,
                         isLoginRequired = false,
                         is2FARequired = false,
                         isAlreadyLoggedIn = true,
+                        isFastLoginInProgress = false,
                         fetchNodesUpdate = cleanFetchNodesUpdate,
                         multiFactorAuthState = null
                     )
@@ -681,6 +687,7 @@ class LoginViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     isLoginInProgress = false,
+                    isFastLoginInProgress = false,
                     isLoginRequired = true,
                     is2FAEnabled = false,
                     is2FARequired = false

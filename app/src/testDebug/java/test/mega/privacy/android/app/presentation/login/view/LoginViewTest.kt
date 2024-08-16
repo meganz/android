@@ -11,7 +11,6 @@ import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.login.view.FETCH_NODES_PROGRESS_TEST_TAG
-import mega.privacy.android.app.presentation.login.view.LOGIN_PROGRESS_TEST_TAG
 import mega.privacy.android.app.presentation.login.view.LoginView
 import mega.privacy.android.app.presentation.login.view.MEGA_LOGO_TEST_TAG
 import mega.privacy.android.app.presentation.login.view.TWO_FA_PROGRESS_TEST_TAG
@@ -127,26 +126,19 @@ class LoginViewTest {
     }
 
     @Test
-    fun `test that login progress bar is shown if login is in progress`() {
-        setupRule(LoginState(isLoginInProgress = true))
-        composeRule.onNodeWithTag(LOGIN_PROGRESS_TEST_TAG).assertExists()
-    }
-
-    @Test
     fun `test that updating file list text is shown if fetch nodes update exists`() {
         setupRule(LoginState(fetchNodesUpdate = FetchNodesUpdate()))
         composeRule.onNodeWithText(fromId(R.string.download_updating_filelist)).assertExists()
     }
 
     @Test
-    fun `test that login progress bar is shown if login fetch nodes exists`() {
-        setupRule(LoginState(fetchNodesUpdate = FetchNodesUpdate()))
-        composeRule.onNodeWithTag(LOGIN_PROGRESS_TEST_TAG).assertExists()
-    }
-
-    @Test
     fun `test that preparing file list text is shown if the progress of fetch nodes is greater than 0`() {
-        setupRule(LoginState(fetchNodesUpdate = FetchNodesUpdate(Progress(0.5F))))
+        setupRule(
+            LoginState(
+                fetchNodesUpdate = FetchNodesUpdate(Progress(0.5F)),
+                isFirstTime = true
+            )
+        )
         composeRule.onNodeWithText(fromId(R.string.login_preparing_filelist)).assertExists()
     }
 

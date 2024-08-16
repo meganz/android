@@ -1,12 +1,16 @@
 package mega.privacy.android.app.presentation.login.model
 
+import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.exception.LoginException
+
 
 /**
  * Data class defining the state of [mega.privacy.android.app.presentation.login.LoginFragment].
@@ -43,6 +47,7 @@ import mega.privacy.android.domain.exception.LoginException
  * @property enabledFlags               Enabled Feature Flags
  * @property isCheckingSignupLink        True if it is checking a signup link, false otherwise.
  * @property snackbarMessage            Message to show in Snackbar.
+ * @property isFastLoginInProgress      True if a fast login is in progress, false otherwise.
  */
 data class LoginState(
     val intentState: LoginIntentState? = null,
@@ -70,6 +75,7 @@ data class LoginState(
     val isLocalLogoutInProgress: Boolean = false,
     val isLoginRequired: Boolean = false,
     val isLoginInProgress: Boolean = false,
+    val isFastLoginInProgress: Boolean = false,
     val loginException: LoginException? = null,
     val ongoingTransfersExist: Boolean? = null,
     val isPendingToFinishActivity: Boolean = false,
@@ -77,4 +83,49 @@ data class LoginState(
     val enabledFlags: Set<Feature> = emptySet(),
     val isCheckingSignupLink: Boolean = false,
     val snackbarMessage: StateEventWithContent<Int> = consumed(),
-)
+) {
+
+    /**
+     * Text to show below progress bar
+     */
+    @StringRes
+    val currentStatusText: Int = when {
+        isCheckingSignupLink -> R.string.login_querying_signup_link
+        isFastLoginInProgress -> R.string.login_connecting_to_server
+        fetchNodesUpdate?.temporaryError != null -> fetchNodesUpdate.temporaryError?.messageId
+            ?: R.string.login_connecting_to_server
+
+        (fetchNodesUpdate?.progress?.floatValue
+            ?: 0f) > 0f && isFirstTime -> R.string.login_preparing_filelist
+
+        fetchNodesUpdate != null -> R.string.download_updating_filelist
+        else -> R.string.login_connecting_to_server
+    }
+
+    /**
+     * Calculate the current progress of the login and fetch nodes
+     * Weights:
+     * - 30% for login if first time, else 50%
+     * - 10% for updating files if first login, else 45%
+     * - 60% for preparing files if first login, else 5%
+     * - Direct to 90% if checking signup link
+     */
+    val currentProgress: Float = run {
+        val progressAfterLogin = if (isFirstTime) 0.3f else 0.5f
+        val progressAfterFetchNode = progressAfterLogin + if (isFirstTime) 0.1f else 0.45f
+        when {
+            isCheckingSignupLink -> 0.9f
+            isFastLoginInProgress -> progressAfterLogin
+            fetchNodesUpdate?.progress != null -> {
+                val fetchNodeProgress = fetchNodesUpdate.progress?.floatValue ?: 0f
+                if (fetchNodeProgress > 0f)
+                    progressAfterFetchNode + (fetchNodeProgress * (1.0f - progressAfterFetchNode))
+                else
+                    progressAfterFetchNode
+            }
+
+            fetchNodesUpdate != null -> progressAfterFetchNode
+            else -> progressAfterLogin
+        }
+    }
+}

@@ -3,7 +3,11 @@ package mega.privacy.android.app.presentation.login.view
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -12,13 +16,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -29,7 +38,9 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,14 +49,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -59,12 +73,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
 import mega.privacy.android.app.presentation.extensions.login.error
-import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
@@ -76,12 +91,11 @@ import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaAnimatedLinearProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
-import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.textfields.LabelTextField
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_white_alpha_087
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
@@ -377,91 +391,114 @@ private fun LoginInProgress(
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
+    val isInLandscape =
+        LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val scrollState = rememberScrollState()
-    Column(
+    ConstraintLayout(
         modifier = modifier
             .fillMaxWidth()
+            .fillMaxHeight()
             .padding(paddingValues)
             .padding(horizontal = 20.dp)
             .verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.logo_loading_ic),
-            contentDescription = stringResource(id = R.string.login_to_mega),
+        val (logo, progressBar, status) = createRefs()
+
+        Box(
             modifier = Modifier
-                .padding(top = 112.dp)
-                .size(144.dp)
-                .testTag(MEGA_LOGO_TEST_TAG),
-            colorFilter = ColorFilter.tint(color = MaterialTheme.colors.red_600_white_alpha_087)
-        )
-        with(state) {
-            if (isCheckingSignupLink) {
-                LoginInProgressText(
-                    stringId = R.string.login_querying_signup_link,
-                    modifier = Modifier
-                        .padding(top = 30.dp)
-                        .testTag(CHECKING_VALIDATION_TAG)
-                )
-            }
-            LoginInProgressText(
-                stringId = R.string.login_connecting_to_server,
+                .constrainAs(logo) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    bottom.linkTo(parent.bottom, if (isInLandscape) 40.dp else 0.dp)
+                    end.linkTo(parent.end)
+                }
+        ) {
+            // To maintain contrast in dark mode
+            Box(
                 modifier = Modifier
-                    .padding(top = 5.dp)
+                    .background(
+                        Color.White,
+                        RoundedCornerShape(120.dp)
+                    )
+                    .size(150.dp)
+                    .clip(CircleShape)
+                    .align(Alignment.Center)
+            )
+            Image(
+                painter = painterResource(id = R.drawable.logo_loading_ic),
+                contentDescription = stringResource(id = R.string.login_to_mega),
+                modifier = Modifier
+                    .size(180.dp)
+                    .testTag(MEGA_LOGO_TEST_TAG),
+            )
+        }
+
+        MegaAnimatedLinearProgressIndicator(
+            indicatorProgress = state.currentProgress,
+            fastAnimation = state.currentProgress > 0.5f,
+            modifier = Modifier
+                .constrainAs(progressBar) {
+                    bottom.linkTo(status.top, margin = 10.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+                .padding(start = 40.dp, end = 40.dp)
+                .widthIn(max = 300.dp)
+                .testTag(FETCH_NODES_PROGRESS_TEST_TAG)
+        )
+
+        Box(
+            modifier = Modifier
+                .defaultMinSize(minHeight = 40.dp)
+                .constrainAs(status) {
+                    bottom.linkTo(parent.bottom, if (isInLandscape) 5.dp else 20.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+        ) {
+            LoginInProgressText(
+                stringId = state.currentStatusText,
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp)
                     .testTag(CONNECTING_TO_SERVER_TAG)
             )
-            fetchNodesUpdate?.apply {
-                LoginInProgressText(
-                    stringId = R.string.download_updating_filelist,
-                    modifier = Modifier
-                        .padding(top = 5.dp)
-                        .testTag(UPDATING_FILE_LIST_TAG)
-                )
-                progress?.let {
-                    if (it.floatValue > 0) {
-                        LoginInProgressText(
-                            stringId = R.string.login_preparing_filelist,
-                            modifier = Modifier
-                                .padding(top = 5.dp)
-                                .testTag(PREPARING_FILE_LIST_TAG)
-                        )
-                        MegaLinearProgressIndicator(
-                            progress = it.floatValue,
-                            modifier = Modifier
-                                .padding(start = 10.dp, top = 10.dp, end = 10.dp)
-                                .testTag(FETCH_NODES_PROGRESS_TEST_TAG)
-                        )
-                    }
-                }
-            }
-            MegaCircularProgressIndicator(
-                modifier = Modifier
-                    .padding(top = 10.dp)
-                    .size(72.dp)
-                    .testTag(LOGIN_PROGRESS_TEST_TAG)
-            )
-            fetchNodesUpdate?.temporaryError?.let {
-                LoginInProgressText(
-                    stringId = it.messageId,
-                    modifier = Modifier
-                        .padding(top = 10.dp)
-                        .testTag(TEMPORARY_ERROR_TAG)
-                )
-            }
         }
     }
 }
 
+/**
+ * Composable to show current status text with a fade in/out animation.
+ */
 @Composable
 private fun LoginInProgressText(
     @StringRes stringId: Int,
     modifier: Modifier,
-) = Text(
-    text = stringResource(id = stringId),
-    modifier = modifier,
-    style = MaterialTheme.typography.subtitle2,
-    textAlign = TextAlign.Center
-)
+) {
+    val isInPreview = LocalInspectionMode.current // To avoid text being hidden in previews
+    var visible by rememberSaveable { mutableStateOf(isInPreview) }
+    var currentTextId by rememberSaveable { mutableIntStateOf(stringId) }
+
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(),
+        exit = fadeOut(),
+    ) {
+        Text(
+            text = stringResource(id = currentTextId),
+            style = MaterialTheme.typography.subtitle2,
+            modifier = modifier,
+            textAlign = TextAlign.Center,
+            minLines = 2
+        )
+    }
+
+    LaunchedEffect(stringId) {
+        visible = false
+        delay(200)
+        currentTextId = stringId
+        visible = true
+    }
+}
 
 @Composable
 private fun TwoFactorAuthentication(
@@ -531,9 +568,9 @@ private fun TwoFactorAuthentication(
 
 
 @Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewEmptyLoginView")
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkEmptyLoginViewPreview")
 @Composable
-private fun PreviewEmptyLoginView() {
+private fun EmptyLoginViewPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         var state by remember { mutableStateOf(LoginState(isLoginRequired = true)) }
 
@@ -554,9 +591,39 @@ private fun PreviewEmptyLoginView() {
 }
 
 @Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewLoginView")
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkLoginViewPreview")
 @Composable
-private fun PreviewLoginView(
+private fun LoginViewPreview(
+    @PreviewParameter(LoginStateProvider::class) state: LoginState,
+) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        LoginView(
+            state = state,
+            onEmailChanged = {},
+            onPasswordChanged = {},
+            onLoginClicked = {},
+            onForgotPassword = {},
+            onCreateAccount = {},
+            onSnackbarMessageConsumed = {},
+            on2FAPinChanged = { _, _ -> },
+            on2FAChanged = {},
+            onLostAuthenticatorDevice = {},
+            onBackPressed = {},
+            onFirstTime2FAConsumed = {},
+            onReportIssue = {},
+        )
+    }
+}
+
+@Preview
+@Preview(
+    uiMode = Configuration.ORIENTATION_LANDSCAPE,
+    heightDp = 360,
+    widthDp = 800,
+    name = "LandscapeLoginViewPreview"
+)
+@Composable
+private fun LandscapeLoginViewPreview(
     @PreviewParameter(LoginStateProvider::class) state: LoginState,
 ) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
