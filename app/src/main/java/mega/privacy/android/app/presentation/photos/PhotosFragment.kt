@@ -339,7 +339,7 @@ class PhotosFragment : Fragment() {
                 timelineViewState.showCameraUploadsPaused && !isCuDefaultStatusVisible
             // Conditions for showing the CU Complete Menu Icon
             val isCuCompleteStatusVisible =
-                timelineViewState.showCameraUploadsComplete && !isCuPausedStatusVisible
+                timelineViewState.showCameraUploadsComplete && !isCuDefaultStatusVisible && !isCuPausedStatusVisible
 
             findItem(R.id.action_cu_status_warning)?.isVisible = isCuWarningStatusVisible
             findItem(R.id.action_cu_status_default)?.isVisible = isCuDefaultStatusVisible
