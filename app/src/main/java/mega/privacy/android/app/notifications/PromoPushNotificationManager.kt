@@ -1,10 +1,12 @@
 package mega.privacy.android.app.notifications
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.Manifest
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationChannelCompat
@@ -12,8 +14,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.R
-import mega.privacy.android.icon.pack.R as iconPackR
-import android.graphics.Color
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_PROMO_ID
 import mega.privacy.android.domain.entity.pushes.PushMessage.PromoPushMessage
@@ -48,7 +48,12 @@ class PromoPushNotificationManager @Inject constructor(
             )
         } else {
             Timber.d("No Application found to can handle promo notification intent")
-            null
+            PendingIntent.getActivity(
+                context,
+                pushMessage.id,
+                Intent(),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
         }
 
         val notificationChannel = NotificationChannelCompat.Builder(
@@ -64,13 +69,6 @@ class PromoPushNotificationManager @Inject constructor(
             .build()
         notificationManagerCompat.createNotificationChannel(notificationChannel)
 
-        val notificationPriority =
-            if (pushMessage.sound.isNullOrEmpty()) {
-                NotificationCompat.PRIORITY_LOW
-            } else {
-                NotificationCompat.PRIORITY_HIGH
-            }
-
         val notification =
             NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_PROMO_ID)
                 .apply {
@@ -78,9 +76,9 @@ class PromoPushNotificationManager @Inject constructor(
                     pushMessage.subtitle?.let { setSubText(it) }
                     setContentText(pushMessage.description)
                     setSmallIcon(iconPackR.drawable.ic_stat_notify)
-                    setPriority(notificationPriority)
+                    setPriority(NotificationCompat.PRIORITY_HIGH)
                     setAutoCancel(true)
-                    setSilent(notificationPriority == NotificationCompat.PRIORITY_LOW)
+                    setSilent(false)
                     pendingIntent?.let {
                         setContentIntent(it)
                     }
@@ -92,6 +90,8 @@ class PromoPushNotificationManager @Inject constructor(
                     )
                 }.build()
 
-        notificationManagerCompat.notify(pushMessage.id, notification)
+        // Generate a unique ID using the current timestamp
+        val notificationId = (System.currentTimeMillis()).toInt()
+        notificationManagerCompat.notify(notificationId, notification)
     }
 }

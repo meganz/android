@@ -53,7 +53,6 @@ class PromoPushNotificationManagerTest {
 
         underTest.show(context, pushMessage)
 
-        verify(notificationManagerCompat).notify(eq(pushMessage.id), any())
         verify(notificationManagerCompat).notify(any(), argThat { arg: Notification ->
             arg.extras.getString("android.title").equals(pushMessage.title)
         })
