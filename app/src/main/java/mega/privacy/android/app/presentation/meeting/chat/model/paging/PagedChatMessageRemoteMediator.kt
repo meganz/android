@@ -61,7 +61,6 @@ class PagedChatMessageRemoteMediator @AssistedInject constructor(
             lateinit var response: FetchMessagePageResponse
             while (messages.size < count && coroutineContext.isActive) {
                 response = fetchMessages(chatId, coroutineScope)
-                Timber.d("Paging mediator load: fetch messages response : $response")
                 messages.addAll(response.messages)
                 if (response.loadResponse == ChatHistoryLoadStatus.NONE) break
             }

@@ -68,7 +68,6 @@ class TypedMessagePagingSourceMapper @Inject constructor(
                 }
 
                 is LoadResult.Page -> {
-                    Timber.d("Paging mediator mapper load: page : ${originalResult.data}")
                     LoadResult.Page(
                         data = originalResult.data.map { metaTypedMessageEntityMapper(it) },
                         prevKey = originalResult.prevKey,

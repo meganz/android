@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -695,8 +694,6 @@ internal class ChatRepositoryImpl @Inject constructor(
     override fun monitorMessageUpdates(chatId: Long): Flow<ChatRoomMessageUpdate> =
         getChatRoomUpdates(chatId).mapNotNull {
             chatRoomMessageUpdateMapper(it)
-        }.onEach {
-            Timber.d("Chat message update for chatId: $chatId: $it")
         }.flowOn(ioDispatcher)
 
     override fun monitorReactionUpdates(chatId: Long) =
