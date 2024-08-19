@@ -300,15 +300,17 @@ private fun EmptyContactsView(onInviteContactsClicked: () -> Unit) {
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
             Spacer(modifier = Modifier.height(50.dp))
         }
-
-        Image(
-            modifier = Modifier
-                .padding(vertical = 10.dp)
-                .size(120.dp),
-            painter = painterResource(id = IconR.drawable.ic_empty_user),
-            contentDescription = "Empty contacts image",
-        )
-
+        val isPortrait =
+            LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+        if (isPortrait) {
+            Image(
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .size(120.dp),
+                painter = painterResource(id = IconR.drawable.ic_empty_user),
+                contentDescription = "Empty contacts image",
+            )
+        }
         MegaText(
             modifier = Modifier.padding(start = 10.dp, top = 0.dp, end = 10.dp, bottom = 16.dp),
             text = stringResource(id = sharedR.string.invite_contacts_to_start_chat_title),

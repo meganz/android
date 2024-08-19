@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.chat.list.view
 import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -288,12 +290,15 @@ private fun EmptyView(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Image(
-            painter = painterResource(imageResource),
-            contentDescription = "Empty placeholder",
-            modifier = Modifier.size(144.dp)
-        )
-
+        val isPortrait =
+            LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+        if (isPortrait) {
+            Image(
+                painter = painterResource(imageResource),
+                contentDescription = "Empty placeholder",
+                modifier = Modifier.size(144.dp)
+            )
+        }
         MegaText(
             text = stringResource(titleResource),
             style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.W500),
