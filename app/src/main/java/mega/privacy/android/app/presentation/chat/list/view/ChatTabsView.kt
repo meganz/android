@@ -80,7 +80,7 @@ fun ChatTabsView(
     onResetManagementStateSnackbarMessage: () -> Unit = {},
     onCancelScheduledMeeting: () -> Unit = {},
     onDismissDialog: () -> Unit = {},
-    onStartChatClick: () -> Unit = {},
+    onStartChatClick: (isFabClicked: Boolean) -> Unit = {},
     onShowNextTooltip: (MeetingTooltipItem) -> Unit = {},
     onDismissForceAppUpdateDialog: () -> Unit = {},
 ) {
@@ -125,7 +125,9 @@ fun ChatTabsView(
                     FabButton(true, onStartChatClick)
                 }
             } else {
-                FabButton(showFabButton, onStartChatClick)
+                if ((state.hasAnyContact.not() && state.chats.isEmpty()) || state.chats.isNotEmpty()) {
+                    FabButton(showFabButton, onStartChatClick)
+                }
             }
         }
     ) { paddingValues ->
@@ -187,7 +189,7 @@ fun ChatTabsView(
                     onItemMoreClick = onItemMoreClick,
                     onItemSelected = onItemSelected,
                     onScrollInProgress = { showFabButton = !it },
-                    onEmptyButtonClick = onStartChatClick,
+                    onEmptyButtonClick = { onStartChatClick(false) },
                     onShowNextTooltip = onShowNextTooltip,
                     hasAnyContact = state.hasAnyContact
                 )
@@ -271,13 +273,13 @@ private fun TabText(titleStringRes: Int, hasUnreadMessages: Boolean) {
 }
 
 @Composable
-private fun FabButton(showFabButton: Boolean, onStartChatClick: () -> Unit) {
+private fun FabButton(showFabButton: Boolean, onStartChatClick: (isFabClicked: Boolean) -> Unit) {
     AnimatedVisibility(
         visible = showFabButton,
         enter = scaleIn(),
         exit = scaleOut(),
     ) {
-        FloatingActionButton(onClick = onStartChatClick) {
+        FloatingActionButton(onClick = { onStartChatClick(true) }) {
             Icon(
                 imageVector = Icons.Filled.Add,
                 contentDescription = "Create new chat",

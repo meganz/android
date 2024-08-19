@@ -33,10 +33,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -294,7 +296,7 @@ private fun EmptyView(
 
         MegaText(
             text = stringResource(titleResource),
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.W500),
             textColor = TextColor.Primary,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 10.dp, start = 50.dp, end = 50.dp)
@@ -319,14 +321,18 @@ private fun EmptyView(
                     Intent(Intent.ACTION_VIEW, Uri.parse("https://mega.io/chatandmeetings"))
                 )
             },
-            baseStyle = MaterialTheme.typography.body1.copy(textAlign = TextAlign.Center),
+            baseStyle = MaterialTheme.typography.body1.copy(
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.W400,
+                fontSize = 14.sp
+            ),
             modifier = Modifier.padding(top = 16.dp, start = 50.dp, end = 50.dp)
         )
         RaisedDefaultMegaButton(
             textId = buttonResource,
             onClick = onEmptyButtonClick,
             modifier = Modifier
-                .padding(vertical = 40.dp)
+                .padding(vertical = 20.dp)
                 .align(Alignment.CenterHorizontally)
         )
     }

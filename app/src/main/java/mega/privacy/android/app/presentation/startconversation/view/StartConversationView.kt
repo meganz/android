@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.ContactItemView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
@@ -301,7 +302,9 @@ private fun EmptyContactsView(onInviteContactsClicked: () -> Unit) {
         }
 
         Image(
-            modifier = Modifier.padding(vertical = 10.dp),
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+                .size(120.dp),
             painter = painterResource(id = IconR.drawable.ic_empty_user),
             contentDescription = "Empty contacts image",
         )
@@ -309,16 +312,19 @@ private fun EmptyContactsView(onInviteContactsClicked: () -> Unit) {
         MegaText(
             modifier = Modifier.padding(start = 10.dp, top = 0.dp, end = 10.dp, bottom = 16.dp),
             text = stringResource(id = sharedR.string.invite_contacts_to_start_chat_title),
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.W500),
             textColor = TextColor.Primary
         )
 
         MegaText(
             modifier = Modifier.padding(start = 10.dp, top = 0.dp, end = 10.dp, bottom = 16.dp),
             text = stringResource(id = sharedR.string.invite_contacts_to_start_chat_subtitle),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.body1.copy(
+                fontWeight = FontWeight.W400,
+                fontSize = 14.sp
+            ),
             textAlign = TextAlign.Center,
-            textColor = TextColor.Secondary
+            textColor = TextColor.Secondary,
         )
 
         RaisedDefaultMegaButton(
