@@ -653,10 +653,10 @@ class AppRTCAudioManager @Inject constructor(
                         Timber.e(exception.message)
                     }.onSuccess {
                         Timber.d("Audio output has changed")
-                        setValues()
                     }
                 }
             }
+            setValues()
         }
     }
 
