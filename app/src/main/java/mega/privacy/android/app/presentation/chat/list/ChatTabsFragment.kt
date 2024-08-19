@@ -412,7 +412,7 @@ class ChatTabsFragment : Fragment() {
                 MeetingBottomSheetDialogFragment.TAG
             )
         } else {
-            if (isFabClicked) {
+            if (isFabClicked || viewModel.getState().value.hasAnyContact) {
                 Analytics.tracker.trackEvent(ChatTabFABPressedEvent)
                 startConversationLauncher.launch(
                     StartConversationActivity.getChatIntent(
