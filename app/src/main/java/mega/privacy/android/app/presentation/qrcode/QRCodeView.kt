@@ -143,12 +143,7 @@ internal fun QRCodeView(
     var showScannedContactLinkResult by remember { mutableStateOf<ScannedContactLinkResult?>(null) }
     var showInviteContactResult by remember { mutableStateOf<InviteContactRequest?>(null) }
     var qrCodeComposableBounds by remember { mutableStateOf<Rect?>(null) }
-
-    val modalSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded },
-        skipHalfExpanded = true,
-    )
+    val modalSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
 
     BackHandler(enabled = modalSheetState.isVisible) {
         coroutineScope.launch { modalSheetState.hide() }
