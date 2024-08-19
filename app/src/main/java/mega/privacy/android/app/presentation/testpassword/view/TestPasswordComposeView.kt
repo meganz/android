@@ -319,11 +319,7 @@ internal fun TestPasswordComposeView(
         }
     ) { padding ->
         val coroutineScope = rememberCoroutineScope()
-        val modalSheetState = rememberModalBottomSheetState(
-            initialValue = ModalBottomSheetValue.Hidden,
-            confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded },
-            skipHalfExpanded = true,
-        )
+        val modalSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
 
         BackHandler(enabled = modalSheetState.isVisible) {
             coroutineScope.launch { modalSheetState.hide() }

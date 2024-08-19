@@ -4,6 +4,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.onNodeWithTag
 import mega.privacy.android.app.presentation.meeting.view.sheet.CANCEL_OCCURRENCE_TAG
 import mega.privacy.android.app.presentation.meeting.view.sheet.RecurringMeetingOccurrenceBottomSheetView
@@ -27,11 +28,6 @@ class RecurringMeetingOccurrenceBottomSheetViewTest {
 
     private val parentSchedId = 123456L
     private val schedId = 789123L
-
-    private val sheetState = ModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        isSkipHalfExpanded = false,
-    )
 
     @Test
     fun `test that Cancel button is shown`() {
@@ -91,6 +87,12 @@ class RecurringMeetingOccurrenceBottomSheetViewTest {
         onEditClick: () -> Unit,
     ) {
         composeTestRule.setContent {
+            val sheetState = ModalBottomSheetState(
+                initialValue = ModalBottomSheetValue.Hidden,
+                isSkipHalfExpanded = false,
+                density = LocalDensity.current,
+            )
+
             val coroutineScope = rememberCoroutineScope()
 
             RecurringMeetingOccurrenceBottomSheetView(

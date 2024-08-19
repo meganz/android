@@ -10,6 +10,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -34,11 +35,14 @@ class BottomSheetTest {
     fun `test that when view is set bottom sheet is not displayed to the user`() {
         val message = "message to test"
         val button = "show-bottom-sheet"
-        val sheetState = ModalBottomSheetState(
-            initialValue = ModalBottomSheetValue.Hidden,
-            isSkipHalfExpanded = false,
-        )
+
         composeTestRule.setContent {
+            val sheetState = ModalBottomSheetState(
+                initialValue = ModalBottomSheetValue.Hidden,
+                isSkipHalfExpanded = false,
+                density = LocalDensity.current,
+            )
+
             val coroutineScope = rememberCoroutineScope()
             BottomSheet(
                 modalSheetState = sheetState,
@@ -74,11 +78,14 @@ class BottomSheetTest {
     fun `test that when user clicks on button to show bottom sheet bottom sheet is shown to user`() {
         val message = "message to test"
         val button = "show-bottom-sheet"
-        val sheetState = ModalBottomSheetState(
-            initialValue = ModalBottomSheetValue.Hidden,
-            isSkipHalfExpanded = false,
-        )
+
         composeTestRule.setContent {
+            val sheetState = ModalBottomSheetState(
+                initialValue = ModalBottomSheetValue.Hidden,
+                isSkipHalfExpanded = false,
+                density = LocalDensity.current
+            )
+
             val coroutineScope = rememberCoroutineScope()
             BottomSheet(
                 modalSheetState = sheetState,

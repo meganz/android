@@ -110,11 +110,7 @@ fun RecurringMeetingInfoView(
     val scaffoldState = rememberScaffoldState()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-    val modalSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded },
-        skipHalfExpanded = true,
-    )
+    val modalSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
 
     BackHandler(enabled = modalSheetState.isVisible) {
         coroutineScope.launch { modalSheetState.hide() }
