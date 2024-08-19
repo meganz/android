@@ -369,7 +369,8 @@ fun Modifier.photosZoomGestureDetector(
             val event = awaitPointerEvent(
                 pass = PointerEventPass.Initial
             )
-            val canceled = event.changes.any { it.isConsumed }
+            if (event.changes.any { it.isConsumed })
+                break
             val zoomChange = event.calculateZoom()
             if (zoomChange != 1.0f) {
                 if (zoomChange > 1.0f) {
@@ -381,6 +382,6 @@ fun Modifier.photosZoomGestureDetector(
                 event.changes.map { it.consume() }
                 break
             }
-        } while (!canceled && event.changes.any { it.pressed })
+        } while (event.changes.any { it.pressed })
     }
 })
