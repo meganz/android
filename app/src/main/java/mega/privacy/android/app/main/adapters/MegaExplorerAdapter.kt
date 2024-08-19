@@ -556,6 +556,7 @@ class MegaExplorerAdapter(
                 if (node.isFolder) {
                     setImageParams(imageView, ICON_SIZE_DP, ICON_MARGIN_DP)
                     itemView.setOnClickListener(::clickItem)
+                    binding.fileExplorerFilename.setOnClickListener { itemView.performClick() }
                     binding.fileExplorerPermissions.isVisible = false
                     binding.fileExplorerFilesize.text = getMegaNodeFolderInfo(node, context)
                     imageView.setImageResource(
