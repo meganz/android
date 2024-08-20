@@ -11,7 +11,6 @@ import mega.privacy.android.app.presentation.base.BaseViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.business.MonitorBusinessAccountExpiredUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransfersFinishedUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,7 +27,7 @@ class BaseViewModelTest {
 
     private lateinit var underTest: BaseViewModel
 
-    private val monitorTransfersFinishedUseCase = mock<MonitorTransfersFinishedUseCase>()
+
     private val monitorAccountBlockedUseCase = mock<MonitorAccountBlockedUseCase>()
     private val monitorBusinessAccountExpiredUseCase = mock<MonitorBusinessAccountExpiredUseCase>()
 
@@ -47,21 +46,18 @@ class BaseViewModelTest {
 
     private fun resetMocks() {
         reset(
-            monitorBusinessAccountExpiredUseCase,
             monitorAccountBlockedUseCase,
             monitorBusinessAccountExpiredUseCase,
         )
     }
 
     private fun baseStubbing() {
-        whenever(monitorTransfersFinishedUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         whenever(monitorBusinessAccountExpiredUseCase()).thenReturn(emptyFlow())
     }
 
     private fun initUnderTest() {
         underTest = BaseViewModel(
-            monitorTransfersFinishedUseCase,
             monitorAccountBlockedUseCase,
             monitorBusinessAccountExpiredUseCase,
         )

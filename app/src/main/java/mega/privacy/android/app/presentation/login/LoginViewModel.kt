@@ -721,9 +721,7 @@ class LoginViewModel @Inject constructor(
                     in order to monitor current transfers and update the related notification.*/
                     startDownloadWorkerUseCase()
                     startChatUploadsWorkerUseCase()
-                    if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                        startUploadsWorkerUseCase()
-                    }
+                    startUploadsWorkerUseCase()
                     //Login check resumed pending transfers
                     transfersManagement.checkResumedPendingTransfers()
                 } else {

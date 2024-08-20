@@ -47,8 +47,7 @@ class TransfersManagementViewModelTest {
         //this mocks are only used in viewmodel init, so no need to reset
         val monitorTransfersSize = mock<MonitorTransfersStatusUseCase>()
         val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
-        whenever(monitorTransfersSize(any(), any())) doReturn monitorTransfersSizeFlow
-        whenever(getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) doReturn true
+        whenever(monitorTransfersSize(any())) doReturn monitorTransfersSizeFlow
         whenever(getFeatureFlagValueUseCase(AppFeatures.ActiveTransfersInCameraUploads)) doReturn true
         commonStub()
 

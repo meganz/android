@@ -40,7 +40,6 @@ import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityCo
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -54,7 +53,6 @@ import mega.privacy.android.app.presentation.extensions.uploadFilesManually
 import mega.privacy.android.app.presentation.extensions.uploadFolderManually
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
-import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants
@@ -72,7 +70,6 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialo
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.UploadUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getAudioPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternalStoragePermission
@@ -87,7 +84,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import nz.mega.documentscanner.DocumentScannerActivity
@@ -123,17 +119,11 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     lateinit var checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase
 
     @Inject
-    lateinit var uploadUseCase: UploadUseCase
-
-    @Inject
     lateinit var copyRequestMessageMapper: CopyRequestMessageMapper
 
     @Inject
     @ApplicationScope
     lateinit var applicationScope: CoroutineScope
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
     lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
@@ -655,29 +645,10 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                             if (collision != null) {
                                 nameCollisionActivityLauncher.launch(arrayListOf(collision))
                             } else {
-                                applicationScope.launch uploadCoroutine@{
-                                    if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                                        viewModel.uploadFile(
-                                            file = file,
-                                            destination = parentHandle
-                                        )
-                                    } else {
-                                        checkNotificationsPermission(this@ContactFileListActivity)
-                                        composite.add(
-                                            uploadUseCase
-                                                .upload(
-                                                    context = this@ContactFileListActivity,
-                                                    file = file,
-                                                    parentHandle = parentHandle
-                                                )
-                                                .subscribeOn(Schedulers.io())
-                                                .observeOn(AndroidSchedulers.mainThread())
-                                                .subscribe({ Timber.d("Upload started") }) { t: Throwable? ->
-                                                    Timber.e(t)
-                                                }
-                                        )
-                                    }
-                                }
+                                viewModel.uploadFile(
+                                    file = file,
+                                    destination = parentHandle
+                                )
                             }
                         }.onFailure {
                             Timber.e(it, "Cannot check name collisions")
@@ -760,31 +731,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                     collidedSharesPath.contains(it.fileAbsolutePath).not()
                 }
                 if (sharesWithoutCollision.isNotEmpty()) {
-                    applicationScope.launch {
-                        if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                            viewModel.uploadShareInfo(sharesWithoutCollision, parentNode.handle)
-                        } else {
-                            val text = resources.getQuantityString(
-                                R.plurals.upload_began,
-                                sharesWithoutCollision.size,
-                                sharesWithoutCollision.size
-                            )
-                            composite.add(
-                                uploadUseCase
-                                    .uploadInfos(
-                                        context = this@ContactFileListActivity,
-                                        infos = sharesWithoutCollision,
-                                        nameFiles = null,
-                                        parentHandle = parentNode.handle
-                                    )
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe({
-                                        showSnackbar(Constants.SNACKBAR_TYPE, text)
-                                    }) { Timber.e(it) }
-                            )
-                        }
-                    }
+                    viewModel.uploadShareInfo(sharesWithoutCollision, parentNode.handle)
                 }
             }.onFailure {
                 dismissAlertDialogIfExists(statusDialog)

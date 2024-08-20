@@ -21,7 +21,6 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageVisibilityUseCase
 import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.shared.original.core.ui.utils.pop
 import mega.privacy.android.shared.original.core.ui.utils.push
@@ -35,7 +34,6 @@ import javax.inject.Inject
 class OfflineComposeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getOfflineNodesByParentIdUseCase: GetOfflineNodesByParentIdUseCase,
-    private val monitorTransfersFinishedUseCase: MonitorTransfersFinishedUseCase,
     private val setOfflineWarningMessageVisibilityUseCase: SetOfflineWarningMessageVisibilityUseCase,
     private val monitorOfflineWarningMessageVisibilityUseCase: MonitorOfflineWarningMessageVisibilityUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
@@ -61,16 +59,6 @@ class OfflineComposeViewModel @Inject constructor(
         monitorOfflineWarningMessage()
         monitorOfflineNodeUpdates()
         monitorViewTypeUpdate()
-        viewModelScope.launch {
-            monitorTransfersFinishedUseCase()
-                .catch {
-                    Timber.e(it)
-                }
-                .conflate()
-                .collect {
-                    loadOfflineNodes()
-                }
-        }
     }
 
     private fun monitorConnectivity() {

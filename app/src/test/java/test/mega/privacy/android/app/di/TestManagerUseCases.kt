@@ -11,7 +11,6 @@ import mega.privacy.android.app.di.manager.ManagerUseCases
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetBackupsChildrenNodes
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
-import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.HasBackupsChildren
 import nz.mega.sdk.MegaNode
@@ -24,11 +23,6 @@ import org.mockito.kotlin.mock
 )
 @Module(includes = [TestGetNodeModule::class])
 object TestManagerUseCases {
-
-    @Provides
-    fun provideGetRootFolder() = mock<GetRootFolder> {
-        on { runBlocking { invoke() } }.thenReturn(MegaNode())
-    }
 
     @Provides
     fun provideGetNumUnreadUserAlerts() = mock<GetNumUnreadUserAlertsUseCase> {

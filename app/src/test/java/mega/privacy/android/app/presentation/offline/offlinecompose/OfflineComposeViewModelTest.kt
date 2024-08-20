@@ -17,7 +17,6 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageVisibilityUseCase
 import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -39,7 +38,6 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OfflineComposeViewModelTest {
     private val getOfflineNodesByParentIdUseCase: GetOfflineNodesByParentIdUseCase = mock()
-    private val monitorTransfersFinishedUseCase: MonitorTransfersFinishedUseCase = mock()
     private val setOfflineWarningMessageVisibilityUseCase: SetOfflineWarningMessageVisibilityUseCase =
         mock()
     private val monitorOfflineWarningMessageVisibilityUseCase: MonitorOfflineWarningMessageVisibilityUseCase =
@@ -62,7 +60,6 @@ class OfflineComposeViewModelTest {
         underTest = OfflineComposeViewModel(
             savedStateHandle = savedStateHandle,
             getOfflineNodesByParentIdUseCase = getOfflineNodesByParentIdUseCase,
-            monitorTransfersFinishedUseCase = monitorTransfersFinishedUseCase,
             setOfflineWarningMessageVisibilityUseCase = setOfflineWarningMessageVisibilityUseCase,
             monitorOfflineWarningMessageVisibilityUseCase = monitorOfflineWarningMessageVisibilityUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
@@ -313,7 +310,6 @@ class OfflineComposeViewModelTest {
 
     private suspend fun stubCommon() {
         whenever(getOfflineNodesByParentIdUseCase(-1)).thenReturn(emptyList())
-        whenever(monitorTransfersFinishedUseCase()).thenReturn(emptyFlow())
         whenever(setOfflineWarningMessageVisibilityUseCase(false)).thenReturn(Unit)
         whenever(monitorOfflineWarningMessageVisibilityUseCase()).thenReturn(emptyFlow())
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
@@ -326,7 +322,6 @@ class OfflineComposeViewModelTest {
         reset(
             savedStateHandle,
             getOfflineNodesByParentIdUseCase,
-            monitorTransfersFinishedUseCase,
             monitorOfflineWarningMessageVisibilityUseCase,
             setOfflineWarningMessageVisibilityUseCase,
             monitorOfflineNodeUpdatesUseCase,

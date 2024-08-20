@@ -11,11 +11,8 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
-import mega.privacy.android.domain.entity.transfer.TransferData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
-import mega.privacy.android.domain.exception.MegaException
 import java.io.File
 
 /**
@@ -80,11 +77,6 @@ interface TransferRepository {
      * @return Number of pending, non-background and paused downloads.
      */
     suspend fun getNumPendingNonBackgroundPausedDownloads(): Int
-
-    /**
-     * Cancels all upload transfers
-     */
-    suspend fun cancelAllUploadTransfers()
 
     /**
      * Cancel Transfer by Tag
@@ -203,17 +195,6 @@ interface TransferRepository {
     fun monitorCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
 
     /**
-     * Add a completed transfer to local storage
-     *
-     * @param transfer
-     */
-    suspend fun addCompletedTransfer(
-        transfer: Transfer,
-        megaException: MegaException?,
-        transferPath: String? = null,
-    )
-
-    /**
      * Add a list of completed transfer to local storage
      *
      * @param finishEventsAndPaths
@@ -245,26 +226,6 @@ interface TransferRepository {
     suspend fun startChatUploadsWorker()
 
     /**
-     * Monitors transfers finished.
-     */
-    fun monitorTransfersFinished(): Flow<TransfersFinishedState>
-
-    /**
-     * Broadcasts transfers finished.
-     */
-    suspend fun broadcastTransfersFinished(transfersFinishedState: TransfersFinishedState)
-
-    /**
-     * Monitors when transfers management have to stop.
-     */
-    fun monitorStopTransfersWork(): Flow<Boolean>
-
-    /**
-     * Broadcasts when transfers management have to stop.
-     */
-    suspend fun broadcastStopTransfersWork()
-
-    /**
      * Reset total uploads
      */
     suspend fun resetTotalUploads()
@@ -283,13 +244,6 @@ interface TransferRepository {
         appData: TransferAppData?,
         shouldStartFirst: Boolean,
     ): Flow<TransferEvent>
-
-    /**
-     * Gets information about transfer queues.
-     *
-     * @return [TransferData]
-     */
-    suspend fun getTransferData(): TransferData?
 
     /**
      * Upload a file or folder

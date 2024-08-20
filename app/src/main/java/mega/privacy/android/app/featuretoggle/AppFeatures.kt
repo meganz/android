@@ -169,14 +169,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     RaiseToSpeak("Raise to speak in a call or a meeting", true),
 
     /**
-     * Enables UploadWorker for upload files, instead of UploadService. This is a work in progress feature.
-     */
-    UploadWorker(
-        "Enables UploadWorker for download files, instead of UploadService. This is a work in progress feature.",
-        true,
-    ),
-
-    /**
      * Camera uploads utilizes active transfers to monitor transfers
      */
     ActiveTransfersInCameraUploads(

@@ -131,7 +131,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
                                 )
                             }
 
-                        viewModel.proceedWithUpload(this, collisionsResult)
+                        viewModel.proceedWithUpload(collisionsResult)
                     }
 
                     Activity.RESULT_CANCELED -> {
@@ -412,16 +412,12 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
      * @param collisions    List of [NameCollisionUiEntity] to manage.
      */
     private fun manageCollisions(collisions: ArrayList<NameCollision>) {
-        if (collisions.isEmpty()) {
-            viewModel.proceedWithUpload(this)
-        } else {
-            collisionsForResult.launch(
-                NameCollisionActivity.getIntentForFolderUpload(
-                    this,
-                    collisions = collisions
-                )
+        collisionsForResult.launch(
+            NameCollisionActivity.getIntentForFolderUpload(
+                this,
+                collisions = collisions
             )
-        }
+        )
     }
 
     /**

@@ -355,7 +355,7 @@ class QRCodeViewModelTest {
     }
 
     @Test
-    fun `test that state is updated correctly if UploadWorker is enabled`() = runTest {
+    fun `test that state is updated correctly if a file upload needs to start`() = runTest {
         val file = mock<File>()
         val parentHandle = 123L
         val expected = triggered(

@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -27,8 +26,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.UploadService
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
@@ -39,7 +36,6 @@ import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
-import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -61,7 +57,6 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.app.utils.notifyObserver
-import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.document.DocumentEntity
@@ -76,7 +71,6 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
@@ -134,7 +128,6 @@ class TextEditorViewModel @Inject constructor(
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
 ) : ViewModel() {
 
@@ -629,7 +622,7 @@ class TextEditorViewModel @Inject constructor(
         }
 
         if (mode.value == EDIT_MODE) {
-            uploadFile(activity, fromHome, tempFile, parentHandle)
+            uploadFile(fromHome, tempFile, parentHandle)
             return
         }
 
@@ -649,7 +642,7 @@ class TextEditorViewModel @Inject constructor(
             }.onSuccess { fileCollisions ->
                 fileCollisions.firstOrNull()?.let {
                     collision.value = it
-                } ?: uploadFile(activity, fromHome, tempFile, parentHandle)
+                } ?: uploadFile(fromHome, tempFile, parentHandle)
             }.onFailure {
                 Timber.e(it, "Cannot check name collisions")
             }
@@ -659,44 +652,26 @@ class TextEditorViewModel @Inject constructor(
     /**
      * Uploads the file.
      *
-     * @param activity Current activity.
      * @param fromHome True if is creating file from Home page, false otherwise.
      * @param tempFile  The file to upload.
      * @param parentHandle  The handle of the folder in which the file will be uploaded.
      */
     private fun uploadFile(
-        activity: Activity,
         fromHome: Boolean,
         tempFile: File,
         parentHandle: Long,
     ) {
-        viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                _uiState.update { state ->
-                    state.copy(
-                        transferEvent = triggered(
-                            TransferTriggerEvent.StartUpload.TextFile(
-                                path = tempFile.absolutePath,
-                                destinationId = NodeId(parentHandle),
-                                isEditMode = isEditMode(),
-                                fromHomePage = fromHome
-                            )
-                        )
+        _uiState.update { state ->
+            state.copy(
+                transferEvent = triggered(
+                    TransferTriggerEvent.StartUpload.TextFile(
+                        path = tempFile.absolutePath,
+                        destinationId = NodeId(parentHandle),
+                        isEditMode = isEditMode(),
+                        fromHomePage = fromHome
                     )
-                }
-            } else {
-                PermissionUtils.checkNotificationsPermission(activity)
-
-                val uploadServiceIntent = Intent(activity, UploadService::class.java)
-                    .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
-                    .putExtra(FROM_HOME_PAGE, fromHome)
-                    .putExtra(UploadService.EXTRA_FILE_PATH, tempFile.absolutePath)
-                    .putExtra(UploadService.EXTRA_NAME, fileName.value)
-                    .putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle)
-                ContextCompat.startForegroundService(activity, uploadServiceIntent)
-
-                activity.finish()
-            }
+                )
+            )
         }
     }
 

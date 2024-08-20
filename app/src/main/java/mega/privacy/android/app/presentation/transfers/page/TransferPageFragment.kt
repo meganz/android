@@ -17,17 +17,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentTransferPageBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.TransfersPageAdapter
@@ -37,19 +33,15 @@ import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
-import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -59,12 +51,6 @@ internal class TransferPageFragment : Fragment() {
 
     @Inject
     lateinit var areTransfersPausedUseCase: AreTransfersPausedUseCase
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
-
-    @Inject
-    lateinit var uploadUseCase: UploadUseCase
 
     @Inject
     @MegaApi
@@ -405,27 +391,9 @@ internal class TransferPageFragment : Fragment() {
      */
     fun retryTransfer(transfer: CompletedTransfer) {
         when (transfer.type) {
-            MegaTransfer.TYPE_DOWNLOAD -> {
+            MegaTransfer.TYPE_DOWNLOAD, MegaTransfer.TYPE_UPLOAD -> {
                 lifecycleScope.launch {
                     transfersViewModel.retryTransfer(transfer)
-                }
-            }
-
-            MegaTransfer.TYPE_UPLOAD -> {
-                lifecycleScope.launch {
-                    if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                        transfersViewModel.retryTransfer(transfer)
-                    } else {
-                        PermissionUtils.checkNotificationsPermission(requireActivity())
-                        val file = File(transfer.originalPath)
-                        uploadUseCase.upload(requireActivity(), file, transfer.parentHandle)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                { Timber.d("Transfer retried.") },
-                                { t: Throwable? -> Timber.e(t) })
-                            .addTo(composite)
-                    }
                 }
             }
 

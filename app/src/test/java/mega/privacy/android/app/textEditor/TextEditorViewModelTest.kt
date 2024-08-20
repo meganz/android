@@ -77,7 +77,6 @@ internal class TextEditorViewModelTest {
             updateNodeSensitiveUseCase = mock(),
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
-            getFeatureFlagValueUseCase = mock(),
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
         )
     }

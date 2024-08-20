@@ -11,7 +11,6 @@ import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.DefaultGetBackupsChildrenNodes
 import mega.privacy.android.app.domain.usecase.GetBackupsChildrenNodes
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
-import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.HasBackupsChildren
@@ -31,10 +30,6 @@ abstract class ManagerUseCases {
     abstract fun bindGetBackupsChildrenNodes(useCase: DefaultGetBackupsChildrenNodes): GetBackupsChildrenNodes
 
     companion object {
-
-        @Provides
-        fun provideGetRootFolder(megaNodeRepository: MegaNodeRepository): GetRootFolder =
-            GetRootFolder(megaNodeRepository::getRootNode)
 
         @Provides
         fun provideHasBackupsChildren(megaNodeRepository: MegaNodeRepository): HasBackupsChildren =

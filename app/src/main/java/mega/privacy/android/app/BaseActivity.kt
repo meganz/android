@@ -87,7 +87,6 @@ import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
 import mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
-import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
@@ -106,8 +105,6 @@ import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.psa.Psa
-import mega.privacy.android.domain.entity.transfer.TransferFinishType
-import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
@@ -381,12 +378,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
         collectFlow(viewModel.state) { uiState ->
             with(uiState) {
-                transfersFinished?.apply {
-                    if (isActivityInForeground) {
-                        checkTransfersFinishedState(this)
-                    }
-                    viewModel.onTransfersFinishedConsumed()
-                }
                 accountBlockedDetail?.apply {
                     checkWhyAmIBlocked(this)
                     viewModel.onAccountBlockedConsumed()
@@ -1531,84 +1522,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * @return true if handled and skip default behavior otherwise false
      */
     protected open fun handlePurchased(purchaseType: PurchaseType): Boolean = false
-
-    private fun checkTransfersFinishedState(transfersFinishedState: TransfersFinishedState) =
-        with(transfersFinishedState) {
-            val generalDownloadMessage = resources.getQuantityString(
-                R.plurals.download_complete,
-                numberFiles,
-                numberFiles
-            )
-            when (type) {
-                TransferFinishType.DOWNLOAD -> {
-                    Util.showSnackbar(this@BaseActivity, generalDownloadMessage)
-                }
-
-                TransferFinishType.DOWNLOAD_OFFLINE -> {
-                    Util.showSnackbar(
-                        this@BaseActivity,
-                        getString(R.string.file_available_offline)
-                    )
-                }
-
-                TransferFinishType.DOWNLOAD_FILE_AND_OPEN_FOR_PREVIEW -> {
-                    autoPlayInfo = AutoPlayInfo(
-                        nodeName ?: return,
-                        nodeId ?: return,
-                        nodeLocalPath ?: return,
-                        true
-                    ).apply {
-                        // After downloaded, if it's open with, open the file by third-party library.
-                        // If not, open the file directly
-                        if (isOpenWith) {
-                            MegaNodeUtil.launchActionView(
-                                this@BaseActivity,
-                                nodeName,
-                                localPath,
-                                this@BaseActivity,
-                                this@BaseActivity
-                            )
-                        } else {
-                            openDownloadedFile()
-                        }
-                    }
-                }
-
-                TransferFinishType.DOWNLOAD_AND_OPEN -> {
-                    autoPlayInfo = AutoPlayInfo(
-                        nodeName ?: return,
-                        nodeId ?: return,
-                        nodeLocalPath ?: return,
-                        true
-                    )
-
-                    showSnackbar(
-                        OPEN_FILE_SNACKBAR_TYPE,
-                        generalDownloadMessage,
-                        MEGACHAT_INVALID_HANDLE
-                    )
-                }
-
-                TransferFinishType.UPLOAD -> {
-                    Util.showSnackbar(
-                        this@BaseActivity, resources.getQuantityString(
-                            R.plurals.upload_finish,
-                            numberFiles,
-                            numberFiles
-                        )
-                    )
-                }
-
-                TransferFinishType.FILE_EXPLORER_CHAT_UPLOAD -> {
-                    Util.showSnackbar(
-                        this@BaseActivity,
-                        MESSAGE_SNACKBAR_TYPE,
-                        null,
-                        chatId ?: MEGACHAT_INVALID_HANDLE
-                    )
-                }
-            }
-        }
 
     companion object {
         private const val EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN"

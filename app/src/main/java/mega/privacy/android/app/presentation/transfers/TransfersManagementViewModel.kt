@@ -63,7 +63,6 @@ class TransfersManagementViewModel @Inject constructor(
     init {
         viewModelScope.launch(ioDispatcher) {
             val flow = monitorTransfersSize(
-                uploadsWorkerFlag = getFeatureFlagValueUseCase(AppFeatures.UploadWorker),
                 activeTransfersInCameraUploadsFlag = getFeatureFlagValueUseCase(AppFeatures.ActiveTransfersInCameraUploads),
             )
 

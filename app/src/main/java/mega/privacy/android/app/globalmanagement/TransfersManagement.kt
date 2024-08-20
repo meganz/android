@@ -22,11 +22,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
-import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getState
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.SDCardOperator
@@ -44,9 +41,7 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.getSDCardDownloadAppData
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.BroadcastFailedTransferUseCase
-import mega.privacy.android.domain.usecase.transfers.BroadcastStopTransfersWorkUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferIfNotExistUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
@@ -76,11 +71,9 @@ class TransfersManagement @Inject constructor(
     private val broadcastFailedTransferUseCase: BroadcastFailedTransferUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
-    private val broadcastStopTransfersWorkUseCase: BroadcastStopTransfersWorkUseCase,
     private val addCompletedTransferIfNotExistUseCase: AddCompletedTransferIfNotExistUseCase,
     private val deleteSdTransferByTagUseCase: DeleteSdTransferByTagUseCase,
     private val getAllSdTransfersUseCase: GetAllSdTransfersUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getTransferByTagUseCase: GetTransferByTagUseCase,
     private val completedTransferMapper: CompletedTransferMapper,
     private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
@@ -286,25 +279,6 @@ class TransfersManagement @Inject constructor(
                 }
             }
         }
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            try {
-                applicationScope.launch {
-                    @Suppress("DEPRECATION")
-                    if (megaApi.numPendingUploads > 0) {
-                        val uploadServiceIntent = Intent(context, UploadService::class.java)
-                            .setAction(Constants.ACTION_RESTART_SERVICE)
-                        val isUploadsWorker = getFeatureFlagValueUseCase(AppFeatures.UploadWorker)
-
-                        if (!isUploadsWorker) {
-                            tryToStartForegroundService(uploadServiceIntent)
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.w(e, "Exception checking pending transfers")
-            }
-        }, WAIT_TIME_TO_RESTART_SERVICES)
     }
 
     /**
@@ -577,7 +551,6 @@ class TransfersManagement @Inject constructor(
         Handler(Looper.getMainLooper()).postDelayed({
             shouldBreakTransfersProcessing = false
             isProcessingTransfers = false
-            applicationScope.launch { broadcastStopTransfersWorkUseCase() }
         }, WAIT_TIME_BEFORE_UPDATE)
     }
 

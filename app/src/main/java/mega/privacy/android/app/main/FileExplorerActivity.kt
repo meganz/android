@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -40,7 +39,6 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -75,7 +73,6 @@ import mega.privacy.android.app.presentation.transfers.TransfersManagementActivi
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
-import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -169,9 +166,6 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
     @Inject
     lateinit var checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase
-
-    @Inject
-    lateinit var uploadUseCase: UploadUseCase
 
     @Inject
     lateinit var copyNodeUseCase: CopyNodeUseCase
@@ -1661,36 +1655,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         collidedSharesPath.contains(it.fileAbsolutePath).not()
                     }
                     if (sharesWithoutCollision.isNotEmpty()) {
-                        lifecycleScope.launch {
-                            if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                                viewModel.uploadFiles(parentHandle)
-                            } else {
-                                checkNotificationsPermission(this@FileExplorerActivity)
-                                val text =
-                                    resources.getQuantityString(
-                                        R.plurals.upload_began,
-                                        sharesWithoutCollision.size,
-                                        sharesWithoutCollision.size
-                                    )
-                                uploadUseCase
-                                    .uploadInfos(
-                                        context = this@FileExplorerActivity,
-                                        infos = infos,
-                                        nameFiles = HashMap(viewModel.uiState.value.fileNames),
-                                        parentHandle = parentHandle
-                                    )
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe({
-                                        showSnackbar(text)
-                                        backToCloud(parentHandle, infos.size, null)
-                                        filePreparedInfos = null
-                                        Timber.d("Processing for start uploading ShareInfos finished.")
-                                        finishAndRemoveTask()
-                                    }) { t: Throwable? -> Timber.e(t) }
-                                    .addTo(composite)
-                            }
-                        }
+                        viewModel.uploadFiles(parentHandle)
                     }
                 }.onFailure {
                     dismissAlertDialogIfExists(statusDialog)
@@ -1951,39 +1916,12 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             }.onSuccess { collisions ->
                 collisions.firstOrNull()?.let {
                     nameCollisionActivityLauncher.launch(arrayListOf(it))
-                } ?: uploadFile(file)
+                } ?: viewModel.uploadFile(file, parentHandle)
             }.onFailure {
                 Timber.e(it, "Cannot check name collisions")
                 showSnackbar(getString(R.string.general_text_error))
             }
         }
-    }
-
-    @SuppressLint("CheckResult")
-    private fun uploadFile(file: File) {
-        lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                viewModel.uploadFile(file, parentHandle)
-            } else {
-                checkNotificationsPermission(this@FileExplorerActivity)
-                val text = resources.getQuantityString(R.plurals.upload_began, 1, 1)
-                uploadUseCase.upload(this@FileExplorerActivity, file, parentHandle)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            text,
-                            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                        )
-                        Timber.d("After UPLOAD click - back to Cloud")
-                        backToCloud(parentHandle, 1, null)
-                        finishAndRemoveTask()
-                    }) { t: Throwable? -> Timber.e(t) }
-                    .addTo(composite)
-            }
-        }
-
     }
 
     override fun finishRenameActionWithSuccess(newName: String) {

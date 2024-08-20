@@ -579,13 +579,6 @@ interface MegaApiGateway {
     fun cancelTransfer(transfer: MegaTransfer, listener: MegaRequestListenerInterface?)
 
     /**
-     * Cancels all [MegaTransfer] uploads
-     *
-     * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
-     */
-    fun cancelAllUploadTransfers(listener: MegaRequestListenerInterface?)
-
-    /**
      * Gets the number of unread user alerts for the logged in user.
      *
      * @return Number of unread user alerts.

@@ -8,7 +8,6 @@ import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
-import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 
 internal interface AppEventGateway {
 
@@ -173,20 +172,6 @@ internal interface AppEventGateway {
     suspend fun broadcastMyAccountUpdate(data: MyAccountUpdate)
 
     /**
-     * Monitor transfers finished.
-     *
-     * @return Flow of [TransfersFinishedState]
-     */
-    fun monitorTransfersFinished(): Flow<TransfersFinishedState>
-
-    /**
-     * Broadcast transfers finished.
-     *
-     * @param transfersFinishedState [TransfersFinishedState]
-     */
-    suspend fun broadcastTransfersFinished(transfersFinishedState: TransfersFinishedState)
-
-    /**
      * Monitor chat archived.
      *
      * @return Flow [String]
@@ -239,18 +224,6 @@ internal interface AppEventGateway {
      * @param chatId [Long] ID of the chat to leave.
      */
     suspend fun broadcastLeaveChat(chatId: Long)
-
-    /**
-     * Monitors when transfers management have to stop.
-     *
-     * @return Flow [Boolean]
-     */
-    fun monitorStopTransfersWork(): Flow<Boolean>
-
-    /**
-     * Broadcasts if transfers management have to stop.
-     */
-    suspend fun broadcastStopTransfersWork()
 
     /**
      * Broadcast refresh session

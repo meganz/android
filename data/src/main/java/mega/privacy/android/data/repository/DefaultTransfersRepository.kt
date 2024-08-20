@@ -44,7 +44,6 @@ import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.mapper.transfer.InProgressTransferMapper
 import mega.privacy.android.data.mapper.transfer.PausedTransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
-import mega.privacy.android.data.mapper.transfer.TransferDataMapper
 import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
@@ -60,8 +59,6 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
-import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -99,7 +96,6 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val workerManagerGateway: WorkManagerGateway,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
-    private val transferDataMapper: TransferDataMapper,
     private val completedTransferMapper: CompletedTransferMapper,
     private val cancelTokenProvider: CancelTokenProvider,
     private val megaNodeMapper: MegaNodeMapper,
@@ -268,17 +264,6 @@ internal class DefaultTransfersRepository @Inject constructor(
     }
         .flowOn(ioDispatcher)
         .cancellable()
-
-    override suspend fun getTransferData() = withContext(ioDispatcher) {
-        megaApiGateway.getTransferData()?.let { transferDataMapper(it) }
-    }
-
-    override suspend fun cancelAllUploadTransfers() = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("cancelAllUploadTransfers") {}
-            megaApiGateway.cancelAllUploadTransfers(listener)
-        }
-    }
 
     private suspend fun getUploadTransfers(): List<MegaTransfer> = withContext(ioDispatcher) {
         megaApiGateway.getTransfers(MegaTransfer.TYPE_UPLOAD)
@@ -451,19 +436,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaLocalRoomGateway.getCompletedTransfers(size)
             .flowOn(ioDispatcher)
 
-    override suspend fun addCompletedTransfer(
-        transfer: Transfer,
-        megaException: MegaException?,
-        transferPath: String?,
-    ) {
-        withContext(ioDispatcher) {
-            val completedTransfer = completedTransferMapper(transfer, megaException, transferPath)
-            megaLocalRoomGateway.addCompletedTransfer(completedTransfer)
-            removeInProgressTransfer(transfer.tag)
-            appEventGateway.broadcastCompletedTransfer()
-        }
-    }
-
     override suspend fun addCompletedTransfers(
         finishEventsAndPaths: Map<TransferEvent.TransferFinishEvent, String?>,
     ) {
@@ -514,15 +486,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         workerManagerGateway.monitorChatUploadsStatusInfo().map { workInfos ->
             workInfos.any { it.state == WorkInfo.State.ENQUEUED }
         }
-
-    override fun monitorTransfersFinished() = appEventGateway.monitorTransfersFinished()
-
-    override suspend fun broadcastTransfersFinished(transfersFinishedState: TransfersFinishedState) =
-        appEventGateway.broadcastTransfersFinished(transfersFinishedState)
-
-    override fun monitorStopTransfersWork() = appEventGateway.monitorStopTransfersWork()
-
-    override suspend fun broadcastStopTransfersWork() = appEventGateway.broadcastStopTransfersWork()
 
     override suspend fun resetTotalUploads() = withContext(ioDispatcher) {
         megaApiGateway.resetTotalUploads()

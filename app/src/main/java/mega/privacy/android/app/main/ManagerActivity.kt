@@ -109,7 +109,6 @@ import mega.privacy.android.app.BusinessExpiredAlertActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
-import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
@@ -252,7 +251,6 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
-import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -416,9 +414,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase
-
-    @Inject
-    lateinit var uploadUseCase: UploadUseCase
 
     @Inject
     lateinit var activityLifecycleHandler: ActivityLifecycleHandler
@@ -6159,7 +6154,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }.onSuccess { collisions ->
                 collisions.firstOrNull()?.let {
                     nameCollisionActivityLauncher.launch(arrayListOf(it))
-                } ?: uploadFile(file, parentHandle)
+                } ?: viewModel.uploadFile(file, parentHandle)
             }.onFailure { throwable: Throwable? ->
                 Timber.e(throwable)
                 showSnackbar(
@@ -6167,24 +6162,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     getString(R.string.general_error),
                     MEGACHAT_INVALID_HANDLE
                 )
-            }
-        }
-    }
-
-    @SuppressLint("CheckResult")
-    private fun uploadFile(file: File, parentHandle: Long) {
-        applicationScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                viewModel.uploadFile(file, parentHandle)
-            } else {
-                PermissionUtils.checkNotificationsPermission(this@ManagerActivity)
-                uploadUseCase.upload(this@ManagerActivity, file, parentHandle)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { Timber.d("Upload started") },
-                        { t: Throwable? -> Timber.e(t) })
-                    .addTo(composite)
             }
         }
     }
@@ -6303,7 +6280,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         when (newStorageState) {
             StorageState.Green -> {
                 Timber.d("STORAGE STATE GREEN")
-                notifyUploadServiceStorageStateChange(newStorageState, storageState)
                 if (myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE) {
                     Timber.d("ACCOUNT TYPE FREE")
                     if (Util.showMessageRandom()) {
@@ -6316,7 +6292,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             StorageState.Orange -> {
                 Timber.w("STORAGE STATE ORANGE")
-                notifyUploadServiceStorageStateChange(newStorageState, storageState)
                 if (newStorageState.ordinal > storageState.ordinal) {
                     showStorageAlmostFullDialog()
                 }
@@ -6334,20 +6309,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             else -> return
         }
         storageState = newStorageState
-    }
-
-    private fun notifyUploadServiceStorageStateChange(
-        newStorageState: StorageState,
-        oldStorageState: StorageState,
-    ) {
-        if (newStorageState != oldStorageState) {
-            val uploadServiceIntent = Intent(this, UploadService::class.java)
-            uploadServiceIntent.action = Constants.ACTION_STORAGE_STATE_CHANGED
-            runCatching { ContextCompat.startForegroundService(this, uploadServiceIntent) }
-                .onFailure {
-                    Timber.e(it, "Exception starting UploadService")
-                }
-        }
     }
 
     /**
@@ -6470,43 +6431,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     collidedSharesPath.contains(it.fileAbsolutePath).not()
                 }
                 if (sharesWithoutCollision.isNotEmpty()) {
-                    lifecycleScope.launch {
-                        if (getFeatureFlagValueUseCase(AppFeatures.UploadWorker)) {
-                            sharesWithoutCollision.filter { it.isContact }.forEach {
-                                requestContactsPermissions(it, parentNode)
-                            }
-                            val shareInfo = sharesWithoutCollision.filter { !it.isContact }
-                            viewModel.uploadShareInfo(shareInfo, parentNode.handle)
-                        } else {
-                            showSnackbar(
-                                Constants.SNACKBAR_TYPE,
-                                resources.getQuantityString(
-                                    R.plurals.upload_began,
-                                    sharesWithoutCollision.size,
-                                    sharesWithoutCollision.size
-                                ),
-                                MEGACHAT_INVALID_HANDLE
-                            )
-                            for (info in sharesWithoutCollision) {
-                                if (info.isContact) {
-                                    requestContactsPermissions(info, parentNode)
-                                } else {
-                                    uploadUseCase.upload(
-                                        this@ManagerActivity,
-                                        info,
-                                        null,
-                                        parentNode.handle
-                                    )
-                                        .subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(
-                                            { Timber.d("Upload started") },
-                                            { t: Throwable? -> Timber.e(t) })
-                                        .addTo(composite)
-                                }
-                            }
-                        }
+                    sharesWithoutCollision.filter { it.isContact }.forEach {
+                        requestContactsPermissions(it, parentNode)
                     }
+                    val shareInfo = sharesWithoutCollision.filter { !it.isContact }
+                    viewModel.uploadShareInfo(shareInfo, parentNode.handle)
                 }
             }.onFailure {
                 dismissAlertDialogIfExists(statusDialog)
@@ -6647,7 +6576,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }.onSuccess { collisions ->
                 collisions.firstOrNull()?.let {
                     nameCollisionActivityLauncher.launch(arrayListOf(it))
-                } ?: uploadFile(file, parentHandle)
+                } ?: viewModel.uploadFile(file, parentHandle)
             }.onFailure { throwable: Throwable? ->
                 Timber.e(throwable)
                 showSnackbar(

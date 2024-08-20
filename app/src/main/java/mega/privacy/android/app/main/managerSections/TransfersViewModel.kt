@@ -108,13 +108,6 @@ class TransfersViewModel @Inject constructor(
      */
     val areTransfersPaused by lazy { monitorPausedTransfersUseCase() }
 
-    /**
-     * Monitor transfer event
-     */
-    val monitorTransferEvent = monitorTransferEventsUseCase()
-        .catch { Timber.e(it) }
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-
     private val _completedTransfers = MutableStateFlow(emptyList<CompletedTransfer>())
 
     /**

@@ -521,10 +521,6 @@
             android:name=".meeting.CallNotificationIntentService"
             android:exported="false" />
         <service
-            android:name=".UploadService"
-            android:exported="false"
-            android:foregroundServiceType="dataSync" />
-        <service
             android:name=".mediaplayer.service.AudioPlayerService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />

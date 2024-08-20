@@ -13,7 +13,6 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreAllTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetNumPendingUploadsUseCase
 import javax.inject.Inject
@@ -23,7 +22,6 @@ import javax.inject.Inject
  */
 class MonitorTransfersStatusUseCase @Inject constructor(
     private val repository: TransferRepository,
-    private val getNumPendingDownloadsNonBackgroundUseCase: GetNumPendingDownloadsNonBackgroundUseCase,
     private val getNumPendingUploadsUseCase: GetNumPendingUploadsUseCase,
     private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
     private val areTransfersPaused: AreAllTransfersPausedUseCase,
@@ -36,30 +34,26 @@ class MonitorTransfersStatusUseCase @Inject constructor(
      * @return Flow of [TransfersStatusInfo]
      */
 
-    operator fun invoke(
-        uploadsWorkerFlag: Boolean,
-        activeTransfersInCameraUploadsFlag: Boolean,
-    ): Flow<TransfersStatusInfo> = when {
-        uploadsWorkerFlag && activeTransfersInCameraUploadsFlag -> {
-            invokeNew(TransferType.entries.filter { it != TransferType.NONE })
-        }
+    operator fun invoke(activeTransfersInCameraUploadsFlag: Boolean): Flow<TransfersStatusInfo> =
+        when {
+            activeTransfersInCameraUploadsFlag -> {
+                invokeNew(TransferType.entries.filter { it != TransferType.NONE })
+            }
 
-        uploadsWorkerFlag -> {
-            invokeNew(TransferType.entries.filter {
-                it != TransferType.NONE && it != TransferType.CU_UPLOAD
-            }).combine(invokeLegacy(onlyCameraUploads = true)) { totals, legacyCuTotals ->
-                yield()
-                totals.copy(
-                    totalSizeToTransfer = totals.totalSizeToTransfer + legacyCuTotals.totalSizeToTransfer,
-                    totalSizeTransferred = totals.totalSizeTransferred + legacyCuTotals.totalSizeTransferred,
-                    pendingUploads = getNumPendingUploadsUseCase(),
-                    paused = areTransfersPaused()
-                )
+            else -> {
+                invokeNew(TransferType.entries.filter {
+                    it != TransferType.NONE && it != TransferType.CU_UPLOAD
+                }).combine(invokeLegacy()) { totals, legacyCuTotals ->
+                    yield()
+                    totals.copy(
+                        totalSizeToTransfer = totals.totalSizeToTransfer + legacyCuTotals.totalSizeToTransfer,
+                        totalSizeTransferred = totals.totalSizeTransferred + legacyCuTotals.totalSizeTransferred,
+                        pendingUploads = getNumPendingUploadsUseCase(),
+                        paused = areTransfersPaused()
+                    )
+                }
             }
         }
-
-        else -> invokeLegacy(onlyCameraUploads = false)
-    }
 
 
     private fun invokeNew(transferTypes: List<TransferType>): Flow<TransfersStatusInfo> =
@@ -85,10 +79,8 @@ class MonitorTransfersStatusUseCase @Inject constructor(
             )
         }
 
-    private fun invokeLegacy(onlyCameraUploads: Boolean) = repository.monitorTransferEvents()
-        .filter {
-            !onlyCameraUploads || it.transfer.transferType == TransferType.CU_UPLOAD
-        }
+    private fun invokeLegacy() = repository.monitorTransferEvents()
+        .filter { it.transfer.transferType == TransferType.CU_UPLOAD }
         .distinctUntilChanged()
         .map {
             val transfer = it.transfer
@@ -114,9 +106,9 @@ class MonitorTransfersStatusUseCase @Inject constructor(
             TransfersStatusInfo(
                 totalSizeToTransfer = totalBytes,
                 totalSizeTransferred = totalTransferred,
-                pendingDownloads = if (onlyCameraUploads) 0 else getNumPendingDownloadsNonBackgroundUseCase(),
-                pendingUploads = if (onlyCameraUploads) 0 else getNumPendingUploadsUseCase(),
-                paused = if (onlyCameraUploads) false else areTransfersPaused(),
+                pendingDownloads = 0,
+                pendingUploads = 0,
+                paused = false,
             )
         }.onStart {
             //in invokeLegacy we only receive updates with transfer updates, so we need to force a first update
