@@ -1390,14 +1390,10 @@ class MyAccountViewModel @Inject constructor(
             AccountType.PRO_II,
             AccountType.PRO_III,
             -> {
-                if (planDetail.subscriptionId.isNullOrEmpty().not()) {
-                    subscriptionList?.any { it.subscriptionId == planDetail.subscriptionId }
+                if (subscriptionList?.size == 1) {
+                    planDetail.accountType == subscriptionList.firstOrNull()?.subscriptionLevel
                 } else {
-                    if (subscriptionList?.size == 1) {
-                        planDetail.accountType == subscriptionList[0].subscriptionLevel
-                    } else {
-                        false
-                    }
+                    false
                 }
             }
 
