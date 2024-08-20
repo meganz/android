@@ -71,7 +71,6 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.SearchView;
@@ -111,6 +110,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
+import mega.privacy.android.app.extensions.EdgeToEdgeExtensionsKt;
 import mega.privacy.android.app.main.adapters.AddContactsAdapter;
 import mega.privacy.android.app.main.adapters.MegaAddContactsAdapter;
 import mega.privacy.android.app.main.adapters.MegaContactsAdapter;
@@ -1430,7 +1430,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        EdgeToEdge.enable(this);
+        EdgeToEdgeExtensionsKt.enableEdgeToEdgeAndConsumeInsets(this);
         super.onCreate(savedInstanceState);
 
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
