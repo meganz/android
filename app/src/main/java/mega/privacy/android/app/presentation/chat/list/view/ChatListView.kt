@@ -296,7 +296,7 @@ private fun EmptyView(
             Image(
                 painter = painterResource(imageResource),
                 contentDescription = "Empty placeholder",
-                modifier = Modifier.size(144.dp)
+                modifier = Modifier.size(120.dp)
             )
         }
         MegaText(
