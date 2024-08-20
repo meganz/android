@@ -8,18 +8,24 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
 import mega.privacy.android.data.mapper.videosection.VideoPlaylistMapper
+import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
@@ -47,7 +53,11 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -63,6 +73,8 @@ class VideoSectionRepositoryImplTest {
     private val userSetMapper: UserSetMapper = ::createUserSet
     private val videoPlaylistMapper = mock<VideoPlaylistMapper>()
     private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
+    private val appPreferencesGateway = mock<AppPreferencesGateway>()
+    private val videoRecentlyWatchedItemMapper = mock<VideoRecentlyWatchedItemMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -70,6 +82,7 @@ class VideoSectionRepositoryImplTest {
     }
 
     private fun initUnderTest() {
+        wheneverBlocking { megaLocalRoomGateway.getAllOfflineInfo() }.thenReturn(emptyList())
         underTest = VideoSectionRepositoryImpl(
             megaApiGateway = megaApiGateway,
             sortOrderIntMapper = sortOrderIntMapper,
@@ -80,6 +93,8 @@ class VideoSectionRepositoryImplTest {
             userSetMapper = userSetMapper,
             videoPlaylistMapper = videoPlaylistMapper,
             megaSearchFilterMapper = megaSearchFilterMapper,
+            appPreferencesGateway = appPreferencesGateway,
+            videoRecentlyWatchedItemMapper = videoRecentlyWatchedItemMapper,
             ioDispatcher = UnconfinedTestDispatcher()
         )
     }
@@ -92,7 +107,9 @@ class VideoSectionRepositoryImplTest {
             fileNodeMapper,
             typedVideoNodeMapper,
             megaLocalRoomGateway,
-            videoPlaylistMapper
+            videoPlaylistMapper,
+            appPreferencesGateway,
+            videoRecentlyWatchedItemMapper
         )
     }
 
@@ -139,7 +156,7 @@ class VideoSectionRepositoryImplTest {
             )
         ).thenReturn(fileNode)
         whenever(typedVideoNodeMapper(fileNode, node.duration, null)).thenReturn(typedVideoNode)
-
+        initUnderTest()
         val actual = underTest.getAllVideos(SortOrder.ORDER_MODIFICATION_DESC)
         assertThat(actual.isNotEmpty()).isTrue()
         assertThat(actual.size).isEqualTo(2)
@@ -162,7 +179,7 @@ class VideoSectionRepositoryImplTest {
             }
 
             initReturnValues(megaSetList, megaSetElementList)
-
+            initUnderTest()
             val actual = underTest.getVideoPlaylists()
             assertThat(actual.isNotEmpty()).isTrue()
             assertThat(actual.size).isEqualTo(2)
@@ -185,7 +202,7 @@ class VideoSectionRepositoryImplTest {
             }
 
             initReturnValues(megaSetList, megaSetElementList)
-
+            initUnderTest()
             val actual = underTest.getVideoPlaylists()
             assertThat(actual.isEmpty()).isTrue()
         }
@@ -207,7 +224,7 @@ class VideoSectionRepositoryImplTest {
             }
 
             initReturnValues(megaSetList, megaSetElementList)
-
+            initUnderTest()
             val actual = underTest.getVideoPlaylists()
             assertThat(actual.isNotEmpty()).isTrue()
             assertThat(actual.size).isEqualTo(1)
@@ -235,6 +252,7 @@ class VideoSectionRepositoryImplTest {
                 on { thumbnailPath }.thenReturn(null)
                 on { duration.inWholeSeconds }.thenReturn(100L)
                 on { isOutShared }.thenReturn(false)
+                on { watchedTimestamp }.thenReturn(0L)
             }
 
             val testVideos: List<TypedVideoNode> =
@@ -246,12 +264,14 @@ class VideoSectionRepositoryImplTest {
                 on { videos }.thenReturn(listOf(mock(), mock(), mock()))
             }
 
-            whenever(typedVideoNodeMapper(anyOrNull(), any(), any(), anyOrNull())).thenReturn(
+            whenever(
+                typedVideoNodeMapper(anyOrNull(), any(), any(), anyOrNull(), anyOrNull())
+            ).thenReturn(
                 typedVideoNode
             )
             whenever(megaApiGateway.isInRubbish(any())).thenReturn(false)
             whenever(videoPlaylistMapper(userSet, testVideos)).thenReturn(testVideoPlaylist)
-
+            initUnderTest()
             val actual = underTest.getVideoPlaylists()
             assertThat(actual.isNotEmpty()).isTrue()
             assertThat(actual.size).isEqualTo(1)
@@ -302,7 +322,7 @@ class VideoSectionRepositoryImplTest {
 
             whenever(megaApiGateway.isInRubbish(any())).thenReturn(true)
             whenever(videoPlaylistMapper(userSet, emptyList())).thenReturn(testVideoPlaylist)
-
+            initUnderTest()
             val actual = underTest.getVideoPlaylists()
             assertThat(actual.isNotEmpty()).isTrue()
             assertThat(actual.size).isEqualTo(1)
@@ -620,4 +640,94 @@ class VideoSectionRepositoryImplTest {
                 assertThat(handle).isEqualTo(videoPlaylistIDs[index])
             }
         }
+
+    @Test
+    fun `test that saveVideoRecentlyWatched function is invoked with the correct parameters`() =
+        runTest {
+            val testHandle = 12345L
+            val testTimestamp = 100000L
+            val testVideoRecentlyWatchedData = mutableListOf<VideoRecentlyWatchedItem>().apply {
+                add(VideoRecentlyWatchedItem(testHandle, testTimestamp))
+            }
+            val addedHandle = 54321L
+            val addedTimestamp = 200000L
+            val testJsonString = Json.encodeToString(testVideoRecentlyWatchedData)
+            val addedRecentlyWatchedItem = VideoRecentlyWatchedItem(addedHandle, addedTimestamp)
+            testVideoRecentlyWatchedData.add(addedRecentlyWatchedItem)
+            val newJsonString = Json.encodeToString(testVideoRecentlyWatchedData)
+            initUnderTest()
+            whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull())).thenReturn(
+                flowOf(testJsonString)
+            )
+            whenever(videoRecentlyWatchedItemMapper(addedHandle, addedTimestamp)).thenReturn(
+                addedRecentlyWatchedItem
+            )
+            underTest.saveVideoRecentlyWatched(addedHandle, addedTimestamp)
+            verify(
+                appPreferencesGateway,
+                times(1)
+            ).putString("PREFERENCE_KEY_VIDEO_RECENTLY_WATCHED", newJsonString)
+        }
+
+    @Test
+    fun `test that getRecentlyWatchedVideoNodes returns the correct result`() = runTest {
+        val testHandles = listOf(12345L, 23456L, 34567L)
+        val testTimestamps = listOf(100000L, 200000L, 300000L)
+        val testVideoRecentlyWatchedData = mutableListOf<VideoRecentlyWatchedItem>()
+        testHandles.mapIndexed { index, handle ->
+            testVideoRecentlyWatchedData.add(
+                VideoRecentlyWatchedItem(
+                    handle,
+                    testTimestamps[index]
+                )
+            )
+        }
+        val testJsonString = Json.encodeToString(testVideoRecentlyWatchedData)
+
+        val testMegaNodes = testHandles.map { handle ->
+            initMegaNode(handle)
+        }
+        val testFileNodes = testHandles.map {
+            mock<TypedFileNode>()
+        }
+        val testTypedVideoNodes = testHandles.mapIndexed { index, handle ->
+            initTypedVideoNode(handle, testTimestamps[index])
+        }
+        testMegaNodes.mapIndexed { index, node ->
+            whenever(megaApiGateway.getMegaNodeByHandle(node.handle)).thenReturn(node)
+            whenever(fileNodeMapper(node, false, null)).thenReturn(testFileNodes[index])
+            whenever(
+                typedVideoNodeMapper(
+                    fileNode = testFileNodes[index],
+                    duration = 100,
+                    watchedTimestamp = testTimestamps[index]
+                )
+            )
+                .thenReturn(testTypedVideoNodes[index])
+        }
+
+        initUnderTest()
+        whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull())).thenReturn(
+            flowOf(testJsonString)
+        )
+        whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(emptyList())
+
+        val actual = underTest.getRecentlyWatchedVideoNodes()
+        assertThat(actual.isNotEmpty()).isTrue()
+        assertThat(actual.size).isEqualTo(3)
+        testTimestamps.sortedByDescending { it }.mapIndexed { index, expectedTimestamp ->
+            assertThat(actual[index].watchedTimestamp).isEqualTo(expectedTimestamp)
+        }
+    }
+
+    private fun initMegaNode(nodeHandle: Long) = mock<MegaNode> {
+        on { handle }.thenReturn(nodeHandle)
+        on { duration }.thenReturn(100)
+    }
+
+    private fun initTypedVideoNode(nodeHandle: Long, timestamp: Long) = mock<TypedVideoNode> {
+        on { id }.thenReturn(NodeId(nodeHandle))
+        on { duration }.thenReturn(100.seconds)
+        on { watchedTimestamp }.thenReturn(timestamp)
+    }
 }

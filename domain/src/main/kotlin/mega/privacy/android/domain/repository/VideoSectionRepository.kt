@@ -106,4 +106,19 @@ interface VideoSectionRepository {
      * @return the ids of the added video playlist which added the video
      */
     suspend fun addVideoToMultiplePlaylists(playlistIDs: List<Long>, videoID: Long): List<Long>
+
+    /**
+     * Save the data of video recently watched
+     *
+     * @param handle the handle of the video node
+     * @param timestamp saved timestamp
+     */
+    suspend fun saveVideoRecentlyWatched(handle: Long, timestamp: Long)
+
+    /**
+     * Get the data of video recently watched
+     *
+     * @return the list of video nodes that includes the watched timestamp
+     */
+    suspend fun getRecentlyWatchedVideoNodes(): List<TypedVideoNode>
 }

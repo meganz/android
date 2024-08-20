@@ -9,10 +9,12 @@ import kotlin.time.Duration
  * @property duration the video duration
  * @property elementID the element id if the video is belong to a playlist
  * @property isOutShared the video file's parent folder whether is out shared
+ * @property watchedTimestamp the timestamp when the video is watched
  */
 data class TypedVideoNode(
     private val fileNode: FileNode,
     val duration: Duration,
     val elementID: Long?,
     val isOutShared: Boolean,
+    val watchedTimestamp: Long,
 ) : TypedFileNode, FileNode by fileNode

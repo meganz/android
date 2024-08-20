@@ -3,15 +3,19 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.listener.AddElementToSetsListenerInterface
 import mega.privacy.android.data.listener.CreateSetElementListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -23,7 +27,9 @@ import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
 import mega.privacy.android.data.mapper.videosection.VideoPlaylistMapper
+import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
@@ -55,10 +61,13 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
     private val userSetMapper: UserSetMapper,
     private val videoPlaylistMapper: VideoPlaylistMapper,
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
+    private val appPreferencesGateway: AppPreferencesGateway,
+    private val videoRecentlyWatchedItemMapper: VideoRecentlyWatchedItemMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : VideoSectionRepository {
     private val videoPlaylistsMap: MutableMap<Long, UserSet> = mutableMapOf()
     private val videoSetsMap: MutableMap<NodeId, MutableSet<Long>> = mutableMapOf()
+    private val videoRecentlyWatchedData = mutableListOf<VideoRecentlyWatchedItem>()
 
     override suspend fun getAllVideos(order: SortOrder): List<TypedVideoNode> =
         withContext(ioDispatcher) {
@@ -76,9 +85,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                 val isOutShared =
                     megaApiGateway.getMegaNodeByHandle(megaNode.parentHandle)?.isOutShare == true
                 typedVideoNodeMapper(
-                    fileNode = megaNode.convertToFileNode(
-                        offlineItems?.get(megaNode.handle.toString())
-                    ),
+                    fileNode = megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()]),
                     duration = megaNode.duration,
                     isOutShared = isOutShared
                 )
@@ -86,7 +93,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
         }
 
     private suspend fun getAllOfflineNodeHandle() =
-        megaLocalRoomGateway.getAllOfflineInfo()?.associateBy { it.handle }
+        megaLocalRoomGateway.getAllOfflineInfo().associateBy { it.handle }
 
     private suspend fun MegaNode.convertToFileNode(offline: Offline?) = fileNodeMapper(
         megaNode = this, requireSerializedData = false, offline = offline
@@ -297,4 +304,49 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
     override fun getVideoPlaylistsMap() = videoPlaylistsMap
 
     override suspend fun getVideoPlaylistSets(): List<UserSet> = getAllUserSets()
+
+    override suspend fun saveVideoRecentlyWatched(handle: Long, timestamp: Long) {
+        initVideoRecentlyWatchedData()
+        videoRecentlyWatchedData.add(videoRecentlyWatchedItemMapper(handle, timestamp))
+        appPreferencesGateway.putString(
+            PREFERENCE_KEY_VIDEO_RECENTLY_WATCHED,
+            Json.encodeToString(videoRecentlyWatchedData)
+        )
+    }
+
+    private suspend fun initVideoRecentlyWatchedData() {
+        if (videoRecentlyWatchedData.isEmpty()) {
+            getRecentlyWatchedData()?.let {
+                videoRecentlyWatchedData.addAll(it)
+            }
+        }
+    }
+
+    private suspend fun getRecentlyWatchedData(): List<VideoRecentlyWatchedItem>? =
+        appPreferencesGateway.monitorString(
+            PREFERENCE_KEY_VIDEO_RECENTLY_WATCHED,
+            null
+        ).firstOrNull()?.let { jsonString ->
+            Json.decodeFromString(jsonString)
+        }
+
+    override suspend fun getRecentlyWatchedVideoNodes(): List<TypedVideoNode> =
+        withContext(ioDispatcher) {
+            initVideoRecentlyWatchedData()
+            val offlineItems = getAllOfflineNodeHandle()
+            videoRecentlyWatchedData.mapNotNull { item ->
+                megaApiGateway.getMegaNodeByHandle(item.videoHandle)?.let { megaNode ->
+                    typedVideoNodeMapper(
+                        fileNode = megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()]),
+                        duration = megaNode.duration,
+                        watchedTimestamp = item.watchedTimestamp
+                    )
+                }
+            }.sortedByDescending { it.watchedTimestamp }
+        }
+
+    companion object {
+        private const val PREFERENCE_KEY_VIDEO_RECENTLY_WATCHED =
+            "PREFERENCE_KEY_VIDEO_RECENTLY_WATCHED"
+    }
 }

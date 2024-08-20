@@ -23,16 +23,19 @@ class TypedVideoNodeMapperTest @Inject constructor() {
         val expectedFileNode = mock<FileNode>()
         val expectedElementID = 1L
         val expectedIsOutShared = true
+        val expectedWatchedTimestamp = 1000L
 
         underTest(
             fileNode = expectedFileNode,
             duration = expectedDuration,
             elementID = expectedElementID,
-            isOutShared = expectedIsOutShared
+            isOutShared = expectedIsOutShared,
+            watchedTimestamp = expectedWatchedTimestamp
         ).let {
             assertThat(it.duration.inWholeSeconds).isEqualTo(expectedDuration)
             assertThat(it.elementID).isEqualTo(expectedElementID)
             assertThat(it.isOutShared).isEqualTo(expectedIsOutShared)
+            assertThat(it.watchedTimestamp).isEqualTo(expectedWatchedTimestamp)
         }
     }
 }
