@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,6 +35,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1me
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.mobile.analytics.event.MaxCallDurationReachedModalEvent
+import mega.privacy.mobile.analytics.event.UpgradeToProToGetUnlimitedCallsDialogEvent
 
 /**
  * Composable function to show the bottom sheet to upgrade to Pro plan.
@@ -43,6 +45,10 @@ fun UpgradeProPlanBottomSheet(
     modifier: Modifier = Modifier,
     hideSheet: () -> Unit = {},
 ) {
+    LaunchedEffect(Unit) {
+        Analytics.tracker.trackEvent(UpgradeToProToGetUnlimitedCallsDialogEvent)
+    }
+
     val context = LocalContext.current
     Column(
         modifier = modifier

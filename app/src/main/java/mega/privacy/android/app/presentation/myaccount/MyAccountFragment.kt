@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.AccountScreenEvent
+import mega.privacy.mobile.analytics.event.UpgradeMyAccountEvent
 import javax.inject.Inject
 
 /**
@@ -130,6 +131,7 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
         findNavController().navigate(R.id.action_my_account_to_my_account_usage)
 
     override fun onUpgradeAccount() {
+        Analytics.tracker.trackEvent(UpgradeMyAccountEvent)
         findNavController().navigate(R.id.action_my_account_to_upgrade)
         activityViewModel.setOpenUpgradeFrom()
     }

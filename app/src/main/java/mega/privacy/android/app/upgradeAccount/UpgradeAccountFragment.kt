@@ -39,8 +39,14 @@ import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.BuyProIEvent
+import mega.privacy.mobile.analytics.event.BuyProIIEvent
+import mega.privacy.mobile.analytics.event.BuyProIIIEvent
+import mega.privacy.mobile.analytics.event.BuyProLiteEvent
+import mega.privacy.mobile.analytics.event.CancelUpgradeMyAccountEvent
 import mega.privacy.mobile.analytics.event.UpgradeAccountBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.UpgradeAccountCancelledEvent
+import mega.privacy.mobile.analytics.event.UpgradeAccountPurchaseSucceededEvent
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
 import javax.inject.Inject
@@ -100,7 +106,10 @@ class UpgradeAccountFragment : Fragment() {
                     testTagsAsResourceId = true
                 },
                 state = uiState,
-                onBackPressed = { trackAndFinish() },
+                onBackPressed = {
+                    Analytics.tracker.trackEvent(CancelUpgradeMyAccountEvent)
+                    trackAndFinish()
+                },
                 onBuyClicked = {
                     upgradeAccountViewModel.currentPaymentCheck(uiState.chosenPlan)
                     if (uiState.currentPayment == UpgradePayment() ||
@@ -153,6 +162,14 @@ class UpgradeAccountFragment : Fragment() {
         isMonthlySelected: Boolean,
         chosenPlan: AccountType,
     ) {
+        when (chosenPlan) {
+            AccountType.PRO_LITE -> Analytics.tracker.trackEvent(BuyProLiteEvent)
+            AccountType.PRO_I -> Analytics.tracker.trackEvent(BuyProIEvent)
+            AccountType.PRO_II -> Analytics.tracker.trackEvent(BuyProIIEvent)
+            AccountType.PRO_III -> Analytics.tracker.trackEvent(BuyProIIIEvent)
+            else -> {}
+        }
+
         billingViewModel.startPurchase(
             upgradeAccountActivity,
             getProductId(
@@ -188,6 +205,8 @@ class UpgradeAccountFragment : Fragment() {
             //payment may take time to process, we will not give privilege until it has been fully processed
             val sku = purchase.sku
             if (billingViewModel.isPurchased(purchase)) {
+                Analytics.tracker.trackEvent(UpgradeAccountPurchaseSucceededEvent)
+
                 //payment has been processed
                 Timber.d(
                     "Purchase $sku successfully, subscription type is: "
