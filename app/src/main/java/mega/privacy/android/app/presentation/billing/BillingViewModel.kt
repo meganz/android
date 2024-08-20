@@ -70,7 +70,7 @@ class BillingViewModel @Inject constructor(
         viewModelScope.launch {
             _skus.value = runCatching { querySkus() }
                 .onFailure {
-                    Timber.e(it)
+                    Timber.e(it, "Failed to query SKUs")
                 }
                 .getOrElse { emptyList() }
         }
@@ -84,7 +84,7 @@ class BillingViewModel @Inject constructor(
         viewModelScope.launch {
             _purchases.value = runCatching { queryPurchase() }
                 .onFailure {
-                    Timber.e(it)
+                    Timber.e(it, "Failed to query purchase")
                 }
                 .getOrElse { emptyList() }
         }
@@ -99,7 +99,7 @@ class BillingViewModel @Inject constructor(
             runCatching {
                 launchPurchaseFlow(activity, productId)
             }.onFailure {
-                Timber.e(it)
+                Timber.e(it, "Failed to launch purchase flow")
             }
         }
     }

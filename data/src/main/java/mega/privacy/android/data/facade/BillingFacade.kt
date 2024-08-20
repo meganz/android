@@ -127,6 +127,7 @@ internal class BillingFacade @Inject constructor(
     @Throws(ProductNotFoundException::class)
     override suspend fun launchPurchaseFlow(activity: Activity, productId: String) {
         val oldSubscription = activeSubscription.get()
+        Timber.d("old subscription is: $oldSubscription")
         val oldSku = oldSubscription?.sku
         val purchaseToken = oldSubscription?.token
         val skuDetails = skusCache.get()?.find { it.sku == productId }
@@ -259,10 +260,18 @@ internal class BillingFacade @Inject constructor(
         purchaseList: List<Purchase>,
     ): List<MegaPurchase> {
         // Verify all available purchases
+        var printPurchaseList =
+            "obfuscated account ID is $obfuscatedAccountId, purchaseList size is ${purchaseList.size}, "
         val validPurchases = purchaseList.filter { purchase ->
+            printPurchaseList += "purchase ${purchaseList.indexOf(purchase)} has "
+            printPurchaseList += "purchase obfuscated id ${purchase.accountIdentifiers?.obfuscatedAccountId}, "
+            printPurchaseList += "purchase original json ${purchase.originalJson}, "
+            printPurchaseList += "purchase signature ${purchase.signature} /n"
             purchase.accountIdentifiers?.obfuscatedAccountId == obfuscatedAccountId
                     && verifyValidSignature(purchase.originalJson, purchase.signature)
         }
+        Timber.d(printPurchaseList)
+        Timber.d("valid purchases are: ${validPurchases.size}")
         validPurchases.forEach { purchase ->
             if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
                 // Acknowledge the purchase if it hasn't already been acknowledged.
@@ -340,11 +349,16 @@ internal class BillingFacade @Inject constructor(
                 signedData,
                 signature
             )
-        }.getOrElse { false }
+        }.getOrElse {
+            Timber.w(it, "Failed to verify valid signature of purchase")
+            false
+        }
     }
 
     private fun updateAccountInfo(purchases: List<MegaPurchase>) {
         val max = purchases.maxByOrNull { it.level }
+        Timber.d("List of purchases: ${purchases.size}")
+        Timber.d("Max purchase: $max")
         activeSubscription.set(max)
         accountInfoWrapper.updateActiveSubscription(max)
     }
