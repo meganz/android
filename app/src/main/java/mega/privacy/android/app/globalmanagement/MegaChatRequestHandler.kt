@@ -110,12 +110,12 @@ class MegaChatRequestHandler @Inject constructor(
                             return@withContext
                         }
                         val loginIntent = Intent(application, LoginActivity::class.java).apply {
+                            putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
                             if (MegaApplication.urlConfirmationLink != null) {
-                                putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                                    .putExtra(
-                                        Constants.EXTRA_CONFIRMATION,
-                                        MegaApplication.urlConfirmationLink
-                                    )
+                                putExtra(
+                                    Constants.EXTRA_CONFIRMATION,
+                                    MegaApplication.urlConfirmationLink
+                                )
                                 if (activityLifecycleHandler.isActivityVisible) {
                                     flags =
                                         Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP

@@ -1,22 +1,122 @@
-# Add project specific ProGuard rules here.
-# By default, the flags in this file are appended to flags specified
-# in /home/sergio/MEGA/dev/android-sdk-linux/tools/proguard/proguard-android.txt
-# You can edit the include path and order by changing the proguardFiles
-# directive in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# This is a configuration file for ProGuard.
+# http://proguard.sourceforge.net/index.html#manual/usage.html
+-optimizationpasses 5
+-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclassmembers
+-verbose
+-dontpreverify
 
-# Add any project specific keep options here:
+##########
+# Enums #
+#########
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
--keepattributes *Annotation*
--keepattributes Exceptions
--keepattributes InnerClasses
--keepattributes Signature
--keepattributes SourceFile,LineNumberTable
+##############
+# Parcelable #
+##############
+-keep class * implements android.os.Parcelable {
+  public static final android.os.Parcelable$Creator *;
+}
+-keepclassmembers class * implements android.os.Parcelable {
+    static ** CREATOR;
+}
+-keepclassmembers class **.R$* {
+    public static <fields>;
+}
+
+#################
+# Serializable #
+################
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private static final java.io.ObjectStreamField[] serialPersistentFields;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
+
+#########################
+# Google Play Services #
+########################
+-keep class com.google.android.gms.* {  *; }
+-dontwarn com.google.android.gms.**
+-dontnote **ILicensingService
+-dontnote com.google.android.gms.**
+-dontwarn com.google.android.gms.ads.**
+
+########################
+# Firebase Crashlytics #
+########################
+-renamesourcefileattribute SourceFile
+-keepattributes SourceFile, LineNumberTable, Signature
+-keep public class * extends java.lang.Exception
+-keep class org.json.** { *; }
+-keepclassmembers class org.json.** { *; }
+
+-keep class org.apache.http.** { *; }
+-keepclassmembers class org.apache.http.** {*;}
+-dontwarn org.apache.**
+
+-keep class android.net.http.** { *; }
+-keepclassmembers class android.net.http.** {*;}
+-dontwarn android.net.**
+
+# Prevent proguard from stripping interface information from TypeAdapter, TypeAdapterFactory,
+# JsonSerializer, JsonDeserializer instances (so they can be used in @JsonAdapter)
+-keep class * extends com.google.gson.TypeAdapter
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+# Prevent R8 from leaving Data object members always null
+-keepclassmembers,allowobfuscation class * {
+  @com.google.gson.annotations.SerializedName <fields>;
+}
+# Retain generic signatures of TypeToken and its subclasses with R8 version 3.0 and higher.
+-keep,allowobfuscation,allowshrinking class com.google.gson.reflect.TypeToken
+-keep,allowobfuscation,allowshrinking class * extends com.google.gson.reflect.TypeToken
+
+##############
+# Coroutines #
+##############
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+
+
+##################
+# WebRTC Library #
+#################
+-keep class org.webrtc.**  { *; }
+-dontwarn org.webrtc.Dav1dDecoder
+
+
+#####################
+# MEGA SDK Bindings #
+#####################
+-keep class nz.mega.sdk.** { *; }
+
+
+#####################
+# SQLCipher Library #
+#####################
+-keep class net.sqlcipher.** { *; }
+-dontwarn net.sqlcipher.**
+
+#####################
+# Protobuf Library #
+#####################
+-keep class * extends com.google.protobuf.GeneratedMessageLite { *; }
+
+#####################
+# Local Lifecycle Owner for version 2.8.2 #
+#####################
+-if public class androidx.compose.ui.platform.AndroidCompositionLocals_androidKt {
+    public static *** getLocalLifecycleOwner();
+}
+-keep public class androidx.compose.ui.platform.AndroidCompositionLocals_androidKt {
+    public static *** getLocalLifecycleOwner();
+}

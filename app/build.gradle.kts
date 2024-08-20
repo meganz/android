@@ -90,6 +90,15 @@ android {
                 unstrippedNativeLibsDir = nativeLibsDir(project)
             }
 
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            // If you want to build release app locally uncomment the following line
+            // signingConfig = signingConfigs.getByName("debug")
+
             buildConfigField("String", "ENVIRONMENT", "\"\"")
         }
 

@@ -833,6 +833,12 @@ class LoginViewModel @Inject constructor(
         runCatching { monitorEphemeralCredentialsUseCase().firstOrNull() }.getOrNull()
 
     /**
+     * Get session
+     */
+    suspend fun getSession() =
+        runCatching { getSessionUseCase() }.getOrNull()
+
+    /**
      * Set temporal email
      *
      * @param email

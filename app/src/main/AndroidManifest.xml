@@ -166,9 +166,14 @@
 
         <activity
             android:name=".presentation.login.LoginActivity"
-            android:label="@string/login_text"
+            android:exported="true"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateAlwaysHidden" />
+            android:windowSoftInputMode="stateAlwaysHidden" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activities.WebViewActivity"
             android:configChanges="orientation|screenSize"
@@ -180,9 +185,6 @@
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
             <meta-data
@@ -244,12 +246,6 @@
                 <data android:scheme="mega" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".imageviewer.ImageViewerActivity"
-            android:label=""
-            android:launchMode="singleTop"
-            android:theme="@style/Theme.Mega.FullScreen.Viewer"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name=".main.ContactFileListActivity"
             android:label="@string/contact_properties_activity"
@@ -339,10 +335,6 @@
             android:launchMode="singleInstance"
             android:windowSoftInputMode="adjustResize|stateVisible" />
         <activity
-            android:name=".zippreview.ui.ZipBrowserActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/zip_browser_activity" />
-        <activity
             android:name=".presentation.zipbrowser.ZipBrowserComposeActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/zip_browser_activity" />
@@ -355,6 +347,7 @@
         <activity
             android:name=".presentation.meeting.chat.ChatHostActivity"
             android:launchMode="singleTask"
+            android:theme="@style/Theme.Mega"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity android:name=".presentation.contactinfo.ContactInfoActivity" />
         <activity android:name=".presentation.fileinfo.FileInfoActivity" />

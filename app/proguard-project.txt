@@ -3,7 +3,7 @@
 #
 # Add project specific ProGuard rules here.
 # By default, the flags in this file are appended to flags specified
-# in ${sdk.dir}/tools/proguard/proguard-android.txt
+# in ${sdk.dir}/tools/proguard/proguard-rules.pro
 # You can edit the include path and order by changing the ProGuard
 # include property in project.properties.
 #

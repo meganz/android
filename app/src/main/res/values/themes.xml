@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!--Top level DayNight theme to be used in AndroidManifest.xml-->
-    <style name="Theme.Mega" parent="Base.Theme.Mega" />
+    <style name="Theme.Mega" parent="Base.Theme.Mega"/>
 
     <!--Base custom theme which will be shared between both light and dark theme variants-->
     <style name="Base.Theme.Mega" parent="Theme.MaterialComponents.DayNight.NoActionBar">
@@ -9,7 +9,6 @@
         <!--colorPrimary colors map to components and elements, such as app bars and buttons. -->
         <!--colorSecondary colors are most often used as accents on components, such as FABs and -->
         <!--selection controls.-->
-
         <!-- e.g. the color of the action bar -->
         <item name="colorPrimary">@color/white</item>
         <!-- e.g. the background color of the FAB -->

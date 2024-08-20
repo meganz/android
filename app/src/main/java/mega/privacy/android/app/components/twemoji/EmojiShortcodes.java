@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.code.regexp.Matcher;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
@@ -21,15 +22,25 @@ public final class EmojiShortcodes extends AbstractEmoji implements Parcelable {
         }
     };
     private static final String HTML_GROUP = "H";
+    @SerializedName("emoji")
     private String emoji;
+    @SerializedName("aliases")
     private List<String> aliases;
+    @SerializedName("category")
     private String category;
+    @SerializedName("description")
     private String description;
+    @SerializedName("tags")
     private List<String> tags;
+    @SerializedName("hexHtml")
     private String hexHtml;
+    @SerializedName("decimalHtml")
     private String decimalHtml;
+    @SerializedName("decimalHtmlShort")
     private String decimalHtmlShort;
+    @SerializedName("hexHtmlShort")
     private String hexHtmlShort;
+    @SerializedName("decimalSurrogateHtml")
     private String decimalSurrogateHtml;
 
     protected EmojiShortcodes(Parcel in) {

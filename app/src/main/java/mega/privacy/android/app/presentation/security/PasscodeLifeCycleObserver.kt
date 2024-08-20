@@ -17,22 +17,22 @@ import javax.inject.Singleton
  */
 @Singleton
 class PasscodeLifeCycleObserver @Inject constructor(
-    private val setAppPausedTimeUseCase: SetAppPausedTimeUseCase,
-    private val updatePasscodeStateUseCase: UpdatePasscodeStateUseCase,
-    @ApplicationScope private val scope: CoroutineScope,
+    private val setAppPausedTimeUseCase: dagger.Lazy<SetAppPausedTimeUseCase>,
+    private val updatePasscodeStateUseCase: dagger.Lazy<UpdatePasscodeStateUseCase>,
+    @ApplicationScope private val scope: dagger.Lazy<CoroutineScope>,
 ) : PasscodeProcessLifeCycleObserver {
 
     override fun onStart(data: PasscodeProcessLifeCycleEventData) {
-        scope.launch {
+        scope.get().launch {
             Timber.d("App started")
-            updatePasscodeStateUseCase(System.currentTimeMillis(), data.orientation)
+            updatePasscodeStateUseCase.get()(System.currentTimeMillis(), data.orientation)
         }
     }
 
     override fun onStop(data: PasscodeProcessLifeCycleEventData) {
-        scope.launch {
+        scope.get().launch {
             Timber.d("App paused")
-            setAppPausedTimeUseCase(System.currentTimeMillis(), data.orientation)
+            setAppPausedTimeUseCase.get()(System.currentTimeMillis(), data.orientation)
         }
     }
 }

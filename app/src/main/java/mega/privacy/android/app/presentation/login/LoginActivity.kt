@@ -136,6 +136,13 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                 firstNameTemp = it.firstName
                 lastNameTemp = it.lastName
                 megaApi.resumeCreateAccount(sessionTemp, this@LoginActivity)
+            } ?: run {
+                if (!intent.hasExtra(Constants.VISIBLE_FRAGMENT)) {
+                    val session = viewModel.getSession()
+                    if (session.isNullOrEmpty()) {
+                        visibleFragment = Constants.TOUR_FRAGMENT
+                    }
+                }
             }
 
             showFragment(visibleFragment)
