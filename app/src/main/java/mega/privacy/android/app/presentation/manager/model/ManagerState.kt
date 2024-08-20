@@ -2,6 +2,8 @@ package mega.privacy.android.app.presentation.manager.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningErrorTypeUiItem
+import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
@@ -40,6 +42,8 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property usersCallLimitReminders                    [UsersCallLimitReminders]
  * @property searchQuery                                Search query
  * @property uploadEvent                                Event to trigger upload actions
+ * @property handleScanDocumentResult                   Decides if the legacy or modern Document Scanner should be used
+ * @property documentScanningErrorTypeUiItem            The specific Error return when using the modern Document Scanner
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -67,4 +71,6 @@ data class ManagerState(
     val usersCallLimitReminders: UsersCallLimitReminders = UsersCallLimitReminders.Enabled,
     val searchQuery: String = "",
     val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload> = consumed(),
+    val handleScanDocumentResult: HandleScanDocumentResult? = null,
+    val documentScanningErrorTypeUiItem: DocumentScanningErrorTypeUiItem? = null,
 )

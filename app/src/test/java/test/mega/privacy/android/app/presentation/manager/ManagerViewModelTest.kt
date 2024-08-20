@@ -28,11 +28,16 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningErrorTypeUiItem
+import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
+import mega.privacy.android.app.service.scanner.UnexpectedErrorInDocumentScanner
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
@@ -135,6 +140,8 @@ import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
@@ -320,6 +327,7 @@ class ManagerViewModelTest {
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase = mock()
     private val hangChatCallUseCase: HangChatCallUseCase = mock()
     private val startOfflineSyncWorkerUseCase: StartOfflineSyncWorkerUseCase = mock()
+    private val scannerHandler: ScannerHandler = mock()
     private val fakeCallUpdatesFlow = MutableSharedFlow<ChatCall>()
     private var monitorDevicePowerConnectionFakeFlow =
         MutableSharedFlow<DevicePowerConnectionState>()
@@ -420,7 +428,8 @@ class ManagerViewModelTest {
                 on { invoke() }.thenReturn(monitorDevicePowerConnectionFakeFlow)
             },
             startOfflineSyncWorkerUseCase = startOfflineSyncWorkerUseCase,
-            filePrepareUseCase = filePrepareUseCase
+            filePrepareUseCase = filePrepareUseCase,
+            scannerHandler = scannerHandler,
         )
     }
 
@@ -471,7 +480,8 @@ class ManagerViewModelTest {
             monitorUpgradeDialogClosedUseCase,
             monitorContactRequestUpdatesUseCase,
             startOfflineSyncWorkerUseCase,
-            filePrepareUseCase
+            filePrepareUseCase,
+            scannerHandler,
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
@@ -1514,6 +1524,52 @@ class ManagerViewModelTest {
 
         underTest.prepareFiles(listOf(uri))
         verify(filePrepareUseCase).invoke(listOf(UriPath("uri")))
+    }
+
+    @Test
+    fun `test that the old document scanner is used for scanning documents`() = runTest {
+        val handleScanDocumentResult = HandleScanDocumentResult.UseLegacyImplementation
+        whenever(scannerHandler.handleScanDocument()).thenReturn(handleScanDocumentResult)
+
+        underTest.handleScanDocument()
+        testScheduler.advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().handleScanDocumentResult).isEqualTo(handleScanDocumentResult)
+        }
+    }
+
+    @Test
+    fun `test that the new ML Document Kit Scanner is used for scanning documents`() = runTest {
+        val handleScanDocumentResult = HandleScanDocumentResult.UseNewImplementation(mock())
+        whenever(scannerHandler.handleScanDocument()).thenReturn(handleScanDocumentResult)
+
+        underTest.handleScanDocument()
+        testScheduler.advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().handleScanDocumentResult).isEqualTo(handleScanDocumentResult)
+        }
+    }
+
+    @Test
+    fun `test that the handle scan document result is reset`() = runTest {
+        underTest.onHandleScanDocumentResultConsumed()
+        testScheduler.advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().handleScanDocumentResult).isNull()
+        }
+    }
+
+    @Test
+    fun `test that the document scanning error type is reset`() = runTest {
+        underTest.onDocumentScanningErrorConsumed()
+        testScheduler.advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().documentScanningErrorTypeUiItem).isNull()
+        }
     }
 
     companion object {

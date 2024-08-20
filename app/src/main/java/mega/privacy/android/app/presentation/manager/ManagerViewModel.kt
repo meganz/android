@@ -28,12 +28,15 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningErrorTypeUiItem
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -262,6 +265,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorDevicePowerConnectionStateUseCase: MonitorDevicePowerConnectionStateUseCase,
     private val startOfflineSyncWorkerUseCase: StartOfflineSyncWorkerUseCase,
     private val filePrepareUseCase: FilePrepareUseCase,
+    private val scannerHandler: ScannerHandler,
 ) : ViewModel() {
 
     /**
@@ -1364,6 +1368,43 @@ class ManagerViewModel @Inject constructor(
      */
     suspend fun prepareFiles(uris: List<Uri>) =
         filePrepareUseCase(uris.map { UriPath(it.toString()) })
+
+    /**
+     * Checks whether the legacy or modern Document Scanner should be used
+     */
+    fun handleScanDocument() {
+        viewModelScope.launch {
+            runCatching {
+                scannerHandler.handleScanDocument()
+            }.onSuccess { handleScanDocumentResult ->
+                _state.update { it.copy(handleScanDocumentResult = handleScanDocumentResult) }
+            }.onFailure { exception ->
+                _state.update {
+                    it.copy(
+                        documentScanningErrorTypeUiItem = if (exception is InsufficientRAMToLaunchDocumentScanner) {
+                            DocumentScanningErrorTypeUiItem.InsufficientRAM
+                        } else {
+                            DocumentScanningErrorTypeUiItem.GenericError
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Resets the value of [ManagerState.handleScanDocumentResult]
+     */
+    fun onHandleScanDocumentResultConsumed() {
+        _state.update { it.copy(handleScanDocumentResult = null) }
+    }
+
+    /**
+     * Resets the value of [ManagerState.documentScanningErrorTypeUiItem]
+     */
+    fun onDocumentScanningErrorConsumed() {
+        _state.update { it.copy(documentScanningErrorTypeUiItem = null) }
+    }
 
     internal companion object {
         internal const val IS_FIRST_LOGIN_KEY = "EXTRA_FIRST_LOGIN"

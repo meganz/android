@@ -3,6 +3,7 @@ package mega.privacy.android.app.service.scanner
 import android.content.Context
 import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
+import com.google.mlkit.common.MlKitException
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanner
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
@@ -22,6 +23,7 @@ import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDoc
 import mega.privacy.android.app.presentation.qrcode.model.BarcodeScanResult
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -107,16 +109,27 @@ class ScannerHandlerImpl @Inject constructor(
                 .installModules(moduleInstallRequest)
                 .addOnSuccessListener { moduleResponse ->
                     if (moduleResponse.areModulesAlreadyInstalled()) {
+                        Timber.d("The ML Document Kit Scanner is successfully installed")
                         continuation.resumeWith(
                             Result.success(
                                 HandleScanDocumentResult.UseNewImplementation(documentScanner)
                             )
                         )
                     } else {
+                        Timber.e("The ML Document Kit Scanner is not installed")
                         continuation.resumeWith(Result.failure(DocumentScannerModuleIsNotInstalled()))
                     }
                 }.addOnFailureListener {
-                    continuation.resumeWith(Result.failure(it))
+                    Timber.e("An Exception occurred when installing the ML Document Kit Scanner:\n\n ${it.printStackTrace()}")
+                    continuation.resumeWith(
+                        Result.failure(
+                            if (it is MlKitException && it.errorCode == MlKitException.UNSUPPORTED) {
+                                InsufficientRAMToLaunchDocumentScanner()
+                            } else {
+                                UnexpectedErrorInDocumentScanner()
+                            }
+                        )
+                    )
                 }
         }
 }
@@ -130,3 +143,15 @@ class BarcodeScannerModuleIsNotInstalled : Exception()
  * An Exception that should be thrown whenever the [GmsDocumentScanning] module has not been installed
  */
 class DocumentScannerModuleIsNotInstalled : Exception()
+
+/**
+ * An Exception that should be thrown when attempting to run the ML Document Scanner with less than
+ * 1.7 GB Device total RAM
+ */
+class InsufficientRAMToLaunchDocumentScanner : Exception()
+
+/**
+ * An Exception that should be thrown when an unexpected error was found trying to install the
+ * ML Document Kit Scanner
+ */
+class UnexpectedErrorInDocumentScanner : Exception()

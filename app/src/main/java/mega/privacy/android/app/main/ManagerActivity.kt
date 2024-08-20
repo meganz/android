@@ -170,6 +170,8 @@ import mega.privacy.android.app.presentation.clouddrive.FileBrowserActionListene
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserComposeFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
+import mega.privacy.android.app.presentation.documentscanner.dialogs.DocumentScanningErrorDialog
+import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
@@ -515,6 +517,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private lateinit var fragmentLayout: LinearLayout
     private lateinit var waitingRoomComposeView: ComposeView
     private lateinit var callRecordingConsentDialogComposeView: ComposeView
+    private lateinit var documentScanningErrorDialogComposeView: ComposeView
     private lateinit var freePlanLimitParticipantsDialogComposeView: ComposeView
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var navigationView: NavigationView
@@ -975,6 +978,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         waitingRoomComposeView = findViewById(R.id.waiting_room_dialog_compose_view)
         callRecordingConsentDialogComposeView =
             findViewById(R.id.call_recording_consent_dialog_compose_view)
+        documentScanningErrorDialogComposeView =
+            findViewById(R.id.document_scanning_error_dialog_compose_view)
         freePlanLimitParticipantsDialogComposeView =
             findViewById(R.id.free_plan_limit_dialog_compose_view)
         adsComposeView = findViewById(R.id.ads_web_compose_view)
@@ -1054,6 +1059,24 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 val isDark = themeMode.isDarkMode()
                 OriginalTempTheme(isDark = isDark) {
                     CallRecordingConsentDialog()
+                }
+            }
+        }
+
+        documentScanningErrorDialogComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val isDark = themeMode.isDarkMode()
+                val state by viewModel.state.collectAsStateWithLifecycle()
+
+                OriginalTempTheme(isDark = isDark) {
+                    DocumentScanningErrorDialog(
+                        documentScanningErrorTypeUiItem = state.documentScanningErrorTypeUiItem,
+                        onErrorAcknowledged = { viewModel.onDocumentScanningErrorConsumed() },
+                        onErrorDismissed = { viewModel.onDocumentScanningErrorConsumed() },
+                    )
                 }
             }
         }
@@ -1909,6 +1932,21 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (managerState.message != null) {
                 showSnackbar(content = managerState.message.getInfo(this))
                 viewModel.markHandledMessage()
+            }
+
+            managerState.handleScanDocumentResult?.let { handleScanDocumentResult ->
+                when (handleScanDocumentResult) {
+                    HandleScanDocumentResult.UseLegacyImplementation -> {
+                        uploadBottomSheetDialogActionHandler.scanDocumentUsingLegacyScanner()
+                    }
+
+                    is HandleScanDocumentResult.UseNewImplementation -> {
+                        uploadBottomSheetDialogActionHandler.scanDocumentUsingNewScanner(
+                            documentScanner = handleScanDocumentResult.documentScanner,
+                        )
+                    }
+                }
+                viewModel.onHandleScanDocumentResultConsumed()
             }
 
             managerState.chatLinkContent?.let {
@@ -5327,7 +5365,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     override fun scanDocument() {
-        uploadBottomSheetDialogActionHandler.scanDocument()
+        viewModel.handleScanDocument()
     }
 
     override fun showNewFolderDialog(typedText: String?) {
