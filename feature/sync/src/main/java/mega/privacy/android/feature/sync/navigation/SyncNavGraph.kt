@@ -54,9 +54,11 @@ internal fun NavGraphBuilder.syncNavGraph(
                 syncPermissionsManager,
                 openSelectMegaFolderScreen = {
                     navController.navigate(syncMegaPicker)
-                }, openNextScreen = {
+                },
+                openNextScreen = {
                     navController.navigate(syncList)
-                }, openUpgradeAccount = {
+                },
+                openUpgradeAccount = {
                     openUpgradeAccountPage()
                 },
                 onBackClicked = {
@@ -69,7 +71,7 @@ internal fun NavGraphBuilder.syncNavGraph(
                     } else {
                         navController.popBackStack()
                     }
-                }
+                },
             )
         }
         composable(route = syncMegaPicker) {

@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -45,8 +46,15 @@ import javax.inject.Inject
 class SyncFragment : Fragment() {
 
     companion object {
-        private const val TITLE_KEY = "titleKey"
-        private const val OPEN_NEW_SYNC_KEY = "openNewSyncKey"
+        /**
+         * To specify the fragment title value
+         */
+        const val TITLE_KEY = "titleKey"
+
+        /**
+         * To specify if the view to create a new sync should be directly displayed
+         */
+        const val OPEN_NEW_SYNC_KEY = "openNewSyncKey"
 
         /**
          * Returns the instance of SyncFragment
@@ -74,11 +82,14 @@ class SyncFragment : Fragment() {
     lateinit var getThemeMode: GetThemeMode
 
     /**
-     * Get fileTypeIconMapper
+     * Get [FileTypeIconMapper]
      */
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
 
+    /**
+     * Get [SyncPermissionsManager]
+     */
     @Inject
     lateinit var syncPermissionsManager: SyncPermissionsManager
 

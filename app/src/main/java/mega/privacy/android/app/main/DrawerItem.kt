@@ -55,11 +55,6 @@ enum class DrawerItem {
     ASK_PERMISSIONS,
 
     /**
-     * Sync
-     */
-    SYNC,
-
-    /**
      * Device Center
      */
     DEVICE_CENTER,

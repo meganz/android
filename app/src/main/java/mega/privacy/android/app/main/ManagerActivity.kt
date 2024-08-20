@@ -319,7 +319,6 @@ import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
-import mega.privacy.android.feature.sync.ui.SyncFragment
 import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.widgets.setTransfersWidgetContent
@@ -554,7 +553,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     // Fragments
     private var fileBrowserComposeFragment: FileBrowserComposeFragment? = null
     private var rubbishBinComposeFragment: RubbishBinComposeFragment? = null
-    private var syncFragment: SyncFragment? = null
     private var incomingSharesComposeFragment: IncomingSharesComposeFragment? = null
     private var outgoingSharesComposeFragment: OutgoingSharesComposeFragment? = null
     private var linksComposeFragment: LinksComposeFragment? = null
@@ -2931,7 +2929,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (drawerItem == null) {
             return@launch
         }
-        if (listOf(DrawerItem.SYNC, DrawerItem.DEVICE_CENTER).contains(drawerItem)) {
+        if (drawerItem == DrawerItem.DEVICE_CENTER) {
             supportActionBar?.hide()
         } else {
             supportActionBar?.show()
@@ -2974,8 +2972,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
             }
-
-            DrawerItem.SYNC -> viewModel.setIsFirstNavigationLevel(false)
 
             DrawerItem.RUBBISH_BIN -> {
                 supportActionBar?.subtitle = null
@@ -3650,8 +3646,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * [INVALID_HANDLE] by default
      * The value is set to -1 by default if no other Backups Node Handle is passed
      * @param errorMessage The [StringRes] of the error message to display
-     * @param title Custom title
-     * @param openNewSync Only for [DrawerItem.SYNC]: True to directly open New Sync screen, False otherwise.
      */
     @SuppressLint("NewApi")
     @JvmOverloads
@@ -3661,8 +3655,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         cloudDriveNodeHandle: Long = INVALID_HANDLE,
         backupsHandle: Long = INVALID_HANDLE,
         @StringRes errorMessage: Int? = null,
-        title: String? = null,
-        openNewSync: Boolean = false,
     ) {
         Timber.d("Selected DrawerItem: ${item?.name}. Current drawerItem is ${drawerItem?.name}")
         if (!this::drawerLayout.isInitialized) {
@@ -3777,17 +3769,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     newFragmentInstance = DeviceCenterFragment.newInstance(),
                     fragmentTag = FragmentTag.DEVICE_CENTER.tag,
                 )
-            }
-
-            DrawerItem.SYNC -> {
-                syncFragment = SyncFragment.newInstance(title = title, openNewSync = openNewSync)
-
-                setBottomNavigationMenuItemChecked(NO_BNV)
-                supportInvalidateOptionsMenu()
-                syncFragment?.let { replaceFragment(it, FragmentTag.SYNC.tag) }
-                showFabButton()
-                updateTransfersWidgetPosition(false)
-                hideAdsView()
             }
 
             DrawerItem.HOMEPAGE -> {
@@ -4538,7 +4519,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             android.R.id.home -> {
                 if (isFirstNavigationLevel) {
                     when (drawerItem) {
-                        DrawerItem.SYNC, DrawerItem.RUBBISH_BIN, DrawerItem.TRANSFERS -> {
+                        DrawerItem.RUBBISH_BIN, DrawerItem.TRANSFERS -> {
                             goBackToBottomNavigationItem(bottomNavigationCurrentItem)
                         }
 
@@ -4553,7 +4534,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 } else {
                     if (drawerItem == DrawerItem.CLOUD_DRIVE) {
                         handleCloudDriveBackNavigation(performBackNavigation = true)
-                    } else if (drawerItem == DrawerItem.SYNC || drawerItem == DrawerItem.DEVICE_CENTER) {
+                    } else if (drawerItem == DrawerItem.DEVICE_CENTER) {
                         onBackPressedDispatcher.onBackPressed()
                     } else if (drawerItem == DrawerItem.RUBBISH_BIN) {
                         rubbishBinComposeFragment = getRubbishBinComposeFragment()
@@ -4793,8 +4774,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         if (drawerItem === DrawerItem.CLOUD_DRIVE) {
             handleCloudDriveBackNavigation(performBackNavigation = true)
-        } else if (drawerItem == DrawerItem.SYNC) {
-            selectDrawerItem(item = DrawerItem.DEVICE_CENTER)
         } else if (drawerItem == DrawerItem.DEVICE_CENTER) {
             handleDeviceCenterBackNavigation()
         } else if (drawerItem == DrawerItem.RUBBISH_BIN) {
@@ -7550,7 +7529,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 ?: return
         val params = transfersWidgetLayout.layoutParams as LinearLayout.LayoutParams
         params.gravity = Gravity.END
-        if (!bNVHidden && isInMainHomePage || drawerItem == DrawerItem.SYNC) {
+        if (!bNVHidden && isInMainHomePage) {
             params.bottomMargin = Util.dp2px(TRANSFER_WIDGET_MARGIN_BOTTOM.toFloat(), outMetrics)
         } else {
             params.bottomMargin = 0

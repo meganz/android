@@ -8,6 +8,10 @@
 
     <application>
 
+        <activity
+            android:name=".ui.SyncHostActivity"
+            android:launchMode="singleTop" />
+
         <service
             android:name=".data.service.SyncBackgroundService"
             android:foregroundServiceType="dataSync"

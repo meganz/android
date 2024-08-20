@@ -113,7 +113,7 @@ class DeviceCenterFragment : Fragment() {
                             if (viewModel.shouldNavigateToSyncs(device)) {
                                 Analytics.tracker.trackEvent(AndroidSyncNavigationItemEvent)
                                 megaNavigator.openSyncs(
-                                    activity = this@DeviceCenterFragment.activity
+                                    context = this@DeviceCenterFragment.activity
                                         ?: return@DeviceCenterScreen,
                                     deviceName = device.name,
                                 )
@@ -158,7 +158,7 @@ class DeviceCenterFragment : Fragment() {
                         onInfoOptionClicked = viewModel::onInfoClicked,
                         onAddNewSyncOptionClicked = { device ->
                             megaNavigator.openSyncs(
-                                activity = this@DeviceCenterFragment.activity
+                                context = this@DeviceCenterFragment.activity
                                     ?: return@DeviceCenterScreen,
                                 deviceName = device.name,
                                 openNewSync = true,

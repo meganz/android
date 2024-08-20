@@ -90,11 +90,11 @@ interface AppNavigator {
     /**
      * Navigates to the Syncs page
      *
-     * @param activity      The Activity
+     * @param context       Context
      * @param deviceName    The device name
      * @param openNewSync   True to directly open New Sync screen, False otherwise.
      */
-    fun openSyncs(activity: Activity, deviceName: String? = null, openNewSync: Boolean = false)
+    fun openSyncs(context: Context, deviceName: String? = null, openNewSync: Boolean = false)
 
     /**
      * Open zip browser
