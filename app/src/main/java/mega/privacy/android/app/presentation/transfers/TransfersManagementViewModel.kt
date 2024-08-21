@@ -13,13 +13,11 @@ import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.GetNumPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
@@ -44,7 +42,6 @@ class TransfersManagementViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     monitorTransfersSize: MonitorTransfersStatusUseCase,
-    getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val samplePeriod: Long?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransferManagementUiState())
@@ -62,9 +59,7 @@ class TransfersManagementViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(ioDispatcher) {
-            val flow = monitorTransfersSize(
-                activeTransfersInCameraUploadsFlag = getFeatureFlagValueUseCase(AppFeatures.ActiveTransfersInCameraUploads),
-            )
+            val flow = monitorTransfersSize()
 
             val samplePeriodFinal = samplePeriod ?: DEFAULT_SAMPLE_PERIOD
             if (samplePeriodFinal > 0) {

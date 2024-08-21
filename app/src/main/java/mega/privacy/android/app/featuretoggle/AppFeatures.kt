@@ -169,14 +169,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     RaiseToSpeak("Raise to speak in a call or a meeting", true),
 
     /**
-     * Camera uploads utilizes active transfers to monitor transfers
-     */
-    ActiveTransfersInCameraUploads(
-        "Camera Uploads uses Active transfers to monitor the transfer progress",
-        true,
-    ),
-
-    /**
      * To enable the new add and manage description feature to node
      */
     NodeWithTags(
