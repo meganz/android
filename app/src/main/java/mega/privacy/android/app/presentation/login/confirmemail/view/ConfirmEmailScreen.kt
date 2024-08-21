@@ -160,7 +160,11 @@ internal fun ConfirmEmailScreen(
     Scaffold(modifier = modifier) {
         Column(modifier = Modifier.padding(it)) {
             MegaText(
-                modifier = Modifier.padding(top = 15.dp, start = 24.dp, end = 24.dp),
+                modifier = Modifier
+                    .padding(top = 15.dp, start = 24.dp, end = 24.dp)
+                    .testTag(
+                        TITLE_TAG
+                    ),
                 text = stringResource(id = R.string.confirm_email_text),
                 textColor = TextColor.Primary,
                 style = MaterialTheme.typography.subtitle1
@@ -169,7 +173,9 @@ internal fun ConfirmEmailScreen(
             Spacer(modifier = Modifier.height(44.dp))
 
             Icon(
-                modifier = Modifier.padding(start = 16.dp),
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .testTag(ICON_TAG),
                 painter = painterResource(id = R.drawable.ic_awaiting_email),
                 contentDescription = null
             )
@@ -177,14 +183,16 @@ internal fun ConfirmEmailScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             MegaText(
-                modifier = Modifier.padding(horizontal = 24.dp),
+                modifier = Modifier.padding(horizontal = 24.dp).testTag(
+                    DESCRIPTION_TAG),
                 text = stringResource(id = R.string.confirm_email_explanation),
                 textColor = TextColor.Primary,
                 style = MaterialTheme.typography.body1
             )
 
             LabelTextField(
-                modifier = Modifier.padding(start = 24.dp, top = 32.dp, end = 24.dp),
+                modifier = Modifier.padding(start = 24.dp, top = 32.dp, end = 24.dp).testTag(
+                    EMAIL_ADDRESS_TAG),
                 onTextChange = { textValue ->
                     emailValueState = textValue.copy(
                         selection = TextRange(textValue.text.length)
@@ -203,7 +211,8 @@ internal fun ConfirmEmailScreen(
             Spacer(modifier = Modifier.padding(top = 24.dp))
 
             MegaSpannedText(
-                modifier = Modifier.padding(horizontal = 24.dp),
+                modifier = Modifier.padding(horizontal = 24.dp).testTag(
+                    EMAIL_ADDRESS_DESCRIPTION_TAG),
                 value = stringResource(id = SharedResR.string.account_confirm_email_misspelled_email_description),
                 baseStyle = MaterialTheme.typography.subtitle2,
                 styles = mapOf(
@@ -256,6 +265,7 @@ internal fun ConfirmEmailScreen(
                 Spacer(modifier = Modifier.width(23.dp))
 
                 TextMegaButton(
+                    modifier = Modifier.testTag(CANCEL_BUTTON_TAG),
                     textId = R.string.general_cancel,
                     onClick = onCancelClick
                 )
@@ -279,4 +289,13 @@ private fun ConfirmEmailScreenPreview() {
     }
 }
 
+internal const val TITLE_TAG = "confirm_email_screen:text_confirm_email"
+internal const val ICON_TAG = "confirm_email_screen:icon_confirm_email"
+internal const val DESCRIPTION_TAG =
+    "confirm_email_screen:text_confirm_email_description"
+internal const val EMAIL_ADDRESS_TAG =
+    "confirm_email_screen:text_email_address"
+internal const val EMAIL_ADDRESS_DESCRIPTION_TAG =
+    "confirm_email_screen:text_email_address_description"
+internal const val CANCEL_BUTTON_TAG = "confirm_email_screen:button_cancel"
 internal const val RESEND_BUTTON_TAG = "confirm_email_screen:button_resend"

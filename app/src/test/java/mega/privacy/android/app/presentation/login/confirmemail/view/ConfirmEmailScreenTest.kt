@@ -20,6 +20,70 @@ class ConfirmEmailScreenTest {
     @get:Rule
     val composeRule = createComposeRule()
 
+
+    @Test
+    fun `test that screen title is displayed`() {
+        with(composeRule) {
+            setScreen()
+
+            onNodeWithTag(TITLE_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that confirm email icon is displayed`() {
+        with(composeRule) {
+            setScreen()
+
+            onNodeWithTag(ICON_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that confirm email instruction is displayed`() {
+        with(composeRule) {
+            setScreen()
+
+            onNodeWithTag(DESCRIPTION_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that email address is displayed`() {
+        with(composeRule) {
+            setScreen()
+
+            onNodeWithTag(EMAIL_ADDRESS_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that email address instruction is displayed`() {
+        with(composeRule) {
+            setScreen()
+
+            onNodeWithTag(EMAIL_ADDRESS_DESCRIPTION_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that resend button is displayed`() {
+        with(composeRule) {
+            setScreen()
+
+            onNodeWithTag(RESEND_BUTTON_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that cancel button is displayed`() {
+        with(composeRule) {
+            setScreen()
+
+            onNodeWithTag(CANCEL_BUTTON_TAG).assertIsDisplayed()
+        }
+    }
+
     @Test
     fun `test that the correct error message is shown when resending the confirmation link with a blank email`() {
         with(composeRule) {
