@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.login
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
@@ -39,39 +40,49 @@ class FastLoginUseCase @Inject constructor(
     ) = callbackFlow {
         loginMutex.lock()
 
-        runCatching { initialiseMegaChatUseCase(session) }
-            .onFailure { exception ->
-                if (exception is ChatNotInitializedErrorStatus) {
-                    chatLogoutUseCase(disableChatApiUseCase)
-                }
-            }
-
-        if (refreshChatUrl) {
-            loginRepository.refreshMegaChatUrl()
-        }
-
-        runCatching {
-            loginRepository.fastLoginFlow(session)
-                .collectLatest { loginStatus ->
-                    if (loginStatus == LoginStatus.LoginSucceed) {
-                        saveAccountCredentialsUseCase()
-                        runCatching { loginMutex.unlock() }
+        val initialiseChatJob = launch {
+            runCatching { initialiseMegaChatUseCase(session) }
+                .onFailure { exception ->
+                    if (exception is ChatNotInitializedErrorStatus) {
+                        chatLogoutUseCase(disableChatApiUseCase)
                     }
-
-                    trySend(loginStatus)
                 }
-        }.onFailure {
-            if (it !is LoginLoggedOutFromOtherLocation) {
-                chatLogoutUseCase(disableChatApiUseCase)
-                resetChatSettingsUseCase()
-            }
-
-            runCatching { loginMutex.unlock() }
-            throw it
         }
+
+        val refreshChatUrlJob = if (refreshChatUrl) {
+            launch { loginRepository.refreshMegaChatUrl() }
+        } else null
+
+        val fastLoginJob = launch {
+            runCatching {
+                loginRepository.fastLoginFlow(session)
+                    .collectLatest { loginStatus ->
+                        if (loginStatus == LoginStatus.LoginSucceed) {
+                            saveAccountCredentialsUseCase()
+                            unlockLoginMutex()
+                        }
+
+                        trySend(loginStatus)
+                    }
+            }.onFailure {
+                if (it !is LoginLoggedOutFromOtherLocation) {
+                    chatLogoutUseCase(disableChatApiUseCase)
+                    resetChatSettingsUseCase()
+                }
+                unlockLoginMutex()
+                throw it
+            }
+        }
+
+        initialiseChatJob.join()
+        refreshChatUrlJob?.join()
+        fastLoginJob.join()
 
         awaitClose {
-            runCatching { loginMutex.unlock() }
+            unlockLoginMutex()
         }
     }
+
+    private fun unlockLoginMutex() = runCatching { loginMutex.unlock() }
+
 }
