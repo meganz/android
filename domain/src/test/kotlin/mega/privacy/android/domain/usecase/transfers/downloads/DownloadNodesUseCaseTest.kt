@@ -158,7 +158,6 @@ class DownloadNodesUseCaseTest {
         TransferAppData.SdCardDownload("target", null),
         TransferAppData.CameraUpload,
         TransferAppData.VoiceClip,
-        TransferAppData.TextFileUpload(TransferAppData.TextFileUpload.Mode.Create, false),
         TransferAppData.ChatUpload(12345L)
     )
 

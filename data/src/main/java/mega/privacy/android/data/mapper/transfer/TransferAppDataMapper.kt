@@ -4,7 +4,6 @@ import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.Background
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.CameraUpload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatUpload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SDCardDownload
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.TextFileUpload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import timber.log.Timber
@@ -41,15 +40,6 @@ class TransferAppDataMapper @Inject constructor() {
                         values.firstIfNotBlank()?.let {
                             TransferAppData.SdCardDownload(it, values.getOrNull(1))
                         }
-                    }
-
-                    TextFileUpload -> {
-                        TextFileModeConstants.getFileDataModeFromSdkValue(values.firstIfNotBlank())
-                            ?.let { mode ->
-                                values.getOrNull(1)?.toBooleanStrictOrNull()?.let { home ->
-                                    TransferAppData.TextFileUpload(mode, home)
-                                }
-                            }
                     }
 
                     BackgroundTransfer -> TransferAppData.BackgroundTransfer

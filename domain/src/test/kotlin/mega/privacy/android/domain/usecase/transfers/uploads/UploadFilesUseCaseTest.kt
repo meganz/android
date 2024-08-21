@@ -157,7 +157,6 @@ class UploadFilesUseCaseTest {
         listOf(TransferAppData.BackgroundTransfer),
         listOf(TransferAppData.SdCardDownload("target", null)),
         listOf(TransferAppData.CameraUpload),
-        listOf(TransferAppData.TextFileUpload(TransferAppData.TextFileUpload.Mode.Create, false)),
         listOf(TransferAppData.CameraUpload, TransferAppData.SdCardDownload("target", null)),
         listOf(null),
     )

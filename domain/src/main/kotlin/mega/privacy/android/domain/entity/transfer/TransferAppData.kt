@@ -37,32 +37,4 @@ sealed interface TransferAppData {
      * @param targetUri the target uri in the sd card where the file will be moved once downloaded
      */
     data class SdCardDownload(val targetPath: String, val targetUri: String?) : TransferAppData
-
-    /**
-     * Identify a transfer that will be used to edit a text file
-     * @param mode indicates the download save mode
-     * @param fromHomePage indicates if the transfer comes from home page or not
-     */
-    data class TextFileUpload(val mode: Mode, val fromHomePage: Boolean) :
-        TransferAppData {
-        /**
-         * TextFileData mode
-         */
-        enum class Mode {
-            /**
-             * The text file is created
-             */
-            Create,
-
-            /**
-             * The text file is edited
-             */
-            Edit,
-
-            /**
-             * The text file will be viewed
-             */
-            View,
-        }
-    }
 }

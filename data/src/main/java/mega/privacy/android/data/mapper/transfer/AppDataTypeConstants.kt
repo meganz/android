@@ -11,7 +11,6 @@ internal enum class AppDataTypeConstants(
     ChatUpload("CHAT_UPLOAD", TransferAppData.ChatUpload::class),
     CameraUpload("CU_UPLOAD", TransferAppData.CameraUpload::class),
     SDCardDownload("SD_CARD_DOWNLOAD", TransferAppData.SdCardDownload::class),
-    TextFileUpload("TXT_FILE_UPLOAD", TransferAppData.TextFileUpload::class),
     BackgroundTransfer("BACKGROUND_TRANSFER", TransferAppData.BackgroundTransfer::class);
 
     override fun toString() = sdkTypeValue

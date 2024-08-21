@@ -25,13 +25,6 @@ fun AppDataOwner.isVoiceClip(): Boolean = appData.contains(TransferAppData.Voice
 fun AppDataOwner.isSDCardDownload(): Boolean = appData.any { it is TransferAppData.SdCardDownload }
 
 /**
- * Is text file upload
- *
- * @return True if the transfer is a text file upload, false otherwise.
- */
-fun AppDataOwner.isTextFileUpload(): Boolean = appData.any { it is TransferAppData.TextFileUpload }
-
-/**
  * Is background transfer
  *
  * @return True if the transfer is a background transfer, false otherwise.
@@ -48,7 +41,7 @@ fun AppDataOwner.isBackgroundTransfer(): Boolean =
 )
 fun AppDataOwner.pendingMessageId() =
     appData
-        .filterIsInstance(TransferAppData.ChatUpload::class.java)
+        .filterIsInstance<TransferAppData.ChatUpload>()
         .firstOrNull()
         ?.pendingMessageId
 
@@ -58,7 +51,7 @@ fun AppDataOwner.pendingMessageId() =
 fun AppDataOwner.pendingMessageIds() =
     appData
         .takeIf { it.any { it is TransferAppData.ChatUpload } }
-        ?.filterIsInstance(TransferAppData.ChatUpload::class.java)
+        ?.filterIsInstance<TransferAppData.ChatUpload>()
         ?.map { it.pendingMessageId }
 
 /**
@@ -79,16 +72,6 @@ fun AppDataOwner.getSDCardTransferUri() = getSDCardDownloadAppData()?.targetUri
 fun AppDataOwner.getSDCardDownloadAppData(): TransferAppData.SdCardDownload? =
     if (isSDCardDownload()) {
         appData
-            .filterIsInstance(TransferAppData.SdCardDownload::class.java)
-            .firstOrNull()
-    } else null
-
-/**
- * @return TransferAppData.SdCardDownload associated to this transfer if it's a SdCard download transfer, null otherwise.
- */
-fun AppDataOwner.getTextFileUploadAppData(): TransferAppData.TextFileUpload? =
-    if (isTextFileUpload()) {
-        appData
-            .filterIsInstance(TransferAppData.TextFileUpload::class.java)
+            .filterIsInstance<TransferAppData.SdCardDownload>()
             .firstOrNull()
     } else null

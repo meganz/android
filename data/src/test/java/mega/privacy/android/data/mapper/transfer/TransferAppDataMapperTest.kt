@@ -1,8 +1,11 @@
 package mega.privacy.android.data.mapper.transfer
 
 import com.google.common.truth.Truth
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.*
-import mega.privacy.android.data.mapper.transfer.TextFileModeConstants.*
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.BackgroundTransfer
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.CameraUpload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatUpload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SDCardDownload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_INDICATOR
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_REPEATED_TRANSFER_SEPARATOR
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_SEPARATOR
@@ -119,9 +122,6 @@ class TransferAppDataMapperTest {
             "",
             "something wrong",
             generateAppDataString(ChatUpload),
-            generateAppDataString(TextFileUpload, Create.toString()), //missing mandatory field
-            "$TextFileUpload$Create${APP_DATA_INDICATOR}true", // missing APP_DATA_INDICATOR
-            generateAppDataString(TextFileUpload, Create.toString(), "treu"), //wrong value
             "$SDCardDownload$APP_DATA_INDICATOR", //missing fields
         )
 
@@ -138,21 +138,6 @@ class TransferAppDataMapperTest {
                     to listOf(TransferAppData.BackgroundTransfer),
             generateAppDataString(SDCardDownload, TARGET_PATH, TARGET_URI)
                     to listOf(TransferAppData.SdCardDownload(TARGET_PATH, TARGET_URI)),
-            generateAppDataString(TextFileUpload, Create.toString(), "true")
-                    to listOf(
-                TransferAppData.TextFileUpload(
-                    TransferAppData.TextFileUpload.Mode.Create,
-                    true
-                )
-            ),
-            generateAppDataString(TextFileUpload, Edit.toString(), "false")
-                    to listOf(
-                TransferAppData.TextFileUpload(
-                    TransferAppData.TextFileUpload.Mode.Edit,
-                    false
-                )
-            )
-
         )
 
         private fun generateAppDataString(
