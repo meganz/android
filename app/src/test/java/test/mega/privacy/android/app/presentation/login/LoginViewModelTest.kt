@@ -148,7 +148,6 @@ internal class LoginViewModelTest {
             clearLastRegisteredEmailUseCase = clearLastRegisteredEmailUseCase,
             installReferrerHandler = installReferrerHandler,
             transfersManagement = transfersManagement,
-            createSupportTicketEmailUseCase = mock(),
             clearUserCredentialsUseCase = clearUserCredentialsUseCase,
             startUploadsWorkerUseCase = startUploadsWorkerUseCase,
         )

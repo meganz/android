@@ -40,14 +40,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables report issue via email in login screen
-     */
-    ReportIssueViaEmail(
-        "Enable report issue via email in login screen",
-        true,
-    ),
-
-    /**
      * Enables the report issue button on the login screen
      */
     LoginReportIssueButton(

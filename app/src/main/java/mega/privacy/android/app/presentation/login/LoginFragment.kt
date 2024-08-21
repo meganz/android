@@ -152,13 +152,7 @@ class LoginFragment : Fragment() {
                 onLostAuthenticatorDevice = ::onLostAuthenticationDevice,
                 onBackPressed = { onBackPressed(uiState) },
                 onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed,
-                onReportIssue = {
-                    viewModel.onReportIssue(
-                        getString(R.string.setting_feedback_body),
-                        ::sendSupportEmail,
-                        ::openReportIssueFragment
-                    )
-                },
+                onReportIssue = ::openReportIssueFragment,
             )
         }
     }
