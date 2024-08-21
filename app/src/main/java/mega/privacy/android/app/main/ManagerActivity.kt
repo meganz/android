@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
-import android.provider.ContactsContract
 import android.text.TextUtils
 import android.view.Display
 import android.view.Gravity
@@ -123,7 +122,6 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler
-import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.ActionBackupListener
@@ -304,7 +302,6 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
 import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
@@ -404,9 +401,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var cookieDialogHandler: CookieDialogHandler
-
-    @Inject
-    lateinit var filePrepareUseCase: FilePrepareUseCase
 
     @Inject
     lateinit var getChatChangesUseCase: GetChatChangesUseCase
@@ -645,10 +639,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            Constants.REQUEST_UPLOAD_CONTACT -> {
-                uploadContactInfo(infoManager, parentNodeManager)
-            }
-
             Constants.REQUEST_CAMERA -> {
                 if (typesCameraPermission == Constants.TAKE_PICTURE_OPTION) {
                     Timber.d("TAKE_PICTURE_OPTION")
@@ -5839,27 +5829,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return
         }
         when {
-            requestCode == Constants.REQUEST_CODE_GET_FILES && resultCode == Activity.RESULT_OK -> {
-                if (intent == null) {
-                    Timber.w("Intent NULL")
-                    return
-                }
-                Timber.d("Intent action: %s", intent.action)
-                Timber.d("Intent type: %s", intent.type)
-                intent.action = Intent.ACTION_OPEN_DOCUMENT
-                processFileDialog = showProcessFileDialog(this, intent)
-                filePrepareUseCase.prepareFiles(intent)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { shareInfo: List<ShareInfo> ->
-                            onIntentProcessed(shareInfo)
-                        },
-                        { throwable: Throwable -> Timber.e(throwable) }
-                    )
-                    .addTo(composite)
-            }
-
             requestCode == Constants.REQUEST_CODE_GET_FOLDER -> {
                 UploadUtil.getFolder(this, resultCode, intent, currentParentHandle)
             }
@@ -6348,12 +6317,24 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
+    fun handleFileUris(uris: List<Uri>) {
+        lifecycleScope.launch {
+            runCatching {
+                processFileDialog = showProcessFileDialog(this@ManagerActivity, intent)
+                val documents = viewModel.prepareFiles(uris)
+                onIntentProcessed(documents)
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
     /**
      * Handle processed upload intent.
      *
-     * @param infoList List<ShareInfo> containing all the upload info.
-    </ShareInfo> */
-    private fun onIntentProcessed(infoList: List<ShareInfo>?) {
+     * @param entities List<DocumentEntity> containing all the upload info.
+     */
+    private fun onIntentProcessed(entities: List<DocumentEntity>) {
         Timber.d("onIntentProcessed")
         val parentNode: MegaNode? = getCurrentParentNode(currentParentHandle, -1)
         if (parentNode == null) {
@@ -6367,7 +6348,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return
         }
         val parentHandle = parentNode.handle
-        if (infoList == null) {
+        if (entities.isEmpty()) {
             dismissAlertDialogIfExists(statusDialog)
             dismissAlertDialogIfExists(processFileDialog)
             showSnackbar(
@@ -6387,14 +6368,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         lifecycleScope.launch {
             runCatching {
                 checkFileNameCollisionsUseCase(
-                    files = infoList.map {
-                        DocumentEntity(
-                            name = it.originalFileName,
-                            size = it.size,
-                            lastModified = it.lastModified,
-                            uri = UriPath(it.fileAbsolutePath),
-                        )
-                    },
+                    files = entities,
                     parentNodeId = NodeId(parentHandle)
                 )
             }.onSuccess { collisions ->
@@ -6406,15 +6380,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
                 val collidedSharesPath = collisions.map { it.path.value }.toSet()
-                val sharesWithoutCollision = infoList.filter {
-                    collidedSharesPath.contains(it.fileAbsolutePath).not()
+                val sharesWithoutCollision = entities.filter {
+                    collidedSharesPath.contains(it.uri.value).not()
                 }
                 if (sharesWithoutCollision.isNotEmpty()) {
-                    sharesWithoutCollision.filter { it.isContact }.forEach {
-                        requestContactsPermissions(it, parentNode)
+                    lifecycleScope.launch {
+                        viewModel.uploadFiles(
+                            pathsAndNames = sharesWithoutCollision.map { it.uri.value }
+                                .associateWith { null },
+                            destinationId = NodeId(parentNode.handle)
+                        )
                     }
-                    val shareInfo = sharesWithoutCollision.filter { !it.isContact }
-                    viewModel.uploadShareInfo(shareInfo, parentNode.handle)
                 }
             }.onFailure {
                 dismissAlertDialogIfExists(statusDialog)
@@ -6425,108 +6401,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     this@ManagerActivity
                 )
             }
-        }
-    }
-
-    private fun requestContactsPermissions(info: ShareInfo?, parentNode: MegaNode?) {
-        Timber.d("requestContactsPermissions")
-        if (!hasPermissions(this, Manifest.permission.READ_CONTACTS)) {
-            Timber.w("No read contacts permission")
-            infoManager = info
-            parentNodeManager = parentNode
-            requestPermission(
-                this,
-                Constants.REQUEST_UPLOAD_CONTACT,
-                Manifest.permission.READ_CONTACTS
-            )
-        } else {
-            uploadContactInfo(info, parentNode)
-        }
-    }
-
-    private fun uploadContactInfo(info: ShareInfo?, parentNode: MegaNode?) {
-        Timber.d("Upload contact info")
-        runCatching {
-            val cursorID =
-                info?.contactUri?.let { contentResolver.query(it, null, null, null, null) }
-                    ?: throw NullPointerException("Cursor of ${info?.contactUri} is null")
-            if (cursorID.moveToFirst()) {
-                Timber.d("It is a contact")
-                var id: String? = null
-                try {
-                    id =
-                        cursorID.getString(cursorID.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
-                } catch (exception: IllegalArgumentException) {
-                    Timber.w(exception, "Exception getting contact ID.")
-                }
-                var name: String? = null
-                try {
-                    name =
-                        cursorID.getString(cursorID.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME))
-                } catch (exception: IllegalArgumentException) {
-                    Timber.w(exception, "Exception getting contact display name.")
-                }
-                var hasPhone = -1
-                try {
-                    hasPhone =
-                        cursorID.getInt(cursorID.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER))
-                } catch (exception: IllegalArgumentException) {
-                    Timber.w(exception, "Exception getting contact details.")
-                }
-
-                // get the user's email address
-                var email: String? = null
-                val ce = contentResolver.query(
-                    ContactsContract.CommonDataKinds.Email.CONTENT_URI,
-                    null,
-                    ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
-                    arrayOf(id),
-                    null
-                )
-                if (ce != null && ce.moveToFirst()) {
-                    try {
-                        email =
-                            ce.getString(ce.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Email.DATA))
-                    } catch (exception: IllegalArgumentException) {
-                        Timber.w(exception, "Exception getting contact email.")
-                    }
-                    ce.close()
-                }
-
-                // get the user's phone number
-                var phone: String? = null
-                if (hasPhone > 0) {
-                    val cp = contentResolver.query(
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                        null,
-                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                        arrayOf(id),
-                        null
-                    )
-                    if (cp != null && cp.moveToFirst()) {
-                        try {
-                            phone =
-                                cp.getString(cp.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                        } catch (exception: IllegalArgumentException) {
-                            Timber.w(exception, "Exception getting contact phone number.")
-                        }
-                        cp.close()
-                    }
-                }
-                val data = StringBuilder()
-                data.append(name)
-                if (phone != null) {
-                    data.append(", $phone")
-                }
-                if (email != null) {
-                    data.append(", $email")
-                }
-                createFile(name, data.toString(), parentNode)
-            }
-            cursorID.close()
-        }.onFailure {
-            Timber.e(it)
-            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.error_temporary_unavaible), -1)
         }
     }
 

@@ -445,6 +445,7 @@ internal class FileFacade @Inject constructor(
             targetFile.outputStream().use { output ->
                 inputStream.copyTo(output)
             }
+            targetFile.setLastModified(sourceFile.lastModified())
         }
     }
 

@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.manager
 
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.Event
 import app.cash.turbine.test
@@ -63,6 +64,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
@@ -95,6 +97,7 @@ import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
@@ -332,6 +335,8 @@ class ManagerViewModelTest {
         onBlocking { invoke() }.thenReturn(monitorUpgradeDialogClosedFlow)
     }
 
+    private val filePrepareUseCase = mock<FilePrepareUseCase>()
+
 
     private fun initViewModel() {
         underTest = ManagerViewModel(
@@ -414,7 +419,8 @@ class ManagerViewModelTest {
             monitorDevicePowerConnectionStateUseCase = mock {
                 on { invoke() }.thenReturn(monitorDevicePowerConnectionFakeFlow)
             },
-            startOfflineSyncWorkerUseCase = startOfflineSyncWorkerUseCase
+            startOfflineSyncWorkerUseCase = startOfflineSyncWorkerUseCase,
+            filePrepareUseCase = filePrepareUseCase
         )
     }
 
@@ -464,7 +470,8 @@ class ManagerViewModelTest {
             broadcastHomeBadgeCountUseCase,
             monitorUpgradeDialogClosedUseCase,
             monitorContactRequestUpdatesUseCase,
-            startOfflineSyncWorkerUseCase
+            startOfflineSyncWorkerUseCase,
+            filePrepareUseCase
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
@@ -1484,21 +1491,29 @@ class ManagerViewModelTest {
     fun `test that state is updated correctly if upload a ShareInfo`() = runTest {
         val file = File("path")
         val path = file.absolutePath
-        val shareInfo = mock<ShareInfo> {
-            on { fileAbsolutePath } doReturn path
-        }
         val parentHandle = 123L
+        val pathsAndNames = mapOf(path to path)
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
-                mapOf(path to null),
+                pathsAndNames,
                 NodeId(parentHandle)
             )
         )
 
-        underTest.uploadShareInfo(listOf(shareInfo), parentHandle)
+        underTest.uploadFiles(pathsAndNames, NodeId(parentHandle))
         underTest.state.map { it.uploadEvent }.test {
             assertThat(awaitItem()).isEqualTo(expected)
         }
+    }
+
+    @Test
+    fun `test that prepareFiles invokes correctly`() = runTest {
+        val uri = mock<Uri> {
+            on { toString() } doReturn "uri"
+        }
+
+        underTest.prepareFiles(listOf(uri))
+        verify(filePrepareUseCase).invoke(listOf(UriPath("uri")))
     }
 
     companion object {

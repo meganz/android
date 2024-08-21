@@ -9,7 +9,6 @@ import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -60,7 +59,7 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
     ShowNewFolderDialogActionListener,
     ShowNewTextFileDialogActionListener {
 
-    private val managerActivity = activity as AppCompatActivity
+    private val managerActivity = activity as ManagerActivity
     private val parentNodeManager = activity as ParentNodeManager
     private val cameraPermissionManager = activity as CameraPermissionManager
     private val navigationDrawerManager = activity as NavigationDrawerManager
@@ -94,6 +93,13 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
         newTextFileDialog?.dismiss()
     }
 
+    private val openMultipleDocumentLauncher =
+        managerActivity.registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) {
+            if (it.isNotEmpty()) {
+                managerActivity.handleFileUris(it)
+            }
+        }
+
     /**
      * When manually uploading Files and the device is running Android 13 and above, this Launcher
      * is called to request the Notification Permission (if possible) and upload Files regardless
@@ -102,7 +108,7 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
     private val manualUploadFilesLauncher: ActivityResultLauncher<String> =
         managerActivity.registerForActivityResult(
             ActivityResultContracts.RequestPermission()
-        ) { activity.uploadFilesManually() }
+        ) { openMultipleDocumentLauncher.launch(arrayOf("*/*")) }
 
     /**
      * When manually uploading a Folder and the device is running Android 13 and above, this Launcher
