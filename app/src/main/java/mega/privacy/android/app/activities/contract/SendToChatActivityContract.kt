@@ -15,7 +15,9 @@ class SendToChatActivityContract :
     ActivityResultContract<LongArray, SendToChatResult?>() {
     override fun createIntent(context: Context, input: LongArray): Intent {
         val intent = Intent(context, ChatExplorerActivity::class.java)
-        intent.putExtra(Constants.NODE_HANDLES, input)
+        if (input.isNotEmpty()) {
+            intent.putExtra(Constants.NODE_HANDLES, input)
+        }
         return intent
     }
 

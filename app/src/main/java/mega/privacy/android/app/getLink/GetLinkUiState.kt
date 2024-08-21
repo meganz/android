@@ -12,5 +12,5 @@ data class GetLinkUiState(
     val key: String = "",
     val linkWithoutKey: String = "",
     val password: String? = null,
-    val linkWithPassword: String? = null
+    val linkWithPassword: String? = null,
 )

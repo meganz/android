@@ -3,18 +3,20 @@ package mega.privacy.android.app.getLink
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
-import android.app.Activity.RESULT_OK
 import android.app.DatePickerDialog
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.text.method.PasswordTransformationMethod
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.ViewGroup
 import android.widget.DatePicker
-import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
@@ -32,27 +34,35 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
+import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.interfaces.showSnackbarWithChat
+import mega.privacy.android.app.main.model.SendToChatResult
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_DISABLED
+import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_ENABLED
+import mega.privacy.android.app.utils.Constants.HANDLE
+import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
+import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.ThumbnailUtils.getRoundedBitmap
-import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.Util.calculateDateFromTimestamp
+import mega.privacy.android.app.utils.Util.calculateTimestamp
+import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 import javax.inject.Inject
 
 /**
@@ -72,7 +82,15 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
     private val viewModel: GetLinkViewModel by activityViewModels()
 
     private lateinit var binding: FragmentGetLinkBinding
-    private lateinit var chatLauncher: ActivityResultLauncher<Unit?>
+    private val chatLauncher = registerForActivityResult(SendToChatActivityContract()) {
+        if (it != null) {
+            if (viewModel.shouldShowShareKeyOrPasswordDialog()) {
+                showShareKeyOrPasswordDialog(SEND_TO_CHAT, it)
+            } else {
+                viewModel.sendLinkToChat(it, shouldAttachKeyOrPassword = false)
+            }
+        }
+    }
 
     private var passwordVisible = false
 
@@ -83,21 +101,6 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        chatLauncher = registerForActivityResult(ChatExplorerActivityContract()) { data ->
-            if (data != null) {
-                if (viewModel.shouldShowShareKeyOrPasswordDialog()) {
-                    showShareKeyOrPasswordDialog(SEND_TO_CHAT, data)
-                } else {
-                    viewModel.sendToChat(data, shouldAttachKeyOrPassword = false) { intent ->
-                        handleActivityResult(intent)
-                    }
-                }
-            }
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -149,7 +152,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             }
 
             R.id.action_chat -> {
-                chatLauncher.launch(Unit)
+                chatLauncher.launch(longArrayOf())
             }
         }
 
@@ -238,6 +241,23 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             it?.let { pair ->
                 copyToClipboard(pair)
                 viewModel.resetLink()
+            }
+        }
+        viewLifecycleOwner.collectFlow(viewModel.sendLinkToChatResult) {
+            it?.let { sendLinkToChatResult ->
+                val message = when (sendLinkToChatResult) {
+                    is SendLinkResult.LinkWithKey -> getString(R.string.link_and_key_sent)
+                    is SendLinkResult.LinkWithPassword -> getString(R.string.link_and_password_sent)
+                    is SendLinkResult.NormalLink -> resources.getQuantityString(
+                        R.plurals.links_sent,
+                        1
+                    )
+                }
+                (activity as? SnackbarShower)?.showSnackbarWithChat(
+                    message,
+                    sendLinkToChatResult.chatId
+                )
+                viewModel.onShareLinkResultHandled()
             }
         }
         viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
@@ -349,6 +369,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      * @param password The password if set, null otherwise.
      */
     private fun updatePassword(password: String?) {
+        if (binding.passwordProtectionSetText.text == password) return
         val isPasswordSet = !isTextEmpty(password)
         val visibility = if (isPasswordSet) VISIBLE else GONE
 
@@ -591,7 +612,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      * @param type Indicates if the share is send to chat or share outside the app.
      * @param data Intent containing the info to share to chat or null if is sharing outside the app.
      */
-    private fun showShareKeyOrPasswordDialog(type: Int, data: Intent? = null) {
+    private fun showShareKeyOrPasswordDialog(type: Int, data: SendToChatResult? = null) {
         MaterialAlertDialogBuilder(requireContext())
             .setMessage(
                 getString(
@@ -609,8 +630,8 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
                 if (type == SHARE) {
                     viewModel.shareLinkAndKeyOrPassword { intent -> startActivity(intent) }
                 } else if (type == SEND_TO_CHAT) {
-                    viewModel.sendLinkToChat(data, true) { intent ->
-                        handleActivityResult(intent)
+                    data?.let {
+                        viewModel.sendLinkToChat(it, true)
                     }
                 }
             }
@@ -618,27 +639,13 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
                 if (type == SHARE) {
                     viewModel.shareCompleteLink { intent -> startActivity(intent) }
                 } else if (type == SEND_TO_CHAT) {
-                    viewModel.sendLinkToChat(data, false) { intent ->
-                        handleActivityResult(intent)
+                    data?.let {
+                        viewModel.sendLinkToChat(it, false)
                     }
                 }
             }
             .create()
             .show()
-    }
-
-    /**
-     * Finishes the send to chat action.
-     *
-     * @param data Intent containing the info to send.
-     */
-    private fun handleActivityResult(data: Intent?) {
-        MegaAttacher(requireActivity() as ActivityLauncher).handleActivityResult(
-            REQUEST_CODE_SELECT_CHAT,
-            RESULT_OK,
-            data,
-            requireActivity() as SnackbarShower
-        )
     }
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {

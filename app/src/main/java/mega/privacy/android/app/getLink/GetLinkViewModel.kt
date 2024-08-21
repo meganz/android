@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -15,15 +14,18 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.main.model.SendToChatResult
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
+import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
+import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -52,7 +54,9 @@ class GetLinkViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val hasSensitiveDescendantUseCase: HasSensitiveDescendantUseCase,
     private val hasSensitiveInheritedUseCase: HasSensitiveInheritedUseCase,
-) : ViewModel() {
+    get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
+    sendTextMessageUseCase: SendTextMessageUseCase,
+) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
 
     private val linkText: MutableLiveData<String> = MutableLiveData()
     private val expiryDate: MutableLiveData<String> = MutableLiveData()
@@ -98,7 +102,6 @@ class GetLinkViewModel @Inject constructor(
      */
     fun initNode(handle: Long) {
         updateLink(handle = handle)
-        resetLinkWithPassword()
     }
 
     /**
@@ -297,38 +300,12 @@ class GetLinkViewModel @Inject constructor(
     }
 
     fun sendLinkToChat(
-        data: Intent?,
+        data: SendToChatResult,
         shouldAttachKeyOrPassword: Boolean,
-        action: (Intent?) -> Unit,
     ) {
-        sendToChat(data, getLinkToShare(), shouldAttachKeyOrPassword, action)
-    }
-
-    /**
-     * Shares the link and extra content if enabled (decryption key or password) to chat.
-     *
-     * @param data                      Intent containing the info to share the content to chats.
-     * @param link                      The link to share.
-     * @param shouldAttachKeyOrPassword True if should share the decryption key or password. False otherwise.
-     * @param action                    Action to perform.
-     */
-    fun sendToChat(
-        data: Intent?,
-        link: String? = null,
-        shouldAttachKeyOrPassword: Boolean,
-        action: (Intent?) -> Unit,
-    ) {
-        data?.putExtra(Constants.EXTRA_LINK, link ?: node?.publicLink)
-
-        if (shouldAttachKeyOrPassword) {
-            if (!getLinkWithPassword().isNullOrEmpty()) {
-                data?.putExtra(Constants.EXTRA_PASSWORD, getPasswordText())
-            } else {
-                data?.putExtra(Constants.EXTRA_KEY, state.value.key)
-            }
-        }
-
-        action.invoke(data)
+        val key = _state.value.key.takeIf { shouldAttachKeyOrPassword }
+        val password = getPasswordText()?.takeIf { shouldAttachKeyOrPassword }
+        sendToChat(data = data, link = getLinkToShare(), key = key, password = password)
     }
 
     /**
@@ -341,7 +318,11 @@ class GetLinkViewModel @Inject constructor(
         if (!getLinkWithPassword().isNullOrEmpty()) context.getString(
             R.string.share_link_with_password, getLinkWithPassword(), getPasswordText()
         )
-        else context.getString(R.string.share_link_with_key, state.value.linkWithoutKey, state.value.key)
+        else context.getString(
+            R.string.share_link_with_key,
+            state.value.linkWithoutKey,
+            state.value.key
+        )
 
     /**
      * Gets the link to share depending on the current enabled option. It can be:
