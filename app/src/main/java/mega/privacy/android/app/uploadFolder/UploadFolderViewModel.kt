@@ -8,8 +8,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +17,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
@@ -42,14 +39,11 @@ import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * ViewModel which manages data of [UploadFolderActivity].
- *
- * @property transfersManagement        Required for checking transfers status.
  */
 @HiltViewModel
 class UploadFolderViewModel @Inject constructor(
     private val getFilesInDocumentFolderUseCase: GetFilesInDocumentFolderUseCase,
     private val applySortOrderToDocumentFolderUseCase: ApplySortOrderToDocumentFolderUseCase,
-    private val transfersManagement: TransfersManagement,
     private val documentEntityDataMapper: DocumentEntityDataMapper,
     private val searchFilesInDocumentFolderRecursiveUseCase: SearchFilesInDocumentFolderRecursiveUseCase,
     private val checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase,
@@ -57,8 +51,6 @@ class UploadFolderViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(UploadFolderViewState())
     val uiState = _uiState.asStateFlow()
-
-    private val composite = CompositeDisposable()
 
     private val currentFolder: MutableLiveData<FolderContent.Data> = MutableLiveData()
     private val folderItems: MutableLiveData<MutableList<FolderContent>> = MutableLiveData()
@@ -72,7 +64,6 @@ class UploadFolderViewModel @Inject constructor(
     private var isList: Boolean = true
     var query: String? = null
     private var isPendingToFinishSelection = false
-    private var getContentDisposable: Disposable? = null
     private var nameCollisionJob: Job? = null
     private var pendingUploads: MutableList<FolderContent.Data> = mutableListOf()
     private val folderTree = mutableMapOf<UriPath, DocumentFolder>()
@@ -413,21 +404,6 @@ class UploadFolderViewModel @Inject constructor(
                 )
             )
         }
-    }
-
-    /**
-     * Cancels the current upload process.
-     */
-    fun cancelUpload() {
-        if (transfersManagement.shouldBreakTransfersProcessing()) {
-            getContentDisposable?.dispose()
-            nameCollisionJob?.cancel()
-        }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        composite.clear()
     }
 
     fun consumeTransferTriggerEvent() {

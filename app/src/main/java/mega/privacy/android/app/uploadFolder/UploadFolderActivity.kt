@@ -8,8 +8,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
@@ -24,13 +22,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
-import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
-import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFERS_CANCELLED
 import mega.privacy.android.app.databinding.ActivityUploadFolderBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.fragments.homepage.EventObserver
@@ -49,7 +45,6 @@ import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.utils.Constants.EXTRA_ACTION_RESULT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_COLLISION_RESULTS
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
-import mega.privacy.android.app.utils.Constants.LONG_SNACKBAR_DURATION
 import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.Util
@@ -334,14 +329,6 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
             folderContentAdapter.notifyItemChanged(0)
             viewModel.setOrder(order.offlineSortOrder)
         }
-
-        LiveEventBus.get(EVENT_SCANNING_TRANSFERS_CANCELLED, Boolean::class.java)
-            .observe(this) { cancelled ->
-                if (cancelled) {
-                    viewModel.cancelUpload()
-                    Handler(Looper.getMainLooper()).postDelayed(::finish, LONG_SNACKBAR_DURATION)
-                }
-            }
     }
 
     /**

@@ -27,7 +27,6 @@ class UploadFolderViewModelTest {
         underTest = UploadFolderViewModel(
             getFilesInDocumentFolderUseCase = mock(),
             applySortOrderToDocumentFolderUseCase = mock(),
-            transfersManagement = mock(),
             documentEntityDataMapper = mock(),
             searchFilesInDocumentFolderRecursiveUseCase = mock(),
             checkFileNameCollisionsUseCase = checkFileNameCollisionsUseCase
