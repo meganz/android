@@ -586,4 +586,62 @@
     <string name="report_issue_error_minimum_characters">お問い合わせは10文字以上でお願いします</string>
     <!-- placeholder message for report issue-->
     <string name="report_issue_description_placeholder_message">問題を10文字以上でご説明ください</string>
+    <!--Title text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_title">会話をプライベートに保つ</string>
+    <!--Subtitle text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_subtitle">すべてのメッセージ、グループチャット、通話は当社のゼロ知識暗号化によって保護されています。[A]詳細[/A]</string>
+    <!-- Label of the action button of inviting a friend from contact screen -->
+    <string name="chat_recent_invite_friend">友人を招待する</string>
+    <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_title">自信を持って友人を招待</string>
+    <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_subtitle">一流のセキュリティおよび認証コードを利用すると、詐欺、データマイニング、情報の盗難を恐れることなく連絡できます。</string>
+    <!-- Label shown when the user wants to add contacts into his MEGA account -->
+    <string name="invite_contacts_action_label">招待</string>
+    <!-- Share hidden folder description -->
+    <string name="share_hidden_folder_description">このフォルダには隠し項目があります。フォルダを共有すると、共有相手には非表示の項目が表示されます。それらの項目は引き続きクラウドドライブに隠されたままです。</string>
+    <!-- Share hidden folders description -->
+    <string name="share_hidden_folders_description">これらのフォルダの1つ以上に隠し項目があります。フォルダを共有すると、共有相手には非表示の項目が表示されることになります。当該項目は引き続きあなたのクラウドドライブに隠されたままになります。</string>
+    <!-- Title shown at the top of the survey screen when cancelling the subscription -->
+    <string name="account_cancel_subscription_survey_title">去ってしまうのは残念です！サブスクリプションをキャンセルする理由を教えていただけますか？</string>
+    <!-- Message explaining the immediate effect of subscription cancellation -->
+    <string name="account_cancel_subscription_survey_cancellation_message">サブスクリプションはすぐにキャンセルされ、現在のプランの有効期限が切れると、無料のMEGAアカウントに移行されます。注意：サブスクリプションをキャンセルしてもアカウントは削除されません。</string>
+    <!-- Warning message shown in a red box when no reason is selected -->
+    <string name="account_cancel_subscription_survey_no_reason_selected">サブスクリプションをキャンセルする理由を選択してください</string>
+    <!-- Option in the survey indicating that the plan is too expensive -->
+    <string name="account_cancel_subscription_survey_option_expensive">プランが高すぎることがわかりました</string>
+    <!-- Option in the survey indicating that the user can no longer afford the plan -->
+    <string name="account_cancel_subscription_survey_option_cannot_afford">お金を払う余裕がなくなりました</string>
+    <!-- Option in the survey indicating that the user doesn't want a subscription or auto-billing -->
+    <string name="account_cancel_subscription_survey_option_no_subscription">サブスクリプションや自動請求は希望しません</string>
+    <!-- Option in the survey indicating that the user doesn't need all the storage in their plan -->
+    <string name="account_cancel_subscription_survey_option_no_storage_need">プランにあるストレージがすべて必要なわけではありません</string>
+    <!-- Option in the survey indicating that the user needs features MEGA doesn't have -->
+    <string name="account_cancel_subscription_survey_option_missing_features">MEGAにはない機能が必要です</string>
+    <!-- Option in the survey indicating that the user is switching to a different provider -->
+    <string name="account_cancel_subscription_survey_option_switch_provider">より気に入ったプロバイダーに切り替えます</string>
+    <!-- Option in the survey indicating that the user finds MEGA confusing and difficult to use -->
+    <string name="account_cancel_subscription_survey_option_confusing">MEGAはわかりにくくて使いにくいと思います</string>
+    <!-- Option in the survey indicating dissatisfaction with support and customer service -->
+    <string name="account_cancel_subscription_survey_option_dissatisfied_support">サポートやカスタマーサービスに満足していません</string>
+    <!-- Option in the survey indicating that the plan was needed temporarily -->
+    <string name="account_cancel_subscription_survey_option_temporary_use">このプランは一時的に必要でしたが、もう使用しません</string>
+    <!-- Option in the survey for other reasons, with a prompt to provide details -->
+    <string name="account_cancel_subscription_survey_option_other">その他（詳細をご記入ください）</string>
+    <!-- Checkbox allowing MEGA to contact the user for further discussion -->
+    <string name="account_cancel_subscription_survey_allow_contact">このトピックについてさらに詳しく話すために、MEGAが私に連絡することを許可します</string>
+    <!-- Button label to cancel the subscription -->
+    <string name="account_cancel_subscription_survey_cancel_button">サブスクリプションをキャンセル</string>
+    <!-- Button label to not cancel the subscription -->
+    <string name="account_cancel_subscription_survey_do_not_cancel_button">キャンセルしない</string>
+    <!-- Video recently watched title of the video section  -->
+    <string name="video_section_title_video_recently_watched">最近視聴</string>
+    <!-- Text that there is no recent activity of the video recently watched page  -->
+    <string name="video_section_empty_hint_no_recently_activity">最近のアクティビティはありません</string>
+    <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Remove from recently watched</string>
+    <!-- Message that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_message_remove_recently_watched_item">Removed from recently watched.</string>
+    <!-- Message that clear recently watched in the video recently watched page  -->
+    <string name="video_section_message_clear_recently_watched">Recently watched has been cleared</string>
 </resources>

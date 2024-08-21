@@ -630,4 +630,62 @@
     <string name="report_issue_error_minimum_characters">Enquiries must be at least 10 characters</string>
     <!-- placeholder message for report issue-->
     <string name="report_issue_description_placeholder_message">Describe the issue with at least 10 characters</string>
+    <!--Title text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_title">Keep conversations private</string>
+    <!--Subtitle text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_subtitle">All your messages, group chats, and calls are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <!-- Label of the action button of inviting a friend from contact screen -->
+    <string name="chat_recent_invite_friend">ادع صديقاً</string>
+    <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_title">Invite friends with confidence</string>
+    <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_subtitle">With top-notch security and verification codes, reach out without fear of scams, data mining, or information theft</string>
+    <!-- Label shown when the user wants to add contacts into his MEGA account -->
+    <string name="invite_contacts_action_label">ادعو</string>
+    <!-- Share hidden folder description -->
+    <string name="share_hidden_folder_description">هناك عناصر مخفية في هذا المجلد. تعني مشاركة المجلد أن العناصر المخفية مرئية لأولئك الذين تشاركهم معهم. ستظل العناصر مخفية في السواقة السحابية الخاص بك.</string>
+    <!-- Share hidden folders description -->
+    <string name="share_hidden_folders_description">هناك عناصر مخفية في واحد أو أكثر من هذه المجلدات. تعني مشاركة المجلدات أن العناصر المخفية مرئية لأولئك الذين تشاركهم معهم. ستظل العناصر مخفية في السواقة السحابية الخاص بك.</string>
+    <!-- Title shown at the top of the survey screen when cancelling the subscription -->
+    <string name="account_cancel_subscription_survey_title">We’re sorry to see you leave! Can you tell us why you’re cancelling your subscription?</string>
+    <!-- Message explaining the immediate effect of subscription cancellation -->
+    <string name="account_cancel_subscription_survey_cancellation_message">Your subscription will be cancelled immediately and you will be moved to a free MEGA account when your current plan expires. Note: Cancelling your subscription won’t delete your account.</string>
+    <!-- Warning message shown in a red box when no reason is selected -->
+    <string name="account_cancel_subscription_survey_no_reason_selected">حدد سببًا لإلغاء اشتراكك</string>
+    <!-- Option in the survey indicating that the plan is too expensive -->
+    <string name="account_cancel_subscription_survey_option_expensive">لقد وجدت باقتي غالية جداً</string>
+    <!-- Option in the survey indicating that the user can no longer afford the plan -->
+    <string name="account_cancel_subscription_survey_option_cannot_afford">لم أعد أستطيع تحمل تكلفته</string>
+    <!-- Option in the survey indicating that the user doesn't want a subscription or auto-billing -->
+    <string name="account_cancel_subscription_survey_option_no_subscription">لا أريد اشتراكًا أو فوترة تلقائية</string>
+    <!-- Option in the survey indicating that the user doesn't need all the storage in their plan -->
+    <string name="account_cancel_subscription_survey_option_no_storage_need">لا أحتاج إلى كل مساحة التخزين في باقتي</string>
+    <!-- Option in the survey indicating that the user needs features MEGA doesn't have -->
+    <string name="account_cancel_subscription_survey_option_missing_features">أحتاج ميزات لا تتوفر في ميغا MEGA</string>
+    <!-- Option in the survey indicating that the user is switching to a different provider -->
+    <string name="account_cancel_subscription_survey_option_switch_provider">أنا أقوم بالتغيير إلى مقدم خدمة أفضله أكثر</string>
+    <!-- Option in the survey indicating that the user finds MEGA confusing and difficult to use -->
+    <string name="account_cancel_subscription_survey_option_confusing">أجد ميغا MEGA محيرة وصعبة الاستخدام</string>
+    <!-- Option in the survey indicating dissatisfaction with support and customer service -->
+    <string name="account_cancel_subscription_survey_option_dissatisfied_support">لست سعيدًا بالدعم وخدمة العملاء</string>
+    <!-- Option in the survey indicating that the plan was needed temporarily -->
+    <string name="account_cancel_subscription_survey_option_temporary_use">كنت بحاجة إلى هذه الباقة مؤقتًا ولم أعد أستخدمها</string>
+    <!-- Option in the survey for other reasons, with a prompt to provide details -->
+    <string name="account_cancel_subscription_survey_option_other">أخرى (يرجى تقديم التفاصيل)</string>
+    <!-- Checkbox allowing MEGA to contact the user for further discussion -->
+    <string name="account_cancel_subscription_survey_allow_contact">I allow MEGA to contact me to talk about this topic further</string>
+    <!-- Button label to cancel the subscription -->
+    <string name="account_cancel_subscription_survey_cancel_button">إلغاء الاشتراك</string>
+    <!-- Button label to not cancel the subscription -->
+    <string name="account_cancel_subscription_survey_do_not_cancel_button">لا تلغي</string>
+    <!-- Video recently watched title of the video section  -->
+    <string name="video_section_title_video_recently_watched">Recently watched</string>
+    <!-- Text that there is no recent activity of the video recently watched page  -->
+    <string name="video_section_empty_hint_no_recently_activity">لا وجود لأي نشاط مؤخراً</string>
+    <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Remove from recently watched</string>
+    <!-- Message that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_message_remove_recently_watched_item">Removed from recently watched.</string>
+    <!-- Message that clear recently watched in the video recently watched page  -->
+    <string name="video_section_message_clear_recently_watched">Recently watched has been cleared</string>
 </resources>

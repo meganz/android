@@ -1743,7 +1743,7 @@
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">Copier dans le presse-papiers</string>
     <!-- Option that permits user logout -->
-    <string name="proceed_to_logout">Poursuivre la déconnexion</string>
+    <string name="proceed_to_logout">Vous déconnecter</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="recovery_key_bottom_sheet">Clé de récupération</string>
     <!-- Option that permits user save on File System -->

@@ -587,15 +587,73 @@
     <string name="settings_sync_debris_cleared_message">Ordner .debris erfolgreich geleert</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="one">Found %1$s and %2$d file.</item>
-        <item quantity="other">Found %1$s and %2$d files.</item>
+        <item quantity="one">%1$s und %2$d Datei gefunden.</item>
+        <item quantity="other">%1$s und %2$d Dateien gefunden.</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">No tags</string>
+    <string name="file_info_information_no_tags_label">Keine Tags</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Transfers werden abgebrochen&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Enquiries must be at least 10 characters</string>
+    <string name="report_issue_error_minimum_characters">Anfragen müssen mindestens 10 Zeichen lang sein</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Describe the issue with at least 10 characters</string>
+    <string name="report_issue_description_placeholder_message">Beschreiben Sie das Problem und verwenden Sie dabei mindestens 10 Zeichen</string>
+    <!--Title text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_title">Schützen Sie Ihre Unterhaltungen</string>
+    <!--Subtitle text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_subtitle">Alle Ihre Nachrichten, Gruppenchats und Anrufe sind durch unsere Zero-Knowledge-Verschlüsselung geschützt. [A]Mehr erfahren[/A]</string>
+    <!-- Label of the action button of inviting a friend from contact screen -->
+    <string name="chat_recent_invite_friend">Einen Freund einladen</string>
+    <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_title">Laden Sie bedenkenlos Freunde ein</string>
+    <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_subtitle">Dank unserer erstklassigen Sicherheit und unserer Verifizierungscodes können Sie ohne Angst vor Betrug, Data Mining oder Informationsdiebstahl Ihre Kontakte pflegen</string>
+    <!-- Label shown when the user wants to add contacts into his MEGA account -->
+    <string name="invite_contacts_action_label">Einladen</string>
+    <!-- Share hidden folder description -->
+    <string name="share_hidden_folder_description">Dieser Ordner enthält verborgene Inhalte. Durch die Freigabe werden die verborgenen Inhalte für die Personen sichtbar, für die Sie den Ordner freigeben. Die Inhalte bleiben in Ihrem Cloud Drive weiterhin verborgen.</string>
+    <!-- Share hidden folders description -->
+    <string name="share_hidden_folders_description">Es gibt verborgene Inhalte in einem oder mehreren dieser Ordner. Durch die Freigabe werden die verborgenen Inhalte für die Personen sichtbar, für die Sie die Ordner freigeben. Die Inhalte bleiben in Ihrem Cloud Drive weiterhin verborgen.</string>
+    <!-- Title shown at the top of the survey screen when cancelling the subscription -->
+    <string name="account_cancel_subscription_survey_title">Es tut uns leid, dass Sie uns verlassen! Könnten Sie uns den Grund für die Kündigung Ihres Abonnements verraten?</string>
+    <!-- Message explaining the immediate effect of subscription cancellation -->
+    <string name="account_cancel_subscription_survey_cancellation_message">Wenn Ihr aktuelles Abonnement ausläuft, wird das Abonnement sofort beendet, und Sie werden auf einen kostenlosen MEGA-Account umgestellt. Hinweis: Durch die Beendigung Ihres Abonnements wird Ihr Account nicht gelöscht.</string>
+    <!-- Warning message shown in a red box when no reason is selected -->
+    <string name="account_cancel_subscription_survey_no_reason_selected">Bitte wählen Sie den Grund für die Kündigung Ihres Abonnements aus</string>
+    <!-- Option in the survey indicating that the plan is too expensive -->
+    <string name="account_cancel_subscription_survey_option_expensive">Ich fand mein Paket zu teuer</string>
+    <!-- Option in the survey indicating that the user can no longer afford the plan -->
+    <string name="account_cancel_subscription_survey_option_cannot_afford">Ich kann es mir nicht mehr leisten</string>
+    <!-- Option in the survey indicating that the user doesn't want a subscription or auto-billing -->
+    <string name="account_cancel_subscription_survey_option_no_subscription">Ich möchte kein Abonnement und keine automatischen Abbuchungen</string>
+    <!-- Option in the survey indicating that the user doesn't need all the storage in their plan -->
+    <string name="account_cancel_subscription_survey_option_no_storage_need">Ich benötige nicht den vielen Speicherplatz in meinem Paket</string>
+    <!-- Option in the survey indicating that the user needs features MEGA doesn't have -->
+    <string name="account_cancel_subscription_survey_option_missing_features">Ich benötige Funktionen, die MEGA nicht bietet</string>
+    <!-- Option in the survey indicating that the user is switching to a different provider -->
+    <string name="account_cancel_subscription_survey_option_switch_provider">Ich wechsle zu einem Anbieter, der mir besser gefällt</string>
+    <!-- Option in the survey indicating that the user finds MEGA confusing and difficult to use -->
+    <string name="account_cancel_subscription_survey_option_confusing">Ich finde MEGA verwirrend und schwierig zu benutzen</string>
+    <!-- Option in the survey indicating dissatisfaction with support and customer service -->
+    <string name="account_cancel_subscription_survey_option_dissatisfied_support">Ich bin unzufrieden mit dem Support oder dem Kundenservice</string>
+    <!-- Option in the survey indicating that the plan was needed temporarily -->
+    <string name="account_cancel_subscription_survey_option_temporary_use">Ich habe dieses Abonnement vorübergehend benötigt und benutze es nicht mehr</string>
+    <!-- Option in the survey for other reasons, with a prompt to provide details -->
+    <string name="account_cancel_subscription_survey_option_other">Sonstiges (bitte Einzelheiten angeben)</string>
+    <!-- Checkbox allowing MEGA to contact the user for further discussion -->
+    <string name="account_cancel_subscription_survey_allow_contact">MEGA darf mich kontaktieren, um dieses Thema weiter zu besprechen</string>
+    <!-- Button label to cancel the subscription -->
+    <string name="account_cancel_subscription_survey_cancel_button">Abonnement kündigen</string>
+    <!-- Button label to not cancel the subscription -->
+    <string name="account_cancel_subscription_survey_do_not_cancel_button">Nicht absagen</string>
+    <!-- Video recently watched title of the video section  -->
+    <string name="video_section_title_video_recently_watched">Kürzlich angesehen</string>
+    <!-- Text that there is no recent activity of the video recently watched page  -->
+    <string name="video_section_empty_hint_no_recently_activity">Keine Aktivität</string>
+    <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Remove from recently watched</string>
+    <!-- Message that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_message_remove_recently_watched_item">Removed from recently watched.</string>
+    <!-- Message that clear recently watched in the video recently watched page  -->
+    <string name="video_section_message_clear_recently_watched">Recently watched has been cleared</string>
 </resources>

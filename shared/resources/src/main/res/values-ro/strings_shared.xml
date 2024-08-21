@@ -598,8 +598,9 @@
     <string name="settings_sync_debris_cleared_message">Folderul .debris a fost șters</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="one">Found %1$s and %2$d file.</item>
-        <item quantity="other">Found %1$s and %2$d files.</item>
+        <item quantity="one">Au fost găsite %1$s și %2$d&#160;fișier.</item>
+        <item quantity="few">Au fost găsite %1$s și %2$d&#160;fișiere.</item>
+        <item quantity="other">Au fost găsite %1$s și %2$d de fișiere.</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->
     <string name="file_info_information_no_tags_label">Nicio etichetă</string>
@@ -609,4 +610,62 @@
     <string name="report_issue_error_minimum_characters">Întrebările trebuie să aibă cel puțin 10&#160;caractere</string>
     <!-- placeholder message for report issue-->
     <string name="report_issue_description_placeholder_message">Descrieți problema cu cel puțin 10&#160;caractere</string>
+    <!--Title text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_title">Păstrați conversațiile private</string>
+    <!--Subtitle text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_subtitle">Toate mesajele, chat-urile de grup și apelurile dvs. sunt protejate de criptarea tip zero cunoștințe. [A]Aflați mai multe[/A]</string>
+    <!-- Label of the action button of inviting a friend from contact screen -->
+    <string name="chat_recent_invite_friend">Invitați un prieten</string>
+    <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_title">Invitați prietenii cu încredere</string>
+    <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_subtitle">Datorită securității de primă clasă cu coduri de verificare, puteți comunica fără teama de escrocherii, extragere de date sau furt de informații.</string>
+    <!-- Label shown when the user wants to add contacts into his MEGA account -->
+    <string name="invite_contacts_action_label">Invitați</string>
+    <!-- Share hidden folder description -->
+    <string name="share_hidden_folder_description">Există elemente ascunse în acest folder. Partajarea folderului va însemna că elementele ascunse sunt vizibile pentru cei cu care partajați. Elementele vor fi în continuare ascunse în Unitatea cloud.</string>
+    <!-- Share hidden folders description -->
+    <string name="share_hidden_folders_description">Există elemente ascunse într-unul sau mai multe dintre aceste folder. Partajarea folderelor va însemna că elementele ascunse sunt vizibile pentru cei cu care partajați. Elementele vor fi în continuare ascunse în Unitatea cloud.</string>
+    <!-- Title shown at the top of the survey screen when cancelling the subscription -->
+    <string name="account_cancel_subscription_survey_title">Ne pare rău să vă vedem plecând. Puteți să ne spuneți de ce vă anulați abonamentul?</string>
+    <!-- Message explaining the immediate effect of subscription cancellation -->
+    <string name="account_cancel_subscription_survey_cancellation_message">Abonamentul dvs. va fi anulat imediat și veți fi mutat într-un cont MEGA gratuit când expiră abonamentul curent. Notă: Anularea abonamentului nu vă va șterge contul.</string>
+    <!-- Warning message shown in a red box when no reason is selected -->
+    <string name="account_cancel_subscription_survey_no_reason_selected">Selectați un motiv pentru anularea abonamentului</string>
+    <!-- Option in the survey indicating that the plan is too expensive -->
+    <string name="account_cancel_subscription_survey_option_expensive">Mi s-a părut abonamentul prea scump</string>
+    <!-- Option in the survey indicating that the user can no longer afford the plan -->
+    <string name="account_cancel_subscription_survey_option_cannot_afford">Nu-mi mai pot permite</string>
+    <!-- Option in the survey indicating that the user doesn't want a subscription or auto-billing -->
+    <string name="account_cancel_subscription_survey_option_no_subscription">Nu doresc un abonament sau facturare automată</string>
+    <!-- Option in the survey indicating that the user doesn't need all the storage in their plan -->
+    <string name="account_cancel_subscription_survey_option_no_storage_need">Nu am nevoie de tot spațiul de stocare din abonamentul meu</string>
+    <!-- Option in the survey indicating that the user needs features MEGA doesn't have -->
+    <string name="account_cancel_subscription_survey_option_missing_features">Am nevoie de funcții pe care MEGA nu le are</string>
+    <!-- Option in the survey indicating that the user is switching to a different provider -->
+    <string name="account_cancel_subscription_survey_option_switch_provider">Trec la un furnizor care îmi place mai mult</string>
+    <!-- Option in the survey indicating that the user finds MEGA confusing and difficult to use -->
+    <string name="account_cancel_subscription_survey_option_confusing">Mi se pare MEGA confuz și greu de folosit</string>
+    <!-- Option in the survey indicating dissatisfaction with support and customer service -->
+    <string name="account_cancel_subscription_survey_option_dissatisfied_support">Nu sunt mulțumit de asistență și servicii pentru clienți</string>
+    <!-- Option in the survey indicating that the plan was needed temporarily -->
+    <string name="account_cancel_subscription_survey_option_temporary_use">Aveam nevoie de acest abonament temporar și nu îl mai folosesc</string>
+    <!-- Option in the survey for other reasons, with a prompt to provide details -->
+    <string name="account_cancel_subscription_survey_option_other">Altele (vă rugăm să furnizați detalii)</string>
+    <!-- Checkbox allowing MEGA to contact the user for further discussion -->
+    <string name="account_cancel_subscription_survey_allow_contact">Permit MEGA să mă contacteze pentru a vorbi mai departe despre acest subiect</string>
+    <!-- Button label to cancel the subscription -->
+    <string name="account_cancel_subscription_survey_cancel_button">Anulați abonamentul</string>
+    <!-- Button label to not cancel the subscription -->
+    <string name="account_cancel_subscription_survey_do_not_cancel_button">Nu anulați</string>
+    <!-- Video recently watched title of the video section  -->
+    <string name="video_section_title_video_recently_watched">Vizionate recent</string>
+    <!-- Text that there is no recent activity of the video recently watched page  -->
+    <string name="video_section_empty_hint_no_recently_activity">Nicio activitate recentă</string>
+    <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Remove from recently watched</string>
+    <!-- Message that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_message_remove_recently_watched_item">Removed from recently watched.</string>
+    <!-- Message that clear recently watched in the video recently watched page  -->
+    <string name="video_section_message_clear_recently_watched">Recently watched has been cleared</string>
 </resources>

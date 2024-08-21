@@ -2897,7 +2897,7 @@
     <!-- Explanation option to send separated the link and decryption key -->
     <string name="explanation_send_decryption_key_separately">Exportă linkul și cheia de decriptare separat.</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
-    <string name="learn_more_option">Află mai multe</string>
+    <string name="learn_more_option">Aflați mai multe</string>
     <!-- Label key referring to a link decryption key -->
     <string name="key_label">Cheie</string>
     <!-- Button which action is share the decryption key of a link -->

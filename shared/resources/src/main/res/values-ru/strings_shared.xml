@@ -622,4 +622,62 @@
     <string name="report_issue_error_minimum_characters">Сообщение должно содержать не менее 10 символов</string>
     <!-- placeholder message for report issue-->
     <string name="report_issue_description_placeholder_message">Опишите проблему, используя не менее 10 символов</string>
+    <!--Title text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_title">Сохраняйте конфиденциальность разговоров</string>
+    <!--Subtitle text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_subtitle">Все ваши сообщения, групповые чаты и звонки защищены нашим шифрованием с нулевым разглашением. [A]Узнать больше[/A]</string>
+    <!-- Label of the action button of inviting a friend from contact screen -->
+    <string name="chat_recent_invite_friend">Пригласить друга</string>
+    <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_title">Приглашайте друзей без опаски</string>
+    <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_subtitle">Благодаря передовому уровню безопасности и кодам подтверждения вы можете быть на связи, не опасаясь мошенничества, сбора данных или кражи информации</string>
+    <!-- Label shown when the user wants to add contacts into his MEGA account -->
+    <string name="invite_contacts_action_label">Пригласить</string>
+    <!-- Share hidden folder description -->
+    <string name="share_hidden_folder_description">В этой папке есть скрытые элементы. Если вы поделитесь папкой, скрытые элементы будут видны тем, с кем вы делитесь. Эти элементы по-прежнему будут скрыты на вашем Облачном диске.</string>
+    <!-- Share hidden folders description -->
+    <string name="share_hidden_folders_description">В одной или нескольких из этих папок есть скрытые элементы. Если вы поделитесь папками, скрытые элементы будут видны тем, с кем вы делитесь. Эти элементы по-прежнему будут скрыты на вашем Облачном диске.</string>
+    <!-- Title shown at the top of the survey screen when cancelling the subscription -->
+    <string name="account_cancel_subscription_survey_title">Жаль, что вы уходите! Можете рассказать нам, почему отменяете подписку?</string>
+    <!-- Message explaining the immediate effect of subscription cancellation -->
+    <string name="account_cancel_subscription_survey_cancellation_message">Ваша подписка будет немедленно отменена, и вы будете переведены на бесплатный аккаунт MEGA, когда истечёт срок действия текущего плана. Примечание: При отмене подписки ваш аккаунт не удаляется.</string>
+    <!-- Warning message shown in a red box when no reason is selected -->
+    <string name="account_cancel_subscription_survey_no_reason_selected">Выберите причину отмены подписки</string>
+    <!-- Option in the survey indicating that the plan is too expensive -->
+    <string name="account_cancel_subscription_survey_option_expensive">Подписка слишком дорогая</string>
+    <!-- Option in the survey indicating that the user can no longer afford the plan -->
+    <string name="account_cancel_subscription_survey_option_cannot_afford">Я больше не могу себе этого позволить</string>
+    <!-- Option in the survey indicating that the user doesn't want a subscription or auto-billing -->
+    <string name="account_cancel_subscription_survey_option_no_subscription">Мне не нужна подписка или автоматическое выставление счетов</string>
+    <!-- Option in the survey indicating that the user doesn't need all the storage in their plan -->
+    <string name="account_cancel_subscription_survey_option_no_storage_need">Мне не нужен весь объём в этой подписке</string>
+    <!-- Option in the survey indicating that the user needs features MEGA doesn't have -->
+    <string name="account_cancel_subscription_survey_option_missing_features">Мне нужны функции, которых нет у MEGA</string>
+    <!-- Option in the survey indicating that the user is switching to a different provider -->
+    <string name="account_cancel_subscription_survey_option_switch_provider">Я перехожу к поставщику, который мне больше нравится</string>
+    <!-- Option in the survey indicating that the user finds MEGA confusing and difficult to use -->
+    <string name="account_cancel_subscription_survey_option_confusing">Я нахожу MEGA запутанной и сложной в использовании</string>
+    <!-- Option in the survey indicating dissatisfaction with support and customer service -->
+    <string name="account_cancel_subscription_survey_option_dissatisfied_support">Я не доволен поддержкой и обслуживанием клиентов</string>
+    <!-- Option in the survey indicating that the plan was needed temporarily -->
+    <string name="account_cancel_subscription_survey_option_temporary_use">Мне временно был нужен этот план, и я им больше не пользуюсь</string>
+    <!-- Option in the survey for other reasons, with a prompt to provide details -->
+    <string name="account_cancel_subscription_survey_option_other">Другое (пожалуйста, укажите подробности)</string>
+    <!-- Checkbox allowing MEGA to contact the user for further discussion -->
+    <string name="account_cancel_subscription_survey_allow_contact">Я разрешаю MEGA связываться со мной для дальнейшего обсуждения этой темы</string>
+    <!-- Button label to cancel the subscription -->
+    <string name="account_cancel_subscription_survey_cancel_button">Отменить подписку</string>
+    <!-- Button label to not cancel the subscription -->
+    <string name="account_cancel_subscription_survey_do_not_cancel_button">Не отменять</string>
+    <!-- Video recently watched title of the video section  -->
+    <string name="video_section_title_video_recently_watched">Недавно просмотренные</string>
+    <!-- Text that there is no recent activity of the video recently watched page  -->
+    <string name="video_section_empty_hint_no_recently_activity">Нет недавней активности</string>
+    <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Remove from recently watched</string>
+    <!-- Message that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_message_remove_recently_watched_item">Removed from recently watched.</string>
+    <!-- Message that clear recently watched in the video recently watched page  -->
+    <string name="video_section_message_clear_recently_watched">Recently watched has been cleared</string>
 </resources>

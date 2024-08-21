@@ -598,8 +598,9 @@
     <string name="settings_sync_debris_cleared_message">Le dossier .debris a été vidé</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="one">Found %1$s and %2$d file.</item>
-        <item quantity="other">Found %1$s and %2$d files.</item>
+        <item quantity="one">%1$s et %2$d&#160;fichier ont été trouvés</item>
+        <item quantity="many">%1$s et %2$d de fichiers ont été trouvés</item>
+        <item quantity="other">%1$s et %2$d&#160;fichiers ont été trouvés</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->
     <string name="file_info_information_no_tags_label">Aucune étiquette</string>
@@ -609,4 +610,62 @@
     <string name="report_issue_error_minimum_characters">Les demandes doivent comporter au moins 10&#160;caractères</string>
     <!-- placeholder message for report issue-->
     <string name="report_issue_description_placeholder_message">Décrivez le problème en 10&#160;caractères, au moins</string>
+    <!--Title text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_title">Assurer la confidentialité des conversations</string>
+    <!--Subtitle text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_subtitle">Toutes vos conversations de groupe, tous vos messages et appels sont protégés par notre chiffrement à divulgation nulle de connaissance. [A]En apprendre davantage[/A]</string>
+    <!-- Label of the action button of inviting a friend from contact screen -->
+    <string name="chat_recent_invite_friend">Inviter des amis</string>
+    <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_title">Inviter des amis en toute confiance</string>
+    <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_subtitle">Grâce à une sécurité de premier ordre avec codes de vérification, communiquez sans craindre les escroqueries, l’exploration des données, ni le vol de renseignements.</string>
+    <!-- Label shown when the user wants to add contacts into his MEGA account -->
+    <string name="invite_contacts_action_label">Inviter</string>
+    <!-- Share hidden folder description -->
+    <string name="share_hidden_folder_description">Des éléments cachés sont présents dans ce dossier. Partager le dossier implique que les éléments cachés sont visibles par les personnes avec qui vous le partagez. Les éléments resteront cachés sur votre Disque nuagique.</string>
+    <!-- Share hidden folders description -->
+    <string name="share_hidden_folders_description">Des éléments cachés sont présents dans un ou plusieurs de ces dossiers. Partager les dossiers implique que les éléments cachés seront visibles par les personnes avec qui vous les partagez. Les éléments resteront cachés dans votre Disque nuagique.</string>
+    <!-- Title shown at the top of the survey screen when cancelling the subscription -->
+    <string name="account_cancel_subscription_survey_title">Nous sommes désolés de vous voir partir. Pouvez-vous nous indiquer pourquoi vous annulez votre abonnement ?</string>
+    <!-- Message explaining the immediate effect of subscription cancellation -->
+    <string name="account_cancel_subscription_survey_cancellation_message">Votre abonnement sera annulé immédiatement et votre compte sera transformé en compte MEGA gratuit après expiration de votre abonnement actuel. Note&#160;: l’annulation de votre abonnement ne supprimera pas votre compte.</string>
+    <!-- Warning message shown in a red box when no reason is selected -->
+    <string name="account_cancel_subscription_survey_no_reason_selected">Pourquoi avez-vous annulé votre abonnement ?</string>
+    <!-- Option in the survey indicating that the plan is too expensive -->
+    <string name="account_cancel_subscription_survey_option_expensive">J’ai trouvé mon abonnement trop cher</string>
+    <!-- Option in the survey indicating that the user can no longer afford the plan -->
+    <string name="account_cancel_subscription_survey_option_cannot_afford">Je ne peux plus me le permettre</string>
+    <!-- Option in the survey indicating that the user doesn't want a subscription or auto-billing -->
+    <string name="account_cancel_subscription_survey_option_no_subscription">Je ne veux pas d’abonnement ni de facturation automatique</string>
+    <!-- Option in the survey indicating that the user doesn't need all the storage in their plan -->
+    <string name="account_cancel_subscription_survey_option_no_storage_need">Je n’ai pas besoin de tout l’espace de stockage de mon abonnement</string>
+    <!-- Option in the survey indicating that the user needs features MEGA doesn't have -->
+    <string name="account_cancel_subscription_survey_option_missing_features">J’ai besoin de fonctions que MEGA ne propose pas</string>
+    <!-- Option in the survey indicating that the user is switching to a different provider -->
+    <string name="account_cancel_subscription_survey_option_switch_provider">Je change pour un fournisseur de service que je préfère</string>
+    <!-- Option in the survey indicating that the user finds MEGA confusing and difficult to use -->
+    <string name="account_cancel_subscription_survey_option_confusing">Je trouve que MEGA est difficile à utiliser</string>
+    <!-- Option in the survey indicating dissatisfaction with support and customer service -->
+    <string name="account_cancel_subscription_survey_option_dissatisfied_support">Je ne suis pas satisfait du soutien et du service à la clientèle</string>
+    <!-- Option in the survey indicating that the plan was needed temporarily -->
+    <string name="account_cancel_subscription_survey_option_temporary_use">J’avais besoin de cet abonnement temporairement et ne l’utilise plus</string>
+    <!-- Option in the survey for other reasons, with a prompt to provide details -->
+    <string name="account_cancel_subscription_survey_option_other">Autre (veuillez donner des détails)</string>
+    <!-- Checkbox allowing MEGA to contact the user for further discussion -->
+    <string name="account_cancel_subscription_survey_allow_contact">J’autorise MEGA à me contacter pour discuter de ce sujet</string>
+    <!-- Button label to cancel the subscription -->
+    <string name="account_cancel_subscription_survey_cancel_button">Annuler l’abonnement</string>
+    <!-- Button label to not cancel the subscription -->
+    <string name="account_cancel_subscription_survey_do_not_cancel_button">Ne pas l’annuler</string>
+    <!-- Video recently watched title of the video section  -->
+    <string name="video_section_title_video_recently_watched">Regardées récemment</string>
+    <!-- Text that there is no recent activity of the video recently watched page  -->
+    <string name="video_section_empty_hint_no_recently_activity">Aucune activité récente</string>
+    <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Remove from recently watched</string>
+    <!-- Message that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_message_remove_recently_watched_item">Removed from recently watched.</string>
+    <!-- Message that clear recently watched in the video recently watched page  -->
+    <string name="video_section_message_clear_recently_watched">Recently watched has been cleared</string>
 </resources>

@@ -65,7 +65,7 @@
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="general_sync_failure_accessing_persistent_storage">Không thể đọc được vị&#160;trí thư&#160;mục. Kiểm&#160;tra xem vị&#160;trí có thể truy&#160;cập được hay không và quyền đi tới vị&#160;trí thư&#160;mục đã được cấp phép.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">An unknown error occurred. Contact support@mega.nz.</string>
+    <string name="general_sync_message_unknown_error">Một lỗi không xác&#160;định được đã xảy ra. Liên&#160;hệ support@mega.nz.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
@@ -293,7 +293,7 @@
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_list_empty_state_title">Không có đồng&#160;bộ nào đã lập</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Sync a folder on your device with a folder on MEGA.</string>
+    <string name="device_center_sync_list_empty_state_message">Đồng&#160;bộ một thư&#160;mục trong thiết&#160;bị của bạn với một thư&#160;mục trên MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Thêm đồng&#160;bộ mới</string>
     <!-- Text for the Sync solved issues chip -->
@@ -556,8 +556,7 @@
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
-        <item quantity="one">%1$d folder</item>
-        <item quantity="other">%1$d folders</item>
+        <item quantity="other">%1$d thư&#160;mục</item>
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
     <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
@@ -568,7 +567,7 @@
     <!-- Title of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_title">Xóa rác vụn?</string>
     <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_body">Backups of the previous versions of your synced files will be permanently deleted from your device. \n\nCheck the .debris folder in your local device to see if you need to restore anything.</string>
+    <string name="settings_sync_clear_debris_dialog_body">Bản sao&#160;lưu của các phiên&#160;bản trước đây của các tệp&#160;tin đã đồng&#160;bộ hóa sẽ bị xóa vĩnh&#160;viễn khỏi thiết&#160;bị của bạn. \n\nKiểm&#160;tra thư&#160;mục .debris trong thiết&#160;bị cục&#160;bộ của bạn để xem bạn có cần khôi&#160;phục bất cứ thứ gì hay không.</string>
     <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_cancel">Hủy</string>
     <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
@@ -577,15 +576,72 @@
     <string name="settings_sync_debris_cleared_message">Thư mục chứa .debris đã được dọn sạch</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="one">Found %1$s and %2$d file.</item>
-        <item quantity="other">Found %1$s and %2$d files.</item>
+        <item quantity="other">Tìm thấy %1$s và %2$d tệp&#160;tin.</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">No tags</string>
+    <string name="file_info_information_no_tags_label">Không có gắn thẻ</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Đang hủy các phiên truyền tải&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Enquiries must be at least 10 characters</string>
+    <string name="report_issue_error_minimum_characters">Lời báo&#160;cáo phải có ít nhất 10 ký&#160;tự</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Describe the issue with at least 10 characters</string>
+    <string name="report_issue_description_placeholder_message">Mô&#160;tả vấn&#160;đề với ít nhất 10 ký&#160;tự</string>
+    <!--Title text to start a conversation from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_title">Keep conversations private</string>
+    <!--Subtitle text from Recent Chat screen empty view-->
+    <string name="chat_recent_list_empty_subtitle">All your messages, group chats, and calls are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <!-- Label of the action button of inviting a friend from contact screen -->
+    <string name="chat_recent_invite_friend">Mời bạn bè</string>
+    <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_title">Invite friends with confidence</string>
+    <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
+    <string name="invite_contacts_to_start_chat_subtitle">With top-notch security and verification codes, reach out without fear of scams, data mining, or information theft</string>
+    <!-- Label shown when the user wants to add contacts into his MEGA account -->
+    <string name="invite_contacts_action_label">Mời</string>
+    <!-- Share hidden folder description -->
+    <string name="share_hidden_folder_description">Có các mục ẩn trong thư&#160;mục này. Việc thực&#160;hiện chia&#160;sẻ thư&#160;mục sẽ làm các mục ẩn hiển&#160;thị cho những người bạn chia&#160;sẻ. Các mục vẫn sẽ được ẩn đi trong Ổ&#160;Mây của bạn.</string>
+    <!-- Share hidden folders description -->
+    <string name="share_hidden_folders_description">Có các mục ẩn nằm trong một hoặc nhiều thư&#160;mục này. Việc thực&#160;hiện chia&#160;sẻ thư&#160;mục sẽ làm các mục ẩn hiển&#160;thị cho những người bạn chia&#160;sẻ. Các mục vẫn sẽ được ẩn đi trong Ổ&#160;Mây của bạn.</string>
+    <!-- Title shown at the top of the survey screen when cancelling the subscription -->
+    <string name="account_cancel_subscription_survey_title">Chúng tôi rất tiếc khi thấy bạn rời khỏi dịch&#160;vụ! Bạn có thể cho chúng&#160;tôi biết lý&#160;do tại sao bạn hủy gói đăng&#160;ký được không?</string>
+    <!-- Message explaining the immediate effect of subscription cancellation -->
+    <string name="account_cancel_subscription_survey_cancellation_message">Gói đăng&#160;ký của bạn sẽ bị hủy ngay&#160;lập&#160;tức và bạn sẽ chuyển thành tài&#160;khoản MEGA miễn&#160;phí khi gói hiện&#160;tại của bạn hết hạn. Lưu&#160;ý: Việc hủy gói đăng&#160;ký không có xóa tài&#160;khoản của bạn.</string>
+    <!-- Warning message shown in a red box when no reason is selected -->
+    <string name="account_cancel_subscription_survey_no_reason_selected">Chọn một lý&#160;do mà bạn hủy gói đăng&#160;ký</string>
+    <!-- Option in the survey indicating that the plan is too expensive -->
+    <string name="account_cancel_subscription_survey_option_expensive">Tôi cảm thấy gói của tôi quá đắt</string>
+    <!-- Option in the survey indicating that the user can no longer afford the plan -->
+    <string name="account_cancel_subscription_survey_option_cannot_afford">Tôi không còn khả&#160;năng chi trả</string>
+    <!-- Option in the survey indicating that the user doesn't want a subscription or auto-billing -->
+    <string name="account_cancel_subscription_survey_option_no_subscription">Tôi không muốn có gói đăng&#160;ký hoặc bị tính phí tự&#160;động</string>
+    <!-- Option in the survey indicating that the user doesn't need all the storage in their plan -->
+    <string name="account_cancel_subscription_survey_option_no_storage_need">Tôi không cần tất cả dung&#160;lượng trong gói của mình</string>
+    <!-- Option in the survey indicating that the user needs features MEGA doesn't have -->
+    <string name="account_cancel_subscription_survey_option_missing_features">Tôi cần sử&#160;đụng các tính&#160;năng mà MEGA không có có</string>
+    <!-- Option in the survey indicating that the user is switching to a different provider -->
+    <string name="account_cancel_subscription_survey_option_switch_provider">Tôi muốn chuyển sang một dịch&#160;vụ cung&#160;cấp mà tôi thích hơn</string>
+    <!-- Option in the survey indicating that the user finds MEGA confusing and difficult to use -->
+    <string name="account_cancel_subscription_survey_option_confusing">Tôi thấy MEGA rườm&#160;rà và khó sử&#160;dụng</string>
+    <!-- Option in the survey indicating dissatisfaction with support and customer service -->
+    <string name="account_cancel_subscription_survey_option_dissatisfied_support">Tôi không có hài&#160;lòng với cách hỗ&#160;trợ và dịch&#160;vụ khách&#160;hàng</string>
+    <!-- Option in the survey indicating that the plan was needed temporarily -->
+    <string name="account_cancel_subscription_survey_option_temporary_use">Tôi chỉ sử&#160;dụng cái này tạm&#160;thời và không còn nhu&#160;cầu nữa</string>
+    <!-- Option in the survey for other reasons, with a prompt to provide details -->
+    <string name="account_cancel_subscription_survey_option_other">Lý&#160;do khác (xin điền chi&#160;tiết)</string>
+    <!-- Checkbox allowing MEGA to contact the user for further discussion -->
+    <string name="account_cancel_subscription_survey_allow_contact">Tôi cho phép MEGA liên&#160;hệ với tôi để bàn thêm về chủ&#160;đề này</string>
+    <!-- Button label to cancel the subscription -->
+    <string name="account_cancel_subscription_survey_cancel_button">Hủy Gói Đăng Ký Dịch Vụ</string>
+    <!-- Button label to not cancel the subscription -->
+    <string name="account_cancel_subscription_survey_do_not_cancel_button">Đừng hủy</string>
+    <!-- Video recently watched title of the video section  -->
+    <string name="video_section_title_video_recently_watched">Recently watched</string>
+    <!-- Text that there is no recent activity of the video recently watched page  -->
+    <string name="video_section_empty_hint_no_recently_activity">Không Có Hoạt Động Gần Đây</string>
+    <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Remove from recently watched</string>
+    <!-- Message that remove recently watched item from the video recently watched page  -->
+    <string name="video_section_message_remove_recently_watched_item">Removed from recently watched.</string>
+    <!-- Message that clear recently watched in the video recently watched page  -->
+    <string name="video_section_message_clear_recently_watched">Recently watched has been cleared</string>
 </resources>
