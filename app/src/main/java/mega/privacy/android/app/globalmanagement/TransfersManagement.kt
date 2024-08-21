@@ -25,7 +25,6 @@ import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueU
 import mega.privacy.android.domain.usecase.transfers.sd.DeleteSdTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.GetAllSdTransfersUseCase
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaCancelToken
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -68,12 +67,6 @@ class TransfersManagement @Inject constructor(
     var hasResumeTransfersWarningAlreadyBeenShown = false
     var shouldShowNetworkWarning = false
 
-    private val scanningTransfers = mutableListOf<ScanningTransferData>()
-    private var scanningTransfersToken: MegaCancelToken? = null
-    var isProcessingFolders = false
-    var isProcessingTransfers = false
-    private var shouldBreakTransfersProcessing = false
-
     init {
         resetTransferOverQuotaTimestamp()
     }
@@ -88,11 +81,6 @@ class TransfersManagement @Inject constructor(
         isTransferOverQuotaBannerShown = false
         hasResumeTransfersWarningAlreadyBeenShown = false
         shouldShowNetworkWarning = false
-        scanningTransfers.clear()
-        scanningTransfersToken = null
-        isProcessingFolders = false
-        isProcessingTransfers = false
-        shouldBreakTransfersProcessing = false
     }
 
     /**
@@ -271,53 +259,6 @@ class TransfersManagement @Inject constructor(
             Timber.e(e, "Error moving file to the sd card path")
         }
     }
-
-    /**
-     * Cancels all the scanning transfers.
-     */
-    fun cancelScanningTransfers() {
-        if (isProcessingTransfers) {
-            shouldBreakTransfersProcessing = true
-        }
-        isProcessingFolders = false
-        scanningTransfersToken?.cancel()
-        scanningTransfersToken = null
-        scanningTransfers.clear()
-    }
-
-    /**
-     * Checks if is scanning transfers.
-     *
-     * @return True if scanningTransfers is not empty, which means is scanning transfers.
-     *         False otherwise.
-     */
-    private fun isScanningTransfers(): Boolean = scanningTransfers.isNotEmpty()
-
-    /**
-     * Updates the flag isProcessingFolders if needed and launches and event to show
-     * or hide the scanning transfers dialog if so.
-     *
-     * @param processing True if is processing folders, false otherwise.
-     */
-    fun setIsProcessingFolders(processing: Boolean) {
-        when {
-            !isScanningTransfers() && !isProcessingFolders && processing -> {
-                isProcessingFolders = true
-            }
-
-            !processing -> {
-                isProcessingFolders = false
-            }
-        }
-    }
-
-    /**
-     * Checks if should show the scanning transfers dialog.
-     *
-     * @return True if should show the dialog, false otherwise.
-     */
-    fun shouldShowScanningTransfersDialog(): Boolean =
-        isProcessingFolders || isScanningTransfers()
 
     fun setAreFailedTransfers(failed: Boolean) {
         areFailedTransfers = failed

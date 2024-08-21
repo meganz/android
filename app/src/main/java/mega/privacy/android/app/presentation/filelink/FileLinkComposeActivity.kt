@@ -53,6 +53,8 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -65,6 +67,18 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FileLinkComposeActivity : TransfersManagementActivity(),
     DecryptAlertDialog.DecryptDialogListener {
+
+    /**
+     * Application Theme Mode
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * [GetFeatureFlagValueUseCase]
+     */
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     /**
      * MegaNavigator

@@ -314,7 +314,9 @@ import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
+import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
@@ -400,6 +402,18 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
         }
     }
+
+    /**
+     * Application Theme Mode
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * [GetFeatureFlagValueUseCase]
+     */
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
     lateinit var cookieDialogHandler: CookieDialogHandler

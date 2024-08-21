@@ -73,6 +73,8 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -85,6 +87,18 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FolderLinkComposeActivity : TransfersManagementActivity(),
     DecryptAlertDialog.DecryptDialogListener {
+
+    /**
+     * Application Theme Mode
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * [GetFeatureFlagValueUseCase]
+     */
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     /**
      * Mapper to get the icon of a file type
