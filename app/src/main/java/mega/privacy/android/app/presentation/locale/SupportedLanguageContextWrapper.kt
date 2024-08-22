@@ -23,6 +23,7 @@ class SupportedLanguageContextWrapper private constructor(base: Context?) : Cont
             "es",
             "fr",
             "in",
+            "id",
             "it",
             "ja",
             "ko",
