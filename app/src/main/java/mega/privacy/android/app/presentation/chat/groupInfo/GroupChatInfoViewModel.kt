@@ -1,15 +1,14 @@
 package mega.privacy.android.app.presentation.chat.groupInfo
 
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -17,7 +16,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.groupInfo.model.GroupInfoState
@@ -29,6 +27,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.usecase.SetOpenInviteWithChatIdUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
@@ -38,12 +37,12 @@ import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
-import nz.mega.sdk.MegaChatRoom
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -83,6 +82,7 @@ class GroupChatInfoViewModel @Inject constructor(
     private val getChatCallUseCase: GetChatCallUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase,
 ) : ViewModel() {
 
     /**
@@ -90,6 +90,7 @@ class GroupChatInfoViewModel @Inject constructor(
      */
     private val _state = MutableStateFlow(GroupInfoState())
 
+    private var monitorChatRoomUpdatesJob: Job? = null
     private var monitorSFUServerUpgradeJob: Job? = null
     private var monitorChatCallJob: Job? = null
 
@@ -102,16 +103,7 @@ class GroupChatInfoViewModel @Inject constructor(
     private val isConnected =
         monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    private val openInviteChangeObserver =
-        Observer<MegaChatRoom> { chat ->
-            _state.update {
-                it.copy(resultSetOpenInvite = chat.isOpenInvite)
-            }
-        }
-
     init {
-        LiveEventBus.get(EventConstants.EVENT_CHAT_OPEN_INVITE, MegaChatRoom::class.java)
-            .observeForever(openInviteChangeObserver)
         viewModelScope.launch {
             monitorUpdatePushNotificationSettingsUseCase().collect {
                 _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = true) }
@@ -119,6 +111,17 @@ class GroupChatInfoViewModel @Inject constructor(
         }
         monitorSFUServerUpgrade()
         getApiFeatureFlag()
+    }
+
+    private fun monitorChatUpdates(chatId: Long) {
+        monitorChatRoomUpdatesJob?.cancel()
+        monitorChatRoomUpdatesJob = viewModelScope.launch {
+            monitorChatRoomUpdatesUseCase(chatId).collectLatest { chat ->
+                if (chat.hasChanged(ChatRoomChange.OpenInvite)) {
+                    _state.update { state -> state.copy(resultSetOpenInvite = chat.isOpenInvite) }
+                }
+            }
+        }
     }
 
     /**
@@ -140,12 +143,6 @@ class GroupChatInfoViewModel @Inject constructor(
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        LiveEventBus.get(EventConstants.EVENT_CHAT_OPEN_INVITE, MegaChatRoom::class.java)
-            .removeObserver(openInviteChangeObserver)
-    }
-
     /**
      * Sets chat id
      *
@@ -159,6 +156,7 @@ class GroupChatInfoViewModel @Inject constructor(
                 )
             }
             getChatCall()
+            monitorChatUpdates(newChatId)
         }
     }
 
@@ -331,7 +329,7 @@ class GroupChatInfoViewModel @Inject constructor(
         }
     }
 
-    private fun monitorChatCall(callId:Long) {
+    private fun monitorChatCall(callId: Long) {
         monitorChatCallJob?.cancel()
         monitorChatCallJob = viewModelScope.launch {
             monitorChatCallUpdatesUseCase()

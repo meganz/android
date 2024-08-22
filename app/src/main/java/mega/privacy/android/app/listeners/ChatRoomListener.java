@@ -1,16 +1,9 @@
 package mega.privacy.android.app.listeners;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME;
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_UPDATE_HISTORY_BY_RT;
 import static mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_OPEN_INVITE;
-import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
-import static nz.mega.sdk.MegaChatRoom.CHANGE_TYPE_OPEN_INVITE;
-import static nz.mega.sdk.MegaChatRoom.CHANGE_TYPE_TITLE;
 
 import android.content.Intent;
-
-import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import mega.privacy.android.app.MegaApplication;
 import nz.mega.sdk.MegaChatApiJava;
@@ -32,10 +25,6 @@ public class ChatRoomListener implements MegaChatRoomListenerInterface {
             intentRetentionTime.putExtra(RETENTION_TIME, chat.getRetentionTime());
             intentRetentionTime.setPackage(MegaApplication.getInstance().getApplicationContext().getPackageName());
             MegaApplication.getInstance().sendBroadcast(intentRetentionTime);
-        }
-
-        if (chat.hasChanged(CHANGE_TYPE_OPEN_INVITE)) {
-            LiveEventBus.get(EVENT_CHAT_OPEN_INVITE, MegaChatRoom.class).post(chat);
         }
     }
 
@@ -66,11 +55,6 @@ public class ChatRoomListener implements MegaChatRoomListenerInterface {
 
     @Override
     public void onHistoryTruncatedByRetentionTime(MegaChatApiJava api, MegaChatMessage msg) {
-        if (msg != null) {
-            Intent intentRetentionTime = new Intent(BROADCAST_ACTION_UPDATE_HISTORY_BY_RT);
-            intentRetentionTime.putExtra(MESSAGE_ID, msg.getMsgId());
-            intentRetentionTime.setPackage(MegaApplication.getInstance().getApplicationContext().getPackageName());
-            MegaApplication.getInstance().sendBroadcast(intentRetentionTime);
-        }
+
     }
 }

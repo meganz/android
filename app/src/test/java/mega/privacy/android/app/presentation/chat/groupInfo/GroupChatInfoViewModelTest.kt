@@ -2,18 +2,20 @@ package mega.privacy.android.app.presentation.chat.groupInfo
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.usecase.SetOpenInviteWithChatIdUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
@@ -22,26 +24,28 @@ import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
-import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GroupChatInfoViewModelTest {
 
     private lateinit var underTest: GroupChatInfoViewModel
@@ -64,23 +68,26 @@ class GroupChatInfoViewModelTest {
     private val getChatCallUseCase: GetChatCallUseCase = mock()
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val monitorChatRoomUpdatesUseCase = mock<MonitorChatRoomUpdatesUseCase>()
 
     private val connectivityFlow = MutableSharedFlow<Boolean>()
     private val updatePushNotificationSettings = MutableSharedFlow<Boolean>()
+    private val chatRoomUpdates = MutableSharedFlow<ChatRoom>()
 
-    @Before
+    private val chatId = 123L
+
+    @BeforeAll
     fun setup() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         initializeStubbing()
         initializeViewModel()
     }
 
-    private  fun initializeStubbing() {
-        whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
-        whenever(monitorUpdatePushNotificationSettingsUseCase()).thenReturn(
-            updatePushNotificationSettings
-        )
-        wheneverBlocking { getFeatureFlagValueUseCase.invoke(any()) }.thenReturn(false)
+    private fun initializeStubbing() {
+        whenever(monitorConnectivityUseCase()) doReturn connectivityFlow
+        whenever(monitorUpdatePushNotificationSettingsUseCase()) doReturn updatePushNotificationSettings
+        wheneverBlocking { monitorSFUServerUpgradeUseCase() } doReturn emptyFlow()
+        wheneverBlocking { getFeatureFlagValueUseCase.invoke(any()) } doReturn false
+        wheneverBlocking { monitorChatRoomUpdatesUseCase(chatId) } doReturn chatRoomUpdates
     }
 
     private fun initializeViewModel() {
@@ -101,7 +108,8 @@ class GroupChatInfoViewModelTest {
             monitorSFUServerUpgradeUseCase = monitorSFUServerUpgradeUseCase,
             getChatCallUseCase = getChatCallUseCase,
             monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            monitorChatRoomUpdatesUseCase = monitorChatRoomUpdatesUseCase,
         )
     }
 
@@ -132,13 +140,12 @@ class GroupChatInfoViewModelTest {
     @Test
     fun `test that new chatId and call are set when setChatId is invoked`() =
         runTest {
-            val newChatId = 456L
             val call = mock<ChatCall>()
-            whenever(getChatCallUseCase.invoke(newChatId)).thenReturn(call)
-            underTest.setChatId(newChatId)
+            whenever(getChatCallUseCase.invoke(chatId)).thenReturn(call)
+            underTest.setChatId(chatId)
             underTest.state.test {
                 val item = awaitItem()
-                assertThat(item.chatId).isEqualTo(newChatId)
+                assertThat(item.chatId).isEqualTo(chatId)
                 verify(monitorChatCallUpdatesUseCase).invoke()
             }
         }
@@ -146,19 +153,41 @@ class GroupChatInfoViewModelTest {
     @Test
     fun `test that call is not set if there is no existing call when setChatId is invoked`() =
         runTest {
-            val newChatId = 456L
-            whenever(getChatCallUseCase.invoke(newChatId)).thenReturn(null)
-            underTest.setChatId(newChatId)
+            whenever(getChatCallUseCase.invoke(chatId)).thenReturn(null)
+            underTest.setChatId(chatId)
             underTest.state.test {
                 val item = awaitItem()
-                assertThat(item.chatId).isEqualTo(newChatId)
+                assertThat(item.chatId).isEqualTo(chatId)
                 verifyNoInteractions(monitorChatCallUpdatesUseCase)
             }
         }
 
-    @After
+    @Test
+    fun `test that open invite updates update state`() = runTest {
+        val chat1 = mock<ChatRoom> {
+            on { chatId } doReturn chatId
+            on { isOpenInvite } doReturn true
+            on { hasChanged(ChatRoomChange.OpenInvite) } doReturn true
+        }
+        val chat2 = mock<ChatRoom> {
+            on { chatId } doReturn chatId
+            on { isOpenInvite } doReturn false
+            on { hasChanged(ChatRoomChange.OpenInvite) } doReturn true
+        }
+
+        underTest.setChatId(chatId)
+        chatRoomUpdates.emit(chat1)
+
+        verify(monitorChatRoomUpdatesUseCase).invoke(chatId)
+        underTest.state.map { it.resultSetOpenInvite }.test {
+            assertThat(awaitItem()).isTrue()
+            chatRoomUpdates.emit(chat2)
+            assertThat(awaitItem()).isFalse()
+        }
+    }
+
+    @BeforeEach
     fun tearDown() {
-        Dispatchers.resetMain()
         reset(
             setOpenInviteWithChatIdUseCase,
             monitorConnectivityUseCase,
@@ -176,5 +205,14 @@ class GroupChatInfoViewModelTest {
             getChatCallUseCase,
             monitorChatCallUpdatesUseCase,
         )
+        initializeStubbing()
+    }
+
+    companion object {
+        private val testDispatcher = UnconfinedTestDispatcher()
+
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(testDispatcher)
     }
 }
