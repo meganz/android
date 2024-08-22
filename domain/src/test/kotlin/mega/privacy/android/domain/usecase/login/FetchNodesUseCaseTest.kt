@@ -5,13 +5,11 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
 import mega.privacy.android.domain.repository.security.LoginRepository
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import org.junit.Before
 import org.junit.Test
@@ -25,15 +23,12 @@ class FetchNodesUseCaseTest {
 
     private lateinit var underTest: FetchNodesUseCase
 
-    private val establishCameraUploadsSyncHandlesUseCase =
-        mock<EstablishCameraUploadsSyncHandlesUseCase>()
     private val loginRepository = mock<LoginRepository>()
     private val resetChatSettingsUseCase = mock<ResetChatSettingsUseCase>()
 
     @Before
     fun setUp() {
         underTest = FetchNodesUseCase(
-            establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
             loginRepository = loginRepository,
             resetChatSettingsUseCase = resetChatSettingsUseCase,
             loginMutex = mock()
@@ -91,18 +86,4 @@ class FetchNodesUseCaseTest {
 
         verify(loginRepository).fetchNodesFlow()
     }
-
-    @Test
-    fun `test that successfully fetching all the nodes invokes establishCameraUploadsSyncHandles`() =
-        runTest {
-            val expectedUpdate = FetchNodesUpdate(Progress(1F), mock())
-            whenever(loginRepository.fetchNodesFlow()).thenReturn(flowOf(expectedUpdate))
-
-            underTest.invoke().test {
-                assertThat(awaitItem()).isEqualTo(expectedUpdate)
-                cancelAndIgnoreRemainingEvents()
-            }
-
-            verify(establishCameraUploadsSyncHandlesUseCase).invoke()
-        }
 }

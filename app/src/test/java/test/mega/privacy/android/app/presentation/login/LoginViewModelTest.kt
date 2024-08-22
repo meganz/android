@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
@@ -101,6 +102,8 @@ internal class LoginViewModelTest {
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase = mock()
     private val monitorAccountBlockedUseCase = mock<MonitorAccountBlockedUseCase>()
     private val getTimelinePhotosUseCase = mock<GetTimelinePhotosUseCase>()
+    private val establishCameraUploadsSyncHandlesUseCase =
+        mock<EstablishCameraUploadsSyncHandlesUseCase>()
     private val startDownloadWorkerUseCase = mock<StartDownloadWorkerUseCase>()
     private val startChatUploadsWorkerUseCase = mock<StartChatUploadsWorkerUseCase>()
     private val getLastRegisteredEmailUseCase = mock<GetLastRegisteredEmailUseCase>()
@@ -132,6 +135,7 @@ internal class LoginViewModelTest {
             loginWith2FAUseCase = loginWith2FAUseCase,
             fastLoginUseCase = fastLoginUseCase,
             fetchNodesUseCase = fetchNodesUseCase,
+            establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
             ongoingTransfersExistUseCase = ongoingTransfersExistUseCase,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,

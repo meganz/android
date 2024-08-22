@@ -54,6 +54,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
@@ -113,6 +114,7 @@ class LoginViewModel @Inject constructor(
     private val loginWith2FAUseCase: LoginWith2FAUseCase,
     private val fastLoginUseCase: FastLoginUseCase,
     private val fetchNodesUseCase: FetchNodesUseCase,
+    private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
     private val ongoingTransfersExistUseCase: OngoingTransfersExistUseCase,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
@@ -716,6 +718,7 @@ class LoginViewModel @Inject constructor(
 
                     /*In case the app crash or restarts, we need to restart the worker
                     in order to monitor current transfers and update the related notification.*/
+                    establishCameraUploadsSyncHandlesUseCase()
                     startDownloadWorkerUseCase()
                     startChatUploadsWorkerUseCase()
                     startUploadsWorkerUseCase()
