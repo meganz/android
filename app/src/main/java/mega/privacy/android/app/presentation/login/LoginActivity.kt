@@ -27,6 +27,7 @@ import mega.privacy.android.app.extensions.isTablet
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
 import mega.privacy.android.app.main.CreateAccountFragment
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.toConstant
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragment
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
@@ -109,6 +110,15 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         Timber.d("onCreate")
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        if (intent.action == Intent.ACTION_MAIN
+            && intent.hasCategory(Intent.CATEGORY_LAUNCHER)
+            && !viewModel.isConnected
+        ) {
+            // in case offline mode, go to ManagerActivity
+            startActivity(Intent(this, ManagerActivity::class.java))
+            finish()
+            return
+        }
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         chatRequestHandler.setIsLoggingRunning(true)
         binding = ActivityLoginBinding.inflate(layoutInflater)
