@@ -670,6 +670,34 @@ class VideoSectionRepositoryImplTest {
         }
 
     @Test
+    fun `test that saveVideoRecentlyWatched function updated the existing value when added video node is existing`() =
+        runTest {
+            val testHandle = 12345L
+            val testTimestamp = 100000L
+            val testVideoRecentlyWatchedData = mutableListOf<VideoRecentlyWatchedItem>().apply {
+                add(VideoRecentlyWatchedItem(testHandle, testTimestamp))
+            }
+            val addedHandle = 12345L
+            val addedTimestamp = 200000L
+            val testJsonString = Json.encodeToString(testVideoRecentlyWatchedData)
+            val addedRecentlyWatchedItem = VideoRecentlyWatchedItem(addedHandle, addedTimestamp)
+            testVideoRecentlyWatchedData[0] = addedRecentlyWatchedItem
+            val newJsonString = Json.encodeToString(testVideoRecentlyWatchedData)
+            initUnderTest()
+            whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull())).thenReturn(
+                flowOf(testJsonString)
+            )
+            whenever(videoRecentlyWatchedItemMapper(addedHandle, addedTimestamp)).thenReturn(
+                addedRecentlyWatchedItem
+            )
+            underTest.saveVideoRecentlyWatched(addedHandle, addedTimestamp)
+            verify(
+                appPreferencesGateway,
+                times(1)
+            ).putString("PREFERENCE_KEY_VIDEO_RECENTLY_WATCHED", newJsonString)
+        }
+
+    @Test
     fun `test that getRecentlyWatchedVideoNodes returns the correct result`() = runTest {
         val testHandles = listOf(12345L, 23456L, 34567L)
         val testTimestamps = listOf(100000L, 200000L, 300000L)

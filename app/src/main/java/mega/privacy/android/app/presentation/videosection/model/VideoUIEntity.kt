@@ -24,6 +24,7 @@ import kotlin.time.Duration
  * @property isSelected the video if is selected
  * @property isMarkedSensitive the video if is marked as sensitive
  * @property isSensitiveInherited the video if is sensitive inherited
+ * @property watchedDate the video's watched date
  */
 data class VideoUIEntity(
     val id: NodeId,
@@ -42,4 +43,5 @@ data class VideoUIEntity(
     val isSelected: Boolean = false,
     val isMarkedSensitive: Boolean = false,
     val isSensitiveInherited: Boolean = false,
+    val watchedDate: String,
 )

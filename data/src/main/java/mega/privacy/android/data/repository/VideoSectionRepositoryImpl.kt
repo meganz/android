@@ -307,11 +307,19 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
 
     override suspend fun saveVideoRecentlyWatched(handle: Long, timestamp: Long) {
         initVideoRecentlyWatchedData()
-        videoRecentlyWatchedData.add(videoRecentlyWatchedItemMapper(handle, timestamp))
-        appPreferencesGateway.putString(
-            PREFERENCE_KEY_VIDEO_RECENTLY_WATCHED,
-            Json.encodeToString(videoRecentlyWatchedData)
-        )
+        videoRecentlyWatchedData.indexOfFirst { it.videoHandle == handle }.let { index ->
+            if (index == -1) {
+                videoRecentlyWatchedData.add(videoRecentlyWatchedItemMapper(handle, timestamp))
+            } else {
+                videoRecentlyWatchedData[index] =
+                    videoRecentlyWatchedData[index].copy(watchedTimestamp = timestamp)
+            }
+
+            appPreferencesGateway.putString(
+                PREFERENCE_KEY_VIDEO_RECENTLY_WATCHED,
+                Json.encodeToString(videoRecentlyWatchedData)
+            )
+        }
     }
 
     private suspend fun initVideoRecentlyWatchedData() {

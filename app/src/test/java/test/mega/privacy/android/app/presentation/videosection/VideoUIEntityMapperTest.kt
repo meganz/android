@@ -1,10 +1,13 @@
 package test.mega.privacy.android.app.presentation.videosection
 
+import android.content.Context
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
+import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.app.utils.TimeUtils.formatRecentlyWatchedDate
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
@@ -13,14 +16,16 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.Mockito
 import org.mockito.kotlin.mock
 import kotlin.time.Duration.Companion.minutes
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VideoUIEntityMapperTest {
     private lateinit var underTest: VideoUIEntityMapper
-
+    private val context = mock<Context>()
     private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
+    private val timeUtilsMock = Mockito.mockStatic(TimeUtils::class.java)
 
     private val expectedId = NodeId(123456L)
     private val expectedParentId = NodeId(654321L)
@@ -35,10 +40,15 @@ class VideoUIEntityMapperTest {
     private val expectedLabel = 1
     private val expectedExportedData = mock<ExportedData>()
     private val expectedType = mock<VideoFileTypeInfo>()
+    private val expectedWatchedTimestamp = 100L
+    private val expectedWatchedDate = "12 April 2024"
 
     @BeforeAll
     fun setUp() {
-        underTest = VideoUIEntityMapper(durationInSecondsTextMapper)
+        timeUtilsMock.`when`<String> {
+            formatRecentlyWatchedDate(100L, context)
+        }.thenReturn(expectedWatchedDate)
+        underTest = VideoUIEntityMapper(context, durationInSecondsTextMapper)
     }
 
     @Test
@@ -102,6 +112,7 @@ class VideoUIEntityMapperTest {
         on { label }.thenReturn(expectedLabel)
         on { type }.thenReturn(expectedType)
         on { isOutShared }.thenReturn(expectedIsOutShared)
+        on { watchedTimestamp }.thenReturn(expectedWatchedTimestamp)
     }
 
     private fun assertMappedVideoUIEntity(
@@ -123,7 +134,8 @@ class VideoUIEntityMapperTest {
                 { assertThat(it.isSharedItems).isEqualTo(expectedIsShared) },
                 { assertThat(it.elementID).isEqualTo(expectedElementID) },
                 { assertThat(it.label).isEqualTo(expectedLabel) },
-                { assertThat(it.fileTypeInfo).isEqualTo(expectedType) }
+                { assertThat(it.fileTypeInfo).isEqualTo(expectedType) },
+                { assertThat(it.watchedDate).isEqualTo(expectedWatchedDate) }
             )
         }
     }

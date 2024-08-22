@@ -170,6 +170,28 @@ sealed interface VideoSectionMenuAction : MenuAction {
         override val orderInCategory = 170
     }
 
+    /**
+     * Video section video recently watched action
+     */
+    object VideoRecentlyWatchedAction : MenuActionString(
+        iconRes = iconPackR.drawable.ic_video_recently_watched,
+        descriptionRes = sharedR.string.video_section_title_video_recently_watched,
+        testTag = TEST_TAG_VIDEO_SECTION_RECENTLY_WATCHED_ACTION
+    ), VideoSectionMenuAction {
+        override val orderInCategory = 175
+    }
+
+    /**
+     * Video section video recently watched action
+     */
+    object VideoRecentlyWatchedClearAction : MenuActionString(
+        iconRes = iconPackR.drawable.ic_trash_medium_regular_outline,
+        descriptionRes = R.string.general_clear,
+        testTag = TEST_TAG_VIDEO_SECTION_RECENTLY_WATCHED_CLEAR_ACTION
+    ), VideoSectionMenuAction {
+        override val orderInCategory = 180
+    }
+
     companion object {
         /**
          * Test tag for video section download action
@@ -246,5 +268,17 @@ sealed interface VideoSectionMenuAction : MenuAction {
          * Test tag for video section more action
          */
         const val TEST_TAG_VIDEO_SECTION_MORE_ACTION = "video_section:action_more"
+
+        /**
+         * Test tag for video section video recently watched action
+         */
+        const val TEST_TAG_VIDEO_SECTION_RECENTLY_WATCHED_ACTION =
+            "video_section:action_recently_watched"
+
+        /**
+         * Test tag for video section video recently watched clear action
+         */
+        const val TEST_TAG_VIDEO_SECTION_RECENTLY_WATCHED_CLEAR_ACTION =
+            "video_section:action_recently_watched_clear"
     }
 }
