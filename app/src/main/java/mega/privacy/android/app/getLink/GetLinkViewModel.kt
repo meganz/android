@@ -78,6 +78,7 @@ class GetLinkViewModel @Inject constructor(
     private lateinit var linkFragmentTitle: String
     private var node: MegaNode? = null
     private var isSendDecryptedKeySeparatelyEnabled = false
+    private var isInitialized = false
 
     fun getLink(): LiveData<String> = linkText
 
@@ -95,6 +96,8 @@ class GetLinkViewModel @Inject constructor(
 
     fun getLinkWithPassword(): String? = state.value.linkWithPassword
 
+    fun isInitialized(): Boolean = isInitialized
+
     /**
      * Initializes the node and all the available info.
      *
@@ -102,6 +105,7 @@ class GetLinkViewModel @Inject constructor(
      */
     fun initNode(handle: Long) {
         updateLink(handle = handle)
+        isInitialized = true
     }
 
     /**
@@ -420,5 +424,9 @@ class GetLinkViewModel @Inject constructor(
             node != null && nodeId != null && !node.isExported && (node.isMarkedSensitive
                     || hasSensitiveInheritedUseCase(nodeId)
                     || (node.isFolder && hasSensitiveDescendantUseCase(nodeId)))
+    }
+
+    fun clearSensitiveItemCheck() {
+        _hasSensitiveItems.value = null
     }
 }

@@ -62,6 +62,9 @@ class GetSeveralLinksViewModel @Inject constructor(
     private val _hasSensitiveItems: MutableStateFlow<Boolean?> = MutableStateFlow(null)
     val hasSensitiveItemsFlow = _hasSensitiveItems.asStateFlow()
 
+    private var isInitialized = false
+    fun isInitialized(): Boolean = isInitialized
+
     /**
      * Initializes the nodes and all the available info.
      *
@@ -111,6 +114,7 @@ class GetSeveralLinksViewModel @Inject constructor(
         exportNodes(pendingExports)
         requestThumbnails(pendingThumbnails)
         linkItemsList.value = links
+        isInitialized = true
     }
 
     /**
@@ -251,5 +255,9 @@ class GetSeveralLinksViewModel @Inject constructor(
                     || hasSensitiveInheritedUseCase(nodeId)
                     || (node.isFolder && hasSensitiveDescendantUseCase(nodeId)))
         }
+    }
+
+    fun clearSensitiveItemCheck() {
+        _hasSensitiveItems.value = null
     }
 }

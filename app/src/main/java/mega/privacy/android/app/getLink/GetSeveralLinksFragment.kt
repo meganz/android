@@ -95,7 +95,7 @@ class GetSeveralLinksFragment : Fragment() {
 
     private fun initialize() {
         viewLifecycleOwner.lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes) && !viewModel.isInitialized()) {
                 checkSensitiveItems()
             } else {
                 initNodes()
@@ -123,6 +123,8 @@ class GetSeveralLinksFragment : Fragment() {
                     setupView()
                     setupObservers()
                 }
+
+                viewModel.clearSensitiveItemCheck()
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.checkSensitiveItems(handles.toList())
@@ -150,6 +152,8 @@ class GetSeveralLinksFragment : Fragment() {
             activity?.finish()
             return
         }
+
+        if (viewModel.isInitialized()) return
         viewModel.initNodes(handles, context)
     }
 

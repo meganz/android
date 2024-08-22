@@ -119,9 +119,11 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
 
     private fun initialize() {
         viewLifecycleOwner.lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes) && !viewModel.isInitialized()) {
                 checkSensitiveItems()
             } else {
+                initNode()
+
                 setupView()
                 setupObservers()
             }
@@ -133,6 +135,8 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             activity?.finish()
             return
         }
+
+        if (viewModel.isInitialized()) return
         viewModel.initNode(handle)
     }
 
@@ -283,6 +287,8 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
                     setupView()
                     setupObservers()
                 }
+
+                viewModel.clearSensitiveItemCheck()
             }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.checkSensitiveItem(handle)
