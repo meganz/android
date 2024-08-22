@@ -30,7 +30,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
@@ -279,18 +278,17 @@ class AlbumContentFragment : Fragment() {
             }
 
             if (album !is UserAlbum) return@launch
-            val isAlbumSharingEnabled = getFeatureFlagValueUseCase(AppFeatures.AlbumSharing)
 
             menu.findItem(R.id.action_menu_get_link)?.let { menu ->
                 menu.title =
                     context?.resources?.getQuantityString(R.plurals.album_share_get_links, 1)
-                menu.isVisible = isAlbumSharingEnabled && album.isExported == false
+                menu.isVisible = album.isExported == false
             }
             menu.findItem(R.id.action_menu_manage_link)?.let { menu ->
-                menu.isVisible = isAlbumSharingEnabled && album.isExported == true
+                menu.isVisible = album.isExported == true
             }
             menu.findItem(R.id.action_menu_remove_link)?.let { menu ->
-                menu.isVisible = isAlbumSharingEnabled && album.isExported == true
+                menu.isVisible = album.isExported == true
             }
 
             menu.findItem(R.id.action_menu_rename)?.isVisible = true
@@ -392,7 +390,8 @@ class AlbumContentFragment : Fragment() {
     private fun openAlbumGetLinkScreen() {
         val album = albumContentViewModel.state.value.uiAlbum?.id as? UserAlbum ?: return
         val hasSensitiveElement = if (!album.isExported) {
-            albumContentViewModel.sourcePhotos?.any { it.isSensitive || it.isSensitiveInherited } ?: false
+            albumContentViewModel.sourcePhotos?.any { it.isSensitive || it.isSensitiveInherited }
+                ?: false
         } else {
             false
         }

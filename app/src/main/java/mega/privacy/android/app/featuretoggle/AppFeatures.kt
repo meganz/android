@@ -88,30 +88,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enable album sharing feature.
-     */
-    AlbumSharing(
-        "Enable album sharing feature",
-        true
-    ),
-
-    /**
-     * To switch into new compose slideshow or not toggle.
-     */
-    SlideShowCompose(
-        "Enable slideshow compose",
-        true
-    ),
-
-    /**
-     * To switch into new photos modularization architecture or not toggle
-     */
-    PhotosCompose(
-        "Enable compose-world photos feature (modularization)",
-        false
-    ),
-
-    /**
      * Permanent logging toggle
      */
     PermanentLogging("Permanently enable logging, removing functionality to turn it on/off", true),

@@ -13,14 +13,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.OpenPasswordLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.contactlink.ContactLinkDialogFragment
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
@@ -184,20 +182,16 @@ internal class OpenLinkDialogFragment : DialogFragment() {
     }
 
     private fun openAlbumLink(url: String) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.AlbumSharing)) {
-                Timber.d("openAlbumLink: $url")
-                startActivity(
-                    AlbumScreenWrapperActivity.createAlbumImportScreen(
-                        context = requireContext(),
-                        albumLink = AlbumLink(url),
-                    ).apply {
-                        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    }
-                )
-                dismissAllowingStateLoss()
+        Timber.d("openAlbumLink: $url")
+        startActivity(
+            AlbumScreenWrapperActivity.createAlbumImportScreen(
+                context = requireContext(),
+                albumLink = AlbumLink(url),
+            ).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
-        }
+        )
+        dismissAllowingStateLoss()
     }
 
     private fun handleCheckLinkResult(result: Result<ChatLinkContent>) {

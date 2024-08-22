@@ -122,15 +122,11 @@ fun AlbumsView(
     onRemoveLinkDialogConfirmClick: () -> Unit = {},
     onRemoveLinkDialogCancelClick: () -> Unit = {},
     resetRemovedLinksCount: () -> Unit = {},
-    isAlbumSharingEnabled: suspend () -> Boolean = { false },
 ) {
     val isLight = MaterialTheme.colors.isLight
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
     val grids = 3.takeIf { isPortrait } ?: 4
 
-    val displayLinkIcon by produceState(initialValue = false) {
-        value = isAlbumSharingEnabled()
-    }
     val isPaid = albumsViewState.accountType?.isPaid
 
     val scaffoldState = rememberScaffoldState()
@@ -357,7 +353,7 @@ fun AlbumsView(
                             )
                         }
 
-                        if (displayLinkIcon && isAlbumExported(album)) {
+                        if (isAlbumExported(album)) {
                             Image(
                                 painter = painterResource(id = R.drawable.ic_overlay),
                                 contentScale = ContentScale.FillBounds,

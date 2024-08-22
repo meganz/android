@@ -234,7 +234,6 @@ fun PhotosScreen(
                 onRemoveLinkDialogConfirmClick = albumsViewModel::removeAlbumsLinks,
                 onRemoveLinkDialogCancelClick = albumsViewModel::hideRemoveLinkDialog,
                 resetRemovedLinksCount = albumsViewModel::resetRemovedLinksCount,
-                isAlbumSharingEnabled = { getFeatureFlagUseCase(AppFeatures.AlbumSharing) },
             )
         },
         timelineViewState = timelineViewState,
