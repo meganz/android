@@ -120,3 +120,11 @@
 -keep public class androidx.compose.ui.platform.AndroidCompositionLocals_androidKt {
     public static *** getLocalLifecycleOwner();
 }
+
+#####################
+# Keep Fragment classes #
+#####################
+-keep class * extends androidx.fragment.app.Fragment {
+    # Keep the public no-argument constructor while allowing other methods to be optimized.
+    <init>();
+}
