@@ -2,6 +2,7 @@ package mega.privacy.android.shared.original.core.ui.controls.chip
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ExperimentalMaterialApi
@@ -97,7 +98,7 @@ fun MegaChip(
                     .contentColor(selected, enabled).value,
             ) {
                 Text(
-                    modifier = Modifier,
+                    modifier = Modifier.fillMaxWidth(),
                     text = text,
                     textAlign = TextAlign.Center
                 )
