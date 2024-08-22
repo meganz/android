@@ -123,6 +123,7 @@ import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
+import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -347,6 +348,7 @@ class ManagerViewModel @Inject constructor(
     init {
         checkUsersCallLimitReminders()
         getApiFeatureFlag()
+        loadAndroidSyncWorkManagerFeatureFlag()
 
         viewModelScope.launch {
             val order = getCloudSortOrder()
@@ -529,6 +531,22 @@ class ManagerViewModel @Inject constructor(
                 Timber.d("The Device Power Connection State is $state")
                 if (state == DevicePowerConnectionState.Connected) {
                     startCameraUploadUseCase()
+                }
+            }
+        }
+    }
+
+    private fun loadAndroidSyncWorkManagerFeatureFlag() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(SyncFeatures.AndroidSyncWorkManager)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { flag ->
+                _state.update { state ->
+                    state.copy(
+                        isAndroidSyncWorkManagerFeatureFlagEnabled = flag,
+                    )
                 }
             }
         }

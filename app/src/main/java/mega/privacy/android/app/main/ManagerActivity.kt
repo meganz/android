@@ -1968,7 +1968,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 viewModel.markHandleCheckLinkResult()
             }
 
-            if (managerState.androidSyncServiceEnabled) {
+            if (managerState.androidSyncServiceEnabled && !managerState.isAndroidSyncWorkManagerFeatureFlagEnabled) {
                 syncNavigator.startSyncService(this)
             } else {
                 syncNavigator.stopSyncService(this)

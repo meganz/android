@@ -14,6 +14,7 @@ import mega.privacy.android.data.qualifier.FeatureFlagPriorityKey
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
+import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -43,7 +44,6 @@ internal abstract class FeatureFlagModule {
     )
     abstract fun provideRemoteFeatureFlagValueProvider(ABTestFeatureFlagValueProvider: ABTestFeatureFlagValueProvider): @JvmSuppressWildcards FeatureFlagValueProvider
 
-
     companion object {
         /**
          * Provide Data features
@@ -67,5 +67,26 @@ internal abstract class FeatureFlagModule {
         fun provideDataFeatureFlagValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
             DataFeatures.Companion
 
+        /**
+         * Provide Sync features
+         *
+         * @return Sync features
+         */
+        @Provides
+        @ElementsIntoSet
+        fun provideSyncFeatures(): Set<@JvmSuppressWildcards Feature> =
+            SyncFeatures.entries.toSet()
+
+        /**
+         * Provide sync feature flag value provider
+         */
+        @Provides
+        @IntoMap
+        @FeatureFlagPriorityKey(
+            implementingClass = SyncFeatures.Companion::class,
+            priority = FeatureFlagValuePriority.Default
+        )
+        fun provideSyncFeatureFlagValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
+            SyncFeatures.Companion
     }
 }
