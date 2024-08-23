@@ -2,14 +2,18 @@ package mega.privacy.android.app.presentation.photos.albums.photosselection
 
 import mega.privacy.android.icon.pack.R as iconPackR
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,9 +39,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -200,24 +208,28 @@ fun AlbumPhotosSelectionScreen(
             }
         },
         content = {
-            AlbumPhotosSelectionContent(
-                lazyGridState = lazyGridState,
-                uiPhotos = state.uiPhotos,
-                selectedPhotoIds = state.selectedPhotoIds,
-                accountType = state.accountType,
-                onPhotoDownload = viewModel::downloadPhoto,
-                onPhotoSelection = { photo ->
-                    if (photo.id in state.selectedPhotoIds) {
-                        viewModel.unselectPhoto(photo)
-                    } else {
-                        if (state.selectedPhotoIds.size < MAX_SELECTION_NUM) {
-                            viewModel.selectPhoto(photo)
+            if (state.photos.isEmpty()) {
+                EmptyStateContent()
+            } else {
+                AlbumPhotosSelectionContent(
+                    lazyGridState = lazyGridState,
+                    uiPhotos = state.uiPhotos,
+                    selectedPhotoIds = state.selectedPhotoIds,
+                    accountType = state.accountType,
+                    onPhotoDownload = viewModel::downloadPhoto,
+                    onPhotoSelection = { photo ->
+                        if (photo.id in state.selectedPhotoIds) {
+                            viewModel.unselectPhoto(photo)
                         } else {
-                            showMaxSelectionDialog = true
+                            if (state.selectedPhotoIds.size < MAX_SELECTION_NUM) {
+                                viewModel.selectPhoto(photo)
+                            } else {
+                                showMaxSelectionDialog = true
+                            }
                         }
-                    }
-                },
-            )
+                    },
+                )
+            }
         },
     )
 }
@@ -499,3 +511,55 @@ private fun locationFilterAnalytics(location: TimelinePhotosSource) =
             CAMERA_UPLOAD -> AlbumPhotosSelectionCameraUploadsButtonEvent
         }
     )
+
+@Composable
+private fun EmptyStateContent(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Image(
+            imageVector = ImageVector.vectorResource(id = R.drawable.ic_no_images),
+            contentDescription = "Empty",
+            colorFilter = ColorFilter.tint(
+                color = if (MaterialTheme.colors.isLight) {
+                    Color(0xFFDADADA)
+                } else {
+                    Color(0xFFEAEFEF)
+                }
+            ),
+            alpha = if (MaterialTheme.colors.isLight) 1F else 0.16F
+        )
+
+        Row(
+            modifier = Modifier
+                .wrapContentWidth()
+                .padding(top = 42.dp)
+        ) {
+            val placeHolderStart = "[B]"
+            val placeHolderEnd = "[/B]"
+
+            val text = stringResource(id = R.string.timeline_empty_media)
+
+            Text(
+                text = text.substring(0, text.indexOf(placeHolderStart)),
+                color = colorResource(id = R.color.grey_054_white_054),
+            )
+
+            Text(
+                text = text.substring(
+                    text.indexOf(placeHolderStart),
+                    text.indexOf(placeHolderEnd)
+                ).replace("[B]", ""),
+                color = colorResource(id = R.color.grey_087_white_087),
+                fontWeight = FontWeight.ExtraBold,
+            )
+
+            Text(
+                text = text.substring(text.indexOf(placeHolderEnd)).replace("[/B]", ""),
+                color = colorResource(id = R.color.grey_054_white_054),
+            )
+        }
+    }
+}
