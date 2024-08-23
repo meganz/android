@@ -320,6 +320,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
+import mega.privacy.android.feature.sync.ui.SyncMonitorViewModel
 import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.widgets.setTransfersWidgetContent
@@ -384,6 +385,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private val startDownloadViewModel: StartDownloadViewModel by viewModels()
     private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
+    private val syncMonitorViewModel: SyncMonitorViewModel by viewModels()
 
     private val searchResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -1976,6 +1978,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             if (managerState.uploadEvent is StateEventWithContentTriggered) {
                 startDownloadViewModel.onUploadClicked(managerState.uploadEvent.content)
+            }
+            if (managerState.isAndroidSyncWorkManagerFeatureFlagEnabled) {
+                syncMonitorViewModel.startMonitoring()
             }
         }
         this.collectFlow(

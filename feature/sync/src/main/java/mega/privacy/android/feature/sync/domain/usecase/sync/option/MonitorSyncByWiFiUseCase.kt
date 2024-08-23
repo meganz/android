@@ -8,7 +8,7 @@ import javax.inject.Inject
 /**
  * Use case for monitoring if sync should be done only when connected to WiFi
  */
-internal class MonitorSyncByWiFiUseCase @Inject constructor(
+class MonitorSyncByWiFiUseCase @Inject constructor(
     private val syncPreferencesRepository: SyncPreferencesRepository,
 ) {
 

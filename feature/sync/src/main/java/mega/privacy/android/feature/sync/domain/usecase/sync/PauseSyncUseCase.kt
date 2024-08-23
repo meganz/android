@@ -3,7 +3,10 @@ package mega.privacy.android.feature.sync.domain.usecase.sync
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import javax.inject.Inject
 
-internal class PauseSyncUseCase @Inject constructor(
+/**
+ *  Use case to pause a sync by sync id
+ */
+class PauseSyncUseCase @Inject constructor(
     private val syncRepository: SyncRepository
 ) {
 

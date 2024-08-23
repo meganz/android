@@ -16,7 +16,7 @@ import javax.inject.Inject
  * @param monitorSyncsUseCase         [MonitorSyncsUseCase]
  * @param isSyncPausedByTheUserUseCase  [IsSyncPausedByTheUserUseCase]
  */
-internal class PauseResumeSyncsBasedOnBatteryAndWiFiUseCase @Inject constructor(
+class PauseResumeSyncsBasedOnBatteryAndWiFiUseCase @Inject constructor(
     private val isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase,
     private val pauseSyncUseCase: PauseSyncUseCase,
     private val resumeSyncUseCase: ResumeSyncUseCase,

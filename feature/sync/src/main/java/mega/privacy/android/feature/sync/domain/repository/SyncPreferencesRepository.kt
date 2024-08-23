@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 /**
  * Repository for storing user preference regarding Sync
  */
-internal interface SyncPreferencesRepository {
+interface SyncPreferencesRepository {
 
     /**
      * Sets if sync should be done only when connected to WiFi
