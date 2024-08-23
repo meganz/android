@@ -30,7 +30,6 @@ import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -72,14 +71,31 @@ class GroupChatInfoViewModelTest {
 
     private val connectivityFlow = MutableSharedFlow<Boolean>()
     private val updatePushNotificationSettings = MutableSharedFlow<Boolean>()
+    private val chatCallUpdates = MutableSharedFlow<ChatCall>()
     private val chatRoomUpdates = MutableSharedFlow<ChatRoom>()
 
     private val chatId = 123L
 
-    @BeforeAll
-    fun setup() {
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            setOpenInviteWithChatIdUseCase,
+            monitorConnectivityUseCase,
+            startCallUseCase,
+            get1On1ChatIdUseCase,
+            passcodeManagement,
+            chatApiGateway,
+            setChatVideoInDeviceUseCase,
+            chatManagement,
+            endCallUseCase,
+            sendStatisticsMeetingsUseCase,
+            monitorUpdatePushNotificationSettingsUseCase,
+            broadcastChatArchivedUseCase,
+            broadcastLeaveChatUseCase,
+            getChatCallUseCase,
+            monitorChatCallUpdatesUseCase,
+        )
         initializeStubbing()
-        initializeViewModel()
     }
 
     private fun initializeStubbing() {
@@ -88,6 +104,7 @@ class GroupChatInfoViewModelTest {
         wheneverBlocking { monitorSFUServerUpgradeUseCase() } doReturn emptyFlow()
         wheneverBlocking { getFeatureFlagValueUseCase.invoke(any()) } doReturn false
         wheneverBlocking { monitorChatRoomUpdatesUseCase(chatId) } doReturn chatRoomUpdates
+        wheneverBlocking { monitorChatCallUpdatesUseCase() } doReturn chatCallUpdates
     }
 
     private fun initializeViewModel() {
@@ -116,6 +133,7 @@ class GroupChatInfoViewModelTest {
     @Test
     fun `test that the end call use case is executed, and the meeting's statistics are sent when the user ends the call for all`() =
         runTest {
+            initializeViewModel()
             underTest.endCallForAll()
 
             verify(endCallUseCase).invoke(underTest.state.value.chatId)
@@ -125,9 +143,11 @@ class GroupChatInfoViewModelTest {
     @Test
     fun `test that a call is started when on call button tapped`() = runTest {
         val chatID = 123L
+
         whenever(get1On1ChatIdUseCase(any())).thenReturn(chatID)
         whenever(setChatVideoInDeviceUseCase()).thenThrow(RuntimeException())
 
+        initializeViewModel()
         underTest.onCallTap(
             userHandle = 456L,
             video = false,
@@ -140,9 +160,15 @@ class GroupChatInfoViewModelTest {
     @Test
     fun `test that new chatId and call are set when setChatId is invoked`() =
         runTest {
-            val call = mock<ChatCall>()
+            val call = mock<ChatCall> {
+                on { callId } doReturn 456L
+            }
+
             whenever(getChatCallUseCase.invoke(chatId)).thenReturn(call)
+
+            initializeViewModel()
             underTest.setChatId(chatId)
+
             underTest.state.test {
                 val item = awaitItem()
                 assertThat(item.chatId).isEqualTo(chatId)
@@ -154,7 +180,10 @@ class GroupChatInfoViewModelTest {
     fun `test that call is not set if there is no existing call when setChatId is invoked`() =
         runTest {
             whenever(getChatCallUseCase.invoke(chatId)).thenReturn(null)
+
+            initializeViewModel()
             underTest.setChatId(chatId)
+
             underTest.state.test {
                 val item = awaitItem()
                 assertThat(item.chatId).isEqualTo(chatId)
@@ -175,10 +204,11 @@ class GroupChatInfoViewModelTest {
             on { hasChanged(ChatRoomChange.OpenInvite) } doReturn true
         }
 
+
+        initializeViewModel()
         underTest.setChatId(chatId)
         chatRoomUpdates.emit(chat1)
 
-        verify(monitorChatRoomUpdatesUseCase).invoke(chatId)
         underTest.state.map { it.resultSetOpenInvite }.test {
             assertThat(awaitItem()).isTrue()
             chatRoomUpdates.emit(chat2)
@@ -186,26 +216,22 @@ class GroupChatInfoViewModelTest {
         }
     }
 
-    @BeforeEach
-    fun tearDown() {
-        reset(
-            setOpenInviteWithChatIdUseCase,
-            monitorConnectivityUseCase,
-            startCallUseCase,
-            get1On1ChatIdUseCase,
-            passcodeManagement,
-            chatApiGateway,
-            setChatVideoInDeviceUseCase,
-            chatManagement,
-            endCallUseCase,
-            sendStatisticsMeetingsUseCase,
-            monitorUpdatePushNotificationSettingsUseCase,
-            broadcastChatArchivedUseCase,
-            broadcastLeaveChatUseCase,
-            getChatCallUseCase,
-            monitorChatCallUpdatesUseCase,
-        )
-        initializeStubbing()
+    @Test
+    fun `test that retention time updates update state correctly`() = runTest {
+        val retentionTime = 5693L
+        val chat1 = mock<ChatRoom> {
+            on { chatId } doReturn chatId
+            on { this.retentionTime } doReturn retentionTime
+            on { hasChanged(ChatRoomChange.RetentionTime) } doReturn true
+        }
+
+        initializeViewModel()
+        underTest.setChatId(chatId)
+        chatRoomUpdates.emit(chat1)
+
+        underTest.state.map { it.retentionTime }.test {
+            assertThat(awaitItem()).isEqualTo(retentionTime)
+        }
     }
 
     companion object {

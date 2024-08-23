@@ -42,6 +42,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * @property showUpdateAliasDialog                      True, shows update nick name dialog to the user
  * @property moveRequestResult
  * @property showForceUpdateDialog                      True, shows force update dialog to the user
+ * @property retentionTime                              The retention time.
  */
 data class ContactInfoUiState(
     val error: Int? = null,
@@ -73,6 +74,7 @@ data class ContactInfoUiState(
     val showUpdateAliasDialog: Boolean = false,
     val moveRequestResult: Result<MoveRequestResult>? = null,
     val showForceUpdateDialog: Boolean = false,
+    val retentionTime: Long? = null,
 ) {
 
     /**

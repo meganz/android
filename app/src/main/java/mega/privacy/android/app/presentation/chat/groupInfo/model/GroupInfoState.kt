@@ -10,6 +10,7 @@ package mega.privacy.android.app.presentation.chat.groupInfo.model
  * @property isPushNotificationSettingsUpdatedEvent     Push notification settings updated event
  * @property showForceUpdateDialog                      True, shows force update dialog to the user
  * @property isCallUnlimitedProPlanFeatureFlagEnabled   True if the call unlimited pro plan feature flag is enabled, false if not.
+ * @property retentionTime                              The retention time.
  */
 data class GroupInfoState(
     val chatId: Long = -1L,
@@ -19,4 +20,5 @@ data class GroupInfoState(
     val isPushNotificationSettingsUpdatedEvent: Boolean = false,
     val showForceUpdateDialog: Boolean = false,
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
+    val retentionTime: Long? = null,
 )

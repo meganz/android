@@ -14,7 +14,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS
-import mega.privacy.android.app.listeners.ChatRoomListener
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.utils.CallUtil
@@ -22,8 +21,8 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.domain.entity.statistics.EndedEmptyCallTimeout
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.chat.BroadcastJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
+import mega.privacy.android.domain.usecase.chat.BroadcastJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -54,11 +53,6 @@ class ChatManagement @Inject constructor(
 ) {
     private val app: MegaApplication = getInstance()
     private var countDownTimerToEndCall: CountDownTimer? = null
-
-    /**
-     * List of chat room listeners
-     */
-    private val chatRoomListeners = HashMap<Long, ChatRoomListener>()
 
     /**
      * Counter down value used to hang a call when user is alone (empty call scenario)
@@ -119,30 +113,6 @@ class ChatManagement @Inject constructor(
     var isDisablingLocalVideo = false
     private var isScreenOn = true
     private var isScreenBroadcastRegister = false
-
-    /**
-     * Method for open a particular chatRoom.
-     *
-     * @param chatId The chat ID.
-     * @return True, if it has been done correctly. False if not.
-     */
-    fun openChatRoom(chatId: Long): Boolean {
-        closeChatRoom(chatId)
-        chatRoomListeners[chatId] = ChatRoomListener()
-        return megaChatApi.openChatRoom(chatId, chatRoomListeners[chatId])
-    }
-
-    /**
-     * Method for close a particular chatRoom.
-     *
-     * @param chatId The chat ID.
-     */
-    private fun closeChatRoom(chatId: Long) {
-        if (chatRoomListeners.containsKey(chatId)) {
-            megaChatApi.closeChatRoom(chatId, chatRoomListeners[chatId])
-            chatRoomListeners.remove(chatId)
-        }
-    }
 
     /**
      * Check if there is a pending join link

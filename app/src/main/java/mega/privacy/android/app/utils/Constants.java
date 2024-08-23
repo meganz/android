@@ -474,7 +474,6 @@ public class Constants {
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";
     public static final String EXTRA_MESSAGE = "EXTRA_MESSAGE";
 
-    public static final String ACTION_IS_CHAT_ALREADY_OPEN = "IS_CHAT_ALREADY_OPEN";
     public static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;
     public static final int MAX_WIDTH_CONTACT_NAME_PORT = 200;
     public static final int EMOJI_SIZE = 20;

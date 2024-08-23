@@ -279,11 +279,7 @@ class ContactAttachmentActivity : PasscodeActivity(), MegaRequestListenerInterfa
         val contact: MegaUser? = megaApi.getContact(c.email)
         if (contact != null) {
             if (contact.visibility == MegaUser.VISIBILITY_VISIBLE) {
-                val chat: MegaChatRoom? = megaChatApi.getChatRoom(chatId)
-                val contactHandle: Long = c.userId
-                val isChatRoomOpen =
-                    chat != null && !chat.isGroup && contactHandle == chat.getPeerHandle(0)
-                ContactUtil.openContactInfoActivity(this, c.email, isChatRoomOpen)
+                ContactUtil.openContactInfoActivity(this, c.email)
             } else {
                 Timber.d("The user is not contact")
                 showSnackbar(getString(R.string.alert_user_is_not_contact))

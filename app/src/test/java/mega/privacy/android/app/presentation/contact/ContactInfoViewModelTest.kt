@@ -7,6 +7,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -35,9 +37,12 @@ import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.call.IsChatConnectedToInitiateCallUseCase
+import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatRetentionTimeUpdateUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.ApplyContactUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromChatUseCase
@@ -48,10 +53,8 @@ import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenU
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
-import mega.privacy.android.domain.usecase.call.IsChatConnectedToInitiateCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
-import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
@@ -65,6 +68,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -110,6 +114,8 @@ class ContactInfoViewModelTest {
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
         on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
     }
+    private val monitorChatRetentionTimeUpdateUseCase =
+        mock<MonitorChatRetentionTimeUpdateUseCase>()
     private var createShareKeyUseCase: CreateShareKeyUseCase = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private var checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase = mock()
@@ -214,6 +220,7 @@ class ContactInfoViewModelTest {
             openOrStartCallUseCase = openOrStartCallUseCase,
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             copyNodesUseCase = copyNodesUseCase,
+            monitorChatRetentionTimeUpdateUseCase = monitorChatRetentionTimeUpdateUseCase
         )
     }
 
@@ -238,6 +245,7 @@ class ContactInfoViewModelTest {
             contactItem
         )
         whenever(isConnectedToInternetUseCase()).thenReturn(true)
+        whenever(monitorChatRetentionTimeUpdateUseCase(any())) doReturn emptyFlow()
     }
 
     @Test
@@ -586,6 +594,20 @@ class ContactInfoViewModelTest {
             uiState.test {
                 assertFalse(awaitItem().isUserRemoved)
             }
+        }
+    }
+
+    @Test
+    fun `test that retention time updates update state correctly`() = runTest {
+        val chatId = 123L
+        val retentionTime = 5693L
+
+        whenever(monitorChatRetentionTimeUpdateUseCase(chatId)) doReturn flowOf(retentionTime)
+
+        underTest.monitorChatRetentionTimeUpdate(chatId)
+
+        underTest.uiState.map { it.retentionTime }.test {
+            assertThat(awaitItem()).isEqualTo(retentionTime)
         }
     }
 }

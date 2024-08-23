@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting
 
-import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,8 +20,6 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
-import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
@@ -402,11 +399,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         val retentionTimeValue =
                             if (chat.hasChanged(ChatRoomChange.RetentionTime)) {
                                 Timber.d("Changes in retention time")
-                                getInstance().sendBroadcast(
-                                    Intent(ACTION_UPDATE_RETENTION_TIME)
-                                        .putExtra(RETENTION_TIME, chat.retentionTime)
-                                        .setPackage(getInstance().applicationContext.packageName)
-                                )
 
                                 if (chat.retentionTime != Constants.DISABLED_RETENTION_TIME) chat.retentionTime
                                 else null

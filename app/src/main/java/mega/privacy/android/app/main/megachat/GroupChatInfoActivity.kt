@@ -35,6 +35,8 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.userWaitingForCall
@@ -136,7 +138,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     lateinit var binding: ActivityGroupChatPropertiesBinding
     private val viewModel by viewModels<GroupChatInfoViewModel>()
 
-    var isChatOpen = false
     var chatLink: String? = null
     var chatC: ChatController? = null
     var chatHandle: Long = 0
@@ -194,23 +195,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         }
     }
 
-    private val retentionTimeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent?) {
-            intent?.let {
-                it.action?.let { action ->
-                    if (action == BroadcastConstants.ACTION_UPDATE_RETENTION_TIME) {
-                        adapter?.updateRetentionTimeUI(
-                            intent.getLongExtra(
-                                BroadcastConstants.RETENTION_TIME,
-                                Constants.DISABLED_RETENTION_TIME
-                            )
-                        )
-                    }
-                }
-            }
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -231,7 +215,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 return
             }
 
-            isChatOpen = extras.getBoolean(Constants.ACTION_IS_CHAT_ALREADY_OPEN, false)
             chat = megaChatApi.getChatRoom(chatHandle)
             if (chat == null) {
                 Timber.e("Chatroom NULL cannot be recovered")
@@ -240,10 +223,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             }
 
             dbH = getInstance().dbH
-
-            if (!isChatOpen) {
-                chatManagement.openChatRoom(chat!!.chatId)
-            }
 
             binding = ActivityGroupChatPropertiesBinding.inflate(layoutInflater)
             setContentView(binding.root)
@@ -294,10 +273,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
             megaChatApi.signalPresenceActivity()
 
-            registerReceiver(
-                retentionTimeReceiver,
-                IntentFilter(BroadcastConstants.ACTION_UPDATE_RETENTION_TIME)
-            )
             val contactUpdateFilter =
                 IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE)
             contactUpdateFilter.addAction(BroadcastConstants.ACTION_UPDATE_NICKNAME)
@@ -364,6 +339,10 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             }
             updateParticipantsWarning()
         }
+
+        collectFlow(viewModel.state.map { it.retentionTime }.distinctUntilChanged()) {
+            it?.let { adapter?.updateRetentionTimeUI(it) }
+        }
     }
 
     private fun updateParticipantsWarning() {
@@ -386,7 +365,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(retentionTimeReceiver)
         unregisterReceiver(contactUpdateReceiver)
         composite.clear()
     }

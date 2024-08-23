@@ -40,10 +40,11 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
@@ -54,10 +55,8 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.twemoji.EmojiEditText
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE
-import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
 import mega.privacy.android.app.databinding.ActivityChatContactPropertiesBinding
 import mega.privacy.android.app.databinding.LayoutMenuReturnCallBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -162,7 +161,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private var setNicknameDialog: AlertDialog? = null
 
     private var startVideo = false
-    private var isChatOpen = false
     private var firstLineTextMaxWidthExpanded = 0
     private var firstLineTextMaxWidthCollapsed = 0
     private var contactStateIcon = 0
@@ -198,19 +196,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         override fun onReceive(context: Context, intent: Intent) {
             hideSelectMode()
             statusDialog?.dismiss()
-        }
-    }
-
-    private val retentionTimeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == ACTION_UPDATE_RETENTION_TIME) {
-                val seconds = intent.getLongExtra(RETENTION_TIME, Constants.DISABLED_RETENTION_TIME)
-                ChatUtil.updateRetentionTimeLayout(
-                    contentContactProperties.retentionTimeText,
-                    seconds,
-                    this@ContactInfoActivity
-                )
-            }
         }
     }
 
@@ -475,10 +460,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE)
         )
         registerReceiver(
-            retentionTimeReceiver,
-            IntentFilter(ACTION_UPDATE_RETENTION_TIME)
-        )
-        registerReceiver(
             destroyActionModeReceiver,
             IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE)
         )
@@ -486,7 +467,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private fun getContactData(extras: Bundle) {
         val chatHandle = extras.getLong(Constants.HANDLE, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
-        isChatOpen = extras.getBoolean(Constants.ACTION_IS_CHAT_ALREADY_OPEN, false)
         val userEmailExtra = extras.getString(Constants.NAME)
         viewModel.updateContactInfo(chatHandle, userEmailExtra)
     }
@@ -943,6 +923,16 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             }
         }
 
+        collectFlow(viewModel.uiState.map { it.retentionTime }.distinctUntilChanged()) {
+            it?.let {
+                ChatUtil.updateRetentionTimeLayout(
+                    contentContactProperties.retentionTimeText,
+                    it,
+                    this@ContactInfoActivity
+                )
+            }
+        }
+
         collectFlow(waitingRoomManagementViewModel.state) { state ->
             state.snackbarString?.let {
                 showSnackbar(
@@ -1313,7 +1303,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         drawableSend?.colorFilter = null
         drawableShare?.colorFilter = null
         megaApi.removeRequestListener(this)
-        unregisterReceiver(retentionTimeReceiver)
         unregisterReceiver(manageShareReceiver)
         unregisterReceiver(destroyActionModeReceiver)
     }
@@ -1370,9 +1359,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 updateChatHistoryLayoutVisibility(shouldShow = false)
                 retentionTimeText.isVisible = false
             } else {
-                if (!isChatOpen) {
-                    getChatManagement().openChatRoom(chatId)
-                }
                 ChatUtil.updateRetentionTimeLayout(
                     retentionTimeText,
                     ChatUtil.getUpdatedRetentionTimeFromAChat(chatId),

@@ -5,7 +5,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDAT
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE;
-import static mega.privacy.android.app.utils.Constants.ACTION_IS_CHAT_ALREADY_OPEN;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
 import static mega.privacy.android.app.utils.Constants.NAME;
@@ -226,20 +225,8 @@ public class ContactUtil {
      * @param name    The name of the contact.
      */
     public static void openContactInfoActivity(Context context, String name) {
-        openContactInfoActivity(context, name, false);
-    }
-
-    /**
-     * Method to open ContactInfoActivity.class.
-     *
-     * @param context        Activity context.
-     * @param name           The name of the contact.
-     * @param isChatRoomAlreadyOpen True, if the chatRoom is already open. False, otherwise.
-     */
-    public static void openContactInfoActivity(Context context, String name, boolean isChatRoomAlreadyOpen) {
         Intent i = new Intent(context, ContactInfoActivity.class);
         i.putExtra(NAME, name);
-        i.putExtra(ACTION_IS_CHAT_ALREADY_OPEN, isChatRoomAlreadyOpen);
         context.startActivity(i);
     }
 

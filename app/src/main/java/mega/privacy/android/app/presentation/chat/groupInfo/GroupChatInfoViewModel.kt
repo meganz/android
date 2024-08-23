@@ -117,8 +117,14 @@ class GroupChatInfoViewModel @Inject constructor(
         monitorChatRoomUpdatesJob?.cancel()
         monitorChatRoomUpdatesJob = viewModelScope.launch {
             monitorChatRoomUpdatesUseCase(chatId).collectLatest { chat ->
-                if (chat.hasChanged(ChatRoomChange.OpenInvite)) {
-                    _state.update { state -> state.copy(resultSetOpenInvite = chat.isOpenInvite) }
+                when {
+                    chat.hasChanged(ChatRoomChange.OpenInvite) -> {
+                        _state.update { state -> state.copy(resultSetOpenInvite = chat.isOpenInvite) }
+                    }
+
+                    chat.hasChanged(ChatRoomChange.RetentionTime) -> {
+                        _state.update { state -> state.copy(retentionTime = chat.retentionTime) }
+                    }
                 }
             }
         }

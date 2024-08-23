@@ -24,7 +24,6 @@ fun showGroupOrContactInfoActivity(context: Context, uiState: ChatUiState) {
                 if (isGroup) GroupChatInfoActivity::class.java else ContactInfoActivity::class.java
             Intent(context, targetActivity).apply {
                 putExtra(Constants.HANDLE, chatId)
-                putExtra(Constants.ACTION_IS_CHAT_ALREADY_OPEN, true)
             }.also {
                 context.startActivity(it)
             }

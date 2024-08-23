@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -49,6 +50,7 @@ import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatRetentionTimeUpdateUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.ApplyContactUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromChatUseCase
@@ -128,9 +130,12 @@ class ContactInfoViewModel @Inject constructor(
     private val copyNodesUseCase: CopyNodesUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    private val monitorChatRetentionTimeUpdateUseCase: MonitorChatRetentionTimeUpdateUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ContactInfoUiState())
+
+    private var monitorChatRetentionTimeUpdateJob: Job? = null
 
     /**
      * UI State ContactInfo
@@ -191,11 +196,22 @@ class ContactInfoViewModel @Inject constructor(
         monitorChatConnectionStateUpdates()
     }
 
+    internal fun monitorChatRetentionTimeUpdate(chatId: Long) {
+        monitorChatRetentionTimeUpdateJob?.cancel()
+        monitorChatRetentionTimeUpdateJob = viewModelScope.launch {
+            monitorChatRetentionTimeUpdateUseCase(chatId).collectLatest {
+                _uiState.update { state -> state.copy(retentionTime = it) }
+            }
+        }
+    }
+
     private fun monitorChatConnectionStateUpdates() = viewModelScope.launch {
         monitorChatConnectionStateUseCase().collectLatest {
             val shouldInitiateCall = isChatConnectedToInitiateCallUseCase(
                 newState = it.chatConnectionStatus,
-                chatRoom = getChatRoomUseCase(it.chatId),
+                chatRoom = getChatRoomUseCase(it.chatId)?.also { chat ->
+                    monitorChatRetentionTimeUpdate(chat.chatId)
+                },
                 isWaitingForCall = MegaApplication.isWaitingForCall,
                 userWaitingForCall = MegaApplication.userWaitingForCall,
             )
@@ -466,7 +482,9 @@ class ContactInfoViewModel @Inject constructor(
                 lastGreen = userInfo?.lastSeen ?: 0,
                 userChatStatus = userInfo?.status ?: UserChatStatus.Invalid,
                 contactItem = userInfo,
-                chatRoom = chatRoom,
+                chatRoom = chatRoom?.also { chat ->
+                    monitorChatRetentionTimeUpdate(chat.chatId)
+                },
             )
         }
         updateAvatar(userInfo)
@@ -657,10 +675,11 @@ class ContactInfoViewModel @Inject constructor(
                 startConversationUseCase(isGroup = false, userHandles = listOf(it))
             }.onSuccess {
                 val chatRoom = getChatRoomUseCase(it)
-                chatRoom?.let {
+                chatRoom?.let { chat ->
                     _uiState.update { state ->
-                        state.copy(chatRoom = chatRoom, shouldNavigateToChat = true)
+                        state.copy(chatRoom = chat, shouldNavigateToChat = true)
                     }
+                    monitorChatRetentionTimeUpdate(chat.chatId)
                 }
             }.onFailure {
                 _uiState.update { state ->
@@ -688,7 +707,9 @@ class ContactInfoViewModel @Inject constructor(
             runCatching {
                 createChatRoomUseCase(isGroup = false, userHandles = listOf(it))
             }.onSuccess {
-                val chatRoom = getChatRoomUseCase(it)
+                val chatRoom = getChatRoomUseCase(it)?.also { chat ->
+                    monitorChatRetentionTimeUpdate(chat.chatId)
+                }
                 _uiState.update { state ->
                     state.copy(chatRoom = chatRoom)
                 }

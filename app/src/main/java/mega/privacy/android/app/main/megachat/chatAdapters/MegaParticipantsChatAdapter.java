@@ -35,7 +35,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -53,6 +52,7 @@ import mega.privacy.android.app.main.megachat.MegaChatParticipant;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsLimitWarningView;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -414,9 +414,6 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                             }
                         }
 
-                        if (!groupChatInfoActivity.isChatOpen()) {
-                            MegaApplication.getChatManagement().openChatRoom(getChat().getChatId());
-                        }
                         updateRetentionTimeLayout(holderHeader.retentionTimeText, getUpdatedRetentionTimeFromAChat(getChat().getChatId()), groupChatInfoActivity);
                     } else {
                         holderHeader.editImageView.setVisibility(View.GONE);

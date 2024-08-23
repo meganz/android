@@ -22,10 +22,6 @@ internal fun openFolderLinkActivity(
         flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
         action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
         data = folderLink
-        putExtra(
-            Constants.ACTION_IS_CHAT_ALREADY_OPEN,
-            true
-        )
     }.also {
         context.startActivity(it)
     }

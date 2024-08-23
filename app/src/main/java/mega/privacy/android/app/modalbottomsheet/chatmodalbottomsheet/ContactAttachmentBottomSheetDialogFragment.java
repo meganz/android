@@ -291,9 +291,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             }
 
             if (contactHandle != MEGACHAT_INVALID_HANDLE) {
-                MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-                boolean isChatRoomOpen = chatRoom != null && !chatRoom.isGroup() && contactHandle == chatRoom.getPeerHandle(0);
-                ContactUtil.openContactInfoActivity(requireActivity(), contactEmail, isChatRoomOpen);
+                ContactUtil.openContactInfoActivity(requireActivity(), contactEmail);
             }
         } else if (id == R.id.option_view) {
             Timber.d("View option");

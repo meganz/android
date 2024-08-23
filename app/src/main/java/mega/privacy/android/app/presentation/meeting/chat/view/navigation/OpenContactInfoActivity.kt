@@ -14,10 +14,6 @@ internal fun openContactInfoActivity(
         ContactInfoActivity::class.java
     ).apply {
         putExtra(Constants.NAME, email)
-        putExtra(
-            Constants.ACTION_IS_CHAT_ALREADY_OPEN,
-            true
-        )
     }.also {
         context.startActivity(it)
     }
