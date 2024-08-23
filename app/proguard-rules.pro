@@ -128,3 +128,9 @@
     # Keep the public no-argument constructor while allowing other methods to be optimized.
     <init>();
 }
+
+-keep public class org.slf4j.** { *; }
+-keep public class ch.** { *; }
+-keep class javax.mail.** { *; }
+-keep class javax.mail.internet.** { *; }
+-dontwarn javax.mail.**

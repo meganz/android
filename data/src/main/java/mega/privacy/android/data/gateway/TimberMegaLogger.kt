@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway
 
 import android.util.Log
+import androidx.annotation.Keep
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaLoggerInterface
 import timber.log.Timber
@@ -13,6 +14,7 @@ import javax.inject.Inject
  *
  * See logback.xml for configuration.
  */
+@Keep
 internal class TimberMegaLogger @Inject constructor() : MegaLoggerInterface {
     @Synchronized
     override fun log(time: String, logLevel: Int, source: String, message: String) {
