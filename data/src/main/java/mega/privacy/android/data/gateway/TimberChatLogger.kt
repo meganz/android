@@ -4,12 +4,14 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatLoggerInterface
 import timber.log.Timber
 import javax.inject.Inject
+import androidx.annotation.Keep
 
 /**
  * Chat file logger
  *
  * Chat log listener that prints all the chat output to file. See logback.xml for configuration
  */
+@Keep
 internal class TimberChatLogger @Inject constructor() : MegaChatLoggerInterface {
     @Synchronized
     override fun log(loglevel: Int, message: String?) {

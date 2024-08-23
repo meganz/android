@@ -1,6 +1,7 @@
 package mega.privacy.android.data.logging
 
 import android.util.Log
+import androidx.annotation.Keep
 import mega.privacy.android.data.gateway.TimberChatLogger
 import mega.privacy.android.data.gateway.TimberMegaLogger
 import timber.log.Timber
@@ -10,6 +11,7 @@ import timber.log.Timber
  *
  * Debug log output tree for logcat
  */
+@Keep
 internal class LineNumberDebugTree : Timber.DebugTree() {
     private val ignoredClasses = listOf(
         Timber::class.java.name,
