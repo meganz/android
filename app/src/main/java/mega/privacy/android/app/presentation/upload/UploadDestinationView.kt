@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +24,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -40,12 +42,19 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
  */
 @Composable
 fun UploadDestinationView(
-    editableFile: String = "",
-    importUiItems: List<ImportUiItem> = emptyList(),
+    confirmImport: () -> Unit,
+    consumeNameValidationError: () -> Unit,
+    editFileName: (ImportUiItem?) -> Unit,
+    updateFileName: (String) -> Unit,
+    uiState: UploadDestinationUiState,
     isUrl: Boolean = false,
 ) {
+    val scaffoldState = rememberScaffoldState()
     MegaScaffold(
-        modifier = Modifier.systemBarsPadding().fillMaxSize(),
+        modifier = Modifier
+            .systemBarsPadding()
+            .fillMaxSize(),
+        scaffoldState = scaffoldState,
         topBar = {
             MegaAppBar(
                 title = stringResource(id = R.string.title_upload_explorer),
@@ -57,8 +66,21 @@ fun UploadDestinationView(
         val showMore = rememberSaveable {
             mutableStateOf(false)
         }
-        val itemsToShow = if (showMore.value) importUiItems else importUiItems.take(4)
+        val itemsToShow =
+            if (showMore.value) uiState.importUiItems else uiState.importUiItems.take(4)
 
+        EventEffect(
+            event = uiState.navigateToUpload,
+            onConsumed = { },
+        ) { items ->
+            scaffoldState.snackbarHostState.showSnackbar("Navigate to upload screen with ${items.size} items")
+        }
+
+        EventEffect(
+            event = uiState.nameValidationError,
+            onConsumed = { consumeNameValidationError() }) {
+            scaffoldState.snackbarHostState.showSnackbar(it)
+        }
 
         LazyColumn(
             modifier = Modifier.testTag(UPLOAD_DESTINATION_VIEW_FILE_LIST_VIEW),
@@ -70,7 +92,7 @@ fun UploadDestinationView(
                     } else {
                         pluralStringResource(
                             id = R.plurals.general_num_files,
-                            count = importUiItems.size
+                            count = uiState.importUiItems.size
                         )
                     },
                     modifier = Modifier
@@ -81,16 +103,22 @@ fun UploadDestinationView(
             }
             items(itemsToShow.size) { item ->
                 UploadDestinationRowItem(
-                    fileName = importUiItems[item].fileName,
-                    filePath = importUiItems[item].filePath,
-                    isEditMode = editableFile == importUiItems[item].fileName,
+                    importUiItem = uiState.importUiItems[item],
+                    isEditMode = uiState.editableFile == uiState.importUiItems[item]
+                            || uiState.importUiItems[item].error.isNullOrBlank().not(),
+                    editFileName = editFileName,
+                    updateFileName = updateFileName,
                 )
                 if (item < itemsToShow.size - 1) {
                     MegaDivider(dividerType = DividerType.FullSize)
                 }
             }
             item {
-                UploadDestinationFooterView(importUiItems, showMore)
+                UploadDestinationFooterView(
+                    fileList = uiState.importUiItems,
+                    showMore = showMore,
+                    confirmImport = confirmImport
+                )
             }
         }
     }
@@ -100,6 +128,7 @@ fun UploadDestinationView(
 private fun UploadDestinationFooterView(
     fileList: List<ImportUiItem>,
     showMore: MutableState<Boolean>,
+    confirmImport: () -> Unit,
 ) {
     if (fileList.size > 4) {
         Row(
@@ -157,6 +186,7 @@ private fun UploadDestinationFooterView(
         modifier = Modifier.testTag(UPLOAD_DESTINATION_VIEW_CLOUD_DRIVE),
         text = stringResource(id = R.string.section_cloud_drive),
         onClick = {
+            confirmImport()
             //navigate to cloud drive
         },
         textAlign = TextAlign.Start,
@@ -167,6 +197,7 @@ private fun UploadDestinationFooterView(
         modifier = Modifier.testTag(UPLOAD_DESTINATION_VIEW_CHAT),
         text = stringResource(id = R.string.section_chat),
         onClick = {
+            confirmImport()
             //navigate to chat
         },
         textAlign = TextAlign.Start,
@@ -179,12 +210,18 @@ private fun UploadDestinationFooterView(
 private fun UploadViewPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         UploadDestinationView(
-            importUiItems = listOf(
-                ImportUiItem(fileName = "file1", filePath = "path1"),
-                ImportUiItem(fileName = "file2", filePath = "path2"),
-                ImportUiItem(fileName = "file3", filePath = "path3"),
-                ImportUiItem(fileName = "file4", filePath = "path4"),
-            )
+            uiState = UploadDestinationUiState(
+                importUiItems = listOf(
+                    ImportUiItem(fileName = "file1", filePath = "path1"),
+                    ImportUiItem(fileName = "file2", filePath = "path2"),
+                    ImportUiItem(fileName = "file3", filePath = "path3"),
+                    ImportUiItem(fileName = "file4", filePath = "path4"),
+                ),
+            ),
+            confirmImport = {},
+            consumeNameValidationError = {},
+            editFileName = {},
+            updateFileName = {},
         )
     }
 }
@@ -194,18 +231,24 @@ private fun UploadViewPreview() {
 private fun UploadViewInEditModePreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         UploadDestinationView(
-            importUiItems = listOf(
-                ImportUiItem(fileName = "file1", filePath = "path1"),
-                ImportUiItem(fileName = "file2", filePath = "path2"),
-                ImportUiItem(fileName = "file3", filePath = "path3"),
-                ImportUiItem(fileName = "file4", filePath = "path4"),
-                ImportUiItem(fileName = "file5", filePath = "path5"),
-                ImportUiItem(fileName = "file6", filePath = "path6"),
-                ImportUiItem(fileName = "file7", filePath = "path7"),
-                ImportUiItem(fileName = "file8", filePath = "path8"),
-                ImportUiItem(fileName = "file9", filePath = "path9"),
+            uiState = UploadDestinationUiState(
+                importUiItems = listOf(
+                    ImportUiItem(fileName = "file1", filePath = "path1"),
+                    ImportUiItem(fileName = "file2", filePath = "path2"),
+                    ImportUiItem(fileName = "file3", filePath = "path3"),
+                    ImportUiItem(fileName = "file4", filePath = "path4"),
+                    ImportUiItem(fileName = "file5", filePath = "path5"),
+                    ImportUiItem(fileName = "file6", filePath = "path6"),
+                    ImportUiItem(fileName = "file7", filePath = "path7"),
+                    ImportUiItem(fileName = "file8", filePath = "path8"),
+                    ImportUiItem(fileName = "file9", filePath = "path9"),
+                ),
+                editableFile = ImportUiItem(fileName = "file5", filePath = "path5"),
             ),
-            editableFile = "path5",
+            confirmImport = {},
+            consumeNameValidationError = {},
+            editFileName = {},
+            updateFileName = {},
         )
     }
 }

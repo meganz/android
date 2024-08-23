@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.upload
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -20,7 +21,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
@@ -35,9 +35,10 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
  */
 @Composable
 fun UploadDestinationRowItem(
-    fileName: String,
-    filePath: String = "",
+    importUiItem: ImportUiItem,
     isEditMode: Boolean = false,
+    editFileName: (ImportUiItem?) -> Unit,
+    updateFileName: (String) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -45,7 +46,7 @@ fun UploadDestinationRowItem(
             .padding(8.dp)
     ) {
         ThumbnailView(
-            data = filePath,
+            data = importUiItem.filePath,
             contentScale = ContentScale.Crop,
             defaultImage = iconPackR.drawable.ic_generic_medium_solid,
             modifier = Modifier
@@ -56,12 +57,15 @@ fun UploadDestinationRowItem(
         )
         if (isEditMode) {
             GenericTextField(
-                placeholder = fileName,
-                textFieldValue = TextFieldValue(fileName),
-                onTextChange = {},
+                placeholder = importUiItem.fileName,
+                text = importUiItem.fileName,
+                errorText = importUiItem.error,
+                onTextChange = {
+                    updateFileName(it)
+                },
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        //handle edit operation
+                        editFileName(null)
                     },
                 ),
                 imeAction = ImeAction.Done,
@@ -76,14 +80,15 @@ fun UploadDestinationRowItem(
                     modifier = Modifier
                         .weight(1f)
                         .horizontalScroll(scroll),
-                    text = fileName,
+                    text = importUiItem.fileName,
                     textColor = TextColor.Primary,
                     overflow = LongTextBehaviour.Visible(1)
                 )
                 Icon(
                     modifier = Modifier
                         .padding(horizontal = 8.dp)
-                        .size(16.dp),
+                        .size(16.dp)
+                        .clickable { editFileName(importUiItem) },
                     painter = painterResource(iconPackR.drawable.ic_pen_2_medium_regular_solid),
                     contentDescription = "Edit",
                     tint = MaterialTheme.colors.onPrimary,
@@ -99,12 +104,22 @@ private fun UploadRowItemPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Column {
             UploadDestinationRowItem(
+                importUiItem = ImportUiItem(
+                    fileName = "IMG_20171123_17220.jpg",
+                    filePath = "file_path"
+                ),
                 isEditMode = false,
-                fileName = "IMG_20171123_17220.jpg"
+                editFileName = {},
+                updateFileName = {},
             )
             UploadDestinationRowItem(
+                importUiItem = ImportUiItem(
+                    filePath = "file_path",
+                    fileName = "IMG_20171123_17220.jpg"
+                ),
                 isEditMode = true,
-                fileName = "IMG_20171123_17220.jpg"
+                editFileName = { },
+                updateFileName = { },
             )
         }
     }

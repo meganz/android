@@ -70,7 +70,11 @@ class UploadDestinationActivity : AppCompatActivity() {
                                 passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                                 content = {
                                     UploadDestinationView(
-                                        importUiItems = uploadActivityUiState.importUiItems
+                                        uiState = uploadActivityUiState,
+                                        confirmImport = uploadDestinationViewModel::confirmImport,
+                                        consumeNameValidationError = uploadDestinationViewModel::consumeNameValidationError,
+                                        editFileName = uploadDestinationViewModel::editFileName,
+                                        updateFileName = uploadDestinationViewModel::updateFileName
                                     )
                                 }
                             )
