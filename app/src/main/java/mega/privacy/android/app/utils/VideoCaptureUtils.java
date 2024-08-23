@@ -2,6 +2,8 @@ package mega.privacy.android.app.utils;
 
 import android.content.Context;
 
+import androidx.annotation.Keep;
+
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.CameraEnumerator;
 import org.webrtc.CapturerObserver;
@@ -13,6 +15,11 @@ import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener;
 import nz.mega.sdk.MegaChatApiAndroid;
 import timber.log.Timber;
 
+/**
+ * The class can call from JNI to manage the video capture devices.
+ * Don't move package name and change class name
+ */
+@Keep
 public class VideoCaptureUtils {
 
     static private VideoCapturer videoCapturer = null;
