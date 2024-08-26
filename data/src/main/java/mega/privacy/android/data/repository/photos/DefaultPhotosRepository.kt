@@ -365,7 +365,9 @@ internal class DefaultPhotosRepository @Inject constructor(
     }
 
     private suspend fun checkCloudDriveNode(node: Node): Boolean {
-        return nodeRepository.isNodeInCloudDrive(handle = node.id.longValue)
+        return nodeRepository.isNodeInCloudDrive(handle = node.id.longValue) || nodeRepository.isNodeInBackups(
+            handle = node.id.longValue
+        )
     }
 
     private suspend fun getMegaNode(nodeId: NodeId): MegaNode? {

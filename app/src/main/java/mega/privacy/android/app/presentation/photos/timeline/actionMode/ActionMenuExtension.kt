@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.photos.timeline.actionMode
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.presentation.photos.PhotosFragment
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.clearSelectedPhotos
@@ -90,6 +91,15 @@ fun PhotosFragment.actionMoveToTrash() {
                 ConfirmMoveToRubbishBinDialogFragment.TAG
             )
     }
+}
+
+fun PhotosFragment.actionRemoveLink() {
+    RemovePublicLinkDialogFragment.newInstance(
+        listOf(
+            timelineViewModel.getSelectedIds().firstOrNull() ?: 0
+        )
+    )
+        .show(requireActivity().supportFragmentManager, RemovePublicLinkDialogFragment.TAG)
 }
 
 fun PhotosFragment.destroyActionMode() {

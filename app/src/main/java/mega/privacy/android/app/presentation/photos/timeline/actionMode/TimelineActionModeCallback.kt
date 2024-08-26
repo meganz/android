@@ -36,6 +36,12 @@ class TimelineActionModeCallback(
                 )
             }
 
+            menu?.findItem(R.id.cab_menu_remove_link)?.let {
+                it.isVisible =
+                    selectedNodes.size == 1 && fragment.timelineViewModel.getSelectedNodes()
+                        .firstOrNull()?.isExported ?: false
+            }
+
             if (isHiddenNodesEnabled && !includeSensitiveInheritedNode) {
                 val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
 
@@ -113,6 +119,12 @@ class TimelineActionModeCallback(
             R.id.cab_menu_trash -> {
                 fragment.actionMoveToTrash()
                 fragment.destroyActionMode()
+            }
+
+            R.id.cab_menu_remove_link -> {
+                fragment.actionRemoveLink()
+                fragment.destroyActionMode()
+
             }
         }
         return true
