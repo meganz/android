@@ -1,7 +1,6 @@
 <configuration>
 
-    <property name="LOG_DIR"
-        value="/storage/emulated/0/Android/data/mega.privacy.android.app.qa/files/MEGA Logs" />
+    <property name="LOG_DIR" value="${LOG_DIR}" />
 
     <!--    SDK Rolling File appender -->
     <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">

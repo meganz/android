@@ -13,12 +13,4 @@ interface LogConfigurationGateway {
      *
      */
     suspend fun resetLoggingConfiguration()
-
-    /**
-     * Get logging directory path
-     *
-     * @return current logging directory
-     */
-    @Throws(XmlPullParserException::class, IOException::class)
-    suspend fun getLoggingDirectoryPath(): String?
 }

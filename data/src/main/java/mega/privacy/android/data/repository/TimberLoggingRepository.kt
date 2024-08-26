@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -18,6 +19,8 @@ import mega.privacy.android.domain.entity.logging.LogEntry
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.ChatLogger
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.LogFileDirectory
+import mega.privacy.android.domain.qualifier.LogZipFileDirectory
 import mega.privacy.android.domain.qualifier.SdkLogger
 import mega.privacy.android.domain.repository.LoggingRepository
 import nz.mega.sdk.MegaApiAndroid
@@ -61,6 +64,8 @@ internal class TimberLoggingRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val appScope: CoroutineScope,
+    @LogFileDirectory private val logFileDirectory: Lazy<File>,
+    @LogZipFileDirectory private val logZipFileDirectory: Lazy<File>,
 ) : LoggingRepository {
 
     init {
@@ -85,17 +90,25 @@ internal class TimberLoggingRepository @Inject constructor(
         MegaApiAndroid.addLoggerObject(megaSdkLogger)
     }
 
-    override fun getSdkLoggingFlow(): Flow<LogEntry> = sdkLogFlowTree.logFlow.onSubscription {
-        MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX)
-        loggingConfig.resetLoggingConfiguration()
-    }.onCompletion {
-        MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL)
-    }
+    override fun getSdkLoggingFlow(): Flow<LogEntry> = sdkLogFlowTree
+        .logFlow
+        .onSubscription {
+            withContext(ioDispatcher) {
+                MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX)
+                loggingConfig.resetLoggingConfiguration()
+            }
+        }.onCompletion {
+            MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL)
+        }
 
     override fun getChatLoggingFlow(): Flow<LogEntry> =
-        chatLogFlowTree.logFlow.onSubscription {
-            loggingConfig.resetLoggingConfiguration()
-        }
+        chatLogFlowTree
+            .logFlow
+            .onSubscription {
+                withContext(ioDispatcher) {
+                    loggingConfig.resetLoggingConfiguration()
+                }
+            }
 
     override suspend fun logToSdkFile(logMessage: LogEntry) =
         withContext(ioDispatcher) { sdkLogger.writeLogEntry(logMessage) }
@@ -104,7 +117,7 @@ internal class TimberLoggingRepository @Inject constructor(
         withContext(ioDispatcher) { chatLogger.writeLogEntry(logMessage) }
 
     override suspend fun compressLogs(): File = withContext(ioDispatcher) {
-        val loggingDirectoryPath = loggingConfig.getLoggingDirectoryPath()
+        val loggingDirectoryPath = logFileDirectory.get().absolutePath
         require(loggingDirectoryPath != null) { "Logging configuration file missing or logging directory not configured" }
         val sourceFolder = File(loggingDirectoryPath).takeIf { it.exists() }
             ?: throw IllegalStateException("Logging directory not found")
@@ -117,7 +130,7 @@ internal class TimberLoggingRepository @Inject constructor(
     }
 
     private fun createEmptyFile() =
-        File("${context.cacheDir.path}/${getLogFileName()}").apply {
+        File("${logZipFileDirectory.get().path}/${getLogFileName()}").apply {
             if (exists()) delete()
             createNewFile()
         }
