@@ -5,8 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -17,8 +21,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -44,6 +48,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.ChatConversationScreenEvent
 import javax.inject.Inject
 
+@OptIn(ExperimentalMaterialApi::class)
 @AndroidEntryPoint
 internal class ChatFragment : Fragment() {
 
@@ -73,7 +78,13 @@ internal class ChatFragment : Fragment() {
                     PasscodeContainer(
                         passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         content = {
-                            val bottomSheetNavigator = rememberBottomSheetNavigator()
+                            val sheetState = rememberModalBottomSheetState(
+                                initialValue = ModalBottomSheetValue.Hidden,
+                                skipHalfExpanded = false
+                            )
+                            val bottomSheetNavigator = remember {
+                                BottomSheetNavigator(sheetState)
+                            }
                             val navHostController = rememberNavController(bottomSheetNavigator)
                             val chatId =
                                 requireActivity().intent.getLongExtra(Constants.CHAT_ID, -1)

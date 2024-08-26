@@ -1,5 +1,7 @@
 package mega.privacy.android.shared.original.core.ui.controls.chat
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -24,6 +26,7 @@ class MegaEmojiPickerViewTest {
             MegaEmojiPickerView(
                 onEmojiPicked = onEmojiPicked,
                 showEmojiPicker = true,
+                modifier = Modifier.fillMaxSize(),
             )
         }
         composeRule.onNodeWithTag(TEST_TAG_EMOJI_PICKER_VIEW).assertIsDisplayed()

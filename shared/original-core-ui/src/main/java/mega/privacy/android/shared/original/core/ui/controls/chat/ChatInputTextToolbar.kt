@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.original.core.ui.controls.chat
 
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -9,8 +10,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +34,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -38,8 +45,8 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
 /**
@@ -251,12 +258,27 @@ fun ChatInputTextToolbar(
                     )
                 }
             }
+
             AnimatedVisibility(visible = showEmojiPicker) {
+                val isPortrait =
+                    LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+                val defaultHeight = if (isPortrait) 300.dp else 150.dp
+                var keyboardHeight by remember {
+                    mutableStateOf(0.dp)
+                }
+                keyboardHeight =
+                    maxOf(
+                        keyboardHeight,
+                        WindowInsets.ime.asPaddingValues().calculateBottomPadding()
+                                - WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                    )
                 MegaEmojiPickerView(
                     onEmojiPicked = {
                         onTextChange(addPickedEmojiToInput(it.emoji, textFieldValue))
                     },
                     showEmojiPicker = showEmojiPicker,
+                    modifier = Modifier
+                        .height(if (keyboardHeight > 0.dp) keyboardHeight else defaultHeight),
                 )
             }
         }
