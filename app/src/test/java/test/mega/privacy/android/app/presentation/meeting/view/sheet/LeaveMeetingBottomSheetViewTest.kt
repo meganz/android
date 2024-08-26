@@ -5,13 +5,13 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.view.sheet.BOTTOM_SHEET_ASSIGN_AND_LEAVE_BUTTON
 import mega.privacy.android.app.presentation.meeting.view.sheet.BOTTOM_SHEET_CONTAINER
 import mega.privacy.android.app.presentation.meeting.view.sheet.BOTTOM_SHEET_END_FOR_ALL_BUTTON
 import mega.privacy.android.app.presentation.meeting.view.sheet.BOTTOM_SHEET_HEADER
 import mega.privacy.android.app.presentation.meeting.view.sheet.BOTTOM_SHEET_LEAVE_ANYWAY_BUTTON
 import mega.privacy.android.app.presentation.meeting.view.sheet.LeaveMeetingBottomSheetView
-import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -110,6 +110,7 @@ class LeaveMeetingBottomSheetViewTest {
         )
 
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_END_FOR_ALL_BUTTON).performClick()
+        composeTestRule.waitForIdle()
         verify(onEndForAllClick).invoke()
     }
 
