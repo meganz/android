@@ -15,19 +15,17 @@ class IsChatConnectedToInitiateCallUseCase @Inject constructor(private val chatR
      *
      * @param newState The state of chat
      * @param chatRoom The MegaChatRoom
-     * @param isWaitingForCall if user is waiting for call
      * @param userWaitingForCall id of the user waiting for call
      * @return True, if the chat is connected and a call can be started. False, otherwise
      */
     suspend operator fun invoke(
         newState: ChatConnectionStatus,
         chatRoom: ChatRoom?,
-        isWaitingForCall: Boolean,
         userWaitingForCall: Long,
     ): Boolean {
         val chatId = chatRoom?.chatId ?: return false
         val peerHandle = chatRepository.getPeerHandle(chatId, 0) ?: return false
-        return isWaitingForCall && newState == ChatConnectionStatus.Online && peerHandle != INVALID_CHAT_HANDLE && peerHandle == userWaitingForCall
+        return newState == ChatConnectionStatus.Online && peerHandle != INVALID_CHAT_HANDLE && peerHandle == userWaitingForCall
     }
 
     companion object {

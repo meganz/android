@@ -547,12 +547,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             private set
 
         /**
-         * Is waiting for call
-         */
-        @JvmStatic
-        var isWaitingForCall = false
-
-        /**
          * User waiting for call
          */
         @JvmStatic

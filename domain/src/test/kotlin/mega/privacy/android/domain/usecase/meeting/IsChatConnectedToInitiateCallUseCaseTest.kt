@@ -35,7 +35,7 @@ class IsChatConnectedToInitiateCallUseCaseTest {
         status: ChatConnectionStatus,
     ) = runTest {
         whenever(chatRepository.getPeerHandle(validChatId, 0)).thenReturn(validPeerId)
-        val actual = underTest(status, chatRoom, true, validPeerId)
+        val actual = underTest(status, chatRoom, validPeerId)
         Truth.assertThat(actual).isEqualTo(expected)
     }
 
@@ -48,7 +48,7 @@ class IsChatConnectedToInitiateCallUseCaseTest {
     ) = runTest {
         whenever(chatRepository.getPeerHandle(validChatId, 0)).thenReturn(validPeerId)
         whenever(chatRepository.getPeerHandle(invalidChatId, 0)).thenReturn(invalidPeerId)
-        val actual = underTest(ChatConnectionStatus.Online, chatRoom, true, validPeerId)
+        val actual = underTest(ChatConnectionStatus.Online, chatRoom, validPeerId)
         Truth.assertThat(actual).isEqualTo(expected)
     }
 
@@ -60,18 +60,7 @@ class IsChatConnectedToInitiateCallUseCaseTest {
     ) = runTest {
         whenever(chatRepository.getPeerHandle(validChatId, 0)).thenReturn(validPeerId)
         whenever(chatRepository.getPeerHandle(invalidChatId, 0)).thenReturn(invalidPeerId)
-        val actual = underTest(ChatConnectionStatus.Online, chatRoom, true, peerId)
-        Truth.assertThat(actual).isEqualTo(expected)
-    }
-
-    @ParameterizedTest(name = "test when peer id is {1} IsChatConnectedToInitiateCallUseCase returns {0}")
-    @MethodSource("provideIsWaitingForCall")
-    fun `test that for different isWaitingForCall we get expected output`(
-        expected: Boolean,
-        isWaitingForCall: Boolean,
-    ) = runTest {
-        whenever(chatRepository.getPeerHandle(validChatId, 0)).thenReturn(validPeerId)
-        val actual = underTest(ChatConnectionStatus.Online, chatRoom, isWaitingForCall, validPeerId)
+        val actual = underTest(ChatConnectionStatus.Online, chatRoom, peerId)
         Truth.assertThat(actual).isEqualTo(expected)
     }
 
@@ -95,10 +84,5 @@ class IsChatConnectedToInitiateCallUseCaseTest {
     private fun providePeerIds(): Stream<Arguments> = Stream.of(
         Arguments.of(true, validPeerId),
         Arguments.of(false, invalidPeerId),
-    )
-
-    private fun provideIsWaitingForCall(): Stream<Arguments> = Stream.of(
-        Arguments.of(true, true),
-        Arguments.of(false, false)
     )
 }

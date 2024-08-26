@@ -1,7 +1,6 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Context
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -127,15 +126,6 @@ class CreateChatListener(
         }
 
         when (action) {
-            START_AUDIO_CALL, START_VIDEO_CALL -> {
-                if (errorCreatingChat()) {
-                    snackbarShower?.showSnackbar(context.getString(R.string.create_chat_error))
-                } else {
-                    MegaApplication.userWaitingForCall = megaUsersNoChat[0].handle
-                    MegaApplication.isWaitingForCall = true
-                }
-            }
-
             SEND_MESSAGES -> {
                 val handles = messageHandles ?: return
 
@@ -176,14 +166,6 @@ class CreateChatListener(
                     onChatsCreated?.invoke(chats)
                 }
             }
-
-            CONFIGURE_DND -> {
-                if (errorCreatingChat()) {
-                    snackbarShower?.showSnackbar(context.getString(R.string.general_text_error))
-                } else {
-                    onChatsCreated?.invoke(chats)
-                }
-            }
         }
     }
 
@@ -198,10 +180,7 @@ class CreateChatListener(
 
     companion object {
         const val ATTACH = 1
-        const val START_AUDIO_CALL = 2
-        const val START_VIDEO_CALL = 3
         const val SEND_MESSAGES = 6
         const val SEND_FILE_EXPLORER_CONTENT = 7
-        const val CONFIGURE_DND = 9
     }
 }

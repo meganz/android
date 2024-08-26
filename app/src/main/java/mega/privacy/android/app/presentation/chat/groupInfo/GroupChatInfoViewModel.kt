@@ -224,8 +224,6 @@ class GroupChatInfoViewModel @Inject constructor(
             return
         }
 
-        MegaApplication.isWaitingForCall = false
-
         viewModelScope.launch {
             runCatching {
                 setChatVideoInDeviceUseCase()

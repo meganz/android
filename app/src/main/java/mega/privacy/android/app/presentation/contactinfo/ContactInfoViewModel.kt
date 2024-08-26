@@ -212,7 +212,6 @@ class ContactInfoViewModel @Inject constructor(
                 chatRoom = getChatRoomUseCase(it.chatId)?.also { chat ->
                     monitorChatRetentionTimeUpdate(chat.chatId)
                 },
-                isWaitingForCall = MegaApplication.isWaitingForCall,
                 userWaitingForCall = MegaApplication.userWaitingForCall,
             )
             if (shouldInitiateCall && chatId != INVALID_CHAT_HANDLE) {
@@ -379,7 +378,6 @@ class ContactInfoViewModel @Inject constructor(
         val chatId = chatId ?: return@launch
         Timber.d("Start call")
         _uiState.update { it.copy(enableCallLayout = false, shouldInitiateCall = false) }
-        MegaApplication.isWaitingForCall = false
         runCatching {
             setChatVideoInDeviceUseCase()
             openOrStartCallUseCase(

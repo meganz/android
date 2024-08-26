@@ -56,9 +56,9 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
-import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.call.CallType
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
@@ -85,12 +85,10 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.call.AllowUsersJoinCallUseCase
 import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.call.BroadcastCallEndedUseCase
-import mega.privacy.android.domain.usecase.meeting.BroadcastCallScreenOpenedUseCase
 import mega.privacy.android.domain.usecase.call.CreateMeetingUseCase
 import mega.privacy.android.domain.usecase.call.GetCallIdsOfOthersCallsUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorAudioOutputUseCase
 import mega.privacy.android.domain.usecase.call.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.call.RingIndividualInACallUseCase
 import mega.privacy.android.domain.usecase.call.StartCallUseCase
@@ -105,9 +103,11 @@ import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCas
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastCallScreenOpenedUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorAudioOutputUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
@@ -1235,7 +1235,6 @@ class MeetingActivityViewModel @Inject constructor(
                                 }
                             } ?: run {
                                 Timber.d("Chat status is connected and the call does not exist")
-                                MegaApplication.isWaitingForCall = false
                                 setChatVideoInDevice(
                                     chatId = chat.chatId,
                                     shouldStartMeeting = true,
@@ -1277,7 +1276,6 @@ class MeetingActivityViewModel @Inject constructor(
                 if (it.number.toInt() == 1) {
                     Timber.d("Meeting created,  chat id ${it.chatHandle}")
                     updateChatRoomId(it.chatHandle)
-                    MegaApplication.isWaitingForCall = true
                 }
             }.onFailure { exception ->
                 Timber.e(exception)

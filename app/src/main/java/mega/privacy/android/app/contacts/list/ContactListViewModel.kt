@@ -35,11 +35,11 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestsUseCase
+import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
+import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
-import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
-import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -260,8 +260,6 @@ internal class ContactListViewModel @Inject constructor(
             )
             return
         }
-
-        MegaApplication.isWaitingForCall = false
 
         viewModelScope.launch {
             runCatching {

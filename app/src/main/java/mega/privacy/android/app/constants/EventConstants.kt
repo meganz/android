@@ -12,5 +12,4 @@ object EventConstants {
     /** Event Keys related to sessions*/
     const val EVENT_PRIVILEGES_CHANGE = "privileges_in_char_change"
     const val EVENT_USER_VISIBILITY_CHANGE = "user_visibility_change"
-    const val EVENT_CHAT_CONNECTION_STATUS = "chat_connection_status_change"
 }

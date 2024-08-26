@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
@@ -765,7 +764,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 .onSuccess { call ->
                     call?.let {
                         Timber.d("Call started")
-                        MegaApplication.isWaitingForCall = false
                         CallUtil.addChecksForACall(call.chatId, false)
                         if (call.isOutgoing) {
                             chatManagement.setRequestSentCall(call.callId, true)

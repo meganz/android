@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.SystemClock
 import android.util.DisplayMetrics
-import android.util.Pair
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -50,7 +49,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
-import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
 import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
@@ -334,13 +332,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         showMuteBanner()
     }
-
-    private val chatConnectionStatusObserver =
-        Observer<Pair<Long, Int>> { chatAndState ->
-            if (inMeetingViewModel.isSameChatRoom(chatAndState.first) && MegaApplication.isWaitingForCall) {
-                startCall()
-            }
-        }
 
     private fun sessionLowRes(session: ChatSession) {
         inMeetingViewModel.getParticipant(
@@ -752,9 +743,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         LiveEventBus.get(EVENT_MEETING_AVATAR_CHANGE, Long::class.java)
             .observe(this, avatarChangeObserver)
-
-        LiveEventBus.get<Pair<Long, Int>>(EVENT_CHAT_CONNECTION_STATUS)
-            .observe(this, chatConnectionStatusObserver)
     }
 
     private fun initToolbar() {
