@@ -471,4 +471,21 @@ interface FileSystemRepository {
      * @param destination
      */
     suspend fun copyUri(name: String, source: UriPath, destination: UriPath)
+
+    /**
+     * Check if the path is malformed from an external app
+     *
+     * @param action
+     * @param path
+     * @return true if the path is malformed
+     */
+    fun isMalformedPathFromExternalApp(action: String?, path: String): Boolean
+
+    /**
+     * Check if the path is insecure
+     *
+     * @param path
+     * @return true if the path is insecure
+     */
+    fun isPathInsecure(path: String): Boolean
 }

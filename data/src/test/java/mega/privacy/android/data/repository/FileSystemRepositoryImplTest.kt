@@ -623,4 +623,21 @@ internal class FileSystemRepositoryImplTest {
         whenever(fileTypeInfoMapper(name)).thenReturn(expectedFileInfoType)
         assertThat(underTest.getFileTypeInfoByName(name)).isEqualTo(expectedFileInfoType)
     }
+
+    @Test
+    fun `test that isMalformedPathFromExternalApp method from file gateway is called when repository method is called`() =
+        runTest {
+            val action = "action"
+            val path = "path"
+            underTest.isMalformedPathFromExternalApp(action, path)
+            verify(fileGateway).isMalformedPathFromExternalApp(action, path)
+        }
+
+    @Test
+    fun `test that isPathInsecure method from file gateway is called when repository method is called`() =
+        runTest {
+            val path = "path"
+            underTest.isPathInsecure(path)
+            verify(fileGateway).isPathInsecure(path)
+        }
 }

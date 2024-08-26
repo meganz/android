@@ -647,4 +647,10 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                 destination = destinationUri
             )
         }
+
+    override fun isPathInsecure(path: String): Boolean =
+        fileGateway.isPathInsecure(path)
+
+    override fun isMalformedPathFromExternalApp(action: String?, path: String): Boolean =
+        fileGateway.isMalformedPathFromExternalApp(action, path)
 }

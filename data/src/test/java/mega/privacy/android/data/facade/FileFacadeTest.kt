@@ -18,6 +18,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -184,4 +186,74 @@ internal class FileFacadeTest {
             assertThat(actual).isEqualTo(expected)
         }
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["../", "/data/data/mega.privacy.android.app/files/Download", "/data/user/0/mega.privacy.android.app", "../data/user/0/mega.privacy.android.app", "../data/data/mega.privacy.android.app"])
+    fun `test that isPathInsecure returns true when a path which contains app directory is given`(
+        path: String,
+    ) =
+        runTest {
+            val result = underTest.isPathInsecure(path)
+
+            assertThat(result).isTrue()
+        }
+
+    @Test
+    fun `test that isPathInsecure returns false when a path which does not contain app directory is given`() =
+        runTest {
+            val path = "/storage/emulated/0/Android/data/mega.privacy.android/files/Download"
+            val result = underTest.isPathInsecure(path)
+
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    fun `test that isMalformedPathFromExternalApp returns false when a path which does not contain app directory is given`() =
+        runTest {
+            val action = "action"
+            val path = "/storage/emulated/0/Android/data/mega.privacy.android/files/Download"
+            val result = underTest.isMalformedPathFromExternalApp(action, path)
+
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    fun `test that isMalformedPathFromExternalApp returns true selected action is ACTION_SEND`() =
+        runTest {
+            val action = "android.intent.action.SEND"
+            val path = "/data/data/mega.privacy.android.app/files/Download"
+            val result = underTest.isMalformedPathFromExternalApp(action, path)
+
+            assertThat(result).isTrue()
+        }
+
+    @Test
+    fun `test that isMalformedPathFromExternalApp returns true selected action is ACTION_SEND_MULTIPLE`() =
+        runTest {
+            val action = "android.intent.action.SEND_MULTIPLE"
+            val path = "/data/data/mega.privacy.android.app/files/Download"
+            val result = underTest.isMalformedPathFromExternalApp(action, path)
+
+            assertThat(result).isTrue()
+        }
+
+    @Test
+    fun `test that isMalformedPathFromExternalApp returns false selected action is not ACTION_SEND or ACTION_SEND_MULTIPLE`() =
+        runTest {
+            val action = "action"
+            val path = "/storage/emulated/0/Android/data/mega.privacy.android/files/Download"
+            val result = underTest.isMalformedPathFromExternalApp(action, path)
+
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    fun `test that isMalformedPathFromExternalApp returns false when path is secure`() =
+        runTest {
+            val action = "android.intent.action.SEND_MULTIPLE"
+            val path = "/storage/emulated/0/Android/data/mega.privacy.android/files/Download"
+            val result = underTest.isMalformedPathFromExternalApp(action, path)
+
+            assertThat(result).isFalse()
+        }
 }
