@@ -129,6 +129,12 @@
     <init>();
 }
 
+#####################
+# LiveEventBus remove this rule when removing LiveEventBus
+# ExternalLiveData.java getFieldObservers and callMethodPutIfAbsent
+#####################
+-keep class androidx.arch.core.internal.SafeIterableMap { *; }
+
 -keep public class org.slf4j.** { *; }
 -keep public class ch.** { *; }
 -keep class javax.mail.** { *; }
