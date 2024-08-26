@@ -16,6 +16,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Compose passcode settings
+     */
+    ComposePasscodeSettings(
+        "Use the new compose version of the passcode settings screens",
+        false
+    ),
+
+    /**
      * Enables document scanner
      */
     DocumentScanner(
