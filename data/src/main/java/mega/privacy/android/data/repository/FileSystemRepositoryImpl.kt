@@ -647,4 +647,15 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                 destination = destinationUri
             )
         }
+
+    override suspend fun getDocumentFileName(uri: UriPath): String = withContext(ioDispatcher) {
+        val rawUri = uri.value.toUri()
+        val isTreeUri = DocumentsContract.isTreeUri(rawUri)
+        val document = if (isTreeUri) {
+            DocumentFile.fromTreeUri(context, rawUri)
+        } else {
+            DocumentFile.fromSingleUri(context, rawUri)
+        } ?: throw FileNotFoundException("Content uri doesn't exist: $rawUri")
+        document.name.orEmpty()
+    }
 }

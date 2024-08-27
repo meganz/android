@@ -471,4 +471,12 @@ interface FileSystemRepository {
      * @param destination
      */
     suspend fun copyUri(name: String, source: UriPath, destination: UriPath)
+
+    /**
+     * Get document file name
+     *
+     * @param uri
+     * @return file name
+     */
+    suspend fun getDocumentFileName(uri: UriPath): String
 }
