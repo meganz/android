@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
@@ -46,6 +47,7 @@ import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCa
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
+import mega.privacy.android.domain.usecase.videosection.GetVideoRecentlyWatchedUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
@@ -93,6 +95,7 @@ class VideoSectionViewModelTest {
     private val fakeMonitorVideoPlaylistSetsUpdateFlow = MutableSharedFlow<List<Long>>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
+    private val getVideoRecentlyWatchedUseCase = mock<GetVideoRecentlyWatchedUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -163,6 +166,7 @@ class VideoSectionViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             getNodeContentUriUseCase = getNodeContentUriUseCase,
+            getVideoRecentlyWatchedUseCase = getVideoRecentlyWatchedUseCase
         )
     }
 
@@ -183,7 +187,8 @@ class VideoSectionViewModelTest {
             getSyncUploadsFolderIdsUseCase,
             removeVideosFromPlaylistUseCase,
             monitorVideoPlaylistSetsUpdateUseCase,
-            getNodeContentUriUseCase
+            getNodeContentUriUseCase,
+            getVideoRecentlyWatchedUseCase
         )
     }
 
@@ -1388,6 +1393,60 @@ class VideoSectionViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that getVideoRecentlyWatched function returns as expected`() = runTest {
+        val testHandles = listOf(1L, 2L, 3L)
+        val testTimestamps = listOf(3000L, 2000L, 1000L)
+        val testWatchDates = listOf("12 April 2024", "11 April 2024", "10 April 2024")
+        val testVideoNodes = testHandles.mapIndexed { index, handle ->
+            initTypedVideoNode(handle, testTimestamps[index])
+        }
+        val testVideoEntities = testHandles.mapIndexed { index, handle ->
+            initVideoUIEntity(handle, testWatchDates[index])
+        }
+        val expectedRecentlyWatchedItems = testVideoEntities.groupBy { it.watchedDate }
+        testVideoNodes.forEachIndexed { index, node ->
+            whenever(videoUIEntityMapper(node)).thenReturn(testVideoEntities[index])
+        }
+        whenever(getVideoRecentlyWatchedUseCase()).thenReturn(testVideoNodes)
+
+        initUnderTest()
+        underTest.getVideoRecentlyWatched()
+        underTest.state.drop(1).test {
+            val actual = awaitItem()
+            assertThat(actual.groupedVideoRecentlyWatchedItems).isEqualTo(
+                expectedRecentlyWatchedItems
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private fun initTypedVideoNode(handle: Long, timestamp: Long) = mock<TypedVideoNode> {
+        on { id }.thenReturn(NodeId((handle)))
+        on { name }.thenReturn("video name")
+        on { watchedTimestamp }.thenReturn(timestamp)
+    }
+
+    private fun initVideoUIEntity(handle: Long, date: String) = mock<VideoUIEntity> {
+        on { id }.thenReturn(NodeId(handle))
+        on { name }.thenReturn("video name")
+        on { watchedDate }.thenReturn(date)
+    }
+
+    @Test
+    fun `test that isRecentlyWatchedEnabled function returns true`() = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.VideoRecentlyWatched)).thenReturn(true)
+        initVideosReturned()
+        assertThat(underTest.isRecentlyWatchedEnabled()).isTrue()
+    }
+
+    @Test
+    fun `test that isRecentlyWatchedEnabled function returns false`() = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.VideoRecentlyWatched)).thenReturn(false)
+        initVideosReturned()
+        assertThat(underTest.isRecentlyWatchedEnabled()).isFalse()
+    }
 
     companion object {
         @JvmField

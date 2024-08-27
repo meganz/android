@@ -28,6 +28,7 @@ internal fun VideoSectionTopBar(
     isHideMenuActionVisible: Boolean,
     isUnhideMenuActionVisible: Boolean,
     isRemoveLinkMenuActionVisible: Boolean,
+    isRecentlyWatchedEnabled: Boolean,
 ) {
     when {
         isActionMode -> {
@@ -69,7 +70,11 @@ internal fun VideoSectionTopBar(
             elevation = false,
             title = title,
             hintId = R.string.hint_action_search,
-            isHideAfterSearch = true
+            isHideAfterSearch = true,
+            leadingActions = if (isRecentlyWatchedEnabled) {
+                listOf(VideoSectionMenuAction.VideoRecentlyWatchedAction)
+            } else null,
+            onActionPressed = { onMenuActionClicked(it as? VideoSectionMenuAction) }
         )
     }
 }

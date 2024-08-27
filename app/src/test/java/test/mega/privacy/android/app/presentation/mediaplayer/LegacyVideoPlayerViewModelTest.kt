@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.mediaplayer
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.media3.common.MediaItem
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,6 +14,7 @@ import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_MATCHED_ITEM
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_OFF
+import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -29,14 +31,18 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoR
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import nz.mega.sdk.MegaApiJava
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import test.mega.privacy.android.app.TimberJUnit5Extension
 import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
@@ -52,6 +58,7 @@ import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorE
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class LegacyVideoPlayerViewModelTest {
     private lateinit var underTest: LegacyVideoPlayerViewModel
+    private val mediaPlayerGateway = mock<MediaPlayerGateway>()
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val savedStateHandle = SavedStateHandle(mapOf())
     private val monitorVideoRepeatModeUseCase = mock<MonitorVideoRepeatModeUseCase>()
@@ -59,6 +66,7 @@ internal class LegacyVideoPlayerViewModelTest {
     private val getOfflineNodesByParentIdUseCase = mock<GetOfflineNodesByParentIdUseCase>()
     private val getOfflineNodeInformationByIdUseCase = mock<GetOfflineNodeInformationByIdUseCase>()
     private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
+    private val saveVideoRecentlyWatchedUseCase = mock<SaveVideoRecentlyWatchedUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -76,7 +84,12 @@ internal class LegacyVideoPlayerViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        reset(monitorVideoRepeatModeUseCase, monitorTransferEventsUseCase)
+        reset(
+            monitorVideoRepeatModeUseCase,
+            monitorTransferEventsUseCase,
+            saveVideoRecentlyWatchedUseCase,
+            mediaPlayerGateway
+        )
         initViewModel()
     }
 
@@ -84,7 +97,7 @@ internal class LegacyVideoPlayerViewModelTest {
         wheneverBlocking { monitorVideoRepeatModeUseCase() }.thenReturn(emptyFlow())
         underTest = LegacyVideoPlayerViewModel(
             context = mock(),
-            mediaPlayerGateway = mock(),
+            mediaPlayerGateway = mediaPlayerGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             playlistItemMapper = mock(),
@@ -131,6 +144,7 @@ internal class LegacyVideoPlayerViewModelTest {
             getOfflineNodesByParentIdUseCase = getOfflineNodesByParentIdUseCase,
             getThumbnailUseCase = getThumbnailUseCase,
             getOfflineNodeInformationByIdUseCase = getOfflineNodeInformationByIdUseCase,
+            saveVideoRecentlyWatchedUseCase = saveVideoRecentlyWatchedUseCase
         )
         savedStateHandle[underTest.subtitleDialogShowKey] = false
         savedStateHandle[underTest.subtitleShowKey] = false
@@ -330,4 +344,21 @@ internal class LegacyVideoPlayerViewModelTest {
             on { invoke() }.thenReturn(flowOf(event))
         }
     }
+
+    @Test
+    fun `test that the saveVideoRecentlyWatchedUseCase is invoked as expected when initVideoSources is called`() =
+        runTest {
+            val testMediaItem = MediaItem.Builder()
+                .setMediaId(expectedId.toString())
+                .build()
+            whenever(getFeatureFlagValueUseCase(anyOrNull())).thenReturn(true)
+            whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+            val timestamp = System.currentTimeMillis() / 1000
+            underTest.initVideoSources(null)
+
+            verify(saveVideoRecentlyWatchedUseCase).invoke(
+                expectedId,
+                timestamp
+            )
+        }
 }

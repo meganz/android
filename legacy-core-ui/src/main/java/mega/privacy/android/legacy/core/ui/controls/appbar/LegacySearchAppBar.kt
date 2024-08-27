@@ -51,11 +51,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import mega.privacy.android.legacy.core.ui.R
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.appbar.ProvideDefaultMegaAppBarColors
 import mega.privacy.android.shared.original.core.ui.controls.menus.MenuActions
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.legacy.core.ui.R
-import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 
 
 /**
@@ -80,6 +80,7 @@ fun LegacySearchAppBar(
     modifier: Modifier = Modifier,
     isHideAfterSearch: Boolean = false,
     actions: List<MenuAction>? = null,
+    leadingActions: List<MenuAction>? = null,
     onActionPressed: ((MenuAction) -> Unit)? = null,
 ) {
     when (searchWidgetState) {
@@ -91,6 +92,7 @@ fun LegacySearchAppBar(
                     elevation = elevation,
                     title = title,
                     actions = actions,
+                    leadingActions = leadingActions,
                     onActionPressed = onActionPressed,
                     modifier = modifier,
                 )
@@ -122,6 +124,7 @@ fun CollapsedSearchAppBar(
     modifier: Modifier = Modifier,
     onSearchClicked: (() -> Unit)? = null,
     actions: List<MenuAction>? = null,
+    leadingActions: List<MenuAction>? = null,
     onActionPressed: ((MenuAction) -> Unit)? = null,
     maxActionsToShow: Int = 3,
     enabled: Boolean = true,
@@ -151,6 +154,14 @@ fun CollapsedSearchAppBar(
             }
         },
         actions = {
+            leadingActions?.let {
+                MenuActions(
+                    actions = it,
+                    maxActionsToShow = maxActionsToShow,
+                    enabled = enabled,
+                    onActionClick = { action -> onActionPressed?.invoke(action) }
+                )
+            }
             if (showSearchButton) {
                 IconButton(
                     modifier = Modifier.testTag(SEARCH_TOOLBAR_SEARCH_BUTTON_TEST_TAG),

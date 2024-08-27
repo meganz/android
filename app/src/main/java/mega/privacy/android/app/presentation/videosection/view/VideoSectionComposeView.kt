@@ -63,9 +63,15 @@ internal fun VideoSectionComposeView(
         tabState.tabs.size
     }
 
+    var isRecentlyWatchedEnabled by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(isRecentlyWatchedEnabled) {
+        isRecentlyWatchedEnabled = videoSectionViewModel.isRecentlyWatchedEnabled()
+    }
+
     val accountType = uiState.accountDetail?.levelDetail?.accountType
 
     var showDeleteVideoPlaylist by rememberSaveable { mutableStateOf(false) }
+
 
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -159,7 +165,8 @@ internal fun VideoSectionComposeView(
                 },
                 isHideMenuActionVisible = uiState.isHideMenuActionVisible,
                 isUnhideMenuActionVisible = uiState.isUnhideMenuActionVisible,
-                isRemoveLinkMenuActionVisible = uiState.isRemoveLinkMenuActionVisible
+                isRemoveLinkMenuActionVisible = uiState.isRemoveLinkMenuActionVisible,
+                isRecentlyWatchedEnabled = isRecentlyWatchedEnabled,
             )
         }
     ) { paddingValues ->

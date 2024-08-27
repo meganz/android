@@ -43,6 +43,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_NEXT
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_PLAYING
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_PREVIOUS
@@ -157,6 +158,7 @@ import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationById
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
@@ -223,6 +225,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     private val getOfflineNodesByParentIdUseCase: GetOfflineNodesByParentIdUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase,
+    private val saveVideoRecentlyWatchedUseCase: SaveVideoRecentlyWatchedUseCase,
 ) : ViewModel(), SearchCallback.Data {
 
     private val compositeDisposable = CompositeDisposable()
@@ -267,10 +270,8 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     internal val itemsClearedState: StateFlow<Boolean?> = _itemsClearedState
 
     private val _actionModeState = MutableStateFlow(false)
-    internal val actionModeState: StateFlow<Boolean> = _actionModeState
 
     private val _itemsSelectedCountState = MutableStateFlow(0)
-    internal val itemsSelectedCountState: StateFlow<Int> = _itemsSelectedCountState
 
     private val _mediaPlaybackState = MutableStateFlow(false)
     internal val mediaPlaybackState: StateFlow<Boolean> = _mediaPlaybackState
@@ -911,7 +912,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
                             getVideosByParentHandleFromMegaApiFolderUseCase(
                                 parentHandle = parent.id.longValue,
                                 order = order
-                            )?.let { children ->
+                            ).let { children ->
                                 buildPlaySourcesByTypedVideoNodes(
                                     type = type,
                                     typedNodes = children,
@@ -1200,6 +1201,13 @@ class LegacyVideoPlayerViewModel @Inject constructor(
                     mediaPlayerGateway.getCurrentItemDuration(),
                     mediaPlayerGateway.getCurrentPlayingPosition()
                 )
+            }
+        }
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.VideoRecentlyWatched)) {
+                mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong()?.let {
+                    saveVideoRecentlyWatchedUseCase(it, System.currentTimeMillis() / 1000)
+                }
             }
         }
     }
@@ -1607,23 +1615,9 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     }
 
     /**
-     * Set the action mode
-     * @param isActionMode whether the action mode is activated
-     */
-    internal fun setActionMode(isActionMode: Boolean) {
-        _actionModeState.update { isActionMode }
-        if (isActionMode) {
-            recreateAndUpdatePlaylistItems(
-                originalItems = _playlistItemsState.value.first,
-                isScroll = false
-            )
-        }
-    }
-
-    /**
      * Reset retry state
      */
-    internal fun resetRetryState() {
+    private fun resetRetryState() {
         playerRetry = 0
         _retryState.update { true }
     }
@@ -1752,20 +1746,6 @@ class LegacyVideoPlayerViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Get the index from playlistItems to keep the play order is correct after reordered
-     * @param item clicked item
-     * @return the index of clicked item in playlistItems or null
-     */
-    internal fun getIndexFromPlaylistItems(item: PlaylistItem): Int? =
-        /* The media items of ExoPlayer are still the original order even the shuffleEnable is true,
-         so the index of media item should be got from original playlist items */
-        playlistItems.indexOfFirst {
-            it.nodeHandle == item.nodeHandle
-        }.takeIf { index ->
-            index in playlistItems.indices
-        }
-
     internal fun getIndexFromPlaylistItems(handle: Long): Int? =
         playlistItems.indexOfFirst {
             it.nodeHandle == handle
@@ -1799,14 +1779,6 @@ class LegacyVideoPlayerViewModel @Inject constructor(
      * @return the position of playing item
      */
     internal fun getPlayingPosition(): Int = playingPosition
-
-    /**
-     * Scroll to the position of playing item
-     */
-    internal fun scrollToPlayingPosition() =
-        recreateAndUpdatePlaylistItems(
-            originalItems = _playlistItemsState.value.first
-        )
 
     /**
      * Get the subtitle file info that is same name as playing media item

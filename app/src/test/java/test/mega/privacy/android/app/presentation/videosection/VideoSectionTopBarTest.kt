@@ -13,6 +13,7 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenu
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_GET_LINK_ACTION
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_HIDE_ACTION
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_MOVE_ACTION
+import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_RECENTLY_WATCHED_ACTION
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_REMOVE_ACTION
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_REMOVE_LINK_ACTION
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_RENAME_ACTION
@@ -52,6 +53,7 @@ class VideoSectionTopBarTest {
         isHideMenuActionVisible: Boolean = false,
         isUnhideMenuActionVisible: Boolean = false,
         isRemoveLinkMenuActionVisible: Boolean = false,
+        isRecentlyWatchedEnabled: Boolean = false
     ) {
         composeTestRule.setContent {
             VideoSectionTopBar(
@@ -68,7 +70,8 @@ class VideoSectionTopBarTest {
                 onBackPressed = onBackPressed,
                 isHideMenuActionVisible = isHideMenuActionVisible,
                 isUnhideMenuActionVisible = isUnhideMenuActionVisible,
-                isRemoveLinkMenuActionVisible = isRemoveLinkMenuActionVisible
+                isRemoveLinkMenuActionVisible = isRemoveLinkMenuActionVisible,
+                isRecentlyWatchedEnabled = isRecentlyWatchedEnabled
             )
         }
     }
@@ -345,6 +348,19 @@ class VideoSectionTopBarTest {
             useUnmergedTree = true
         ).performClick()
         onMenuActionClick.invoke(VideoSectionMenuAction.VideoSectionRemoveAction)
+    }
+
+    @Test
+    fun `test that recently watched action is pressed`() {
+        setComposeContent(
+            onMenuActionClick = onMenuActionClick,
+            isRecentlyWatchedEnabled = true
+        )
+        composeTestRule.onNodeWithTag(
+            testTag = TEST_TAG_VIDEO_SECTION_RECENTLY_WATCHED_ACTION,
+            useUnmergedTree = true
+        ).performClick()
+        onMenuActionClick.invoke(VideoSectionMenuAction.VideoRecentlyWatchedAction)
     }
 }
 

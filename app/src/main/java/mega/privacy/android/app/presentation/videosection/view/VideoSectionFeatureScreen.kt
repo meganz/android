@@ -15,6 +15,8 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenu
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistDetailView
 import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
+import mega.privacy.android.app.presentation.videosection.view.recentlywatched.VideoRecentlyWatchedView
+import mega.privacy.android.app.presentation.videosection.view.recentlywatched.videoRecentlyWatchedRoute
 
 @Composable
 internal fun VideoSectionFeatureScreen(
@@ -79,6 +81,9 @@ internal fun VideoSectionNavHost(
         }
     }
 
+    val onBackPressedDispatcher =
+        LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
     NavHost(
         modifier = modifier,
         navController = navHostController,
@@ -103,14 +108,20 @@ internal fun VideoSectionNavHost(
                 },
                 onPlaylistItemLongClick = viewModel::onVideoPlaylistItemClicked,
                 onDeleteDialogButtonClicked = viewModel::clearAllSelectedVideoPlaylists,
-                onMenuAction = onMenuAction
+                onMenuAction = { action ->
+                    if (action is VideoSectionMenuAction.VideoRecentlyWatchedAction) {
+                        viewModel.getVideoRecentlyWatched()
+                        navHostController.navigate(route = videoRecentlyWatchedRoute)
+                    } else {
+                        onMenuAction(action)
+                    }
+                }
             )
         }
         composable(
             route = videoPlaylistDetailRoute
         ) {
-            val onBackPressedDispatcher =
-                LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
             VideoPlaylistDetailView(
                 playlist = state.currentVideoPlaylist,
                 selectedSize = state.selectedVideoElementIDs.size,
@@ -152,6 +163,19 @@ internal fun VideoSectionNavHost(
                         else -> {}
                     }
                 }
+            )
+        }
+
+        composable(route = videoRecentlyWatchedRoute) {
+            VideoRecentlyWatchedView(
+                group = state.groupedVideoRecentlyWatchedItems,
+                modifier = Modifier,
+                onBackPressed = { onBackPressedDispatcher?.onBackPressed() },
+                onClick = viewModel::onItemClicked,
+                onActionPressed = {
+                    //TODO the function for clear recently watched videos
+                },
+                onMenuClick = onMenuClick
             )
         }
     }

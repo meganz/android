@@ -57,6 +57,7 @@ import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCa
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
+import mega.privacy.android.domain.usecase.videosection.GetVideoRecentlyWatchedUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
@@ -95,6 +96,7 @@ class VideoSectionViewModel @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
+    private val getVideoRecentlyWatchedUseCase: GetVideoRecentlyWatchedUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -997,6 +999,26 @@ class VideoSectionViewModel @Inject constructor(
             )
         }
     }
+
+    internal fun getVideoRecentlyWatched() = viewModelScope.launch {
+        runCatching {
+            getVideoRecentlyWatchedUseCase().map {
+                videoUIEntityMapper(it)
+            }.groupBy { it.watchedDate }
+        }.onSuccess { group ->
+            _state.update {
+                it.copy(groupedVideoRecentlyWatchedItems = group)
+            }
+        }.onFailure { error ->
+            Timber.e(error)
+            _state.update {
+                it.copy(groupedVideoRecentlyWatchedItems = emptyMap())
+            }
+        }
+    }
+
+    internal suspend fun isRecentlyWatchedEnabled() =
+        getFeatureFlagValueUseCase(AppFeatures.VideoRecentlyWatched)
 
     companion object {
         private const val ERROR_MESSAGE_REPEATED_TITLE = 0
