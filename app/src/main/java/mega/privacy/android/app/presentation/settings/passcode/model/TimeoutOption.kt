@@ -40,7 +40,9 @@ sealed interface TimeoutOption {
      *
      * @property timeoutInSeconds
      */
-    data class SecondsTimeSpan(val timeoutInSeconds: Int) : TimeoutOption {
+    data class SecondsTimeSpan(
+        val timeoutInSeconds: Int,
+    ) : TimeoutOption {
         override fun getTitle(context: Context) = removeFormatPlaceholder(
             context.resources.getQuantityString(
                 R.plurals.plural_call_ended_messages_seconds,
@@ -57,7 +59,9 @@ sealed interface TimeoutOption {
      *
      * @property timeoutInMinutes
      */
-    data class MinutesTimeSpan(val timeoutInMinutes: Int) : TimeoutOption {
+    data class MinutesTimeSpan(
+        val timeoutInMinutes: Int,
+    ) : TimeoutOption {
         override fun getTitle(context: Context) = removeFormatPlaceholder(
             context.resources.getQuantityString(
                 R.plurals.plural_call_ended_messages_seconds,
