@@ -27,8 +27,8 @@ data class DocumentEntity(
 /**
  * Creates DocumentEntity from file
  */
-fun File.toDocumentEntity() = DocumentEntity(
-    name = name,
+fun File.toDocumentEntity(customName: String? = null) = DocumentEntity(
+    name = customName ?: name,
     size = length(),
     lastModified = lastModified(),
     uri = UriPath(absolutePath),

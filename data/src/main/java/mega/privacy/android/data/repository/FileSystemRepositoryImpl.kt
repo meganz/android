@@ -653,4 +653,15 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override fun isMalformedPathFromExternalApp(action: String?, path: String): Boolean =
         fileGateway.isMalformedPathFromExternalApp(action, path)
+
+    override suspend fun getDocumentFileName(uri: UriPath): String = withContext(ioDispatcher) {
+        val rawUri = uri.value.toUri()
+        val isTreeUri = DocumentsContract.isTreeUri(rawUri)
+        val document = if (isTreeUri) {
+            DocumentFile.fromTreeUri(context, rawUri)
+        } else {
+            DocumentFile.fromSingleUri(context, rawUri)
+        } ?: throw FileNotFoundException("Content uri doesn't exist: $rawUri")
+        document.name.orEmpty()
+    }
 }

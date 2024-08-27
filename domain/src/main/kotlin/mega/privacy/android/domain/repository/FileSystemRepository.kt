@@ -488,4 +488,12 @@ interface FileSystemRepository {
      * @return true if the path is insecure
      */
     fun isPathInsecure(path: String): Boolean
+
+    /**
+     * Get document file name
+     *
+     * @param uri
+     * @return file name
+     */
+    suspend fun getDocumentFileName(uri: UriPath): String
 }
