@@ -213,6 +213,7 @@ dependencies {
     implementation(androidx.work.ktx)
     implementation(androidx.paging)
     implementation(androidx.sqlite.ktx)
+    implementation(androidx.splashscreen)
 
     // Compose
     implementation(androidx.bundles.compose.bom)

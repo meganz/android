@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.Mega.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/app_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+        <item name="android:windowSplashScreenAnimationDuration" tools:ignore="NewApi">0</item>
+        <item name="android:windowSplashScreenBehavior" tools:targetApi="33">icon_preferred</item>
+        <item name="splashScreenIconSize">288dp</item>
+        <item name="postSplashScreenTheme">@style/Theme.Mega</item>
+    </style>
     <!--Top level DayNight theme to be used in AndroidManifest.xml-->
     <style name="Theme.Mega" parent="Base.Theme.Mega"/>
 

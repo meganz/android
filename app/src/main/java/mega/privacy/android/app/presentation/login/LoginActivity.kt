@@ -13,10 +13,13 @@ import android.view.ViewTreeObserver
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
@@ -73,6 +76,11 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
     private var firstNameTemp: String? = null
     private var lastNameTemp: String? = null
 
+    /**
+     * Flag to delay showing the splash screen.
+     */
+    private var keepShowingSplashScreen = true
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             Timber.d("onBackPressed")
@@ -108,8 +116,13 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition {
+            keepShowingSplashScreen
+        }
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
         if (intent.action == Intent.ACTION_MAIN
             && intent.hasCategory(Intent.CATEGORY_LAUNCHER)
             && !viewModel.isConnected
@@ -121,11 +134,17 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         }
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         chatRequestHandler.setIsLoggingRunning(true)
+
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupObservers()
+        // Turn off splash transition animation, and prevent the icon being jumped
+        splashScreen.setOnExitAnimationListener {
+            it.remove()
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+        }
 
+        setupObservers()
         lifecycleScope.launch {
             if (savedInstanceState != null) {
                 Timber.d("Bundle is NOT NULL")
@@ -155,8 +174,26 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                 }
             }
 
+            if (visibleFragment != Constants.LOGIN_FRAGMENT) {
+                stopShowingSplashScreen()
+            }
             showFragment(visibleFragment)
+
+            // A fail-safe to avoid the splash screen to be shown forever
+            // in case not called by expected fragments
+            delay(1500)
+            if (keepShowingSplashScreen) {
+                stopShowingSplashScreen()
+                Timber.w("Splash screen is being shown for too long")
+            }
         }
+    }
+
+    /**
+     * Stops showing the splash screen.
+     */
+    fun stopShowingSplashScreen() {
+        keepShowingSplashScreen = false
     }
 
     private fun setupObservers() {

@@ -7,7 +7,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -16,18 +15,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -49,13 +49,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -73,7 +72,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
@@ -96,6 +94,7 @@ import mega.privacy.android.shared.original.core.ui.controls.progressindicator.M
 import mega.privacy.android.shared.original.core.ui.controls.textfields.LabelTextField
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
@@ -138,10 +137,12 @@ fun LoginView(
     val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
     var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
-
+    val showLoginInProgress = state.isLoginInProgress || state.fetchNodesUpdate != null
     Scaffold(
         modifier = modifier
-            .systemBarsPadding()
+            .conditional(!showLoginInProgress) {
+                systemBarsPadding()
+            }
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
         scaffoldState = scaffoldState,
@@ -157,7 +158,7 @@ fun LoginView(
     ) { paddingValues ->
         with(state) {
             when {
-                isLoginInProgress || fetchNodesUpdate != null -> LoginInProgress(
+                showLoginInProgress -> LoginInProgress(
                     state = this,
                     paddingValues = paddingValues
                 )
@@ -394,7 +395,7 @@ private fun LoginInProgress(
     val isInLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val scrollState = rememberScrollState()
-    ConstraintLayout(
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight()
@@ -402,66 +403,49 @@ private fun LoginInProgress(
             .padding(horizontal = 20.dp)
             .verticalScroll(scrollState),
     ) {
-        val (logo, progressBar, status) = createRefs()
-
-        Box(
+        Image(
+            painter = painterResource(id = R.drawable.ic_splash_logo),
+            contentDescription = stringResource(id = R.string.login_to_mega),
             modifier = Modifier
-                .constrainAs(logo) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    bottom.linkTo(parent.bottom, if (isInLandscape) 40.dp else 0.dp)
-                    end.linkTo(parent.end)
-                }
-        ) {
-            // To maintain contrast in dark mode
-            Box(
-                modifier = Modifier
-                    .background(
-                        Color.White,
-                        RoundedCornerShape(120.dp)
-                    )
-                    .size(150.dp)
-                    .clip(CircleShape)
-                    .align(Alignment.Center)
-            )
-            Image(
-                painter = painterResource(id = R.drawable.logo_loading_ic),
-                contentDescription = stringResource(id = R.string.login_to_mega),
-                modifier = Modifier
-                    .size(180.dp)
-                    .testTag(MEGA_LOGO_TEST_TAG),
-            )
-        }
-
-        MegaAnimatedLinearProgressIndicator(
-            indicatorProgress = state.currentProgress,
-            fastAnimation = state.currentProgress > 0.5f,
-            modifier = Modifier
-                .constrainAs(progressBar) {
-                    bottom.linkTo(status.top, margin = 10.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-                .padding(start = 40.dp, end = 40.dp)
-                .widthIn(max = 300.dp)
-                .testTag(FETCH_NODES_PROGRESS_TEST_TAG)
+                .align(Alignment.Center)
+                .size(288.dp)
+                .testTag(MEGA_LOGO_TEST_TAG),
+            contentScale = ContentScale.FillBounds
         )
 
-        Box(
+        Column(
             modifier = Modifier
-                .defaultMinSize(minHeight = 40.dp)
-                .constrainAs(status) {
-                    bottom.linkTo(parent.bottom, if (isInLandscape) 5.dp else 20.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
+                .align(Alignment.BottomCenter)
+                .windowInsetsPadding(WindowInsets.navigationBars),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            LoginInProgressText(
-                stringId = state.currentStatusText,
+            MegaAnimatedLinearProgressIndicator(
+                indicatorProgress = state.currentProgress,
+                fastAnimation = state.currentProgress > 0.5f,
                 modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp)
-                    .testTag(CONNECTING_TO_SERVER_TAG)
+                    .padding(start = 56.dp, end = 56.dp)
+                    .widthIn(max = 300.dp)
+                    .testTag(FETCH_NODES_PROGRESS_TEST_TAG)
             )
+            Spacer(modifier = Modifier.height(10.dp))
+            Box {
+                LoginInProgressText(
+                    stringId = state.currentStatusText,
+                    modifier = Modifier
+                        .padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                        )
+                        .testTag(CONNECTING_TO_SERVER_TAG)
+                )
+                // White-space to prevent jumping when visibility animates
+                Text(
+                    text = " ",
+                    style = MaterialTheme.typography.subtitle2,
+                    minLines = 2
+                )
+            }
+            Spacer(modifier = Modifier.height(if (isInLandscape) 0.dp else 15.dp))
         }
     }
 }

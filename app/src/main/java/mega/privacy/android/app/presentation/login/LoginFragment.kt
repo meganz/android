@@ -17,6 +17,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -26,6 +27,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.isIsHeartBeatAlive
@@ -154,6 +156,12 @@ class LoginFragment : Fragment() {
                 onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed,
                 onReportIssue = ::openReportIssueFragment,
             )
+        }
+
+        // Hide splash after UI is rendered, to prevent blinking
+        LaunchedEffect(key1 = Unit) {
+            delay(100)
+            (activity as? LoginActivity)?.stopShowingSplashScreen()
         }
     }
 
