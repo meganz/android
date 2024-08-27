@@ -53,7 +53,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
@@ -663,10 +662,10 @@ class VideoSectionRepositoryImplTest {
                 addedRecentlyWatchedItem
             )
             underTest.saveVideoRecentlyWatched(addedHandle, addedTimestamp)
-            verify(
-                appPreferencesGateway,
-                times(1)
-            ).putString("PREFERENCE_KEY_VIDEO_RECENTLY_WATCHED", newJsonString)
+            verify(appPreferencesGateway).putString(
+                "PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS",
+                newJsonString
+            )
         }
 
     @Test
@@ -691,10 +690,10 @@ class VideoSectionRepositoryImplTest {
                 addedRecentlyWatchedItem
             )
             underTest.saveVideoRecentlyWatched(addedHandle, addedTimestamp)
-            verify(
-                appPreferencesGateway,
-                times(1)
-            ).putString("PREFERENCE_KEY_VIDEO_RECENTLY_WATCHED", newJsonString)
+            verify(appPreferencesGateway).putString(
+                "PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS",
+                newJsonString
+            )
         }
 
     @Test
@@ -757,5 +756,15 @@ class VideoSectionRepositoryImplTest {
         on { id }.thenReturn(NodeId(nodeHandle))
         on { duration }.thenReturn(100.seconds)
         on { watchedTimestamp }.thenReturn(timestamp)
+    }
+
+    @Test
+    fun `test that clearRecentlyWatchedVideos function is invoked as expected`() = runTest {
+        underTest.clearRecentlyWatchedVideos()
+        val jsonString = Json.encodeToString(emptyList<VideoRecentlyWatchedItem>())
+        verify(appPreferencesGateway).putString(
+            "PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS",
+            jsonString
+        )
     }
 }
