@@ -140,3 +140,15 @@
 -keep class javax.mail.** { *; }
 -keep class javax.mail.internet.** { *; }
 -dontwarn javax.mail.**
+
+#####################
+# BannerViewPager #
+#####################
+-keep class androidx.recyclerview.widget.** { *; }
+-keep class androidx.viewpager2.widget.** { *; }
+
+#####################
+# Matcher #
+#####################
+-keep class org.hamcrest.** { *; }
+-dontwarn org.hamcrest.**
