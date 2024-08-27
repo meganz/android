@@ -47,7 +47,6 @@ fun UploadDestinationView(
     editFileName: (ImportUiItem?) -> Unit,
     updateFileName: (String) -> Unit,
     uiState: UploadDestinationUiState,
-    isUrl: Boolean = false,
 ) {
     val scaffoldState = rememberScaffoldState()
     MegaScaffold(
@@ -87,7 +86,7 @@ fun UploadDestinationView(
         ) {
             item {
                 MegaText(
-                    text = if (isUrl) {
+                    text = if (uiState.importUiItems.firstOrNull()?.isUrl == true) {
                         stringResource(id = R.string.file_properties_shared_folder_public_link_name)
                     } else {
                         pluralStringResource(

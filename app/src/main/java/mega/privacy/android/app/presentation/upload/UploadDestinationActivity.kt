@@ -92,9 +92,7 @@ class UploadDestinationActivity : AppCompatActivity() {
 
     private fun handleIntent() = when (intent?.action) {
         Intent.ACTION_SEND -> when {
-            intent.type == Constants.TYPE_TEXT_PLAIN && !intent.hasExtra(Intent.EXTRA_STREAM) ->
-                handleSendText(intent)
-
+            isImportingText() -> handleSendText(intent)
             else -> handleSendFiles(intent)
         }
 
@@ -105,10 +103,15 @@ class UploadDestinationActivity : AppCompatActivity() {
     private fun handleSendText(intent: Intent) {
         intent.apply {
             val text = getStringExtra(Intent.EXTRA_TEXT).orEmpty()
-            val email = getStringExtra(Intent.EXTRA_EMAIL).orEmpty()
             val subject = getStringExtra(Intent.EXTRA_SUBJECT).orEmpty()
-            uploadDestinationViewModel.updateTextContent(text, email, subject)
+            uploadDestinationViewModel.updateContent(text, subject)
         }
+    }
+
+    private fun isImportingText() = with(intent) {
+        action == Intent.ACTION_SEND &&
+                type == Constants.TYPE_TEXT_PLAIN &&
+                extras?.containsKey(Intent.EXTRA_STREAM) == false
     }
 
     private fun handleSendFiles(intent: Intent) {

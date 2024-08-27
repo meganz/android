@@ -7,6 +7,7 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileForUploadUseCase
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -29,6 +30,7 @@ class UploadDestinationViewModelTest {
     private val getFileForUploadUseCase = mock<GetFileForUploadUseCase>()
     private val importFilesErrorMessageMapper = mock<ImportFilesErrorMessageMapper>()
     private val importFileErrorMessageMapper = mock<ImportFileErrorMessageMapper>()
+    private val fileTypeIconMapper = mock<FileTypeIconMapper>()
     private lateinit var viewModel: UploadDestinationViewModel
 
     @BeforeEach
@@ -37,13 +39,15 @@ class UploadDestinationViewModelTest {
             getFileForUploadUseCase,
             getFileForUploadUseCase,
             importFilesErrorMessageMapper,
-            importFileErrorMessageMapper
+            importFileErrorMessageMapper,
+            fileTypeIconMapper,
         )
         viewModel = UploadDestinationViewModel(
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getFileForUploadUseCase = getFileForUploadUseCase,
             importFilesErrorMessageMapper = importFilesErrorMessageMapper,
-            importFileErrorMessageMapper = importFileErrorMessageMapper
+            importFileErrorMessageMapper = importFileErrorMessageMapper,
+            fileTypeIconMapper = fileTypeIconMapper,
         )
     }
 

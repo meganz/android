@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.upload
 
 import android.net.Uri
+import android.webkit.URLUtil
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,8 +13,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileForUploadUseCase
+import mega.privacy.android.icon.pack.R
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,6 +27,7 @@ import javax.inject.Inject
 class UploadDestinationViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getFileForUploadUseCase: GetFileForUploadUseCase,
+    private val fileTypeIconMapper: FileTypeIconMapper,
     private val importFilesErrorMessageMapper: ImportFilesErrorMessageMapper,
     private val importFileErrorMessageMapper: ImportFileErrorMessageMapper,
 ) : ViewModel() {
@@ -68,9 +72,18 @@ class UploadDestinationViewModel @Inject constructor(
 
     /**
      * Update the text content
+     *
+     * @param text Text of the content
+     * @param subject Subject of the content
      */
-    fun updateTextContent(text: String, email: String, subject: String) {
-        Timber.d("Text content updated $text $email $subject")
+    fun updateContent(text: String, subject: String) {
+        val isUrl = URLUtil.isHttpUrl(text) || URLUtil.isHttpsUrl(text)
+        val importTextItem = ImportUiItem(
+            filePath = null,
+            fileName = subject,
+            fileIcon = if (isUrl) R.drawable.ic_url_medium_solid else fileTypeIconMapper(text),
+        )
+        _uiState.update { it.copy(importUiItems = listOf(importTextItem)) }
     }
 
     /**

@@ -46,7 +46,7 @@ fun UploadDestinationRowItem(
             .padding(8.dp)
     ) {
         ThumbnailView(
-            data = importUiItem.filePath,
+            data = importUiItem.filePath ?: importUiItem.fileIcon,
             contentScale = ContentScale.Crop,
             defaultImage = iconPackR.drawable.ic_generic_medium_solid,
             modifier = Modifier
@@ -58,7 +58,7 @@ fun UploadDestinationRowItem(
         if (isEditMode) {
             GenericTextField(
                 placeholder = importUiItem.fileName,
-                text = importUiItem.fileName,
+                text = importUiItem.fileName.replace("\n", " "),
                 errorText = importUiItem.error,
                 onTextChange = {
                     updateFileName(it)
@@ -80,7 +80,7 @@ fun UploadDestinationRowItem(
                     modifier = Modifier
                         .weight(1f)
                         .horizontalScroll(scroll),
-                    text = importUiItem.fileName,
+                    text = importUiItem.fileName.replace("\n", " "),
                     textColor = TextColor.Primary,
                     overflow = LongTextBehaviour.Visible(1)
                 )
@@ -89,7 +89,7 @@ fun UploadDestinationRowItem(
                         .padding(horizontal = 8.dp)
                         .size(16.dp)
                         .clickable { editFileName(importUiItem) },
-                    painter = painterResource(iconPackR.drawable.ic_pen_2_medium_regular_solid),
+                    painter = painterResource(iconPackR.drawable.ic_pen_02_medium_regular_outline),
                     contentDescription = "Edit",
                     tint = MaterialTheme.colors.onPrimary,
                 )

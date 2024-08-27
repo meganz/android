@@ -22,7 +22,6 @@ class UploadDestinationViewTest {
                 consumeNameValidationError = {},
                 updateFileName = {},
                 uiState = UploadDestinationUiState(),
-                isUrl = false,
             )
         }
         composeTestRule.onNodeWithText("Upload to MEGA", useUnmergedTree = true).assertExists()
@@ -55,7 +54,6 @@ class UploadDestinationViewTest {
                         ImportUiItem("file3", "path3"),
                     )
                 ),
-                isUrl = false,
             )
         }
         composeTestRule.onNodeWithText("Upload to MEGA", useUnmergedTree = true).assertExists()
@@ -94,7 +92,6 @@ class UploadDestinationViewTest {
                         ImportUiItem(fileName = "file9", filePath = "path9"),
                     ),
                 ),
-                isUrl = false
             )
         }
         composeTestRule.onNodeWithText("Upload to MEGA", useUnmergedTree = true).assertExists()
@@ -122,11 +119,9 @@ class UploadDestinationViewTest {
                 updateFileName = {},
                 uiState = UploadDestinationUiState(
                     importUiItems = listOf(
-                        ImportUiItem("file1", "path1"),
-                        ImportUiItem("file2", "path2"),
+                        ImportUiItem("file1", "path1", isUrl = true),
                     ),
                 ),
-                isUrl = true
             )
         }
         composeTestRule.onNodeWithText("Link", useUnmergedTree = true).assertExists()
