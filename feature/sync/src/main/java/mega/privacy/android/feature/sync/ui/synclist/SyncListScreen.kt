@@ -71,10 +71,11 @@ internal fun SyncListScreen(
     actions: List<MenuAction>,
     onActionPressed: (MenuAction) -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
-    title: String? = null,
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
+    title: String? = null,
+    selectedChip: SyncChip = SYNC_FOLDERS,
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -155,6 +156,7 @@ internal fun SyncListScreen(
                     syncFoldersViewModel = syncFoldersViewModel,
                     syncStalledIssuesViewModel = syncStalledIssuesViewModel,
                     syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
+                    selectedChip = selectedChip,
                 )
             },
             snackbarHost = {
@@ -183,8 +185,9 @@ private fun SyncListScreenContent(
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
+    selectedChip: SyncChip = SYNC_FOLDERS,
 ) {
-    var checkedChip by rememberSaveable { mutableStateOf(SYNC_FOLDERS) }
+    var checkedChip by rememberSaveable { mutableStateOf(selectedChip) }
 
     val syncFoldersState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
     val syncStalledIssuesState by syncStalledIssuesViewModel.state.collectAsStateWithLifecycle()

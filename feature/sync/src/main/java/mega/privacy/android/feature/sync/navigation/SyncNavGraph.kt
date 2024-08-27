@@ -1,15 +1,20 @@
 package mega.privacy.android.feature.sync.navigation
 
+import android.content.Intent
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.SyncEmptyScreen
+import mega.privacy.android.feature.sync.ui.mapper.SyncChipValueMapper
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
@@ -18,17 +23,37 @@ import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.mobile.analytics.event.AddSyncScreenEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncGetStartedButtonEvent
+import timber.log.Timber
 
-internal const val syncRoute = "sync"
+/**
+ * Route ro the Sync feature
+ */
+const val syncRoute = "sync"
 
-private const val syncEmptyRoute = "sync/empty"
-private const val syncNewFolderRoute = "sync/new-folder"
-private const val syncMegaPicker = "sync/mega-picker"
-private const val syncList = "sync/list"
+/**
+ * Route to the Sync list
+ */
+const val syncListRoute = "$syncRoute/list"
+
+/**
+ * Route to the onboarding screen
+ */
+private const val syncEmptyRoute = "$syncRoute/empty"
+
+/**
+ * Route to the add new sync screen
+ */
+private const val syncNewFolderRoute = "$syncRoute/new-folder"
+
+/**
+ * Route to the MEGA folder picker screen
+ */
+private const val syncMegaPicker = "$syncRoute/mega-picker"
 
 internal fun NavGraphBuilder.syncNavGraph(
     navController: NavController,
     fileTypeIconMapper: FileTypeIconMapper,
+    syncChipValueMapper: SyncChipValueMapper,
     syncPermissionsManager: SyncPermissionsManager,
     openUpgradeAccountPage: () -> Unit,
     title: String? = null,
@@ -37,7 +62,7 @@ internal fun NavGraphBuilder.syncNavGraph(
     navigation(
         startDestination = when {
             openNewSync -> syncNewFolderRoute
-            else -> syncList
+            else -> syncListRoute
         },
         route = syncRoute
     ) {
@@ -56,14 +81,14 @@ internal fun NavGraphBuilder.syncNavGraph(
                     navController.navigate(syncMegaPicker)
                 },
                 openNextScreen = {
-                    navController.navigate(syncList)
+                    navController.navigate(syncListRoute)
                 },
                 openUpgradeAccount = {
                     openUpgradeAccountPage()
                 },
                 onBackClicked = {
                     if (openNewSync) {
-                        navController.navigate(syncList) {
+                        navController.navigate(syncListRoute) {
                             popUpTo(syncNewFolderRoute) {
                                 inclusive = true
                             }
@@ -86,7 +111,23 @@ internal fun NavGraphBuilder.syncNavGraph(
                 fileTypeIconMapper = fileTypeIconMapper
             )
         }
-        composable(route = syncList) {
+        composable(
+            route = syncListRoute,
+            deepLinks = listOf(navDeepLink {
+                uriPattern = "https://mega.nz/$syncListRoute/{selectedChip}"
+                action = Intent.ACTION_VIEW
+            }),
+            arguments = listOf(
+                navArgument("selectedChip") {
+                    type = NavType.IntType
+                    defaultValue = 0
+                }
+            )
+        ) { navBackStackEntry ->
+            val selectedChip =
+                syncChipValueMapper(navBackStackEntry.arguments?.getInt("selectedChip", 0) ?: 0)
+            Timber.d("Selected Chip = $selectedChip")
+
             val fragmentActivity = LocalContext.current.findFragmentActivity()
             val viewModelStoreOwner =
                 fragmentActivity ?: checkNotNull(LocalViewModelStoreOwner.current)
@@ -103,6 +144,7 @@ internal fun NavGraphBuilder.syncNavGraph(
                 syncFoldersViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
                 syncStalledIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
                 syncSolvedIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
+                selectedChip = selectedChip,
             )
         }
     }

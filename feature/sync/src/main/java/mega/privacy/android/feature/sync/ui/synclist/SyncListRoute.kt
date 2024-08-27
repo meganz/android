@@ -40,10 +40,11 @@ internal fun SyncListRoute(
     syncPermissionsManager: SyncPermissionsManager,
     addFolderClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
-    title: String? = null,
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
+    title: String? = null,
+    selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -126,6 +127,7 @@ internal fun SyncListRoute(
         syncFoldersViewModel = syncFoldersViewModel,
         syncStalledIssuesViewModel = syncStalledIssuesViewModel,
         syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
+        selectedChip = selectedChip,
     )
 
     if (showUpgradeDialog) {

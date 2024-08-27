@@ -89,6 +89,7 @@ import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.navigation.DeeplinkHandler
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -113,6 +114,12 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
      */
     @Inject
     lateinit var navigator: MegaNavigator
+
+    /**
+     * [DeeplinkHandler] injection
+     */
+    @Inject
+    lateinit var deeplinkHandler: DeeplinkHandler
 
     /**
      * MegaChatRequestHandler injection
@@ -486,6 +493,16 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     navigateToUpgradeAccount()
 
                     finish()
+                }
+            }
+
+            deeplinkHandler.matches(url.toString()) -> {
+                if (isLoggedIn) {
+                    deeplinkHandler.process(this, url.toString())
+                    finish()
+                } else {
+                    Timber.w("Not logged")
+                    setError(getString(R.string.alert_not_logged_in))
                 }
             }
 

@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -29,6 +28,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.navigation.syncNavGraph
 import mega.privacy.android.feature.sync.navigation.syncRoute
+import mega.privacy.android.feature.sync.ui.mapper.SyncChipValueMapper
 import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.navigation.MegaNavigator
@@ -88,6 +88,12 @@ class SyncFragment : Fragment() {
     lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     /**
+     * Get [SyncChipValueMapper]
+     */
+    @Inject
+    lateinit var syncChipValueMapper: SyncChipValueMapper
+
+    /**
      * Get [SyncPermissionsManager]
      */
     @Inject
@@ -133,6 +139,7 @@ class SyncFragment : Fragment() {
             syncNavGraph(
                 navController = animatedNavController,
                 fileTypeIconMapper = fileTypeIconMapper,
+                syncChipValueMapper = syncChipValueMapper,
                 syncPermissionsManager = syncPermissionsManager,
                 openUpgradeAccountPage = {
                     megaNavigator.openUpgradeAccount(context)
