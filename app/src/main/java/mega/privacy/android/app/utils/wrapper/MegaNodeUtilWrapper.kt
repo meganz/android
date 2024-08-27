@@ -557,9 +557,6 @@ interface MegaNodeUtilWrapper {
     /**
      * Setup streaming server
      *
-     * @param megaApi
      */
-    fun setupStreamingServer(megaApi: MegaApiAndroid)
-
-
+    fun setupStreamingServer()
 }

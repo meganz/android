@@ -7,6 +7,7 @@ import android.content.res.Resources
 import android.net.Uri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -329,10 +330,8 @@ class MegaNodeUtilFacade @Inject constructor(
 
     override fun containsMediaFile(handle: Long) = MegaNodeUtil.containsMediaFile(handle)
 
-    override fun setupStreamingServer(megaApi: MegaApiAndroid) {
-        coroutineScope.launch {
-            launchStreamingServer()
-        }
+    override fun setupStreamingServer() {
+        runBlocking { launchStreamingServer() }
     }
 
     private suspend fun launchStreamingServer() = streamingGateway.startServer()

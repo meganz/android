@@ -674,7 +674,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         }
                         pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     } else {
-                        megaNodeUtilWrapper.setupStreamingServer(megaApi)
+                        megaNodeUtilWrapper.setupStreamingServer()
                         val url = megaApi.httpServerGetLocalLink(vNode)
                         if (url != null) {
                             val parsedUri = Uri.parse(url)
