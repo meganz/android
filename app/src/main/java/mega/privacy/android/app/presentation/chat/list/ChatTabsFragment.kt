@@ -177,7 +177,8 @@ class ChatTabsFragment : Fragment() {
                         onDismissDialog = ::onDismissDialog,
                         onStartChatClick = ::startChatAction,
                         onShowNextTooltip = viewModel::setNextMeetingTooltip,
-                        onDismissForceAppUpdateDialog = viewModel::onForceUpdateDialogDismissed
+                        onDismissForceAppUpdateDialog = viewModel::onForceUpdateDialogDismissed,
+                        onScheduleMeeting = ::onScheduleMeeting
                     )
                 }
             }
@@ -404,13 +405,22 @@ class ChatTabsFragment : Fragment() {
         )
     }
 
+    private fun onScheduleMeeting() {
+        (activity as? ManagerActivity?)?.onScheduleMeeting()
+    }
+
     private fun startChatAction(isFabClicked: Boolean) {
         if (isMeetingTabShown()) {
-            Analytics.tracker.trackEvent(ChatTabFABPressedEvent)
-            MeetingBottomSheetDialogFragment.newInstance(true).show(
-                childFragmentManager,
-                MeetingBottomSheetDialogFragment.TAG
-            )
+            if (isFabClicked) {
+                Analytics.tracker.trackEvent(ChatTabFABPressedEvent)
+                MeetingBottomSheetDialogFragment.newInstance(true).show(
+                    childFragmentManager,
+                    MeetingBottomSheetDialogFragment.TAG
+                )
+            } else {
+                (activity as? ManagerActivity?)?.onCreateMeeting()
+            }
+
         } else {
             if (isFabClicked || viewModel.getState().value.hasAnyContact) {
                 Analytics.tracker.trackEvent(ChatTabFABPressedEvent)

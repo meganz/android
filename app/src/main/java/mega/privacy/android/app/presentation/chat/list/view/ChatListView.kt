@@ -47,6 +47,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
+import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedWithoutBackgroundMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
@@ -92,6 +93,7 @@ fun ChatListView(
     onFirstItemVisible: (Boolean) -> Unit = {},
     onScrollInProgress: (Boolean) -> Unit = {},
     onEmptyButtonClick: () -> Unit = {},
+    onScheduleMeeting: () -> Unit = {},
     onShowNextTooltip: (MeetingTooltipItem) -> Unit = {},
 ) {
     Box(
@@ -117,7 +119,8 @@ fun ChatListView(
                 EmptyView(
                     isMeetingView = isMeetingView,
                     onEmptyButtonClick = onEmptyButtonClick,
-                    hasAnyContact = hasAnyContact
+                    hasAnyContact = hasAnyContact,
+                    onScheduleMeeting = onScheduleMeeting,
                 )
         }
     }
@@ -264,16 +267,17 @@ private fun EmptyView(
     modifier: Modifier = Modifier,
     hasAnyContact: Boolean = false,
     onEmptyButtonClick: () -> Unit = {},
+    onScheduleMeeting: () -> Unit = {},
 ) {
     val imageResource: Int
     val titleResource: Int
     val descriptionResource: Int
     val buttonResource: Int
     if (isMeetingView) {
-        imageResource = R.drawable.ic_zero_meeting
-        titleResource = R.string.meeting_list_empty_action
-        descriptionResource = R.string.meeting_list_empty_description
-        buttonResource = R.string.new_meeting
+        imageResource = IconR.drawable.ic_meeting_video
+        titleResource = sharedR.string.meeting_recent_list_empty_title
+        descriptionResource = sharedR.string.meeting_recent_list_empty_subtitle
+        buttonResource = R.string.action_start_meeting_now
     } else {
         imageResource = IconR.drawable.ic_message_call
         titleResource = sharedR.string.chat_recent_list_empty_title
@@ -337,9 +341,20 @@ private fun EmptyView(
             textId = buttonResource,
             onClick = onEmptyButtonClick,
             modifier = Modifier
-                .padding(vertical = 20.dp)
+                .padding(vertical = 12.dp)
                 .align(Alignment.CenterHorizontally)
         )
+        if (isMeetingView) {
+            OutlinedWithoutBackgroundMegaButton(
+                modifier = Modifier
+                    .padding(start = 20.dp, end = 20.dp, bottom = 8.dp),
+                text = stringResource(id = R.string.chat_schedule_meeting),
+                onClick = onScheduleMeeting,
+                rounded = false,
+                enabled = true,
+                iconId = null
+            )
+        }
     }
 }
 

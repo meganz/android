@@ -329,9 +329,12 @@ import mega.privacy.mobile.analytics.event.ChatRoomsBottomNavigationItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveBottomNavigationItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveSearchMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.IncomingSharesTabEvent
+import mega.privacy.mobile.analytics.event.JoinMeetingPressedEvent
 import mega.privacy.mobile.analytics.event.LinkSharesTabEvent
 import mega.privacy.mobile.analytics.event.OutgoingSharesTabEvent
+import mega.privacy.mobile.analytics.event.ScheduleMeetingPressedEvent
 import mega.privacy.mobile.analytics.event.SharedItemsScreenEvent
+import mega.privacy.mobile.analytics.event.StartMeetingNowPressedEvent
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -5497,6 +5500,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     override fun onJoinMeeting() {
+        Analytics.tracker.trackEvent(JoinMeetingPressedEvent)
         if (CallUtil.participatingInACall()) {
             CallUtil.showConfirmationInACall(
                 this,
@@ -5509,10 +5513,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     override fun onCreateMeeting() {
+        Analytics.tracker.trackEvent(StartMeetingNowPressedEvent)
         chatsFragment?.onCreateMeeting()
     }
 
     override fun onScheduleMeeting() {
+        Analytics.tracker.trackEvent(ScheduleMeetingPressedEvent)
         startActivity(Intent(this, CreateScheduledMeetingActivity::class.java))
     }
 

@@ -81,6 +81,7 @@ fun ChatTabsView(
     onCancelScheduledMeeting: () -> Unit = {},
     onDismissDialog: () -> Unit = {},
     onStartChatClick: (isFabClicked: Boolean) -> Unit = {},
+    onScheduleMeeting: () -> Unit = {},
     onShowNextTooltip: (MeetingTooltipItem) -> Unit = {},
     onDismissForceAppUpdateDialog: () -> Unit = {},
 ) {
@@ -190,6 +191,7 @@ fun ChatTabsView(
                     onItemSelected = onItemSelected,
                     onScrollInProgress = { showFabButton = !it },
                     onEmptyButtonClick = { onStartChatClick(false) },
+                    onScheduleMeeting = onScheduleMeeting,
                     onShowNextTooltip = onShowNextTooltip,
                     hasAnyContact = state.hasAnyContact
                 )
