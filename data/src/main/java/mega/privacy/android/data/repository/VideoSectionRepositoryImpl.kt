@@ -361,6 +361,15 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
         )
     }
 
+    override suspend fun removeRecentlyWatchedItem(handle: Long) {
+        initVideoRecentlyWatchedData()
+        recentlyWatchedVideosData.removeAll { it.videoHandle == handle }
+        appPreferencesGateway.putString(
+            PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS,
+            Json.encodeToString(recentlyWatchedVideosData)
+        )
+    }
+
     companion object {
         private const val PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS =
             "PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS"

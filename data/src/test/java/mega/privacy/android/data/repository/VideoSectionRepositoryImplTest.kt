@@ -767,4 +767,29 @@ class VideoSectionRepositoryImplTest {
             jsonString
         )
     }
+
+    @Test
+    fun `test that removeRecentlyWatchedItem function is invoked with the correct parameters`() =
+        runTest {
+            val testHandle = 12345L
+            val testTimestamp = 100000L
+            val testRecentlyWatchedItem = VideoRecentlyWatchedItem(testHandle, testTimestamp)
+            val addedHandle = 54321L
+            val addedTimestamp = 200000L
+            val addedRecentlyWatchedItem = VideoRecentlyWatchedItem(addedHandle, addedTimestamp)
+            val testVideoRecentlyWatchedData =
+                mutableListOf(addedRecentlyWatchedItem, testRecentlyWatchedItem)
+            val testJsonString = Json.encodeToString(testVideoRecentlyWatchedData)
+            initUnderTest()
+            whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull())).thenReturn(
+                flowOf(testJsonString)
+            )
+            testVideoRecentlyWatchedData.removeAll { it.videoHandle == addedHandle }
+            val expectedJson = Json.encodeToString(testVideoRecentlyWatchedData)
+            underTest.removeRecentlyWatchedItem(addedHandle)
+            verify(appPreferencesGateway).putString(
+                "PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS",
+                expectedJson
+            )
+        }
 }

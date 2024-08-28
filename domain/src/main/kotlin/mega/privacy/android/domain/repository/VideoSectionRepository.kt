@@ -126,4 +126,11 @@ interface VideoSectionRepository {
      * Clear the data of video recently watched
      */
     suspend fun clearRecentlyWatchedVideos()
+
+    /**
+     * Remove the item of recently watched
+     *
+     * @param handle removed item handle
+     */
+    suspend fun removeRecentlyWatchedItem(handle: Long)
 }
