@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.cancelaccountplan.view
+package mega.privacy.android.app.presentation.cancelaccountplan.view
 
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
@@ -15,7 +15,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import test.mega.privacy.android.app.hasDrawable
+import mega.privacy.android.app.hasDrawable
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

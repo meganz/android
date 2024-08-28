@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.favourites
+package mega.privacy.android.app.presentation.favourites
 
 import android.os.Bundle
 import android.view.View
@@ -34,8 +34,8 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.di.TestWrapperModule
-import test.mega.privacy.android.app.launchFragmentInHiltContainer
+import mega.privacy.android.app.di.TestWrapperModule
+import mega.privacy.android.app.launchFragmentInHiltContainer
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

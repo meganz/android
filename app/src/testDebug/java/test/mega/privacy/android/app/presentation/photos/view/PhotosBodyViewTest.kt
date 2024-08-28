@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.photos.view
+package mega.privacy.android.app.presentation.photos.view
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.rememberPagerState
@@ -13,7 +13,7 @@ import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import test.mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.onNodeWithText
 
 @OptIn(ExperimentalFoundationApi::class)
 @HiltAndroidTest

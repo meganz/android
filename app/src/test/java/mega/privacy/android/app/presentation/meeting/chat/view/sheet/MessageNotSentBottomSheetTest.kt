@@ -16,7 +16,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import test.mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class MessageNotSentBottomSheetTest {

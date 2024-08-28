@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.achievements.invites
+package mega.privacy.android.app.presentation.achievements.invites
 
 import android.app.Activity
 import android.content.ComponentName
@@ -40,7 +40,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.shadow.api.Shadow
 import org.robolectric.shadows.ShadowActivity
-import test.mega.privacy.android.app.fromId
+import mega.privacy.android.app.fromId
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

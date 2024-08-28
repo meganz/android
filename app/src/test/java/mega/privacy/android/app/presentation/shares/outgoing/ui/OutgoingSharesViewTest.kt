@@ -14,7 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.robolectric.annotation.Config
-import test.mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.onNodeWithText
 
 @Config(sdk = [Build.VERSION_CODES.Q])
 @RunWith(AndroidJUnit4::class)

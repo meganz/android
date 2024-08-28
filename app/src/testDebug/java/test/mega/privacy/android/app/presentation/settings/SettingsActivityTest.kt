@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.settings
+package mega.privacy.android.app.presentation.settings
 
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.contrib.RecyclerViewActions
@@ -19,11 +19,11 @@ import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.RecyclerViewAssertions
-import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.onViewHolder
-import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withRowContaining
+import mega.privacy.android.app.RecyclerViewAssertions
+import mega.privacy.android.app.RecyclerViewAssertions.Companion.onViewHolder
+import mega.privacy.android.app.RecyclerViewAssertions.Companion.withRowContaining
 
-import test.mega.privacy.android.app.di.TestSettingsAdvancedUseCases
+import mega.privacy.android.app.di.TestSettingsAdvancedUseCases
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

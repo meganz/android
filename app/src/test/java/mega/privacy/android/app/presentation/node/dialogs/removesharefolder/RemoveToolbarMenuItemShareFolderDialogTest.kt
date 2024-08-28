@@ -11,8 +11,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
-import test.mega.privacy.android.app.fromId
-import test.mega.privacy.android.app.fromPluralId
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.fromPluralId
 
 @RunWith(AndroidJUnit4::class)
 class RemoveToolbarMenuItemShareFolderDialogTest {

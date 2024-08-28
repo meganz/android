@@ -32,8 +32,8 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CO
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import test.mega.privacy.android.app.fromId
-import test.mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class ManageChatHistoryScreenTest {

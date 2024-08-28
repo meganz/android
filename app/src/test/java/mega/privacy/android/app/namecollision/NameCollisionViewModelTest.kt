@@ -40,9 +40,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.InstantExecutorExtension
-import test.mega.privacy.android.app.TestSchedulerExtension
-import test.mega.privacy.android.app.extensions.withCoroutineExceptions
+import mega.privacy.android.app.InstantExecutorExtension
+import mega.privacy.android.app.TestSchedulerExtension
+import mega.privacy.android.app.extensions.withCoroutineExceptions
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

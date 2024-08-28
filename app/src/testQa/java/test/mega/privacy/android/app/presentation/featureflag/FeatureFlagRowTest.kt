@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.featureflag
+package mega.privacy.android.app.presentation.featureflag
 
 import androidx.compose.ui.test.assertIsToggleable
 import androidx.compose.ui.test.junit4.createComposeRule

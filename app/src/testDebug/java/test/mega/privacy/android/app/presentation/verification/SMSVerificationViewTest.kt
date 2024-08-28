@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.verification
+package mega.privacy.android.app.presentation.verification
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
@@ -18,7 +18,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import test.mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.onNodeWithText
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.cancelaccountplan.view
+package mega.privacy.android.app.presentation.cancelaccountplan.view
 
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -14,7 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import test.mega.privacy.android.app.fromId
+import mega.privacy.android.app.fromId
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

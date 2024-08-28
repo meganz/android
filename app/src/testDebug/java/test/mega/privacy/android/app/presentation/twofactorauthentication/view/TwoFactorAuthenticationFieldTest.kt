@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.twofactorauthentication.view
+package mega.privacy.android.app.presentation.twofactorauthentication.view
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag

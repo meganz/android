@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.cancelaccountplan.view
+package mega.privacy.android.app.presentation.cancelaccountplan.view
 
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createComposeRule

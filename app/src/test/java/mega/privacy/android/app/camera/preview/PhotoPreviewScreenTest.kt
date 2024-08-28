@@ -18,7 +18,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import test.mega.privacy.android.app.fromId
+import mega.privacy.android.app.fromId
 
 @RunWith(AndroidJUnit4::class)
 class PhotoPreviewScreenTest {

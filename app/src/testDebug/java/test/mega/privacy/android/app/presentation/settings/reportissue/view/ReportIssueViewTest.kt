@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.settings.reportissue.view
+package mega.privacy.android.app.presentation.settings.reportissue.view
 
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.assert
@@ -21,7 +21,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import test.mega.privacy.android.app.fromId
+import mega.privacy.android.app.fromId
 
 @RunWith(AndroidJUnit4::class)
 class ReportIssueViewTest {

@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.myaccount
+package mega.privacy.android.app.presentation.myaccount
 
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.assert
@@ -63,8 +63,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import test.mega.privacy.android.app.fromId
-import test.mega.privacy.android.app.fromPluralId
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.fromPluralId
 import kotlin.random.Random
 
 @HiltAndroidTest

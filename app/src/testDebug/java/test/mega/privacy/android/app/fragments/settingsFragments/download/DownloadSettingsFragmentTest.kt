@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.fragments.settingsFragments.download
+package mega.privacy.android.app.fragments.settingsFragments.download
 
 import android.os.Build.VERSION_CODES
 import android.view.View
@@ -22,12 +22,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
-import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withNoRowContaining
-import test.mega.privacy.android.app.RecyclerViewAssertions.Companion.withRowContaining
-import test.mega.privacy.android.app.di.TestDownloadSettingsUseCases.getDownloadLocationPath
-import test.mega.privacy.android.app.di.TestDownloadSettingsUseCases.getStorageDownloadAskAlways
-import test.mega.privacy.android.app.launchFragmentInHiltContainer
-import test.mega.privacy.android.app.presentation.settings.onPreferences
+import mega.privacy.android.app.RecyclerViewAssertions.Companion.withNoRowContaining
+import mega.privacy.android.app.RecyclerViewAssertions.Companion.withRowContaining
+import mega.privacy.android.app.di.TestDownloadSettingsUseCases.getDownloadLocationPath
+import mega.privacy.android.app.di.TestDownloadSettingsUseCases.getStorageDownloadAskAlways
+import mega.privacy.android.app.launchFragmentInHiltContainer
+import mega.privacy.android.app.presentation.settings.onPreferences
 
 @HiltAndroidTest
 @Config(sdk = [VERSION_CODES.Q])

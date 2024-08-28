@@ -8,7 +8,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
-import test.mega.privacy.android.app.fromPluralId
+import mega.privacy.android.app.fromPluralId
 
 @RunWith(AndroidJUnit4::class)
 class LeaveShareDialogTest {

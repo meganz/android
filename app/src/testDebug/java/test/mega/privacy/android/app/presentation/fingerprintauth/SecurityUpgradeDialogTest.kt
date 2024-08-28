@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.fingerprintauth
+package mega.privacy.android.app.presentation.fingerprintauth
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -10,7 +10,7 @@ import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDial
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import test.mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.onNodeWithText
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

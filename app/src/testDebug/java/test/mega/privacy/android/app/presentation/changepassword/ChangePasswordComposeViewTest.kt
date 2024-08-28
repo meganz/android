@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.changepassword
+package mega.privacy.android.app.presentation.changepassword
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assert
@@ -43,9 +43,9 @@ import mega.privacy.android.shared.original.core.ui.theme.yellow_600
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import test.mega.privacy.android.app.fromId
-import test.mega.privacy.android.app.hasBackgroundColor
-import test.mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.hasBackgroundColor
+import mega.privacy.android.app.onNodeWithText
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

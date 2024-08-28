@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.achievements.view
+package mega.privacy.android.app.presentation.achievements.view
 
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
@@ -14,7 +14,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import test.mega.privacy.android.app.fromId
+import mega.privacy.android.app.fromId
 
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "w720dp-h1280dp-xhdpi")

@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.favourites
+package mega.privacy.android.app.presentation.favourites
 
 import android.view.View
 import android.widget.ImageView
@@ -42,11 +42,11 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.di.TestMapperModule
-import test.mega.privacy.android.app.di.TestSortOrderUseCases
-import test.mega.privacy.android.app.di.TestWrapperModule
-import test.mega.privacy.android.app.launchFragmentInHiltContainer
-import test.mega.privacy.android.app.testFragment
+import mega.privacy.android.app.di.TestMapperModule
+import mega.privacy.android.app.di.TestSortOrderUseCases
+import mega.privacy.android.app.di.TestWrapperModule
+import mega.privacy.android.app.launchFragmentInHiltContainer
+import mega.privacy.android.app.testFragment
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

@@ -8,7 +8,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
-import test.mega.privacy.android.app.fromId
+import mega.privacy.android.app.fromId
 
 @RunWith(AndroidJUnit4::class)
 class ShareFolderAccessDialogTest {

@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.domain.usecase
+package mega.privacy.android.app.domain.usecase
 
 import mega.privacy.android.app.domain.repository.ShakeDetectorRepository
 import mega.privacy.android.app.domain.usecase.VibrateDevice

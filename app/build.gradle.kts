@@ -69,7 +69,7 @@ android {
         resValue("string", "sdk_version", "\"${getSdkGitHash(megaSdkVersion, project)}\"")
         resValue("string", "karere_version", "\"${getChatGitHash(megaSdkVersion, project)}\"")
 
-        testInstrumentationRunner = "test.mega.privacy.android.app.HiltTestRunner"
+        testInstrumentationRunner = "mega.privacy.android.app.HiltTestRunner"
     }
 
     buildTypes {

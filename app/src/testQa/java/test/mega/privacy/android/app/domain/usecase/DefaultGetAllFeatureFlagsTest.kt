@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.domain.usecase
+package mega.privacy.android.app.domain.usecase
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat

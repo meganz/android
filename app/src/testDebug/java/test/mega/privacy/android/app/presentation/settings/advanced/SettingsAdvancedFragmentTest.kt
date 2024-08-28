@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.settings.advanced
+package mega.privacy.android.app.presentation.settings.advanced
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
@@ -26,10 +26,10 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.RecyclerViewAssertions
-import test.mega.privacy.android.app.di.TestSettingsAdvancedUseCases
-import test.mega.privacy.android.app.launchFragmentInHiltContainer
-import test.mega.privacy.android.app.presentation.settings.onPreferences
+import mega.privacy.android.app.RecyclerViewAssertions
+import mega.privacy.android.app.di.TestSettingsAdvancedUseCases
+import mega.privacy.android.app.launchFragmentInHiltContainer
+import mega.privacy.android.app.presentation.settings.onPreferences
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

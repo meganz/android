@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.cancelaccountplan
+package mega.privacy.android.app.presentation.cancelaccountplan
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat

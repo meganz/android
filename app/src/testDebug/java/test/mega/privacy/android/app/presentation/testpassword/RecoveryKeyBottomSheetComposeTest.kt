@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.testpassword
+package mega.privacy.android.app.presentation.testpassword
 
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState

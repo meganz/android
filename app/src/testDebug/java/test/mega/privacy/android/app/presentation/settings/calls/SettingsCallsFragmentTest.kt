@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.settings.calls
+package mega.privacy.android.app.presentation.settings.calls
 
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
@@ -21,9 +21,9 @@ import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.di.TestSettingsModule
-import test.mega.privacy.android.app.fromId
-import test.mega.privacy.android.app.launchFragmentInHiltContainer
+import mega.privacy.android.app.di.TestSettingsModule
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.launchFragmentInHiltContainer
 
 
 @HiltAndroidTest

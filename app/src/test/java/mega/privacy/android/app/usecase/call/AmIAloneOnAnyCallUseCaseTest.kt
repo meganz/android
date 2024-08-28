@@ -33,7 +33,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.extensions.asHotFlow
+import mega.privacy.android.app.extensions.asHotFlow
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AmIAloneOnAnyCallUseCaseTest {

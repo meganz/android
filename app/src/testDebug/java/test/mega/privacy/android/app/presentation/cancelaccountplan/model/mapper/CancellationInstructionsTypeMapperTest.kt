@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.cancelaccountplan.model.mapper
+package mega.privacy.android.app.presentation.cancelaccountplan.model.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancellationInstructionsType

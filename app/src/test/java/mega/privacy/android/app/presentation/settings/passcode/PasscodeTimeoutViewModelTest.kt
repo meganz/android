@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.presentation.settings.passcode.mapper.PasscodeTimeoutMapper
 import mega.privacy.android.app.presentation.settings.passcode.mapper.TimeoutOptionMapper
 import mega.privacy.android.app.presentation.settings.passcode.model.TimeoutOption
@@ -21,7 +22,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
-import test.mega.privacy.android.app.extensions.asHotFlow
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PasscodeTimeoutViewModelTest {

@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.login.view
+package mega.privacy.android.app.presentation.login.view
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -21,7 +21,7 @@ import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import test.mega.privacy.android.app.fromId
+import mega.privacy.android.app.fromId
 
 @RunWith(AndroidJUnit4::class)
 class LoginViewTest {

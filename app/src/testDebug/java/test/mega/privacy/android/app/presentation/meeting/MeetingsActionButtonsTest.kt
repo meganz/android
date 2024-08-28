@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.meeting
+package mega.privacy.android.app.presentation.meeting
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -12,7 +12,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import test.mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.domain.entity.call.AudioDevice
 
 

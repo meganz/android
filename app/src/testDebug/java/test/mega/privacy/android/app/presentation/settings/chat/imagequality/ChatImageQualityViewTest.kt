@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.settings.chat.imagequality
+package mega.privacy.android.app.presentation.settings.chat.imagequality
 
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
@@ -12,7 +12,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
-import test.mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class ChatImageQualityViewTest {

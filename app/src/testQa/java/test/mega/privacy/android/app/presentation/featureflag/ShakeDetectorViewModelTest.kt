@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.featureflag
+package mega.privacy.android.app.presentation.featureflag
 
 import app.cash.turbine.test
 import kotlinx.coroutines.Dispatchers

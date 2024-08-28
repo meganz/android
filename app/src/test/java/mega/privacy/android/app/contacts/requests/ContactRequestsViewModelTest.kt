@@ -23,8 +23,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verifyBlocking
-import test.mega.privacy.android.app.InstantExecutorExtension
-import test.mega.privacy.android.app.TestSchedulerExtension
+import mega.privacy.android.app.InstantExecutorExtension
+import mega.privacy.android.app.TestSchedulerExtension
 
 @ExtendWith(
     InstantExecutorExtension::class,

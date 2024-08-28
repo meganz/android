@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.avatar.view
+package mega.privacy.android.app.presentation.avatar.view
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color

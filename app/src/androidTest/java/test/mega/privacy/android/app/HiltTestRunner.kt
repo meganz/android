@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app
+package mega.privacy.android.app
 
 import android.app.Application
 import android.content.Context

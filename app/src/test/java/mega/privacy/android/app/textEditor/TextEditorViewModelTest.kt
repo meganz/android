@@ -31,7 +31,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
+import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 
 
 @ExperimentalCoroutinesApi

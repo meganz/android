@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.data
+package mega.privacy.android.app.data
 
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener

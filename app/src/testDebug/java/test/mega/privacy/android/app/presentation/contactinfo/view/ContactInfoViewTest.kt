@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.contactinfo.view
+package mega.privacy.android.app.presentation.contactinfo.view
 
 import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -17,8 +17,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
-import test.mega.privacy.android.app.fromId
-import test.mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class ContactInfoViewTest {

@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.settings.reportissue.view
+package mega.privacy.android.app.presentation.settings.reportissue.view
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText

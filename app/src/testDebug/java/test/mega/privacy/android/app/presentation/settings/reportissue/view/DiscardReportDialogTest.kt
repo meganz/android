@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalCoroutinesApi::class)
 
-package test.mega.privacy.android.app.presentation.settings.reportissue.view
+package mega.privacy.android.app.presentation.settings.reportissue.view
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -27,7 +27,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import test.mega.privacy.android.app.fromId
+import mega.privacy.android.app.fromId
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

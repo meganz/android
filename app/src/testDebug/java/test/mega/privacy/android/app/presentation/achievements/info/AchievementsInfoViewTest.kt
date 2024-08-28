@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.achievements.info
+package mega.privacy.android.app.presentation.achievements.info
 
 import android.content.Context
 import androidx.compose.ui.Modifier
@@ -26,9 +26,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import test.mega.privacy.android.app.fromId
-import test.mega.privacy.android.app.fromPluralId
-import test.mega.privacy.android.app.hasTextColor
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.fromPluralId
+import mega.privacy.android.app.hasTextColor
 import kotlin.random.Random
 
 @HiltAndroidTest

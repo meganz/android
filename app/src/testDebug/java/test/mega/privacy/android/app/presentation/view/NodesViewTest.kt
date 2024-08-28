@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.view
+package mega.privacy.android.app.presentation.view
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.hasTestTag

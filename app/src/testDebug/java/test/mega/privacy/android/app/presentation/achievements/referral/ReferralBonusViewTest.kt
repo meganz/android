@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.achievements.referral
+package mega.privacy.android.app.presentation.achievements.referral
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -29,7 +29,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import test.mega.privacy.android.app.fromId
+import mega.privacy.android.app.fromId
 import kotlin.random.Random
 
 @OptIn(ExperimentalCoilApi::class)

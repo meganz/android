@@ -5,7 +5,7 @@ import mega.privacy.android.app.presentation.chat.model.ChatRoomUiState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import test.mega.privacy.android.app.presentation.meeting.model.newChatRoom
+import mega.privacy.android.app.presentation.meeting.model.newChatRoom
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ChatRoomUiMapperTest {

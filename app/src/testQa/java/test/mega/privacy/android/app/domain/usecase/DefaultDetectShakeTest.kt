@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.domain.usecase
+package mega.privacy.android.app.domain.usecase
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
