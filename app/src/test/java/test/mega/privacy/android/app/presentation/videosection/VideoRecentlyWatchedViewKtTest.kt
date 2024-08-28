@@ -13,6 +13,8 @@ import coil.Coil
 import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
 import coil.test.FakeImageLoaderEngine
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_RECENTLY_WATCHED_CLEAR_ACTION
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
@@ -53,20 +55,24 @@ class VideoRecentlyWatchedViewKtTest {
 
     private fun setComposeContent(
         group: Map<String, List<VideoUIEntity>> = emptyMap(),
+        clearRecentlyWatchedSuccess: StateEvent = consumed,
         modifier: Modifier = Modifier,
         onBackPressed: () -> Unit = {},
         onClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
         onActionPressed: (VideoSectionMenuAction?) -> Unit = {},
         onMenuClick: (VideoUIEntity) -> Unit = {},
+        clearRecentlyWatchedMessageShown: () -> Unit = {},
     ) {
         composeTestRule.setContent {
             VideoRecentlyWatchedView(
                 group = group,
+                clearRecentlyWatchedVideosSuccess = clearRecentlyWatchedSuccess,
                 modifier = modifier,
                 onBackPressed = onBackPressed,
                 onClick = onClick,
                 onActionPressed = onActionPressed,
-                onMenuClick = onMenuClick
+                onMenuClick = onMenuClick,
+                clearRecentlyWatchedVideosMessageShown = clearRecentlyWatchedMessageShown
             )
         }
     }
@@ -110,5 +116,14 @@ class VideoRecentlyWatchedViewKtTest {
             useUnmergedTree = true
         ).performClick()
         verify(onActionPressed).invoke(VideoSectionMenuAction.VideoRecentlyWatchedClearAction)
+    }
+
+    @Test
+    fun `test that VideoRecentlyWatchedClearAction does not exist when the group is empty`() {
+        setComposeContent()
+        composeTestRule.onNodeWithTag(
+            testTag = TEST_TAG_VIDEO_SECTION_RECENTLY_WATCHED_CLEAR_ACTION,
+            useUnmergedTree = true
+        ).assertDoesNotExist()
     }
 }

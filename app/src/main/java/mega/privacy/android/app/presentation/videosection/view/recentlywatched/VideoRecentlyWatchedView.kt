@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -26,6 +28,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.StateEvent
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VideoItemView
@@ -35,8 +40,10 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import nz.mega.sdk.MegaNode
 
 /**
@@ -46,21 +53,44 @@ import nz.mega.sdk.MegaNode
 @Composable
 fun VideoRecentlyWatchedView(
     group: Map<String, List<VideoUIEntity>>,
+    clearRecentlyWatchedVideosSuccess: StateEvent,
     modifier: Modifier,
     onBackPressed: () -> Unit,
     onClick: (item: VideoUIEntity, index: Int) -> Unit,
     onActionPressed: (VideoSectionMenuAction?) -> Unit,
     onMenuClick: (VideoUIEntity) -> Unit,
+    clearRecentlyWatchedVideosMessageShown: () -> Unit,
 ) {
-    Scaffold(
+    val snackBarHostState = remember { SnackbarHostState() }
+    val scaffoldState = rememberScaffoldState(snackbarHostState = snackBarHostState)
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    EventEffect(
+        event = clearRecentlyWatchedVideosSuccess,
+        onConsumed = clearRecentlyWatchedVideosMessageShown,
+        action = {
+            coroutineScope.launch {
+                snackBarHostState.showAutoDurationSnackbar(
+                    context.resources.getString(
+                        shareR.string.video_section_message_clear_recently_watched
+                    )
+                )
+            }
+        }
+    )
+
+    MegaScaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
-        scaffoldState = rememberScaffoldState(),
+        scaffoldState = scaffoldState,
         topBar = {
             MegaAppBar(
                 appBarType = AppBarType.BACK_NAVIGATION,
                 title = stringResource(id = shareR.string.video_section_title_video_recently_watched),
                 modifier = Modifier.testTag(VIDEO_RECENTLY_WATCHED_TOP_BAR_TEST_TAG),
-                actions = listOf(VideoSectionMenuAction.VideoRecentlyWatchedClearAction),
+                actions = if (group.isNotEmpty()) {
+                    listOf(VideoSectionMenuAction.VideoRecentlyWatchedClearAction)
+                } else null,
                 onActionPressed = { onActionPressed(it as? VideoSectionMenuAction) },
                 onNavigationPressed = onBackPressed,
             )

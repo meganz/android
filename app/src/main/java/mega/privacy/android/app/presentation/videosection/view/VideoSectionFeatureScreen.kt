@@ -169,13 +169,17 @@ internal fun VideoSectionNavHost(
         composable(route = videoRecentlyWatchedRoute) {
             VideoRecentlyWatchedView(
                 group = state.groupedVideoRecentlyWatchedItems,
+                clearRecentlyWatchedVideosSuccess = state.clearRecentlyWatchedVideosSuccess,
                 modifier = Modifier,
                 onBackPressed = { onBackPressedDispatcher?.onBackPressed() },
                 onClick = viewModel::onItemClicked,
                 onActionPressed = {
-                    //TODO the function for clear recently watched videos
+                    if (it is VideoSectionMenuAction.VideoRecentlyWatchedClearAction) {
+                        viewModel.clearRecentlyWatchedVideos()
+                    }
                 },
-                onMenuClick = onMenuClick
+                onMenuClick = onMenuClick,
+                clearRecentlyWatchedVideosMessageShown = viewModel::resetClearRecentlyWatchedVideosSuccess
             )
         }
     }

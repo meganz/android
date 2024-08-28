@@ -2,6 +2,8 @@ package test.mega.privacy.android.app.presentation.videosection
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,6 +22,7 @@ import mega.privacy.android.app.presentation.videosection.model.LocationFilterOp
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
+import mega.privacy.android.app.presentation.videosection.view.recentlywatched.videoRecentlyWatchedRoute
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
@@ -43,6 +46,7 @@ import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseC
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCase
+import mega.privacy.android.domain.usecase.videosection.ClearRecentlyWatchedVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsUseCase
@@ -96,6 +100,7 @@ class VideoSectionViewModelTest {
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
     private val getVideoRecentlyWatchedUseCase = mock<GetVideoRecentlyWatchedUseCase>()
+    private val clearRecentlyWatchedVideosUseCase = mock<ClearRecentlyWatchedVideosUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -166,7 +171,8 @@ class VideoSectionViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             getNodeContentUriUseCase = getNodeContentUriUseCase,
-            getVideoRecentlyWatchedUseCase = getVideoRecentlyWatchedUseCase
+            getVideoRecentlyWatchedUseCase = getVideoRecentlyWatchedUseCase,
+            clearRecentlyWatchedVideosUseCase = clearRecentlyWatchedVideosUseCase
         )
     }
 
@@ -188,7 +194,8 @@ class VideoSectionViewModelTest {
             removeVideosFromPlaylistUseCase,
             monitorVideoPlaylistSetsUpdateUseCase,
             getNodeContentUriUseCase,
-            getVideoRecentlyWatchedUseCase
+            getVideoRecentlyWatchedUseCase,
+            clearRecentlyWatchedVideosUseCase
         )
     }
 
@@ -1447,6 +1454,82 @@ class VideoSectionViewModelTest {
         initVideosReturned()
         assertThat(underTest.isRecentlyWatchedEnabled()).isFalse()
     }
+
+    @Test
+    fun `test that the state is updated correctly after the clearRecentlyWatchedVideos is invoked`() =
+        runTest {
+            initUnderTest()
+            underTest.clearRecentlyWatchedVideos()
+
+            underTest.state.drop(1).test {
+                val actual = awaitItem()
+                assertThat(actual.groupedVideoRecentlyWatchedItems).isEmpty()
+                assertThat(actual.clearRecentlyWatchedVideosSuccess).isEqualTo(triggered)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the state is updated correctly after the resetClearRecentlyWatchedVideosSuccess is invoked`() =
+        runTest {
+            initUnderTest()
+            underTest.clearRecentlyWatchedVideos()
+
+            underTest.state.drop(1).test {
+                assertThat(awaitItem().clearRecentlyWatchedVideosSuccess).isEqualTo(triggered)
+                underTest.resetClearRecentlyWatchedVideosSuccess()
+                assertThat(awaitItem().clearRecentlyWatchedVideosSuccess).isEqualTo(consumed)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that state is correctly updated when monitorOfflineNodeUpdatesUseCase is triggered`() =
+        runTest {
+            val testHandle = 1L
+            val testTimestamp = 1000L
+            val testWatchDate = "12 April 2024"
+            val testVideoNodes = listOf(initTypedVideoNode(testHandle, testTimestamp))
+            val testVideoEntity = initVideoUIEntity(testHandle, testWatchDate)
+            val expectedRecentlyWatchedItems = mapOf((testWatchDate to listOf(testVideoEntity)))
+            whenever(videoUIEntityMapper(anyOrNull())).thenReturn(testVideoEntity)
+            whenever(getVideoRecentlyWatchedUseCase()).thenReturn(testVideoNodes)
+
+            testScheduler.advanceUntilIdle()
+            underTest.setCurrentDestinationRoute(videoRecentlyWatchedRoute)
+
+            underTest.state.drop(2).test {
+                fakeMonitorOfflineNodeUpdatesFlow.emit(emptyList())
+                assertThat(awaitItem().groupedVideoRecentlyWatchedItems).isEqualTo(
+                    expectedRecentlyWatchedItems
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that state is correctly updated when monitorNodeUpdatesUseCase is triggered`() =
+        runTest {
+            val testHandle = 1L
+            val testTimestamp = 1000L
+            val testWatchDate = "12 April 2024"
+            val testVideoNodes = listOf(initTypedVideoNode(testHandle, testTimestamp))
+            val testVideoEntity = initVideoUIEntity(testHandle, testWatchDate)
+            val expectedRecentlyWatchedItems = mapOf((testWatchDate to listOf(testVideoEntity)))
+            whenever(videoUIEntityMapper(anyOrNull())).thenReturn(testVideoEntity)
+            whenever(getVideoRecentlyWatchedUseCase()).thenReturn(testVideoNodes)
+
+            testScheduler.advanceUntilIdle()
+            underTest.setCurrentDestinationRoute(videoRecentlyWatchedRoute)
+
+            underTest.state.drop(2).test {
+                fakeMonitorNodeUpdatesFlow.emit(NodeUpdate(emptyMap()))
+                assertThat(awaitItem().groupedVideoRecentlyWatchedItems).isEqualTo(
+                    expectedRecentlyWatchedItems
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     companion object {
         @JvmField

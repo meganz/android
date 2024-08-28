@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.videosection.model
 
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.TypedVideoNode
@@ -42,6 +44,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property isUnhideMenuActionVisible the unhide menu action whether is visible
  * @property isRemoveLinkMenuActionVisible the remove link menu action whether is visible
  * @property groupedVideoRecentlyWatchedItems map of video recently watched items, grouped by timestamp for sticky header
+ * @property clearRecentlyWatchedVideosSuccess State Event which notifies that clear recently watched videos is successful
  */
 data class VideoSectionState(
     val allVideos: List<VideoUIEntity> = emptyList(),
@@ -77,5 +80,6 @@ data class VideoSectionState(
     val isHideMenuActionVisible: Boolean = false,
     val isUnhideMenuActionVisible: Boolean = false,
     val isRemoveLinkMenuActionVisible: Boolean = false,
-    val groupedVideoRecentlyWatchedItems: Map<String, List<VideoUIEntity>> = emptyMap()
+    val groupedVideoRecentlyWatchedItems: Map<String, List<VideoUIEntity>> = emptyMap(),
+    val clearRecentlyWatchedVideosSuccess: StateEvent = consumed,
 )
