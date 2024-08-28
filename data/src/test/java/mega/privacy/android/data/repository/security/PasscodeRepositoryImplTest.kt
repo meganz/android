@@ -212,12 +212,11 @@ internal class PasscodeRepositoryImplTest {
         }
 
     @Test
-    internal fun `test that set passcode timeout with immediate sets the value on the store to 0`() =
+    internal fun `test that set passcode timeout with null sets the value on the store to null`() =
         runTest {
-            val expected = 0L
-            underTest.setPasscodeTimeOut(PasscodeTimeout.Immediate)
+            underTest.setPasscodeTimeOut(null)
 
-            verifyBlocking(passcodeStoreGateway) { setPasscodeTimeout(expected) }
+            verifyBlocking(passcodeStoreGateway) { setPasscodeTimeout(null) }
         }
 
     @Test

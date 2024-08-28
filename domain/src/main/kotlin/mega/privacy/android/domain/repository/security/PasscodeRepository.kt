@@ -96,7 +96,7 @@ interface PasscodeRepository {
      *
      * @param passcodeTimeout
      */
-    suspend fun setPasscodeTimeOut(passcodeTimeout: PasscodeTimeout)
+    suspend fun setPasscodeTimeOut(passcodeTimeout: PasscodeTimeout?)
 
     /**
      * Monitor passcode type

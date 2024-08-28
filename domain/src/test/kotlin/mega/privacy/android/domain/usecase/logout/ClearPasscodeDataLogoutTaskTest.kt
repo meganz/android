@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.logout
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.security.PasscodeRepository
-import mega.privacy.android.domain.usecase.passcode.SetPasscodeEnabledUseCase
+import mega.privacy.android.domain.usecase.passcode.DisablePasscodeUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
@@ -15,13 +15,13 @@ class ClearPasscodeDataLogoutTaskTest {
 
     private val passcodeRepository = mock<PasscodeRepository>()
 
-    private val setPasscodeEnabledUseCase = mock<SetPasscodeEnabledUseCase>()
+    private val disablePasscodeUseCase = mock<DisablePasscodeUseCase>()
 
     @BeforeEach
     internal fun setUp() {
         underTest = ClearPasscodeDataLogoutTask(
             passcodeRepository = passcodeRepository,
-            setPasscodeEnabledUseCase = setPasscodeEnabledUseCase,
+            disablePasscodeUseCase = disablePasscodeUseCase,
         )
     }
 
@@ -36,6 +36,6 @@ class ClearPasscodeDataLogoutTaskTest {
     internal fun `test that passcode enabled state is set to false`() = runTest{
         underTest()
 
-        verify(setPasscodeEnabledUseCase).invoke(false)
+        verify(disablePasscodeUseCase).invoke()
     }
 }

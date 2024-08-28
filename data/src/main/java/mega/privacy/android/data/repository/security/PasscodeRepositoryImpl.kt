@@ -70,10 +70,11 @@ internal class PasscodeRepositoryImpl @Inject constructor(
             .map { passcodeTimeoutMapper(it) }
             .flowOn(ioDispatcher)
 
-    override suspend fun setPasscodeTimeOut(passcodeTimeout: PasscodeTimeout) =
+    override suspend fun setPasscodeTimeOut(passcodeTimeout: PasscodeTimeout?) =
         withContext(ioDispatcher) {
             passcodeStoreGateway.setPasscodeTimeout(
                 when (passcodeTimeout) {
+                    null -> null
                     PasscodeTimeout.Immediate -> 0
                     is PasscodeTimeout.TimeSpan -> passcodeTimeout.milliseconds
                 }
