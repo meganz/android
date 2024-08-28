@@ -64,7 +64,7 @@ sealed interface TimeoutOption {
     ) : TimeoutOption {
         override fun getTitle(context: Context) = removeFormatPlaceholder(
             context.resources.getQuantityString(
-                R.plurals.plural_call_ended_messages_seconds,
+                R.plurals.plural_call_ended_messages_minutes,
                 timeoutInMinutes,
                 timeoutInMinutes,
             )
