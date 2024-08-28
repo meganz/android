@@ -516,6 +516,24 @@ pipeline {
                 }
             }
         }
+        stage('Update Analytics Dependency') {
+            when {
+                expression { triggeredByUpdateAnalyticsDependency() }
+            }
+            steps {
+                script {
+                    BUILD_STEP = 'Update Analytics Dependency'
+                    withCredentials([
+                            string(credentialsId: 'ANALYTICS_GIT_URL', variable: 'ANALYTICS_GIT_URL'),
+                            gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default'),
+                    ]) {
+                        util.useGpg() {
+                            sh './gradlew fetchAnalyticDependency'
+                        }
+                    }
+                }
+            }
+        }
         stage("Post Release") {
             when {
                 expression { triggeredByPostRelease() }
@@ -841,4 +859,13 @@ private boolean triggeredBySendCodeFreezeReminder() {
 private boolean triggeredByPostRelease() {
     return env.gitlabTriggerPhrase != null &&
             env.gitlabTriggerPhrase.trim().startsWith("postRelease")
+}
+
+/**
+ * Check if build is triggered by 'update_analytics_dependency' command.
+ * @return true if build is triggered by 'update_analytics_dependency' command. Otherwise return false.
+ */
+private boolean triggeredByUpdateAnalyticsDependency() {
+    return env.gitlabTriggerPhrase != null &&
+            env.gitlabTriggerPhrase.trim().startsWith("update_analytics_dependency")
 }
