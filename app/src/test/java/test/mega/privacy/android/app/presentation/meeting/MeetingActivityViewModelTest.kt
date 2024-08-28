@@ -2,9 +2,16 @@ package test.mega.privacy.android.app.presentation.meeting
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
+import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityRepository
@@ -17,6 +24,11 @@ import mega.privacy.android.app.presentation.meeting.mapper.ChatParticipantMappe
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.domain.entity.EventType
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.chat.ChatConnectionState
+import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -33,12 +45,12 @@ import mega.privacy.android.domain.usecase.call.CreateMeetingUseCase
 import mega.privacy.android.domain.usecase.call.GetCallIdsOfOthersCallsUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorAudioOutputUseCase
 import mega.privacy.android.domain.usecase.call.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.call.RingIndividualInACallUseCase
 import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
@@ -52,6 +64,7 @@ import mega.privacy.android.domain.usecase.meeting.BroadcastCallScreenOpenedUseC
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorAudioOutputUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
@@ -64,9 +77,14 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 
 @ExperimentalCoroutinesApi
@@ -127,6 +145,7 @@ class MeetingActivityViewModelTest {
     private val startVideoDeviceUseCase: StartVideoDeviceUseCase = mock()
     private val monitorCallEndedUseCase: MonitorCallEndedUseCase = mock()
     private val monitorAudioOutputUseCase: MonitorAudioOutputUseCase = mock()
+    private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase = mock()
 
     private val enableOrDisableVideoUseCase: EnableOrDisableVideoUseCase = mock()
     private val enableOrDisableAudioUseCase: EnableOrDisableAudioUseCase = mock()
@@ -199,8 +218,21 @@ class MeetingActivityViewModelTest {
             enableOrDisableAudioUseCase,
             enableOrDisableVideoUseCase,
             monitorAudioOutputUseCase,
-            savedStateHandle
+            savedStateHandle,
         )
+        wheneverBlocking { monitorChatConnectionStateUseCase() } doReturn emptyFlow()
+        wheneverBlocking { monitorConnectivityUseCase() } doReturn emptyFlow()
+        wheneverBlocking { monitorFinishActivityUseCase() } doReturn emptyFlow()
+        wheneverBlocking { monitorChatCallUpdatesUseCase() } doReturn emptyFlow()
+        wheneverBlocking { monitorChatSessionUpdatesUseCase() } doReturn emptyFlow()
+        wheneverBlocking { monitorChatRoomUpdatesUseCase(chatId) } doReturn emptyFlow()
+        wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
+            StorageStateEvent(1L, "", 0L, "", EventType.Unknown, StorageState.Unknown)
+        )
+        wheneverBlocking { monitorUserUpdates() } doReturn emptyFlow()
+        wheneverBlocking { monitorScheduledMeetingUpdatesUseCase() } doReturn emptyFlow()
+        wheneverBlocking { monitorCallEndedUseCase() } doReturn emptyFlow()
+        wheneverBlocking { monitorAudioOutputUseCase() } doReturn emptyFlow()
     }
 
     private fun initUnderTest() {
@@ -259,11 +291,62 @@ class MeetingActivityViewModelTest {
             createMeetingUseCase = createMeetingUseCase,
             startCallUseCase = startCallUseCase,
             passcodeManagement = passcodeManagement,
-            monitorAudioOutputUseCase = monitorAudioOutputUseCase
+            monitorAudioOutputUseCase = monitorAudioOutputUseCase,
+            monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
         )
     }
 
     private fun stubCommon() {
         whenever(savedStateHandle.get<Long>(MeetingActivity.MEETING_CHAT_ID)).thenReturn(chatId)
+    }
+
+    @ParameterizedTest
+    @EnumSource(ChatConnectionStatus::class)
+    fun `test that MonitorChatConnectionStateUseCase updates state if invoked with correct chatId`(
+        chatConnectionStatus: ChatConnectionStatus,
+    ) = runTest {
+        val updateFlow = MutableStateFlow(
+            ChatConnectionState(
+                chatId = chatId,
+                chatConnectionStatus = chatConnectionStatus
+            )
+        )
+
+        whenever(monitorChatConnectionStateUseCase()).thenReturn(updateFlow)
+
+        initUnderTest()
+        underTest.monitorChatConnectionStatus(chatId)
+        underTest.state.map { it.chatConnectionStatus }.test {
+            assertThat(awaitItem()).isEqualTo(chatConnectionStatus)
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(ChatConnectionStatus::class)
+    fun `test that MonitorChatConnectionStateUseCase updates state if invoked with incorrect chatId`(
+        chatConnectionStatus: ChatConnectionStatus,
+    ) = runTest {
+        val updateFlow = MutableStateFlow(
+            ChatConnectionState(
+                chatId = 321L,
+                chatConnectionStatus = chatConnectionStatus
+            )
+        )
+
+        whenever(monitorChatConnectionStateUseCase()).thenReturn(updateFlow)
+
+        initUnderTest()
+        underTest.monitorChatConnectionStatus(chatId)
+        underTest.state.map { it.chatConnectionStatus }.test {
+            assertThat(awaitItem()).isNull()
+        }
+    }
+
+    companion object {
+        private val testDispatcher = UnconfinedTestDispatcher()
+
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(testDispatcher)
     }
 }

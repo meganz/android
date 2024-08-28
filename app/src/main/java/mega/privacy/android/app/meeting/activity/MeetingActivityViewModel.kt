@@ -94,6 +94,7 @@ import mega.privacy.android.domain.usecase.call.RingIndividualInACallUseCase
 import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
@@ -225,6 +226,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val startCallUseCase: StartCallUseCase,
     private val passcodeManagement: PasscodeManagement,
     private val monitorAudioOutputUseCase: MonitorAudioOutputUseCase,
+    private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
     savedStateHandle: SavedStateHandle,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
@@ -264,6 +266,7 @@ class MeetingActivityViewModel @Inject constructor(
     private var raisedHandUsersMap: Map<Long, Pair<Boolean, Int>> = emptyMap()
 
     private var monitorChatCallUpdatesJob: Job? = null
+    private var monitorChatConnectionStateJob: Job? = null
 
     // OnOffFab
     private val _micLiveData: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
@@ -399,6 +402,19 @@ class MeetingActivityViewModel @Inject constructor(
                     else -> Unit
                 }
             }
+        }
+    }
+
+    internal fun monitorChatConnectionStatus(chatId: Long) {
+        monitorChatConnectionStateJob?.cancel()
+        monitorChatConnectionStateJob = viewModelScope.launch {
+            monitorChatConnectionStateUseCase()
+                .filter { it.chatId == chatId }
+                .collectLatest {
+                    _state.update { state ->
+                        state.copy(chatConnectionStatus = it.chatConnectionStatus)
+                    }
+                }
         }
     }
 
@@ -1235,6 +1251,7 @@ class MeetingActivityViewModel @Inject constructor(
                                 }
                             } ?: run {
                                 Timber.d("Chat status is connected and the call does not exist")
+                                setIsWaitingForCall(false)
                                 setChatVideoInDevice(
                                     chatId = chat.chatId,
                                     shouldStartMeeting = true,
@@ -1275,12 +1292,20 @@ class MeetingActivityViewModel @Inject constructor(
             }.onSuccess {
                 if (it.number.toInt() == 1) {
                     Timber.d("Meeting created,  chat id ${it.chatHandle}")
+                    setIsWaitingForCall(true)
                     updateChatRoomId(it.chatHandle)
                 }
             }.onFailure { exception ->
                 Timber.e(exception)
             }
         }
+    }
+
+    /**
+     * Set if the user is waiting for a call.
+     */
+    fun setIsWaitingForCall(isWaitingForCall: Boolean) {
+        _state.update { state -> state.copy(isWaitingForCall = isWaitingForCall) }
     }
 
     /**
@@ -1307,8 +1332,11 @@ class MeetingActivityViewModel @Inject constructor(
         getChatRoom()
         getChatCall()
         getScheduledMeeting()
-        startMonitoringChatParticipantsUpdated(chatId = _state.value.chatId)
-        startMonitorChatRoomUpdates(chatId = _state.value.chatId)
+        _state.value.chatId.let { chatId ->
+            startMonitoringChatParticipantsUpdated(chatId)
+            startMonitorChatRoomUpdates(chatId)
+            monitorChatConnectionStatus(chatId)
+        }
         startMonitorScheduledMeetingUpdates()
     }
 
@@ -1395,7 +1423,7 @@ class MeetingActivityViewModel @Inject constructor(
         chatId: Long = -1,
         shouldStartMeeting: Boolean,
         shouldVideoBeEnabled: Boolean,
-        shouldAudioBeEnabled: Boolean = false
+        shouldAudioBeEnabled: Boolean = false,
     ) {
         viewModelScope.launch {
             runCatching {

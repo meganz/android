@@ -121,6 +121,7 @@ import mega.privacy.android.domain.entity.call.CallUIStatusType
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatSession
 import mega.privacy.android.domain.entity.call.ChatSessionStatus
+import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
@@ -1268,6 +1269,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             false -> changeToGridView()
                         }
                     }
+                }
+
+                state.isWaitingForCall && state.chatConnectionStatus == ChatConnectionStatus.Online -> {
+                    startCall()
+                    sharedModel.setIsWaitingForCall(false)
                 }
             }
 

@@ -7,10 +7,11 @@ import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.call.CallType
 import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
-import mega.privacy.android.domain.entity.call.CallType
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 
 /**
@@ -130,6 +131,8 @@ data class MeetingState(
     val isInPipMode: Boolean = false,
     val callEndedDueToTooManyParticipants: Boolean = false,
     val startedMeetingChatId: Long? = null,
+    val isWaitingForCall: Boolean = false,
+    val chatConnectionStatus: ChatConnectionStatus? = null,
 ) {
 
     /**
