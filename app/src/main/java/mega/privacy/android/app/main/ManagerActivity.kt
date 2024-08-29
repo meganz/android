@@ -31,6 +31,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Chronometer
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -80,6 +81,11 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.WorkManager
 import com.anggrayudi.storage.file.getAbsolutePath
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.admanager.AdManagerAdRequest
+import com.google.android.gms.ads.admanager.AdManagerAdView
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -159,7 +165,6 @@ import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_CLOUD_SLOT_ID
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_HOME_SLOT_ID
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
-import mega.privacy.android.app.presentation.advertisements.view.AdsBannerView
 import mega.privacy.android.app.presentation.backups.BackupsFragment
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
@@ -540,7 +545,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private lateinit var freePlanLimitParticipantsDialogComposeView: ComposeView
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var navigationView: NavigationView
-    private lateinit var adsComposeView: ComposeView
+    private lateinit var adsContainerView: FrameLayout
 
     private var miniAudioPlayerController: MiniAudioPlayerController? = null
     private lateinit var cameraUploadViewTypes: LinearLayout
@@ -653,6 +658,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }.getOrNull()
         }
     }
+
+    private var adView: AdManagerAdView? = null
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -940,8 +947,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun checkForInAppAdvertisement() {
         lifecycleScope.launch {
             runCatching {
-                val isAdsEnabled = getFeatureFlagValueUseCase(ABTestFeatures.ads)
-                if (isAdsEnabled) {
+                val isAdseFlagEnabled = getFeatureFlagValueUseCase(ABTestFeatures.adse)
+                if (isAdseFlagEnabled) {
                     if (this@ManagerActivity.isPortrait()) {
                         setupAdsView()
                     } else {
@@ -951,7 +958,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     adsViewModel.getDefaultStartScreen()
                 }
             }.onFailure {
-                Timber.e("Failed to fetch feature flags or ab_ads test flag with error: ${it.message}")
+                Timber.e("Failed to fetch ab_adse flag with error: ${it.message}")
             }
         }
     }
@@ -1001,7 +1008,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             findViewById(R.id.document_scanning_error_dialog_compose_view)
         freePlanLimitParticipantsDialogComposeView =
             findViewById(R.id.free_plan_limit_dialog_compose_view)
-        adsComposeView = findViewById(R.id.ads_web_compose_view)
+        adsContainerView = findViewById(R.id.ads_web_compose_view)
         fragmentLayout = findViewById(R.id.fragment_layout)
         bottomNavigationView =
             findViewById(R.id.bottom_navigation_view)
@@ -2331,7 +2338,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     fun handleShowingAds(slotId: String) {
         if (this.isPortrait() && adsViewModel.canConsumeAdSlot(slotId)) {
-            adsViewModel.fetchNewAd(slotId)
+            showAdsView()
         } else {
             hideAdsView()
         }
@@ -2349,6 +2356,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         checkForInAppUpdateInstallStatus()
         cookieDialogHandler.onResume()
         updateTransfersWidgetVisibility()
+        adView?.resume()
     }
 
     private fun checkForInAppUpdateInstallStatus() {
@@ -2750,6 +2758,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     override fun onPause() {
         Timber.d("onPause")
         transfersManagement.isOnTransfersSection = false
+        adView?.pause()
         super.onPause()
     }
 
@@ -2761,6 +2770,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         reconnectDialog?.cancel()
         dismissAlertDialogIfExists(processFileDialog)
         cookieDialogHandler.onDestroy()
+        adView?.destroy()
         super.onDestroy()
     }
 
@@ -4069,7 +4079,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
         )
         val padding =
-            if (adsComposeView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
+            if (adsContainerView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
             else resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
         params.setMargins(
             0, 0, 0,
@@ -7206,7 +7216,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
             val height: Int =
-                if (adsComposeView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
+                if (adsContainerView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
                 else resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
 
             if (hide && visibility == View.VISIBLE) {
@@ -7839,33 +7849,51 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun setupAdsView() {
-        adsComposeView.apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
-            setContent {
-                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                val isDark = themeMode.isDarkMode()
-                val uiState by adsViewModel.uiState.collectAsStateWithLifecycle()
-                OriginalTempTheme(isDark = isDark) {
-                    AdsBannerView(uiState = uiState,
-                        onAdsWebpageLoaded = ::onAdsWebpageLoaded,
-                        onAdClicked = { uri ->
-                            uri?.let {
-                                val intent = Intent(Intent.ACTION_VIEW, it)
-                                if (intent.resolveActivity(packageManager) != null) {
-                                    startActivity(intent)
-                                    onAdConsumed()
-                                } else {
-                                    Timber.d("No Application found to can handle Ads intent")
-                                    adsViewModel.fetchNewAd()
-                                }
-                            }
-                        }, onAdDismissed = {
-                            onAdConsumed()
-                        }
-                    )
-                }
+        val adView = AdManagerAdView(this)
+        // This is a adUntiId only for testing, it should be replace with real one after testing is finished
+        adView.adUnitId = AD_UNIT_ID
+        // the size will be set manually for now, the better implementation will be provided when API and SDK are ready
+        adView.setAdSize(AD_SIZE)
+        adView.adListener = object : AdListener() {
+            override fun onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+                Timber.d("Ad clicked")
+            }
+
+            override fun onAdClosed() {
+                Timber.i("Ad closed")
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+
+            override fun onAdFailedToLoad(adError : LoadAdError) {
+                // Code to be executed when an ad request fails.
+                Timber.w("Ad failed to load: ${adError.message}")
+            }
+
+            override fun onAdImpression() {
+                Timber.i("Ad impression")
+                // Code to be executed when an impression is recorded
+                // for an ad.
+            }
+
+            override fun onAdLoaded() {
+                Timber.i("Ad loaded")
+                // Code to be executed when an ad finishes loading.
+            }
+
+            override fun onAdOpened() {
+                Timber.i("Ad opened")
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
             }
         }
+        this.adView = adView
+        adsContainerView.removeAllViews()
+        adsContainerView.addView(adView)
+
+        val adRequest = AdManagerAdRequest.Builder().build()
+        adView.loadAd(adRequest)
     }
 
     private fun onAdConsumed() {
@@ -7876,11 +7904,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun showAdsView() {
-        adsComposeView.isVisible = true
+        if (viewModel.state().adsEnabled) {
+            adsContainerView.isVisible = true
+            setupAdsView()
+        }
     }
 
     fun hideAdsView() {
-        adsComposeView.isVisible = false
+        adsContainerView.isVisible = false
         adsViewModel.cancelFetchingAds()
     }
 
@@ -7901,6 +7932,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     companion object {
+        const val AD_UNIT_ID = "ca-app-pub-2135147798858967/9835644604"
+        val AD_SIZE = AdSize(320, 50)
         const val TRANSFERS_TAB = "TRANSFERS_TAB"
         private const val BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE =
             "BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE"

@@ -154,10 +154,10 @@
                     app:labelVisibilityMode="unlabeled"
                     app:menu="@menu/bottom_navigation_items" />
 
-                <androidx.compose.ui.platform.ComposeView
+                <FrameLayout
                     android:id="@+id/ads_web_compose_view"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="50dp"
                     android:layout_gravity="bottom"
                     android:visibility="gone"
                     tools:visibility="gone" />

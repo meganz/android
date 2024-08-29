@@ -15,6 +15,7 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import coil.decode.VideoFrameDecoder
+import com.google.android.gms.ads.MobileAds
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -225,6 +226,13 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         setupMegaChatApi()
         getMiscFlagsIfNeeded()
         applicationScope.launch {
+            runCatching {
+                // Initialize the Google Mobile Ads SDK on a background thread.
+                MobileAds.initialize(this@MegaApplication) {}
+                Timber.i("MobileAds initialized")
+            }.onFailure {
+                Timber.e(it, "MobileAds initialization failed")
+            }
             runCatching { updateApiServerUseCase() }
             dbH.resetExtendedAccountDetailsTimestamp()
             // clear the cache files stored in the external cache folder.
