@@ -145,7 +145,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">No network connection</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">You have been logged out on this device from another location</string>
+    <string name="error_server_expired_session">You’ve been logged out of this device from another location</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">Generating encryption keys</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->

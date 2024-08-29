@@ -11,6 +11,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -56,6 +58,7 @@ import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnot
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeTabletLandscapePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.mobile.analytics.event.InviteFriendsLearnMorePressedEvent
@@ -262,6 +265,29 @@ private fun TooltipView(
 }
 
 @Composable
+private fun OrientationSwapper(
+    content: @Composable () -> Unit,
+) {
+    val portrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+    if (portrait) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            content()
+        }
+    } else {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
 private fun EmptyView(
     isMeetingView: Boolean,
     modifier: Modifier = Modifier,
@@ -274,12 +300,14 @@ private fun EmptyView(
     val descriptionResource: Int
     val buttonResource: Int
     if (isMeetingView) {
-        imageResource = IconR.drawable.ic_meeting_video
+        imageResource =
+            if (isSystemInDarkTheme()) IconR.drawable.ic_meeting_video_dark else IconR.drawable.ic_meeting_video
         titleResource = sharedR.string.meeting_recent_list_empty_title
         descriptionResource = sharedR.string.meeting_recent_list_empty_subtitle
         buttonResource = R.string.action_start_meeting_now
     } else {
-        imageResource = IconR.drawable.ic_message_call
+        imageResource =
+            if (isSystemInDarkTheme()) IconR.drawable.ic_message_call_dark else IconR.drawable.ic_message_call
         titleResource = sharedR.string.chat_recent_list_empty_title
         descriptionResource = sharedR.string.chat_recent_list_empty_subtitle
         buttonResource =
@@ -300,7 +328,7 @@ private fun EmptyView(
             Image(
                 painter = painterResource(imageResource),
                 contentDescription = "Empty placeholder",
-                modifier = Modifier.size(120.dp)
+                modifier = Modifier.size(120.dp),
             )
         }
         MegaText(
@@ -335,30 +363,35 @@ private fun EmptyView(
                 fontWeight = FontWeight.W400,
                 fontSize = 14.sp
             ),
-            modifier = Modifier.padding(top = 16.dp, start = 50.dp, end = 50.dp)
+            modifier = Modifier.padding(top = 20.dp, start = 50.dp, end = 50.dp)
         )
-        RaisedDefaultMegaButton(
-            textId = buttonResource,
-            onClick = onEmptyButtonClick,
-            modifier = Modifier
-                .padding(vertical = 12.dp)
-                .align(Alignment.CenterHorizontally)
-        )
-        if (isMeetingView) {
-            OutlinedWithoutBackgroundMegaButton(
+        OrientationSwapper {
+            RaisedDefaultMegaButton(
+                textId = buttonResource,
+                onClick = onEmptyButtonClick,
                 modifier = Modifier
-                    .padding(start = 20.dp, end = 20.dp, bottom = 8.dp),
-                text = stringResource(id = R.string.chat_schedule_meeting),
-                onClick = onScheduleMeeting,
-                rounded = false,
-                enabled = true,
-                iconId = null
+                    .padding(vertical = 12.dp)
+                    .align(Alignment.CenterHorizontally)
             )
+            if (isMeetingView) {
+                OutlinedWithoutBackgroundMegaButton(
+                    modifier = Modifier
+                        .padding(start = 20.dp, end = 20.dp)
+                        .align(Alignment.CenterHorizontally),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    text = stringResource(id = R.string.chat_schedule_meeting),
+                    onClick = onScheduleMeeting,
+                    rounded = false,
+                    enabled = true,
+                    iconId = null
+                )
+            }
         }
     }
 }
 
 @CombinedThemePreviews
+@CombinedThemeTabletLandscapePreviews
 @Composable
 private fun PreviewMeetingEmptyView(
     @PreviewParameter(BooleanProvider::class) isMeeting: Boolean,

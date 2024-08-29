@@ -126,7 +126,7 @@ fun ChatTabsView(
                     FabButton(true, onStartChatClick)
                 }
             } else {
-                if ((state.hasAnyContact.not() && state.chats.isEmpty()) || state.chats.isNotEmpty()) {
+                if ((state.hasAnyContact.not() && state.chats.isEmpty()) || state.chats.isNotEmpty() || pagerState.currentPage == ChatTab.MEETINGS.ordinal) {
                     FabButton(showFabButton, onStartChatClick)
                 }
             }

@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Plain button with an outlined border
@@ -51,6 +51,7 @@ fun OutlinedWithoutBackgroundMegaButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     @DrawableRes iconId: Int? = null,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
 ) {
     val color = if (enabled) {
         MegaOriginalTheme.colors.button.outline
@@ -68,7 +69,7 @@ fun OutlinedWithoutBackgroundMegaButton(
         ),
         onClick = onClick,
         shape = if (rounded) RoundedCornerShape(25.dp) else MaterialTheme.shapes.medium,
-        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp),
+        contentPadding = contentPadding,
         border = BorderStroke(1.dp, color)
     ) {
         iconId?.let {
