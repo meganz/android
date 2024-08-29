@@ -54,9 +54,13 @@ dependencies {
     implementation(androidx.lifecycle.service)
     implementation(androidx.compose.activity)
     implementation(androidx.bundles.compose.bom)
+    implementation(androidx.work.ktx)
+    implementation(androidx.hilt.work)
     implementation(lib.compose.state.events)
+    implementation(google.guava)
 
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
+    testImplementation(androidx.work.test)
 }

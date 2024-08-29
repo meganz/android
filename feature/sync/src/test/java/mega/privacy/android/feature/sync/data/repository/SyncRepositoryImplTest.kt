@@ -16,6 +16,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.MegaSyncException
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
+import mega.privacy.android.feature.sync.data.gateway.SyncWorkManagerGateway
 import mega.privacy.android.feature.sync.data.mapper.FolderPairMapper
 import mega.privacy.android.feature.sync.data.mapper.stalledissue.StalledIssueTypeMapper
 import mega.privacy.android.feature.sync.data.mapper.stalledissue.StalledIssuesMapper
@@ -41,6 +42,7 @@ class SyncRepositoryImplTest {
     private lateinit var underTest: SyncRepositoryImpl
     private val syncGateway: SyncGateway = mock()
     private val syncStatsCacheGateway: SyncStatsCacheGateway = mock()
+    private val syncWorkManagerGateway: SyncWorkManagerGateway = mock()
     private val megaApiGateway: MegaApiGateway = mock()
     private val folderPairMapper: FolderPairMapper = FolderPairMapper(mock(), mock())
     private val stalledIssuesMapper: StalledIssuesMapper = StalledIssuesMapper(
@@ -67,6 +69,7 @@ class SyncRepositoryImplTest {
             stalledIssuesMapper = stalledIssuesMapper,
             ioDispatcher = unconfinedTestDispatcher,
             syncErrorMapper = syncErrorMapper,
+            syncWorkManagerGateway = syncWorkManagerGateway,
             appScope = testScope,
         )
     }
@@ -147,5 +150,17 @@ class SyncRepositoryImplTest {
             { assertThat(result?.errorString).isEqualTo(domainError.errorString) },
             { assertThat(result?.syncError).isEqualTo(domainError.syncError) },
         )
+    }
+
+    @Test
+    fun `test that startSyncWorker invokes gateway enqueueSyncWorkerRequest method`() = runTest {
+        underTest.startSyncWorker()
+        verify(syncWorkManagerGateway).enqueueSyncWorkerRequest()
+    }
+
+    @Test
+    fun `test that stopSyncWorker invokes gateway cancelSyncWorkerRequest method`() = runTest {
+        underTest.stopSyncWorker()
+        verify(syncWorkManagerGateway).cancelSyncWorkerRequest()
     }
 }

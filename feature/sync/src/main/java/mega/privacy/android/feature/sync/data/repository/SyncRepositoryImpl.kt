@@ -23,6 +23,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
+import mega.privacy.android.feature.sync.data.gateway.SyncWorkManagerGateway
 import mega.privacy.android.feature.sync.data.mapper.FolderPairMapper
 import mega.privacy.android.feature.sync.data.mapper.stalledissue.StalledIssuesMapper
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
@@ -35,6 +36,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 internal class SyncRepositoryImpl @Inject constructor(
+    private val syncWorkManagerGateway: SyncWorkManagerGateway,
     private val syncGateway: SyncGateway,
     private val syncStatsCacheGateway: SyncStatsCacheGateway,
     private val megaApiGateway: MegaApiGateway,
@@ -164,5 +166,13 @@ internal class SyncRepositoryImpl @Inject constructor(
                 syncError = syncError
             )
         }
+    }
+
+    override suspend fun startSyncWorker() {
+        syncWorkManagerGateway.enqueueSyncWorkerRequest()
+    }
+
+    override suspend fun stopSyncWorker() {
+        syncWorkManagerGateway.cancelSyncWorkerRequest()
     }
 }

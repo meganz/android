@@ -20,6 +20,8 @@ import mega.privacy.android.feature.sync.data.gateway.SyncSolvedIssuesGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncSolvedIssuesGatewayImpl
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGatewayImpl
+import mega.privacy.android.feature.sync.data.gateway.SyncWorkManagerGateway
+import mega.privacy.android.feature.sync.data.gateway.SyncWorkManagerGatewayImpl
 import mega.privacy.android.feature.sync.data.gateway.UserPausedSyncGateway
 import mega.privacy.android.feature.sync.data.gateway.UserPausedSyncGatewayImpl
 import mega.privacy.android.feature.sync.data.gateway.syncPrefsDataStore
@@ -84,6 +86,10 @@ internal interface SyncDataModule {
     @Binds
     @Singleton
     fun bindSyncDebrisGateway(implementation: SyncDebrisGatewayImpl): SyncDebrisGateway
+
+    @Binds
+    @Singleton
+    fun bindSyncWorkManagerGateway(implementation: SyncWorkManagerGatewayImpl): SyncWorkManagerGateway
 
     companion object {
         @Provides

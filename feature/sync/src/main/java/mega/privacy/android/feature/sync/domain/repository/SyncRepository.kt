@@ -82,4 +82,14 @@ interface SyncRepository {
      */
     @Throws(MegaSyncException::class)
     suspend fun tryNodeSync(nodeId: NodeId)
+
+    /**
+     * Starts the sync worker that will sync folders when the app is closed
+     */
+    suspend fun startSyncWorker()
+
+    /**
+     * Stops the sync worker
+     */
+    suspend fun stopSyncWorker()
 }
