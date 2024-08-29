@@ -16,12 +16,10 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancellationInstructionsType
-import mega.privacy.android.app.presentation.cancelaccountplan.model.UIAccountDetails
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelAccountPlanView
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelSubscriptionSurveyView
 import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.CancellationInstructionsView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel.Companion.getProductId
 import mega.privacy.android.app.utils.MANAGE_PLAY_STORE_SUBSCRIPTION_URL
 import mega.privacy.android.domain.entity.AccountType
@@ -41,35 +39,18 @@ import javax.inject.Inject
 class CancelAccountPlanActivity : AppCompatActivity() {
 
     companion object {
-        const val EXTRA_ACCOUNT_TYPE = "EXTRA_ACCOUNT_TYPE"
-        const val EXTRA_TRANSFER_QUOTA = "EXTRA_TRANSFER_QUOTA"
-        const val EXTRA_STORAGE_QUOTA = "EXTRA_STORAGE_QUOTA"
         const val EXTRA_USED_STORAGE = "EXTRA_USED_STORAGE"
-
     }
-
-    private val REWIND_DAYS_QUOTA_PRO_LITE = "90"
-    private val REWIND_DAYS_QUOTA_OTHERS = "180"
-    private val FREE_STORAGE_QUOTA = "20"
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
-
-    @Inject
-    lateinit var accountNameMapper: AccountNameMapper
 
     private val viewModel: CancelAccountPlanViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-
-        val accountType = intent.getStringExtra(EXTRA_ACCOUNT_TYPE)?.let { AccountType.valueOf(it) }
-            ?: AccountType.UNKNOWN
         val usedStorage = intent.getStringExtra(EXTRA_USED_STORAGE) ?: ""
-        val transferQuota = intent.getStringExtra(EXTRA_TRANSFER_QUOTA) ?: ""
-        val storageQuota = intent.getStringExtra(EXTRA_STORAGE_QUOTA) ?: ""
-
         val cancelAccountPlanRoute = "cancelAccount/plan"
         val cancellationInstructionsRoute = "cancelAccount/cancellationInstructions"
         val cancellationSurveyRoute = "cancelAccount/cancellationSurvey"
@@ -91,6 +72,7 @@ class CancelAccountPlanActivity : AppCompatActivity() {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val accountType = uiState.accountType
             OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 NavHost(
                     navController = navController,
@@ -102,18 +84,8 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                 ) {
                     composable(cancelAccountPlanRoute) {
                         CancelAccountPlanView(
-                            accountDetailsUI = UIAccountDetails(
-                                accountType = getString(accountNameMapper(accountType)),
-                                storageQuotaSize = storageQuota,
-                                usedStorageSize = usedStorage,
-                                transferQuotaSize = transferQuota,
-                                rewindDaysQuota = if (accountType == AccountType.PRO_LITE) {
-                                    REWIND_DAYS_QUOTA_PRO_LITE
-                                } else {
-                                    REWIND_DAYS_QUOTA_OTHERS
-                                },
-                                freeStorageQuota = FREE_STORAGE_QUOTA
-                            ),
+                            uiState = uiState,
+                            formattedUsedStorage = usedStorage,
                             onKeepPlanButtonClicked = {
                                 Analytics.tracker.trackEvent(
                                     CancelSubscriptionKeepPlanButtonPressedEvent

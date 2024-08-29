@@ -8,14 +8,17 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
-import mega.privacy.android.app.presentation.cancelaccountplan.model.UIAccountDetails
+import mega.privacy.android.app.presentation.cancelaccountplan.model.CancelAccountPlanUiState
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CANCEL_ACCOUNT_PLAN_FEATURE_TABLE_TEST_TAG
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CANCEL_ACCOUNT_PLAN_STORAGE_HINT_TEST_TAG
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CANCEL_ACCOUNT_PLAN_SUBTITLE_TEST_TAG
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CANCEL_ACCOUNT_PLAN_TITLE_TEST_TAG
+import mega.privacy.android.app.presentation.cancelaccountplan.view.CANCEL_ACCOUNT_PLAN_VIEW_LOADING_TEST_TAG
+import mega.privacy.android.app.presentation.cancelaccountplan.view.CANCEL_ACCOUNT_PLAN_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CONTINUE_CANCELLATION_BUTTON_TEST_TAG
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelAccountPlanView
 import mega.privacy.android.app.presentation.cancelaccountplan.view.KEEP_PRO_PLAN_BUTTON_TEST_TAG
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.shared.resources.R
 import org.junit.Rule
 import org.junit.Test
@@ -32,23 +35,43 @@ class CancelAccountPlanViewTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `test that all screen components are displayed correctly`() {
+    fun `test that loading screen is displayed correctly when uiState is loading`() {
 
-        val proPlanDetails = UIAccountDetails(
-            accountType = "PRO I",
-            storageQuotaSize = "200 GB",
-            usedStorageSize = "100 GB",
-            transferQuotaSize = "1 TB",
-            freeStorageQuota = "1 GB",
-            rewindDaysQuota = "90",
+        val formattedUsedStorage = "1.5 GB"
+        val uiState = CancelAccountPlanUiState(
+            isLoading = true
         )
+
         composeTestRule.setContent {
             CancelAccountPlanView(
-                accountDetailsUI = proPlanDetails,
+                uiState = uiState,
+                formattedUsedStorage = formattedUsedStorage,
                 onKeepPlanButtonClicked = { }) {
             }
         }
+        composeTestRule.onNodeWithTag(CANCEL_ACCOUNT_PLAN_VIEW_LOADING_TEST_TAG)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(CANCEL_ACCOUNT_PLAN_VIEW_TEST_TAG)
+            .assertDoesNotExist()
+    }
 
+
+    @Test
+    fun `test that all screen components are displayed correctly when uiState is loaded`() {
+
+        val formattedUsedStorage = "1.5 GB"
+        val uiState = CancelAccountPlanUiState(
+            accountType = AccountType.PRO_I,
+            isLoading = false
+        )
+
+        composeTestRule.setContent {
+            CancelAccountPlanView(
+                uiState = uiState,
+                formattedUsedStorage = formattedUsedStorage,
+                onKeepPlanButtonClicked = { }) {
+            }
+        }
         composeTestRule.onNodeWithTag(CANCEL_ACCOUNT_PLAN_TITLE_TEST_TAG)
             .assertIsDisplayed().assert(
                 hasText(
@@ -70,20 +93,20 @@ class CancelAccountPlanViewTest {
                 hasText(
                     fromId(
                         R.string.account_cancel_account_screen_plan_current_storage_warning,
-                        proPlanDetails.usedStorageSize
+                        formattedUsedStorage
                     )
                 )
             )
-        composeTestRule.onNodeWithTag(CANCEL_ACCOUNT_PLAN_FEATURE_TABLE_TEST_TAG)
-            .assertIsDisplayed()
         composeTestRule.onNodeWithTag(KEEP_PRO_PLAN_BUTTON_TEST_TAG).assertIsDisplayed().assert(
             hasText(
                 fromId(
                     R.string.account_cancel_account_plan_keep_pro_plan,
-                    proPlanDetails.accountType
+                    fromId(uiState.accountNameRes)
                 )
             )
         ).assertHasClickAction()
+        composeTestRule.onNodeWithTag(CANCEL_ACCOUNT_PLAN_FEATURE_TABLE_TEST_TAG)
+            .assertIsDisplayed()
         composeTestRule.onNodeWithTag(CONTINUE_CANCELLATION_BUTTON_TEST_TAG).assertIsDisplayed()
             .assert(
                 hasText(fromId(R.string.account_cancel_account_plan_continue_cancellation))

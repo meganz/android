@@ -503,21 +503,10 @@ class MyAccountActivity : PasscodeActivity(),
     }
 
     private fun navigateToCancelAccountPlan() {
-        val accountType = viewModel.getAccountType()
-        val totalStorage = viewModel.getTotalStorage()
-        val totalTransfer = viewModel.getTotalTransfer()
-
         startActivity(
-            Intent(this, CancelAccountPlanActivity::class.java)
-                .putExtra(
-                    CancelAccountPlanActivity.EXTRA_ACCOUNT_TYPE, accountType.name
-                ).putExtra(
-                    CancelAccountPlanActivity.EXTRA_TRANSFER_QUOTA, totalTransfer
-                ).putExtra(
-                    CancelAccountPlanActivity.EXTRA_STORAGE_QUOTA, totalStorage
-                ).putExtra(
-                    CancelAccountPlanActivity.EXTRA_USED_STORAGE, viewModel.getUsedStorage()
-                )
+            Intent(this, CancelAccountPlanActivity::class.java).putExtra(
+                CancelAccountPlanActivity.EXTRA_USED_STORAGE, viewModel.getUsedStorage()
+            )
         )
     }
 

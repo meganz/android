@@ -12,7 +12,7 @@ import javax.inject.Inject
 class GetAccountDetailsUseCase @Inject constructor(
     private val accountsRepository: AccountRepository,
     private val isDatabaseEntryStale: IsDatabaseEntryStale,
-){
+) {
     suspend operator fun invoke(forceRefresh: Boolean): UserAccount {
         if (forceRefresh || accountsRepository.storageCapacityUsedIsBlank() || isDatabaseEntryStale()) {
             accountsRepository.resetAccountDetailsTimeStamp()
