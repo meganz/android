@@ -351,6 +351,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                             Analytics.tracker.trackEvent(VideoPlayerIsActivatedEvent)
                         }
                         setCurrentPlayingHandle(it.toLong())
+                        videoViewModel.saveVideoWatchedTime()
                         lifecycleScope.launch {
                             monitorPlaybackTimes(it.toLong()) { positionInMs ->
                                 when (videoPlayType) {

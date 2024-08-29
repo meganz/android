@@ -356,9 +356,20 @@ internal class LegacyVideoPlayerViewModelTest {
             val timestamp = System.currentTimeMillis() / 1000
             underTest.initVideoSources(null)
 
-            verify(saveVideoRecentlyWatchedUseCase).invoke(
-                expectedId,
-                timestamp
-            )
+            verify(saveVideoRecentlyWatchedUseCase).invoke(expectedId, timestamp)
+        }
+
+    @Test
+    fun `test that the saveVideoRecentlyWatchedUseCase is invoked as expected when saveVideoWatchedTime is called`() =
+        runTest {
+            val testMediaItem = MediaItem.Builder()
+                .setMediaId(expectedId.toString())
+                .build()
+            whenever(getFeatureFlagValueUseCase(anyOrNull())).thenReturn(true)
+            whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+            val timestamp = System.currentTimeMillis() / 1000
+            underTest.saveVideoWatchedTime()
+
+            verify(saveVideoRecentlyWatchedUseCase).invoke(expectedId, timestamp)
         }
 }

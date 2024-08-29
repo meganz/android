@@ -1203,11 +1203,13 @@ class LegacyVideoPlayerViewModel @Inject constructor(
                 )
             }
         }
-        viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.VideoRecentlyWatched)) {
-                mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong()?.let {
-                    saveVideoRecentlyWatchedUseCase(it, System.currentTimeMillis() / 1000)
-                }
+        saveVideoWatchedTime()
+    }
+
+    internal fun saveVideoWatchedTime() = viewModelScope.launch {
+        if (getFeatureFlagValueUseCase(AppFeatures.VideoRecentlyWatched)) {
+            mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong()?.let {
+                saveVideoRecentlyWatchedUseCase(it, System.currentTimeMillis() / 1000)
             }
         }
     }
