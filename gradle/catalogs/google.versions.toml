@@ -14,6 +14,7 @@ maps-compose = "6.1.0"
 play-review = "2.0.1"
 play-update = "2.1.0"
 protobuff = "3.22.3"
+services-ads = "23.3.0"
 services-location = "21.3.0"
 services-maps = "18.2.0"
 services-mlkit-document-scanner = "16.0.0-beta1"
@@ -54,6 +55,7 @@ play-review-ktx = { module = "com.google.android.play:review-ktx", version.ref =
 play-update = { module = "com.google.android.play:app-update", version.ref = "play-update" }
 play-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "play-update" }
 protobuff = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuff" }
+services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "services-ads" }
 services-location = { module = "com.google.android.gms:play-services-location", version.ref = "services-location" }
 services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "services-maps" }
 services-mlkit-document-scanner = { module = "com.google.android.gms:play-services-mlkit-document-scanner", version.ref = "services-mlkit-document-scanner"}
