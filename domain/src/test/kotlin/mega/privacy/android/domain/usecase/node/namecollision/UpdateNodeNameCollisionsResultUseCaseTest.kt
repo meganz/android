@@ -60,9 +60,9 @@ class UpdateNodeNameCollisionsResultUseCaseTest {
                 lastModified = 0L,
                 parentHandle = 0L,
                 isFile = false,
-                type = NodeNameCollisionType.COPY
+                type = NodeNameCollisionType.COPY,
+                renameName = null
             ),
-            renameName = null
         )
         val result = underTest(
             listOf(nodeNameCollision),
@@ -88,9 +88,9 @@ class UpdateNodeNameCollisionsResultUseCaseTest {
                     lastModified = 0L,
                     parentHandle = 0L,
                     isFile = true,
-                    type = NodeNameCollisionType.COPY
+                    type = NodeNameCollisionType.COPY,
+                    renameName = "test (1)"
                 ),
-                renameName = "test (1)"
             )
             whenever(getNodeNameCollisionRenameNameUseCase(any())).thenReturn("test (1)")
             val result = underTest(
@@ -99,7 +99,7 @@ class UpdateNodeNameCollisionsResultUseCaseTest {
                 false
             )
 
-            assertThat(result.first.first().renameName).isEqualTo("test (2)")
+            assertThat(result.first.first().nameCollision.renameName).isEqualTo("test (2)")
             assertThat(result.second).isEqualTo(listOf("test (1)"))
         }
 
@@ -116,9 +116,9 @@ class UpdateNodeNameCollisionsResultUseCaseTest {
                 lastModified = 0L,
                 parentHandle = 0L,
                 isFile = true,
-                type = NodeNameCollisionType.COPY
+                type = NodeNameCollisionType.COPY,
+                renameName = "test (1)"
             ),
-            renameName = "test (1)"
         )
         whenever(getNodeNameCollisionRenameNameUseCase(any())).thenReturn("test (1)")
         val result = underTest(
@@ -127,7 +127,7 @@ class UpdateNodeNameCollisionsResultUseCaseTest {
             true
         )
 
-        assertThat(result.first.first().renameName).isEqualTo("test (2)")
+        assertThat(result.first.first().nameCollision.renameName).isEqualTo("test (2)")
         assertThat(result.second).contains("test (2)")
     }
 }

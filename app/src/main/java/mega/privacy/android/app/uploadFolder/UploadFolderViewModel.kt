@@ -390,7 +390,7 @@ class UploadFolderViewModel @Inject constructor(
         val pathsAndNames = pendingUploads.associate { folderContentData ->
             val fileName = (collisionRename
                 ?.firstOrNull { it.nameCollision.name == folderContentData.name }
-                ?.renameName
+                ?.nameCollision?.renameName
                     ) ?: folderContentData.name
             folderContentData.uri.toString() to fileName
         }

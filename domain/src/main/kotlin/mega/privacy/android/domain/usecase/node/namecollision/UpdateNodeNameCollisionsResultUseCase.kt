@@ -7,8 +7,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
-import mega.privacy.android.domain.entity.node.FileNameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollision
+import mega.privacy.android.domain.entity.node.copy
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
 import javax.inject.Inject
 
@@ -40,7 +39,7 @@ class UpdateNodeNameCollisionsResultUseCase @Inject constructor(
             .map { collision ->
                 async {
                     val nameCollision = collision.nameCollision
-                    if (!nameCollision.isFile || collision.renameName == null)
+                    if (!nameCollision.isFile || collision.nameCollision.renameName == null)
                         return@async collision
                     semaphore.withPermit {
                         var newRenameName =
@@ -56,14 +55,7 @@ class UpdateNodeNameCollisionsResultUseCase @Inject constructor(
                             }
                         }
                         collision.copy(
-                            nameCollision = when (nameCollision) {
-                                is NodeNameCollision.Default -> nameCollision.copy(renameName = newRenameName)
-
-                                is NodeNameCollision.Chat -> nameCollision.copy(renameName = newRenameName)
-
-                                is FileNameCollision -> nameCollision
-                            },
-                            renameName = newRenameName
+                            nameCollision = nameCollision.copy(newRenameName),
                         )
                     }
                 }

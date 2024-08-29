@@ -10,7 +10,6 @@ package mega.privacy.android.domain.entity.node
 sealed interface NodeNameCollision : NameCollision {
     val nodeHandle: Long
     val serializedData: String?
-    val renameName: String?
 
     /**
      * General node name collision

@@ -20,6 +20,7 @@ import java.io.Serializable
  * @property lastModified
  * @property parentHandle
  * @property isFile
+ * @property renameName
  * @constructor Create empty Name collision
  */
 sealed class NameCollisionUiEntity : Serializable {
@@ -31,6 +32,7 @@ sealed class NameCollisionUiEntity : Serializable {
     abstract val lastModified: Long
     abstract val parentHandle: Long?
     abstract val isFile: Boolean
+    abstract val renameName: String?
 
     /**
      * Upload
@@ -47,6 +49,7 @@ sealed class NameCollisionUiEntity : Serializable {
         override val lastModified: Long,
         override val parentHandle: Long?,
         override val isFile: Boolean = true,
+        override val renameName: String? = null,
     ) : NameCollisionUiEntity() {
 
         companion object {
@@ -67,7 +70,8 @@ sealed class NameCollisionUiEntity : Serializable {
                 childFileCount = collision.childFileCount,
                 lastModified = collision.lastModified,
                 parentHandle = collision.parentHandle,
-                isFile = collision.isFile
+                isFile = collision.isFile,
+                renameName = collision.renameName
             )
 
             /**
@@ -82,6 +86,7 @@ sealed class NameCollisionUiEntity : Serializable {
                 lastModified = lastModified,
                 parentHandle = parentHandle ?: -1L,
                 isFile = isFile,
+                renameName = renameName,
                 path = UriPath(absolutePath)
             )
         }
@@ -103,6 +108,7 @@ sealed class NameCollisionUiEntity : Serializable {
         override val lastModified: Long,
         override val parentHandle: Long,
         override val isFile: Boolean,
+        override val renameName: String? = null,
         val serializedNode: String? = null,
     ) : NameCollisionUiEntity() {
 
@@ -122,6 +128,7 @@ sealed class NameCollisionUiEntity : Serializable {
                 lastModified = nameCollision.lastModified,
                 parentHandle = nameCollision.parentHandle,
                 isFile = nameCollision.isFile,
+                renameName = nameCollision.renameName,
                 serializedNode = nameCollision.serializedData
             )
         }
@@ -140,7 +147,7 @@ sealed class NameCollisionUiEntity : Serializable {
             parentHandle = parentHandle,
             isFile = isFile,
             serializedData = serializedNode,
-            renameName = null,
+            renameName = renameName,
             type = NodeNameCollisionType.COPY
         )
     }
@@ -164,6 +171,7 @@ sealed class NameCollisionUiEntity : Serializable {
         override val lastModified: Long,
         override val parentHandle: Long,
         override val isFile: Boolean = true,
+        override val renameName: String? = null,
     ) : NameCollisionUiEntity() {
 
         companion object {
@@ -183,7 +191,8 @@ sealed class NameCollisionUiEntity : Serializable {
                 childFileCount = nameCollision.childFileCount,
                 lastModified = nameCollision.lastModified,
                 parentHandle = nameCollision.parentHandle,
-                isFile = nameCollision.isFile
+                isFile = nameCollision.isFile,
+                renameName = nameCollision.renameName
             )
         }
 
@@ -201,7 +210,7 @@ sealed class NameCollisionUiEntity : Serializable {
             parentHandle = parentHandle,
             isFile = isFile,
             serializedData = null,
-            renameName = null,
+            renameName = renameName,
             chatId = chatId,
             messageId = messageId
         )
@@ -222,6 +231,7 @@ sealed class NameCollisionUiEntity : Serializable {
         override val lastModified: Long,
         override val parentHandle: Long,
         override val isFile: Boolean,
+        override val renameName: String? = null,
     ) : NameCollisionUiEntity() {
 
         companion object {
@@ -239,7 +249,8 @@ sealed class NameCollisionUiEntity : Serializable {
                 childFileCount = nameCollision.childFileCount,
                 lastModified = nameCollision.lastModified,
                 parentHandle = nameCollision.parentHandle,
-                isFile = nameCollision.isFile
+                isFile = nameCollision.isFile,
+                renameName = nameCollision.renameName
             )
         }
 
@@ -257,7 +268,7 @@ sealed class NameCollisionUiEntity : Serializable {
             parentHandle = parentHandle,
             isFile = isFile,
             serializedData = null,
-            renameName = null,
+            renameName = renameName,
             type = NodeNameCollisionType.MOVE
         )
     }

@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.usecase.node.GetChildNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
@@ -118,7 +119,7 @@ class GetNodeNameCollisionsResultUseCaseTest {
 
             val result = underTest(nameCollision = defaultNodeNameCollision)
 
-            assertThat(result.renameName).isEqualTo("${defaultNodeNameCollision.name} (1)")
+            assertThat(result.nameCollision.renameName).isEqualTo("${defaultNodeNameCollision.name} (1)")
             assertThat(result.thumbnail?.value).contains("thumb1.jpg")
             assertThat(result.collisionThumbnail?.value).contains("thumb2.jpg")
             assertThat(result.collisionSize).isEqualTo(100L)
@@ -160,7 +161,7 @@ class GetNodeNameCollisionsResultUseCaseTest {
                 nameCollision = defaultNodeNameCollision
             )
 
-            assertThat(result.renameName).isEqualTo("${defaultNodeNameCollision.name} (1)")
+            assertThat(result.nameCollision.renameName).isEqualTo("${defaultNodeNameCollision.name} (1)")
             assertThat(result.thumbnail).isNull()
             assertThat(result.collisionThumbnail).isNull()
             assertThat(result.collisionSize).isNull()
@@ -172,11 +173,17 @@ class GetNodeNameCollisionsResultUseCaseTest {
     @Test
     fun `test that current node thumbnail is not fetched when collision type is not NodeNameCollision`() =
         runTest {
-            val uploadCollision = mock<FileNameCollision> {
-                on { name } doReturn "file"
-                on { collisionHandle } doReturn 123L
-                on { parentHandle } doReturn 456L
-            }
+            val uploadCollision = FileNameCollision(
+                collisionHandle = 123L,
+                name = "file",
+                size = 100L,
+                childFolderCount = 0,
+                childFileCount = 0,
+                lastModified = 123456L,
+                parentHandle = 456L,
+                isFile = true,
+                path = UriPath("path")
+            )
             val nodeNameCollision = defaultNodeNameCollision.copy(
                 parentHandle = -1L
             )

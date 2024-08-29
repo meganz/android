@@ -11,6 +11,7 @@ package mega.privacy.android.domain.entity.node
  * @property lastModified
  * @property parentHandle
  * @property isFile
+ * @property renameName
  */
 sealed interface NameCollision {
     val collisionHandle: Long
@@ -21,4 +22,16 @@ sealed interface NameCollision {
     val lastModified: Long
     val parentHandle: Long
     val isFile: Boolean
+    val renameName: String?
+}
+
+/**
+ * Creates a copy of the NameCollision with a new renameName
+ */
+fun NameCollision.copy(renameName: String?): NameCollision {
+    return when (this) {
+        is NodeNameCollision.Default -> copy(renameName = renameName)
+        is NodeNameCollision.Chat -> copy(renameName = renameName)
+        is FileNameCollision -> copy(renameName = renameName)
+    }
 }

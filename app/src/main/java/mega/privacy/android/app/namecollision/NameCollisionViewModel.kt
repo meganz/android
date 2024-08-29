@@ -402,7 +402,7 @@ class NameCollisionViewModel @Inject constructor(
      * @param applyOnNext   True if should rename the next file collisions.
      */
     fun rename(context: Context, applyOnNext: Boolean) {
-        renameNames.add(currentCollision.value?.renameName ?: return)
+        renameNames.add(currentCollision.value?.nameCollision?.renameName ?: return)
         viewModelScope.launch {
             runCatching {
                 updateNodeNameCollisionsResultUseCase(
@@ -447,7 +447,7 @@ class NameCollisionViewModel @Inject constructor(
                     }
 
                     applyOnNext -> upload(getAllPendingCollisions(), rename)
-                    else -> singleUpload(context, rename)
+                    else -> singleUpload(rename)
                 }
             }
 
@@ -506,7 +506,7 @@ class NameCollisionViewModel @Inject constructor(
      * @param context   Required context for start the service.
      * @param rename    True if should rename the file, false otherwise.
      */
-    private fun singleUpload(context: Context, rename: Boolean) {
+    private fun singleUpload(rename: Boolean) {
         val choice =
             if (rename) NameCollisionChoice.RENAME
             else NameCollisionChoice.REPLACE_UPDATE_MERGE
@@ -522,7 +522,7 @@ class NameCollisionViewModel @Inject constructor(
             val parentId = currentCollision.nameCollision.parentHandle
             val path = (currentCollision.nameCollision as FileNameCollision).path.value
             val name = if (rename)
-                currentCollision.renameName
+                currentCollision.nameCollision.renameName
             else
                 currentCollision.nameCollision.name
             uploadFiles(
@@ -567,7 +567,7 @@ class NameCollisionViewModel @Inject constructor(
                 .filter { it.nameCollision is FileNameCollision }
                 .associate {
                     (it.nameCollision as FileNameCollision).path.value to
-                            if (rename) it.renameName else it.nameCollision.name
+                            if (rename) it.nameCollision.renameName else it.nameCollision.name
                 }
             uploadFiles(
                 pathsAndNames,

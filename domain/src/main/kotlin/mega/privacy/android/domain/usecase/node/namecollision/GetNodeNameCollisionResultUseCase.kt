@@ -1,11 +1,11 @@
 package mega.privacy.android.domain.usecase.node.namecollision
 
 import mega.privacy.android.domain.entity.FolderTreeInfo
-import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollision
+import mega.privacy.android.domain.entity.node.copy
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
@@ -46,13 +46,7 @@ class GetNodeNameCollisionResultUseCase @Inject constructor(
 
         return with(collidedNode) {
             NodeNameCollisionResult(
-                nameCollision = when (nameCollision) {
-                    is NodeNameCollision.Default -> nameCollision.copy(renameName = renameName)
-
-                    is NodeNameCollision.Chat -> nameCollision.copy(renameName = renameName)
-
-                    is FileNameCollision -> nameCollision
-                },
+                nameCollision = nameCollision.copy(renameName = renameName),
                 collisionName = name,
                 collisionSize = (this as? FileNode)?.size,
                 collisionFolderContent = (this as? FolderNode)?.let {
@@ -67,7 +61,6 @@ class GetNodeNameCollisionResultUseCase @Inject constructor(
                 collisionLastModified = if (this is FileNode) modificationTime else creationTime,
                 collisionThumbnail = collisionNodeThumbnail,
                 thumbnail = currentNodeThumbnail,
-                renameName = getNodeNameCollisionRenameNameUseCase(nameCollision)
             )
         }
     }

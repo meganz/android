@@ -372,7 +372,7 @@ class NameCollisionActivity : PasscodeActivity() {
                         }
                     }
                 }
-                this.name.text = collisionResult.renameName
+                this.name.text = collisionResult.nameCollision.renameName
                 size.isVisible = false
                 date.isVisible = false
 

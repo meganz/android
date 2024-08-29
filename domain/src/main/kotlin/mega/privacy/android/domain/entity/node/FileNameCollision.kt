@@ -16,5 +16,6 @@ data class FileNameCollision(
     override val lastModified: Long,
     override val parentHandle: Long,
     override val isFile: Boolean,
+    override val renameName: String? = null,
     val path: UriPath,
 ) : NameCollision
