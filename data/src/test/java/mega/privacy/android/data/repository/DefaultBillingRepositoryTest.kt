@@ -347,7 +347,7 @@ class DefaultBillingRepositoryTest {
     }
 
     @Test
-    fun `test that cancelSubscriptions returns true when creditCardQuerySubscriptions is successful`() {
+    fun `test that legacyCancelSubscriptions returns true when creditCardQuerySubscriptions is successful`() {
         runTest {
             val feedback = "feedback"
             val megaError = mock<MegaError> {
@@ -366,8 +366,40 @@ class DefaultBillingRepositoryTest {
                 )
             }
 
-            val actual = underTest.cancelSubscriptions(feedback)
+            val actual = underTest.legacyCancelSubscriptions(feedback)
             Truth.assertThat(actual).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that MegaApiGateway is invoked when cancelSubscriptionWithSurveyAnswers is called`() {
+        runTest {
+            val reason = "test reason"
+            val subscriptionId = "subscriptionID"
+            val canContact = 0
+
+            whenever(
+                megaApiGateway.creditCardCancelSubscriptions(
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            ).thenAnswer {
+                ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock(),
+                )
+            }
+
+            underTest.cancelSubscriptionWithSurveyAnswers(reason, subscriptionId, canContact)
+            verify(megaApiGateway, times(1)).creditCardCancelSubscriptions(
+                any(),
+                any(),
+                any(),
+                any()
+            )
         }
     }
 }

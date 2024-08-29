@@ -85,7 +85,7 @@ import mega.privacy.android.domain.usecase.IsUrlMatchesRegexUseCase
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
-import mega.privacy.android.domain.usecase.account.CancelSubscriptionsUseCase
+import mega.privacy.android.domain.usecase.account.LegacyCancelSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.CheckVersionsUseCase
 import mega.privacy.android.domain.usecase.account.ConfirmCancelAccountUseCase
@@ -127,7 +127,7 @@ import javax.inject.Inject
  * @property isMultiFactorAuthEnabledUseCase [IsMultiFactorAuthEnabledUseCase]
  * @property checkVersionsUseCase
  * @property killOtherSessionsUseCase [KillOtherSessionsUseCase]
- * @property cancelSubscriptionsUseCase
+ * @property legacyCancelSubscriptionsUseCase
  * @property getMyAvatarFileUseCase
  * @property checkPasswordReminderUseCase
  * @property resetSMSVerifiedPhoneNumberUseCase
@@ -163,7 +163,7 @@ class MyAccountViewModel @Inject constructor(
     private val isMultiFactorAuthEnabledUseCase: IsMultiFactorAuthEnabledUseCase,
     private val checkVersionsUseCase: CheckVersionsUseCase,
     private val killOtherSessionsUseCase: KillOtherSessionsUseCase,
-    private val cancelSubscriptionsUseCase: CancelSubscriptionsUseCase,
+    private val legacyCancelSubscriptionsUseCase: LegacyCancelSubscriptionsUseCase,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
     private val resetSMSVerifiedPhoneNumberUseCase: ResetSMSVerifiedPhoneNumberUseCase,
@@ -765,7 +765,7 @@ class MyAccountViewModel @Inject constructor(
     fun cancelSubscriptions(feedback: String?) {
         viewModelScope.launch {
             runCatching {
-                cancelSubscriptionsUseCase(feedback).let { isSuccessful ->
+                legacyCancelSubscriptionsUseCase(feedback).let { isSuccessful ->
                     snackBarHandler.postSnackbarMessage(
                         if (isSuccessful) R.string.cancel_subscription_ok
                         else R.string.cancel_subscription_error,

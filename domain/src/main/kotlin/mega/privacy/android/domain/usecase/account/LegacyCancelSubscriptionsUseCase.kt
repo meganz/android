@@ -8,7 +8,7 @@ import javax.inject.Inject
  *
  * @property billingRepository Repository to manage all billing related requests.
  */
-class CancelSubscriptionsUseCase @Inject constructor(
+class LegacyCancelSubscriptionsUseCase @Inject constructor(
     private val billingRepository: BillingRepository,
 ) {
 
@@ -19,6 +19,6 @@ class CancelSubscriptionsUseCase @Inject constructor(
      * @return True if the request finished with success, error if not.
      */
     suspend operator fun invoke(feedback: String?): Boolean =
-        billingRepository.cancelSubscriptions(feedback)
+        billingRepository.legacyCancelSubscriptions(feedback)
 
 }

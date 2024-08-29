@@ -83,5 +83,14 @@ interface BillingRepository {
     /**
      * Get the credit card subscriptions of the account
      */
-    suspend fun cancelSubscriptions(feedback: String?): Boolean
+    suspend fun legacyCancelSubscriptions(feedback: String?): Boolean
+
+    /**
+     * Provide API with cancellation survey answers
+     */
+    suspend fun cancelSubscriptionWithSurveyAnswers(
+        reason: String,
+        subscriptionId: String,
+        canContact: Int,
+    )
 }

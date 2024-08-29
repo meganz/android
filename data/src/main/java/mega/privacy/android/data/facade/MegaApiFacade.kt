@@ -1532,4 +1532,13 @@ internal class MegaApiFacade @Inject constructor(
         searchString: String,
         cancelToken: MegaCancelToken?,
     ): MegaStringList? = megaApi.getAllNodeTags(searchString, cancelToken)
+
+    override fun creditCardCancelSubscriptions(
+        reason: String,
+        subscriptionId: String,
+        canContact: Int,
+        listener: MegaRequestListenerInterface
+    ) {
+        megaApi.creditCardCancelSubscriptions(reason, subscriptionId, canContact, listener)
+    }
 }

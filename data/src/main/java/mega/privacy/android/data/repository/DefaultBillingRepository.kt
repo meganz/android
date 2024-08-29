@@ -119,7 +119,7 @@ internal class DefaultBillingRepository @Inject constructor(
             it.methodId == paymentMethodTypeMapper(accountInfoWrapper.subscriptionMethodId)
         }
 
-    override suspend fun cancelSubscriptions(feedback: String?) = withContext(ioDispatcher) {
+    override suspend fun legacyCancelSubscriptions(feedback: String?) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener =
                 continuation.getRequestListener(methodName = "cancelSubscriptions") { true }
@@ -134,5 +134,21 @@ internal class DefaultBillingRepository @Inject constructor(
     override fun clearCache() {
         activeSubscriptionCache.clear()
         numberOfSubscriptionCache.clear()
+    }
+
+    override suspend fun cancelSubscriptionWithSurveyAnswers(
+        reason: String,
+        subscriptionId: String,
+        canContact: Int,
+    ) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("cancelSubscriptionWithSurveyAnswers") {}
+            megaApiGateway.creditCardCancelSubscriptions(
+                reason,
+                subscriptionId,
+                canContact,
+                listener
+            )
+        }
     }
 }

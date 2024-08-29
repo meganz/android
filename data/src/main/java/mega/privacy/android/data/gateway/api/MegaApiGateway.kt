@@ -3533,4 +3533,24 @@ interface MegaApiGateway {
      * @return All the unique node tags that match the search criteria.
      */
     fun getAllNodeTags(searchString: String, cancelToken: MegaCancelToken?): MegaStringList?
+
+    /**
+     * Cancel credit card subscriptions of the account
+     *
+     * The associated request type with this request is
+     * MegaRequest::TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS
+     *
+     * @param reason The reason for the cancellation. It can be NULL
+     * @param subscriptionId The subscription ID for the cancellation. It can be NULL
+     * @param canContact Whether the user has permitted MEGA to contact them for the cancellation
+     *      - MegaApi::CREDIT_CARD_CANCEL_SUBSCRIPTIONS_CAN_CONTACT_NO = 0
+     *      - MegaApi::CREDIT_CARD_CANCEL_SUBSCRIPTIONS_CAN_CONTACT_YES = 1
+     *@param listener MegaRequestListener to track this request
+     */
+    fun creditCardCancelSubscriptions(
+        reason: String,
+        subscriptionId: String,
+        canContact: Int,
+        listener: MegaRequestListenerInterface,
+    )
 }

@@ -48,7 +48,7 @@ import mega.privacy.android.domain.usecase.IsUrlMatchesRegexUseCase
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
-import mega.privacy.android.domain.usecase.account.CancelSubscriptionsUseCase
+import mega.privacy.android.domain.usecase.account.LegacyCancelSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.CheckVersionsUseCase
 import mega.privacy.android.domain.usecase.account.ConfirmCancelAccountUseCase
@@ -105,7 +105,7 @@ internal class MyAccountViewModelTest {
     private val isMultiFactorAuthEnabledUseCase: IsMultiFactorAuthEnabledUseCase = mock()
     private val checkVersionsUseCase: CheckVersionsUseCase = mock()
     private val killOtherSessionsUseCase: KillOtherSessionsUseCase = mock()
-    private val cancelSubscriptionsUseCase: CancelSubscriptionsUseCase = mock()
+    private val legacyCancelSubscriptionsUseCase: LegacyCancelSubscriptionsUseCase = mock()
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase = mock()
     private val resetSMSVerifiedPhoneNumberUseCase: ResetSMSVerifiedPhoneNumberUseCase = mock()
@@ -189,7 +189,7 @@ internal class MyAccountViewModelTest {
             isMultiFactorAuthEnabledUseCase = isMultiFactorAuthEnabledUseCase,
             checkVersionsUseCase = checkVersionsUseCase,
             killOtherSessionsUseCase = killOtherSessionsUseCase,
-            cancelSubscriptionsUseCase = cancelSubscriptionsUseCase,
+            legacyCancelSubscriptionsUseCase = legacyCancelSubscriptionsUseCase,
             getMyAvatarFileUseCase = getMyAvatarFileUseCase,
             checkPasswordReminderUseCase = checkPasswordReminderUseCase,
             resetSMSVerifiedPhoneNumberUseCase = resetSMSVerifiedPhoneNumberUseCase,
@@ -294,7 +294,7 @@ internal class MyAccountViewModelTest {
         runTest {
             val feedback = "feedback"
             val shouldClearCache = true
-            whenever(cancelSubscriptionsUseCase(feedback)).thenReturn(true)
+            whenever(legacyCancelSubscriptionsUseCase(feedback)).thenReturn(true)
             underTest.cancelSubscriptions(feedback)
             verify(getNumberOfSubscription, times(1)).invoke(shouldClearCache)
         }
@@ -304,7 +304,7 @@ internal class MyAccountViewModelTest {
     fun `test that a failed snackBar message is shown when cancelSubscriptionsUseCase return false`() =
         runTest {
             val feedback = "feedback"
-            whenever(cancelSubscriptionsUseCase(feedback)).thenReturn(false)
+            whenever(legacyCancelSubscriptionsUseCase(feedback)).thenReturn(false)
 
             underTest.cancelSubscriptions(feedback)
 
@@ -320,7 +320,7 @@ internal class MyAccountViewModelTest {
     fun `test that a success snackBar message is shown when cancelSubscriptionsUseCase return true`() =
         runTest {
             val feedback = "feedback"
-            whenever(cancelSubscriptionsUseCase(feedback)).thenReturn(true)
+            whenever(legacyCancelSubscriptionsUseCase(feedback)).thenReturn(true)
 
             underTest.cancelSubscriptions(feedback)
 
@@ -848,7 +848,7 @@ internal class MyAccountViewModelTest {
             isMultiFactorAuthEnabledUseCase,
             checkVersionsUseCase,
             killOtherSessionsUseCase,
-            cancelSubscriptionsUseCase,
+            legacyCancelSubscriptionsUseCase,
             getMyAvatarFileUseCase,
             checkPasswordReminderUseCase,
             resetSMSVerifiedPhoneNumberUseCase,
