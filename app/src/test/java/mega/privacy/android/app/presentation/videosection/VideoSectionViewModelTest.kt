@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -169,7 +168,7 @@ class VideoSectionViewModelTest {
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            defaultDispatcher = UnconfinedTestDispatcher(),
+            defaultDispatcher = StandardTestDispatcher(),
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             getVideoRecentlyWatchedUseCase = getVideoRecentlyWatchedUseCase,
             clearRecentlyWatchedVideosUseCase = clearRecentlyWatchedVideosUseCase

@@ -195,7 +195,7 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     private fun loadVideoPlaylists() {
-        viewModelScope.launch {
+        viewModelScope.launch(defaultDispatcher) {
             val videoPlaylists =
                 getVideoPlaylists().updateOriginalPlaylistEntities()
                     .filterVideoPlaylistsBySearchQuery()
@@ -235,7 +235,7 @@ class VideoSectionViewModel @Inject constructor(
 
     private fun setPendingRefreshNodes() = _state.update { it.copy(isPendingRefresh = true) }
 
-    internal fun refreshNodes() = viewModelScope.launch {
+    internal fun refreshNodes() = viewModelScope.launch(defaultDispatcher) {
         val videoList = filterNonSensitiveItems(
             items = getVideoUIEntityList(),
             showHiddenItems = this@VideoSectionViewModel.showHiddenItems,
