@@ -45,7 +45,7 @@ class HideDropdownMenuItem @Inject constructor(
             return false
         }
 
-        val isPaid = monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
+        isPaid = monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
         if (!isPaid) {
             return true
         }

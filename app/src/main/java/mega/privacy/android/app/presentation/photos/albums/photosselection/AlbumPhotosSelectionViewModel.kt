@@ -182,6 +182,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
                 selectedLocation = newLocation,
                 isLocationDetermined = isLocationDetermined,
                 showFilterMenu = showFilterMenu,
+                isLoading = false,
             )
         }
     }

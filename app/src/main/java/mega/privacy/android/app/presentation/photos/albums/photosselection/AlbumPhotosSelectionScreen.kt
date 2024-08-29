@@ -208,7 +208,7 @@ fun AlbumPhotosSelectionScreen(
             }
         },
         content = {
-            if (state.photos.isEmpty()) {
+            if (state.photos.isEmpty() && !state.isLoading) {
                 EmptyStateContent()
             } else {
                 AlbumPhotosSelectionContent(

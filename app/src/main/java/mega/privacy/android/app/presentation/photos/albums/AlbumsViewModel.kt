@@ -74,7 +74,8 @@ class AlbumsViewModel @Inject constructor(
     private var createAlbumJob: Job? = null
 
     @VisibleForTesting
-    internal var showHiddenItems: Boolean? = null
+    @Volatile
+    internal var showHiddenItems: Boolean? = true
 
     @VisibleForTesting
     internal var systemAlbumPhotos: ConcurrentHashMap<Album, List<Photo>> = ConcurrentHashMap()
