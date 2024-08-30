@@ -175,35 +175,17 @@ fun MegaSwitch(
     val thumbAnimationSpecs = tween<Color>(easing = LinearOutSlowInEasing)
 
     val trackColor by animateColorAsState(
-        targetValue = if (checked && enabled) {
-            MegaOriginalTheme.colors.components.selectionControl
-        } else if (!checked) {
-            MegaOriginalTheme.colors.background.pageBackground
-        } else {
-            MegaOriginalTheme.colors.border.disabled
-        },
+        targetValue = getColorForTrack(checked = checked, pressed = isPressed, enabled = enabled),
         animationSpec = trackAnimationSpecs,
         label = "track color"
     )
     val borderColor by animateColorAsState(
-        targetValue = if (enabled) {
-            MegaOriginalTheme.colors.button.outline
-        } else {
-            MegaOriginalTheme.colors.border.disabled
-        },
+        targetValue = getColorForBorder(pressed = isPressed, enabled = enabled),
         animationSpec = trackAnimationSpecs,
         label = "border color"
     )
     val thumbColor by animateColorAsState(
-        targetValue = if (checked) {
-            MegaOriginalTheme.colors.background.pageBackground
-        } else if (enabled && isPressed) {
-            MegaOriginalTheme.colors.button.outlinePressed
-        } else if (enabled) {
-            MegaOriginalTheme.colors.button.outline
-        } else {
-            MegaOriginalTheme.colors.border.disabled
-        },
+        targetValue = getColorForThumb(checked = checked, pressed = isPressed, enabled = enabled),
         animationSpec = thumbAnimationSpecs,
         label = "thumb color"
     )
@@ -286,6 +268,34 @@ private val trackHeight = 24.dp
 private val trackWidth = 48.dp
 private val rippleSize = 32.dp
 internal const val CHECKED_TAG = "mega_switch:icon_checked"
+
+@Composable
+private fun getColorForThumb(checked: Boolean, pressed: Boolean, enabled: Boolean) =
+    if (enabled) {
+        when {
+            !checked && !pressed -> MegaOriginalTheme.colors.components.selectionControl
+            !checked && pressed -> MegaOriginalTheme.colors.button.outlinePressed
+            else /*checked*/ -> MegaOriginalTheme.colors.background.surface1
+        }
+    } else {
+        if (checked) MegaOriginalTheme.colors.background.pageBackground else MegaOriginalTheme.colors.border.disabled
+    }
+
+@Composable
+private fun getColorForTrack(checked: Boolean, pressed: Boolean, enabled: Boolean) =
+    getColorForThumb(
+        checked = !checked,
+        pressed = pressed,
+        enabled = enabled
+    )
+
+@Composable
+private fun getColorForBorder(pressed: Boolean, enabled: Boolean) =
+    getColorForThumb(
+        checked = false,
+        pressed = pressed,
+        enabled = enabled
+    )
 
 @CombinedThemePreviews
 @Composable
