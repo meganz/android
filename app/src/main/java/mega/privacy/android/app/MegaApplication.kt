@@ -55,6 +55,8 @@ import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
+import mega.privacy.android.domain.usecase.appstart.AppStartTask
+import mega.privacy.android.domain.usecase.appstart.AppStopTask
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -174,7 +176,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     lateinit var globalNetworkStateHandler: GlobalNetworkStateHandler
 
     @Inject
-    lateinit var greeter: Provider<Greeter>
+    internal lateinit var greeter: Provider<Greeter>
 
     @Inject
     internal lateinit var thumbnailFactory: MegaThumbnailFetcher.Factory
@@ -183,7 +185,13 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     internal lateinit var avatarFactory: MegaAvatarFetcher.Factory
 
     @Inject
-    lateinit var updateApiServerUseCase: UpdateApiServerUseCase
+    internal lateinit var updateApiServerUseCase: UpdateApiServerUseCase
+
+    @Inject
+    internal lateinit var appStartTasks: Set<@JvmSuppressWildcards AppStartTask>
+
+    @Inject
+    internal lateinit var appStopTasks: Set<@JvmSuppressWildcards AppStopTask>
 
     var localIpAddress: String? = ""
 
@@ -278,6 +286,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             if (backgroundStatus != -1 && backgroundStatus != 0) {
                 megaChatApi.setBackgroundStatus(false)
             }
+            appStartTasks.forEach { it() }
         }
     }
 
@@ -292,6 +301,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             if (backgroundStatus != -1 && backgroundStatus != 1) {
                 megaChatApi.setBackgroundStatus(true)
             }
+            appStopTasks.forEach { it() }
         }
     }
 

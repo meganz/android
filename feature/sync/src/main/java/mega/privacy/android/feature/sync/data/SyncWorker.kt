@@ -33,11 +33,10 @@ class SyncWorker @AssistedInject constructor(
             runCatching { backgroundFastLoginUseCase() }.getOrElse(Timber::e)
         }
         while (true) {
+            delay(SYNC_WORKER_RECHECK_DELAY)
             val syncs = monitorSyncsUseCase().first()
             Timber.d("SyncWorker syncs: $syncs")
-            if (syncs.any { it.syncStatus != SyncStatus.SYNCED }) {
-                delay(SYNC_WORKER_RECHECK_DELAY)
-            } else {
+            if (syncs.all { it.syncStatus == SyncStatus.SYNCED }) {
                 Timber.d("SyncWorker finished")
                 return Result.success()
             }
