@@ -83,6 +83,7 @@ internal class BillingFacade @Inject constructor(
     private val activeSubscription: Cache<MegaPurchase>,
 ) : BillingGateway, PurchasesUpdatedListener, DefaultLifecycleObserver {
     private val mutex = Mutex()
+    private val proceedPurchaseMutex = Mutex()
     private val billingEvent = MutableSharedFlow<BillingEvent>()
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
@@ -98,6 +99,7 @@ internal class BillingFacade @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         applicationScope.launch(exceptionHandler) {
             ensureConnect()
+            queryPurchase()
         }
     }
 
@@ -258,12 +260,12 @@ internal class BillingFacade @Inject constructor(
     private suspend fun processPurchase(
         client: BillingClient,
         purchaseList: List<Purchase>,
-    ): List<MegaPurchase> {
+    ): List<MegaPurchase> = proceedPurchaseMutex.withLock {
         // Verify all available purchases
         var printPurchaseList =
             "obfuscated account ID is $obfuscatedAccountId, purchaseList size is ${purchaseList.size}, "
-        val validPurchases = purchaseList.filter { purchase ->
-            printPurchaseList += "purchase ${purchaseList.indexOf(purchase)} has "
+        val validPurchases = purchaseList.filterIndexed { index, purchase ->
+            printPurchaseList += "purchase $index has "
             printPurchaseList += "purchase obfuscated id ${purchase.accountIdentifiers?.obfuscatedAccountId}, "
             printPurchaseList += "purchase original json ${purchase.originalJson}, "
             printPurchaseList += "purchase signature ${purchase.signature} /n"
@@ -325,6 +327,7 @@ internal class BillingFacade @Inject constructor(
                         if (result.responseCode == BillingClient.BillingResponseCode.OK) {
                             if (continuation.isActive)
                                 continuation.resumeWith(Result.success(newClient))
+                                    .also { billingClientRef.set(newClient) }
                         } else {
                             if (continuation.isActive)
                                 continuation.resumeWith(
