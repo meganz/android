@@ -2,10 +2,14 @@ package mega.privacy.android.app.getLink
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import mega.privacy.android.app.main.model.SendToChatResult
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
@@ -39,24 +43,61 @@ abstract class BaseLinkViewModel(
         key: String?,
         password: String?,
     ) {
-        link ?: return
+        link?.let {
+            sendToChat(data, listOf(it), key, password)
+        }
+    }
+
+    /**
+     * Shares the link to chat.
+     */
+    fun sendToChat(
+        data: SendToChatResult,
+        links: List<String>,
+    ) {
+        sendToChat(data, links, null, null)
+    }
+
+    private fun sendToChat(
+        data: SendToChatResult,
+        links: List<String>,
+        key: String?,
+        password: String?,
+    ) {
         viewModelScope.launch {
+            val semaphore = Semaphore(10)
             runCatching {
-                val createdChatIds = data.userHandles.toList().mapNotNull { userHandle ->
-                    runCatching {
-                        get1On1ChatIdUseCase(userHandle)
-                    }.getOrNull()
-                }
+                val createdChatIds = createNewChat(data.userHandles.toList())
                 val finalChatIds = createdChatIds + data.chatIds.toList()
-                finalChatIds.forEach {
-                    sendTextMessageUseCase(it, link)
-                    if (!key.isNullOrEmpty() || !password.isNullOrEmpty()) {
-                        if (!password.isNullOrEmpty()) {
-                            sendTextMessageUseCase(it, password)
-                        } else {
-                            sendTextMessageUseCase(it, key.orEmpty())
+                finalChatIds.map {
+                    links.map { link ->
+                        async {
+                            semaphore.withPermit {
+                                runCatching {
+                                    sendTextMessageUseCase(it, link)
+                                }.onFailure {
+                                    Timber.e(it)
+                                }
+                            }
                         }
                     }
+                }.flatten().awaitAll()
+                if (key.isNullOrEmpty() || password.isNullOrEmpty()) {
+                    finalChatIds.map {
+                        async {
+                            semaphore.withPermit {
+                                runCatching {
+                                    if (!password.isNullOrEmpty()) {
+                                        sendTextMessageUseCase(it, password)
+                                    } else {
+                                        sendTextMessageUseCase(it, key.orEmpty())
+                                    }
+                                }.onFailure {
+                                    Timber.e(it)
+                                }
+                            }
+                        }
+                    }.awaitAll()
                 }
                 if (finalChatIds.size == 1) finalChatIds.first() else -1L
             }.onSuccess { openChatId ->
@@ -72,6 +113,13 @@ abstract class BaseLinkViewModel(
             }
         }
     }
+
+    private suspend fun createNewChat(userHandles: List<Long>) =
+        userHandles.mapNotNull { userHandle ->
+            runCatching {
+                get1On1ChatIdUseCase(userHandle)
+            }.getOrNull()
+        }
 
     /**
      * On share link result handled.

@@ -3,7 +3,6 @@ package mega.privacy.android.app.getLink
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -22,6 +21,8 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
+import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -45,7 +46,9 @@ class GetSeveralLinksViewModel @Inject constructor(
     private val getThumbnailUseCase: GetThumbnailUseCase,
     private val hasSensitiveDescendantUseCase: HasSensitiveDescendantUseCase,
     private val hasSensitiveInheritedUseCase: HasSensitiveInheritedUseCase,
-) : ViewModel() {
+    get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
+    sendTextMessageUseCase: SendTextMessageUseCase,
+) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
 
     private val linkItemsList: MutableLiveData<List<LinkItem>> = MutableLiveData()
     fun getLinkItems(): LiveData<List<LinkItem>> = linkItemsList

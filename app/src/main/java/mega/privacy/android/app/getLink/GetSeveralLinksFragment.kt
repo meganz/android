@@ -1,7 +1,6 @@
 package mega.privacy.android.app.getLink
 
 import mega.privacy.android.shared.resources.R as sharedR
-import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,7 +9,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -21,26 +19,23 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
+import mega.privacy.android.app.activities.contract.SendToChatActivityContract
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.PositionDividerItemDecoration
-import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.FragmentGetSeveralLinksBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.getLink.adapter.LinksAdapter
 import mega.privacy.android.app.getLink.data.LinkItem
-import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_DISABLED
 import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_ENABLED
-import mega.privacy.android.app.utils.Constants.EXTRA_SEVERAL_LINKS
-import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT
 import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.TextUtil.copyToClipboard
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import nz.mega.sdk.MegaApiJava
 import java.util.UUID
 import javax.inject.Inject
 
@@ -53,7 +48,11 @@ class GetSeveralLinksFragment : Fragment() {
     private val viewModel: GetSeveralLinksViewModel by activityViewModels()
 
     private lateinit var binding: FragmentGetSeveralLinksBinding
-    private lateinit var chatLauncher: ActivityResultLauncher<Unit?>
+    private val chatLauncher = registerForActivityResult(SendToChatActivityContract()) {
+        if (it != null) {
+            viewModel.sendToChat(it, viewModel.getLinksList())
+        }
+    }
     private var menu: Menu? = null
 
     private val linksAdapter by lazy { LinksAdapter() }
@@ -64,20 +63,6 @@ class GetSeveralLinksFragment : Fragment() {
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        chatLauncher = registerForActivityResult(ChatExplorerActivityContract()) { data ->
-            data?.putStringArrayListExtra(EXTRA_SEVERAL_LINKS, viewModel.getLinksList())
-
-            MegaAttacher(requireActivity() as ActivityLauncher).handleActivityResult(
-                REQUEST_CODE_SELECT_CHAT,
-                RESULT_OK,
-                data,
-                requireActivity() as SnackbarShower
-            )
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -91,6 +76,18 @@ class GetSeveralLinksFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initialize()
+        viewLifecycleOwner.collectFlow(viewModel.sendLinkToChatResult) {
+            it?.let { sendLinkToChatResult ->
+                (activity as? SnackbarShower)?.showSnackbarWithChat(
+                    resources.getQuantityString(
+                        R.plurals.links_sent,
+                        1
+                    ),
+                    sendLinkToChatResult.chatId
+                )
+                viewModel.onShareLinkResultHandled()
+            }
+        }
     }
 
     private fun initialize() {
@@ -174,7 +171,7 @@ class GetSeveralLinksFragment : Fragment() {
             }
 
             R.id.action_chat -> {
-                chatLauncher.launch(Unit)
+                chatLauncher.launch(longArrayOf())
             }
         }
 
