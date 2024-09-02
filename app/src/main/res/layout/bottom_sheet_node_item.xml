@@ -241,6 +241,27 @@
                 android:orientation="horizontal" />
 
             <LinearLayout
+                android:id="@+id/remove_recently_watched_item_option"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    style="@style/BottomSheetOption"
+                    android:text="@string/video_section_bottom_sheet_option_remove_recently_watched_item"
+                    app:drawableStartCompat="@drawable/ic_remove_video_recently_watched_item"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="72dp"
+                    android:background="@color/grey_012_white_012" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/dispute_option"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

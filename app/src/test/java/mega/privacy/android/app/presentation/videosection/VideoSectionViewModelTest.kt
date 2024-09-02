@@ -13,7 +13,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
@@ -52,6 +51,7 @@ import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsU
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoRecentlyWatchedUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
+import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
@@ -100,6 +100,7 @@ class VideoSectionViewModelTest {
     private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
     private val getVideoRecentlyWatchedUseCase = mock<GetVideoRecentlyWatchedUseCase>()
     private val clearRecentlyWatchedVideosUseCase = mock<ClearRecentlyWatchedVideosUseCase>()
+    private val removeRecentlyWatchedItemUseCase = mock<RemoveRecentlyWatchedItemUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -171,7 +172,8 @@ class VideoSectionViewModelTest {
             defaultDispatcher = StandardTestDispatcher(),
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             getVideoRecentlyWatchedUseCase = getVideoRecentlyWatchedUseCase,
-            clearRecentlyWatchedVideosUseCase = clearRecentlyWatchedVideosUseCase
+            clearRecentlyWatchedVideosUseCase = clearRecentlyWatchedVideosUseCase,
+            removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase
         )
     }
 
@@ -194,7 +196,8 @@ class VideoSectionViewModelTest {
             monitorVideoPlaylistSetsUpdateUseCase,
             getNodeContentUriUseCase,
             getVideoRecentlyWatchedUseCase,
-            clearRecentlyWatchedVideosUseCase
+            clearRecentlyWatchedVideosUseCase,
+            removeRecentlyWatchedItemUseCase
         )
     }
 
@@ -1418,7 +1421,7 @@ class VideoSectionViewModelTest {
         whenever(getVideoRecentlyWatchedUseCase()).thenReturn(testVideoNodes)
 
         initUnderTest()
-        underTest.getVideoRecentlyWatched()
+        underTest.loadRecentlyWatchedVideos()
         underTest.state.drop(1).test {
             val actual = awaitItem()
             assertThat(actual.groupedVideoRecentlyWatchedItems).isEqualTo(
@@ -1469,6 +1472,19 @@ class VideoSectionViewModelTest {
         }
 
     @Test
+    fun `test that the state is updated correctly after the removeRecentlyWatchedItem is invoked`() =
+        runTest {
+            initUnderTest()
+            underTest.removeRecentlyWatchedItem(12345L)
+
+            underTest.state.drop(1).test {
+                val actual = awaitItem()
+                assertThat(actual.removeRecentlyWatchedItemSuccess).isEqualTo(triggered)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that the state is updated correctly after the resetClearRecentlyWatchedVideosSuccess is invoked`() =
         runTest {
             initUnderTest()
@@ -1478,6 +1494,20 @@ class VideoSectionViewModelTest {
                 assertThat(awaitItem().clearRecentlyWatchedVideosSuccess).isEqualTo(triggered)
                 underTest.resetClearRecentlyWatchedVideosSuccess()
                 assertThat(awaitItem().clearRecentlyWatchedVideosSuccess).isEqualTo(consumed)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the state is updated correctly after the resetRemoveRecentlyWatchedItemSuccess is invoked`() =
+        runTest {
+            initUnderTest()
+            underTest.removeRecentlyWatchedItem(12345L)
+
+            underTest.state.drop(1).test {
+                assertThat(awaitItem().removeRecentlyWatchedItemSuccess).isEqualTo(triggered)
+                underTest.resetRemoveRecentlyWatchedItemSuccess()
+                assertThat(awaitItem().removeRecentlyWatchedItemSuccess).isEqualTo(consumed)
                 cancelAndIgnoreRemainingEvents()
             }
         }

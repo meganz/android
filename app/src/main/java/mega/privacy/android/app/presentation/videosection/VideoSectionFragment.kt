@@ -19,7 +19,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,7 +32,6 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
-import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
@@ -67,7 +65,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class VideoSectionFragment : Fragment() {
 
-    private val videoSectionViewModel by viewModels<VideoSectionViewModel>()
+    private val videoSectionViewModel: VideoSectionViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
     /**
@@ -139,9 +137,7 @@ class VideoSectionFragment : Fragment() {
                             .fillMaxWidth(),
                         onSortOrderClick = { showSortByPanel() },
                         videoSectionViewModel = videoSectionViewModel,
-                        onMenuClick = { item ->
-                            showOptionsMenuForItem(item)
-                        },
+                        onMenuClick = ::showOptionsMenuForItem,
                         onAddElementsClicked = {
                             navigateToVideoSelectedActivity()
                         },
@@ -335,11 +331,8 @@ class VideoSectionFragment : Fragment() {
         }
     }
 
-    private fun showOptionsMenuForItem(item: VideoUIEntity) {
-        (requireActivity() as ManagerActivity).showNodeOptionsPanel(
-            nodeId = item.id,
-            mode = NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
-        )
+    private fun showOptionsMenuForItem(item: VideoUIEntity, mode: Int) {
+        (requireActivity() as ManagerActivity).showNodeOptionsPanel(nodeId = item.id, mode = mode)
     }
 
     suspend fun handleHideNodeClick() {

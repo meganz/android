@@ -45,6 +45,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property isRemoveLinkMenuActionVisible the remove link menu action whether is visible
  * @property groupedVideoRecentlyWatchedItems map of video recently watched items, grouped by timestamp for sticky header
  * @property clearRecentlyWatchedVideosSuccess State Event which notifies that clear recently watched videos is successful
+ * @property removeRecentlyWatchedItemSuccess State Event which notifies that remove recently watched item is successful
  */
 data class VideoSectionState(
     val allVideos: List<VideoUIEntity> = emptyList(),
@@ -82,4 +83,5 @@ data class VideoSectionState(
     val isRemoveLinkMenuActionVisible: Boolean = false,
     val groupedVideoRecentlyWatchedItems: Map<String, List<VideoUIEntity>> = emptyMap(),
     val clearRecentlyWatchedVideosSuccess: StateEvent = consumed,
+    val removeRecentlyWatchedItemSuccess: StateEvent = consumed,
 )

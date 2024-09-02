@@ -55,24 +55,28 @@ class VideoRecentlyWatchedViewKtTest {
 
     private fun setComposeContent(
         group: Map<String, List<VideoUIEntity>> = emptyMap(),
-        clearRecentlyWatchedSuccess: StateEvent = consumed,
+        clearRecentlyWatchedVideosSuccess: StateEvent = consumed,
+        removeRecentlyWatchedItemSuccess: StateEvent = consumed,
         modifier: Modifier = Modifier,
         onBackPressed: () -> Unit = {},
         onClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
         onActionPressed: (VideoSectionMenuAction?) -> Unit = {},
         onMenuClick: (VideoUIEntity) -> Unit = {},
-        clearRecentlyWatchedMessageShown: () -> Unit = {},
+        clearRecentlyWatchedVideosMessageShown: () -> Unit = {},
+        removedRecentlyWatchedItemMessageShown: () -> Unit = {},
     ) {
         composeTestRule.setContent {
             VideoRecentlyWatchedView(
                 group = group,
-                clearRecentlyWatchedVideosSuccess = clearRecentlyWatchedSuccess,
+                clearRecentlyWatchedVideosSuccess = clearRecentlyWatchedVideosSuccess,
+                removeRecentlyWatchedItemSuccess = removeRecentlyWatchedItemSuccess,
                 modifier = modifier,
                 onBackPressed = onBackPressed,
                 onClick = onClick,
                 onActionPressed = onActionPressed,
                 onMenuClick = onMenuClick,
-                clearRecentlyWatchedVideosMessageShown = clearRecentlyWatchedMessageShown
+                clearRecentlyWatchedVideosMessageShown = clearRecentlyWatchedVideosMessageShown,
+                removedRecentlyWatchedItemMessageShown = removedRecentlyWatchedItemMessageShown
             )
         }
     }

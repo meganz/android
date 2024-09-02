@@ -62,6 +62,7 @@ import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
+import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants
@@ -110,6 +111,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private val nodeOptionsViewModel: NodeOptionsViewModel by viewModels()
     private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
+    private val videoSectionViewModel: VideoSectionViewModel by activityViewModels()
     private var tempNodeId: NodeId? = null
 
     /**
@@ -200,6 +202,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             contentView.findViewById<LinearLayout>(R.id.separator_download_options)
         val separatorShares = contentView.findViewById<LinearLayout>(R.id.separator_share_options)
         val separatorModify = contentView.findViewById<LinearLayout>(R.id.separator_modify_options)
+        val optionRemoveRecentlyWatchedItem =
+            contentView.findViewById<View>(R.id.remove_recently_watched_item_option)
         if (!Util.isScreenInPortrait(requireContext())) {
             Timber.d("Landscape configuration")
             nodeName.maxWidth = Util.scaleWidthPx(275, resources.displayMetrics)
@@ -312,6 +316,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     }
                 }
                 optionVersionsLayout.setOnClickListener { onClick { onVersionsClicked(node) } }
+                optionRemoveRecentlyWatchedItem.setOnClickListener {
+                    videoSectionViewModel.removeRecentlyWatchedItem(node.handle)
+                    setStateBottomSheetBehaviorHidden()
+                }
 
                 val isTakenDown = node.isTakenDown
                 val accessLevel = megaApi.getAccess(node)
@@ -489,7 +497,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     mapDrawerItemToMode(state.nodeDeviceCenterInformation)
                 }
                 when (mode) {
-                    CLOUD_DRIVE_MODE, SEARCH_MODE -> {
+                    CLOUD_DRIVE_MODE, SEARCH_MODE, VIDEO_RECENTLY_WATCHED_MODE -> {
                         Timber.d("show Cloud bottom sheet")
                         optionRemove.visibility = View.GONE
                         optionLeaveShares.visibility = View.GONE
@@ -497,6 +505,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         optionOpenFolder.visibility = View.GONE
                         counterModify--
                         optionRestoreFromRubbish.visibility = View.GONE
+                        optionRemoveRecentlyWatchedItem.visibility =
+                            if (mode == VIDEO_RECENTLY_WATCHED_MODE) {
+                                View.VISIBLE
+                            } else {
+                                View.GONE
+                            }
                     }
 
                     BACKUPS_MODE -> {
@@ -1610,7 +1624,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             args.putLong(NODE_ID_KEY, nodeId.longValue)
             args.putInt(
                 MODE_KEY,
-                mode?.takeIf { it in DEFAULT_MODE..FAVOURITES_MODE } ?: DEFAULT_MODE)
+                mode?.takeIf { it in DEFAULT_MODE..VIDEO_RECENTLY_WATCHED_MODE } ?: DEFAULT_MODE)
             shareData?.let {
                 val shareInfo = NodeShareInformation(
                     user = it.user,
@@ -1676,5 +1690,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
          */
         const val FAVOURITES_MODE = 8
 
+        /**
+         * For Video Recently Watched
+         */
+        const val VIDEO_RECENTLY_WATCHED_MODE = 9
     }
 }

@@ -63,6 +63,7 @@ import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsU
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoRecentlyWatchedUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
+import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
@@ -102,6 +103,7 @@ class VideoSectionViewModel @Inject constructor(
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val getVideoRecentlyWatchedUseCase: GetVideoRecentlyWatchedUseCase,
     private val clearRecentlyWatchedVideosUseCase: ClearRecentlyWatchedVideosUseCase,
+    private val removeRecentlyWatchedItemUseCase: RemoveRecentlyWatchedItemUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -188,7 +190,7 @@ class VideoSectionViewModel @Inject constructor(
                 }.collect {
                     setPendingRefreshNodes()
                     if (_state.value.currentDestinationRoute == videoRecentlyWatchedRoute) {
-                        getVideoRecentlyWatched()
+                        loadRecentlyWatchedVideos()
                     }
                 }
         }
@@ -1008,7 +1010,7 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    internal fun getVideoRecentlyWatched() = viewModelScope.launch {
+    internal fun loadRecentlyWatchedVideos() = viewModelScope.launch {
         runCatching {
             getVideoRecentlyWatchedUseCase().map {
                 videoUIEntityMapper(it)
@@ -1044,9 +1046,30 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
+    internal fun removeRecentlyWatchedItem(handle: Long) {
+        viewModelScope.launch {
+            runCatching {
+                removeRecentlyWatchedItemUseCase(handle)
+                _state.update {
+                    it.copy(
+                        removeRecentlyWatchedItemSuccess = triggered
+                    )
+                }
+                loadRecentlyWatchedVideos()
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
     internal fun resetClearRecentlyWatchedVideosSuccess() =
         _state.update {
             it.copy(clearRecentlyWatchedVideosSuccess = consumed)
+        }
+
+    internal fun resetRemoveRecentlyWatchedItemSuccess() =
+        _state.update {
+            it.copy(removeRecentlyWatchedItemSuccess = consumed)
         }
 
     companion object {

@@ -9,6 +9,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.CLOUD_DRIVE_MODE
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_RECENTLY_WATCHED_MODE
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
@@ -24,7 +26,7 @@ internal fun VideoSectionFeatureScreen(
     videoSectionViewModel: VideoSectionViewModel,
     onAddElementsClicked: () -> Unit,
     onSortOrderClick: () -> Unit,
-    onMenuClick: (VideoUIEntity) -> Unit,
+    onMenuClick: (VideoUIEntity, index: Int) -> Unit,
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
 ) {
     val navHostController = rememberNavController()
@@ -44,7 +46,7 @@ internal fun VideoSectionFeatureScreen(
 internal fun VideoSectionNavHost(
     navHostController: NavHostController,
     onSortOrderClick: () -> Unit,
-    onMenuClick: (VideoUIEntity) -> Unit,
+    onMenuClick: (VideoUIEntity, index: Int) -> Unit,
     onAddElementsClicked: () -> Unit,
     modifier: Modifier,
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
@@ -96,7 +98,7 @@ internal fun VideoSectionNavHost(
                 videoSectionViewModel = viewModel,
                 onClick = viewModel::onItemClicked,
                 onSortOrderClick = onSortOrderClick,
-                onMenuClick = onMenuClick,
+                onMenuClick = { onMenuClick(it, CLOUD_DRIVE_MODE) },
                 onLongClick = viewModel::onItemLongClicked,
                 onPlaylistItemClick = { playlist, index ->
                     if (state.isInSelection) {
@@ -110,7 +112,7 @@ internal fun VideoSectionNavHost(
                 onDeleteDialogButtonClicked = viewModel::clearAllSelectedVideoPlaylists,
                 onMenuAction = { action ->
                     if (action is VideoSectionMenuAction.VideoRecentlyWatchedAction) {
-                        viewModel.getVideoRecentlyWatched()
+                        viewModel.loadRecentlyWatchedVideos()
                         navHostController.navigate(route = videoRecentlyWatchedRoute)
                     } else {
                         onMenuAction(action)
@@ -141,7 +143,7 @@ internal fun VideoSectionNavHost(
                         viewModel.onVideoItemOfPlaylistClicked(item, index)
                     }
                 },
-                onMenuClick = onMenuClick,
+                onMenuClick = { onMenuClick(it, CLOUD_DRIVE_MODE) },
                 onLongClick = viewModel::onVideoItemOfPlaylistLongClicked,
                 onDeleteVideosDialogPositiveButtonClicked = onDeleteVideosDialogPositiveButtonClicked,
                 onPlayAllClicked = viewModel::playAllButtonClicked,
@@ -170,6 +172,7 @@ internal fun VideoSectionNavHost(
             VideoRecentlyWatchedView(
                 group = state.groupedVideoRecentlyWatchedItems,
                 clearRecentlyWatchedVideosSuccess = state.clearRecentlyWatchedVideosSuccess,
+                removeRecentlyWatchedItemSuccess = state.removeRecentlyWatchedItemSuccess,
                 modifier = Modifier,
                 onBackPressed = { onBackPressedDispatcher?.onBackPressed() },
                 onClick = viewModel::onItemClicked,
@@ -178,8 +181,9 @@ internal fun VideoSectionNavHost(
                         viewModel.clearRecentlyWatchedVideos()
                     }
                 },
-                onMenuClick = onMenuClick,
-                clearRecentlyWatchedVideosMessageShown = viewModel::resetClearRecentlyWatchedVideosSuccess
+                onMenuClick = { onMenuClick(it, VIDEO_RECENTLY_WATCHED_MODE) },
+                clearRecentlyWatchedVideosMessageShown = viewModel::resetClearRecentlyWatchedVideosSuccess,
+                removedRecentlyWatchedItemMessageShown = viewModel::resetRemoveRecentlyWatchedItemSuccess
             )
         }
     }

@@ -11,10 +11,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -54,17 +57,22 @@ import nz.mega.sdk.MegaNode
 fun VideoRecentlyWatchedView(
     group: Map<String, List<VideoUIEntity>>,
     clearRecentlyWatchedVideosSuccess: StateEvent,
+    removeRecentlyWatchedItemSuccess: StateEvent,
     modifier: Modifier,
     onBackPressed: () -> Unit,
     onClick: (item: VideoUIEntity, index: Int) -> Unit,
     onActionPressed: (VideoSectionMenuAction?) -> Unit,
     onMenuClick: (VideoUIEntity) -> Unit,
     clearRecentlyWatchedVideosMessageShown: () -> Unit,
+    removedRecentlyWatchedItemMessageShown: () -> Unit,
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState(snackbarHostState = snackBarHostState)
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val lazyListState = rememberLazyListState()
+
+    val isInFirstItem by remember { derivedStateOf { lazyListState.firstVisibleItemIndex != 0 } }
 
     EventEffect(
         event = clearRecentlyWatchedVideosSuccess,
@@ -74,6 +82,20 @@ fun VideoRecentlyWatchedView(
                 snackBarHostState.showAutoDurationSnackbar(
                     context.resources.getString(
                         shareR.string.video_section_message_clear_recently_watched
+                    )
+                )
+            }
+        }
+    )
+
+    EventEffect(
+        event = removeRecentlyWatchedItemSuccess,
+        onConsumed = removedRecentlyWatchedItemMessageShown,
+        action = {
+            coroutineScope.launch {
+                snackBarHostState.showAutoDurationSnackbar(
+                    context.resources.getString(
+                        shareR.string.video_section_message_remove_recently_watched_item
                     )
                 )
             }
@@ -93,6 +115,7 @@ fun VideoRecentlyWatchedView(
                 } else null,
                 onActionPressed = { onActionPressed(it as? VideoSectionMenuAction) },
                 onNavigationPressed = onBackPressed,
+                elevation = if (isInFirstItem) AppBarDefaults.TopAppBarElevation else 0.dp
             )
         }
     ) { paddingValue ->
@@ -106,7 +129,7 @@ fun VideoRecentlyWatchedView(
 
                 else -> {
                     LazyColumn(
-                        state = rememberLazyListState(),
+                        state = lazyListState,
                         modifier = Modifier.padding(paddingValue)
                     ) {
                         group.forEach { (date, items) ->
