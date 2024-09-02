@@ -8,7 +8,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattachment.model.ChatAttachmentUiEntity
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattachment.model.NodeAttachmentBottomSheetUiState
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,12 +22,10 @@ class NodeAttachmentBottomSheetContentTest {
     fun `test that node view is shown`() {
         composeRule.setContent {
             val uiState = NodeAttachmentBottomSheetUiState(
-                nodeId = NodeId(1),
                 isOnline = false,
                 item = ChatAttachmentUiEntity(
                     name = "Title",
                     size = 1230,
-                    modificationTime = System.currentTimeMillis() / 1000,
                     thumbnailPath = null,
                     isAvailableOffline = true,
                     isInAnonymousMode = false
@@ -53,12 +50,10 @@ class NodeAttachmentBottomSheetContentTest {
     fun `test that import and offline actions are not shown when chat is in anonymous mode`() {
         composeRule.setContent {
             val uiState = NodeAttachmentBottomSheetUiState(
-                nodeId = NodeId(1),
                 isOnline = false,
                 item = ChatAttachmentUiEntity(
                     name = "Title",
                     size = 1230,
-                    modificationTime = System.currentTimeMillis() / 1000,
                     thumbnailPath = null,
                     isAvailableOffline = true,
                     isInAnonymousMode = true

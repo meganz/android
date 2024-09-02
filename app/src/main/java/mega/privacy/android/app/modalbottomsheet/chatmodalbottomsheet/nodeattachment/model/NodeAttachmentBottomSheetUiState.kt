@@ -2,7 +2,6 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattac
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.domain.entity.node.NodeId
 
 /**
  * UI state for the OfflineFileInfoComposeViewModel
@@ -14,7 +13,6 @@ import mega.privacy.android.domain.entity.node.NodeId
  * @property errorEvent event to show an error message
  */
 data class NodeAttachmentBottomSheetUiState(
-    val nodeId: NodeId,
     val item: ChatAttachmentUiEntity? = null,
     val isOnline: Boolean = false,
     val isLoading: Boolean = true,

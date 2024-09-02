@@ -7,15 +7,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.intl.Locale
 import com.google.common.io.Files
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattachment.model.ChatAttachmentUiEntity
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattachment.model.NodeAttachmentBottomSheetUiState
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_AVAILABLE_OFFLINE_SWITCH
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
@@ -42,16 +39,7 @@ internal fun NodeAttachmentBottomSheetContent(
                     modifier = Modifier.testTag(NODE_VIEW_TEST_TAG),
                     title = name,
                     titleOverflow = LongTextBehaviour.MiddleEllipsis,
-                    subtitle = formatFileSize(size, LocalContext.current)
-                        .plus(" · ")
-                        .plus(
-                            formatModifiedDate(
-                                java.util.Locale(
-                                    Locale.current.language, Locale.current.region
-                                ),
-                                modificationTime
-                            )
-                        ),
+                    subtitle = formatFileSize(size, LocalContext.current),
                     icon = fileTypeIconMapper(Files.getFileExtension(name)),
                     thumbnailData = thumbnailPath,
                 )
@@ -106,12 +94,10 @@ private fun NodeAttachmentBottomSheetContentPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         NodeAttachmentBottomSheetContent(
             uiState = NodeAttachmentBottomSheetUiState(
-                nodeId = NodeId(1),
                 isOnline = false,
                 item = ChatAttachmentUiEntity(
                     name = "Title",
                     size = 1230,
-                    modificationTime = System.currentTimeMillis() / 1000,
                     thumbnailPath = null,
                     isAvailableOffline = true,
                     isInAnonymousMode = false

@@ -13,7 +13,6 @@ data class ChatAttachmentUiEntity(
     val name: String,
     val size: Long,
     val thumbnailPath: String?,
-    val modificationTime: Long,
     val isInAnonymousMode: Boolean,
     val isAvailableOffline: Boolean
 )

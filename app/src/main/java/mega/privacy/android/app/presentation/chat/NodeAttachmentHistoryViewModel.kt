@@ -81,7 +81,7 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
      */
     fun importChatNodes(
         chatId: Long,
-        messageIds: MutableList<Long>,
+        messageIds: List<Long>,
         newParentHandle: Long,
     ) {
         viewModelScope.launch {
