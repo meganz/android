@@ -5,9 +5,7 @@ import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
-import androidx.biometric.BiometricPrompt.AuthenticationCallback
 import androidx.biometric.BiometricPrompt.CryptoObject
-import androidx.biometric.BiometricPrompt.ERROR_USER_CANCELED
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -59,7 +57,6 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.Password
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_100_alpha_060_dark_grey
-import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
 import mega.privacy.mobile.analytics.event.PasscodeEnteredEvent
@@ -84,7 +81,7 @@ internal fun PasscodeView(
         context: Context,
         promptInfo: BiometricPrompt.PromptInfo,
         cryptObject: CryptoObject,
-    ) -> Unit = ::launchBiometricPrompt,
+    ) -> Unit = ::biometricAuthPrompt,
 ) {
     Timber.d("Passcode main UI composed")
     val uiState by passcodeUnlockViewModel.state.collectAsStateWithLifecycle()
@@ -149,39 +146,6 @@ internal fun PasscodeView(
             }
         }
     }
-}
-
-private fun launchBiometricPrompt(
-    onSuccess: () -> Unit,
-    onError: () -> Unit,
-    onFail: () -> Unit,
-    context: Context,
-    promptInfo: BiometricPrompt.PromptInfo,
-    cryptObject: CryptoObject,
-) {
-    val activity = context.findFragmentActivity()
-    if (activity == null) onError()
-
-
-    val callback = object : AuthenticationCallback() {
-        override fun onAuthenticationFailed() {
-            super.onAuthenticationFailed()
-            onFail()
-        }
-
-        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-            if (errorCode == ERROR_USER_CANCELED) {
-                activity?.finish()
-            } else {
-                onError()
-            }
-        }
-
-        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-            onSuccess()
-        }
-    }
-    activity?.let { BiometricPrompt(it, callback).authenticate(promptInfo, cryptObject) }
 }
 
 private fun biometricPreferenceIsEnabled(uiState: PasscodeUnlockState) =
