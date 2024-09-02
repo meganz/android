@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
+import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaChatMessage
 import timber.log.Timber
@@ -36,6 +37,7 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
+    private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
     private val megaNavigator: MegaNavigator,
 ) : ViewModel() {
 
@@ -172,6 +174,19 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
                         error = throwable
                     )
                 )
+            }
+        }
+    }
+
+    /**
+     * Remove chat node from offline
+     *
+     * @param nodeId node ID
+     */
+    fun removeChatNodeFromOffline(nodeId: NodeId) {
+        viewModelScope.launch {
+            runCatching {
+                removeOfflineNodeUseCase(nodeId)
             }
         }
     }

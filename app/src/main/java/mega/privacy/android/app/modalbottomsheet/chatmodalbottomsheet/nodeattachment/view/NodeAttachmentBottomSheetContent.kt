@@ -13,6 +13,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattach
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_AVAILABLE_OFFLINE_SWITCH
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
@@ -28,7 +29,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 internal fun NodeAttachmentBottomSheetContent(
     uiState: NodeAttachmentBottomSheetUiState,
     fileTypeIconMapper: FileTypeIconMapper,
-    onAvailableOfflineChecked: (Boolean) -> Unit,
+    onAvailableOfflineChecked: (Boolean, NodeId) -> Unit,
     onSaveToDeviceClicked: () -> Unit,
     onImportClicked: () -> Unit,
 ) {
@@ -73,7 +74,9 @@ internal fun NodeAttachmentBottomSheetContent(
                             MegaSwitch(
                                 checked = isAvailableOffline,
                                 enabled = true,
-                                onCheckedChange = onAvailableOfflineChecked,
+                                onCheckedChange = {
+                                    onAvailableOfflineChecked(it, nodeId)
+                                },
                                 modifier = Modifier.testTag(TEST_TAG_AVAILABLE_OFFLINE_SWITCH)
                             )
                         }
@@ -96,6 +99,7 @@ private fun NodeAttachmentBottomSheetContentPreview() {
             uiState = NodeAttachmentBottomSheetUiState(
                 isOnline = false,
                 item = ChatAttachmentUiEntity(
+                    nodeId = NodeId(123),
                     name = "Title",
                     size = 1230,
                     thumbnailPath = null,
@@ -105,7 +109,7 @@ private fun NodeAttachmentBottomSheetContentPreview() {
                 isLoading = false
             ),
             fileTypeIconMapper = FileTypeIconMapper(),
-            onAvailableOfflineChecked = {},
+            onAvailableOfflineChecked = { _, _ -> },
             onSaveToDeviceClicked = {},
             onImportClicked = {}
         )

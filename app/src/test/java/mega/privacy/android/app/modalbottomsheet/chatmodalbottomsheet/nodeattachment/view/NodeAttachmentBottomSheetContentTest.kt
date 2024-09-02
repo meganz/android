@@ -8,6 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattachment.model.ChatAttachmentUiEntity
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattachment.model.NodeAttachmentBottomSheetUiState
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,6 +25,7 @@ class NodeAttachmentBottomSheetContentTest {
             val uiState = NodeAttachmentBottomSheetUiState(
                 isOnline = false,
                 item = ChatAttachmentUiEntity(
+                    nodeId = NodeId(123),
                     name = "Title",
                     size = 1230,
                     thumbnailPath = null,
@@ -35,7 +37,7 @@ class NodeAttachmentBottomSheetContentTest {
             NodeAttachmentBottomSheetContent(
                 uiState = uiState,
                 fileTypeIconMapper = FileTypeIconMapper(),
-                onAvailableOfflineChecked = {},
+                onAvailableOfflineChecked = { _, _ -> },
                 onSaveToDeviceClicked = {},
                 onImportClicked = {}
             )
@@ -52,6 +54,7 @@ class NodeAttachmentBottomSheetContentTest {
             val uiState = NodeAttachmentBottomSheetUiState(
                 isOnline = false,
                 item = ChatAttachmentUiEntity(
+                    nodeId = NodeId(123),
                     name = "Title",
                     size = 1230,
                     thumbnailPath = null,
@@ -63,7 +66,7 @@ class NodeAttachmentBottomSheetContentTest {
             NodeAttachmentBottomSheetContent(
                 uiState = uiState,
                 fileTypeIconMapper = FileTypeIconMapper(),
-                onAvailableOfflineChecked = {},
+                onAvailableOfflineChecked = { _, _ -> },
                 onSaveToDeviceClicked = {},
                 onImportClicked = {}
             )

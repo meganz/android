@@ -8,17 +8,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.os.bundleOf
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.main.controllers.ChatController
-import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattachment.NodeAttachmentBottomSheetViewModel.Companion.CHAT_ID
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattachment.NodeAttachmentBottomSheetViewModel.Companion.MESSAGE_ID
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattachment.view.NodeAttachmentBottomSheetContent
+import mega.privacy.android.app.presentation.chat.NodeAttachmentHistoryViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.utils.Constants.IMPORT_ONLY_OPTION
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
@@ -30,6 +32,8 @@ import javax.inject.Inject
 internal class NodeAttachmentBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private val viewModel: NodeAttachmentBottomSheetViewModel by viewModels()
+    private val nodeAttachmentHistoryViewModel: NodeAttachmentHistoryViewModel by activityViewModels()
+    private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
     private val chatController: ChatController by lazy { ChatController(requireActivity()) }
 
     @Inject
@@ -54,12 +58,22 @@ internal class NodeAttachmentBottomSheetDialogFragment : BottomSheetDialogFragme
                     NodeAttachmentBottomSheetContent(
                         uiState = uiState,
                         fileTypeIconMapper = fileTypeIconMapper,
-                        onAvailableOfflineChecked = {
-
+                        onAvailableOfflineChecked = { checked, nodeId ->
+                            if (checked) {
+                                startDownloadViewModel.onSaveOfflineClicked(
+                                    chatId = viewModel.chatId,
+                                    messageId = viewModel.messageId
+                                )
+                            } else {
+                                nodeAttachmentHistoryViewModel.removeChatNodeFromOffline(nodeId)
+                            }
+                            dismissAllowingStateLoss()
                         },
                         onSaveToDeviceClicked = {
-                            (requireActivity() as? NodeAttachmentHistoryActivity)
-                                ?.downloadMessageNode(viewModel.messageId)
+                            startDownloadViewModel.onDownloadClicked(
+                                chatId = viewModel.chatId,
+                                messageId = viewModel.messageId
+                            )
                             dismissAllowingStateLoss()
                         },
                         onImportClicked = {
@@ -87,6 +101,7 @@ internal class NodeAttachmentBottomSheetDialogFragment : BottomSheetDialogFragme
     }
 
     companion object {
+        @JvmStatic
         fun newInstance(chatId: Long, messageId: Long) =
             NodeAttachmentBottomSheetDialogFragment().apply {
                 arguments = bundleOf(

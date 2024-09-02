@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.usecase.chat.IsAnonymousModeUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
@@ -92,6 +93,7 @@ class NodeAttachmentBottomSheetViewModelTest {
     @Test
     fun `test that UI state is updated with correct data`() = runTest {
         val chatFile = mock<ChatDefaultFile> {
+            on { id } doReturn NodeId(123)
             on { name } doReturn "Title"
             on { size } doReturn 1230
             on { thumbnailPath } doReturn null
@@ -106,6 +108,7 @@ class NodeAttachmentBottomSheetViewModelTest {
         underTest.uiState.test {
             val uiState = expectMostRecentItem()
             assertThat(uiState.item).isNotNull()
+            assertThat(uiState.item?.nodeId?.longValue).isEqualTo(123)
             assertThat(uiState.item?.name).isEqualTo("Title")
             assertThat(uiState.item?.size).isEqualTo(1230)
             assertThat(uiState.item?.thumbnailPath).isNull()

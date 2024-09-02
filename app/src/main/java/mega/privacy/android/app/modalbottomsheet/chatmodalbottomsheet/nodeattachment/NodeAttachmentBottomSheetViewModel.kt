@@ -70,6 +70,7 @@ internal class NodeAttachmentBottomSheetViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         item = ChatAttachmentUiEntity(
+                            nodeId = chatFile.id,
                             name = chatFile.name,
                             size = chatFile.size,
                             thumbnailPath = chatFile.thumbnailPath,
