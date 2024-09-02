@@ -8,7 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.facade.CacheFolderFacade.Companion.CHAT_TEMPORARY_FOLDER
+import mega.privacy.android.data.constant.CacheFolderConstant.CHAT_TEMPORARY_FOLDER
 import mega.privacy.android.data.gateway.FileGateway
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach

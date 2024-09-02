@@ -42,11 +42,6 @@ object CacheFolderManager {
     const val TEMPORARY_FOLDER = "tempMEGA"
 
     /**
-     * CHAT_TEMPORARY_FOLDER
-     */
-    const val CHAT_TEMPORARY_FOLDER = "chatTempMEGA"
-
-    /**
      * CacheFolder Gateway
      */
     val cacheFolderGateway: CacheFolderGateway by lazy {
@@ -138,14 +133,6 @@ object CacheFolderManager {
     @JvmStatic
     fun buildTempFile(fileName: String?): File? {
         return cacheFolderGateway.getCacheFile(TEMPORARY_FOLDER, fileName)
-    }
-
-    /**
-     * Get Chat Temp Cache File Instance
-     */
-    @JvmStatic
-    fun buildChatTempFile(fileName: String?): File? {
-        return cacheFolderGateway.getCacheFile(CHAT_TEMPORARY_FOLDER, fileName)
     }
 
     /**

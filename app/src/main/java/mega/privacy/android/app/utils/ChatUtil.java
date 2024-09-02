@@ -1,6 +1,5 @@
 package mega.privacy.android.app.utils;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.buildChatTempFile;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME;
 import static mega.privacy.android.app.utils.Constants.FROM_CHAT;
@@ -253,64 +252,6 @@ public class ChatUtil {
             }
         }
         return Bitmap.CompressFormat.JPEG;
-    }
-
-    /**
-     * Checks an image before upload to a chat and downscales it if needed.
-     *
-     * @param file Original image file.
-     * @return Image file to be uploaded.
-     */
-    public static File checkImageBeforeUpload(File file) {
-        int orientation = AndroidGfxProcessor.getExifOrientation(file.getAbsolutePath());
-        Rect fileRect = AndroidGfxProcessor.getImageDimensions(file.getAbsolutePath(), orientation);
-        Bitmap fileBitmap = AndroidGfxProcessor.getBitmap(file.getAbsolutePath(), fileRect, orientation, fileRect.right, fileRect.bottom);
-        if (fileBitmap == null) {
-            Timber.e("Bitmap NULL when decoding image file for upload it to chat.");
-            return null;
-        }
-
-        File outFile = null;
-        float width = fileBitmap.getWidth();
-        float height = fileBitmap.getHeight();
-        float totalPixels = width * height;
-        float division = DOWNSCALE_IMAGES_PX / totalPixels;
-        float factor = (float) Math.min(Math.sqrt(division), 1);
-
-        if (factor < 1) {
-            width *= factor;
-            height *= factor;
-            Timber.d("DATA connection factor<1 totalPixels: " + totalPixels + " width: " + width + " height: " + height +
-                    " DOWNSCALE_IMAGES_PX/totalPixels: " + division + " Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels): " + Math.sqrt(division));
-
-            Bitmap scaleBitmap = Bitmap.createScaledBitmap(fileBitmap, (int) width, (int) height, true);
-            if (scaleBitmap == null) {
-                Timber.e("Bitmap NULL when scaling image file for upload it to chat.");
-                return null;
-            }
-
-            outFile = buildChatTempFile(file.getName());
-            if (outFile == null) {
-                Timber.e("File NULL when building it for upload a scaled image to chat.");
-                return null;
-            }
-
-            FileOutputStream fOut;
-            try {
-                fOut = new FileOutputStream(outFile);
-                scaleBitmap.compress(getCompressFormat(file.getName()), 100, fOut);
-                fOut.flush();
-                fOut.close();
-            } catch (Exception e) {
-                Timber.e(e, "Exception compressing image file for upload it to chat.");
-            }
-
-            scaleBitmap.recycle();
-        }
-
-        fileBitmap.recycle();
-
-        return outFile;
     }
 
     /**

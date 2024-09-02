@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CacheRepository
@@ -38,4 +39,11 @@ internal class CacheRepositoryImpl @Inject constructor(
 
     override fun isFileInCacheDirectory(file: File) =
         cacheFolderGateway.isFileInCacheDirectory(file)
+
+    override fun getCacheFolderNameForUpload(isForChat: Boolean) =
+        if (isForChat) {
+            CacheFolderConstant.CHAT_TEMPORARY_FOLDER
+        } else {
+            CacheFolderConstant.TEMPORARY_FOLDER
+        }
 }

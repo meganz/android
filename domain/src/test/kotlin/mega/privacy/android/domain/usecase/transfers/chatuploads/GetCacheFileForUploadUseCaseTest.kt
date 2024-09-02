@@ -2,10 +2,9 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase
-import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase.Companion.CHAT_TEMPORARY_FOLDER
-import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase.Companion.TEMPORARY_FOLDER
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -22,11 +21,13 @@ class GetCacheFileForUploadUseCaseTest {
     private lateinit var underTest: GetCacheFileForUploadUseCase
 
     private val getCacheFileUseCase = mock<GetCacheFileUseCase>()
+    private val cacheRepository = mock<CacheRepository>()
 
     @BeforeAll
     fun setup() {
         underTest = GetCacheFileForUploadUseCase(
             getCacheFileUseCase,
+            cacheRepository,
         )
     }
 
@@ -34,6 +35,7 @@ class GetCacheFileForUploadUseCaseTest {
     fun resetMocks() =
         reset(
             getCacheFileUseCase,
+            cacheRepository,
         )
 
     @ParameterizedTest(name = " and isChatUpload is {0}")
@@ -130,5 +132,7 @@ class GetCacheFileForUploadUseCaseTest {
         "${this.nameWithoutExtension}_$suffix.${this.extension}"
 
     private fun getCacheFolder(isChatUpload: Boolean) =
-        if (isChatUpload) CHAT_TEMPORARY_FOLDER else TEMPORARY_FOLDER
+        (if (isChatUpload) "chatFolder" else "noChatFolder").also {
+            whenever(cacheRepository.getCacheFolderNameForUpload(isChatUpload)) doReturn it
+        }
 }

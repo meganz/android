@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -96,4 +97,15 @@ class CacheRepositoryImplTest {
         assertThat(actual).isEqualTo(expected)
     }
 
+    @Test
+    fun `test that correct name is returned for cache folder for uploads`() = runTest {
+        val actual = underTest.getCacheFolderNameForUpload(false)
+        assertThat(actual).isEqualTo(CacheFolderConstant.TEMPORARY_FOLDER)
+    }
+
+    @Test
+    fun `test that correct name is returned for cache folder for chat uploads`() = runTest {
+        val actual = underTest.getCacheFolderNameForUpload(true)
+        assertThat(actual).isEqualTo(CacheFolderConstant.CHAT_TEMPORARY_FOLDER)
+    }
 }

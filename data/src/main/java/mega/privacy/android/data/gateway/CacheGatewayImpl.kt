@@ -23,7 +23,6 @@ internal class CacheGatewayImpl @Inject constructor(
 ) : CacheGateway {
 
     companion object {
-        private const val CHAT_TEMPORARY_FOLDER = "chatTempMEGA"
         private const val VOICE_CLIP_FOLDER = "voiceClipsMEGA"
     }
 
@@ -33,7 +32,7 @@ internal class CacheGatewayImpl @Inject constructor(
         }
 
     override suspend fun getOrCreateChatCacheFolder(): File? = withContext(ioDispatcher) {
-        File(context.filesDir, CHAT_TEMPORARY_FOLDER).takeIf { it.exists() || it.mkdir() }
+        File(context.filesDir, CacheFolderConstant.CHAT_TEMPORARY_FOLDER).takeIf { it.exists() || it.mkdir() }
     }
 
     override suspend fun getCacheFile(folderName: String, fileName: String): File? =

@@ -110,7 +110,7 @@ class CacheGatewayImplTest {
     @Test
     fun test_that_getOrCreateChatCacheFolder_returns_the_file_CHAT_TEMPORARY_FOLDER_in_filesDir_if_exist() =
         runTest {
-            val folderName = "chatTempMEGA"
+            val folderName = CacheFolderConstant.CHAT_TEMPORARY_FOLDER
             val expected = File(context.filesDir, folderName)
             createDirectory(expected)
 
@@ -125,7 +125,7 @@ class CacheGatewayImplTest {
     @Test
     fun test_that_getOrCreateChatCacheFolder_creates_the_file_CHAT_TEMPORARY_FOLDER_in_filesDir_if_not_exist_and_return_the_file() =
         runTest {
-            val folderName = "chatTempMEGA"
+            val folderName = CacheFolderConstant.CHAT_TEMPORARY_FOLDER
             val expected = File(context.filesDir, folderName)
 
             assertThat(expected.exists()).isEqualTo(false)

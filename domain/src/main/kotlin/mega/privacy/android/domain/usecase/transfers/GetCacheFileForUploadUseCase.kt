@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.transfers
 
+import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import java.io.File
 import javax.inject.Inject
@@ -9,6 +10,7 @@ import javax.inject.Inject
  */
 class GetCacheFileForUploadUseCase @Inject constructor(
     private val getCacheFileUseCase: GetCacheFileUseCase,
+    private val cacheRepository: CacheRepository,
 ) {
     /**
      * Invoke
@@ -16,22 +18,17 @@ class GetCacheFileForUploadUseCase @Inject constructor(
      * @return a file in cache temporary folder that does not exist yet or null if not possible
      */
     operator fun invoke(file: File, isChatUpload: Boolean): File? =
-        (if (isChatUpload) CHAT_TEMPORARY_FOLDER else TEMPORARY_FOLDER).let { folder ->
-            getCacheFileUseCase(folder, file.name)?.takeIf { !it.exists() }
+        (cacheRepository.getCacheFolderNameForUpload(isChatUpload)).let { folderName ->
+            getCacheFileUseCase(folderName, file.name)?.takeIf { !it.exists() }
                 ?: run {
                     (1..99).firstNotNullOfOrNull { suffix ->
                         val nameWithSuffix = "${file.nameWithoutExtension}_$suffix"
                             .plus(if (file.extension.isNotBlank()) ".${file.extension}" else "")
                         getCacheFileUseCase(
-                            folder,
+                            folderName,
                             nameWithSuffix
                         )?.takeIf { !it.exists() }
                     }
                 }
         }
-
-    companion object {
-        internal const val CHAT_TEMPORARY_FOLDER = "chatTempMEGA"
-        internal const val TEMPORARY_FOLDER = "tempMEGA"
-    }
 }

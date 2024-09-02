@@ -22,6 +22,11 @@ object CacheFolderConstant {
     const val TEMPORARY_FOLDER = "tempMEGA"
 
     /**
+     * Chat temporary files goes to this specific folder in files dir
+     */
+    const val CHAT_TEMPORARY_FOLDER = "chatTempMEGA"
+
+    /**
      * Avatar Folder
      */
     const val AVATAR_FOLDER = "avatarsMEGA"

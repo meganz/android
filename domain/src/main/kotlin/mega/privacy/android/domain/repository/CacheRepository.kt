@@ -31,6 +31,13 @@ interface CacheRepository {
     suspend fun getCacheFolder(folderName: String): File?
 
     /**
+     * Get the folder name for uploads
+     * @param isForChat true if the folder is to upload chat files, false otherwise
+     * @return the folder name to upload temporary files
+     */
+    fun getCacheFolderNameForUpload(isForChat: Boolean): String
+
+    /**
      * Get preview file
      *
      * @param fileName The name of the file
