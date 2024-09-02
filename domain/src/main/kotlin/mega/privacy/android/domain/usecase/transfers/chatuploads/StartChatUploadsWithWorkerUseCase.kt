@@ -84,7 +84,7 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
                     emptyFlow()
                 } else {
                     uploadFilesUseCase(
-                        filesAndNames, chatFilesFolderId, appData, false
+                        filesAndNames, chatFilesFolderId, appData, true
                     ).onEach { event ->
                         handleChatUploadTransferEventUseCase(event, *pendingMessageIds)
                     }

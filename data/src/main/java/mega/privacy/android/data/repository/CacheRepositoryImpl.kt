@@ -36,4 +36,6 @@ internal class CacheRepositoryImpl @Inject constructor(
     override suspend fun getPreviewDownloadPathForNode(): String =
         cacheFolderGateway.getPreviewDownloadPathForNode()
 
+    override fun isFileInCacheDirectory(file: File) =
+        cacheFolderGateway.isFileInCacheDirectory(file)
 }

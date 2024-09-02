@@ -32,7 +32,7 @@ internal class CacheFolderFacade @Inject constructor(
 ) : CacheFolderGateway {
 
     companion object {
-        private const val CHAT_TEMPORARY_FOLDER = "chatTempMEGA"
+        const val CHAT_TEMPORARY_FOLDER = "chatTempMEGA"
     }
 
     override fun getCacheFolder(folderName: String): File? =
@@ -119,4 +119,16 @@ internal class CacheFolderFacade @Inject constructor(
     override suspend fun getPreviewFile(fileName: String) = File(
         getPreviewDownloadPathForNode() + fileName
     ).takeIf { it.exists() }
+
+    override fun isFileInCacheDirectory(file: File): Boolean {
+        val cachePaths = context.externalCacheDirs.asSequence()
+            // as [CHAT_TEMPORARY_FOLDER] in filesDir is returned by [getCacheFolderAsync] we consider it as a cache folder as well
+            .plus(File(context.filesDir, CHAT_TEMPORARY_FOLDER))
+            .plus(context.externalCacheDir)
+            .plus(context.cacheDir)
+            .filterNotNull()
+        return cachePaths
+            .map { it.absolutePath.plus(File.separator) }
+            .any { file.absolutePath.startsWith(it) && file.absolutePath.length > it.length }
+    }
 }

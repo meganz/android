@@ -53,7 +53,7 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
     fun `test that upload files use case is invoked when the use case is invoked`() = runTest {
         val filesAndNames = mapOf(mock<File>() to "name")
         val pendingMessageIds = listOf(1L, 2L, 3L)
-        whenever(uploadFilesUseCase(any(), NodeId(any()), any(), any(), any())) doReturn emptyFlow()
+        whenever(uploadFilesUseCase(any(), NodeId(any()), any(), any())) doReturn emptyFlow()
 
         underTest(filesAndNames, pendingMessageIds)
 
@@ -84,7 +84,6 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
                     NodeId(any()),
                     any(),
                     any(),
-                    any()
                 )
             ) doReturn flowOf(expected)
 
@@ -114,7 +113,6 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
                         NodeId(any()),
                         any(),
                         any(),
-                        any()
                     )
                 ) doReturn flow {
                     emit(finishEvent)

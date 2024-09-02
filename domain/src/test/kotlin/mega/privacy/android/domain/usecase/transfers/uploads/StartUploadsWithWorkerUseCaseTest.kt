@@ -116,7 +116,7 @@ class StartUploadsWithWorkerUseCaseTest {
         whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
         underTest(urisWithNames, destinationId).test {
             verify(uploadFilesUseCase).invoke(
-                eq(mapOf(file to null)), NodeId(eq(destinationId.longValue)), eq(null), any(), any()
+                eq(mapOf(file to null)), NodeId(eq(destinationId.longValue)), eq(null), any()
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -132,7 +132,6 @@ class StartUploadsWithWorkerUseCaseTest {
                 NodeId(eq(destinationId.longValue)),
                 eq(null),
                 any(),
-                any()
             )
             cancelAndConsumeRemainingEvents()
         }
@@ -179,7 +178,7 @@ class StartUploadsWithWorkerUseCaseTest {
     }
 
     private fun mockFlow(flow: Flow<MultiTransferEvent>) {
-        whenever(uploadFilesUseCase(any(), NodeId(any()), anyOrNull(), any(), any()))
+        whenever(uploadFilesUseCase(any(), NodeId(any()), anyOrNull(), any()))
             .thenReturn(flow)
     }
 }

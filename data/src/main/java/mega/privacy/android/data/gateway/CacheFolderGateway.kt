@@ -90,4 +90,9 @@ interface CacheFolderGateway {
      * @param fileName Name of the file
      */
     suspend fun getPreviewFile(fileName: String): File?
+
+    /**
+     * @return true if the path represents a file or folder in the device cache directory, false otherwise
+     */
+    fun isFileInCacheDirectory(file: File): Boolean
 }

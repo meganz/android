@@ -93,7 +93,21 @@ class StartChatUploadsWithWorkerUseCaseTest {
         val file = mockFile()
         underTest(file, NodeId(11L), 1L).test {
             verify(uploadFilesUseCase).invoke(
-                eq(mapOf(file to null)), NodeId(any()), any(), any(), any()
+                eq(mapOf(file to null)), NodeId(any()), any(), any()
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the file is send as high priority`() = runTest {
+        val file = mockFile()
+        underTest(file, NodeId(11L), 1L).test {
+            verify(uploadFilesUseCase).invoke(
+                filesAndNames = any(),
+                parentFolderId = NodeId(any()),
+                appData = any(),
+                isHighPriority = eq(true)
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -121,7 +135,6 @@ class StartChatUploadsWithWorkerUseCaseTest {
                 NodeId(eq(chatFilesFolderId.longValue)),
                 any(),
                 any(),
-                any()
             )
             cancelAndConsumeRemainingEvents()
         }
@@ -136,7 +149,6 @@ class StartChatUploadsWithWorkerUseCaseTest {
                 NodeId(any()),
                 eq(listOf(TransferAppData.ChatUpload(pendingMessageId))),
                 any(),
-                any()
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -152,7 +164,6 @@ class StartChatUploadsWithWorkerUseCaseTest {
                     NodeId(any()),
                     eq(pendingMessageIds.map { TransferAppData.ChatUpload(it) }),
                     any(),
-                    any()
                 )
                 cancelAndIgnoreRemainingEvents()
             }
@@ -226,7 +237,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
         whenever(getPendingMessageUseCase(1L)) doReturn pendingMessage
         underTest(file, NodeId(11L), pendingMessageId).test {
             verify(uploadFilesUseCase).invoke(
-                eq(mapOf(file to pendingMessageName)), NodeId(any()), any(), any(), any()
+                eq(mapOf(file to pendingMessageName)), NodeId(any()), any(), any()
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -245,7 +256,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
                 TransferEvent.TransferStartEvent(transfer), 0, 0
             )
             whenever(
-                uploadFilesUseCase(any(), NodeId(any()), any(), any(), any())
+                uploadFilesUseCase(any(), NodeId(any()), any(), any())
             ) doReturn flowOf(event)
 
             underTest(file, NodeId(11L), pendingMessageId).test {
@@ -260,7 +271,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
     }
 
     private fun mockFlow(flow: Flow<MultiTransferEvent>) {
-        whenever(uploadFilesUseCase(any(), NodeId(any()), anyOrNull(), any(), any()))
+        whenever(uploadFilesUseCase(any(), NodeId(any()), anyOrNull(), any()))
             .thenReturn(flow)
     }
 }

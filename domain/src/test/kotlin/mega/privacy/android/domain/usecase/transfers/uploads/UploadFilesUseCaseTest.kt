@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.repository.CancelTokenRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
@@ -34,6 +35,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.internal.verification.Times
 import org.mockito.kotlin.anyVararg
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -54,11 +56,13 @@ class UploadFilesUseCaseTest {
     private val fileNode = mock<TypedFileNode>()
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val transfer = mock<Transfer>()
+    private val cacheRepository = mock<CacheRepository>()
 
     private lateinit var underTest: UploadFilesUseCase
 
     @BeforeAll
     fun setup() {
+
         underTest =
             UploadFilesUseCase(
                 cancelCancelTokenUseCase = cancelCancelTokenUseCase,
@@ -66,6 +70,7 @@ class UploadFilesUseCaseTest {
                 handleTransferEventUseCase = handleTransferEventUseCase,
                 monitorTransferEventsUseCase = monitorTransferEventsUseCase,
                 transferRepository = transferRepository,
+                cacheRepository = cacheRepository
             )
     }
 
@@ -75,7 +80,7 @@ class UploadFilesUseCaseTest {
             transferRepository, cancelTokenRepository, fileSystemRepository,
             handleTransferEventUseCase, fileNode, invalidateCancelTokenUseCase,
             cancelCancelTokenUseCase, transfer,
-            monitorTransferEventsUseCase,
+            monitorTransferEventsUseCase, cacheRepository,
         )
         commonStub()
     }
@@ -94,7 +99,7 @@ class UploadFilesUseCaseTest {
     @ValueSource(booleans = [true, false])
     fun `test that repository start upload is called with the proper priority`(priority: Boolean) =
         runTest {
-            underTest(mapOf(file to null), parentId, null, priority, false).test {
+            underTest(mapOf(file to null), parentId, null, priority).test {
 
                 verify(transferRepository).startUpload(
                     ABSOLUTE_PATH,
@@ -109,6 +114,28 @@ class UploadFilesUseCaseTest {
             }
         }
 
+    @ParameterizedTest(name = "priority: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that repository start upload is called with the proper isSourceTemporary`(
+        isSourceTemporary: Boolean,
+    ) =
+        runTest {
+            whenever(cacheRepository.isFileInCacheDirectory(file)) doReturn isSourceTemporary
+            underTest(mapOf(file to null), parentId, null, false).test {
+
+                verify(transferRepository).startUpload(
+                    ABSOLUTE_PATH,
+                    parentId,
+                    null,
+                    MODIFIED_TIME_SECS,
+                    null,
+                    isSourceTemporary,
+                    false,
+                )
+                awaitComplete()
+            }
+        }
+
     @ParameterizedTest(name = "appdata: \"{0}\"")
     @MethodSource("provideAppDataExceptChat")
     fun `test that repository start upload is called with the proper appData when appData is not a chat upload`(
@@ -117,7 +144,6 @@ class UploadFilesUseCaseTest {
         underTest(
             mapOf(file to null), parentId, appData,
             isHighPriority = false,
-            isSourceTemporary = false
         ).test {
             verify(transferRepository).startUpload(
                 ABSOLUTE_PATH,
@@ -139,7 +165,6 @@ class UploadFilesUseCaseTest {
     ) = runTest {
         underTest(
             mapOf(file to null), parentId, appData,
-            isSourceTemporary = false,
             isHighPriority = false
         ).test {
             verify(transferRepository).startUploadForChat(
@@ -152,6 +177,28 @@ class UploadFilesUseCaseTest {
             awaitComplete()
         }
     }
+
+    @ParameterizedTest(name = "priority: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that repository start upload for chat is called with the proper isSourceTemporary`(
+        isSourceTemporary: Boolean,
+    ) =
+        runTest {
+            whenever(cacheRepository.isFileInCacheDirectory(file)) doReturn isSourceTemporary
+            val chatAppData = listOf(TransferAppData.ChatUpload(12345L))
+            underTest(mapOf(file to null), parentId, chatAppData, false).test {
+
+                verify(transferRepository).startUploadForChat(
+                    ABSOLUTE_PATH,
+                    parentId,
+                    null,
+                    chatAppData,
+                    isSourceTemporary = isSourceTemporary,
+                )
+                awaitComplete()
+            }
+        }
+
 
     private fun provideAppDataExceptChat() = listOf(
         listOf(TransferAppData.BackgroundTransfer),
@@ -175,7 +222,6 @@ class UploadFilesUseCaseTest {
             underTest(
                 fileNodesAndNullNames, parentId, null,
                 isHighPriority = false,
-                isSourceTemporary = false
             ).test {
                 fileNodesAndNullNames.keys.forEach { file ->
                     verify(transferRepository).startUpload(
@@ -199,7 +245,7 @@ class UploadFilesUseCaseTest {
             stubDelay()
             underTest(
                 fileNodesAndNullNames, parentId, null,
-                isHighPriority = false, isSourceTemporary = false
+                isHighPriority = false,
             ).test {
                 cancel()
                 verify(cancelCancelTokenUseCase).invoke()
@@ -214,7 +260,6 @@ class UploadFilesUseCaseTest {
             underTest(
                 fileNodesAndNullNames, parentId, null,
                 isHighPriority = false,
-                isSourceTemporary = false
             ).test {
                 cancel()
                 verify(invalidateCancelTokenUseCase, never()).invoke()
@@ -229,7 +274,6 @@ class UploadFilesUseCaseTest {
             underTest(
                 fileNodesAndNullNames, parentId, null,
                 isHighPriority = false,
-                isSourceTemporary = false
             ).test {
                 verify(cancelCancelTokenUseCase, never()).invoke()
                 cancelAndIgnoreRemainingEvents()
@@ -243,7 +287,6 @@ class UploadFilesUseCaseTest {
             underTest(
                 fileNodesAndNullNames, parentId, null,
                 isHighPriority = false,
-                isSourceTemporary = false
             )
                 .filterIsInstance<MultiTransferEvent.SingleTransferEvent>().test {
                     repeat(fileNodesAndNullNames.size) {
@@ -266,7 +309,6 @@ class UploadFilesUseCaseTest {
             underTest(
                 fileNodesAndNullNames, parentId, null,
                 isHighPriority = false,
-                isSourceTemporary = false
             )
                 .filterIsInstance<MultiTransferEvent.SingleTransferEvent>().test {
                     cancelAndConsumeRemainingEvents()
@@ -280,7 +322,7 @@ class UploadFilesUseCaseTest {
     @Test
     fun `test that fileName is used in startUpload when is not null`() = runTest {
         val name = "RenamedFile"
-        underTest(mapOf(file to name), parentId, null, false, false).test {
+        underTest(mapOf(file to name), parentId, null, false).test {
 
             verify(transferRepository).startUpload(
                 ABSOLUTE_PATH,
@@ -301,7 +343,7 @@ class UploadFilesUseCaseTest {
         appData: List<TransferAppData.ChatTransferAppData>,
     ) = runTest {
         val name = "RenamedFile"
-        underTest(mapOf(file to name), parentId, appData, false, false).test {
+        underTest(mapOf(file to name), parentId, appData, false).test {
             verify(transferRepository).startUploadForChat(
                 ABSOLUTE_PATH,
                 parentId,

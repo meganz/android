@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.doReturn
@@ -80,6 +82,16 @@ class CacheRepositoryImplTest {
         whenever(cacheFolderGateway.getCacheFolderAsync(folderName)) doReturn expected
 
         val actual = underTest.getCacheFolder((folderName))
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that is returned from gateway`(expected: Boolean) = runTest {
+        val file = mock<File>()
+        whenever(cacheFolderGateway.isFileInCacheDirectory(file)) doReturn expected
+        val actual = underTest.isFileInCacheDirectory(file)
 
         assertThat(actual).isEqualTo(expected)
     }

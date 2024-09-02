@@ -41,4 +41,9 @@ interface CacheRepository {
      * Get the path to download file for preview
      */
     suspend fun getPreviewDownloadPathForNode(): String
+
+    /**
+     * @return true if the path represents a file or folder in the device cache directory, false otherwise
+     */
+    fun isFileInCacheDirectory(file: File): Boolean
 }

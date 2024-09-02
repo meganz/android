@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
@@ -23,6 +24,7 @@ class UploadFilesUseCase @Inject constructor(
     handleTransferEventUseCase: HandleTransferEventUseCase,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val transferRepository: TransferRepository,
+    private val cacheRepository: CacheRepository,
 ) : AbstractTransferNodesUseCase<File, String>(
     cancelCancelTokenUseCase,
     invalidateCancelTokenUseCase,
@@ -36,7 +38,6 @@ class UploadFilesUseCase @Inject constructor(
      * @param filesAndNames files and / or folders to be uploaded, associated with the desired node's name or null if there are no changes
      * @param parentFolderId destination folder id where [filesAndNames] will be uploaded
      * @param appData Custom app data to save in the MegaTransfer object.
-     * @param isSourceTemporary Whether the temporary file or folder that is created for upload should be deleted or not
      * @param isHighPriority Whether the file or folder should be placed on top of the upload queue or not, chat uploads are always priority regardless of this parameter
      *
      * @return a flow of [MultiTransferEvent]s to monitor the download state and progress
@@ -46,12 +47,12 @@ class UploadFilesUseCase @Inject constructor(
         parentFolderId: NodeId,
         appData: List<TransferAppData>?,
         isHighPriority: Boolean,
-        isSourceTemporary: Boolean = false,
     ): Flow<MultiTransferEvent> {
         return super.commonInvoke(
             items = filesAndNames.keys.toList(),
             null,
         ) { file ->
+            val isSourceTemporary = cacheRepository.isFileInCacheDirectory(file)
             if (!appData.isNullOrEmpty() && appData.all { it is TransferAppData.ChatTransferAppData }) {
                 @Suppress("UNCHECKED_CAST")
                 transferRepository.startUploadForChat(
