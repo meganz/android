@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.settings.passcode.model
 
 import android.content.Context
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import mega.privacy.android.app.R
 
 /**
@@ -8,7 +10,7 @@ import mega.privacy.android.app.R
  *
  * @constructor Create empty Timeout option
  */
-sealed interface TimeoutOption {
+sealed interface TimeoutOption : Parcelable {
     /**
      * Get title
      *
@@ -27,6 +29,7 @@ sealed interface TimeoutOption {
     /**
      * Immediate
      */
+    @Parcelize
     data object Immediate : TimeoutOption {
         override fun getTitle(context: Context) =
             context.getString(R.string.action_immediately)
@@ -40,6 +43,7 @@ sealed interface TimeoutOption {
      *
      * @property timeoutInSeconds
      */
+    @Parcelize
     data class SecondsTimeSpan(
         val timeoutInSeconds: Int,
     ) : TimeoutOption {
@@ -59,6 +63,7 @@ sealed interface TimeoutOption {
      *
      * @property timeoutInMinutes
      */
+    @Parcelize
     data class MinutesTimeSpan(
         val timeoutInMinutes: Int,
     ) : TimeoutOption {
