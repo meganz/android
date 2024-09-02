@@ -10,12 +10,14 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_MATCHED_ITEM
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_OFF
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
+import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
@@ -27,6 +29,7 @@ import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
@@ -44,8 +47,7 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
-import mega.privacy.android.app.TimberJUnit5Extension
-import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
+import java.io.File
 
 @ExtendWith(
     value = [
@@ -67,6 +69,7 @@ internal class LegacyVideoPlayerViewModelTest {
     private val getOfflineNodeInformationByIdUseCase = mock<GetOfflineNodeInformationByIdUseCase>()
     private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
     private val saveVideoRecentlyWatchedUseCase = mock<SaveVideoRecentlyWatchedUseCase>()
+    private val getFileUriUseCase = mock<GetFileUriUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -88,7 +91,8 @@ internal class LegacyVideoPlayerViewModelTest {
             monitorVideoRepeatModeUseCase,
             monitorTransferEventsUseCase,
             saveVideoRecentlyWatchedUseCase,
-            mediaPlayerGateway
+            mediaPlayerGateway,
+            getFileUriUseCase
         )
         initViewModel()
     }
@@ -144,7 +148,8 @@ internal class LegacyVideoPlayerViewModelTest {
             getOfflineNodesByParentIdUseCase = getOfflineNodesByParentIdUseCase,
             getThumbnailUseCase = getThumbnailUseCase,
             getOfflineNodeInformationByIdUseCase = getOfflineNodeInformationByIdUseCase,
-            saveVideoRecentlyWatchedUseCase = saveVideoRecentlyWatchedUseCase
+            saveVideoRecentlyWatchedUseCase = saveVideoRecentlyWatchedUseCase,
+            getFileUriUseCase = getFileUriUseCase
         )
         savedStateHandle[underTest.subtitleDialogShowKey] = false
         savedStateHandle[underTest.subtitleShowKey] = false
@@ -372,4 +377,13 @@ internal class LegacyVideoPlayerViewModelTest {
 
             verify(saveVideoRecentlyWatchedUseCase).invoke(expectedId, timestamp)
         }
+
+    @Test
+    fun `test that the getContentUri returns as expected`() = runTest {
+        val testFile = mock<File>()
+        val expectedUri = "expectedUri"
+        whenever(getFileUriUseCase(anyOrNull(), anyOrNull())).thenReturn(expectedUri)
+        initViewModel()
+        assertThat(underTest.getContentUri(testFile)).isEqualTo(expectedUri)
+    }
 }

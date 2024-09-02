@@ -15,6 +15,7 @@ import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.database.ContentObserver
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -38,6 +39,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -87,6 +89,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
@@ -149,6 +152,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -594,13 +598,25 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                     Analytics.tracker.trackEvent(VideoPlayerShareMenuToolbarEvent)
                     when (adapterType) {
                         OFFLINE_ADAPTER, ZIP_ADAPTER -> {
-                            val mediaItem = mediaPlayerGateway.getCurrentMediaItem()
-                            videoViewModel.getPlaylistItem(mediaItem?.mediaId)?.nodeName
-                                ?.let { nodeName ->
-                                    mediaItem?.localConfiguration?.uri?.let { uri ->
-                                        FileUtil.shareUri(this, nodeName, uri)
+                            lifecycleScope.launch {
+                                runCatching {
+                                    mediaPlayerGateway.getCurrentMediaItem()?.let { mediaItem ->
+                                        mediaItem.localConfiguration?.uri?.path?.let { path ->
+                                            val file = File(path)
+                                            if (file.exists()) {
+                                                val contentUri = videoViewModel.getContentUri(file)
+                                                FileUtil.shareUri(
+                                                    this@LegacyVideoPlayerActivity,
+                                                    file.name,
+                                                    Uri.parse(contentUri)
+                                                )
+                                            }
+                                        }
                                     }
+                                }.onFailure {
+                                    Timber.e(it)
                                 }
+                            }
                         }
 
                         FILE_LINK_ADAPTER -> {

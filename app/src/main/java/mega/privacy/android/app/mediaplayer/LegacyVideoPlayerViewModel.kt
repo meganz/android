@@ -131,6 +131,7 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
@@ -226,6 +227,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase,
     private val saveVideoRecentlyWatchedUseCase: SaveVideoRecentlyWatchedUseCase,
+    private val getFileUriUseCase: GetFileUriUseCase,
 ) : ViewModel(), SearchCallback.Data {
 
     private val compositeDisposable = CompositeDisposable()
@@ -1506,6 +1508,9 @@ class LegacyVideoPlayerViewModel @Inject constructor(
                 nodeHandle == handle.toLong()
             }
         }
+
+    internal suspend fun getContentUri(file: File) =
+        getFileUriUseCase(file, Constants.AUTHORITY_STRING_FILE_PROVIDER)
 
     /**
      * Remove item
