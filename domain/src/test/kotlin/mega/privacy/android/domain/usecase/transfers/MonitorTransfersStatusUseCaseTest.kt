@@ -136,6 +136,6 @@ internal class MonitorTransfersStatusUseCaseTest {
         totalCompletedFileTransfers = 0,
         totalBytes = 0L,
         transferredBytes = 0L,
-        totalAlreadyDownloadedFiles = 0,
+        totalAlreadyTransferredFiles = 0,
     )
 }

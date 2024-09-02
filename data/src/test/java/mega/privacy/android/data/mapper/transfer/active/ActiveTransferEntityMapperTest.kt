@@ -6,7 +6,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -47,7 +46,7 @@ class ActiveTransferEntityMapperTest {
                                     isFinished = isFinished,
                                     isFolderTransfer = isFolder,
                                     isPaused = isPaused,
-                                    isAlreadyDownloaded = isAlreadyDownloaded,
+                                    isAlreadyTransferred = isAlreadyDownloaded,
                                 ),
                                 ActiveTransferEntity(
                                     tag = TAG,
@@ -56,7 +55,7 @@ class ActiveTransferEntityMapperTest {
                                     isFinished = isFinished,
                                     isFolderTransfer = isFolder,
                                     isPaused = isPaused,
-                                    isAlreadyDownloaded = isAlreadyDownloaded,
+                                    isAlreadyTransferred = isAlreadyDownloaded,
                                 )
                             )
                         }
@@ -83,6 +82,6 @@ class ActiveTransferEntityMapperTest {
         override val isFinished: Boolean,
         override val isFolderTransfer: Boolean,
         override val isPaused: Boolean,
-        override val isAlreadyDownloaded: Boolean,
+        override val isAlreadyTransferred: Boolean,
     ) : ActiveTransfer
 }

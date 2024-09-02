@@ -30,7 +30,7 @@ class ActiveTransferDaoTest {
                 isFinished = index.rem(3) == 0,
                 isPaused = false,
                 isFolderTransfer = false,
-                isAlreadyDownloaded = false,
+                isAlreadyTransferred = false,
             )
         }
     }
@@ -60,7 +60,7 @@ class ActiveTransferDaoTest {
             isFinished = true,
             isFolderTransfer = false,
             isPaused = false,
-            isAlreadyDownloaded = false,
+            isAlreadyTransferred = false,
         )
         activeTransferDao.insertOrUpdateActiveTransfer(newEntity)
         val actual = activeTransferDao.getActiveTransferByTag(newEntity.tag)

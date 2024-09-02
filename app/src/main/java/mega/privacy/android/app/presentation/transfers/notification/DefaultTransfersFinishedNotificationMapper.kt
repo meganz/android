@@ -39,7 +39,7 @@ class DefaultTransfersFinishedNotificationMapper @Inject constructor(
         val totalCompleted = activeTransferTotals.totalCompletedFileTransfers
         val totalFinished = activeTransferTotals.totalFinishedFileTransfers
         val errorCount = activeTransferTotals.totalFinishedWithErrorsFileTransfers
-        val alreadyDownloadedCount = activeTransferTotals.totalAlreadyDownloadedFiles
+        val alreadyTransferredCount = activeTransferTotals.totalAlreadyTransferredFiles
         val isDownload = activeTransferTotals.transfersType == TransferType.DOWNLOAD
 
         val notificationTitle = when {
@@ -79,11 +79,11 @@ class DefaultTransfersFinishedNotificationMapper @Inject constructor(
         }
 
         val contentText = when {
-            errorCount > 0 && alreadyDownloadedCount > 0 ->
-                "${alreadyDownloadedMsg(alreadyDownloadedCount)}, ${errorMsg(errorCount)}"
+            errorCount > 0 && alreadyTransferredCount > 0 ->
+                "${alreadyMsg(alreadyTransferredCount, isDownload)}, ${errorMsg(errorCount)}"
 
             isDownload && errorCount > 0 -> errorMsg(errorCount)
-            alreadyDownloadedCount > 0 -> alreadyDownloadedMsg(alreadyDownloadedCount)
+            alreadyTransferredCount > 0 -> alreadyMsg(alreadyTransferredCount, isDownload)
             else -> okayMsg(activeTransferTotals.transferredBytes)
         }
 
@@ -120,11 +120,12 @@ class DefaultTransfersFinishedNotificationMapper @Inject constructor(
         errorCount
     )
 
-    private fun alreadyDownloadedMsg(alreadyDownloadedCount: Int) = resources.getQuantityString(
-        R.plurals.already_downloaded_service,
-        alreadyDownloadedCount,
-        alreadyDownloadedCount,
-    )
+    private fun alreadyMsg(alreadyDownloadedCount: Int, isDownload: Boolean) =
+        resources.getQuantityString(
+            if (isDownload) R.plurals.already_downloaded_service else R.plurals.upload_service_notification_already_uploaded,
+            alreadyDownloadedCount,
+            alreadyDownloadedCount,
+        )
 
     private fun okayMsg(bytes: Long) = resources.getString(
         R.string.general_total_size,

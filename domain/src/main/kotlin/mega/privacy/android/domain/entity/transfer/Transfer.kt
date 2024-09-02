@@ -76,7 +76,7 @@ data class Transfer(
     /**
      * True if the transfer finished without actually transferring bytes because it was already transferred
      */
-    override val isAlreadyDownloaded =
+    override val isAlreadyTransferred =
         isFinished && transferredBytes == 0L && state != TransferState.STATE_FAILED && state != TransferState.STATE_CANCELLED
 
     /**

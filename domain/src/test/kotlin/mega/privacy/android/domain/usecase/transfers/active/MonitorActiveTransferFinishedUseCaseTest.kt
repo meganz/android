@@ -131,7 +131,7 @@ class MonitorActiveTransferFinishedUseCaseTest {
         totalAlreadyDownloadedFiles: Int = 0,
     ) = mock<ActiveTransferTotals> {
         on { this.totalCompletedFileTransfers } doReturn totalCompleted
-        on { this.totalAlreadyDownloadedFiles } doReturn totalAlreadyDownloadedFiles
+        on { this.totalAlreadyTransferredFiles } doReturn totalAlreadyDownloadedFiles
     }
 
 }

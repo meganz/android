@@ -105,11 +105,11 @@ class ActiveTransferTotalsMapperTest {
 
     @ParameterizedTest(name = "Transfer Type {0}")
     @EnumSource(TransferType::class)
-    fun `test that mapper returns correct total already download files`(transferType: TransferType) {
+    fun `test that mapper returns correct total already transferred files`(transferType: TransferType) {
         val entities = createEntities(transferType)
-        val expected = entities.filter { !it.isFolderTransfer }.count { it.isAlreadyDownloaded }
+        val expected = entities.filter { !it.isFolderTransfer }.count { it.isAlreadyTransferred }
         val actual = underTest(transferType, entities, emptyMap())
-        assertThat(actual.totalAlreadyDownloadedFiles).isEqualTo(expected)
+        assertThat(actual.totalAlreadyTransferredFiles).isEqualTo(expected)
     }
 
     @ParameterizedTest(name = "Transfer Type {0}")
@@ -127,7 +127,7 @@ class ActiveTransferTotalsMapperTest {
             isFinished = tag.rem(5) == 0,
             isFolderTransfer = tag.rem(8) == 0,
             isPaused = false,
-            isAlreadyDownloaded = tag.rem(9) == 0
+            isAlreadyTransferred = tag.rem(9) == 0
         )
     }
 }

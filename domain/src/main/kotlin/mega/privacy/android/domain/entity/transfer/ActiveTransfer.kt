@@ -23,5 +23,5 @@ interface ActiveTransfer : TypedTransfer {
     /**
      * True if the transfer finished without actually transferring bytes because it was already transferred
      */
-    val isAlreadyDownloaded: Boolean
+    val isAlreadyTransferred: Boolean
 }

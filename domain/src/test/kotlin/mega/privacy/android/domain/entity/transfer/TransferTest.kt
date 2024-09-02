@@ -30,7 +30,7 @@ class TransferTest {
             transferredBytes = 0,
         )
 
-        assertThat(underTest.isAlreadyDownloaded).isTrue()
+        assertThat(underTest.isAlreadyTransferred).isTrue()
     }
 
     @ParameterizedTest
@@ -38,7 +38,7 @@ class TransferTest {
     fun `test that isAlreadyDownloaded is false when the conditions are not met`() {
         underTest = createAlreadyDownloadedTransfer()
 
-        assertThat(underTest.isAlreadyDownloaded).isTrue()
+        assertThat(underTest.isAlreadyTransferred).isTrue()
     }
 
     @Test

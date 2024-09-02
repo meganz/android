@@ -180,7 +180,7 @@ abstract class AbstractTransferNodesUseCase<T, R>(
      */
     private val TransferEvent.isAlreadyTransferredEvent: Boolean
         get() = with(this.transfer) {
-            !isFolderTransfer && isAlreadyDownloaded
+            !isFolderTransfer && isAlreadyTransferred
         }
 
     /**

@@ -13,7 +13,7 @@ internal class ActiveTransferEntityMapper @Inject constructor() {
             isFinished = isFinished,
             isFolderTransfer = isFolderTransfer,
             isPaused = isPaused,
-            isAlreadyDownloaded = isAlreadyDownloaded,
+            isAlreadyTransferred = isAlreadyTransferred,
         )
     }
 }
