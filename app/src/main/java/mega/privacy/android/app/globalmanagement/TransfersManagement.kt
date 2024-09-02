@@ -2,7 +2,9 @@ package mega.privacy.android.app.globalmanagement
 
 import android.os.CountDownTimer
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -135,7 +137,7 @@ class TransfersManagement @Inject constructor(
      * Starts a CountDownTimer after show warnings related to no internet connection.
      * If the timer finishes, launches a Broadcast to update the widget.
      */
-    fun startNetworkTimer() {
+    suspend fun startNetworkTimer() = withContext(Dispatchers.Main) {
         networkTimer = object : CountDownTimer(
             WAIT_TIME_TO_SHOW_NETWORK_WARNING,
             WAIT_TIME_TO_SHOW_NETWORK_WARNING
@@ -154,7 +156,7 @@ class TransfersManagement @Inject constructor(
     /**
      * Cancels the CountDownTimer to show warnings related to no internet connection.
      */
-    fun resetNetworkTimer() {
+    suspend fun resetNetworkTimer() = withContext(Dispatchers.Main) {
         networkTimer?.let { timer ->
             timer.cancel()
             shouldShowNetworkWarning = false

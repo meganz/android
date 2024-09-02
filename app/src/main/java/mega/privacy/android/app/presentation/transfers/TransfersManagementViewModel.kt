@@ -70,6 +70,15 @@ class TransfersManagementViewModel @Inject constructor(
                 updateUiState(transfersInfo)
             }
         }
+        viewModelScope.launch(ioDispatcher) {
+            online.collect { online ->
+                if (online) {
+                    transfersManagement.resetNetworkTimer()
+                } else {
+                    transfersManagement.startNetworkTimer()
+                }
+            }
+        }
     }
 
     /**

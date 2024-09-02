@@ -1,10 +1,8 @@
 package mega.privacy.android.app.presentation.transfers
 
-import android.os.Bundle
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.navigation.MegaNavigator
 import javax.inject.Inject
@@ -23,23 +21,4 @@ open class TransfersManagementActivity : PasscodeActivity() {
      */
     @Inject
     lateinit var navigator: MegaNavigator
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setupObservers()
-    }
-
-    /**
-     * Registers the transfers BroadcastReceivers and observers.
-     */
-    private fun setupObservers() {
-        collectFlow(transfersManagementViewModel.online) { online ->
-            if (online) {
-                transfersManagement.resetNetworkTimer()
-            } else {
-                transfersManagement.startNetworkTimer()
-            }
-        }
-    }
 }
