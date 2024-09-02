@@ -73,19 +73,7 @@ internal class SyncFoldersViewModel @Inject constructor(
             }
         }
 
-        viewModelScope.launch {
-            runCatching {
-                isStorageOverQuotaUseCase()
-            }.onSuccess { isStorageOverQuota ->
-                _uiState.update {
-                    it.copy(
-                        isStorageOverQuota = isStorageOverQuota,
-                    )
-                }
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
+        checkOverQuotaStatus()
 
         viewModelScope.launch {
             monitorBatteryInfoUseCase().collect { batteryInfo ->
@@ -100,6 +88,7 @@ internal class SyncFoldersViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(isFreeAccount = accountDetail.levelDetail?.accountType == AccountType.FREE)
                 }
+                checkOverQuotaStatus()
             }
         }
     }
@@ -181,6 +170,22 @@ internal class SyncFoldersViewModel @Inject constructor(
                         showSyncsPausedErrorDialog = false
                     )
                 }
+            }
+        }
+    }
+
+    private fun checkOverQuotaStatus() {
+        viewModelScope.launch {
+            runCatching {
+                isStorageOverQuotaUseCase()
+            }.onSuccess { isStorageOverQuota ->
+                _uiState.update {
+                    it.copy(
+                        isStorageOverQuota = isStorageOverQuota,
+                    )
+                }
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }
