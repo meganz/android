@@ -91,7 +91,7 @@ import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.main.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.LegacyNodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.presentation.chat.NodeAttachmentHistoryViewModel;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity;
@@ -181,7 +181,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     private ArrayList<MegaChatMessage> preservedMessagesSelected;
     private ArrayList<MegaChatMessage> preservedMessagesToImport;
 
-    private NodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment;
+    private LegacyNodeAttachmentBottomSheetDialogFragment bottomSheetDialogFragment;
 
     private final ActivityResultLauncher<ArrayList<NameCollision>> nameCollisionActivityLauncher = registerForActivityResult(
             new NameCollisionActivityContract(),
@@ -1278,7 +1278,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
         selectedMessageId = message.getMsgId();
-        bottomSheetDialogFragment = new NodeAttachmentBottomSheetDialogFragment();
+        bottomSheetDialogFragment = new LegacyNodeAttachmentBottomSheetDialogFragment();
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 

@@ -28,28 +28,27 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import kotlin.Unit;
-import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch;
-
 import java.util.ArrayList;
 
+import kotlin.Unit;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.main.controllers.ChatController;
-import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
+import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import timber.log.Timber;
 
-public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+public class LegacyNodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private MegaNode node;
     private MegaNodeList nodeList;
