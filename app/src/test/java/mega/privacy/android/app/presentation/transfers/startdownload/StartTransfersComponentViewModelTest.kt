@@ -65,6 +65,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -200,8 +201,9 @@ class StartTransfersComponentViewModelTest {
         whenever(startDownloadsWithWorkerUseCase(any(), any(), any())).thenReturn(emptyFlow())
         whenever(
             startUploadWithWorkerUseCase(
-                mapOf(uploadUri.toString() to null),
-                parentId
+                eq(mapOf(uploadUri.toString() to null)),
+                NodeId(eq(parentId.longValue)),
+                any(),
             )
         ).thenReturn(emptyFlow())
     }
@@ -523,7 +525,11 @@ class StartTransfersComponentViewModelTest {
 
         underTest.startTransfer(startEvent)
 
-        verify(startUploadWithWorkerUseCase).invoke(mapOf(DESTINATION to null), parentId)
+        verify(startUploadWithWorkerUseCase).invoke(
+            mapOf(DESTINATION to null),
+            parentId,
+            startEvent.isHighPriority
+        )
     }
 
     @Test
@@ -819,8 +825,9 @@ class StartTransfersComponentViewModelTest {
     private fun stubStartUpload(flow: Flow<MultiTransferEvent>) {
         whenever(
             startUploadWithWorkerUseCase(
-                mapOf(DESTINATION to null),
-                parentId
+                eq(mapOf(DESTINATION to null)),
+                NodeId(eq(parentId.longValue)),
+                any(),
             )
         ).thenReturn(flow)
     }

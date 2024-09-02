@@ -705,7 +705,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         var startMessageShown = false
         startUploadWithWorkerUseCase(
             pathsAndNames,
-            destinationId
+            destinationId,
+            transferTriggerEvent.isHighPriority,
         ).catch {
             if (transferTriggerEvent is TransferTriggerEvent.StartUpload.TextFile) {
                 _uiState.updateEventAndClearProgress(

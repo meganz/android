@@ -22,6 +22,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.AdditionalAnswers
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -102,7 +104,7 @@ class StartUploadsWithWorkerUseCaseTest {
                 StorageState.PayWall
             )
         )
-        underTest(urisWithNames, destinationId).test {
+        underTest(urisWithNames, destinationId, false).test {
             val notStartedEvents = cancelAndConsumeRemainingEvents()
                 .filterIsInstance<Event.Item<MultiTransferEvent>>()
                 .map { it.value }
@@ -114,9 +116,26 @@ class StartUploadsWithWorkerUseCaseTest {
     @Test
     fun `test that the file is send to upload files use case`() = runTest {
         whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
-        underTest(urisWithNames, destinationId).test {
+        underTest(urisWithNames, destinationId, false).test {
             verify(uploadFilesUseCase).invoke(
                 eq(mapOf(file to null)), NodeId(eq(destinationId.longValue)), eq(null), any()
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that the is high priority is send to upload files use case`(
+        expected: Boolean,
+    ) = runTest {
+        whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
+        underTest(urisWithNames, destinationId, expected).test {
+            verify(uploadFilesUseCase).invoke(
+                eq(mapOf(file to null)),
+                NodeId(eq(destinationId.longValue)),
+                eq(null),
+                isHighPriority = eq(expected),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -126,7 +145,7 @@ class StartUploadsWithWorkerUseCaseTest {
     @Test
     fun `test that destinationId is used as destination`() = runTest {
         whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
-        underTest(urisWithNames, destinationId).test {
+        underTest(urisWithNames, destinationId, false).test {
             verify(uploadFilesUseCase).invoke(
                 eq(mapOf(file to null)),
                 NodeId(eq(destinationId.longValue)),
@@ -148,7 +167,7 @@ class StartUploadsWithWorkerUseCaseTest {
                 awaitCancellation()
             }
         )
-        underTest(urisWithNames, destinationId).collect()
+        underTest(urisWithNames, destinationId, false).collect()
         verify(startUploadsWorkerAndWaitUntilIsStartedUseCase).invoke()
     }
 
@@ -169,7 +188,7 @@ class StartUploadsWithWorkerUseCaseTest {
             ) {
                 workerStarted = true
             })
-        underTest(urisWithNames, destinationId).test {
+        underTest(urisWithNames, destinationId, false).test {
             awaitItem()
             awaitComplete()
             assertThat(workerStarted).isTrue()

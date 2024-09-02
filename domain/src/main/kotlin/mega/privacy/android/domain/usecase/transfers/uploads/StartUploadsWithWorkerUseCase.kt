@@ -37,6 +37,7 @@ class StartUploadsWithWorkerUseCase @Inject constructor(
     operator fun invoke(
         urisWithNames: Map<String, String?>,
         destinationId: NodeId,
+        isHighPriority: Boolean,
     ): Flow<MultiTransferEvent> =
         if (monitorStorageStateEventUseCase().value.storageState == StorageState.PayWall) {
             urisWithNames.keys
@@ -55,7 +56,7 @@ class StartUploadsWithWorkerUseCase @Inject constructor(
                             filesAndNames = filesAndNames,
                             parentFolderId = destinationId,
                             appData = null,
-                            isHighPriority = false
+                            isHighPriority = isHighPriority
                         )
                     },
                     startWorker = {
