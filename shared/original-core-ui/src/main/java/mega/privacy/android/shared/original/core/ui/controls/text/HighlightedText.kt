@@ -27,7 +27,7 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
  * @param textColor Text color
  * @param modifier [Modifier]
  * @param highlightColor Optional color for background highlight
- * @param highlightBold Optional bold font highlight
+ * @param highlightFontWeight Optional font weight for highlight
  * @param maxLines Minimum lines
  * @param style Text style
  * @param overflow Overflow option
@@ -37,10 +37,10 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 fun HighlightedText(
     text: String,
     highlightText: String,
-    textColor: TextColor,
     modifier: Modifier = Modifier,
+    textColor: TextColor = TextColor.Primary,
     highlightColor: Color = teal_300_alpha_020,
-    highlightBold: Boolean = false,
+    highlightFontWeight: FontWeight = FontWeight.Normal,
     maxLines: Int = 1,
     style: TextStyle = LocalTextStyle.current,
     overflow: TextOverflow = TextOverflow.Ellipsis,
@@ -53,7 +53,7 @@ fun HighlightedText(
             addStyle(
                 style = SpanStyle(
                     background = highlightColor,
-                    fontWeight = if (highlightBold) FontWeight.Bold else FontWeight.Normal
+                    fontWeight = highlightFontWeight,
                 ),
                 start = startIndex,
                 end = endIndex
@@ -97,7 +97,7 @@ private fun HighlightedTextBoldPreview() {
             highlightText = "TITLE",
             textColor = TextColor.Primary,
             highlightColor = red_200,
-            highlightBold = true,
+            highlightFontWeight = FontWeight.Bold,
         )
     }
 }

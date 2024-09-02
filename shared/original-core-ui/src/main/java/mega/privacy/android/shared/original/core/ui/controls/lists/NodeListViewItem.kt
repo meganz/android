@@ -8,9 +8,13 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
@@ -21,8 +25,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
+import mega.privacy.android.shared.original.core.ui.controls.chip.HighlightChip
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.shared.original.core.ui.controls.text.HighlightedText
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
@@ -40,6 +46,7 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
  * @param title Title
  * @param subtitle Subtitle
  * @param description Description
+ * @param tags Tags
  * @param icon Icon
  * @param modifier Modifier
  * @param thumbnailData Thumbnail data
@@ -65,6 +72,7 @@ fun NodeListViewItem(
     @DrawableRes icon: Int,
     modifier: Modifier = Modifier,
     description: String? = null,
+    tags: List<String>? = null,
     thumbnailData: Any? = null,
     titleColor: TextColor = TextColor.Primary,
     subtitleColor: TextColor = TextColor.Secondary,
@@ -88,7 +96,7 @@ fun NodeListViewItem(
     onItemClicked: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
 ) {
-    GenericThreeLineListItem(
+    GenericMultilineListItem(
         modifier = modifier
             .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
             .combinedClickable(
@@ -222,9 +230,26 @@ fun NodeListViewItem(
                     HighlightedText(
                         text = description,
                         highlightText = highlightText,
-                        highlightBold = true,
+                        highlightFontWeight = FontWeight.Bold,
                         textColor = subtitleColor,
                     )
+                }
+            }
+        },
+        customRow = {
+            tags?.let {
+                if (highlightText.isNotBlank()) {
+                    Row(
+                        modifier = Modifier.horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        tags.forEach { tag ->
+                            HighlightChip(
+                                text = "#$tag",
+                                highlightText = highlightText,
+                            )
+                        }
+                    }
                 }
             }
         },

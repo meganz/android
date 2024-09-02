@@ -140,6 +140,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
+     * To enable search by node tags
+     */
+    SearchWithTags(
+        "Enable search with tags",
+        false
+    ),
+
+    /**
      * To enable the new cancel subscription feature
      */
     CancelSubscription(

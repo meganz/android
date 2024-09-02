@@ -108,7 +108,7 @@ class SearchActivityViewModel @Inject constructor(
     private var showHiddenItems: Boolean = true
 
     init {
-        checkSearchDescriptionFlag()
+        checkSearchFlags()
         monitorNodeUpdatesForSearch()
         initializeSearch()
         checkViewType()
@@ -116,13 +116,15 @@ class SearchActivityViewModel @Inject constructor(
         monitorShowHiddenItems()
     }
 
-    private fun checkSearchDescriptionFlag() {
+    private fun checkSearchFlags() {
         viewModelScope.launch {
             runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.SearchWithDescription)
-            }.onSuccess { flag ->
+                val description = getFeatureFlagValueUseCase(AppFeatures.SearchWithDescription)
+                val tags = getFeatureFlagValueUseCase(AppFeatures.SearchWithTags)
+                description to tags
+            }.onSuccess { (description, tags) ->
                 _state.update {
-                    it.copy(searchDescriptionEnabled = flag)
+                    it.copy(searchDescriptionEnabled = description, searchTagsEnabled = tags)
                 }
             }.onFailure {
                 Timber.e("Get feature flag failed $it")
