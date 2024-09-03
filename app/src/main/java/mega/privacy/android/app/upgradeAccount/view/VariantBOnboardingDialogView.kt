@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider.Companion.localisedSubscriptionsList
 import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider.Companion.subscriptionProLite
@@ -59,6 +60,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 @Composable
 fun VariantBOnboardingDialogView(
     state: ChooseAccountState,
+    accountUiState: AccountStorageUIState,
     onBackPressed: () -> Unit,
     onContinueClicked: () -> Unit,
     onChoosingMonthlyYearlyPlan: (isMonthly: Boolean) -> Unit,
@@ -81,6 +83,7 @@ fun VariantBOnboardingDialogView(
         content = {
             VariantBOnboardingDialogColumn(
                 uiState = state,
+                accountUiState = accountUiState,
                 scrollState = scrollState,
                 onContinueClicked = onContinueClicked,
                 onChoosingMonthlyYearlyPlan = onChoosingMonthlyYearlyPlan,
@@ -96,6 +99,7 @@ fun VariantBOnboardingDialogView(
 @Composable
 internal fun VariantBOnboardingDialogColumn(
     uiState: ChooseAccountState,
+    accountUiState: AccountStorageUIState,
     scrollState: ScrollState,
     onContinueClicked: () -> Unit,
     onChoosingMonthlyYearlyPlan: (isMonthly: Boolean) -> Unit,
@@ -199,6 +203,7 @@ internal fun VariantBOnboardingDialogColumn(
                     ProPlanInfoCard(
                         proPlan = AccountType.FREE,
                         subscription = cheapestSubscriptionAvailable!!,
+                        baseStorageFormatted = accountUiState.baseStorageFormatted,
                         isRecommended = false,
                         onPlanClicked = {
                             chosenPlan = AccountType.FREE
@@ -230,6 +235,7 @@ internal fun VariantBOnboardingDialogColumn(
                         ProPlanInfoCard(
                             proPlan = localisedSubscription.accountType,
                             subscription = localisedSubscription,
+                            baseStorageFormatted = accountUiState.baseStorageFormatted,
                             isRecommended = isRecommended,
                             onPlanClicked = {
                                 if (!isPaymentMethodAvailable) {
@@ -309,6 +315,7 @@ private fun PreviewVariantBOnboardingDialogView(
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VariantBOnboardingDialogView(
             state = state,
+            accountUiState = AccountStorageUIState(),
             onBackPressed = {},
             onContinueClicked = {},
             onChoosingMonthlyYearlyPlan = {},

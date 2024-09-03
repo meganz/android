@@ -13,6 +13,7 @@ import androidx.compose.ui.test.printToString
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.app.upgradeAccount.view.ADDITIONAL_FEATURES_DESCRIPTION_ROW
@@ -192,6 +193,7 @@ class VariantBOnboardingDialogViewTest {
     private fun setContent() = composeRule.setContent {
         VariantBOnboardingDialogView(
             state = getChooseAccountState(),
+            accountUiState = AccountStorageUIState(),
             onBackPressed = {},
             onContinueClicked = {},
             onChoosingMonthlyYearlyPlan = {},
@@ -204,6 +206,7 @@ class VariantBOnboardingDialogViewTest {
     private fun setContentWithAdsEnabled() = composeRule.setContent {
         VariantBOnboardingDialogView(
             state = getChooseAccountStateWithAdsEnabled(),
+            accountUiState = AccountStorageUIState(),
             onBackPressed = {},
             onContinueClicked = {},
             onChoosingMonthlyYearlyPlan = {},

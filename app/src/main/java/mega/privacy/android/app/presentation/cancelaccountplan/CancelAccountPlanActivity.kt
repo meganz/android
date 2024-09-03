@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.presentation.account.AccountStorageViewModel
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancellationInstructionsType
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelAccountPlanView
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelSubscriptionSurveyView
@@ -45,6 +46,7 @@ class CancelAccountPlanActivity : AppCompatActivity() {
     lateinit var getThemeMode: GetThemeMode
 
     private val viewModel: CancelAccountPlanViewModel by viewModels()
+    private val accountStorageViewModel: AccountStorageViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -59,6 +61,8 @@ class CancelAccountPlanActivity : AppCompatActivity() {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val accountUiState by accountStorageViewModel.state.collectAsStateWithLifecycle()
+
             val accountType = uiState.accountType
             OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 NavHost(
@@ -72,6 +76,7 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                     composable(cancelAccountPlanRoute) {
                         CancelAccountPlanView(
                             uiState = uiState,
+                            accountUiState = accountUiState,
                             formattedUsedStorage = usedStorage,
                             onKeepPlanButtonClicked = {
                                 Analytics.tracker.trackEvent(

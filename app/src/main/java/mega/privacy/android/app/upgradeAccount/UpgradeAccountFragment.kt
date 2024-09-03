@@ -23,6 +23,7 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.myAccount.MyAccountActivity
+import mega.privacy.android.app.presentation.account.AccountStorageViewModel
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
@@ -65,6 +66,7 @@ class UpgradeAccountFragment : Fragment() {
     lateinit var myAccountInfo: MyAccountInfo
 
     private val upgradeAccountViewModel by activityViewModels<UpgradeAccountViewModel>()
+    private val accountStorageViewModel by activityViewModels<AccountStorageViewModel>()
 
     private val billingViewModel by activityViewModels<BillingViewModel>()
 
@@ -97,6 +99,8 @@ class UpgradeAccountFragment : Fragment() {
     @Composable
     fun UpgradeAccountBody() {
         val uiState by upgradeAccountViewModel.state.collectAsStateWithLifecycle()
+        val accountUiState by accountStorageViewModel.state.collectAsStateWithLifecycle()
+
         val mode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         BackHandler { trackAndFinish() }
@@ -106,6 +110,7 @@ class UpgradeAccountFragment : Fragment() {
                     testTagsAsResourceId = true
                 },
                 state = uiState,
+                accountStorageState = accountUiState,
                 onBackPressed = {
                     Analytics.tracker.trackEvent(CancelUpgradeMyAccountEvent)
                     trackAndFinish()

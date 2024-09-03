@@ -20,6 +20,7 @@ internal fun toMegaAchievement(
     awardIndex: Long,
 ): MegaAchievement = with(megaAchievementsDetails) {
     MegaAchievement(
+        baseStorage = baseStorage,
         invitedEmails = getInviteEmailList(getAwardEmails(awardIndex)),
         grantedStorage = getClassStorage(achievementType.classValue),
         grantedTransferQuota = getClassTransfer(achievementType.classValue),

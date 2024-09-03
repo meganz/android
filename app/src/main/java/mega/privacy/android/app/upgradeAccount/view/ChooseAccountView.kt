@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UIAccountType
@@ -68,6 +69,7 @@ import java.util.Locale
 @Composable
 fun ChooseAccountView(
     state: ChooseAccountState,
+    accountStorageUIState: AccountStorageUIState,
     onBackPressed: () -> Unit = {},
     onPlanClicked: (AccountType) -> Unit = {},
     modifier: Modifier = Modifier,
@@ -91,7 +93,10 @@ fun ChooseAccountView(
         ) {
             if (state.localisedSubscriptionsList.isNotEmpty()) {
 
-                FreePlanRow(onPlanClicked = onPlanClicked)
+                FreePlanRow(
+                    onPlanClicked = onPlanClicked,
+                    baseStorageFormatted = accountStorageUIState.baseStorageFormatted
+                )
 
                 Divider(
                     thickness = 1.dp,
@@ -141,6 +146,7 @@ fun ChooseAccountView(
 @Composable
 fun FreePlanRow(
     onPlanClicked: (AccountType) -> Unit,
+    baseStorageFormatted: String,
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -171,7 +177,7 @@ fun FreePlanRow(
         MegaSpannedText(
             value = stringResource(
                 id = R.string.account_upgrade_storage_label,
-                "20 GB+"
+                baseStorageFormatted
             ) + "[B]1[/B]",
             baseStyle = subtitle2,
             styles = hashMapOf(
@@ -392,7 +398,13 @@ private fun PreviewChooseAccountView(
     @PreviewParameter(ChooseAccountPreviewProvider::class) state: ChooseAccountState,
 ) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
-        ChooseAccountView(state = state)
+        ChooseAccountView(
+            state = state,
+            accountStorageUIState = AccountStorageUIState(
+                totalStorageFormatted = "20 GB",
+                baseStorageFormatted = "20 GB"
+            )
+        )
     }
 }
 

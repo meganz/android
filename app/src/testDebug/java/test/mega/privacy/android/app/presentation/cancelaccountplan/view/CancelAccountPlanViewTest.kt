@@ -25,6 +25,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import mega.privacy.android.app.fromId
+import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -45,6 +46,7 @@ class CancelAccountPlanViewTest {
         composeTestRule.setContent {
             CancelAccountPlanView(
                 uiState = uiState,
+                accountUiState = AccountStorageUIState(),
                 formattedUsedStorage = formattedUsedStorage,
                 onKeepPlanButtonClicked = { }) {
             }
@@ -68,6 +70,7 @@ class CancelAccountPlanViewTest {
         composeTestRule.setContent {
             CancelAccountPlanView(
                 uiState = uiState,
+                accountUiState = AccountStorageUIState(),
                 formattedUsedStorage = formattedUsedStorage,
                 onKeepPlanButtonClicked = { }) {
             }

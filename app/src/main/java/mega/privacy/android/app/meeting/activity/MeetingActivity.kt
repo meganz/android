@@ -355,7 +355,6 @@ class MeetingActivity : PasscodeActivity() {
                             state.callEndedDueToTooManyParticipants
                         )
                 )
-                finish()
             }
 
             if (state.callEndedDueToFreePlanLimits) {

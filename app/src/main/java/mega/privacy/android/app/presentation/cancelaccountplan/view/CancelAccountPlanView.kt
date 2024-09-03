@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancelAccountPlanUiState
 import mega.privacy.android.app.upgradeAccount.model.FormattedSize
 import mega.privacy.android.icon.pack.R.drawable
@@ -40,6 +41,7 @@ import mega.privacy.android.shared.original.core.ui.utils.isTablet
 @Composable
 internal fun CancelAccountPlanView(
     uiState: CancelAccountPlanUiState,
+    accountUiState: AccountStorageUIState,
     formattedUsedStorage: String,
     onKeepPlanButtonClicked: () -> Unit,
     onContinueCancellationButtonClicked: () -> Unit,
@@ -148,7 +150,7 @@ internal fun CancelAccountPlanView(
             TableCell.TextCell(
                 text = context.getString(
                     SharedR.string.account_cancel_account_screen_plan_free_storage,
-                    uiState.freePlanStorageQuota
+                    accountUiState.baseStorageFormatted,
                 ),
                 style = TableCell.TextCellStyle.Normal,
                 cellAlignment = TableCell.CellAlignment.Center,
@@ -314,6 +316,7 @@ private fun CancelAccountPlanViewPreview() {
                 rewindDaysQuota = "90",
                 isLoading = false
             ),
+            accountUiState = AccountStorageUIState(),
             formattedUsedStorage = "50 GB",
             onKeepPlanButtonClicked = {},
             onContinueCancellationButtonClicked = {},

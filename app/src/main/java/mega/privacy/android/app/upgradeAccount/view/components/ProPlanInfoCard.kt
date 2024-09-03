@@ -56,6 +56,7 @@ import java.util.Locale
 internal fun ProPlanInfoCard(
     proPlan: AccountType,
     subscription: LocalisedSubscription,
+    baseStorageFormatted: String,
     isRecommended: Boolean,
     onPlanClicked: () -> Unit,
     isMonthly: Boolean,
@@ -67,7 +68,7 @@ internal fun ProPlanInfoCard(
     val isFreePlan = proPlan == AccountType.FREE
     val storageValueString =
         if (isFreePlan) {
-            stringResource(id = sharedR.string.general_size_giga_byte, "20")
+            stringResource(id = sharedR.string.general_size_giga_byte, baseStorageFormatted)
         } else {
             stringResource(
                 id = subscription.formatStorageSize().unit,
@@ -281,6 +282,7 @@ fun ProPlanInfoCardPreview() {
         ProPlanInfoCard(
             proPlan = AccountType.PRO_I,
             subscription = subscriptionProI,
+            baseStorageFormatted = "20 GB",
             isRecommended = true,
             onPlanClicked = { /*TODO*/ },
             isMonthly = true,
@@ -315,6 +317,7 @@ fun FreePlanInfoCardPreview() {
         ProPlanInfoCard(
             proPlan = AccountType.FREE,
             subscription = subscriptionProI,
+            baseStorageFormatted = "20 GB",
             isRecommended = false,
             onPlanClicked = { /*TODO*/ },
             isMonthly = true,

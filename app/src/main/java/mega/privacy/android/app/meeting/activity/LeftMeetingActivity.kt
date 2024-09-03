@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.meeting.view.dialog.FreePlanLimitPa
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.resources.R as sharedR
 
 class LeftMeetingActivity : BaseActivity() {
     private lateinit var binding: ActivityGuestLeaveMeetingBinding
@@ -42,6 +43,9 @@ class LeftMeetingActivity : BaseActivity() {
         binding.ivRemove.setOnClickListener {
             finish()
         }
+
+        binding.tvLeftMeetingsTitle2.text =
+            getString(sharedR.string.meeting_guest_left_meeting_bonus_title)
 
         binding.composeView.apply {
             this.isVisible = true

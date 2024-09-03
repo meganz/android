@@ -11,6 +11,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
@@ -64,6 +65,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -100,6 +102,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -135,6 +138,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -164,6 +168,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -193,6 +198,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -219,6 +225,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -249,6 +256,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBuyClicked = onBuyClicked,
                 onBackPressed = {},
                 onPlayStoreLinkClicked = {},
@@ -280,6 +288,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = true,
                     isPaymentMethodAvailable = false
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -306,6 +315,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = true,
                     isPaymentMethodAvailable = false
                 ),
+                accountStorageState = AccountStorageUIState(),
                 showBillingWarning = {},
                 hideBillingWarning = hideBillingWarning,
                 onBackPressed = {},
@@ -332,6 +342,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -357,6 +368,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -383,6 +395,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -409,6 +422,7 @@ class UpgradeAccountViewTest {
                     isPaymentMethodAvailable = true,
                     userSubscription = UserSubscription.MONTHLY_SUBSCRIBED
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -442,6 +456,7 @@ class UpgradeAccountViewTest {
                     isPaymentMethodAvailable = true,
                     userSubscription = UserSubscription.MONTHLY_SUBSCRIBED
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -516,6 +531,7 @@ class UpgradeAccountViewTest {
                     isPaymentMethodAvailable = true,
                     userSubscription = UserSubscription.NOT_SUBSCRIBED
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -543,6 +559,7 @@ class UpgradeAccountViewTest {
                     isPaymentMethodAvailable = true,
                     userSubscription = UserSubscription.NOT_SUBSCRIBED
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -569,6 +586,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -598,6 +616,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -627,6 +646,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},
@@ -658,6 +678,7 @@ class UpgradeAccountViewTest {
                     isPaymentMethodAvailable = true,
                     userSubscription = UserSubscription.MONTHLY_SUBSCRIBED,
                 ),
+                accountStorageState = AccountStorageUIState(),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onPlayStoreLinkClicked = {},

@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
@@ -104,6 +105,7 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 @Composable
 fun UpgradeAccountView(
     state: UpgradeAccountState,
+    accountStorageState: AccountStorageUIState,
     onBackPressed: () -> Unit,
     onBuyClicked: () -> Unit,
     onPlayStoreLinkClicked: (String) -> Unit,
@@ -248,6 +250,7 @@ fun UpgradeAccountView(
                     }
                     ProPlanInfoCard(
                         proPlan = it.accountType,
+                        baseStorageFormatted = accountStorageState.baseStorageFormatted,
                         subscription = it,
                         isRecommended = isRecommended.value,
                         onPlanClicked = {
@@ -652,6 +655,7 @@ fun PreviewUpgradeAccountView(
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         UpgradeAccountView(
             state = state,
+            accountStorageState = AccountStorageUIState(),
             onBackPressed = {},
             onBuyClicked = {},
             onPlayStoreLinkClicked = {},

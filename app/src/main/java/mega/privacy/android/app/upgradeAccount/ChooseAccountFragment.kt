@@ -23,6 +23,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.account.AccountStorageViewModel
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
@@ -67,6 +68,8 @@ class ChooseAccountFragment : Fragment() {
 
     private val billingViewModel by activityViewModels<BillingViewModel>()
 
+    private val accountStorageViewModel by activityViewModels<AccountStorageViewModel>()
+
     private lateinit var chooseAccountActivity: ChooseAccountActivity
 
 
@@ -97,6 +100,8 @@ class ChooseAccountFragment : Fragment() {
     @Composable
     fun ChooseAccountBody() {
         val uiState by chooseAccountViewModel.state.collectAsStateWithLifecycle()
+        val accountStorageUiState by accountStorageViewModel.state.collectAsStateWithLifecycle()
+
         val mode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         OriginalTempTheme(isDark = mode.isDarkMode()) {
@@ -120,6 +125,7 @@ class ChooseAccountFragment : Fragment() {
             } else if (uiState.enableVariantBUI) {
                 VariantBOnboardingDialogView(
                     state = uiState,
+                    accountUiState = accountStorageUiState,
                     onBackPressed = chooseAccountActivity::onFreeClick,
                     onContinueClicked = {
                         callContinueButtonAnalytics(uiState.chosenPlan)
@@ -145,6 +151,7 @@ class ChooseAccountFragment : Fragment() {
             } else {
                 ChooseAccountView(
                     state = uiState,
+                    accountStorageUIState = accountStorageUiState,
                     onBackPressed = chooseAccountActivity::onFreeClick,
                     onPlanClicked = chooseAccountActivity::onPlanClicked,
                     modifier = modifier,

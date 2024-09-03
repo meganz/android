@@ -27,6 +27,8 @@ class ProPlanInfoCardTest {
     private val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
     private val formattedSizeMapper = FormattedSizeMapper()
 
+    private val baseStorageFormatted = "20 GB"
+
     private val subscriptionProI = LocalisedSubscription(
         accountType = AccountType.PRO_I,
         storage = 2048,
@@ -48,6 +50,7 @@ class ProPlanInfoCardTest {
             ProPlanInfoCard(
                 proPlan = AccountType.PRO_I,
                 subscription = subscriptionProI,
+                baseStorageFormatted = baseStorageFormatted,
                 isRecommended = false,
                 onPlanClicked = {},
                 isMonthly = true,
@@ -66,6 +69,7 @@ class ProPlanInfoCardTest {
             ProPlanInfoCard(
                 proPlan = AccountType.PRO_I,
                 subscription = subscriptionProI,
+                baseStorageFormatted = baseStorageFormatted,
                 isRecommended = true,
                 onPlanClicked = {},
                 isMonthly = true,

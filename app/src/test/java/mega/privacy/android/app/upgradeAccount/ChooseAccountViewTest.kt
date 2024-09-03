@@ -5,6 +5,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
@@ -110,7 +111,7 @@ internal class ChooseAccountViewTest {
             InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.free_account),
             InstrumentationRegistry.getInstrumentation().targetContext.getString(
                 R.string.account_upgrade_storage_label,
-                "20 GB+"
+                "20 GB"
             ).replace("[A]", "").replace("[/A]", "") + "1",
             InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.account_choose_free_limited_transfer_quota)
                 .replace("[A]", "").replace("[/A]", ""),
@@ -203,6 +204,12 @@ internal class ChooseAccountViewTest {
     private fun setContent() = composeRule.setContent {
         ChooseAccountView(
             getChooseAccountState(),
+            accountStorageUIState = AccountStorageUIState(
+                baseStorage = 21474836480,
+                baseStorageFormatted = "20 GB",
+                totalStorage = 21474836480,
+                totalStorageFormatted = "20 GB"
+            ),
             onBackPressed = {},
             onPlanClicked = {},
         )

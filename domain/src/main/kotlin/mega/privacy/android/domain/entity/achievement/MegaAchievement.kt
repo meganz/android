@@ -4,6 +4,7 @@ package mega.privacy.android.domain.entity.achievement
 /**
  * MegaAchievement to include all the  common values for an achievement
  *
+ * @property baseStorage    Base storage
  * @property invitedEmails : List of emails referred by user
  * @property grantedStorage: Long : The granted storage (in bytes) for a specific type of achievement
  * @property grantedTransferQuota: Long : The granted transfer quota (in bytes) for a specific type of achievement
@@ -16,6 +17,7 @@ package mega.privacy.android.domain.entity.achievement
  * @property rewardTransferByAwardId: Long : Transfer rewarded by specific award Id
  */
 data class MegaAchievement(
+    val baseStorage: Long? = null,
     val invitedEmails: List<String> = emptyList(),
     val awardId: Int = 0,
     val grantedStorage: Long = 0L,
