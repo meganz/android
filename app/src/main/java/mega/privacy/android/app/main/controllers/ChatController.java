@@ -632,16 +632,6 @@ public class ChatController {
         }
     }
 
-    public void saveForOfflineWithAndroidMessages(ArrayList<AndroidMegaChatMessage> messages,
-                                                  MegaChatRoom chatRoom,
-                                                  SnackbarShower snackbarShower) {
-        Timber.d("Save for offline multiple messages");
-        for (int i = 0; i < messages.size(); i++) {
-            saveForOffline(messages.get(i).getMessage().getMegaNodeList(), chatRoom, false,
-                    snackbarShower);
-        }
-    }
-
     public void saveForOffline(MegaNodeList nodeList, MegaChatRoom chatRoom,
                                boolean fromMediaViewer, SnackbarShower snackbarShower) {
         File destination = null;

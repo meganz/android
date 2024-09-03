@@ -1300,16 +1300,4 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     public void setMyChatFilesFolder(MegaNode myChatFilesFolder) {
         this.myChatFilesFolder = myChatFilesFolder;
     }
-
-    public void downloadMessageNode(Long msgId) {
-        if (msgId != null) {
-            ArrayList<Long> msgIds = new ArrayList<>();
-            msgIds.add(msgId);
-            startDownloadViewModel.onDownloadClicked(
-                    chatId,
-                    msgIds
-            );
-        }
-    }
 }
-
