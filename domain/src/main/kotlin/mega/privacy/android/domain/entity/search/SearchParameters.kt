@@ -9,6 +9,7 @@ package mega.privacy.android.domain.entity.search
  * @property modificationDate last modified date
  * @property creationDate added date
  * @property description description
+ * @property tag tag
  */
 data class SearchParameters(
     val query: String,
@@ -17,4 +18,5 @@ data class SearchParameters(
     val modificationDate: DateFilterOption? = null,
     val creationDate: DateFilterOption? = null,
     val description: String? = null,
+    val tag: String? = null,
 )

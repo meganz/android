@@ -175,6 +175,7 @@ class SearchActivityViewModel @Inject constructor(
                         modificationDate = state.value.dateModifiedSelectedFilterOption?.date,
                         creationDate = state.value.dateAddedSelectedFilterOption?.date,
                         description = if (state.value.searchDescriptionEnabled == true) getCurrentSearchQuery() else null,
+                        tag = if (state.value.searchTagsEnabled == true) getCurrentSearchQuery() else null,
                     )
                 )
             }.onSuccess {

@@ -41,7 +41,7 @@ internal class SearchRepositoryImpl @Inject constructor(
         parameters: SearchParameters,
     ): List<UnTypedNode> = withContext(ioDispatcher) {
         val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
-        val (query, searchTarget, searchCategory, modificationDate, creationDate, description) = parameters
+        val (query, searchTarget, searchCategory, modificationDate, creationDate, description, tag) = parameters
         val queryFilter = megaSearchFilterMapper(
             searchQuery = query,
             parentHandle = nodeId ?: NodeId(-1L),
@@ -64,7 +64,20 @@ internal class SearchRepositoryImpl @Inject constructor(
                 searchAndMap(descriptionFilter, order, megaCancelToken)
             } ?: emptyList()
         }
-        queryListDeferred.await() + descriptionListDeferred.await()
+        val tagListDeferred = async {
+            tag?.let {
+                val tagFilter = megaSearchFilterMapper(
+                    parentHandle = nodeId ?: NodeId(-1L),
+                    searchTarget = searchTarget,
+                    searchCategory = searchCategory,
+                    modificationDate = modificationDate,
+                    creationDate = creationDate,
+                    tag = tag,
+                )
+                searchAndMap(tagFilter, order, megaCancelToken)
+            } ?: emptyList()
+        }
+        queryListDeferred.await() + descriptionListDeferred.await() + tagListDeferred.await()
     }
 
     private suspend fun searchAndMap(
@@ -86,7 +99,7 @@ internal class SearchRepositoryImpl @Inject constructor(
         parameters: SearchParameters,
     ): List<UnTypedNode> = withContext(ioDispatcher) {
         val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
-        val (query, searchTarget, searchCategory, modificationDate, creationDate, description) = parameters
+        val (query, searchTarget, searchCategory, modificationDate, creationDate, description, tag) = parameters
         val filter = megaSearchFilterMapper(
             searchQuery = query,
             parentHandle = nodeId ?: NodeId(-1),
@@ -95,6 +108,7 @@ internal class SearchRepositoryImpl @Inject constructor(
             modificationDate = modificationDate,
             creationDate = creationDate,
             description = description,
+            tag = tag,
         )
         val searchList = megaApiGateway.getChildren(
             filter = filter,
