@@ -329,22 +329,8 @@ class MeetingActivityViewModel @Inject constructor(
                         finishMeetingActivity()
                     }
                 }
-
-            monitorAudioOutputUseCase()
-                .catch { Timber.e(it) }
-                .collect {
-                    if (_speakerLiveData.value != it && it != AudioDevice.None) {
-                        Timber.d("Updating speaker $it")
-
-                        _speakerLiveData.value = it
-                        tips.value = when (it) {
-                            AudioDevice.Earpiece -> context.getString(R.string.general_speaker_off)
-                            AudioDevice.SpeakerPhone -> context.getString(R.string.general_speaker_on)
-                            else -> context.getString(R.string.general_headphone_on)
-                        }
-                    }
-                }
         }
+        startMonitoringAudioOutput()
 
         viewModelScope.launch {
             runCatching {
@@ -402,6 +388,25 @@ class MeetingActivityViewModel @Inject constructor(
                     else -> Unit
                 }
             }
+        }
+    }
+
+    private fun startMonitoringAudioOutput() {
+        viewModelScope.launch {
+            monitorAudioOutputUseCase()
+                .catch { Timber.e(it) }
+                .collect {
+                    if (_speakerLiveData.value != it && it != AudioDevice.None) {
+                        Timber.d("Updating speaker $it")
+
+                        _speakerLiveData.value = it
+                        tips.value = when (it) {
+                            AudioDevice.Earpiece -> context.getString(R.string.general_speaker_off)
+                            AudioDevice.SpeakerPhone -> context.getString(R.string.general_speaker_on)
+                            else -> context.getString(R.string.general_headphone_on)
+                        }
+                    }
+                }
         }
     }
 
