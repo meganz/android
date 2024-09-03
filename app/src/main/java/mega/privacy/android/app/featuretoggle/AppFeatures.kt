@@ -28,7 +28,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     ComposePasscodeSettings(
         "Use the new compose version of the passcode settings screens",
-        false
+        true
     ),
 
     /**
