@@ -35,6 +35,7 @@ import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
+import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
@@ -69,7 +70,6 @@ import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
@@ -154,7 +154,7 @@ import javax.inject.Inject
  * @property shouldRestartSearch       True if should restart the search, false otherwise.
  */
 @AndroidEntryPoint
-class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerInterface,
+class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener,
     ActionNodeCallback, SnackbarShower {
 

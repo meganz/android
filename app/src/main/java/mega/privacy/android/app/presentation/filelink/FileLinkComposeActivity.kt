@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.isClosedChat
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.extensions.isPortrait
@@ -42,7 +43,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
-import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
+import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
 import mega.privacy.android.app.textEditor.TextEditorActivity
@@ -65,7 +66,7 @@ import javax.inject.Inject
  * FileLinkActivity with compose view
  */
 @AndroidEntryPoint
-class FileLinkComposeActivity : TransfersManagementActivity(),
+class FileLinkComposeActivity : PasscodeActivity(),
     DecryptAlertDialog.DecryptDialogListener {
 
     /**
@@ -86,7 +87,14 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
+    /**
+     * [MegaNavigator]
+     */
+    @Inject
+    lateinit var navigator: MegaNavigator
+
     private val viewModel: FileLinkViewModel by viewModels()
+    private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
 
     private var mKey: String? = null
 

@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.constants.IntentConstants
@@ -53,7 +54,7 @@ import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
-import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
+import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
 import mega.privacy.android.app.textEditor.TextEditorActivity
@@ -85,7 +86,7 @@ import javax.inject.Inject
  * FolderLinkActivity with compose view
  */
 @AndroidEntryPoint
-class FolderLinkComposeActivity : TransfersManagementActivity(),
+class FolderLinkComposeActivity : PasscodeActivity(),
     DecryptAlertDialog.DecryptDialogListener {
 
     /**
@@ -115,6 +116,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
     private lateinit var binding: ActivityFolderLinkComposeBinding
 
     private val viewModel: FolderLinkViewModel by viewModels()
+    private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
 
     private var mKey: String? = null
     private var statusDialog: AlertDialog? = null
@@ -391,7 +393,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 return@launch
             }
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                navigator.openTransfers(this@FolderLinkComposeActivity, IN_PROGRESS_TAB_INDEX)
+                megaNavigator.openTransfers(this@FolderLinkComposeActivity, IN_PROGRESS_TAB_INDEX)
             } else {
                 startActivity(
                     Intent(this@FolderLinkComposeActivity, ManagerActivity::class.java)
