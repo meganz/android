@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.devicecenter.data.mapper
 
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
@@ -30,6 +31,19 @@ internal class DeviceNodeStatusMapperTest {
         assertThat(
             underTest(
                 folders = emptyList(),
+                isCurrentDevice = true,
+            )
+        ).isEqualTo(DeviceCenterNodeStatus.NothingSetUp)
+    }
+
+    @Test
+    fun `test that a nothing set up device status is returned if only CU or MU has been set up`() {
+        assertThat(
+            underTest(
+                folders = listOf(
+                    mock { on { type }.thenReturn(BackupInfoType.CAMERA_UPLOADS) },
+                    mock { on { type }.thenReturn(BackupInfoType.MEDIA_UPLOADS) }
+                ),
                 isCurrentDevice = true,
             )
         ).isEqualTo(DeviceCenterNodeStatus.NothingSetUp)
