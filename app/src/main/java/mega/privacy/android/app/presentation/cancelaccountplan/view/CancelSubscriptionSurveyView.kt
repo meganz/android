@@ -121,7 +121,14 @@ internal fun CancelSubscriptionSurveyView(
 
         if (selectedOptionPosition == possibleCancellationReasons.lastIndex) {
             GenericDescriptionWithCharacterLimitTextField(
-                maxCharacterLimit = CHARACTER_LIMIT,
+                maxCharacterLimit = MAX_CHARACTER_LIMIT,
+                minCharacterLimit = MIN_CHARACTER_LIMIT,
+                emptyErrorMessage = stringResource(
+                    id = SharedR.string.account_cancel_subscription_survey_enter_details
+                ),
+                errorMinLengthMessage = stringResource(
+                    id = SharedR.string.account_cancel_subscription_survey_minimum_character_limit
+                ),
                 value = othersDescriptionText,
                 modifier = Modifier
                     .padding(top = 10.dp)
@@ -173,7 +180,7 @@ internal fun CancelSubscriptionSurveyView(
                         showError = true
                     } else {
                         showError = false
-                        if (othersDescriptionText.length <= CHARACTER_LIMIT)
+                        if (othersDescriptionText.length <= MAX_CHARACTER_LIMIT)
                             onCancelSubscriptionButtonClicked()
                     }
                 },
@@ -263,7 +270,8 @@ private fun CancelSubscriptionSurveyViewPreview() {
     }
 }
 
-internal const val CHARACTER_LIMIT = 120
+internal const val MAX_CHARACTER_LIMIT = 120
+internal const val MIN_CHARACTER_LIMIT = 10
 
 internal const val SURVEY_OPTIONS_GROUP_TEST_TAG =
     "cancel_subscription_survey_view:options_group"

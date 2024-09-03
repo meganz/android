@@ -668,4 +668,8 @@
     <string name="meeting_recent_list_empty_title">Protect your calls</string>
     <!--Subtitle text from Meeting screen empty view-->
     <string name="meeting_recent_list_empty_subtitle">Your meetings, family calls, and private conversations are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <!--Warning message to inform the user the minimum number of characters to enter into the edit text field for the survey-->
+    <string name="account_cancel_subscription_survey_minimum_character_limit">Message must be at least 10 characters</string>
+    <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
+    <string name="account_cancel_subscription_survey_enter_details">Enter details</string>
 </resources>

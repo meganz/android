@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.cancelaccountplan.model
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.FormattedSize
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.shared.resources.R.string
 
 
 /**
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.AccountType
  * @param accountType type of the account
  * @param accountNameRes name of the account
  * @param isLoading UI state to show the loading state
+ * @property cancellationReasons list of cancellation reasons
  */
 data class CancelAccountPlanUiState(
     val cancellationInstructionsType: CancellationInstructionsType? = null,
@@ -27,4 +29,16 @@ data class CancelAccountPlanUiState(
     val accountType: AccountType = AccountType.UNKNOWN,
     val accountNameRes: Int = R.string.recovering_info,
     val isLoading: Boolean = true,
+    val cancellationReasons: List<Int> = listOf(
+        string.account_cancel_subscription_survey_option_expensive,
+        string.account_cancel_subscription_survey_option_cannot_afford,
+        string.account_cancel_subscription_survey_option_no_subscription,
+        string.account_cancel_subscription_survey_option_no_storage_need,
+        string.account_cancel_subscription_survey_option_missing_features,
+        string.account_cancel_subscription_survey_option_switch_provider,
+        string.account_cancel_subscription_survey_option_confusing,
+        string.account_cancel_subscription_survey_option_dissatisfied_support,
+        string.account_cancel_subscription_survey_option_temporary_use,
+        string.account_cancel_subscription_survey_option_other
+    ),
 )

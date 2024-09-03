@@ -1,13 +1,16 @@
 package mega.privacy.android.shared.original.core.ui.controls.textfields
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -28,13 +31,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.icon.pack.R.drawable
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.drawableId
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
@@ -48,7 +56,10 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 @Composable
 fun GenericDescriptionWithCharacterLimitTextField(
     maxCharacterLimit: Int,
+    emptyErrorMessage: String,
+    errorMinLengthMessage: String,
     modifier: Modifier = Modifier,
+    minCharacterLimit: Int = 0,
     showClearIcon: Boolean = true,
     initiallyFocused: Boolean = false,
     imeAction: ImeAction = ImeAction.Done,
@@ -59,7 +70,10 @@ fun GenericDescriptionWithCharacterLimitTextField(
     var textFieldValue by remember { mutableStateOf(TextFieldValue(value)) }
     var isFocused by rememberSaveable { mutableStateOf(initiallyFocused) }
     val focusRequester = remember { FocusRequester() }
-
+    val isMinCharLimitError =
+        textFieldValue.text.length < minCharacterLimit || textFieldValue.text.isEmpty()
+    val isMaxCharLimitError = textFieldValue.text.length > maxCharacterLimit
+    val isError = isMinCharLimitError || isMaxCharLimitError
     val keyboardOption = KeyboardOptions(
         keyboardType = KeyboardType.Text,
         imeAction = imeAction,
@@ -90,7 +104,7 @@ fun GenericDescriptionWithCharacterLimitTextField(
                 unfocusedBorderColor = MegaOriginalTheme.colors.border.strong,
                 errorBorderColor = MegaOriginalTheme.colors.support.error
             ),
-            isError = textFieldValue.text.length > maxCharacterLimit,
+            isError = isError,
             keyboardOptions = keyboardOption,
             trailingIcon = {
                 if (showClearIcon && textFieldValue.text.isNotEmpty()) {
@@ -120,7 +134,7 @@ fun GenericDescriptionWithCharacterLimitTextField(
 
         MegaText(
             text = "${textFieldValue.text.length}/${maxCharacterLimit}",
-            textColor = if (textFieldValue.text.length <= maxCharacterLimit) TextColor.Secondary else TextColor.Error,
+            textColor = if (isError) TextColor.Error else TextColor.Secondary,
             style = MaterialTheme.typography.body3,
             textAlign = TextAlign.Start,
             modifier = Modifier
@@ -128,6 +142,37 @@ fun GenericDescriptionWithCharacterLimitTextField(
                 .padding(top = 4.dp)
                 .testTag(TEXT_FIELD_LIMIT_TEXT_COUNTER_TEST_TAG)
         )
+
+        if (isMinCharLimitError) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .testTag(TEXT_FIELD_LIMIT_ERROR_ROW_TEST_TAG),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = drawable.ic_warning_icon),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .testTag(TEXT_FIELD_LIMIT_ICON_ERROR_TEST_TAG)
+                        .semantics {
+                            drawableId = drawable.ic_warning_icon
+                        },
+                    colorFilter = ColorFilter.tint(MegaOriginalTheme.colors.support.error)
+                )
+                MegaText(
+                    text = if (textFieldValue.text.isNotEmpty() && textFieldValue.text.length < minCharacterLimit) errorMinLengthMessage else emptyErrorMessage,
+                    textColor = TextColor.Error,
+                    style = MaterialTheme.typography.body3,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .testTag(TEXT_FIELD_LIMIT_TEXT_ERROR_TEST_TAG),
+                )
+            }
+        }
     }
 
     if (initiallyFocused) {
@@ -143,6 +188,8 @@ private fun TextFieldWithCharacterLimitEmptyPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         GenericDescriptionWithCharacterLimitTextField(
             maxCharacterLimit = 120,
+            emptyErrorMessage = "This field is required",
+            errorMinLengthMessage = "This field must have at least 10 characters",
             onValueChange = {}
         )
     }
@@ -154,6 +201,9 @@ private fun TextFieldWithCharacterLimitDefaultPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         GenericDescriptionWithCharacterLimitTextField(
             maxCharacterLimit = 120,
+            minCharacterLimit = 10,
+            emptyErrorMessage = "This field is required",
+            errorMinLengthMessage = "This field must have at least 10 characters",
             value = "This is a description with a character limit",
             initiallyFocused = true,
             onValueChange = {}
@@ -163,16 +213,40 @@ private fun TextFieldWithCharacterLimitDefaultPreview() {
 
 @Composable
 @CombinedThemePreviews
-private fun TextFieldWithCharacterLimitErrorPreview() {
+private fun TextFieldWithMaxCharacterLimitErrorPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         GenericDescriptionWithCharacterLimitTextField(
             maxCharacterLimit = 120,
+            minCharacterLimit = 10,
+            emptyErrorMessage = "This field is required",
+            errorMinLengthMessage = "This field must have at least 10 characters",
             value = "This is a description with a character limit, but it's too long and takes times to fully read it because the number of characters of it exceeds the allowed limit",
             onValueChange = {}
         )
     }
 }
 
+@Composable
+@CombinedThemePreviews
+private fun TextFieldWithMinCharacterLimitErrorPreview() {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        GenericDescriptionWithCharacterLimitTextField(
+            maxCharacterLimit = 120,
+            minCharacterLimit = 10,
+            emptyErrorMessage = "This field is required",
+            errorMinLengthMessage = "This field must have at least 10 characters",
+            value = "This is..",
+            onValueChange = {}
+        )
+    }
+}
+
+internal const val TEXT_FIELD_LIMIT_ERROR_ROW_TEST_TAG =
+    "text_field_with_character_limit:error_row"
+internal const val TEXT_FIELD_LIMIT_ICON_ERROR_TEST_TAG =
+    "text_field_with_character_limit:error_icon"
+internal const val TEXT_FIELD_LIMIT_TEXT_ERROR_TEST_TAG =
+    "text_field_with_character_limit:limit_text_error"
 internal const val TEXT_FIELD_LIMIT_TEXT_COUNTER_TEST_TAG =
     "text_field_with_character_limit:limit_text_counter"
 internal const val TEXT_FIELD_WITH_CHARACTER_LIMIT_VIEW_TEXT_FIELD =

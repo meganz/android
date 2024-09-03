@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.cancelaccountplan
+package test.mega.privacy.android.app.presentation.cancelaccountplan
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetAppSubscriptionOptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
+import mega.privacy.android.shared.resources.R.string
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -351,6 +352,10 @@ internal class CancelAccountPlanViewModelTest {
             assertThat(state.accountNameRes).isEqualTo(45)
             assertThat(state.isLoading).isEqualTo(false)
             assertThat(state.accountType).isEqualTo(accountType)
+            assertThat(state.cancellationReasons.size).isEqualTo(10)
+            assertThat(state.cancellationReasons.last()).isEqualTo(
+                string.account_cancel_subscription_survey_option_other
+            )
         }
     }
 

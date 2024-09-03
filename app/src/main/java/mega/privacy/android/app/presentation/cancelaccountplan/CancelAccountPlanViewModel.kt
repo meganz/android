@@ -95,7 +95,8 @@ class CancelAccountPlanViewModel @Inject constructor(
                                     accountType = accountType,
                                     rewindDaysQuota = planRewindDaysQuota,
                                     accountNameRes = accountNameMapper(accountType),
-                                    isLoading = false
+                                    isLoading = false,
+                                    cancellationReasons = getShuffleCancellationReasons(it.cancellationReasons)
                                 )
                             }
                         }
@@ -105,6 +106,17 @@ class CancelAccountPlanViewModel @Inject constructor(
             }
         }
     }
+
+
+    /**
+     * Get the cancellation reasons list in shuffled order
+     */
+    private fun getShuffleCancellationReasons(reasons: List<Int>): List<Int> {
+        val lastReason = reasons.last()
+        val shuffledReasons = reasons.subList(0, reasons.size - 1).shuffled()
+        return shuffledReasons + lastReason
+    }
+
 
     /**
      * Get the active account plan details
