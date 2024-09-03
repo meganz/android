@@ -20,7 +20,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     VideoRecentlyWatched(
         "Enable video recently watched feature",
-        false
+        true
     ),
 
     /**
