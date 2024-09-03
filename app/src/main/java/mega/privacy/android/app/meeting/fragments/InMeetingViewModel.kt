@@ -76,6 +76,7 @@ import mega.privacy.android.domain.entity.call.ChatSession
 import mega.privacy.android.domain.entity.call.ChatSessionChanges
 import mega.privacy.android.domain.entity.call.ChatSessionStatus
 import mega.privacy.android.domain.entity.call.ParticipantsCountChange
+import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.meeting.NetworkQualityType
@@ -84,6 +85,7 @@ import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
+import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.call.BroadcastCallEndedUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
@@ -208,6 +210,7 @@ class InMeetingViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     private val amIAloneOnAnyCallUseCase: AmIAloneOnAnyCallUseCase,
+    private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     @ApplicationContext private val context: Context,
 ) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -331,9 +334,9 @@ class InMeetingViewModel @Inject constructor(
         }
 
     init {
-        startMonitorChatRoomUpdates()
         startMonitorChatCallUpdates()
         startMonitorChatSessionUpdates()
+        startMonitorChatListItemUpdates()
         getMyUserHandle()
 
         viewModelScope.launch {
@@ -555,26 +558,56 @@ class InMeetingViewModel @Inject constructor(
         _showPoorConnectionBanner.value = quality == NetworkQualityType.Bad
     }
 
+    fun onSnackbarMsgConsumed() = _state.update { state ->
+        state.copy(
+            snackbarMsg = null
+        )
+    }
 
     /**
      * Get chat room updates
      */
-    private fun startMonitorChatRoomUpdates() {
+    private fun startMonitorChatRoomUpdates(chatId: Long) {
         monitorChatRoomUpdatesJob?.cancel()
         monitorChatRoomUpdatesJob = viewModelScope.launch {
-            monitorChatRoomUpdatesUseCase(_state.value.currentChatId).collectLatest { chat ->
+            monitorChatRoomUpdatesUseCase(chatId).collectLatest { chat ->
                 _state.update { it.copy(chat = chat) }
 
-                if (chat.hasChanged(ChatRoomChange.Title)) {
-                    Timber.d("Changes in chat title")
-                    _state.update { state ->
+                when {
+                    chat.hasChanged(ChatRoomChange.OwnPrivilege) -> {
+                        if (chat.ownPrivilege == ChatRoomPermission.Moderator) {
+                            _state.update { state ->
+                                state.copy(
+                                    snackbarMsg = getStringFromStringResMapper(
+                                        R.string.be_new_moderator
+                                    ),
+                                )
+                            }
+                        }
+
+                        participants.value = participants.value?.map { participant ->
+                            return@map participant.copy(
+                                hasOptionsAllowed = shouldParticipantsOptionBeVisible(
+                                    participant.isMe,
+                                    participant.isGuest
+                                )
+                            )
+                        }?.toMutableList()
+                        updateMeetingInfoBottomPanel()
+
+                    }
+
+                    chat.hasChanged(ChatRoomChange.Title) -> _state.update { state ->
                         state.copy(
                             chatTitle = chat.title,
                         )
                     }
-                }
-                if (chat.hasChanged(ChatRoomChange.OpenInvite)) {
-                    _state.update { it.copy(isOpenInvite = chat.isOpenInvite) }
+
+                    chat.hasChanged(ChatRoomChange.Participants) -> _state.update {
+                        it.copy(
+                            isOpenInvite = chat.isOpenInvite
+                        )
+                    }
                 }
             }
         }
@@ -638,6 +671,25 @@ class InMeetingViewModel @Inject constructor(
                 }
         }
     }
+
+    /**
+     * Get chat list item updates
+     */
+    private fun startMonitorChatListItemUpdates() =
+        viewModelScope.launch {
+            monitorChatListItemUpdates()
+                .filter { it.chatId == _state.value.currentChatId }
+                .collectLatest { item ->
+                    when (item.changes) {
+                        ChatListItemChanges.Participants -> {
+                            Timber.d("Change in the privileges of a participant")
+                            updateParticipantsPrivileges()
+                        }
+
+                        else -> {}
+                    }
+                }
+        }
 
     /**
      * Get chat call updates
@@ -1145,6 +1197,7 @@ class InMeetingViewModel @Inject constructor(
 
         getChatRoom()
         getChatCall()
+        startMonitorChatRoomUpdates(_state.value.currentChatId)
         startMonitorParticipatingInACall(_state.value.currentChatId)
         enableAudioLevelMonitor(_state.value.currentChatId)
     }

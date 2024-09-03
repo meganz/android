@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.call.CallUIStatusType
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatSession
+import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import timber.log.Timber
@@ -116,6 +117,7 @@ data class InMeetingUiState(
     val changesInStatusInSession: ChatSession? = null,
     val shouldCheckChildFragments: Boolean = false,
     val callAnsweredInAnotherClient: Boolean = false,
+    val snackbarMsg: String? = null
 ) {
     /**
      * Check if it's one to one call

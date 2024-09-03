@@ -53,7 +53,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
-import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -131,7 +130,6 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatListItem
-import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -260,32 +258,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private val visibilityChangeObserver = Observer<Long> {
         Timber.d("Change in the visibility of a participant")
         inMeetingViewModel.updateParticipantsVisibility(it)
-    }
-
-    private val privilegesChangeObserver = Observer<MegaChatListItem> { item ->
-        if (inMeetingViewModel.isSameChatRoom(item.chatId)) {
-            inMeetingViewModel.getCall()?.let { call ->
-                if (call.status == ChatCallStatus.InProgress) {
-                    if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
-                        Timber.d("Change in my privileges")
-                        if (MegaChatRoom.PRIV_MODERATOR == inMeetingViewModel.getOwnPrivileges()) {
-                            showSnackbar(
-                                SNACKBAR_TYPE,
-                                getString(R.string.be_new_moderator),
-                                MEGACHAT_INVALID_HANDLE
-                            )
-                        }
-
-                        inMeetingViewModel.updateOwnPrivileges()
-                    }
-
-                    if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)) {
-                        Timber.d("Change in the privileges of a participant")
-                        inMeetingViewModel.updateParticipantsPrivileges()
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -733,9 +705,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         LiveEventBus.get(EVENT_CONTACT_NAME_CHANGE, Long::class.java)
             .observe(this, nameChangeObserver)
 
-        LiveEventBus.get(EVENT_PRIVILEGES_CHANGE, MegaChatListItem::class.java)
-            .observe(this, privilegesChangeObserver)
-
         LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long::class.java)
             .observe(this, visibilityChangeObserver)
 
@@ -860,6 +829,17 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.snackbarMsg }
+            .distinctUntilChanged()) { msg ->
+            msg?.let {
+                inMeetingViewModel.onSnackbarMsgConsumed()
+                showSnackbar(
+                    SNACKBAR_TYPE,
+                    msg,
+                    MEGACHAT_INVALID_HANDLE
+                )
+            }
+        }
 
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state) { state: InMeetingUiState ->
             if (state.shouldFinish) {
