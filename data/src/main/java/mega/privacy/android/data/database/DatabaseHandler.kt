@@ -2,7 +2,6 @@ package mega.privacy.android.data.database
 
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
-import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
@@ -96,12 +95,12 @@ interface DatabaseHandler {
 
     fun setNotificationSoundChat(sound: String?)
     fun setVibrationEnabledChat(enabled: String?)
-    fun setWrittenTextItem(handle: String?, text: String?, editedMsgId: String?): Int
     fun setNonContactFirstName(name: String?, handle: String?): Int
     fun setNonContactLastName(lastName: String?, handle: String?): Int
     fun setNonContactEmail(email: String?, handle: String?): Int
+
+    @Deprecated("Should be removed when OfflineUtils is removed")
     fun exists(handle: Long): Boolean
-    fun removeById(id: Int): Int
     fun setFirstTime(firstTime: Boolean)
     fun setPreferredSortCloud(order: String?)
     fun setPreferredSortCameraUpload(order: String?)
@@ -114,7 +113,6 @@ interface DatabaseHandler {
     fun setStorageAskAlways(storageAskAlways: Boolean)
     fun setStorageDownloadLocation(storageDownloadLocation: String?)
     fun setAttrAskSizeDownload(askSizeDownload: String?)
-    fun setAttrAskNoAppDownload(askNoAppDownload: String?)
     fun setUseHttpsOnly(useHttpsOnly: Boolean)
     fun setShowCopyright(showCopyright: Boolean)
     fun setShowNotifOff(showNotifOff: Boolean)
@@ -165,12 +163,4 @@ interface DatabaseHandler {
     fun findNonContactByHandle(handle: String): NonContactInfo?
     fun findContactByHandle(handleParam: Long): Contact?
     fun findContactByEmail(mail: String?): Contact?
-
-    /**
-     * Gets pending messages.
-     *
-     * @param chatId Chat identifier from which the messages has to be get.
-     * @return A list of [AndroidMegaChatMessage].
-     */
-    fun findPendingMessagesNotSent(chatId: Long): List<AndroidMegaChatMessage>
 }

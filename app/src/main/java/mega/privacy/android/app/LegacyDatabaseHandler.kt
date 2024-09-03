@@ -10,6 +10,4 @@ import mega.privacy.android.data.database.DatabaseHandler
 interface LegacyDatabaseHandler : DatabaseHandler {
     fun findByHandle(handle: Long): MegaOffline?
     fun findByHandle(handle: String?): MegaOffline?
-    fun findByParentId(parentId: Int): ArrayList<MegaOffline>
-    fun findById(id: Int): MegaOffline?
 }

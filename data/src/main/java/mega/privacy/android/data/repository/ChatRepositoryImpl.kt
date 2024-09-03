@@ -949,10 +949,6 @@ internal class ChatRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun getPendingMessages(chatId: Long) = withContext(ioDispatcher) {
-        pendingMessageListMapper(localStorageGateway.findPendingMessagesNotSent(chatId))
-    }
-
     override suspend fun createEphemeralAccountPlusPlus(
         firstName: String,
         lastName: String,

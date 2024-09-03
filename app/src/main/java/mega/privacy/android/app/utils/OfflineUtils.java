@@ -2,14 +2,12 @@ package mega.privacy.android.app.utils;
 
 import static mega.privacy.android.app.utils.Constants.FROM_BACKUPS;
 import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
-import static mega.privacy.android.app.utils.FileUtil.deleteFolderAndSubFolders;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.FileUtil.isFileDownloadedLatest;
 
 import android.content.Context;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -26,85 +24,6 @@ public class OfflineUtils {
     public static final String OFFLINE_DIR = "MEGA Offline";
     public static final String OFFLINE_BACKUPS_DIR = OFFLINE_DIR + File.separator + "in";
 
-    /**
-     * @deprecated
-     * use RemoveOfflineNodeUseCase instead
-     */
-    @Deprecated
-    public static void removeOffline(MegaOffline mOffDelete, LegacyDatabaseHandler dbH, Context context) {
-
-        if (mOffDelete == null) {
-            return;
-        }
-
-        Timber.d("File(type): %s(%s)", mOffDelete.getName(), mOffDelete.getType());
-        ArrayList<MegaOffline> mOffListChildren;
-
-        if (mOffDelete.getType().equals(MegaOffline.FOLDER)) {
-            Timber.d("Finding children... ");
-
-            //Delete children in DB
-            mOffListChildren = dbH.findByParentId(mOffDelete.getId());
-            if (mOffListChildren.size() > 0) {
-                Timber.d("Children: %s", mOffListChildren.size());
-                deleteChildrenDB(mOffListChildren, dbH);
-            }
-        } else {
-            Timber.d("NOT children... ");
-        }
-
-        //remove red arrow from current item
-        int parentId = mOffDelete.getParentId();
-        dbH.removeById(mOffDelete.getId());
-        if (parentId != -1) {
-            updateParentOfflineStatus(parentId, dbH);
-        }
-
-        //Remove the node physically
-        File offlineFile = getOfflineFile(context, mOffDelete);
-        try {
-            deleteFolderAndSubFolders(offlineFile);
-        } catch (Exception e) {
-            Timber.e(e, "Exception deleting folder");
-        }
-
-    }
-
-    public static void updateParentOfflineStatus(int parentId, LegacyDatabaseHandler dbH) {
-        ArrayList<MegaOffline> offlineSiblings = dbH.findByParentId(parentId);
-
-        if (offlineSiblings.size() > 0) {
-            //have other offline file within same folder, so no need to do anything to the folder
-            return;
-        } else {
-            //keep checking if there is any parent folder should display red arrow
-            MegaOffline parentNode = dbH.findById(parentId);
-            if (parentNode != null) {
-                int grandParentNodeId = parentNode.getParentId();
-                dbH.removeById(parentId);
-                updateParentOfflineStatus(grandParentNodeId, dbH);
-            }
-        }
-    }
-
-    public static void deleteChildrenDB(ArrayList<MegaOffline> mOffList, LegacyDatabaseHandler dbH) {
-
-        Timber.d("deleteChildenDB");
-        MegaOffline mOffDelete;
-
-        for (int i = 0; i < mOffList.size(); i++) {
-
-            mOffDelete = mOffList.get(i);
-            ArrayList<MegaOffline> mOffListChildren2 = dbH.findByParentId(mOffDelete.getId());
-            if (mOffList.size() > 0) {
-                //The node have children, delete
-                deleteChildrenDB(mOffListChildren2, dbH);
-
-            }
-            Timber.d("deleting %s", mOffDelete.getName());
-            dbH.removeById(mOffDelete.getId());
-        }
-    }
 
     public static boolean availableOffline(Context context, MegaNode node) {
         LegacyDatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();

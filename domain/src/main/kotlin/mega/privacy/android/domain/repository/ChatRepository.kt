@@ -15,7 +15,6 @@ import mega.privacy.android.domain.entity.chat.ChatPreview
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.ConnectionState
-import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
 import mega.privacy.android.domain.entity.chat.messages.ChatMessageInfo
 import mega.privacy.android.domain.entity.chat.messages.reactions.ReactionUpdate
@@ -586,14 +585,6 @@ interface ChatRepository {
         beep: Boolean,
         defaultSound: String?,
     ): NotificationBehaviour
-
-    /**
-     * Gets pending messages.
-     *
-     * @param chatId Chat identifier from which the messages has to be get.
-     * @return A list of [PendingMessage].
-     */
-    suspend fun getPendingMessages(chatId: Long): List<PendingMessage>
 
     /**
      * Create Ephemeral++ account

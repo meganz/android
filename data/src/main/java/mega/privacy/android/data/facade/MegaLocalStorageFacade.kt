@@ -161,9 +161,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun clearChatSettings() = dbHandler.clearChatSettings()
 
-    override suspend fun findPendingMessagesNotSent(chatId: Long) =
-        dbHandler.findPendingMessagesNotSent(chatId)
-
     override suspend fun setTransferQueueStatus(isPause: Boolean) {
         dbHandler.transferQueueStatus = isPause
     }

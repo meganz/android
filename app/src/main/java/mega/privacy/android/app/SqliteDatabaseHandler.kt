@@ -22,12 +22,10 @@ import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
-import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoQuality
-import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.ChatSettings
@@ -491,25 +489,6 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
-    override fun setWrittenTextItem(handle: String?, text: String?, editedMsgId: String?): Int {
-        Timber.d("setWrittenTextItem: %s %s", text, handle)
-        val values = ContentValues().apply {
-            put(KEY_CHAT_ITEM_WRITTEN_TEXT, encrypt(text))
-            put(
-                KEY_CHAT_ITEM_EDITED_MSG_ID,
-                if (!TextUtil.isTextEmpty(editedMsgId)) encrypt(editedMsgId) else ""
-            )
-        }
-
-        return writableDatabase.update(
-            TABLE_CHAT_ITEMS,
-            SQLiteDatabase.CONFLICT_REPLACE,
-            values,
-            "$KEY_CHAT_HANDLE = '${encrypt(handle)}'",
-            emptyArray()
-        )
-    }
-
     /**
      * Saves attributes in DB.
      *
@@ -829,82 +808,6 @@ class SqliteDatabaseHandler @Inject constructor(
             Timber.e(e, "Exception opening or managing DB cursor")
         }
         return null
-    }
-
-    override fun findByParentId(parentId: Int): ArrayList<MegaOffline> {
-        val listOffline = ArrayList<MegaOffline>()
-        //Get the foreign key of the node
-        val selectQuery =
-            "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_PARENT = '$parentId'"
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    do {
-                        val _id = cursor.getString(0).toInt()
-                        val _handle = decrypt(cursor.getString(1))
-                        val _path = decrypt(cursor.getString(2))
-                        val _name = decrypt(cursor.getString(3))
-                        val _parent = cursor.getInt(4)
-                        val _type = decrypt(cursor.getString(5))
-                        val _incoming = cursor.getInt(6)
-                        val _handleIncoming = decrypt(cursor.getString(7))
-                        listOffline.add(
-                            MegaOffline(
-                                _id,
-                                _handle.toString(),
-                                _path.toString(),
-                                _name.toString(),
-                                _parent,
-                                _type,
-                                _incoming,
-                                _handleIncoming.toString()
-                            )
-                        )
-                    } while (cursor.moveToNext())
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return listOffline
-    }
-
-    override fun findById(id: Int): MegaOffline? {
-        val selectQuery = "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_ID = '$id'"
-        var offline: MegaOffline? = null
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    do {
-                        val _id = cursor.getString(0).toInt()
-                        val _handle = decrypt(cursor.getString(1))
-                        val _path = decrypt(cursor.getString(2))
-                        val _name = decrypt(cursor.getString(3))
-                        val _parent = cursor.getInt(4)
-                        val _type = decrypt(cursor.getString(5))
-                        val _incoming = cursor.getInt(6)
-                        val _handleIncoming = decrypt(cursor.getString(7))
-                        offline = MegaOffline(
-                            _id,
-                            _handle.toString(),
-                            _path.toString(),
-                            _name.toString(),
-                            _parent,
-                            _type,
-                            _incoming,
-                            _handleIncoming.toString()
-                        )
-                    } while (cursor.moveToNext())
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return offline
-    }
-
-    override fun removeById(id: Int): Int {
-        return writableDatabase.delete(TABLE_OFFLINE, "$KEY_ID=$id", emptyArray())
     }
 
     override fun setFirstTime(firstTime: Boolean) {
@@ -1356,28 +1259,6 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
-    override fun setAttrAskNoAppDownload(askNoAppDownload: String?) {
-        val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_ATTRIBUTES_TABLE =
-                        "UPDATE $TABLE_ATTRIBUTES SET $KEY_ATTR_ASK_NOAPP_DOWNLOAD='${
-                            encrypt(askNoAppDownload)
-                        }' WHERE $KEY_ID ='1'"
-                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
-                    Timber.d("UPDATE_ATTRIBUTES_TABLE : %s", UPDATE_ATTRIBUTES_TABLE)
-                } else {
-                    values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(askNoAppDownload))
-                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
     override fun setUseHttpsOnly(useHttpsOnly: Boolean) {
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
@@ -1748,63 +1629,6 @@ class SqliteDatabaseHandler @Inject constructor(
             where,
             emptyArray()
         )
-    }
-
-    override fun findPendingMessagesNotSent(idChat: Long): ArrayList<AndroidMegaChatMessage> {
-        Timber.d("findPendingMessagesNotSent")
-        val pendMsgs = ArrayList<AndroidMegaChatMessage>()
-        val chat = idChat.toString()
-        val selectQuery =
-            "SELECT * FROM $TABLE_PENDING_MSG_SINGLE WHERE $KEY_PENDING_MSG_STATE < ${PendingMessageState.SENT.value} AND $KEY_ID_CHAT ='${
-                encrypt(chat)
-            }'"
-        Timber.d("QUERY: %s", selectQuery)
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    do {
-                        val id = cursor.getLong(0)
-                        val chatId = decrypt(cursor.getString(1))!!
-                            .toLong()
-                        val timestamp = decrypt(cursor.getString(2))!!
-                            .toLong()
-                        val idKarereString = decrypt(cursor.getString(3))
-                        var idTempKarere: Long = -1
-                        if (idKarereString != null && !idKarereString.isEmpty()) {
-                            idTempKarere = idKarereString.toLong()
-                        }
-                        val filePath = decrypt(cursor.getString(4))
-                        val name = decrypt(cursor.getString(5))
-                        val nodeHandleString = decrypt(cursor.getString(6))
-                        var nodeHandle: Long = -1
-                        if (nodeHandleString != null && !nodeHandleString.isEmpty()) {
-                            nodeHandle = nodeHandleString.toLong()
-                        }
-                        val fingerPrint = decrypt(cursor.getString(7))
-                        val transferTag = cursor.getInt(8)
-                        val state = cursor.getInt(9)
-                        val pendMsg = PendingMessage(
-                            id,
-                            chatId,
-                            timestamp,
-                            idTempKarere,
-                            filePath.orEmpty(),
-                            fingerPrint,
-                            name,
-                            nodeHandle,
-                            transferTag,
-                            state
-                        )
-                        val aPMsg = AndroidMegaChatMessage(pendMsg, true)
-                        pendMsgs.add(aPMsg)
-                    } while (cursor.moveToNext())
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        Timber.d("Found: %s", pendMsgs.size)
-        return pendMsgs
     }
 
     override fun removeSentPendingMessages() {

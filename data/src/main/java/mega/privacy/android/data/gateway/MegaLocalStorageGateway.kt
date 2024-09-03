@@ -1,7 +1,6 @@
 package mega.privacy.android.data.gateway
 
 import mega.privacy.android.data.model.MegaAttributes
-import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.settings.ChatSettings
@@ -251,14 +250,6 @@ interface MegaLocalStorageGateway {
      * Clears chat settings.
      */
     suspend fun clearChatSettings()
-
-    /**
-     * Gets pending messages.
-     *
-     * @param chatId Chat identifier from which the messages has to be get.
-     * @return A list of [AndroidMegaChatMessage].
-     */
-    suspend fun findPendingMessagesNotSent(chatId: Long): List<AndroidMegaChatMessage>
 
     /**
      * Set transfer queue status
