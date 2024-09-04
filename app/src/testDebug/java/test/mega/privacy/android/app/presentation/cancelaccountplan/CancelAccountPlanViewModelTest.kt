@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.cancelaccountplan
+package mega.privacy.android.app.presentation.cancelaccountplan
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -6,8 +6,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.cancelaccountplan.CancelAccountPlanViewModel
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancellationInstructionsType
+import mega.privacy.android.app.presentation.cancelaccountplan.model.UICancellationSurveyAnswer
 import mega.privacy.android.app.presentation.cancelaccountplan.model.mapper.CancellationInstructionsTypeMapper
 import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.app.upgradeAccount.model.FormattedSize
@@ -21,11 +21,13 @@ import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.account.AccountPlanDetail
 import mega.privacy.android.domain.entity.account.CurrencyPoint
+import mega.privacy.android.domain.usecase.account.CancelSubscriptionWithSurveyAnswersUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetAppSubscriptionOptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
-import mega.privacy.android.shared.resources.R.string
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -36,6 +38,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
@@ -52,6 +55,11 @@ internal class CancelAccountPlanViewModelTest {
     private val formattedSizeMapper = mock<FormattedSizeMapper>()
     private val accountNameMapper = mock<AccountNameMapper>()
     private val accountDetailFlow = MutableStateFlow(AccountDetail())
+    private val cancelSubscriptionWithSurveyAnswersUseCase =
+        mock<CancelSubscriptionWithSurveyAnswersUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+
+    private val expectedSubscriptionId = "testSubscriptionId"
 
     private fun getAccountDetails(
         accountType: AccountType,
@@ -66,7 +74,14 @@ internal class CancelAccountPlanViewModelTest {
                 subscriptionRenewTime = 0L,
                 accountSubscriptionCycle = AccountSubscriptionCycle.MONTHLY,
                 proExpirationTime = 0L,
-                accountPlanDetail = null,
+                accountPlanDetail = AccountPlanDetail(
+                    accountType = accountType,
+                    isProPlan = true,
+                    expirationTime = 0L,
+                    subscriptionId = expectedSubscriptionId,
+                    featuresList = listOf(),
+                    isFreeTrial = false,
+                ),
                 accountSubscriptionDetailList = listOf(),
             )
         )
@@ -95,6 +110,8 @@ internal class CancelAccountPlanViewModelTest {
             getAppSubscriptionOptionsUseCase = getAppSubscriptionOptionsUseCase,
             formattedSizeMapper = formattedSizeMapper,
             accountNameMapper = accountNameMapper,
+            cancelSubscriptionWithSurveyAnswersUseCase = cancelSubscriptionWithSurveyAnswersUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -106,7 +123,9 @@ internal class CancelAccountPlanViewModelTest {
             cancellationInstructionsTypeMapper,
             getAppSubscriptionOptionsUseCase,
             formattedSizeMapper,
-            accountNameMapper
+            accountNameMapper,
+            cancelSubscriptionWithSurveyAnswersUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 
@@ -354,8 +373,9 @@ internal class CancelAccountPlanViewModelTest {
             assertThat(state.accountType).isEqualTo(accountType)
             assertThat(state.cancellationReasons.size).isEqualTo(10)
             assertThat(state.cancellationReasons.last()).isEqualTo(
-                string.account_cancel_subscription_survey_option_other
+                UICancellationSurveyAnswer.Answer8
             )
+            assertThat(state.subscriptionId).isEqualTo(expectedSubscriptionId)
         }
     }
 
@@ -366,5 +386,29 @@ internal class CancelAccountPlanViewModelTest {
             val state = awaitItem()
             assertThat(state.isLoading).isEqualTo(true)
         }
+    }
+
+    @Test
+    fun `test that invoke calls cancelSubscriptionWithSurveyAnswersUseCase`() = runTest {
+        val reason = "reason"
+        val canContact = 1
+        val accountType = AccountType.PRO_LITE
+
+        whenever(getAppSubscriptionOptionsUseCase(any())).thenReturn(
+            listOf(getSubscriptionOption(accountType))
+        )
+        whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
+
+        initViewModel()
+
+        accountDetailFlow.emit(getAccountDetails(accountType))
+
+        advanceUntilIdle()
+        underTest.cancelSubscription(reason, canContact)
+        verify(cancelSubscriptionWithSurveyAnswersUseCase).invoke(
+            reason,
+            expectedSubscriptionId,
+            canContact
+        )
     }
 }

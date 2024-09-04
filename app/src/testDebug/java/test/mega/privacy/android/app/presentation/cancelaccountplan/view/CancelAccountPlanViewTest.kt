@@ -9,15 +9,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancelAccountPlanUiState
-import mega.privacy.android.app.presentation.cancelaccountplan.view.CANCEL_ACCOUNT_PLAN_FEATURE_TABLE_TEST_TAG
-import mega.privacy.android.app.presentation.cancelaccountplan.view.CANCEL_ACCOUNT_PLAN_STORAGE_HINT_TEST_TAG
-import mega.privacy.android.app.presentation.cancelaccountplan.view.CANCEL_ACCOUNT_PLAN_SUBTITLE_TEST_TAG
-import mega.privacy.android.app.presentation.cancelaccountplan.view.CANCEL_ACCOUNT_PLAN_TITLE_TEST_TAG
-import mega.privacy.android.app.presentation.cancelaccountplan.view.CANCEL_ACCOUNT_PLAN_VIEW_LOADING_TEST_TAG
-import mega.privacy.android.app.presentation.cancelaccountplan.view.CANCEL_ACCOUNT_PLAN_VIEW_TEST_TAG
-import mega.privacy.android.app.presentation.cancelaccountplan.view.CONTINUE_CANCELLATION_BUTTON_TEST_TAG
-import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelAccountPlanView
-import mega.privacy.android.app.presentation.cancelaccountplan.view.KEEP_PRO_PLAN_BUTTON_TEST_TAG
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.shared.resources.R
 import org.junit.Rule

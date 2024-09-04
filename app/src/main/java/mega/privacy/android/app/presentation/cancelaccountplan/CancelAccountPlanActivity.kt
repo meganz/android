@@ -10,10 +10,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.account.AccountStorageViewModel
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancellationInstructionsType
@@ -29,6 +31,9 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.CancelSubscriptionContinueCancellationButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CancelSubscriptionKeepPlanButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SubscriptionCancellationSurveyCancelSubscriptionButtonEvent
+import mega.privacy.mobile.analytics.event.SubscriptionCancellationSurveyDontCancelButtonEvent
+import mega.privacy.mobile.analytics.event.SubscriptionCancellationSurveyScreenEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -96,13 +101,19 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                                             cancellationInstructionsRoute
                                         )
 
-                                        CancellationInstructionsType.PlayStore ->
+                                        CancellationInstructionsType.PlayStore,
+                                        -> if (uiState.showCancellationSurvey) {
+                                            navController.navigate(
+                                                cancellationSurveyRoute
+                                            )
+                                        } else {
                                             uiState.isMonthlySubscription?.let { isMonthlySubscription ->
                                                 redirectToCancelPlayStoreSubscription(
                                                     accountType,
                                                     isMonthlySubscription
                                                 )
                                             }
+                                        }
                                     }
                                 }
                             })
@@ -127,28 +138,25 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                         )
                     }
                     composable(cancellationSurveyRoute) {
+                        Analytics.tracker.trackEvent(SubscriptionCancellationSurveyScreenEvent)
                         CancelSubscriptionSurveyView(
                             possibleCancellationReasons = uiState.cancellationReasons,
-                            onCancelSubscriptionButtonClicked = {
-                                uiState.cancellationInstructionsType?.let { cancellationInstructionsType ->
-                                    when (cancellationInstructionsType) {
-                                        CancellationInstructionsType.AppStore,
-                                        CancellationInstructionsType.WebClient,
-                                        -> navController.navigate(
-                                            cancellationInstructionsRoute
-                                        )
-
-                                        CancellationInstructionsType.PlayStore ->
-                                            uiState.isMonthlySubscription?.let { isMonthlySubscription ->
-                                                redirectToCancelPlayStoreSubscription(
-                                                    accountType,
-                                                    isMonthlySubscription
-                                                )
-                                            }
-                                    }
+                            onCancelSubscriptionButtonClicked = { reason, canContact ->
+                                Analytics.tracker.trackEvent(
+                                    SubscriptionCancellationSurveyCancelSubscriptionButtonEvent
+                                )
+                                viewModel.cancelSubscription(reason, canContact)
+                                uiState.isMonthlySubscription?.let { isMonthlySubscription ->
+                                    redirectToCancelPlayStoreSubscription(
+                                        accountType,
+                                        isMonthlySubscription
+                                    )
                                 }
                             },
                             onDoNotCancelButtonClicked = {
+                                Analytics.tracker.trackEvent(
+                                    SubscriptionCancellationSurveyDontCancelButtonEvent
+                                )
                                 finish()
                             })
                     }

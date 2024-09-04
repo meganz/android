@@ -21,11 +21,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.anggrayudi.storage.extension.toInt
+import mega.privacy.android.app.presentation.cancelaccountplan.model.UICancellationSurveyAnswer
 import mega.privacy.android.shared.original.core.ui.controls.banners.PromptMessageBanner
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaCheckbox
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -42,18 +45,19 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1me
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.isScreenOrientationLandscape
 import mega.privacy.android.shared.original.core.ui.utils.isTablet
-import mega.privacy.android.shared.resources.R
 
 @Composable
 internal fun CancelSubscriptionSurveyView(
-    possibleCancellationReasons: List<Int>,
-    onCancelSubscriptionButtonClicked: () -> Unit,
+    possibleCancellationReasons: List<UICancellationSurveyAnswer>,
+    onCancelSubscriptionButtonClicked: (String, Int) -> Unit,
     onDoNotCancelButtonClicked: () -> Unit,
 ) {
 
+    val context = LocalContext.current
     var showError by rememberSaveable { mutableStateOf(false) }
     var allowContact by rememberSaveable { mutableStateOf(false) }
-    var selectedOptionPosition by rememberSaveable { mutableIntStateOf(-1) }
+    var selectedOptionId by rememberSaveable { mutableIntStateOf(-1) }
+    var selectedOptionString by rememberSaveable { mutableStateOf("") }
     var othersDescriptionText by rememberSaveable { mutableStateOf("") }
     val scrollState = rememberScrollState()
 
@@ -109,9 +113,15 @@ internal fun CancelSubscriptionSurveyView(
 
         SurveyOptions(
             possibleCancellationReasons = possibleCancellationReasons,
-            selectedOptionPosition = selectedOptionPosition,
-            onItemClicked = { index ->
-                selectedOptionPosition = index
+            selectedOptionId = selectedOptionId,
+            onItemClicked = { reason ->
+                selectedOptionId = reason.answerId
+                selectedOptionString =
+                    if (selectedOptionId == UICancellationSurveyAnswer.Answer8.answerId) {
+                        othersDescriptionText
+                    } else {
+                        context.getString(reason.answerValue)
+                    }
                 showError = false
             },
             modifier = Modifier
@@ -119,7 +129,7 @@ internal fun CancelSubscriptionSurveyView(
                 .testTag(SURVEY_OPTIONS_GROUP_TEST_TAG)
         )
 
-        if (selectedOptionPosition == possibleCancellationReasons.lastIndex) {
+        if (selectedOptionId == possibleCancellationReasons.last().answerId) {
             GenericDescriptionWithCharacterLimitTextField(
                 maxCharacterLimit = MAX_CHARACTER_LIMIT,
                 minCharacterLimit = MIN_CHARACTER_LIMIT,
@@ -176,12 +186,22 @@ internal fun CancelSubscriptionSurveyView(
                     id = SharedR.string.account_cancel_subscription_survey_cancel_button
                 ),
                 onClick = {
-                    if (selectedOptionPosition == -1) {
+                    if (selectedOptionId == -1) {
                         showError = true
                     } else {
                         showError = false
                         if (othersDescriptionText.length <= MAX_CHARACTER_LIMIT)
-                            onCancelSubscriptionButtonClicked()
+                            if (selectedOptionId == UICancellationSurveyAnswer.Answer8.answerId) {
+                                onCancelSubscriptionButtonClicked(
+                                    othersDescriptionText,
+                                    allowContact.toInt()
+                                )
+                            } else {
+                                onCancelSubscriptionButtonClicked(
+                                    "$selectedOptionId - $selectedOptionString",
+                                    allowContact.toInt()
+                                )
+                            }
                     }
                 },
             )
@@ -199,31 +219,31 @@ internal fun CancelSubscriptionSurveyView(
 
 @Composable
 internal fun SurveyOptions(
-    possibleCancellationReasons: List<Int>,
-    onItemClicked: (Int) -> Unit,
-    selectedOptionPosition: Int,
+    possibleCancellationReasons: List<UICancellationSurveyAnswer>,
+    onItemClicked: (UICancellationSurveyAnswer) -> Unit,
+    selectedOptionId: Int,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.selectableGroup()) {
-        possibleCancellationReasons.forEachIndexed { index, reasonResId ->
+        possibleCancellationReasons.forEach { reason ->
             Row(
                 Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .align(Alignment.CenterHorizontally)
                     .selectable(
-                        selected = (index == selectedOptionPosition),
+                        selected = (reason.answerId == selectedOptionId),
                         onClick = {
-                            onItemClicked(index)
+                            onItemClicked(reason)
                         },
                         role = Role.RadioButton
                     )
                     .testTag(SURVEY_OPTIONS_ROW_TEST_TAG)
             ) {
                 MegaRadioButton(
-                    selected = (index == selectedOptionPosition),
+                    selected = (reason.answerId == selectedOptionId),
                     onClick = {
-                        onItemClicked(index)
+                        onItemClicked(reason)
                     },
                     modifier = Modifier
                         .size(20.dp)
@@ -231,7 +251,7 @@ internal fun SurveyOptions(
                         .testTag(SURVEY_OPTIONS_OPTION_RADIO_TEST_TAG),
                 )
                 MegaText(
-                    text = stringResource(id = reasonResId),
+                    text = stringResource(id = reason.answerValue),
                     textColor = TextColor.Secondary,
                     style = MaterialTheme.typography.body1,
                     textAlign = TextAlign.Start,
@@ -251,20 +271,20 @@ internal fun SurveyOptions(
 @CombinedThemeTabletPortraitPreviews
 private fun CancelSubscriptionSurveyViewPreview() {
     val possibleCancellationReasons = listOf(
-        R.string.account_cancel_subscription_survey_option_expensive,
-        R.string.account_cancel_subscription_survey_option_cannot_afford,
-        R.string.account_cancel_subscription_survey_option_no_subscription,
-        R.string.account_cancel_subscription_survey_option_no_storage_need,
-        R.string.account_cancel_subscription_survey_option_missing_features,
-        R.string.account_cancel_subscription_survey_option_switch_provider,
-        R.string.account_cancel_subscription_survey_option_confusing,
-        R.string.account_cancel_subscription_survey_option_dissatisfied_support,
-        R.string.account_cancel_subscription_survey_option_temporary_use,
-    ).shuffled() + R.string.account_cancel_subscription_survey_option_other
+        UICancellationSurveyAnswer.Answer1,
+        UICancellationSurveyAnswer.Answer2,
+        UICancellationSurveyAnswer.Answer3,
+        UICancellationSurveyAnswer.Answer4,
+        UICancellationSurveyAnswer.Answer5,
+        UICancellationSurveyAnswer.Answer6,
+        UICancellationSurveyAnswer.Answer7,
+        UICancellationSurveyAnswer.Answer9,
+        UICancellationSurveyAnswer.Answer10,
+    ).shuffled() + UICancellationSurveyAnswer.Answer8
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CancelSubscriptionSurveyView(
             possibleCancellationReasons = possibleCancellationReasons,
-            onCancelSubscriptionButtonClicked = {},
+            onCancelSubscriptionButtonClicked = { _, _ -> },
             onDoNotCancelButtonClicked = {},
         )
     }
