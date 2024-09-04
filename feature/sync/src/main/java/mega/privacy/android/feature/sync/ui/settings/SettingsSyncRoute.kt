@@ -21,8 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.feature.sync.ui.model.SyncFrequency
 import mega.privacy.android.feature.sync.ui.model.SyncOption
 import mega.privacy.android.feature.sync.ui.views.ClearSyncDebrisDialog
+import mega.privacy.android.feature.sync.ui.views.SyncFrequencyDialog
 import mega.privacy.android.feature.sync.ui.views.SyncOptionsDialog
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -44,7 +46,10 @@ internal fun SettingsSyncRoute(
         },
         syncOptionSelected = { selectedOption ->
             viewModel.handleAction(SettingsSyncAction.SyncOptionSelected(selectedOption))
-        }
+        },
+        syncFrequencySelected = { selectedFrequency ->
+            viewModel.handleAction(SettingsSyncAction.SyncFrequencySelected(selectedFrequency))
+        },
     )
 }
 
@@ -53,11 +58,13 @@ private fun SettingSyncScreen(
     uiState: SettingsSyncUiState,
     syncDebrisCleared: () -> Unit,
     syncOptionSelected: (SyncOption) -> Unit,
+    syncFrequencySelected: (SyncFrequency) -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var showSyncOptionsDialog by rememberSaveable { mutableStateOf(false) }
     var showClearSyncDebrisDialog by rememberSaveable { mutableStateOf(false) }
+    var showSyncFrequencyDialog by rememberSaveable { mutableStateOf(false) }
 
     MegaScaffold(
         scaffoldState = scaffoldState,
@@ -89,6 +96,14 @@ private fun SettingSyncScreen(
                         showClearSyncDebrisDialog = true
                     }
                 )
+                if (uiState.showSyncFrequency) {
+                    SyncFrequencyView(
+                        currentSyncFrequency = uiState.syncFrequency,
+                        syncFrequencyClicked = {
+                            showSyncFrequencyDialog = true
+                        },
+                    )
+                }
             }
         }
     )
@@ -129,10 +144,26 @@ private fun SettingSyncScreen(
             }
         )
     }
+    if (showSyncFrequencyDialog) {
+        SyncFrequencyDialog(
+            onDismiss = {
+                showSyncFrequencyDialog = false
+            },
+            selectedSyncFrequency = uiState.syncFrequency,
+            onSyncFrequencyClicked = { selectedSyncFrequency ->
+                syncFrequencySelected(selectedSyncFrequency)
+                showSyncFrequencyDialog = false
+            },
+        )
+    }
     val context = LocalContext.current
     LaunchedEffect(key1 = uiState.snackbarMessage) {
         uiState.snackbarMessage?.let { message ->
-            scaffoldState.snackbarHostState.showAutoDurationSnackbar(context.resources.getString(message))
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                context.resources.getString(
+                    message
+                )
+            )
         }
     }
 }

@@ -6,16 +6,20 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ClearSyncDebrisUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncDebrisSizeInBytesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSyncByWiFiUseCase
+import mega.privacy.android.feature.sync.ui.model.SyncFrequency
 import mega.privacy.android.feature.sync.ui.model.SyncOption
+import mega.privacy.android.feature.sync.ui.settings.SettingsSyncAction
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncAction.SyncOptionSelected
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncAction.SnackbarShown
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncAction.ClearDebrisClicked
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncViewModel
 import mega.privacy.android.shared.resources.R
+import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -36,6 +40,7 @@ class SettingsSyncViewModelTest {
     private val setSyncByWiFiUseCase: SetSyncByWiFiUseCase = mock()
     private val getSyncDebrisSizeUseCase: GetSyncDebrisSizeInBytesUseCase = mock()
     private val clearSyncDebrisUseCase: ClearSyncDebrisUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     private lateinit var underTest: SettingsSyncViewModel
 
@@ -128,12 +133,39 @@ class SettingsSyncViewModelTest {
         }
     }
 
+    @Test
+    fun `test that AndroidSyncWorkManager feature flag updates ui state upon viewmodel init`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(SyncFeatures.AndroidSyncWorkManager)).thenReturn(
+                true
+            )
+
+            initViewModel()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().showSyncFrequency).isEqualTo(true)
+            }
+        }
+
+    @Test
+    fun `test that set frequency selected updates ui state`() = runTest {
+        val frequency = SyncFrequency.EVERY_30_MINUTES
+        initViewModel()
+
+        underTest.handleAction(SettingsSyncAction.SyncFrequencySelected(frequency))
+
+        underTest.uiState.test {
+            assertThat(awaitItem().syncFrequency).isEqualTo(frequency)
+        }
+    }
+
     private fun initViewModel() {
         underTest = SettingsSyncViewModel(
             monitorSyncByWiFiUseCase,
             setSyncByWiFiUseCase,
             getSyncDebrisSizeUseCase,
-            clearSyncDebrisUseCase
+            clearSyncDebrisUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 }

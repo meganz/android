@@ -7,12 +7,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ClearSyncDebrisUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncDebrisSizeInBytesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.ui.model.SyncOption
 import mega.privacy.android.shared.resources.R
+import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -22,6 +24,7 @@ internal class SettingsSyncViewModel @Inject constructor(
     private val setSyncByWiFiUseCase: SetSyncByWiFiUseCase,
     private val getSyncDebrisSizeUseCase: GetSyncDebrisSizeInBytesUseCase,
     private val clearSyncDebrisUseCase: ClearSyncDebrisUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsSyncUiState())
@@ -42,6 +45,19 @@ internal class SettingsSyncViewModel @Inject constructor(
             }
         }
         fetchSyncDebris()
+        loadIsSyncFrequencyEnabled()
+    }
+
+    private fun loadIsSyncFrequencyEnabled() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(SyncFeatures.AndroidSyncWorkManager)
+            }.onSuccess { isSyncFrequencyEnabled ->
+                _uiState.update {
+                    it.copy(showSyncFrequency = isSyncFrequencyEnabled)
+                }
+            }.onFailure(Timber::e)
+        }
     }
 
     fun handleAction(action: SettingsSyncAction) {
@@ -57,6 +73,12 @@ internal class SettingsSyncViewModel @Inject constructor(
             SettingsSyncAction.SnackbarShown -> {
                 _uiState.update {
                     it.copy(snackbarMessage = null)
+                }
+            }
+
+            is SettingsSyncAction.SyncFrequencySelected -> {
+                _uiState.update {
+                    it.copy(syncFrequency = action.frequency)
                 }
             }
         }

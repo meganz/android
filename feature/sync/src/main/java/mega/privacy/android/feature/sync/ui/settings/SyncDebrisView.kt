@@ -19,7 +19,7 @@ internal fun SyncDebrisView(
     clearDebrisClicked: () -> Unit,
 ) {
     GenericTwoLineListItem(
-        modifier = modifier.testTag(SETTINGS_SYNC_SYNC_OPTIONS_VIEW),
+        modifier = modifier.testTag(SETTINGS_SYNC_SYNC_DEBRIS_VIEW),
         title = stringResource(R.string.settings_sync_clear_debris_item_title),
         subtitle = formatFileSize(size, LocalContext.current),
         showEntireSubtitle = true,
@@ -38,4 +38,4 @@ private fun SyncOptionsViewPreview() {
     }
 }
 
-private const val SETTINGS_SYNC_SYNC_OPTIONS_VIEW = "SETTINGS_SYNC_DEBRIS_VIEW"
+private const val SETTINGS_SYNC_SYNC_DEBRIS_VIEW = "SETTINGS_SYNC_DEBRIS_VIEW"
