@@ -11,6 +11,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistSetUiEntity
+import mega.privacy.android.app.presentation.videosection.view.VIDEO_SECTION_LOADING_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.VIDEO_TO_PLAYLIST_CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.VIDEO_TO_PLAYLIST_DIVIDER_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.VIDEO_TO_PLAYLIST_DONE_BUTTON_TEST_TAG
@@ -18,8 +19,6 @@ import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.V
 import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.VIDEO_TO_PLAYLIST_ITEM_CHECK_BOX_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.VIDEO_TO_PLAYLIST_LIST_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.VIDEO_TO_PLAYLIST_NEW_PLAYLIST_TEST_TAG
-import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.VIDEO_TO_PLAYLIST_PROGRESS_BAR_CONTAINER_TEST_TAG
-import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.VIDEO_TO_PLAYLIST_PROGRESS_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.VIDEO_TO_PLAYLIST_SEARCH_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.VideoToPlaylistView
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
@@ -90,8 +89,7 @@ class VideoToPlaylistViewTest {
         setComposeContent(isLoading = true)
 
         listOf(
-            VIDEO_TO_PLAYLIST_PROGRESS_BAR_CONTAINER_TEST_TAG,
-            VIDEO_TO_PLAYLIST_PROGRESS_BAR_TEST_TAG,
+            VIDEO_SECTION_LOADING_VIEW_TEST_TAG,
             VIDEO_TO_PLAYLIST_SEARCH_BAR_TEST_TAG,
             VIDEO_TO_PLAYLIST_NEW_PLAYLIST_TEST_TAG,
         ).map {
@@ -114,8 +112,7 @@ class VideoToPlaylistViewTest {
         }
         listOf(
             VIDEO_TO_PLAYLIST_LIST_TEST_TAG,
-            VIDEO_TO_PLAYLIST_PROGRESS_BAR_CONTAINER_TEST_TAG,
-            VIDEO_TO_PLAYLIST_PROGRESS_BAR_TEST_TAG
+            VIDEO_SECTION_LOADING_VIEW_TEST_TAG
         ).map {
             it.doesNotExist()
         }
@@ -150,8 +147,7 @@ class VideoToPlaylistViewTest {
         }
         listOf(
             VIDEO_TO_PLAYLIST_EMPTY_VIEW_TEST_TAG,
-            VIDEO_TO_PLAYLIST_PROGRESS_BAR_CONTAINER_TEST_TAG,
-            VIDEO_TO_PLAYLIST_PROGRESS_BAR_TEST_TAG
+            VIDEO_SECTION_LOADING_VIEW_TEST_TAG
         ).map {
             it.doesNotExist()
         }

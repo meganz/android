@@ -10,10 +10,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
+import mega.privacy.android.app.presentation.videosection.view.VIDEO_SECTION_LOADING_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.FAB_BUTTON_TEST_TAG
-import mega.privacy.android.app.presentation.videosection.view.playlist.PROGRESS_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_DELETE_BOTTOM_SHEET_TILE_TEST_TAG
@@ -114,7 +114,7 @@ class VideoPlaylistsViewTest {
     fun `test that progressBar is displayed correctly`() {
         setComposeContent(progressBarShowing = true)
 
-        PROGRESS_BAR_TEST_TAG.assertIsDisplayed()
+        VIDEO_SECTION_LOADING_VIEW_TEST_TAG.assertIsDisplayed()
     }
 
     @Test

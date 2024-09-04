@@ -7,10 +7,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -26,7 +23,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -41,13 +37,13 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSelectedState
+import mega.privacy.android.app.presentation.videosection.view.VideoSectionLoadingView
 import mega.privacy.android.app.presentation.view.NodeGridView
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
-import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
@@ -88,7 +84,9 @@ internal fun VideoSelectedView(
     }
 
     Scaffold(
-        modifier = modifier.systemBarsPadding().semantics { testTagsAsResourceId = true },
+        modifier = modifier
+            .systemBarsPadding()
+            .semantics { testTagsAsResourceId = true },
         scaffoldState = rememberScaffoldState(),
         topBar = {
             VideoSelectedTopBar(
@@ -128,20 +126,7 @@ internal fun VideoSelectedView(
         }
     ) { paddingValue ->
         when {
-            uiState.isLoading -> Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 20.dp)
-                    .testTag(VIDEO_SELECTED_PROGRESS_BAR_TEST_TAG),
-                contentAlignment = Alignment.TopCenter,
-                content = {
-                    MegaCircularProgressIndicator(
-                        modifier = Modifier
-                            .size(50.dp),
-                        strokeWidth = 4.dp,
-                    )
-                },
-            )
+            uiState.isLoading -> VideoSectionLoadingView()
 
             uiState.nodesList.isEmpty() -> LegacyMegaEmptyViewWithImage(
                 modifier = Modifier.testTag(VIDEO_SELECTED_EMPTY_VIEW_TEST_TAG),
@@ -283,12 +268,6 @@ private fun VideoSelectedViewWithEmptyViewPreview() {
         )
     }
 }
-
-
-/**
- * Test tag for progressBar
- */
-const val VIDEO_SELECTED_PROGRESS_BAR_TEST_TAG = "video_selected:progress_bar"
 
 /**
  * Test tag for empty view

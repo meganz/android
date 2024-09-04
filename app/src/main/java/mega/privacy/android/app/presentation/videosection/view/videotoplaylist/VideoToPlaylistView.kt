@@ -4,17 +4,13 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -25,6 +21,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistSetUiEntity
+import mega.privacy.android.app.presentation.videosection.view.VideoSectionLoadingView
 import mega.privacy.android.app.presentation.videosection.view.playlist.CreateVideoPlaylistDialog
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
@@ -35,7 +32,6 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLineListItem
-import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
@@ -120,21 +116,7 @@ internal fun VideoToPlaylistView(
             )
 
             when {
-                isLoading -> Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 20.dp)
-                        .testTag(VIDEO_TO_PLAYLIST_PROGRESS_BAR_CONTAINER_TEST_TAG),
-                    contentAlignment = Alignment.TopCenter,
-                    content = {
-                        MegaCircularProgressIndicator(
-                            modifier = Modifier
-                                .size(50.dp)
-                                .testTag(VIDEO_TO_PLAYLIST_PROGRESS_BAR_TEST_TAG),
-                            strokeWidth = 4.dp,
-                        )
-                    },
-                )
+                isLoading -> VideoSectionLoadingView()
 
                 items.isEmpty() -> LegacyMegaEmptyViewWithImage(
                     modifier = Modifier.testTag(VIDEO_TO_PLAYLIST_EMPTY_VIEW_TEST_TAG),
@@ -251,16 +233,6 @@ const val VIDEO_TO_PLAYLIST_NEW_PLAYLIST_TEST_TAG = "video_to_playlist_item:text
  * Test tag for empty view
  */
 const val VIDEO_TO_PLAYLIST_EMPTY_VIEW_TEST_TAG = "video_to_playlist_view:empty_view"
-
-/**
- * Test tag for progressBar
- */
-const val VIDEO_TO_PLAYLIST_PROGRESS_BAR_TEST_TAG = "video_to_playlist_view:progress_bar"
-
-/**
- * Test tag for progressBar container
- */
-const val VIDEO_TO_PLAYLIST_PROGRESS_BAR_CONTAINER_TEST_TAG = "video_to_playlist_view:box_container"
 
 /**
  * Test tag for CreateVideoPlaylistDialog

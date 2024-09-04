@@ -15,15 +15,15 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSelectedState
+import mega.privacy.android.app.presentation.videosection.view.VIDEO_SECTION_LOADING_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VIDEO_SELECTED_EMPTY_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VIDEO_SELECTED_FAB_BUTTON_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VIDEO_SELECTED_GRID_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VIDEO_SELECTED_LIST_VIEW_TEST_TAG
-import mega.privacy.android.app.presentation.videosection.view.videoselected.VIDEO_SELECTED_PROGRESS_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VideoSelectedView
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -81,7 +81,7 @@ class VideoSelectedViewTest {
     fun `test that ui is displayed correctly when isLoading is true`() {
         setComposeContent()
 
-        composeTestRule.onNodeWithTag(VIDEO_SELECTED_PROGRESS_BAR_TEST_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(VIDEO_SECTION_LOADING_VIEW_TEST_TAG).assertIsDisplayed()
     }
 
     @Test

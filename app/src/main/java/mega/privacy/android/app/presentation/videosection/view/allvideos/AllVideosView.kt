@@ -4,11 +4,8 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ExperimentalMaterialApi
@@ -19,7 +16,6 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
@@ -34,13 +30,13 @@ import mega.privacy.android.app.presentation.videosection.model.DurationFilterOp
 import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideosFilterOptionEntity
+import mega.privacy.android.app.presentation.videosection.view.VideoSectionLoadingView
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
-import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaNode
@@ -135,22 +131,7 @@ internal fun AllVideosView(
             )
 
             when {
-                progressBarShowing -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 20.dp)
-                            .testTag(VIDEOS_PROGRESS_BAR_TEST_TAG),
-                        contentAlignment = Alignment.TopCenter,
-                        content = {
-                            MegaCircularProgressIndicator(
-                                modifier = Modifier
-                                    .size(50.dp),
-                                strokeWidth = 4.dp,
-                            )
-                        },
-                    )
-                }
+                progressBarShowing -> VideoSectionLoadingView()
 
                 items.isEmpty() -> LegacyMegaEmptyViewWithImage(
                     modifier = Modifier.testTag(VIDEOS_EMPTY_VIEW_TEST_TAG),
@@ -298,11 +279,6 @@ private fun AllVideosViewPreview() {
         )
     }
 }
-
-/**
- * Test tag for the videos progress bar.
- */
-const val VIDEOS_PROGRESS_BAR_TEST_TAG = "all_videos:progress_bar"
 
 /**
  * Test tag for the videos empty view.

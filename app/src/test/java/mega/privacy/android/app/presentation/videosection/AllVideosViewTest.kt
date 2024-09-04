@@ -15,11 +15,11 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
+import mega.privacy.android.app.presentation.videosection.view.VIDEO_SECTION_LOADING_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.allvideos.AllVideosView
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEOS_EMPTY_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEOS_FILTER_BUTTON_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEOS_LIST_TEST_TAG
-import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEOS_PROGRESS_BAR_TEST_TAG
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.Before
@@ -88,7 +88,7 @@ class AllVideosViewTest {
     fun `test that the ui is displayed correctly when progressBarShowing is true`() {
         setComposeContent(progressBarShowing = true)
 
-        composeTestRule.onNodeWithTag(VIDEOS_PROGRESS_BAR_TEST_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(VIDEO_SECTION_LOADING_VIEW_TEST_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(VIDEOS_FILTER_BUTTON_VIEW_TEST_TAG).assertIsDisplayed()
     }
 
