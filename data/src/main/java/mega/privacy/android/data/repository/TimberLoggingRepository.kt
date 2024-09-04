@@ -82,6 +82,7 @@ internal class TimberLoggingRepository @Inject constructor(
         MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX)
         MegaChatApiAndroid.setLoggerObject(megaChatLogger)
         MegaChatApiAndroid.setLogLevel(MegaChatApiAndroid.LOG_LEVEL_MAX)
+        MegaChatApiAndroid.setInternalMaxLogLevel(MegaChatApiAndroid.LOG_LEVEL_DEBUG)
         Timber.plant(LineNumberDebugTree())
     }
 
