@@ -159,6 +159,7 @@ import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.domain.usecase.FakeMonitorBackupFolder
+import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import java.io.File
 import java.util.stream.Stream
 import kotlin.test.assertFalse
@@ -344,6 +345,7 @@ class ManagerViewModelTest {
     }
 
     private val filePrepareUseCase = mock<FilePrepareUseCase>()
+    private val createFolderNodeUseCase: CreateFolderNodeUseCase = mock()
 
 
     private fun initViewModel() {
@@ -430,6 +432,7 @@ class ManagerViewModelTest {
             startOfflineSyncWorkerUseCase = startOfflineSyncWorkerUseCase,
             filePrepareUseCase = filePrepareUseCase,
             scannerHandler = scannerHandler,
+            createFolderNodeUseCase = createFolderNodeUseCase,
         )
     }
 
@@ -482,6 +485,7 @@ class ManagerViewModelTest {
             startOfflineSyncWorkerUseCase,
             filePrepareUseCase,
             scannerHandler,
+            createFolderNodeUseCase
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
@@ -1570,6 +1574,14 @@ class ManagerViewModelTest {
         underTest.state.test {
             assertThat(awaitItem().documentScanningErrorTypeUiItem).isNull()
         }
+    }
+
+    @Test
+    fun `test that createFolder invokes the use case`() = runTest {
+        val parentHandle = 123L
+        val folderName = "folderName"
+        underTest.createFolder(parentHandle, folderName)
+        verify(createFolderNodeUseCase).invoke(folderName, NodeId(parentHandle))
     }
 
     companion object {

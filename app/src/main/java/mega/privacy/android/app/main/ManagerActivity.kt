@@ -113,7 +113,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BusinessExpiredAlertActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -522,8 +521,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private lateinit var appBarLayout: AppBarLayout
 
     private var selectedAccountType = 0
-    private var infoManager: ShareInfo? = null
-    private var parentNodeManager: MegaNode? = null
 
     lateinit var drawerLayout: DrawerLayout
 
@@ -5487,37 +5484,51 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         Timber.d("createFolder")
         if (!viewModel.isConnected) {
             showSnackbar(
-                Constants.SNACKBAR_TYPE,
+                SNACKBAR_TYPE,
                 getString(R.string.error_server_connection_problem),
                 -1
             )
             return
         }
-        if (isFinishing) {
-            return
-        }
-        val parentNode = getCurrentParentNode(
-            currentParentHandle,
-            R.string.context_folder_no_created
-        )
-            ?: return
-        val nL: ArrayList<MegaNode> = megaApi.getChildren(parentNode)
-        for (i in nL.indices) {
-            if (folderName.compareTo(nL[i].name) == 0) {
+        lifecycleScope.launch {
+            statusDialog = createProgressDialog(
+                this@ManagerActivity,
+                getString(R.string.context_creating_folder)
+            )
+            runCatching {
+                viewModel.createFolder(currentParentHandle, folderName)
+            }.onSuccess { node ->
                 showSnackbar(
                     Constants.SNACKBAR_TYPE,
-                    getString(R.string.context_folder_already_exists),
+                    getString(R.string.context_folder_created),
                     -1
                 )
-                Timber.d("Folder not created: folder already exists")
-                return
+                if (drawerItem === DrawerItem.CLOUD_DRIVE) {
+                    if (isCloudAdded) {
+                        fileBrowserViewModel.setFileBrowserHandle(node.longValue)
+                    }
+                } else if (drawerItem === DrawerItem.SHARED_ITEMS) {
+                    when (tabItemShares) {
+                        SharesTab.INCOMING_TAB -> if (isIncomingAdded) {
+                            incomingSharesViewModel.setCurrentHandle(node.longValue)
+                        }
+
+                        SharesTab.OUTGOING_TAB -> if (isOutgoingAdded) {
+                            outgoingSharesViewModel.setCurrentHandle(node.longValue)
+                        }
+
+                        SharesTab.LINKS_TAB -> if (isLinksAdded) {
+                            linksViewModel.openFolderByHandleWithRetry(node.longValue)
+                        }
+
+                        else -> {}
+                    }
+                }
+            }.onFailure {
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_no_created), -1)
             }
+            dismissAlertDialogIfExists(statusDialog)
         }
-        statusDialog = createProgressDialog(
-            this,
-            getString(R.string.context_creating_folder)
-        )
-        megaApi.createFolder(folderName, parentNode, this)
     }
 
     override fun onJoinMeeting() {
@@ -6488,43 +6499,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
-    private fun createFile(name: String?, data: String, parentNode: MegaNode?) {
-        if (viewModel.getStorageState() === StorageState.PayWall) {
-            showOverDiskQuotaPaywallWarning()
-            return
-        }
-        val file = FileUtil.createTemporalTextFile(this, name, data)
-        if (file == null) {
-            showSnackbar(
-                Constants.SNACKBAR_TYPE,
-                getString(R.string.general_text_error),
-                MEGACHAT_INVALID_HANDLE
-            )
-            return
-        }
-        if (parentNode == null) return
-        val parentHandle = parentNode.handle
-        lifecycleScope.launch {
-            runCatching {
-                checkFileNameCollisionsUseCase(
-                    files = listOf(file.toDocumentEntity()),
-                    parentNodeId = NodeId(parentHandle)
-                )
-            }.onSuccess { collisions ->
-                collisions.firstOrNull()?.let {
-                    nameCollisionActivityLauncher.launch(arrayListOf(it))
-                } ?: viewModel.uploadFile(file, parentHandle)
-            }.onFailure { throwable: Throwable? ->
-                Timber.e(throwable)
-                showSnackbar(
-                    Constants.SNACKBAR_TYPE,
-                    getString(R.string.general_error),
-                    MEGACHAT_INVALID_HANDLE
-                )
-            }
-        }
-    }
-
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
         Timber.d("onRequestStart: %s", request.requestString)
     }
@@ -6693,47 +6667,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             )
                         }
                     }
-                }
-            }
-
-            MegaRequest.TYPE_CREATE_FOLDER -> {
-                dismissAlertDialogIfExists(statusDialog)
-                if (e.errorCode == MegaError.API_OK) {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.context_folder_created),
-                        -1
-                    )
-                    val folderNode =
-                        megaApi.getNodeByHandle(request.nodeHandle) ?: return
-                    if (drawerItem === DrawerItem.CLOUD_DRIVE) {
-                        if (isCloudAdded) {
-                            fileBrowserViewModel.setFileBrowserHandle(folderNode.handle)
-                        }
-                    } else if (drawerItem === DrawerItem.SHARED_ITEMS) {
-                        when (tabItemShares) {
-                            SharesTab.INCOMING_TAB -> if (isIncomingAdded) {
-                                incomingSharesViewModel.setCurrentHandle(folderNode.handle)
-                            }
-
-                            SharesTab.OUTGOING_TAB -> if (isOutgoingAdded) {
-                                outgoingSharesViewModel.setCurrentHandle(folderNode.handle)
-                            }
-
-                            SharesTab.LINKS_TAB -> if (isLinksAdded) {
-                                linksViewModel.openFolderByHandleWithRetry(folderNode.handle)
-                            }
-
-                            else -> {}
-                        }
-                    }
-                } else {
-                    Timber.e("TYPE_CREATE_FOLDER ERROR: %s___%s", e.errorCode, e.errorString)
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.context_folder_no_created),
-                        -1
-                    )
                 }
             }
 
