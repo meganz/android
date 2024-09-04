@@ -152,7 +152,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     CancelSubscription(
         "Enable cancel subscription feature",
-        false
+        true
     ),
 
     /**
