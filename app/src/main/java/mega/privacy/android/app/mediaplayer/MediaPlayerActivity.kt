@@ -9,7 +9,6 @@ import androidx.navigation.NavController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
-import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
@@ -24,7 +23,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatMessage
-import nz.mega.sdk.MegaNode
 
 /**
  * Media player Activity
@@ -64,15 +62,11 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
 
     internal val selectImportFolderLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            val node = getChatMessageNode()
-            val chatMessage = getChatMessage()
-            val chatId = chatMessage.first
-            val messageId = chatMessage.second?.msgId
             val toHandle = result.data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
-            if (node != null && toHandle != null && messageId != null) {
+            if (toHandle != null) {
                 viewModel.importChatNode(
-                    chatId = chatId,
-                    messageId = messageId,
+                    chatId = getChatId(),
+                    messageId = getMessageId(),
                     newParentHandle = NodeId(toHandle)
                 )
             }
@@ -107,8 +101,8 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
      * @return first is chat id, second is chat message
      */
     internal fun getChatMessage(): Pair<Long, MegaChatMessage?> {
-        val chatId = intent.getLongExtra(INTENT_EXTRA_KEY_CHAT_ID, INVALID_HANDLE)
-        val msgId = intent.getLongExtra(INTENT_EXTRA_KEY_MSG_ID, INVALID_HANDLE)
+        val chatId = getChatId()
+        val msgId = getMessageId()
 
         if (chatId == INVALID_HANDLE || msgId == INVALID_HANDLE) {
             return Pair(chatId, null)
@@ -124,20 +118,8 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
         )
     }
 
-    /**
-     * Get chat message node from the launch intent.
-     *
-     * @return chat message node
-     */
-    internal fun getChatMessageNode(): MegaNode? {
-        val pair = getChatMessage()
-        val message = pair.second ?: return null
-
-        return ChatController(this).authorizeNodeIfPreview(
-            message.megaNodeList.get(0),
-            megaChatApi.getChatRoom(pair.first)
-        )
-    }
+    internal fun getChatId() = intent.getLongExtra(INTENT_EXTRA_KEY_CHAT_ID, INVALID_HANDLE)
+    internal fun getMessageId() = intent.getLongExtra(INTENT_EXTRA_KEY_MSG_ID, INVALID_HANDLE)
 
     internal fun saveChatNode() {
         val (chatId, message) = getChatMessage()

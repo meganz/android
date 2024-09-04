@@ -22,11 +22,14 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
@@ -41,11 +44,14 @@ class MediaPlayerViewModel @Inject constructor(
     private val legacyPublicAlbumPhotoNodeProvider: LegacyPublicAlbumPhotoNodeProvider,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
+    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
+    private val getChatFileUseCase: GetChatFileUseCase,
 ) : ViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
     private val throwable = SingleLiveEvent<Throwable>()
     private val snackbarMessage = SingleLiveEvent<Int>()
+    private val startChatFileOfflineDownload = SingleLiveEvent<ChatFile>()
 
     /**
      * The flow for clicked event
@@ -108,6 +114,8 @@ class MediaPlayerViewModel @Inject constructor(
     internal fun onSnackbarMessage(): LiveData<Int> = snackbarMessage
 
     internal fun onExceptionThrown(): LiveData<Throwable> = throwable
+
+    internal fun onStartChatFileOfflineDownload(): LiveData<ChatFile> = startChatFileOfflineDownload
 
     /**
      * Rename update
@@ -270,5 +278,29 @@ class MediaPlayerViewModel @Inject constructor(
             album = metadata.album,
             nodeName = metadata.nodeName,
         )
+    }
+
+    /**
+     * Save chat node to offline
+     *
+     * @param chatId    Chat ID where the node is.
+     * @param messageId Message ID where the node is.
+     */
+    fun saveChatNodeToOffline(chatId: Long, messageId: Long) {
+        viewModelScope.launch {
+            runCatching {
+                val chatFile = getChatFileUseCase(chatId = chatId, messageId = messageId)
+                    ?: throw IllegalStateException("Chat file not found")
+                val isAvailableOffline = isAvailableOfflineUseCase(chatFile)
+                if (isAvailableOffline) {
+                    snackbarMessage.value = R.string.file_already_exists
+                } else {
+                    startChatFileOfflineDownload.value = chatFile
+                }
+            }.onFailure {
+                Timber.e(it)
+                throwable.value = it
+            }
+        }
     }
 }

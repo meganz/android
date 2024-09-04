@@ -45,7 +45,6 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -271,6 +270,10 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     @OptIn(FlowPreview::class)
     private fun setupObserver() {
         with(viewModel) {
+            onStartChatFileOfflineDownload().observe(this@AudioPlayerActivity) {
+                startDownloadViewModel.onSaveOfflineClicked(it)
+            }
+
             getCollision().observe(this@AudioPlayerActivity) { collision ->
                 nameCollisionActivityContract.launch(arrayListOf(collision))
             }
@@ -448,17 +451,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 }
 
                 R.id.chat_save_for_offline -> {
-                    PermissionUtils.checkNotificationsPermission(this)
-                    getChatMessage().let { (chatId, message) ->
-                        message?.let {
-                            ChatController(this).saveForOffline(
-                                it.megaNodeList,
-                                megaChatApi.getChatRoom(chatId),
-                                true,
-                                this
-                            )
-                        }
-                    }
+                    viewModel.saveChatNodeToOffline(chatId = getChatId(), messageId = getMessageId())
                 }
 
                 R.id.rename -> {

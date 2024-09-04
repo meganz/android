@@ -39,7 +39,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -71,7 +70,6 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.VIDEO_TYPE_RESTART_PLAYBACK_POSITION
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.VIDEO_TYPE_RESUME_PLAYBACK_POSITION
@@ -89,7 +87,6 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
@@ -131,7 +128,6 @@ import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.getFragmentFromNavHost
-import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -464,6 +460,10 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
     @OptIn(FlowPreview::class)
     private fun setupObserver() {
         with(viewModel) {
+            onStartChatFileOfflineDownload().observe(this@LegacyVideoPlayerActivity) {
+                startDownloadViewModel.onSaveOfflineClicked(it)
+            }
+
             getCollision().observe(this@LegacyVideoPlayerActivity) { collision ->
                 nameCollisionActivityContract.launch(arrayListOf(collision))
             }
@@ -682,17 +682,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                 }
 
                 R.id.chat_save_for_offline -> {
-                    PermissionUtils.checkNotificationsPermission(this)
-                    getChatMessage().let { (chatId, message) ->
-                        message?.let {
-                            ChatController(this).saveForOffline(
-                                it.megaNodeList,
-                                megaChatApi.getChatRoom(chatId),
-                                true,
-                                this
-                            )
-                        }
-                    }
+                    viewModel.saveChatNodeToOffline(chatId = getChatId(), messageId = getMessageId())
                 }
 
                 R.id.rename -> {

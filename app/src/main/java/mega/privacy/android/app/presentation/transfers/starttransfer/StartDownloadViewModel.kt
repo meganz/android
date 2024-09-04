@@ -16,6 +16,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
@@ -221,6 +222,18 @@ class StartDownloadViewModel @Inject constructor(
                 _state.update {
                     triggered(TransferTriggerEvent.StartDownloadForOffline(chatFile))
                 }
+            }
+        }
+    }
+
+    /**
+     * Triggers the event related to save offline a chat node
+     * @param chatFile
+     */
+    fun onSaveOfflineClicked(chatFile: ChatFile) {
+        viewModelScope.launch {
+            _state.update {
+                triggered(TransferTriggerEvent.StartDownloadForOffline(chatFile))
             }
         }
     }
