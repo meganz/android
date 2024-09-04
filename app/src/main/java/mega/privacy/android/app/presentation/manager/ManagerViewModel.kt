@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
@@ -535,15 +534,6 @@ class ManagerViewModel @Inject constructor(
                 if (state == DevicePowerConnectionState.Connected) {
                     startCameraUploadUseCase()
                 }
-            }
-        }
-
-        viewModelScope.launch {
-            runCatching {
-                val isAdseFlagEnabled = getFeatureFlagValueUseCase(ABTestFeatures.adse)
-                _state.update { it.copy(adsEnabled = isAdseFlagEnabled) }
-            }.onFailure {
-                Timber.e(it, "Failed to get the adse feature flag")
             }
         }
     }

@@ -45,7 +45,6 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property handleScanDocumentResult                   Decides if the legacy or modern Document Scanner should be used
  * @property documentScanningErrorTypeUiItem            The specific Error return when using the modern Document Scanner
  * @property isAndroidSyncWorkManagerFeatureFlagEnabled Feature flag to use Android Sync Work Manager instead of SyncBackgroundService
- * @property adsEnabled                                 Boolean to determine if ads are enabled
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -76,5 +75,4 @@ data class ManagerState(
     val handleScanDocumentResult: HandleScanDocumentResult? = null,
     val documentScanningErrorTypeUiItem: DocumentScanningErrorTypeUiItem? = null,
     val isAndroidSyncWorkManagerFeatureFlagEnabled: Boolean = false,
-    val adsEnabled: Boolean = false,
 )

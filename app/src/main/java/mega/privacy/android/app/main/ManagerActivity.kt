@@ -110,6 +110,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.BusinessExpiredAlertActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -667,7 +668,40 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
-    private var adView: AdManagerAdView? = null
+    private val adView: AdManagerAdView by lazy {
+        AdManagerAdView(this).apply {
+            adUnitId = BuildConfig.AD_UNIT_ID
+            setAdSize(AD_SIZE)
+            adListener = object : AdListener() {
+                override fun onAdClicked() {
+                    Timber.d("Ad clicked")
+                }
+
+                override fun onAdClosed() {
+                    Timber.i("Ad closed")
+                }
+
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    Timber.w("Ad failed to load: ${adError.message}")
+                    hideAdsView()
+                    fetchNewAd()
+                }
+
+                override fun onAdImpression() {
+                    Timber.i("Ad impression")
+                }
+
+                override fun onAdLoaded() {
+                    Timber.i("Ad loaded")
+                    onAdsViewLoaded()
+                }
+
+                override fun onAdOpened() {
+                    Timber.i("Ad opened")
+                }
+            }
+        }
+    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -963,7 +997,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         hideAdsView()
                     }
                     adsViewModel.enableAdsFeature()
-                    adsViewModel.getDefaultStartScreen()
                 }
             }.onFailure {
                 Timber.e("Failed to fetch ab_adse flag with error: ${it.message}")
@@ -2343,10 +2376,49 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     /**
      * Checks for the screen orientation and handle showing the Ads view
+     * @param slotId assigned Ad slot id to be used to fetch new ad
      */
     fun handleShowingAds(slotId: String) {
-        if (this.isPortrait() && adsViewModel.canConsumeAdSlot(slotId)) {
+        //slotId is not used for now during the implementation of the new Ads SDK
+        if (this.isPortrait() && adsViewModel.isAdsFeatureEnabled()) {
+            fetchNewAd()
+        } else {
+            hideAdsView()
+        }
+    }
+
+    private fun setupAdsView() {
+        adsContainerView.removeAllViews()
+        adsContainerView.addView(adView)
+    }
+
+    /**
+     * Fetch a new Ad by creating new request
+     */
+    private fun fetchNewAd() {
+        val adRequest = AdManagerAdRequest.Builder().build()
+        adView.loadAd(adRequest)
+    }
+
+    private fun showAdsView() {
+        adsContainerView.isVisible = true
+    }
+
+    fun hideAdsView() {
+        adsContainerView.isVisible = false
+    }
+
+    /**
+     * Checks if we can still show the Ad because loading the webpage takes
+     * time and the user could have navigated to another screen where the Ad shouldn't show
+     */
+    private fun onAdsViewLoaded() {
+
+        if (drawerItem == DrawerItem.CLOUD_DRIVE || isInMainHomePage || isInPhotosPage
+        ) {
             showAdsView()
+            showBNVImmediate()
+            showHideBottomNavigationView(hide = false)
         } else {
             hideAdsView()
         }
@@ -2364,7 +2436,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         checkForInAppUpdateInstallStatus()
         cookieDialogHandler.onResume()
         updateTransfersWidgetVisibility()
-        adView?.resume()
+        adView.resume()
     }
 
     private fun checkForInAppUpdateInstallStatus() {
@@ -7792,91 +7864,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
-    private fun setupAdsView() {
-        val adView = AdManagerAdView(this)
-        // This is a adUntiId only for testing, it should be replace with real one after testing is finished
-        adView.adUnitId = AD_UNIT_ID
-        // the size will be set manually for now, the better implementation will be provided when API and SDK are ready
-        adView.setAdSize(AD_SIZE)
-        adView.adListener = object : AdListener() {
-            override fun onAdClicked() {
-                // Code to be executed when the user clicks on an ad.
-                Timber.d("Ad clicked")
-            }
-
-            override fun onAdClosed() {
-                Timber.i("Ad closed")
-                // Code to be executed when the user is about to return
-                // to the app after tapping on an ad.
-            }
-
-            override fun onAdFailedToLoad(adError : LoadAdError) {
-                // Code to be executed when an ad request fails.
-                Timber.w("Ad failed to load: ${adError.message}")
-            }
-
-            override fun onAdImpression() {
-                Timber.i("Ad impression")
-                // Code to be executed when an impression is recorded
-                // for an ad.
-            }
-
-            override fun onAdLoaded() {
-                Timber.i("Ad loaded")
-                // Code to be executed when an ad finishes loading.
-            }
-
-            override fun onAdOpened() {
-                Timber.i("Ad opened")
-                // Code to be executed when an ad opens an overlay that
-                // covers the screen.
-            }
-        }
-        this.adView = adView
-        adsContainerView.removeAllViews()
-        adsContainerView.addView(adView)
-
-        val adRequest = AdManagerAdRequest.Builder().build()
-        adView.loadAd(adRequest)
-    }
-
-    private fun onAdConsumed() {
-        hideAdsView()
-        showBNVImmediate()
-        showHideBottomNavigationView(hide = false)
-        adsViewModel.onAdConsumed()
-    }
-
-    private fun showAdsView() {
-        if (viewModel.state().adsEnabled) {
-            adsContainerView.isVisible = true
-            setupAdsView()
-        }
-    }
-
-    fun hideAdsView() {
-        adsContainerView.isVisible = false
-        adsViewModel.cancelFetchingAds()
-    }
-
-    /**
-     * Checks if we can still show the Ad because loading the webpage takes
-     * time and the user could have navigated to another screen where the Ad shouldn't show
-     */
-    private fun onAdsWebpageLoaded() {
-
-        if (drawerItem == DrawerItem.CLOUD_DRIVE || isInMainHomePage || isInPhotosPage
-        ) {
-            showAdsView()
-            showBNVImmediate()
-            showHideBottomNavigationView(hide = false)
-        } else {
-            hideAdsView()
-        }
-    }
-
     companion object {
-        const val AD_UNIT_ID = "ca-app-pub-2135147798858967/9835644604"
         val AD_SIZE = AdSize(320, 50)
         const val TRANSFERS_TAB = "TRANSFERS_TAB"
         private const val BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE =

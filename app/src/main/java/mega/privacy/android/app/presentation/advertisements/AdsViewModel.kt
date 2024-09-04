@@ -45,6 +45,7 @@ class AdsViewModel @Inject constructor(
     private var fetchAdUrlJob: Job? = null
 
 
+    fun isAdsFeatureEnabled() = isAdsFeatureEnabled
     /**
      * Enable the ads feature
      */

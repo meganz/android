@@ -78,6 +78,7 @@ android {
             extra["enableCrashlytics"] = false
             extra["alwaysUpdateBuildId"] = false
             buildConfigField("String", "ENVIRONMENT", "\"MEGAEnv/Dev\"")
+            buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
         }
         release {
             firebaseAppDistribution {
@@ -100,6 +101,8 @@ android {
             // signingConfig = signingConfigs.getByName("debug")
 
             buildConfigField("String", "ENVIRONMENT", "\"\"")
+            buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-2135147798858967/9835644604\"")
+
         }
 
         register("qa") {
@@ -108,6 +111,7 @@ android {
             matchingFallbacks += listOf("debug", "release")
             applicationIdSuffix = ".qa"
             buildConfigField("String", "ENVIRONMENT", "\"MEGAEnv/QA\"")
+            buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
             firebaseAppDistribution {
                 releaseNotes = readReleaseNotes()
                 groups = readTesterGroupList()
