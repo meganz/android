@@ -111,7 +111,13 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
     private val manualUploadFilesLauncher: ActivityResultLauncher<String> =
         managerActivity.registerForActivityResult(
             ActivityResultContracts.RequestPermission()
-        ) { openMultipleDocumentLauncher.launch(arrayOf("*/*")) }
+        ) {
+            runCatching {
+                openMultipleDocumentLauncher.launch(arrayOf("*/*"))
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
 
     /**
      * When manually uploading a Folder and the device is running Android 13 and above, this Launcher
