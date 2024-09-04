@@ -149,7 +149,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Нет интернет-соединения</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">Вы вышли вышли из системы на этом устройстве из другого места</string>
+    <string name="error_server_expired_session">Вы вышли из этого устройства из другого места</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">Генерация ключей шифрования</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -185,7 +185,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Пароли не совпадают</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">На введённый вами адрес электронной почты уже зарегистрирован аккаунт MEGA</string>
+    <string name="error_email_registered">На этот адрес электронной почты уже зарегистрирован аккаунт MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">Подключение к серверу: создание аккаунта</string>
     <!--  -->
@@ -2587,7 +2587,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Пригласите контакты и начните безопасно общаться в зашифрованном чате MEGA.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Привет. Начните зашифрованное общение со мной с помощью MEGA и получите 20&#160;ГБ на диске бесплатно. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Привет, присоединяйся ко мне в MEGA и наслаждайся бесплатным, надёжно зашифрованным хранилищем и связью. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Нет доступной ссылки на чат.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2621,7 +2621,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">Вход в MEGA</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">Создайте аккаунт MEGA</string>
+    <string name="create_account_title">Регистрация в MEGA</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Недавние</string>
     <!-- Label to reference a chats section -->
@@ -3857,7 +3857,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Ваш аккаунт MEGA был заблокирован из-за неоднократных обвинений в нарушении авторских прав. Это означает, что вы не можете получить доступ к аккаунту или данным в нём. \nля получения дополнительной информации о том, как подать встречное заявление, проверьте свою электронную почту.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Ваш аккаунт был удалён из-за нарушения Условий использования MEGA.\nВы не сможете восстановить доступ к своим сохранённым данным или зарегистрировать новый аккаунт MEGA.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Ваш аккаунт был удалён из-за нарушения Условий использования MEGA.\nВы не сможете восстановить доступ к сохранённым данным или получить разрешение на регистрацию нового аккаунта MEGA.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Встречи</string>
     <!-- Title of the location option displayed in the chat room toolbar -->

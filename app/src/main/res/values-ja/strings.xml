@@ -143,7 +143,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">ネットワーク接続がありません</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">別の場所からこの端末でログアウトされました</string>
+    <string name="error_server_expired_session">別の場所から、このデバイスからログアウトされました</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">暗号化キーの生成</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -179,7 +179,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">パスワードが合いません</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">このメールアドレスはすでにMEGAでアカウントを登録しています</string>
+    <string name="error_email_registered">このメールアドレスはすでにMEGAのアカウントにサインアップしています</string>
     <!--  -->
     <string name="create_account_creating_account">サーバーに接続：アカウントを作成</string>
     <!--  -->
@@ -1340,7 +1340,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">仕組み</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">無料のMEGAアカウントを作成し、MEGAモバイルアプリをインストールするようにお友だちをご招待ください。サインアップとアプリがインストールされるたびに、ボーナスとして無料のストレージを受け取ることができます。</string>
+    <string name="first_paragraph_achievement_invite_friends">無料のMEGAアカウントをサインアップ（登録）し、MEGAモバイルアプリをインストールするようにお友だちをご招待ください。サインアップされ、アプリがインストールされるたびに、ボーナスとして無料のストレージを受け取ることができます。</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">新規ご招待かつ、MEGAモバイルアプリかMEGAデスクトップアプリをインストールした場合に限り、無料ストレージボーナスが適用されます。</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -2339,7 +2339,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">クラウド内のあなたの写真</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">カメラアップロードは、あらゆるモバイル端末にとって不可欠な機能で、あなたにもご利用いただけます。今すぐアカウントを作成してください。</string>
+    <string name="content_tour_four">カメラアップロードは、あらゆるモバイル端末にとって不可欠な機能で、あなたにもご利用いただけます。今すぐアカウントをサインアップ（登録）してください。</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">パスワードを入力</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2401,7 +2401,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">連絡先を招待し、MEGAの暗号化チャットで安全にチャットを始めましょう。</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">こんにちは！私とMEGAでセキュアな会話をして、20&#160;GBの無料クラウドストレージを獲得しましょう。%1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">こんにちは。MEGAに参加して、安全に暗号化されたストレージとコミュニケーションを、無料で楽しみましょう。%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">利用できるチャットリンクはありません。</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2429,7 +2429,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">MEGAにログイン</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">MEGA アカウントを作成</string>
+    <string name="create_account_title">MEGAアカウントにサインアップ</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">最近</string>
     <!-- Label to reference a chats section -->
@@ -3569,7 +3569,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">度重なる著作権侵害の申し立てにより、あなたのMEGAアカウントは停止されました。これは、アカウントまたはアカウント内のデータにアクセスできないことを意味します。\n異議申し立て通知を提出する方法の詳細については、メール受信箱を確認してください。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">MEGAのご利用規約違反により、あなたのアカウントは停止されました。\n保存されたデータへのアクセスを回復したり、MEGAアカウントを新規登録したりすることはできません。</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">MEGAのご利用規約違反により、あなたのアカウントは停止されました。\n保管されたデータへのアクセスを回復したり、MEGAアカウントを新規サインアップしたりすることはできません。</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">ミーティング</string>
     <!-- Title of the location option displayed in the chat room toolbar -->

@@ -143,7 +143,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">ไม่มีการเชื่อมต่อเครือข่าย</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">คุณได้ออกจากระบบในอุปกรณ์นี้จากตำแหน่งที่ตั้งอื่น</string>
+    <string name="error_server_expired_session">คุณถูกออกจากระบบในอุปกรณ์นี้ เนื่องจากมีการเข้าถึงจากตำแหน่งที่ตั้งอื่น</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">กำลังสร้างคีย์การเข้ารหัส</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -1340,7 +1340,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">วิธีการทำงาน</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">เชิญเพื่อนของคุณสร้างบัญชี MEGA ฟรีและติดตั้งแอปมือถือ MEGA คุณจะได้รับพื้นที่เก็บข้อมูลฟรีเป็นโบนัสทุกครั้งเมื่อเพื่อนของคุณลงทะเบียนและติดตั้งแอป</string>
+    <string name="first_paragraph_achievement_invite_friends">เชิญเพื่อนของคุณลงทะเบียน MEGA ฟรีและติดตั้งแอปมือถือ MEGA คุณจะได้รับพื้นที่เก็บข้อมูลฟรีเป็นโบนัสทุกครั้งเมื่อเพื่อนของคุณลงทะเบียนและติดตั้งแอป</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">โบนัสพื้นที่เก็บข้อมูลฟรี เฉพาะคำเชิญใหม่และติดตั้งแอป MEGA บนมือถือหรือแอป MEGA เดสก์ทอปเท่านั้น</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -2339,7 +2339,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">รูปถ่ายของคุณในคลาวด์</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">การอัปโหลดจากกล้อง เป็นฟีเจอร์สำคัญสำหรับโทรศัพท์มือถือทุกเครื่องและเราได้ให้ความสำคัญกับคุณ สร้างบัญชีของคุณเลย</string>
+    <string name="content_tour_four">การอัปโหลดจากกล้องเป็นฟีเจอร์สำคัญสำหรับมือถือทุกเครื่อง และเราก็มีบริการนี้ให้คุณแล้ว สมัครสมาชิกเลยตอนนี้</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">กรอกรหัสผ่านของคุณ</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2401,7 +2401,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">เชิญผู้ติดต่อและเริ่มแชทอย่างปลอดภัยด้วยแชทที่เข้ารหัสบน MEGA</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">หวัดดี มาร่วมสนทนากับฉันบน MEGA อย่างปลอดภัยสิ แล้วรับพื้นที่เก็บข้อมูลบนคลาวด์ฟรี 20&#160;GB ไปเลย %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">สวัสดี เชิญมาร่วมกับฉันที่ MEGA และเพลิดเพลินไปกับพื้นที่เก็บข้อมูลและการสื่อสารที่ปลอดภัยด้วยการเข้ารหัส โดยไม่เสียค่าใช้จ่ายใด ๆ %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">ไม่มีลิงก์แชท</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2429,7 +2429,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">เข้าสู่ระบบ MEGA</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">สร้างบัญชี MEGA ของคุณ</string>
+    <string name="create_account_title">ลงทะเบียน MEGA</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">ล่าสุด</string>
     <!-- Label to reference a chats section -->
@@ -3569,7 +3569,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">บัญชี MEGA ของคุณถูกระงับชั่วคราว เนื่องจากมีการร้องเรียนเรื่องการละเมิดลิขสิทธิ์ซ้ำหลายครั้ง หมายความว่าคุณไม่สามารถเข้าถึงบัญชีหรือข้อมูลใด ๆ ภายในบัญชีของคุณได้\nตรวจสอบกล่องจดหมายอีเมลของคุณเพื่อดูข้อมูลเพิ่มเติมเกี่ยวกับวิธีการยื่นเรื่องโต้แย้ง</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">บัญชีของคุณถูกยุติการใช้งานเนื่องจากละเมิดเงื่อนไขการให้บริการของ MEGA\nคุณจะไม่สามารถเข้าถึงข้อมูลที่เก็บไว้หรือลงทะเบียนบัญชี MEGA ใหม่ได้อีกต่อไป</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">บัญชีของคุณถูกยกเลิก เนื่องจากมีการกระทำที่ขัดต่อเงื่อนไขการให้บริการของ MEGA\nคุณจะไม่สามารถเข้าถึงข้อมูลที่เก็บไว้ หรือสมัครใช้บัญชี MEGA ใหม่ได้อีก</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">การประชุม</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -4943,13 +4943,13 @@
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
     <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]แผนฟรีของคุณมีข้อจำกัดเวลาการประชุม 60 นาที ผู้ใช้ Pro สามารถโทรได้ไม่จำกัดและมีผู้เข้าร่วมประชุมได้สูงสุด 1000 คน[/A] [B]อัปเกรดเลย[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 1 month for %2$s per month. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">คุณจะถูกเรียกเก็บเงิน %1$s ทันที และการสมัครใช้งานของคุณจะต่ออายุโดยอัตโนมัติหลังจาก 1 เดือน ในราคา %2$s ต่อเดือน บัญชี Google&#160;Play ของคุณจะถูกเรียกเก็บเงินเพื่อใช้ในการต่ออายุภายใน 24 ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินแต่ละรอบ หากต้องการยกเลิกการสมัครใช้งาน คุณต้องปิดการต่ออายุการสมัครใช้งาน MEGA&#160;Pro ของคุณแบบอัตโนมัติอย่างน้อย 24&#160;ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินของคุณ ผ่านเมนูการสมัครใช้งานใน [A]Google&#160;Play[/A] \nเมื่อคุณอัปเกรดบัญชีของคุณ แสดงว่าคุณยอมรับ[B]เงื่อนไขการให้บริการ[/B]และ[C]นโยบายความเป็นส่วนตัวและข้อมูล[/C]ของ MEGA</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 12 months for %2$s per year. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">คุณจะถูกเรียกเก็บเงิน %1$s ทันที และการสมัครใช้งานของคุณจะต่ออายุโดยอัตโนมัติหลังจาก 12 เดือน ในราคา %2$s ต่อปี บัญชี Google&#160;Play ของคุณจะถูกเรียกเก็บเงินเพื่อใช้ในการต่ออายุภายใน 24 ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินแต่ละรอบ หากต้องการยกเลิกการสมัครใช้งาน คุณต้องปิดการต่ออายุการสมัครใช้งาน MEGA&#160;Pro ของคุณแบบอัตโนมัติอย่างน้อย 24&#160;ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินของคุณ ผ่านเมนูการสมัครใช้งานใน [A]Google&#160;Play[/A] \nเมื่อคุณอัปเกรดบัญชีของคุณ แสดงว่าคุณยอมรับ[B]เงื่อนไขการให้บริการ[/B]และ[C]นโยบายความเป็นส่วนตัวและข้อมูล[/C]ของ MEGA</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">You will be charged immediately and your subscription will automatically renew after 1 month. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">คุณจะถูกเรียกเก็บเงินทันที และการสมัครใช้งานของคุณจะต่ออายุโดยอัตโนมัติหลังจาก 1 เดือน บัญชี Google&#160;Play ของคุณจะถูกเรียกเก็บเงินเพื่อใช้ในการต่ออายุภายใน 24&#160;ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินแต่ละรอบ หากต้องการยกเลิกการสมัครใช้งาน คุณต้องปิดการต่ออายุการสมัครใช้งาน MEGA&#160;Pro ของคุณแบบอัตโนมัติอย่างน้อย 24&#160;ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินของคุณ ผ่านเมนูการสมัครใช้งานใน [A]Google&#160;Play[/A] \nเมื่อคุณอัปเกรดบัญชีของคุณ แสดงว่าคุณยอมรับ[B]เงื่อนไขการให้บริการ[/B]และ[C]นโยบายความเป็นส่วนตัวและข้อมูล[/C]ของ MEGA</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">You will be charged immediately and your subscription will automatically renew after 12&#160;months. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">คุณจะถูกเรียกเก็บเงินทันที และการสมัครใช้งานของคุณจะต่ออายุหลังจาก 12&#160;เดือนโดยอัตโนมัติ บัญชี Google&#160;Play ของคุณจะถูกเรียกเก็บเงินเพื่อใช้ในการต่ออายุภายใน 24&#160;ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินแต่ละรอบ หากต้องการยกเลิกการสมัครใช้งาน คุณต้องปิดการต่ออายุการสมัครใช้งาน MEGA&#160;Pro ของคุณแบบอัตโนมัติอย่างน้อย 24&#160;ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินของคุณ ผ่านเมนูการสมัครใช้งานใน [A]Google&#160;Play[/A] \nเมื่อคุณอัปเกรดบัญชีของคุณ แสดงว่าคุณยอมรับ[B]เงื่อนไขการให้บริการ[/B]และ[C]นโยบายความเป็นส่วนตัวและข้อมูล[/C]ของ MEGA</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">บัญชีธุรกิจถูกปิดการใช้งานแล้ว</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->

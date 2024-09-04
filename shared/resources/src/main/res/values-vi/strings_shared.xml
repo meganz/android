@@ -213,7 +213,7 @@
     <!-- Text for the header of the screen to add a new sync folder -->
     <string name="sync_add_new_sync_folder_header_text">Thêm thư&#160;mục đồng&#160;bộ hóa:</string>
     <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
-    <string name="general_size_giga_byte">%1$s&#160;GB</string>
+    <string name="general_size_giga_byte">%1$s</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
     <string name="general_free_plan_name">Miễn phí</string>
     <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
@@ -333,7 +333,7 @@
     <!-- Third subtitle of the tour screen -->
     <string name="cloud_drive_tour_third_subtitle">Thêm tên liên&#160;lạc, tạo kết&#160;nối, cộng&#160;tác với nhau, trao&#160;đổi qua gọi thoại và video mà không cần phải rời khỏi MEGA.</string>
     <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">Đăng Tải Camêra là tính năng thiết yếu cho mọi thiết bị di động, và MEGA có cung cấp cho mọi người dùng. Tạo tài khoản ngay.</string>
+    <string name="cloud_drive_tour_fourth_subtitle">Camera uploads is an essential feature for any mobile device and we have got you covered. Sign up for an account now.</string>
     <!-- Fifth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fifth_subtitle">Gọi họp video an&#160;toàn với mã&#160;hóa vô&#160;kiến&#160;thức.</string>
     <!-- Titles of the tour screen to onboard users with the MEGA application -->
@@ -424,8 +424,8 @@
     <string name="account_cancel_account_screen_plan_free_plan">Free</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Lưu trữ</string>
-    <!-- Storage amount available in the free plan. %1s represents the amount of storage in GB. -->
-    <string name="account_cancel_account_screen_plan_free_storage">%1s&#160;GB</string>
+    <!-- Storage amount available in the free plan. %1s represents the amount of storage and the unit -->
+    <string name="account_cancel_account_screen_plan_free_storage">%1giây</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">Truyền Tải</string>
     <!-- Transfer limit in the free plan -->
@@ -635,13 +635,31 @@
     <!-- Button label to not cancel the subscription -->
     <string name="account_cancel_subscription_survey_do_not_cancel_button">Đừng hủy</string>
     <!-- Video recently watched title of the video section  -->
-    <string name="video_section_title_video_recently_watched">Recently watched</string>
+    <string name="video_section_title_video_recently_watched">Đã xem gần đây</string>
     <!-- Text that there is no recent activity of the video recently watched page  -->
     <string name="video_section_empty_hint_no_recently_activity">Không Có Hoạt Động Gần Đây</string>
     <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
-    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Remove from recently watched</string>
+    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Loại bỏ khỏi mục đã xem gần đây</string>
     <!-- Message that remove recently watched item from the video recently watched page  -->
-    <string name="video_section_message_remove_recently_watched_item">Removed from recently watched.</string>
+    <string name="video_section_message_remove_recently_watched_item">Đã loại ra khỏi mục đã xem gần đây</string>
     <!-- Message that clear recently watched in the video recently watched page  -->
-    <string name="video_section_message_clear_recently_watched">Recently watched has been cleared</string>
+    <string name="video_section_message_clear_recently_watched">Mục đã xem gần đây đã được dọn sạch</string>
+    <!-- Title of the Document Scanning Error Dialog -->
+    <string name="document_scanning_error_dialog_title">Quét không được hoàn&#160;tất</string>
+    <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
+    <string name="document_scanning_error_type_insufficient_ram">Your phone doesn’t meet the minimum memory requirements to complete the scan</string>
+    <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
+    <string name="document_scanning_error_type_generic_error">We’re having trouble scanning this document. Please try again.</string>
+    <!-- The confirmation Button text of the Document Scanning Error Dialog -->
+    <string name="document_scanning_error_dialog_confirm_button">Đóng</string>
+    <!--Title text to start a meeting from Meeting screen empty view-->
+    <string name="meeting_recent_list_empty_title">Protect your calls</string>
+    <!--Subtitle text from Meeting screen empty view-->
+    <string name="meeting_recent_list_empty_subtitle">Your meetings, family calls, and private conversations are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <!--Warning message to inform the user the minimum number of characters to enter into the edit text field for the survey-->
+    <string name="account_cancel_subscription_survey_minimum_character_limit">Message must be at least 10 characters</string>
+    <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
+    <string name="account_cancel_subscription_survey_enter_details">Nhập chi&#160;tiết</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="meeting_guest_left_meeting_bonus_title">Nhận lấy không&#160;gian lưu&#160;trữ đám&#160;mây miễn&#160;phí</string>
 </resources>

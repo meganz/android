@@ -217,7 +217,7 @@
     <!-- Text for the header of the screen to add a new sync folder -->
     <string name="sync_add_new_sync_folder_header_text">Gesynchroniseerde map toevoegen:</string>
     <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
-    <string name="general_size_giga_byte">%1$s&#160; GB</string>
+    <string name="general_size_giga_byte">%1$s</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
     <string name="general_free_plan_name">Gratis</string>
     <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
@@ -341,7 +341,7 @@
     <!-- Third subtitle of the tour screen -->
     <string name="cloud_drive_tour_third_subtitle">Voeg contacten toe, creëer een netwerk, werk samen en voer spraak- en videogesprekken zonder MEGA te verlaten.</string>
     <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">Camera uploads zijn een essentiële functie voor elk mobiel apparaat en wij helpen u daarbij. Creëer uw account nu.</string>
+    <string name="cloud_drive_tour_fourth_subtitle">Camera-uploads zijn een essentieel kenmerk voor elk mobiel apparaat en we staan voor u klaar. Meld u nu aan voor een account.</string>
     <!-- Fifth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fifth_subtitle">Zero-knowledge gecodeerde videovergadering.</string>
     <!-- Titles of the tour screen to onboard users with the MEGA application -->
@@ -432,8 +432,8 @@
     <string name="account_cancel_account_screen_plan_free_plan">Free</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Opslag</string>
-    <!-- Storage amount available in the free plan. %1s represents the amount of storage in GB. -->
-    <string name="account_cancel_account_screen_plan_free_storage">%1s&#160; GB</string>
+    <!-- Storage amount available in the free plan. %1s represents the amount of storage and the unit -->
+    <string name="account_cancel_account_screen_plan_free_storage">%1s</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">Overdracht</string>
     <!-- Transfer limit in the free plan -->
@@ -587,8 +587,8 @@
     <string name="settings_sync_debris_cleared_message">.debris map met succes gewist</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="one">Found %1$s and %2$d file.</item>
-        <item quantity="other">Found %1$s and %2$d files.</item>
+        <item quantity="one">%1$s en %2$d bestand gevonden.</item>
+        <item quantity="other">%1$s en %2$d bestanden gevonden.</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->
     <string name="file_info_information_no_tags_label">Geen labels</string>
@@ -599,15 +599,15 @@
     <!-- placeholder message for report issue-->
     <string name="report_issue_description_placeholder_message">Beschrijf het probleem met minstens 10 tekens</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_title">Keep conversations private</string>
+    <string name="chat_recent_list_empty_title">Houd gesprekken privé</string>
     <!--Subtitle text from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_subtitle">All your messages, group chats, and calls are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <string name="chat_recent_list_empty_subtitle">Al uw berichten, groepschats en gesprekken worden beschermd door onze zero-knowledge codering. [A]Meer informatie[/A]</string>
     <!-- Label of the action button of inviting a friend from contact screen -->
     <string name="chat_recent_invite_friend">Nodig een vriend uit</string>
     <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
-    <string name="invite_contacts_to_start_chat_title">Invite friends with confidence</string>
+    <string name="invite_contacts_to_start_chat_title">Nodig vrienden met vertrouwen uit</string>
     <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
-    <string name="invite_contacts_to_start_chat_subtitle">With top-notch security and verification codes, reach out without fear of scams, data mining, or information theft</string>
+    <string name="invite_contacts_to_start_chat_subtitle">Met eersteklas beveiligings- en verificatiecodes kunt u contact opnemen zonder bang te hoeven zijn voor oplichting, datamining of informatiediefstal</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
     <string name="invite_contacts_action_label">Uitnodigen</string>
     <!-- Share hidden folder description -->
@@ -615,7 +615,7 @@
     <!-- Share hidden folders description -->
     <string name="share_hidden_folders_description">Er zijn verborgen items in een of meer van deze mappen. Als u de mappen deelt, zijn de verborgen items zichtbaar voor degenen met wie u ze deelt. De items blijven verborgen op uw Cloud-schijf.</string>
     <!-- Title shown at the top of the survey screen when cancelling the subscription -->
-    <string name="account_cancel_subscription_survey_title">We’re sorry to see you leave! Can you tell us why you’re cancelling your subscription?</string>
+    <string name="account_cancel_subscription_survey_title">Het spijt ons u te zien verlaten! Kunt u ons vertellen waarom u uw abonnement opzegt?</string>
     <!-- Message explaining the immediate effect of subscription cancellation -->
     <string name="account_cancel_subscription_survey_cancellation_message">Uw abonnement wordt onmiddellijk opgezegd en u wordt overgezet naar een gratis MEGA-account wanneer uw huidige abonnement afloopt. Hou er rekening mee dat als u uw abonnement annuleert, uw account niet wordt verwijderd.</string>
     <!-- Warning message shown in a red box when no reason is selected -->
@@ -647,13 +647,31 @@
     <!-- Button label to not cancel the subscription -->
     <string name="account_cancel_subscription_survey_do_not_cancel_button">Niet annuleren</string>
     <!-- Video recently watched title of the video section  -->
-    <string name="video_section_title_video_recently_watched">Recently watched</string>
+    <string name="video_section_title_video_recently_watched">Recent bekeken</string>
     <!-- Text that there is no recent activity of the video recently watched page  -->
     <string name="video_section_empty_hint_no_recently_activity">Geen Recente Activiteit</string>
     <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
-    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Remove from recently watched</string>
+    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Verwijderen uit recent bekeken</string>
     <!-- Message that remove recently watched item from the video recently watched page  -->
-    <string name="video_section_message_remove_recently_watched_item">Removed from recently watched.</string>
+    <string name="video_section_message_remove_recently_watched_item">Verwijderd uit recent bekeken</string>
     <!-- Message that clear recently watched in the video recently watched page  -->
-    <string name="video_section_message_clear_recently_watched">Recently watched has been cleared</string>
+    <string name="video_section_message_clear_recently_watched">Recent bekeken is gewist</string>
+    <!-- Title of the Document Scanning Error Dialog -->
+    <string name="document_scanning_error_dialog_title">Scan onvolledig</string>
+    <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
+    <string name="document_scanning_error_type_insufficient_ram">Uw telefoon voldoet niet aan de minimale geheugenvereisten om de scan te voltooien</string>
+    <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
+    <string name="document_scanning_error_type_generic_error">We hebben problemen met het scannen van dit document. Probeer het opnieuw.</string>
+    <!-- The confirmation Button text of the Document Scanning Error Dialog -->
+    <string name="document_scanning_error_dialog_confirm_button">Sluiten</string>
+    <!--Title text to start a meeting from Meeting screen empty view-->
+    <string name="meeting_recent_list_empty_title">Bescherm uw gesprekken</string>
+    <!--Subtitle text from Meeting screen empty view-->
+    <string name="meeting_recent_list_empty_subtitle">Uw vergaderingen, familiegesprekken en privégesprekken worden beschermd door onze zero-knowledge codering. [A]Meer informatie[/A]</string>
+    <!--Warning message to inform the user the minimum number of characters to enter into the edit text field for the survey-->
+    <string name="account_cancel_subscription_survey_minimum_character_limit">Message must be at least 10 characters</string>
+    <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
+    <string name="account_cancel_subscription_survey_enter_details">Voer details in</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="meeting_guest_left_meeting_bonus_title">Ontvang gratis cloudopslag</string>
 </resources>

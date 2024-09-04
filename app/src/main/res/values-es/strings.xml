@@ -183,7 +183,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Las contraseñas no coinciden</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">Esta dirección de correo electrónico ya fue utilizada para el registro de una cuenta con MEGA</string>
+    <string name="error_email_registered">This email address has already signed up for an account with MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">Conectando con el servidor: creando cuenta</string>
     <!--  -->
@@ -1400,7 +1400,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Cómo funciona</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invita a tus amigos a crear una cuenta gratuita de MEGA e instalar nuestra aplicación móvil. Por cada registro e instalación de la aplicación, recibirás un bono adicional de almacenamiento.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invite your friends to sign up for a free MEGA account and to install a MEGA Mobile App. You will receive free storage as a bonus for every signup and app installation.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Bono de almacenamiento gratuito aplicable solo a usuarios nuevos que instalen la aplicación móvil o de escritorio de MEGA.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -2463,7 +2463,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Tus fotos en la nube</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">La función Subidas de la cámara es esencial para cualquier dispositivo móvil y nosotros la tenemos. Crea tu cuenta ahora.</string>
+    <string name="content_tour_four">Camera uploads is an essential feature for any mobile device and we have got you covered. Sign up for an account now.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Introduce tu contraseña</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2525,7 +2525,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Invita a contactos y chatea de forma segura con el chat cifrado de MEGA.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">¡Hola! Habla conmigo de forma segura en MEGA y obtén 20&#160;GB de almacenamiento gratuito. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hola, únete a MEGA y disfruta gratis de almacenamiento y comunicación cifrados. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Link de chat no disponible.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2557,7 +2557,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">Iniciar sesión en MEGA</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">Crea tu cuenta de MEGA</string>
+    <string name="create_account_title">Sign up for a MEGA account</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Recientes</string>
     <!-- Label to reference a chats section -->
@@ -3761,7 +3761,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Tu cuenta de MEGA ha sido suspendida debido a repetidas notificaciones de presuntas infracciones de derechos de autor. Como consecuencia, no podrás acceder a tu cuenta ni a tus datos.\nRevisa el correo electrónico que enviamos a tu dirección de correo para obtener más información sobre cómo presentar una contranotificación.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Hemos cerrado tu cuenta debido a un incumplimiento de los Términos de servicio de MEGA.\nNo podrás recuperar el acceso a tus datos ni estás autorizado a registrar una nueva cuenta de MEGA.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to sign up for a new MEGA account.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Reuniones</string>
     <!-- Title of the location option displayed in the chat room toolbar -->

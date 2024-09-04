@@ -153,7 +153,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">لا يوجد اتصال</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">لقد تم تسجيل الخروج على هذا الجهاز من موقع آخر</string>
+    <string name="error_server_expired_session">لقد تم تسجيل خروجك من هذا الجهاز من موقع آخر</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">توليد مفاتيح التشفير</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -189,7 +189,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">كلمات المرور غير متطابقة</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">هذا البريد الإلكتروني لديه حساب مسجل بالفعل لدى ميغا MEGA</string>
+    <string name="error_email_registered">تم تسجيل عنوان البريد الإلكتروني هذا بالفعل للحصول على حساب مع ميغا MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">جاري الاتصال بالمخدم: جاري إنشاء حساب</string>
     <!--  -->
@@ -1490,7 +1490,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">كيف تعمل</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">قم بدعوة أصدقائك لإنشاء حساب ميغا MEGA مجاني ولتثبيت تطبيق ميغا للهاتف المحمول MEGA Mobile. ستتلقى مساحة تخزين مجانية كمكافأة مقابل كل اشتراك وتثبيت للتطبيق.</string>
+    <string name="first_paragraph_achievement_invite_friends">قم بدعوة أصدقائك للتسجيل للحصول على حساب ميغا MEGA مجاني وتثبيت تطبيق ميغا MEGA للهاتف المحمول. ستحصل على مساحة تخزين مجانية كمكافأة لكل تسجيل وتثبيت تطبيق.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">تنطبق مكافأة التخزين المجانية على الدعوات الجديدة فقط وحين يتم تثبيت تطبيق ميغا للهاتف المحمول MEGA Mobile أو تطبيق ميغا للحاسب المكتبي MEGA Desktop App.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -2649,7 +2649,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">صورك على السحابة</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">ترفيع صور الكاميرا هو ميزة أساسية لأي جهاز محمول و نحن نقدم لك ذلك. أنشأ حسابك الآن.</string>
+    <string name="content_tour_four">تُعد ترفيعات الكاميرا ميزة أساسية لأي جهاز محمول ونحن هنا لنقدم لك الدعم. قم بالتسجيل للحصول على حساب الآن.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">أدخل كلمة المرور الخاصة بك</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2711,7 +2711,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">ادع جهات الاتصال وابدأ المحادثة بأمان باستخدام المحادثة المشفرة من ميغا MEGA.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">أهلا. قم بإجراء محادثات آمنة على ميغا MEGA معي واحصل على 20&#160;غيغابايت من التخزين السحابي المجاني.%1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">مرحبًا، انضم إلي على ميغا MEGA واستمتع بالتخزين والاتصالات المجانية والمشفرة بأمان. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">لا يوجد رابط محادثة متاح.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2749,7 +2749,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">تسجيل الدخول الى ميغا MEGA</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">أنشأ حساب ميغا MEGA الخاص بك</string>
+    <string name="create_account_title">قم بالتسجيل للحصول على حساب ميغا MEGA</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">مؤخراً</string>
     <!-- Label to reference a chats section -->
@@ -4049,7 +4049,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">تم تعليق حساب ميغا MEGA الخاص بك بسبب الادعاءات المتكررة بانتهاكات حقوق الطبع والنشر. هذا يعني أنه لا يمكنك الوصول إلى حسابك أو البيانات الموجودة فيه.\nتحقق من صندوق البريد الإلكتروني الخاص بك للحصول على مزيد من المعلومات حول كيفية تقديم إشعار مضاد.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">تم إنهاء حسابك بسبب خرق لشروط خدمة ميغا MEGA.\n لن تتمكن من استعادة الوصول إلى بياناتك المخزنة أو لن يُسمح لك بتسجيل حساب ميغا MEGA جديد.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">تم إنهاء حسابك بسبب خرق شروط الخدمة الخاصة بميغا MEGA.\nلن تتمكن من استعادة الوصول إلى بياناتك المخزنة أو السماح لك بالتسجيل للحصول على حساب ميغا MEGA جديد.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">الاجتماعات</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -6108,13 +6108,13 @@
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
     <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]باقتك المجانية لها حد 60 دقيقة للاجتماعات. يتمتع مستخدمو برو Pro بمكالمات غير محدودة وما يصل إلى 1000 مشارك.[/A] [B]قم بالترقية الآن.[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 1 month for %2$s per month. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">سيتم محاسبتك بمبلغ %1$s على الفور وسيتم تجديد اشتراكك تلقائيًا بعد شهر واحد بمبلغ  %2$s في الشهر. سيتم فرض رسوم على حساب غوغل بلاي Google&#160;Play الخاص بك للتجديد في غضون 24 ساعة من نهاية كل فترة دفع. لإلغاء اشتراكك يجب عليك تعطيل التجديد التلقائي لاشتراك ميغا برو MEGA&#160;Pro الخاص بك قبل 24 ساعة على الأقل من نهاية فترة الفاتورة عبر الاشتراكات في [A]غوغل بلاي Google&#160;Play[/A].\nمن خلال ترقية حسابك فإنك توافق على[B]شروط الخدمة[/B] و [C]سياسة الخصوصية والبيانات[/C] الخاصين بميغا MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 12 months for %2$s per year. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">سيتم محاسبتك بمبلغ %1$s على الفور وسيتم تجديد اشتراكك تلقائيًا بعد 12 شهر بمبلغ  %2$s في السنة. سيتم فرض رسوم على حساب غوغل بلاي Google&#160;Play الخاص بك للتجديد في غضون 24 ساعة من نهاية كل فترة دفع. لإلغاء اشتراكك يجب عليك تعطيل التجديد التلقائي لاشتراك ميغا برو MEGA&#160;Pro الخاص بك قبل 24 ساعة على الأقل من نهاية فترة الفاتورة عبر الاشتراكات في [A]غوغل بلاي Google&#160;Play[/A].\nمن خلال ترقية حسابك فإنك توافق على[B]شروط الخدمة[/B] و [C]سياسة الخصوصية والبيانات[/C] الخاصين بميغا MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">You will be charged immediately and your subscription will automatically renew after 1 month. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">سيتم محاسبتك على الفور وسيتم تجديد اشتراكك تلقائيًا بعد 1 شهر واحد. سيتم فرض رسوم على حساب غوغل بلاي Google&#160;Play الخاص بك للتجديد في غضون 24 ساعة من نهاية كل فترة دفع. لإلغاء اشتراكك، يجب عليك تعطيل التجديد التلقائي لاشتراك ميغا برو MEGA&#160;Pro الخاص بك قبل 24 ساعة على الأقل من نهاية فترة الفاتورة عبر الاشتراكات في [A]غوغل بلاي Google&#160;Play[/A].\nمن خلال ترقية حسابك فإنك توافق على [B]شروط الخدمة[/B] و [C]سياسة الخصوصية والبيانات[/C] الخاصين بميغا MEGA .</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">You will be charged immediately and your subscription will automatically renew after 12&#160;months. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">سيتم محاسبتك على الفور وسيتم تجديد اشتراكك تلقائيًا بعد 12&#160;شهر. سيتم فرض رسوم على حساب غوغل بلاي Google&#160;Play الخاص بك للتجديد في غضون 24&#160;ساعة من نهاية كل فترة دفع. لإلغاء اشتراكك يجب عليك إيقاف التجديد التلقائي لاشتراك MEGA&#160;Pro ميغا برو الخاص بك قبل 24&#160;ساعة على الأقل من نهاية فترة الفاتورة عبر الاشتراكات في [A]غوغل بلاي Google&#160;Play[/A].\nمن خلال ترقية حسابك فإنك توافق على [B]شروط خدمة[/B] و [C]سياسة الخصوصية والبيانات[/C] الخاصين بميغا MEGA.</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">تم إلغاء تفعيل حساب الأعمال Business</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->

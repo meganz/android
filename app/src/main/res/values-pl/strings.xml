@@ -149,7 +149,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Brak połączenia</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">Zostałeś wylogowany z serwisu z innej lokalizacji</string>
+    <string name="error_server_expired_session">Zostałeś wylogowany z tego urządzenia z innej lokalizacji</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">Generowanie kluczy szyfrujących</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -185,7 +185,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Hasła do siebie nie pasują</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">Podany adres e-mail został&#160;już użyty podczas rejestracji</string>
+    <string name="error_email_registered">Ten adres email zarejestrował już konto w MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">Łączenie z serwerem: tworzenie konta</string>
     <!--  -->
@@ -1430,7 +1430,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Jak to działa</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Zaproś swoich znajomych do założenia bezpłatnego konta MEGA i zainstalowania aplikacji mobilnej MEGA. Za każdą rejestrację i instalację aplikacji otrzymasz jako bonus bezpłatne przechowywanie.</string>
+    <string name="first_paragraph_achievement_invite_friends">Zaproś znajomych do założenia bezpłatnego konto MEGA i zainstalowania Aplikacja mobilna MEGA. Otrzymasz bezpłatną pamięć jako bonus za każdą rejestrację i instalację aplikacja.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Premia za bezpłatne przechowywanie dotyczy tylko nowych zaproszeń, w których zainstalowana jest aplikacja MEGA Mobile lub MEGA Desktop.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -2525,7 +2525,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Twoje zdjęcia w chmurze</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Przesyłanie z kamery to podstawowa funkcja każdego urządzenia mobilnego, a my jesteśmy objęci. Utwórz teraz swoje konto.</string>
+    <string name="content_tour_four">Przesyłanie z aparatu jest niezbędną funkcją każdego urządzenia mobilnego, a my zapewniamy Ci ochronę. Zarejestruj się teraz, aby założyć konto.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Wprowadz swoje hasło</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2587,7 +2587,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Zaproś kontakty i zacznij bezpiecznie rozmawiać za pomocą szyfrowanego czatu MEGA.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Cześć. Prowadź ze mną bezpieczne rozmowy na MEGA i otrzymaj 20&#160;GB darmowej pamięci w chmurze. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Cześć, dołącz do mnie na MEGA i ciesz się darmową, bezpiecznią szyfrowaną pamięcią i komunikacją. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Brak dostępnego linku do czatu.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2621,7 +2621,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">Zaloguj się do MEGA</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">Utwórz swoje konto MEGA</string>
+    <string name="create_account_title">Zarejestruj się, aby założyć konto MEGA</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Niedawne</string>
     <!-- Label to reference a chats section -->
@@ -3857,7 +3857,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Twoje konto MEGA zostało zawieszone z powodu powtarzających się zarzutów naruszenia praw autorskich. Oznacza to, że nie możesz uzyskać dostępu do swojego konto ani danych na nim.\nSprawdź swoją skrzynkę email, aby uzyskać więcej informacji o tym, jak złożyć zawiadomienie.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Twoje konto zostało zamknięte z powodu naruszenia Warunków świadczenia usług MEGA. \nNie będziesz w stanie odzyskać dostępu do przechowywanych danych ani uzyskać autoryzacji do rejestracji nowego konta MEGA.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Twoje konto zostało zamknięte z powodu naruszenia Warunków korzystania z usługi MEGA.\nNie będziesz w stanie odzyskać dostępu do przechowywanych danych ani uzyskać uprawnienia do założenia nowego konto MEGA.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Spotkania</string>
     <!-- Title of the location option displayed in the chat room toolbar -->

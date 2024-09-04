@@ -149,7 +149,7 @@
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Syncs -->
     <string name="device_center_top_app_bar_search_syncs_hint">Tìm mục đồng bộ</string>
     <!-- Text to show in the Device Center when no search results are found -->
-    <string name="device_center_empty_screen_no_results">Không có Kết quả</string>
+    <string name="device_center_empty_screen_no_results">Không có kết&#160;quả</string>
     <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="device_center_info_num_folders_and_files">
         <item quantity="other">%1$d thư&#160;mục&#160;·&#160;</item>

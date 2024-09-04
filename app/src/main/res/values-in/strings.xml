@@ -179,7 +179,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Kata sandi berbeda</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">Alamat e-mail ini telah memiliki akun terdaftar di MEGA</string>
+    <string name="error_email_registered">Alamat email ini telah mendaftar untuk akun dengan MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">Sedang menghubungi server: Membuat akun</string>
     <!--  -->
@@ -625,7 +625,7 @@
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
     <string name="settings_about">Tentang</string>
     <!-- Preference screen item action button -->
-    <string name="settings_about_privacy_policy">Privacy and Data Policy</string>
+    <string name="settings_about_privacy_policy">Kebijakan Privasi dan Data</string>
     <!--  -->
     <string name="settings_about_terms_of_service">Persyaratan Layanan</string>
     <!-- App means “Application” -->
@@ -1340,7 +1340,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Cara kerja</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Undang teman anda untuk membuat akun MEGA gratis dan menginstal Aplikasi Seluler MEGA. Anda akan menerima penyimpanan gratis sebagai bonus untuk setiap pendaftaran dan pemasangan aplikasi.</string>
+    <string name="first_paragraph_achievement_invite_friends">Undang teman anda untuk mendaftar akun MEGA gratis dan menginstal Aplikasi Seluler MEGA. Anda akan menerima penyimpanan gratis sebagai bonus untuk setiap pendaftaran dan instalasi aplikasi.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Bonus penyimpanan gratis hanya berlaku untuk undangan baru dan di mana Aplikasi Seluler MEGA atau Aplikasi Desktop MEGA diinstal.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -2339,7 +2339,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Foto anda di cloud</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Unggahan camera adalah fitur penting untuk perangkat seluler apa pun dan kami telah melindungi anda. Buat akun anda sekarang.</string>
+    <string name="content_tour_four">Unggahan kamera adalah fitur penting untuk perangkat seluler apa pun dan kami siap membantu anda. Mendaftar untuk akun sekarang.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Masukkan password anda</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2401,7 +2401,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Undang kontak dan mulailah mengobrol dengan aman dengan obrolan terenkripsi MEGA.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Halo. Lakukan percakapan aman di MEGA dengan saya dan dapatkan 20&#160;GB penyimpanan cloud gratis. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hai, bergabunglah dengan saya di MEGA dan nikmati penyimpanan dan komunikasi terenkripsi gratis dan aman. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Tautan obrolan tidak tersedia.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2429,7 +2429,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">Masuk ke MEGA</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">Create akun MEGA anda</string>
+    <string name="create_account_title">Daftar untuk akun MEGA</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Baru-baru ini</string>
     <!-- Label to reference a chats section -->
@@ -3569,7 +3569,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Akun MEGA anda telah ditangguhkan karena dugaan berulang pelanggaran hak cipta. Ini berarti anda tidak dapat mengakses akun atau data anda di dalamnya.\nPeriksa kotak masuk email anda untuk informasi lebih lanjut tentang cara mengajukan pemberitahuan balasan.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Akun anda dihentikan karena pelanggaran Ketentuan Layanan MEGA.\nAnda tidak akan bisa mendapatkan kembali akses ke data yang disimpan atau diberi wewenang untuk mendaftarkan akun MEGA baru.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Akun anda dihentikan karena pelanggaran Ketentuan Layanan MEGA.\nAnda tidak akan dapat memperoleh kembali akses ke data yang disimpan atau diberi wewenang untuk mendaftar akun MEGA baru.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Pertemuan</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -4913,7 +4913,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Unggahan dijeda karena baterai di bawah %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support&#64;mega.nz.</string>
+    <string name="photos_camera_uploads_general_issue">Unggahan kamera berhenti berfungsi. Coba aktifkan kembali unggahan kamera untuk menyelesaikannya. Jika masalah berlanjut, hubungi support&#64;mega.nz.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">Pengunggahan kamera sedang berlangsung, %1$d file tertunda</item>
@@ -4943,13 +4943,13 @@
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
     <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]Paket gratis anda memiliki batas 60 menit untuk rapat. Pengguna pro memiliki panggilan tak terbatas dan hingga 1000 peserta.[/A] [B]Tingkatkan sekarang.[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 1 month for %2$s per month. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Anda akan dikenakan biaya %1$s segera dan langganan anda akan diperpanjang secara otomatis setelah 1 bulan untuk %2$s per bulan. Akun Google&#160;Play anda akan dikenakan biaya untuk pembaruan dalam waktu 24 jam setelah akhir setiap periode penagihan. Untuk membatalkan langganan anda, anda harus menonaktifkan perpanjangan otomatis langganan MEGA&#160;Pro anda setidaknya 24 jam sebelum akhir periode penagihan anda melalui Langganan di [A]Google&#160;Play[/A].\nDengan meningkatkan akun anda, anda menyetujui MEGA [B]Ketentuan Layanan[/B] dan [C]Kebijakan Privasi dan Data[/C].</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 12 months for %2$s per year. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">Anda akan dikenakan biaya %1$s segera dan langganan anda akan diperpanjang secara otomatis setelah 12 bulan untuk %2$s per tahun. Akun Google&#160;Play anda akan dikenakan biaya untuk pembaruan dalam waktu 24 jam setelah akhir setiap periode penagihan. Untuk membatalkan langganan anda, anda harus menonaktifkan perpanjangan otomatis langganan MEGA&#160;Pro anda setidaknya 24 jam sebelum akhir periode penagihan anda melalui Langganan di [A]Google&#160;Play[/A].\nDengan memutakhirkan akun anda, anda menyetujui MEGA [B]Ketentuan Layanan[/B] dan [C]Kebijakan Privasi dan Data[/C].</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">You will be charged immediately and your subscription will automatically renew after 1 month. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">Anda akan ditagih segera dan langganan anda akan diperpanjang secara otomatis setelah 1 bulan. Akun Google&#160;Play anda akan dikenakan biaya untuk pembaruan dalam waktu 24 jam setelah akhir setiap periode penagihan. Untuk membatalkan langganan anda, anda harus menonaktifkan perpanjangan otomatis langganan MEGA&#160;Pro anda setidaknya 24 jam sebelum akhir periode penagihan anda melalui Langganan di [A]Google&#160;Play[/A].\nDengan memutakhirkan akun anda, anda menyetujui MEGA [B]Ketentuan Layanan[/B] dan [C]Kebijakan Privasi dan Data[/C].</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">You will be charged immediately and your subscription will automatically renew after 12&#160;months. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">Anda akan ditagih segera dan langganan anda akan diperpanjang secara otomatis setelah 12&#160;bulan. Akun Google&#160;Play anda akan dikenakan biaya untuk pembaruan dalam waktu 24&#160;jam setelah akhir setiap periode penagihan. Untuk membatalkan langganan anda, anda harus menonaktifkan perpanjangan otomatis langganan MEGA&#160;Pro anda setidaknya 24&#160;jam sebelum akhir periode penagihan anda melalui Langganan di [A]Google&#160;Play[/A].\nDengan memutakhirkan akun anda, anda menyetujui MEGA [B]Ketentuan Layanan[/B] dan [C]Kebijakan Privasi dan Data[/C].</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">Akun bisnis dinonaktifkan</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
@@ -5099,5 +5099,5 @@
     <!-- Image or Video map location title-->
     <string name="file_properties_info_map_location">Lokasi</string>
     <!-- Image or Video no map location info-->
-    <string name="file_properties_info_map_location_no_location_info">No location information</string>
+    <string name="file_properties_info_map_location_no_location_info">Tidak ada informasi lokasi</string>
 </resources>

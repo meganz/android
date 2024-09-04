@@ -47,7 +47,7 @@
     <!-- state while importing the file -->
     <string name="general_forwarding">Đang chuyển đi</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">Lưu vào Ổ&#160;Mây</string>
+    <string name="general_import">Thêm vào Ổ&#160;Mây</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">Lỗi</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -143,7 +143,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Không có kết nối mạng</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">Bạn bị đăng&#160;xuất ra&#160;khỏi thiết&#160;bị vì đăng&#160;nhập ở một thiết&#160;bị khác</string>
+    <string name="error_server_expired_session">Bạn đã bị đăng&#160;xuất ra thiết&#160;bị này bởi một phiên đăng&#160;nhập từ chỗ khác</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">Đang tạo ra các chìa khóa mã</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -179,7 +179,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Hai mật khẩu này không trùng khớp</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">Địa chỉ e-mail này đã đăng ký từ trước với MEGA</string>
+    <string name="error_email_registered">This email address has already signed up for an account with MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">Đang kết nối đến máy chủ: Đang tạo tài khoản</string>
     <!--  -->
@@ -1340,7 +1340,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Cách hoạt động</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Mời bạn&#160;bè của bạn tạo một tài&#160;khoản MEGA miễn&#160;phí và cài&#160;đặt App MEGA cho Di&#160;Động. Bạn sẽ nhận được thêm không&#160;gian miễn&#160;phí như một phần&#160;thưởng cho mỗi lần đăng&#160;ký và cài đặt ứng&#160;dụng.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invite your friends to sign up for a free MEGA account and to install a MEGA Mobile App. You will receive free storage as a bonus for every signup and app installation.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Phần thưởng không gian lưu trữ miễn phí chỉ có áp dụng cho những lời mời mới và khi App MEGA cho Di Động hoặc App MEGA cho Máy Tính được cài đặt.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -2101,7 +2101,7 @@
     <!-- Subtitle of the historic notification for contact request denied -->
     <string name="subtitle_outgoing_contact_request_denied">[A]%s [/A][B]đã từ chối yêu cầu thêm vào liên lạc.[/B]</string>
     <!-- Subtitle of the historic notification for contact request accepted -->
-    <string name="subtitle_outgoing_contact_request_accepted">[A]%s [/A][B]đã chấp nhận yêu cầu thêm vào liên lạc.[/B]</string>
+    <string name="subtitle_outgoing_contact_request_accepted">[A]%s[/A][B]đã chấp nhận yêu&#160;cầu thêm vào liên&#160;lạc.[/B]</string>
     <!-- Subtitle of the historic notification for deleted shared folders (one or many) -->
     <string name="notification_deleted_shared_folder">[B]Quyền truy cập vào thư mục được chia sẻ từ [/B][A]%s[/A][B] đã bị xóa bỏ.[/B]</string>
     <!-- Subtitle of the historic notification when a contact leaves a shared folder -->
@@ -2339,7 +2339,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Hình Ảnh được gửi lên mây</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Đăng Tải Camêra là tính năng thiết yếu cho mọi thiết bị di động, và MEGA có cung cấp cho mọi người dùng. Tạo tài khoản ngay.</string>
+    <string name="content_tour_four">Camera uploads is an essential feature for any mobile device and we have got you covered. Sign up for an account now.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Nhập mật khẩu</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2401,7 +2401,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Mời thêm tên liên lạc và để bắt đầu trò chuyện thông qua MEGA và được bảo mật mạnh mẽ.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Xin chào! Mời bạn cùng sử&#160;dụng MEGA với tôi để có ngay 20&#160;GB không&#160;gian lưu&#160;trữ đám&#160;mây miễn&#160;phí. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Xin chào, tham&#160;gia với tôi trên MEGA và tận&#160;hưởng không&#160;gian lưu&#160;trữ &amp;amp; công&#160;cụ giao&#160;tiếp được mã hóa miễn&#160;phí và an&#160;toàn. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Không có liên kết chát nào cả.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2429,7 +2429,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">Đăng&#160;nhập vào MEGA</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">Tạo tài khoản MEGA</string>
+    <string name="create_account_title">Sign up for a MEGA account</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Gần Đây</string>
     <!-- Label to reference a chats section -->
@@ -3569,7 +3569,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Tài&#160;khoản MEGA của quý&#160;vị đã bị đình&#160;chỉ do đã nhiều lần bị cáo&#160;buộc vi&#160;phạm bản&#160;quyền. Điều này có nghĩa là quý&#160;vị không được phép truy&#160;cập tài&#160;khoản của mình hoặc bất cứ dữ&#160;liệu bên trong.\nKiểm&#160;tra hộp thư email của quý&#160;vị để biết thêm thông&#160;tin và về cách gửi đơn phản&#160;đối.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Tài&#160;khoản của quý&#160;vị đã bị chấm&#160;dứt do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ của MEGA.\nQuý&#160;vị sẽ không thể lấy lại quyền truy&#160;cập vào dữ&#160;liệu đã được lưu&#160;trữ của mình hoặc được phép đăng&#160;ký tài&#160;khoản MEGA mới.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to sign up for a new MEGA account.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Họp</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -4875,7 +4875,7 @@
         <item quantity="other">đã không&#160;thể chia&#160;sẻ %1$d thư&#160;mục</item>
     </plurals>
     <!-- Button text to mute a participant in the info of participant in call screen-->
-    <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">Tắt Tiếng</string>
+    <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">Tắt tiếng</string>
     <!-- Button text to mute all participant in the call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_all_participants_button">Tắt tiếng tất&#160;cả</string>
     <!-- Label text indicating that all participants are muted -->

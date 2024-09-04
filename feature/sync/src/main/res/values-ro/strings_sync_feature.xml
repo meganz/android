@@ -91,7 +91,7 @@
     <!-- Sync Run -->
     <string name="sync_card_run_sync">Reluați</string>
     <!-- Sync Remove -->
-    <string name="sync_card_remove_sync">Elimină</string>
+    <string name="sync_card_remove_sync">Eliminați</string>
     <!-- Sync dialog for sync over Wi-Fi or mobile data -->
     <string name="sync_dialog_message_wifi_or_mobile_data">Wi-Fi sau date mobile</string>
     <!-- Sync dialog for sync only over Wi-Fi -->

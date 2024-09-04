@@ -51,7 +51,7 @@
     <!-- Sync dialog not now button -->
     <string name="sync_dialog_file_permission_negative_button">Không Phải Lúc Này</string>
     <!-- Sync dialog title for storage access -->
-    <string name="sync_dialog_storage_access_title">Truy&#160;cập vào tất&#160;cả các tập&#160;tin</string>
+    <string name="sync_dialog_storage_access_title">Truy&#160;cập vào tất&#160;cả tệp&#160;tin</string>
     <!-- Sync dialog title for battery optimization -->
     <string name="sync_dialog_battery_optimization_title">Tối&#160;ưu hóa pin</string>
     <!-- Sync dialog cancel button text -->

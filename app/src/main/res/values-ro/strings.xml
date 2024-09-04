@@ -23,7 +23,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="general_move">Mută</string>
     <!-- Menu option to delete one or multiple selected items. -->
-    <string name="general_remove">Elimină</string>
+    <string name="general_remove">Eliminați</string>
     <!-- button -->
     <string name="general_share">Partajează</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -183,7 +183,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Parolele nu coincid</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">Această adresă de e-mail a înregistrat deja un cont cu MEGA</string>
+    <string name="error_email_registered">Această adresă de e-mail s-a înscris deja pentru un cont la MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">Se conectează la server: Crearea contului</string>
     <!--  -->
@@ -305,9 +305,9 @@
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">Părăsește partajarea</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_clean_shares_menu">Elimină partajarea</string>
+    <string name="context_clean_shares_menu">Eliminați partajarea</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_remove_link_menu">Elimină linkul</string>
+    <string name="context_remove_link_menu">Eliminați linkul</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Acest link nu va mai fi disponibil publicului.</string>
     <!-- Warning that appears prior to remove links of files. Plural. -->
@@ -337,7 +337,7 @@
     <!-- menu item -->
     <string name="context_move_to_trash">Mutați în Coșul de gunoi</string>
     <!-- menu item -->
-    <string name="context_delete_from_mega">Elimină de pe MEGA</string>
+    <string name="context_delete_from_mega">Eliminați de pe MEGA</string>
     <!-- Input field description in the create folder dialog. -->
     <string name="context_new_folder_name">Numele folderului</string>
     <!-- status dialog when performing the action -->
@@ -349,9 +349,9 @@
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">Trimite</string>
     <!-- Menu option to delete one or multiple selected items. -->
-    <string name="context_remove">Elimină</string>
+    <string name="context_remove">Eliminați</string>
     <!-- Menu option to delete selected items of the offline state -->
-    <string name="context_delete_offline">Elimină din offline</string>
+    <string name="context_delete_offline">Eliminați din offline</string>
     <!-- menu item -->
     <string name="context_share_folder">Partajează folderul</string>
     <!-- menu item -->
@@ -945,7 +945,7 @@
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Adaugă participanți</string>
     <!-- Menu item to remove a participants from a chat -->
-    <string name="remove_participant_menu_item">Elimină participantul</string>
+    <string name="remove_participant_menu_item">Eliminați participantul</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_info_empty_screen">Vă protejează chat-ul cu criptare tip zero cunoștințe, oferind asigurări esențiale de siguranță:</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1348,7 +1348,7 @@
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_chat_clear">Golește istoricul chatului</string>
     <!-- Title of the section to remove contact in the Contact Properties screen -->
-    <string name="title_properties_remove_contact">Elimină contactul</string>
+    <string name="title_properties_remove_contact">Eliminați contactul</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_chat_notifications_contact">Notificări de chat</string>
     <!-- Text shown when the chat history was cleared by someone -->
@@ -1400,7 +1400,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Cum funcționează</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invită-ți prietenii să-și creeze un cont gratuit MEGA și să-și instaleze Aplicația Mobilă MEGA. Vei primi spațiu de stocare gratuit drept bonus pentru fiecare înscriere și instalare a aplicației.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invitați-vă prietenii să se înscrie pentru un cont MEGA gratuit și să instaleze o Aplicație Mobile MEGA. Veți primi spațiu de stocare gratuit ca bonus pentru fiecare înregistrare și instalare a aplicației.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Bonusul pentru spațiul de stocare gratuit se aplică numai la noile invitații și în cazul în care este instalată Aplicația Mobilă MEGA sau Aplicația Desktop MEGA.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -2073,7 +2073,7 @@
     <!-- Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB. -->
     <string name="settings_compression_queue_subtitle">Dimensiunea minimă este %1$s și dimensiunea maximă este %2$s.</string>
     <!-- Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler -->
-    <string name="settings_rb_scheduler_select_days_title">Elimină fișierele mai vechi de</string>
+    <string name="settings_rb_scheduler_select_days_title">Eliminați fișierele mai vechi de</string>
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
     <string name="settings_video_compression_queue_size_popup_title">Notifică-mă când dimensiunea este mai mare de</string>
     <!-- Title of compression queue size option in settings -->
@@ -2463,7 +2463,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Fotografiile dvs. în cloud</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Încărcările camerelor sunt o caracteristică esențială pentru orice dispozitiv mobil și vă asigurăm. Creează-ți contul acum.</string>
+    <string name="content_tour_four">Încărcări cameră sunt o funcție esențială pentru orice dispozitiv mobil și vă asigurăm. Înscrieți-vă acum pentru un cont.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Introduceți parola dvs.</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2525,7 +2525,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Invită contacte și începe să chatuiești în siguranță cu chatul criptat MEGA.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Bună. Conversează securizat pe MEGA cu mine și obține 20&#160;GB spațiu de stocare în cloud gratuit. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Bună ziua, alăturați-vă mie pe MEGA și bucurați-vă de stocare și comunicare gratuite, criptate în siguranță. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Niciun link de chat disponibil.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2557,7 +2557,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">Conectați-vă la MEGA</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">Creează-ți contul MEGA</string>
+    <string name="create_account_title">Înscrieți-vă pentru un cont MEGA</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Recente</string>
     <!-- Label to reference a chats section -->
@@ -2771,7 +2771,7 @@
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
     <string name="title_modify_phone_number">Modifică numărul de telefon</string>
     <!-- Option in bottom sheet dialog for removing the associated phone number of current account. -->
-    <string name="title_remove_phone_number">Elimină numărul de telefon</string>
+    <string name="title_remove_phone_number">Eliminați numărul de telefon</string>
     <!-- Message showing to explain what will happen when the operation of -->
     <string name="modify_phone_number_message">Această operație va elimina numărul dvs. de telefon curent și va începe procesul de asociere a unui nou număr de telefon cu contul dvs.</string>
     <!-- Message for action to remove the registered phone number. -->
@@ -2937,11 +2937,11 @@
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">Favorit</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
-    <string name="file_properties_unfavourite">Elimină de la favorite</string>
+    <string name="file_properties_unfavourite">Eliminați de la favorite</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
     <string name="file_properties_label">Etichetă</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
-    <string name="action_remove_label">Elimină eticheta</string>
+    <string name="action_remove_label">Eliminați eticheta</string>
     <!-- Title text to show label selector. -->
     <string name="title_label">Etichetă</string>
     <!-- A user can mark a folder or file with red colour. -->
@@ -3387,7 +3387,7 @@
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Încarcă un folder</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
-    <string name="remove_moderator">Elimină ca gazdă</string>
+    <string name="remove_moderator">Eliminați ca gazdă</string>
     <!-- Title message of existing subscription dialog -->
     <string name="title_existing_subscription">Cumperi un nou abonament?</string>
     <!-- Text of buy new subscription button -->
@@ -3423,7 +3423,7 @@
     <!-- Text that indicates that there’s no media files to show in favourite album -->
     <string name="empty_hint_favourite_album">[B]Niciun[/B] [A]favorit[/A]</string>
     <!-- Action button which will remove favourites in selection mode -->
-    <string name="action_remove_favourites">Elimină favoritele</string>
+    <string name="action_remove_favourites">Eliminați favoritele</string>
     <!-- Message of notice that the zip file format is error -->
     <string name="message_zip_format_error">Formatul fișierului nu este suportat. Nu se poate deschide fișierul.</string>
     <!-- Warnign shown after trying to upload an empty folder -->
@@ -3761,7 +3761,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Contul dvs. MEGA a fost suspendat din cauza acuzațiilor repetate de încălcare a drepturilor de autor. Aceasta înseamnă că nu vă puteți accesa contul sau datele din acesta.\nVerificați căsuța de e-mail pentru mai multe informații despre cum să depuneți o contranotificare.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Contul dvs. a fost desființat din cauza unei încălcări a Termenilor de utilizare a serviciului MEGA.\nNu veți putea recâștiga accesul la datele stocate sau nu veți putea fi autorizat să înregistrați un nou cont MEGA.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Contul dvs. a fost desființat din cauza unei încălcări a Termenii de utilizare a serviciului MEGA.\nNu veți putea redobândi accesul la datele stocate sau nu veți putea fi autorizat să înscrieți pentru un nou cont MEGA.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Întâlniri</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -4748,9 +4748,9 @@
     </plurals>
     <!-- Remove button for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_button">
-        <item quantity="one">Elimină linkul</item>
-        <item quantity="few">Elimină linkurile</item>
-        <item quantity="other">Elimină linkurile</item>
+        <item quantity="one">Eliminați linkul</item>
+        <item quantity="few">Eliminați linkurile</item>
+        <item quantity="other">Eliminați linkurile</item>
     </plurals>
     <!-- Input decryption key dialog title for album import -->
     <string name="album_import_input_decryption_key_title">Introduceți cheia de decriptare</string>

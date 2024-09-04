@@ -143,7 +143,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">沒有網路連線</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">您已從其他位置登出此設備</string>
+    <string name="error_server_expired_session">您已從其它位置登出此裝置</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">正在生成加密金鑰</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -179,7 +179,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">密碼不相符</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">此電子郵件地址已在MEGA註冊過帳戶</string>
+    <string name="error_email_registered">此電子郵件地址已註冊MEGA帳戶</string>
     <!--  -->
     <string name="create_account_creating_account">正在連接到伺服器：正在建立帳戶</string>
     <!--  -->
@@ -1340,7 +1340,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">如何使用</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">邀請您的朋友建立一個免費的MEGA帳戶並且安裝MEGA手機應用程式。每一個完成註冊和應用程式安裝，您都將獲得免費儲存空間作為獎勵。</string>
+    <string name="first_paragraph_achievement_invite_friends">邀請您的朋友註冊一個免費的MEGA帳戶並且安裝MEGA行動應用程式。每一個完成註冊和應用程式安裝，您將獲得免費儲存空間作為獎勵。</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">免費儲存空間獎勵只限於新邀請並且有安裝MEGA手機應用程式或MEGA桌面應用程式才有效。</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -2339,7 +2339,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">您在雲端的照片</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">相機上傳是任何行動裝置的必要功能，我們現已為您提供這項服務。立即建立您的帳戶。</string>
+    <string name="content_tour_four">相機上傳是任何行動裝置的基本功能，我們已經為您提供這項服務。立即註冊一個帳戶。</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">請輸入您的密碼</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2401,7 +2401,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">邀請聯絡人並開始在MEGA上使用加密對話功能。</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">嗨。在MEGA上與我安全的進行對談並且可獲得20&#160;GB免費雲端空間。%1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">嗨，與我一起加入MEGA，享受免費、安全加密的儲存和通訊。%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">沒有可用的對話連結。</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2429,7 +2429,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">登入MEGA</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">建立您的MEGA帳戶</string>
+    <string name="create_account_title">註冊一個MEGA帳戶</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">近期的</string>
     <!-- Label to reference a chats section -->
@@ -3569,7 +3569,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">由於多次侵犯版權的指控，您的MEGA帳戶已被暫停。這意味著您無法存取您的帳戶或當中的資料。\n檢查您的電子郵件收件匣，瞭解有關如何提交反對通知的更多資訊。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">您的帳戶由於違反MEGA的服務條款而被終止。\n您將無法重新存取您儲存的資料，也無法被授權註冊新的MEGA帳戶。</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">由於違反MEGA的服務條款，您的帳戶已被終止。\n您將無法重新存取您儲存的資料，也無法獲得註冊新MEGA帳戶的授權。</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">會議</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -4943,13 +4943,13 @@
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
     <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]您的免費方案有60分鐘的會議時間限制。Pro會員的通話時間不受限制，而且最多可容納1000位與會者。[/A][B]立即升級。[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 1 month for %2$s per month. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">您將立即被收取%1$s的費用，而且您的訂閱將在1個月後自動以每月%2$s續訂。您的Google&#160;Play帳戶將在每個計費週期結束後24小時內被收取續訂費用。若要取消訂閱，您必須在計費週期結束前至少24小時透過[A]Google&#160;Play[/A]中的訂閱停用MEGA&#160;Pro訂閱的自動續訂。\n升級您的帳戶即表示您同意MEGA的[B]服務條款[/B]和[C]隱私和資料政策[/C]。</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 12 months for %2$s per year. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">您將立即被收取%1$s的費用，而且您的訂閱將在12個月後自動以每年%2$s續訂。您的Google&#160;Play帳戶將在每個計費週期結束後24小時內被收取續訂費用。若要取消訂閱，您必須在計費週期結束前至少24小時透過[A]Google&#160;Play[/A]中的訂閱停用MEGA&#160;Pro訂閱的自動續訂。\n升級您的帳戶即表示您同意MEGA的[B]服務條款[/B]和[C]隱私和資料政策[/C]。</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">You will be charged immediately and your subscription will automatically renew after 1 month. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">您將立即被收取費用，而且您的訂閱將在1個月後自動續訂。您的Google&#160;Play帳戶將在每個計費週期結束後24小時內被收取續訂費用。若要取消訂閱，您必須在計費週期結束前至少24小時透過[A]Google&#160;Play[/A]中的訂閱停用MEGA&#160;Pro訂閱的自動續訂。\n升級您的帳戶即表示您同意MEGA的[B]服務條款[/B]和[C]隱私和資料政策[/C]。</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">You will be charged immediately and your subscription will automatically renew after 12&#160;months. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">您將立即被收取費用，而且您的訂閱將在12&#160;個月後自動續訂。您的Google&#160;Play帳戶將在每個計費週期結束後24&#160;小時內被收取續訂費用。若要取消訂閱，您必須在計費週期結束前至少24&#160;小時透過[A]Google&#160;Play[/A]中的訂閱停用MEGA&#160;Pro訂閱的自動續訂。\n升級您的帳戶即表示您同意MEGA的[B]服務條款[/B]和[C]隱私和資料政策[/C]。</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">商業帳戶已停用</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
@@ -5099,5 +5099,5 @@
     <!-- Image or Video map location title-->
     <string name="file_properties_info_map_location">位置</string>
     <!-- Image or Video no map location info-->
-    <string name="file_properties_info_map_location_no_location_info">No location information</string>
+    <string name="file_properties_info_map_location_no_location_info">沒有位置資訊</string>
 </resources>

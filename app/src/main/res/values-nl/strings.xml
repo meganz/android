@@ -145,7 +145,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Geen netwerk verbinding</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">U bent afgemeld op dit apparaat vanaf een andere locatie</string>
+    <string name="error_server_expired_session">U bent vanaf een andere locatie uitgelogd bij dit apparaat</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">Coderingssleutels genereren</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -181,7 +181,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Wachtwoorden komen niet overeen</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">Met dit e-mail adres is al een account bij MEGA geregistreerd</string>
+    <string name="error_email_registered">Dit e-mailadres is al aangemeld voor een account bij MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">Verbinding maken met de server: Account aanmaken</string>
     <!--  -->
@@ -1370,7 +1370,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Hoe het werkt</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Nodig uw vrienden uit om een ​​gratis MEGA-account aan te maken en een MEGA Mobile Applicatie te installeren. U ontvangt gratis opslagruimte als bonus voor elke succesvolle aanmelding en applicatie-installatie.</string>
+    <string name="first_paragraph_achievement_invite_friends">Nodig uw vrienden uit om zich aan te melden voor een gratis MEGA-account en om een MEGA Mobile Applicatie te installeren. U ontvangt gratis opslag als bonus voor elke aanmelding en applicatie-installatie.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Gratis opslagbonus alleen van toepassing op nieuwe uitnodigingen en waar MEGA Mobile Applicatie of MEGA Desktop Applicatie is geïnstalleerd.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -2401,7 +2401,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Uw foto’s in de cloud</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Camera uploads zijn een essentiële functie voor elk mobiel apparaat en wij helpen u daarbij. Creëer uw account nu.</string>
+    <string name="content_tour_four">Camera-uploads zijn een essentieel kenmerk voor elk mobiel apparaat en we staan voor u klaar. Meld u nu aan voor een account.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Vul uw wachtwoord in</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2463,7 +2463,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Nodig contacten uit en begin een veilig gesprek met MEGA’s gecodeerde chat.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Hoi. Voer veilige gesprekken op MEGA met mij en krijg 20&#160;GB gratis cloud opslag.%1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hallo, doe mee op MEGA en genieten van gratis, veilige gecodeerde opslag en communicatie. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Geen gesprekslink beschikbaar.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2493,7 +2493,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">Inloggen in MEGA</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">Creëer uw MEGA-account</string>
+    <string name="create_account_title">Meld u aan voor een MEGA-account</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Recent</string>
     <!-- Label to reference a chats section -->
@@ -3665,7 +3665,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Uw MEGA-account is opgeschort vanwege herhaalde beschuldigingen van schendingen van auteursrechten. Dit betekent dat u geen toegang hebt tot uw account of de gegevens die erin staan.\nKijk in uw e-mailinbox voor meer informatie over hoe u een tegenmelding kunt indienen.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Uw account is beëindigd vanwege een schending van MEGA\’s Algemene Voorwaarden.\nU kunt geen toegang meer krijgen tot uw opgeslagen gegevens of worden geautoriseerd om een ​​nieuw MEGA-account te registreren.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Uw account is beëindigd vanwege een schending van de Algemene Voorwaarden van MEGA.\nU zult niet opnieuw toegang krijgen tot u opgeslagen gegevens of geautoriseerd worden om u aan te melden voor een nieuw MEGA-account.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Vergaderingen</string>
     <!-- Title of the location option displayed in the chat room toolbar -->

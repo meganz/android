@@ -147,7 +147,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Vous n’êtes pas connecté au réseau</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">Vous avez été déconnecté de cet appareil d’un autre endroit</string>
+    <string name="error_server_expired_session">Vous avez été déconnecté de cet appareil à partir d’un autre endroit</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">Génération des clés de chiffrement</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -183,7 +183,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Les mots de passe ne correspondent pas</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">Un compte&#160;MEGA a déjà été créé avec cette adresse courriel</string>
+    <string name="error_email_registered">Cette adresse courriel est déjà inscrite pour un compte avec MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">Connexion au serveur&#160;: création du compte</string>
     <!--  -->
@@ -1400,7 +1400,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Fonctionnement</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invitez vos amies et amis à créer un compte&#160;MEGA gratuit et à installer une Appli&#160;MEGA Mobile. Vous recevrez de l’espace de stockage gratuit en prime pour chaque inscription et installation d’appli.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invitez vos amis à créer un compte MEGA gratuit et à installer une Appli Mobile MEGA. Vous bénéficierez d\’un espace de stockage gratuit en prime pour chaque inscription et chaque installation d\’application.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">La prime d’espace de stockage gratuit n’est applicable que pour les nouvelles invitations et si l’Appli&#160;MEGA mobile ou l’Appli&#160;MEGA pour ordinateur est installée.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -2463,7 +2463,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Vos photos dans le nuage</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Le téléversement de l’appareil photo est une fonction essentielle de tout appareil mobile et nous nous en occupons pour vous. Créez votre compte maintenant.</string>
+    <string name="content_tour_four">Les téléversements de lappareil photo sont une fonction essentielle de tout appareil mobile et nous avons ce qu\’il vous faut. Ouvrez un compte dès maintenant.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Saisissez votre mot de passe</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2525,7 +2525,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Invitez des contacts et commencez à dialoguer en toute sécurité grâce au dialogue en ligne chiffré de MEGA.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Bonjour. Conversez avec moi en toute sécurité sur MEGA et obtenez 20&#160;Go d’espace de stockage nuagique gratuit. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Bonjour. Joignez-vous à moi sur MEGA et profitez de services de stockage et de communication chiffrés et sécurisés. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Aucun lien de conversation n’est proposé.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2557,7 +2557,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">Connectez-vous à MEGA</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">Créer votre compte&#160;MEGA</string>
+    <string name="create_account_title">Inscrivez-vous pour un compte MEGA</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Récents</string>
     <!-- Label to reference a chats section -->
@@ -3603,7 +3603,7 @@
     <!-- Report issue setting name-->
     <string name="settings_help_report_issue">Signaler un problème</string>
     <!-- Report issue fragment instructions-->
-    <string name="settings_help_report_issue_instructions">Votre rétroaction nous aide à améliorer MEGA. Veuillez décrire clairement le problème que vous avez rencontré. Plus vous fournirez de détails, plus facile sera la résolution.</string>
+    <string name="settings_help_report_issue_instructions">Votre rétroaction nous aide à améliorer MEGA. Décrivez clairement le problème que vous avez rencontré. Plus vous fournirez de détails, plus facile sera la résolution.</string>
     <!-- Hint text for the description field on the report issue screen-->
     <string name="settings_help_report_issue_description_label">Décrivez le problème</string>
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
@@ -5313,7 +5313,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Appel général</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">Cette appli est connectée à un autre compte MEGA.\nDéconnectez-vous de ce compte et connectez-vous avec votre compte RPV&#160;MEGA&#160;VPN.</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">Cette appli est connectée à un autre compte MEGA.\nDéconnectez-vous de ce compte et connectez-vous avec votre compte MEGA&#160;VPN.</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">MEGA a besoin d’accéder à votre appareil photo pour capturer des photos et des vidéos.</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->

@@ -145,7 +145,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Keine Netzverbindung</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">Ihre Sitzung wurde anderswo beendet</string>
+    <string name="error_server_expired_session">Sie wurden aus der Ferne von diesem Gerät abgemeldet</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">Schlüssel werden erzeugt</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -1370,7 +1370,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Funktionsprinzip</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Laden Sie Ihre Freunde ein, einen kostenlosen MEGA-Account zu erstellen und eine MEGA-Mobilapp zu installieren. Für jede Anmeldung und App-Installation erhalten Sie als Bonus kostenlosen Speicherplatz.</string>
+    <string name="first_paragraph_achievement_invite_friends">Laden Sie Ihre Freunde ein, einen kostenlosen MEGA-Account zu registrieren und eine MEGA-Mobil-App zu installieren. Für jede Anmeldung und App-Installation erhalten Sie als Bonus kostenlosen Speicherplatz.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Der kostenlose Bonusspeicherplatz wird nur bei neuen Einladungen und bei Installation einer MEGA-Mobil-App oder der MEGA-Desktop-App gewährt.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -2401,7 +2401,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Ihre Fotos in der Cloud</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Kamera-Uploads ist essentiell für alle Mobilgeräte, und MEGA unterstützt dies selbstverständlich. Erstellen Sie jetzt Ihren Account.</string>
+    <string name="content_tour_four">Kamera-Uploads sind bei Mobilgeräten unverzichtbar und werden von MEGA bestens unterstützt. Registrieren Sie Ihren Account jetzt!</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Passwort</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2463,7 +2463,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Laden Sie Kontakte ein und kommunizieren Sie sicher mit MEGAs Ende-zu-Ende-Verschlüsselung.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Hallo! Nutze MEGA für die sichere Kommunikation mit mir und erhalte 20 &#160;GB kostenlosen Cloudspeicher. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hallo! Ich lade Sie herzlich zu MEGA ein. MEGA bietet Ihnen eine kostenlose, sicher verschlüsselte Datenspeicherung und Kommunikation. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Kein Chatlink verfügbar.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2493,7 +2493,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">In MEGA einloggen</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">MEGA-Account erstellen</string>
+    <string name="create_account_title">Registrieren Sie Ihren MEGA-Account</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Neu/geändert</string>
     <!-- Label to reference a chats section -->

@@ -143,7 +143,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">네트워크 연결 없음</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">다른 위치에서 이 기기를 로그아웃 하였습니다</string>
+    <string name="error_server_expired_session">다른 위치에서 이 장치를 로그아웃 하였습니다</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">암호화 키 생성 중</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -179,7 +179,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">암호가 일치하지 않습니다</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">이 이메일 주소는 이미 MEGA에 가입되어 있습니다</string>
+    <string name="error_email_registered">This email address has already signed up for an account with MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">서버에 연결 중: 계정 생성 중</string>
     <!--  -->
@@ -1340,7 +1340,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">작동 원리</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">친구를 초대하여 무료 MEGA 계정을 만들고 MEGA 모바일 앱을 설치하게 하세요. 가입과 앱 설치마다 당신은 무료 저장소를 보너스로 받게 됩니다.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invite your friends to sign up for a free MEGA account and to install a MEGA Mobile App. You will receive free storage as a bonus for every signup and app installation.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">무료 저장소 보너스는 새 초대에만 적용되며 MEGA 모바일 앱 또는 MEGA 데스크톱 앱이 설치되어야 합니다.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -2339,7 +2339,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">클라우드 속 당신의 사진</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">카메라 업로드는 어떠한 모바일 기기에서든 필요한 기능이며 우리는 이 기능이 준비되어 있습니다. 지금 계정을 만드세요.</string>
+    <string name="content_tour_four">Camera uploads is an essential feature for any mobile device and we have got you covered. Sign up for an account now.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">암호를 입력하세요</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2401,7 +2401,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">지인을 초대하고 MEGA의 암호화된 대화로 안전하게 대화를 시작하세요.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">안녕하세요. 저와 MEGA에서 안전하게 대화하고 20&#160;GB의 무료 저장소를 받으세요. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">안녕하세요, MEGA에서 저와 함께하고, 안전하게 암호화된 저장소와 대화에 참여해주세요. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">사용 가능한 대화 링크 없음.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2429,7 +2429,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">MEGA에 로그인</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">MEGA 계정을 만드세요</string>
+    <string name="create_account_title">Sign up for a MEGA account</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">최근</string>
     <!-- Label to reference a chats section -->
@@ -3569,7 +3569,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">당신의 MEGA 계정이 반복된 저작권 침해 혐의로 인해 정지 되었습니다. 이것은 당신의 계정이나 그 안의 데이터에 접근할 수 없다는 뜻입니다.\n이의 제기를 제출하는 방법에 대한 자세한 정보는 이메일 수신함을 확인하세요.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">당신의 계정이 MEGA의 이용 약관 위반으로 삭제되었습니다.\n저장된 데이터에 대한 접근 또는 새 MEGA 계정을 등록하는 것이 금지됩니다.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to sign up for a new MEGA account.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">회의</string>
     <!-- Title of the location option displayed in the chat room toolbar -->

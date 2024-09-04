@@ -225,7 +225,7 @@
     <!-- Text for the header of the screen to add a new sync folder -->
     <string name="sync_add_new_sync_folder_header_text">Добавить синхронизируемую папку:</string>
     <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
-    <string name="general_size_giga_byte">%1$s&#160;ГБ</string>
+    <string name="general_size_giga_byte">%1$s</string>
     <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
     <string name="general_free_plan_name">Бесплатный</string>
     <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
@@ -448,8 +448,8 @@
     <string name="account_cancel_account_screen_plan_free_plan">Free</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Хранилище</string>
-    <!-- Storage amount available in the free plan. %1s represents the amount of storage in GB. -->
-    <string name="account_cancel_account_screen_plan_free_storage">%1s&#160;ГБ</string>
+    <!-- Storage amount available in the free plan. %1s represents the amount of storage and the unit -->
+    <string name="account_cancel_account_screen_plan_free_storage">%1&#160;с.</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">Передача данных</string>
     <!-- Transfer limit in the free plan -->
@@ -675,9 +675,27 @@
     <!-- Text that there is no recent activity of the video recently watched page  -->
     <string name="video_section_empty_hint_no_recently_activity">Нет недавней активности</string>
     <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
-    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Remove from recently watched</string>
+    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Удалить из недавно просмотренных</string>
     <!-- Message that remove recently watched item from the video recently watched page  -->
-    <string name="video_section_message_remove_recently_watched_item">Removed from recently watched.</string>
+    <string name="video_section_message_remove_recently_watched_item">Удалено из недавно просмотренных</string>
     <!-- Message that clear recently watched in the video recently watched page  -->
-    <string name="video_section_message_clear_recently_watched">Recently watched has been cleared</string>
+    <string name="video_section_message_clear_recently_watched">Недавно просмотренные очищены</string>
+    <!-- Title of the Document Scanning Error Dialog -->
+    <string name="document_scanning_error_dialog_title">Сканирование не завершено</string>
+    <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
+    <string name="document_scanning_error_type_insufficient_ram">Ваш телефон не соответствует минимальным требованиям к объёму оперативной памяти для завершения сканирования</string>
+    <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
+    <string name="document_scanning_error_type_generic_error">У нас возникли проблемы со сканированием этого документа. Пожалуйста, попробуйте ещё раз.</string>
+    <!-- The confirmation Button text of the Document Scanning Error Dialog -->
+    <string name="document_scanning_error_dialog_confirm_button">Закрыть</string>
+    <!--Title text to start a meeting from Meeting screen empty view-->
+    <string name="meeting_recent_list_empty_title">Защитите свои звонки</string>
+    <!--Subtitle text from Meeting screen empty view-->
+    <string name="meeting_recent_list_empty_subtitle">Ваши встречи, семейные звонки и личные разговоры защищены нашим шифрованием с нулевым разглашением. [A]Узнать больше[/A]</string>
+    <!--Warning message to inform the user the minimum number of characters to enter into the edit text field for the survey-->
+    <string name="account_cancel_subscription_survey_minimum_character_limit">Сообщение должно содержать не менее 10 символов</string>
+    <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
+    <string name="account_cancel_subscription_survey_enter_details">Укажите подробности</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="meeting_guest_left_meeting_bonus_title">Бесплатное облачное хранилище</string>
 </resources>
