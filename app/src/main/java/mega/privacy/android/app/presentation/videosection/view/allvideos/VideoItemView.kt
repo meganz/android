@@ -21,9 +21,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -35,11 +42,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
@@ -130,7 +141,11 @@ internal fun VideoThumbnailView(
     duration: String?,
     isFavourite: Boolean,
 ) {
-    Box(modifier = modifier.width(126.dp).aspectRatio(1.77f)) {
+    Box(
+        modifier = modifier
+            .width(126.dp)
+            .aspectRatio(1.77f)
+    ) {
         val thumbnailModifier = Modifier
             .fillMaxHeight()
             .clip(RoundedCornerShape(5.dp))
@@ -216,31 +231,80 @@ internal fun VideoNameAndLabelView(
     name: String,
     labelColor: Color?,
     modifier: Modifier = Modifier,
+    maxLines: Int = 2,
 ) {
+    val inlineContentId = "box"
+    val ellipsis = "..."
+
+    val text = AnnotatedString.Builder().also { builder ->
+        builder.append(name)
+        builder.appendInlineContent(inlineContentId)
+    }.toAnnotatedString()
+
+    var finalText by remember { mutableStateOf(text) }
+    val textLayoutResultState = remember { mutableStateOf<TextLayoutResult?>(null) }
+    val textLayoutResult = textLayoutResultState.value
+
+    LaunchedEffect(textLayoutResult) {
+        if (textLayoutResult == null) return@LaunchedEffect
+        if (textLayoutResult.hasVisualOverflow) {
+            val lastCharIndex = textLayoutResult.getLineEnd(maxLines - 1)
+            val textWithoutOverflow =
+                AnnotatedString(text.substring(startIndex = 0, endIndex = lastCharIndex))
+
+            val lastCharIndexBeforeEllipse = maxOf(
+                0,
+                textWithoutOverflow.length - ellipsis.length - 1,
+                textWithoutOverflow.lastIndexOf("\n")
+            )
+
+            val adjustedText = text
+                .subSequence(startIndex = 0, endIndex = lastCharIndex)
+                .subSequence(startIndex = 0, endIndex = lastCharIndexBeforeEllipse)
+                .plus(AnnotatedString(ellipsis))
+
+            finalText = AnnotatedString.Builder().also { builder ->
+                builder.append(adjustedText)
+                builder.appendInlineContent(inlineContentId)
+            }.toAnnotatedString()
+        }
+    }
+
     Row(modifier = modifier) {
+        val inlineContent = mapOf(
+            inlineContentId to InlineTextContent(
+                Placeholder(
+                    width = 20.sp,
+                    height = 10.sp,
+                    placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                )
+            ) {
+                labelColor?.let {
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 10.dp)
+                            .size(10.dp)
+                            .background(shape = CircleShape, color = it)
+                            .align(Alignment.CenterVertically)
+                            .testTag(VIDEO_ITEM_LABEL_VIEW_TEST_TAG),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {}
+                }
+            }
+        )
+
         MegaText(
             modifier = Modifier
                 .padding(start = 10.dp)
-                .weight(1f)
                 .align(Alignment.CenterVertically)
                 .testTag(VIDEO_ITEM_NAME_VIEW_TEST_TAG),
-            text = name,
+            text = finalText,
+            maxLines = maxLines,
             textColor = TextColor.Primary,
-            overflow = LongTextBehaviour.Ellipsis(2),
-            style = MaterialTheme.typography.subtitle1
+            style = MaterialTheme.typography.subtitle1,
+            inlineContent = inlineContent,
+            onTextLayout = { textLayoutResultState.value = it }
         )
-
-        labelColor?.let {
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 5.dp)
-                    .size(10.dp)
-                    .background(shape = CircleShape, color = it)
-                    .align(Alignment.CenterVertically)
-                    .testTag(VIDEO_ITEM_LABEL_VIEW_TEST_TAG),
-                contentAlignment = Alignment.CenterEnd
-            ) {}
-        }
     }
 }
 

@@ -99,23 +99,21 @@ class VideoItemViewTest {
     @Test
     fun `test that the UIs are displayed correctly when parameters are default value`() {
         setComposeContent()
-
-        composeTestRule.onNodeWithTag(VIDEO_ITEM_NAME_VIEW_TEST_TAG, true).run {
-            assertIsDisplayed()
-            assertTextEquals("")
+        VIDEO_ITEM_NAME_VIEW_TEST_TAG.assertIsDisplayedWithTag()
+        listOf(
+            VIDEO_ITEM_SIZE_VIEW_TEST_TAG,
+            VIDEO_ITEM_DURATION_VIEW_TEST_TAG,
+            VIDEO_ITEM_LABEL_VIEW_TEST_TAG
+        ).forEach {
+            it.assertIsNotDisplayedWithTag()
         }
-        composeTestRule.onNodeWithTag(VIDEO_ITEM_SIZE_VIEW_TEST_TAG, true).assertIsNotDisplayed()
-        composeTestRule.onNodeWithTag(VIDEO_ITEM_DURATION_VIEW_TEST_TAG, true)
-            .assertIsNotDisplayed()
-        composeTestRule.onNodeWithTag(VIDEO_ITEM_LABEL_VIEW_TEST_TAG, true).assertIsNotDisplayed()
 
         listOf(
             VIDEO_ITEM_PLAY_ICON_CONTENT_DESCRIPTION,
             VIDEO_ITEM_THUMBNAIL_CONTENT_DESCRIPTION,
             VIDEO_ITEM_MENU_ICON_CONTENT_DESCRIPTION,
         ).forEach {
-            composeTestRule.onNodeWithContentDescription(label = it, useUnmergedTree = true)
-                .assertIsDisplayed()
+            it.assertIsDisplayedWithDescription()
         }
 
         listOf(
@@ -123,10 +121,18 @@ class VideoItemViewTest {
             VIDEO_ITEM_OFFLINE_ICON_CONTENT_DESCRIPTION,
             VIDEO_ITEM_LINK_ICON_CONTENT_DESCRIPTION
         ).forEach {
-            composeTestRule.onNodeWithContentDescription(it, useUnmergedTree = true)
-                .assertIsNotDisplayed()
+            it.assertIsNotDisplayedWithDescription()
         }
     }
+
+    private fun String.assertIsNotDisplayedWithTag() =
+        composeTestRule.onNodeWithTag(this, true).assertIsNotDisplayed()
+
+    private fun String.assertIsNotDisplayedWithDescription() =
+        composeTestRule.onNodeWithContentDescription(this, true).assertIsNotDisplayed()
+
+    private fun String.assertIsDisplayedWithDescription() =
+        composeTestRule.onNodeWithContentDescription(this, true).assertIsDisplayed()
 
     @Test
     fun `test that the UIs are correctly displayed when all parameters have values or are set to true`() {
@@ -143,19 +149,16 @@ class VideoItemViewTest {
             nodeAvailableOffline = true,
         )
 
-        composeTestRule.onNodeWithTag(VIDEO_ITEM_NAME_VIEW_TEST_TAG, true).run {
-            assertIsDisplayed()
-            assertTextEquals(name)
+        VIDEO_ITEM_NAME_VIEW_TEST_TAG.assertIsDisplayedWithTag()
+        VIDEO_ITEM_SIZE_VIEW_TEST_TAG.run {
+            assertIsDisplayedWithTag()
+            assertTextEqualsWithTag(fileSize)
         }
-        composeTestRule.onNodeWithTag(VIDEO_ITEM_SIZE_VIEW_TEST_TAG, true).run {
-            assertIsDisplayed()
-            assertTextEquals(fileSize)
+        VIDEO_ITEM_DURATION_VIEW_TEST_TAG.run {
+            assertIsDisplayedWithTag()
+            assertTextEqualsWithTag(duration)
         }
-        composeTestRule.onNodeWithTag(VIDEO_ITEM_DURATION_VIEW_TEST_TAG, true).run {
-            assertIsDisplayed()
-            assertTextEquals(duration)
-        }
-        composeTestRule.onNodeWithTag(VIDEO_ITEM_LABEL_VIEW_TEST_TAG, true).assertIsDisplayed()
+        VIDEO_ITEM_LABEL_VIEW_TEST_TAG.assertIsDisplayedWithTag()
 
         listOf(
             VIDEO_ITEM_FAVOURITE_ICON_CONTENT_DESCRIPTION,
@@ -165,10 +168,15 @@ class VideoItemViewTest {
             VIDEO_ITEM_OFFLINE_ICON_CONTENT_DESCRIPTION,
             VIDEO_ITEM_LINK_ICON_CONTENT_DESCRIPTION
         ).forEach {
-            composeTestRule.onNodeWithContentDescription(it, useUnmergedTree = true)
-                .assertIsDisplayed()
+            it.assertIsDisplayedWithDescription()
         }
     }
+
+    private fun String.assertIsDisplayedWithTag() =
+        composeTestRule.onNodeWithTag(this, true).assertIsDisplayed()
+
+    private fun String.assertTextEqualsWithTag(value: String) =
+        composeTestRule.onNodeWithTag(this, true).assertTextEquals(value)
 
     @Test
     fun `test that onClick is invoked when item is performClick`() {

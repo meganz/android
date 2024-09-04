@@ -4,10 +4,13 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -15,8 +18,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
@@ -68,6 +71,42 @@ fun MegaText(
         textAlign = textAlign
     )
 }
+
+/**
+ * Mega text.
+ *
+ * @param text AnnotatedString.
+ * @param textColor Text color.
+ * @param modifier [Modifier].
+ * @param inlineContent Map<String, InlineTextContent> A map store composables that replaces certain ranges of the text.
+ * @param maxLines Max lines.
+ * @param minLines Min lines.
+ * @param style Text style.
+ * @param textAlign The alignment of the text within the lines of the paragraph.
+ * @param onTextLayout Callback that is executed when a new text layout is calculated.
+ */
+@Composable
+fun MegaText(
+    text: AnnotatedString,
+    textColor: TextColor,
+    maxLines: Int,
+    modifier: Modifier = Modifier,
+    inlineContent: Map<String, InlineTextContent> = mapOf(),
+    minLines: Int = 1,
+    style: TextStyle = LocalTextStyle.current,
+    textAlign: TextAlign? = null,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
+) = Text(
+    text = text,
+    modifier = modifier,
+    color = MegaOriginalTheme.textColor(textColor = textColor),
+    maxLines = maxLines,
+    minLines = minLines,
+    style = style,
+    textAlign = textAlign,
+    inlineContent = inlineContent,
+    onTextLayout = onTextLayout
+)
 
 /**
  * Mega text overflow mapper.
