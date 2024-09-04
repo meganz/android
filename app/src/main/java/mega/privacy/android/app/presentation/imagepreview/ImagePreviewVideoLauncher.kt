@@ -7,12 +7,14 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.VIEWER_FROM_ZIP_BROWSER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.chat.ChatImageFile
 import mega.privacy.android.domain.usecase.GetFileUrlByImageNodeUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
-import mega.privacy.android.domain.usecase.node.GetFileLinkNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaNode
@@ -28,7 +30,8 @@ class ImagePreviewVideoLauncher @Inject constructor(
     private val getFingerprintUseCase: GetFingerprintUseCase,
     private val getFileUrlByImageNodeUseCase: GetFileUrlByImageNodeUseCase,
     private val addImageTypeUseCase: AddImageTypeUseCase,
-    private val getFileLinkNodeContentUriUseCase: GetFileLinkNodeContentUriUseCase,
+    private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
+    private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val getFolderLinkNodeContentUriUseCase: GetFolderLinkNodeContentUriUseCase,
     private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
     private val megaNavigator: MegaNavigator,
@@ -61,7 +64,11 @@ class ImagePreviewVideoLauncher @Inject constructor(
                 val typedFileNode = addImageTypeUseCase(imageNode)
                 if (source == ImagePreviewFetcherSource.CHAT) {
                     getFileUrlByImageNodeUseCase(imageNode as ChatImageFile)?.let {
-                        getFileLinkNodeContentUriUseCase(it)
+                        val shouldStopHttpSever = if (megaApiHttpServerIsRunningUseCase() == 0) {
+                            megaApiHttpServerStartUseCase()
+                            true
+                        } else false
+                        NodeContentUri.RemoteContentUri(it, shouldStopHttpSever)
                     }
                 } else {
                     getFolderLinkNodeContentUriUseCase(typedFileNode)
