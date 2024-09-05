@@ -325,12 +325,14 @@ internal class ManagerDrawerFragment : Fragment() {
         binding.rubbishBinSection.isEnabled = isEnable
         binding.upgradeNavigationView.isEnabled = isEnable
         binding.notificationsSection.isEnabled = isEnable
+        binding.settingsSection.isEnabled = isEnable
         val alpha = if (isEnable) 1f else 0.38f
         with(alpha) {
             binding.myAccountSectionText.alpha = this
             binding.contactsSectionText.alpha = this
             binding.notificationSectionText.alpha = this
             binding.rubbishBinSectionText.alpha = this
+            binding.settingsSectionText.alpha = this
         }
     }
 
