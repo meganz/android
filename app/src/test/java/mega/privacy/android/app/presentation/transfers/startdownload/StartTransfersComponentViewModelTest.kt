@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
@@ -500,6 +501,19 @@ class StartTransfersComponentViewModelTest {
             )
 
             assertCurrentEventIsEqualTo(StartTransferEvent.Message.TransferCancelled)
+        }
+
+    @Test
+    fun `test that not sufficient space event is emitted when start upload emits a NotEnoughStorageException`() =
+        runTest {
+            commonStub()
+            stubStartUpload(
+                flowOf(MultiTransferEvent.TransferNotStarted(null, NotEnoughStorageException()))
+            )
+
+            underTest.startTransfer(startUploadFilesEvent)
+
+            assertCurrentEventIsEqualTo(StartTransferEvent.Message.NotSufficientSpace)
         }
 
     @Test

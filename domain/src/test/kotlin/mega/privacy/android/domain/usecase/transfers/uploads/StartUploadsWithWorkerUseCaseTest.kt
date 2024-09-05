@@ -124,9 +124,34 @@ class StartUploadsWithWorkerUseCaseTest {
         }
     }
 
+    @Test
+    fun `test that TransferNotStarted is emitted when getFileForUploadUseCase returns null`() =
+        runTest {
+            whenever(getFileForUploadUseCase(path, false)).thenReturn(null)
+            underTest(urisWithNames, destinationId, false).test {
+                val actual = awaitItem()
+                assertThat(actual).isInstanceOf(MultiTransferEvent.TransferNotStarted::class.java)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that TransferNotStarted is emitted with an exception when getFileForUploadUseCase throws that exception`() =
+        runTest {
+            val exception = RuntimeException("exception")
+            whenever(getFileForUploadUseCase(path, false)).thenThrow(exception)
+            underTest(urisWithNames, destinationId, false).test {
+                val actual = awaitItem()
+                assertThat(actual).isInstanceOf(MultiTransferEvent.TransferNotStarted::class.java)
+                assertThat((actual as MultiTransferEvent.TransferNotStarted<*>).exception)
+                    .isEqualTo(exception)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
-    fun `test that the is high priority is send to upload files use case`(
+    fun `test that the is high priority flag is send to upload files use case`(
         expected: Boolean,
     ) = runTest {
         whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
@@ -182,6 +207,7 @@ class StartUploadsWithWorkerUseCaseTest {
                 awaitCancellation()
             }
         )
+        whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
         whenever(startUploadsWorkerAndWaitUntilIsStartedUseCase()).then(
             AdditionalAnswers.answersWithDelay(
                 10

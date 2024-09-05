@@ -47,13 +47,20 @@ class StartUploadsWithWorkerUseCase @Inject constructor(
                 }
         } else {
             flow {
-                val filesAndNames: Map<File, String?> = urisWithNames.mapKeys {
-                    getFileForUploadUseCase(it.key, false)
-                }.filter { it.key != null }.mapKeys { it.key!! }
+                val filesAndNames: Map<Result<File?>, String?> = urisWithNames.mapKeys {
+                    runCatching {
+                        getFileForUploadUseCase(it.key, false)
+                    }
+                }
+                filesAndNames.filter { it.key.getOrNull() == null }.forEach { (f, s) ->
+                    emit(MultiTransferEvent.TransferNotStarted(s, f.exceptionOrNull()))
+                }
                 emitAll(startTransfersAndThenWorkerFlow(
                     doTransfers = {
                         uploadFilesUseCase(
-                            filesAndNames = filesAndNames,
+                            filesAndNames = filesAndNames
+                                .filter { it.key.getOrNull() != null }
+                                .mapKeys { it.key.getOrNull()!! },
                             parentFolderId = destinationId,
                             appData = null,
                             isHighPriority = isHighPriority

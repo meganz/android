@@ -361,6 +361,7 @@ import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 
 @Suppress("KDocMissingDocumentation")
@@ -6485,6 +6486,11 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 val documents = viewModel.prepareFiles(uris)
                 onIntentProcessed(documents)
             }.onFailure {
+                if (it is IOException) {
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.error_not_enough_free_space))
+                }
+                dismissAlertDialogIfExists(statusDialog)
+                dismissAlertDialogIfExists(processFileDialog)
                 Timber.e(it)
             }
         }

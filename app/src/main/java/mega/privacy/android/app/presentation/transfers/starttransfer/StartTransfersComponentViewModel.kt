@@ -63,6 +63,7 @@ import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpe
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWithWorkerUseCase
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 
 /**
@@ -725,7 +726,11 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             when (event) {
                 is MultiTransferEvent.TransferNotStarted<*> -> {
                     Timber.e(event.exception, "Error starting upload")
-                    StartTransferEvent.Message.TransferCancelled
+                    if (event.exception is IOException) {
+                        StartTransferEvent.Message.NotSufficientSpace
+                    } else {
+                        StartTransferEvent.Message.TransferCancelled
+                    }
                 }
 
                 MultiTransferEvent.InsufficientSpace -> StartTransferEvent.Message.NotSufficientSpace

@@ -1,7 +1,9 @@
 package mega.privacy.android.domain.usecase.transfers
 
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
 import java.io.File
 import javax.inject.Inject
 
@@ -13,6 +15,7 @@ import javax.inject.Inject
  */
 class GetFileForUploadUseCase @Inject constructor(
     private val getCacheFileForUploadUseCase: GetCacheFileForUploadUseCase,
+    private val doesPathHaveSufficientSpaceUseCase: DoesPathHaveSufficientSpaceUseCase,
     private val fileSystemRepository: FileSystemRepository,
 ) {
     /**
@@ -36,6 +39,10 @@ class GetFileForUploadUseCase @Inject constructor(
                         file = File(it),
                         isChatUpload = isChatUpload,
                     )?.also { destination ->
+                        val size = fileSystemRepository.getFileSizeFromUri(it) ?: 0L
+                        if (!doesPathHaveSufficientSpaceUseCase(destination.parent, size)) {
+                            throw NotEnoughStorageException()
+                        }
                         fileSystemRepository.copyContentUriToFile(
                             UriPath(uriOrPathString),
                             destination
