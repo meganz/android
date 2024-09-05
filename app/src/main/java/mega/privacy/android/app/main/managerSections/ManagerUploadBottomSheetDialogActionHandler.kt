@@ -31,7 +31,6 @@ import mega.privacy.android.app.presentation.bottomsheet.TakePictureAndUploadAct
 import mega.privacy.android.app.presentation.bottomsheet.UploadFilesActionListener
 import mega.privacy.android.app.presentation.bottomsheet.UploadFolderActionListener
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsActivity
-import mega.privacy.android.app.presentation.extensions.uploadFilesManually
 import mega.privacy.android.app.presentation.extensions.uploadFolderManually
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN
@@ -183,7 +182,7 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             manualUploadFilesLauncher.launch(POST_NOTIFICATIONS)
         } else {
-            managerActivity.uploadFilesManually()
+            openMultipleDocumentLauncher.launch(arrayOf("*/*"))
         }
     }
 
