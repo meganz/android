@@ -63,6 +63,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_FILE_MAN
 import mega.privacy.android.app.constants.SettingsConstants.KEY_SUB_FOLDER_MEDIA_DISCOVERY
 import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
 import mega.privacy.android.app.di.settings.ViewModelPreferenceDataStoreFactory
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.hideKeyboard
 import mega.privacy.android.app.presentation.settings.calls.SettingsCallsActivity
@@ -70,10 +71,12 @@ import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCame
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
+import mega.privacy.android.app.presentation.settings.passcode.PasscodeSettingsActivity
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncActivity
 import javax.inject.Inject
 
@@ -88,6 +91,9 @@ class SettingsFragment :
 
     @Inject
     lateinit var viewModelPreferenceDataStoreFactory: ViewModelPreferenceDataStoreFactory
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private var numberOfClicksAppVersion = 0
 
@@ -290,12 +296,23 @@ class SettingsFragment :
                 )
             )
 
-            KEY_PASSCODE_LOCK -> startActivity(
-                Intent(
-                    context,
-                    LegacyPasscodePreferencesActivity::class.java
-                )
-            )
+            KEY_PASSCODE_LOCK -> {
+                lifecycleScope.launch {
+                    val activity =
+                        if (getFeatureFlagValueUseCase(AppFeatures.ComposePasscodeSettings)) {
+                            PasscodeSettingsActivity::class.java
+                        } else {
+                            LegacyPasscodePreferencesActivity::class.java
+                        }
+
+                    startActivity(
+                        Intent(
+                            context,
+                            activity
+                        )
+                    )
+                }
+            }
 
             KEY_CHANGE_PASSWORD -> startActivity(
                 Intent(

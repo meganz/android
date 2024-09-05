@@ -4,7 +4,10 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.rememberScaffoldState
@@ -60,7 +63,11 @@ internal fun PasscodeSettingsView(
     }
 
     MegaScaffold(
-        modifier = modifier.semantics { testTagsAsResourceId = true },
+        modifier = modifier
+            .semantics { testTagsAsResourceId = true }
+            .fillMaxSize()
+            .systemBarsPadding()
+            .imePadding(),
         scaffoldState = scaffoldState,
         topBar = {
             MegaAppBar(

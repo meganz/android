@@ -6,10 +6,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import kotlinx.collections.immutable.persistentListOf
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.passcode.model.PasscodeTimeoutUIState
@@ -18,6 +21,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.Confirmatio
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun PasscodeTimeoutDialog(
     state: PasscodeTimeoutUIState,
@@ -26,7 +30,9 @@ internal fun PasscodeTimeoutDialog(
 ) {
     val context = LocalContext.current
     ConfirmationDialogWithRadioButtons(
-        modifier = Modifier.testTag(PASSCODE_TIMEOUT_DIALOG),
+        modifier = Modifier
+            .semantics { testTagsAsResourceId = true }
+            .testTag(PASSCODE_TIMEOUT_DIALOG),
         titleText = stringResource(R.string.settings_require_passcode),
         initialSelectedOption = state.currentOption,
         radioOptions = state.options,
