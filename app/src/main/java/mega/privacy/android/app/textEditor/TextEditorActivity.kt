@@ -34,6 +34,7 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
@@ -49,17 +50,20 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.controllers.ChatController
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.usecase.exception.MegaException
+import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.ANIMATION_DURATION
+import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
@@ -71,6 +75,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_TO
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
 import mega.privacy.android.app.utils.Constants.LONG_SNACKBAR_DURATION
+import mega.privacy.android.app.utils.Constants.MESSAGE_ID
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
@@ -94,11 +99,13 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.TextEditorHideNodeMenuItemEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import javax.inject.Inject
@@ -331,14 +338,18 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             R.id.chat_action_import -> importNode()
             R.id.chat_action_save_for_offline -> {
-                checkNotificationsPermission(this)
-
-                ChatController(this).saveForOffline(
-                    viewModel.getMsgChat()!!.megaNodeList,
-                    viewModel.getChatRoom(),
-                    true,
-                    this
-                )
+                if (getStorageState() == StorageState.PayWall) {
+                    AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+                } else {
+                    val msgId = intent.getLongExtra(MESSAGE_ID, MEGACHAT_INVALID_HANDLE)
+                    val chatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE)
+                    if (chatId == MEGACHAT_INVALID_HANDLE)
+                        return false
+                    viewModel.saveChatNodeToOffline(
+                        chatId = chatId,
+                        messageId = msgId
+                    )
+                }
             }
 
             R.id.chat_action_remove -> removeAttachmentMessage(
@@ -665,12 +676,20 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     private fun addStartTransferView() {
         binding.root.addView(
             createStartTransferView(
-                this,
-                viewModel.uiState.map { it.transferEvent },
-                viewModel::consumeTransferEvent
-            ) {
-                finish()
-            }
+                activity = this,
+                transferEventState = viewModel.uiState.map { it.transferEvent },
+                onConsumeEvent = {
+                    val isTextFileUpload = viewModel.uiState.value.transferEvent
+                        .let { it is StateEventWithContentTriggered && (it.content is TransferTriggerEvent.StartUpload.TextFile) }
+
+                    viewModel.consumeTransferEvent()
+
+                    // Close activity if a text file upload is triggered
+                    if (isTextFileUpload) {
+                        finish()
+                    }
+                }
+            )
         )
     }
 

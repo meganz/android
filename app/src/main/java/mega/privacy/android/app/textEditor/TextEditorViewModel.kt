@@ -71,6 +71,7 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
@@ -129,6 +130,7 @@ class TextEditorViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -979,5 +981,37 @@ class TextEditorViewModel @Inject constructor(
     fun nextClicked() {
         pagination.value?.nextPage()
         pagination.notifyObserver()
+    }
+
+    /**
+     * Save chat node to offline
+     *
+     * @param chatId    Chat ID where the node is.
+     * @param messageId Message ID where the node is.
+     */
+    fun saveChatNodeToOffline(chatId: Long, messageId: Long) {
+        viewModelScope.launch {
+            runCatching {
+                val chatFile = getChatFileUseCase(chatId = chatId, messageId = messageId)
+                    ?: throw IllegalStateException("Chat file not found")
+                val isAvailableOffline = isAvailableOfflineUseCase(chatFile)
+                if (isAvailableOffline) {
+                    snackBarMessage.value = R.string.file_already_exists
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            transferEvent = triggered(
+                                TransferTriggerEvent.StartDownloadForOffline(
+                                    chatFile
+                                )
+                            )
+                        )
+                    }
+                }
+            }.onFailure {
+                Timber.e(it)
+                throwable.value = it
+            }
+        }
     }
 }

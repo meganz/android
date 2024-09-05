@@ -1,7 +1,9 @@
 package mega.privacy.android.app.textEditor
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
@@ -10,6 +12,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.observeOnce
+import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -17,11 +21,14 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -31,7 +38,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
-import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 
 
 @ExperimentalCoroutinesApi
@@ -44,6 +50,8 @@ internal class TextEditorViewModelTest {
         mock<CheckNodesNameCollisionWithActionUseCase>()
     private val checkChatNodesNameCollisionAndCopyUseCase =
         mock<CheckChatNodesNameCollisionAndCopyUseCase>()
+    private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
+    private val getChatFileUseCase = mock<GetChatFileUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -71,13 +79,14 @@ internal class TextEditorViewModelTest {
             downloadBackgroundFile = mock(),
             ioDispatcher = mock(),
             getNodeByIdUseCase = mock(),
-            getChatFileUseCase = mock(),
+            getChatFileUseCase = getChatFileUseCase,
             getPublicChildNodeFromIdUseCase = mock(),
             getPublicNodeFromSerializedDataUseCase = mock(),
             updateNodeSensitiveUseCase = mock(),
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            isAvailableOfflineUseCase = isAvailableOfflineUseCase
         )
     }
 
@@ -324,6 +333,58 @@ internal class TextEditorViewModelTest {
                 assertThat(it).isEqualTo(runtimeException)
             }
         }
+
+    @Test
+    internal fun `test that snackbar message is shown when chat file is already available offline`() =
+        runTest {
+            val chatId = 1000L
+            val messageId = 2000L
+            val chatFile = mock<ChatDefaultFile>()
+            whenever(getChatFileUseCase(chatId, messageId)).thenReturn(chatFile)
+            whenever(isAvailableOfflineUseCase(chatFile)).thenReturn(true)
+
+            underTest.saveChatNodeToOffline(chatId, messageId)
+            advanceUntilIdle()
+
+            underTest.onSnackBarMessage().test().assertValue(R.string.file_already_exists)
+        }
+
+    @Test
+    internal fun `test that startChatFileOfflineDownload event is triggered when chat file is not available offline`() =
+        runTest {
+            val chatId = 1000L
+            val messageId = 2000L
+            val chatFile = mock<ChatDefaultFile>()
+            whenever(getChatFileUseCase(chatId, messageId)).thenReturn(chatFile)
+            whenever(isAvailableOfflineUseCase(chatFile)).thenReturn(false)
+
+            underTest.saveChatNodeToOffline(chatId, messageId)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                val event = actual.transferEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val content = (event as StateEventWithContentTriggered).content
+                assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadForOffline::class.java)
+            }
+        }
+
+    @Test
+    internal fun `test that exception is handled correctly when chat file is not found`() =
+        runTest {
+            val chatId = 1000L
+            val messageId = 2000L
+            whenever(getChatFileUseCase(chatId, messageId)).thenReturn(null)
+
+            underTest.saveChatNodeToOffline(chatId, messageId)
+            advanceUntilIdle()
+
+            underTest.onExceptionThrown().test().assertValue {
+                it is IllegalStateException
+            }
+        }
+
 
     companion object {
         @JvmField
