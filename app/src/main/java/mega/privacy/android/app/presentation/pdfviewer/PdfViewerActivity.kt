@@ -40,6 +40,7 @@ import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shockwave.pdfium.PdfDocument.Bookmark
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -60,6 +61,7 @@ import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.security.PasscodeCheck
@@ -69,6 +71,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownlo
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
+import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.AlertsAndWarnings.showTakenDownAlert
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.HANDLE
@@ -85,7 +88,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAva
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -378,6 +381,11 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     private fun collectFLows() {
         collectFlow(viewModel.uiState) { pdfViewerState ->
             with(pdfViewerState) {
+                (startChatOfflineDownloadEvent as? StateEventWithContentTriggered)?.let { event ->
+                    startDownloadViewModel.onSaveOfflineClicked(event.content)
+                    viewModel.onConsumeStartChatOfflineDownloadEvent()
+                }
+
                 if (snackBarMessage != null) {
                     dismissAlertDialogIfExists(statusDialog)
                     showSnackbar(
@@ -1303,14 +1311,12 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             R.id.chat_pdf_viewer_import -> importNode()
 
             R.id.chat_pdf_viewer_save_for_offline -> {
-                if (chatC == null) {
-                    chatC = ChatController(this)
-                }
-                if (msgChat != null) {
-                    checkNotificationsPermission(this)
-                    chatC!!.saveForOffline(
-                        msgChat!!.megaNodeList, megaChatApi.getChatRoom(chatId),
-                        true, this
+                if (getStorageState() == StorageState.PayWall) {
+                    AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+                } else {
+                    viewModel.saveChatNodeToOffline(
+                        chatId = chatId,
+                        messageId = msgId
                     )
                 }
             }

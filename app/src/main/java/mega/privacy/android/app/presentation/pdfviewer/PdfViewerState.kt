@@ -1,8 +1,10 @@
 package mega.privacy.android.app.presentation.pdfviewer
 
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NameCollision
+import mega.privacy.android.domain.entity.node.chat.ChatFile
 
 /**
  * Pdf viewer UI state
@@ -14,6 +16,7 @@ import mega.privacy.android.domain.entity.node.NameCollision
  * @property nameCollision                  Name collision if identified
  * @property accountType                    the account type
  * @property isHiddenNodesOnboarded         if the user has been onboarded with hidden nodes
+ * @property startChatOfflineDownloadEvent  Event to start chat node offline download
  */
 data class PdfViewerState(
     val snackBarMessage: Int? = null,
@@ -24,4 +27,5 @@ data class PdfViewerState(
     val pdfStreamData: ByteArray? = null,
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean = false,
+    val startChatOfflineDownloadEvent: StateEventWithContent<ChatFile> = consumed()
 )

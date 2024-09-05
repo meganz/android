@@ -2,25 +2,29 @@ package mega.privacy.android.app.presentation.pdfviewer
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerViewModel
+import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -30,7 +34,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
-import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
@@ -44,6 +47,8 @@ internal class PdfViewerViewModelTest {
         mock<CheckChatNodesNameCollisionAndCopyUseCase>()
     private val getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase = mock()
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase = mock()
+    private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
+    private val getChatFileUseCase = mock<GetChatFileUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -64,7 +69,9 @@ internal class PdfViewerViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             checkNodesNameCollisionWithActionUseCase = checkNodesNameCollisionWithActionUseCase,
-            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase
+            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
+            isAvailableOfflineUseCase = isAvailableOfflineUseCase,
+            getChatFileUseCase = getChatFileUseCase,
         )
     }
 
@@ -72,7 +79,9 @@ internal class PdfViewerViewModelTest {
     fun resetMocks() {
         reset(
             checkNodesNameCollisionWithActionUseCase,
-            checkChatNodesNameCollisionAndCopyUseCase
+            checkChatNodesNameCollisionAndCopyUseCase,
+            getChatFileUseCase,
+            isAvailableOfflineUseCase,
         )
     }
 
@@ -327,6 +336,46 @@ internal class PdfViewerViewModelTest {
                 val actual = awaitItem()
                 assertThat(actual.nodeCopyError)
                     .isInstanceOf(RuntimeException::class.java)
+            }
+        }
+
+    @Test
+    internal fun `test that snackbar message is shown when chat file is already available offline`() =
+        runTest {
+            val chatId = 1000L
+            val messageId = 2000L
+            val chatFile = mock<ChatDefaultFile>()
+            whenever(getChatFileUseCase(chatId, messageId)).thenReturn(chatFile)
+            whenever(isAvailableOfflineUseCase(chatFile)).thenReturn(true)
+
+            underTest.saveChatNodeToOffline(chatId, messageId)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.snackBarMessage)
+                    .isEqualTo(R.string.file_already_exists)
+            }
+        }
+
+    @Test
+    internal fun `test that startChatOfflineDownloadEvent event is triggered when chat file is not available offline`() =
+        runTest {
+            val chatId = 1000L
+            val messageId = 2000L
+            val chatFile = mock<ChatDefaultFile>()
+            whenever(getChatFileUseCase(chatId, messageId)).thenReturn(chatFile)
+            whenever(isAvailableOfflineUseCase(chatFile)).thenReturn(false)
+
+            underTest.saveChatNodeToOffline(chatId, messageId)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                val event = actual.startChatOfflineDownloadEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val content = (event as StateEventWithContentTriggered).content
+                assertThat(content).isEqualTo(chatFile)
             }
         }
 

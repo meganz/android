@@ -682,7 +682,14 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                 }
 
                 R.id.chat_save_for_offline -> {
-                    viewModel.saveChatNodeToOffline(chatId = getChatId(), messageId = getMessageId())
+                    if (getStorageState() == StorageState.PayWall) {
+                        AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+                    } else {
+                        viewModel.saveChatNodeToOffline(
+                            chatId = getChatId(),
+                            messageId = getMessageId()
+                        )
+                    }
                 }
 
                 R.id.rename -> {
