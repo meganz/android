@@ -73,7 +73,6 @@ import mega.privacy.android.domain.usecase.login.LoginWith2FAUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
-import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -101,7 +100,6 @@ class LoginViewModel @Inject constructor(
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val resetChatSettingsUseCase: ResetChatSettingsUseCase,
-    private val saveAccountCredentialsUseCase: SaveAccountCredentialsUseCase,
     private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase,
     private val getSessionUseCase: GetSessionUseCase,
     private val hasPreferencesUseCase: HasPreferencesUseCase,
@@ -350,18 +348,6 @@ class LoginViewModel @Inject constructor(
     private fun checkTemporalCredentials() = with(state.value) {
         if (temporalEmail != null && temporalPassword != null) {
             performLogin(temporalEmail, temporalPassword)
-        }
-    }
-
-    /**
-     * Saves credentials
-     */
-    fun saveCredentials() = viewModelScope.launch {
-        _state.update {
-            it.copy(
-                accountSession = saveAccountCredentialsUseCase(),
-                isAlreadyLoggedIn = true
-            )
         }
     }
 

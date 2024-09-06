@@ -27,6 +27,7 @@ import mega.privacy.android.app.utils.Constants
 @Composable
 internal fun SessionContainer(
     shouldCheckChatSession: Boolean = false,
+    shouldFinish: Boolean = true,
     viewModel: SessionViewModel = hiltViewModel(),
     content: @Composable () -> Unit,
 ) {
@@ -53,17 +54,19 @@ internal fun SessionContainer(
                 content()
             }
 
-        state.isRootNodeExists == false -> navigateToLogin(context)
+        state.isRootNodeExists == false -> navigateToLogin(context, shouldFinish)
     }
 }
 
-private fun navigateToLogin(context: Context) {
+private fun navigateToLogin(context: Context, shouldFinish: Boolean) {
     context.findActivity()?.let { activity ->
         val intent = Intent(context, LoginActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             putExtra(Constants.LAUNCH_INTENT, activity.intent)
         }
         context.startActivity(intent)
-        activity.finish()
+        if (shouldFinish) {
+            activity.finish()
+        }
     }
 }

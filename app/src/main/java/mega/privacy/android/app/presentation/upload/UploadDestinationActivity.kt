@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,7 +57,6 @@ class UploadDestinationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        handleIntent()
         setContent {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -64,7 +64,10 @@ class UploadDestinationActivity : AppCompatActivity() {
             val isNewUploadActivityEnabled = uploadActivityUiState.isNewUploadScreenEnabled
             if (isNewUploadActivityEnabled != null) {
                 if (isNewUploadActivityEnabled) {
-                    SessionContainer(shouldCheckChatSession = true) {
+                    SessionContainer(shouldCheckChatSession = false, shouldFinish = false) {
+                        LaunchedEffect(Unit) {
+                            handleIntent()
+                        }
                         OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                             PasscodeContainer(
                                 passcodeCryptObjectFactory = passcodeCryptObjectFactory,

@@ -12,11 +12,12 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.AnalyticsTestExtension
+import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetails
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
-import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
@@ -43,7 +44,6 @@ import mega.privacy.android.domain.usecase.login.LoginWith2FAUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
-import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -64,8 +64,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import mega.privacy.android.app.AnalyticsTestExtension
-import mega.privacy.android.app.InstantExecutorExtension
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -81,7 +79,6 @@ internal class LoginViewModelTest {
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase =
         mock { onBlocking { invoke(any()) }.thenReturn(false) }
     private val resetChatSettingsUseCase: ResetChatSettingsUseCase = mock()
-    private val saveAccountCredentialsUseCase: SaveAccountCredentialsUseCase = mock()
     private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase = mock()
     private val getSessionUseCase: GetSessionUseCase = mock()
     private val hasPreferencesUseCase: HasPreferencesUseCase = mock()
@@ -122,7 +119,6 @@ internal class LoginViewModelTest {
             rootNodeExistsUseCase = rootNodeExistsUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             resetChatSettingsUseCase = resetChatSettingsUseCase,
-            saveAccountCredentialsUseCase = saveAccountCredentialsUseCase,
             getAccountCredentialsUseCase = getAccountCredentialsUseCase,
             getSessionUseCase = getSessionUseCase,
             hasPreferencesUseCase = hasPreferencesUseCase,
