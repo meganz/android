@@ -257,6 +257,11 @@ interface MediaPlayerRepository {
     suspend fun deletePlaybackInformation(mediaId: Long)
 
     /**
+     * Clear Playback Information
+     */
+    suspend fun clearPlaybackInformation()
+
+    /**
      * Save the playback times
      */
     suspend fun savePlaybackTimes()

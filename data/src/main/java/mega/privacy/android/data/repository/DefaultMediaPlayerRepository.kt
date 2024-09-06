@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.FileGateway
@@ -389,6 +391,14 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 
     override suspend fun deletePlaybackInformation(mediaId: Long) {
         playbackInfoMap.remove(mediaId)
+    }
+
+    override suspend fun clearPlaybackInformation() = withContext(ioDispatcher) {
+        playbackInfoMap.clear()
+        appPreferencesGateway.putString(
+            PREFERENCE_KEY_VIDEO_EXIT_TIME,
+            Json.encodeToString(playbackInfoMap)
+        )
     }
 
     override suspend fun savePlaybackTimes() {

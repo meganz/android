@@ -1,5 +1,8 @@
 package mega.privacy.android.domain.entity.mediaplayer
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
 /**
  * The entity for playback information
  *
@@ -7,8 +10,9 @@ package mega.privacy.android.domain.entity.mediaplayer
  * @property totalDuration the total duration of media item
  * @property currentPosition the current position of media item
  */
+@Serializable
 data class PlaybackInformation(
-    val mediaId: Long?,
-    val totalDuration: Long,
-    val currentPosition: Long,
+    @SerialName("mediaId") val mediaId: Long?,
+    @SerialName("totalDuration") val totalDuration: Long,
+    @SerialName("currentPosition") val currentPosition: Long,
 )
