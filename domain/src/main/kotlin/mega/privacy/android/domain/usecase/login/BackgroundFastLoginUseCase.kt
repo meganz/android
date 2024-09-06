@@ -33,8 +33,10 @@ class BackgroundFastLoginUseCase @Inject constructor(
     suspend operator fun invoke(): String {
         loginMutex.lock()
 
-        val session =
-            getSessionUseCase() ?: throw SessionNotRetrievedException()
+        val session = getSessionUseCase() ?: run {
+            runCatching { loginMutex.unlock() }
+            throw SessionNotRetrievedException()
+        }
 
         if (!getRootNodeExistsUseCase()) {
             initialiseMegaChatUseCase(session)
