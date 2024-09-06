@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
@@ -228,6 +230,16 @@ class DefaultMediaPlayerRepositoryTest {
             val actual = underTest.monitorPlaybackTimes().firstOrNull()
 
             assertThat(actual?.containsKey(expectedDeleteMediaId)).isFalse()
+        }
+
+    @Test
+    fun `test that clearPlaybackInformation function is invoked as expected`() =
+        runTest {
+            underTest.clearPlaybackInformation()
+            verify(appPreferencesGateway).putString(
+                "PREFERENCE_KEY_VIDEO_EXIT_TIME",
+                Json.encodeToString(emptyMap<Long, PlaybackInformation>())
+            )
         }
 
     @ParameterizedTest(name = "when audio repeatMode is {0}, the result of monitorAudioRepeatMode is {1}")

@@ -353,7 +353,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
             }.sortedByDescending { it.watchedTimestamp }
         }
 
-    override suspend fun clearRecentlyWatchedVideos() {
+    override suspend fun clearRecentlyWatchedVideos() = withContext(ioDispatcher) {
         recentlyWatchedVideosData.clear()
         appPreferencesGateway.putString(
             PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS,
