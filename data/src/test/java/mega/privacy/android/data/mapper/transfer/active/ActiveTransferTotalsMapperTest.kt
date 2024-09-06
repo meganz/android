@@ -3,6 +3,7 @@ package mega.privacy.android.data.mapper.transfer.active
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
@@ -127,7 +128,10 @@ class ActiveTransferTotalsMapperTest {
             isFinished = tag.rem(5) == 0,
             isFolderTransfer = tag.rem(8) == 0,
             isPaused = false,
-            isAlreadyTransferred = tag.rem(9) == 0
+            isAlreadyTransferred = tag.rem(9) == 0,
+            localPath = "path/file.txt",
+            nodeHandle = -1L,
+            state = TransferState.STATE_ACTIVE,
         )
     }
 }

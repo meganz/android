@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
@@ -12,7 +13,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ActiveTransferEntityMapperTest {
     private lateinit var underTest: ActiveTransferEntityMapper
@@ -34,30 +34,38 @@ class ActiveTransferEntityMapperTest {
 
     private fun provideParameters(): List<Arguments> =
         TransferType.entries.flatMap { transferType ->
-            listOf(true, false).flatMap { isFinished ->
-                listOf(true, false).flatMap { isFolder ->
-                    listOf(true, false).flatMap { isPaused ->
-                        listOf(true, false).map { isAlreadyDownloaded ->
-                            Arguments.of(
-                                ActiveTransferTestImpl(
-                                    tag = TAG,
-                                    transferType = transferType,
-                                    totalBytes = TOTAL,
-                                    isFinished = isFinished,
-                                    isFolderTransfer = isFolder,
-                                    isPaused = isPaused,
-                                    isAlreadyTransferred = isAlreadyDownloaded,
-                                ),
-                                ActiveTransferEntity(
-                                    tag = TAG,
-                                    transferType = transferType,
-                                    totalBytes = TOTAL,
-                                    isFinished = isFinished,
-                                    isFolderTransfer = isFolder,
-                                    isPaused = isPaused,
-                                    isAlreadyTransferred = isAlreadyDownloaded,
+            TransferState.entries.flatMap { transferState ->
+                listOf(true, false).flatMap { isFinished ->
+                    listOf(true, false).flatMap { isFolder ->
+                        listOf(true, false).flatMap { isPaused ->
+                            listOf(true, false).map { isAlreadyDownloaded ->
+                                Arguments.of(
+                                    ActiveTransferTestImpl(
+                                        tag = TAG,
+                                        transferType = transferType,
+                                        totalBytes = TOTAL,
+                                        isFinished = isFinished,
+                                        isFolderTransfer = isFolder,
+                                        isPaused = isPaused,
+                                        isAlreadyTransferred = isAlreadyDownloaded,
+                                        localPath = LOCAL_PATH,
+                                        nodeHandle = NODE_HANDLE,
+                                        state = transferState,
+                                    ),
+                                    ActiveTransferEntity(
+                                        tag = TAG,
+                                        transferType = transferType,
+                                        totalBytes = TOTAL,
+                                        isFinished = isFinished,
+                                        isFolderTransfer = isFolder,
+                                        isPaused = isPaused,
+                                        isAlreadyTransferred = isAlreadyDownloaded,
+                                        localPath = LOCAL_PATH,
+                                        nodeHandle = NODE_HANDLE,
+                                        state = transferState,
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
                 }
@@ -67,6 +75,8 @@ class ActiveTransferEntityMapperTest {
     companion object {
         private const val TAG = 2
         private const val TOTAL = 1024L
+        private const val LOCAL_PATH = "path/file.txt"
+        private const val NODE_HANDLE = 1235345L
     }
 
 
@@ -83,5 +93,8 @@ class ActiveTransferEntityMapperTest {
         override val isFolderTransfer: Boolean,
         override val isPaused: Boolean,
         override val isAlreadyTransferred: Boolean,
+        override val localPath: String,
+        override val nodeHandle: Long,
+        override val state: TransferState,
     ) : ActiveTransfer
 }

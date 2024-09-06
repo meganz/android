@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import org.junit.After
 import org.junit.Before
@@ -31,6 +32,9 @@ class ActiveTransferDaoTest {
                 isPaused = false,
                 isFolderTransfer = false,
                 isAlreadyTransferred = false,
+                nodeHandle = 4576L,
+                localPath = "path/file.txt",
+                state = TransferState.STATE_QUEUED,
             )
         }
     }
@@ -61,6 +65,9 @@ class ActiveTransferDaoTest {
             isFolderTransfer = false,
             isPaused = false,
             isAlreadyTransferred = false,
+            nodeHandle = 4576L,
+            localPath = "path/file.txt",
+            state = TransferState.STATE_QUEUED,
         )
         activeTransferDao.insertOrUpdateActiveTransfer(newEntity)
         val actual = activeTransferDao.getActiveTransferByTag(newEntity.tag)
