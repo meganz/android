@@ -5,6 +5,8 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import javax.inject.Inject
@@ -15,6 +17,8 @@ import javax.inject.Inject
 class GetFolderLinkNodeContentUriUseCase @Inject constructor(
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
+    private val megaApiFolderHttpServerIsRunningUseCase: MegaApiFolderHttpServerIsRunningUseCase,
+    private val megaApiFolderHttpServerStartUseCase: MegaApiFolderHttpServerStartUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
@@ -28,13 +32,18 @@ class GetFolderLinkNodeContentUriUseCase @Inject constructor(
      *
      */
     suspend operator fun invoke(fileNode: TypedFileNode): NodeContentUri {
-        val shouldStopHttpSever = if (megaApiHttpServerIsRunningUseCase() == 0) {
-            megaApiHttpServerStartUseCase()
-            true
-        } else false
+        val shouldStopHttpSever: Boolean
         return if (hasCredentialsUseCase()) {
+            shouldStopHttpSever = if (megaApiHttpServerIsRunningUseCase() == 0) {
+                megaApiHttpServerStartUseCase()
+                true
+            } else false
             getLocalFolderLinkFromMegaApiUseCase(fileNode.id.longValue)
         } else {
+            shouldStopHttpSever = if (megaApiFolderHttpServerIsRunningUseCase() == 0) {
+                megaApiFolderHttpServerStartUseCase()
+                true
+            } else false
             getLocalFolderLinkFromMegaApiFolderUseCase(fileNode.id.longValue)
         }?.let { url ->
             NodeContentUri.RemoteContentUri(url, shouldStopHttpSever)

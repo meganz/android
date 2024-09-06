@@ -4,6 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCase
@@ -24,6 +26,9 @@ class GetFolderLinkNodeContentUriUseCaseTest {
 
     private val megaApiHttpServerStartUseCase = mock<MegaApiHttpServerStartUseCase>()
     private val megaApiHttpServerIsRunningUseCase = mock<MegaApiHttpServerIsRunningUseCase>()
+    private val megaApiFolderHttpServerIsRunningUseCase =
+        mock<MegaApiFolderHttpServerIsRunningUseCase>()
+    private val megaApiFolderHttpServerStartUseCase = mock<MegaApiFolderHttpServerStartUseCase>()
     private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
     private val hasCredentialsUseCase = mock<HasCredentialsUseCase>()
     private val getLocalFolderLinkFromMegaApiUseCase = mock<GetLocalFolderLinkFromMegaApiUseCase>()
@@ -37,6 +42,8 @@ class GetFolderLinkNodeContentUriUseCaseTest {
         underTest = GetFolderLinkNodeContentUriUseCase(
             megaApiHttpServerStartUseCase = megaApiHttpServerStartUseCase,
             megaApiHttpServerIsRunningUseCase = megaApiHttpServerIsRunningUseCase,
+            megaApiFolderHttpServerStartUseCase = megaApiFolderHttpServerStartUseCase,
+            megaApiFolderHttpServerIsRunningUseCase = megaApiFolderHttpServerIsRunningUseCase,
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             hasCredentialsUseCase = hasCredentialsUseCase,
             getLocalFolderLinkFromMegaApiUseCase = getLocalFolderLinkFromMegaApiUseCase,
@@ -49,6 +56,8 @@ class GetFolderLinkNodeContentUriUseCaseTest {
         reset(
             megaApiHttpServerStartUseCase,
             megaApiHttpServerIsRunningUseCase,
+            megaApiFolderHttpServerStartUseCase,
+            megaApiFolderHttpServerIsRunningUseCase,
             getNodeContentUriUseCase,
             hasCredentialsUseCase,
             getLocalFolderLinkFromMegaApiUseCase,
@@ -72,7 +81,7 @@ class GetFolderLinkNodeContentUriUseCaseTest {
         runTest {
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(getLocalFolderLinkFromMegaApiFolderUseCase(any())).thenReturn(expectedUrl)
-            whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(0)
+            whenever(megaApiFolderHttpServerIsRunningUseCase()).thenReturn(0)
             assertThat(underTest(mock())).isEqualTo(
                 NodeContentUri.RemoteContentUri(url = expectedUrl, shouldStopHttpSever = true)
             )
@@ -94,7 +103,7 @@ class GetFolderLinkNodeContentUriUseCaseTest {
         runTest {
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(getLocalFolderLinkFromMegaApiFolderUseCase(any())).thenReturn(expectedUrl)
-            whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(1)
+            whenever(megaApiFolderHttpServerIsRunningUseCase()).thenReturn(1)
             assertThat(underTest(mock())).isEqualTo(
                 NodeContentUri.RemoteContentUri(url = expectedUrl, shouldStopHttpSever = false)
             )
@@ -117,7 +126,7 @@ class GetFolderLinkNodeContentUriUseCaseTest {
             val fileNode = mock<TypedFileNode>()
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(getLocalFolderLinkFromMegaApiFolderUseCase(any())).thenReturn(null)
-            whenever(megaApiHttpServerIsRunningUseCase()).thenReturn(1)
+            whenever(megaApiFolderHttpServerIsRunningUseCase()).thenReturn(1)
             underTest(fileNode)
             verify(getNodeContentUriUseCase).invoke(fileNode)
         }
