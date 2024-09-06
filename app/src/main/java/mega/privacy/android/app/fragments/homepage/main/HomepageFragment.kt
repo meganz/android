@@ -34,14 +34,12 @@ import com.zhpan.bannerview.utils.BannerUtils
 import com.zhpan.indicator.enums.IndicatorStyle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
 import mega.privacy.android.app.main.ManagerActivity
@@ -336,7 +334,8 @@ class HomepageFragment : Fragment() {
         }
 
         viewLifecycleOwner.collectFlow(viewModel.uiState) {
-            val iconRes = userChatStatusIconMapper(it.userChatStatus, Util.isDarkMode(requireContext()))
+            val iconRes =
+                userChatStatusIconMapper(it.userChatStatus, Util.isDarkMode(requireContext()))
             searchInputView.setChatStatus(iconRes != 0, iconRes)
         }
 
@@ -484,7 +483,7 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private suspend fun clickDocumentSectionTileAndAnalysis() {
+    private fun clickDocumentSectionTileAndAnalysis() {
         Analytics.tracker.trackEvent(HomeScreenDocsTilePressedEvent)
         findNavController().run {
             if (currentDestination?.id == R.id.homepageFragment) {
@@ -498,16 +497,12 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private suspend fun clickVideoSectionTileAndAnalysis() {
+    private fun clickVideoSectionTileAndAnalysis() {
         Analytics.tracker.trackEvent(HomeScreenVideosTilePressedEvent)
         findNavController().run {
             if (currentDestination?.id == R.id.homepageFragment) {
                 val destination =
-                    if (getFeatureFlagValueUseCase(AppFeatures.NewVideoSection)) {
-                        HomepageFragmentDirections.actionHomepageFragmentToVideoSectionFragment()
-                    } else {
-                        HomepageFragmentDirections.actionHomepageFragmentToVideoFragment()
-                    }
+                    HomepageFragmentDirections.actionHomepageFragmentToVideoSectionFragment()
                 currentDestination?.getAction(destination.actionId)?.let {
                     navigate(destination.actionId)
                 }

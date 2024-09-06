@@ -72,14 +72,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables new video section flag
-     */
-    NewVideoSection(
-        "Enable new video section flag",
-        true
-    ),
-
-    /**
      * Enables prefetch timeline photos as soon initialization screen completed
      */
     PrefetchTimeline(

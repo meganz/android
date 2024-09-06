@@ -3181,7 +3181,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         HomepageScreen.FAVOURITES -> titleId = R.string.favourites_category_title
                         HomepageScreen.DOCUMENTS -> titleId = R.string.section_documents
                         HomepageScreen.AUDIO -> titleId = R.string.upload_to_audio
-                        HomepageScreen.VIDEO -> titleId = R.string.sortby_type_video_first
                         HomepageScreen.RECENT_BUCKET -> {
                             getFragmentByType(
                                 RecentActionBucketFragment::class.java
@@ -3701,11 +3700,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
                 R.id.audioSectionFragment -> {
                     homepageScreen = HomepageScreen.AUDIO
-                    hideAdsView()
-                }
-
-                R.id.videoFragment -> {
-                    homepageScreen = HomepageScreen.VIDEO
                     hideAdsView()
                 }
 
