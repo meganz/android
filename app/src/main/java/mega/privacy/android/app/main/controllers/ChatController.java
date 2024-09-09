@@ -1,11 +1,9 @@
 package mega.privacy.android.app.main.controllers;
 
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
 import static mega.privacy.android.app.utils.ChatUtil.getMegaChatMessage;
 import static mega.privacy.android.app.utils.ChatUtil.getMutedPeriodString;
 import static mega.privacy.android.app.utils.Constants.ACTION_FORWARD_MESSAGES;
-import static mega.privacy.android.app.utils.Constants.FROM_OTHERS;
 import static mega.privacy.android.app.utils.Constants.ID_CHAT_FROM;
 import static mega.privacy.android.app.utils.Constants.ID_MESSAGES;
 import static mega.privacy.android.app.utils.Constants.IMPORT_TO_SHARE_OPTION;
@@ -15,33 +13,25 @@ import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_UN
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.ContactUtil.getContactEmailDB;
 import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
 import static mega.privacy.android.app.utils.ContactUtil.getFirstNameDB;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.MegaNodeUtil.existsMyChatFilesFolder;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getMyChatFilesFolder;
-import static mega.privacy.android.app.utils.OfflineUtils.getOfflineParentFile;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnCalendar;
-import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static mega.privacy.android.app.utils.Util.toCDATA;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.StatFs;
 import android.text.Html;
 import android.text.Spanned;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -55,12 +45,10 @@ import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerActivity;
-import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.app.utils.MeetingUtil;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.data.model.chat.NonContactInfo;
-import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -621,76 +609,6 @@ public class ChatController {
         }
 
         return fullName;
-    }
-
-    public void saveForOfflineWithMessages(ArrayList<MegaChatMessage> messages,
-                                           MegaChatRoom chatRoom,
-                                           SnackbarShower snackbarShower) {
-        Timber.d("Save for offline multiple messages");
-        for (int i = 0; i < messages.size(); i++) {
-            saveForOffline(messages.get(i).getMegaNodeList(), chatRoom, false, snackbarShower);
-        }
-    }
-
-    public void saveForOffline(MegaNodeList nodeList, MegaChatRoom chatRoom,
-                               boolean fromMediaViewer, SnackbarShower snackbarShower) {
-        File destination = null;
-
-        if (StorageStateExtensionsKt.getStorageState() == StorageState.PayWall) {
-            showOverDiskQuotaPaywallWarning();
-            return;
-        }
-
-        Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-        for (int i = 0; i < nodeList.size(); i++) {
-
-            MegaNode document = nodeList.get(i);
-            if (document != null) {
-                document = authorizeNodeIfPreview(document, chatRoom);
-                destination = getOfflineParentFile(context, FROM_OTHERS, document, null);
-                destination.mkdirs();
-
-                Timber.d("DESTINATION: %s", destination.getAbsolutePath());
-                if (isFileAvailable(destination) && destination.isDirectory()) {
-
-                    File offlineFile = new File(destination, document.getName());
-                    if (offlineFile.exists() && document.getSize() == offlineFile.length() && offlineFile.getName().equals(document.getName())) { //This means that is already available offline
-                        Timber.w("File already exists!");
-                        snackbarShower.showSnackbar(SNACKBAR_TYPE,
-                                context.getString(R.string.file_already_exists), MEGACHAT_INVALID_HANDLE);
-                    } else {
-                        dlFiles.put(document, destination.getAbsolutePath());
-                    }
-                } else {
-                    Timber.e("Destination ERROR");
-                }
-            }
-        }
-
-        double availableFreeSpace = Double.MAX_VALUE;
-        try {
-            StatFs stat = new StatFs(destination.getAbsolutePath());
-            availableFreeSpace = (double) stat.getAvailableBlocksLong() * (double) stat.getBlockSize();
-        } catch (Exception ex) {
-            Timber.e(ex);
-        }
-
-        for (MegaNode document : dlFiles.keySet()) {
-
-            String path = dlFiles.get(document);
-
-            if (availableFreeSpace < document.getSize()) {
-                showErrorAlertDialog(
-                        context.getString(R.string.location_label,
-                                context.getString(R.string.error_not_enough_free_space),
-                                document.getName()),
-                        false, ((Activity) context));
-                continue;
-            }
-
-            Timber.d("Download service has been removed, this should not be called as new chat is using ChatUploadsWorker");
-        }
-
     }
 
     public void importNode(long idMessage, long idChat, int typeImport) {

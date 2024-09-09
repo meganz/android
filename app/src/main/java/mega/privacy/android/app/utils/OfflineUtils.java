@@ -1,7 +1,5 @@
 package mega.privacy.android.app.utils;
 
-import static mega.privacy.android.app.utils.Constants.FROM_BACKUPS;
-import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.FileUtil.isFileDownloadedLatest;
 
@@ -10,11 +8,9 @@ import android.content.Context;
 import java.io.File;
 
 import mega.privacy.android.app.LegacyDatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
@@ -41,28 +37,6 @@ public class OfflineUtils {
 
         Timber.d("Not found offline file");
         return false;
-    }
-
-    public static long findIncomingParentHandle(MegaNode nodeToFind, MegaApiAndroid megaApi) {
-        Timber.d("findIncomingParentHandle");
-
-        MegaNode parentNodeI = megaApi.getParentNode(nodeToFind);
-        long result = -1;
-
-        if (nodeToFind == null)
-            return result;
-
-        if (parentNodeI == null) {
-            Timber.d("A: %s", nodeToFind.getHandle());
-            return nodeToFind.getHandle();
-        } else {
-            result = findIncomingParentHandle(parentNodeI, megaApi);
-            while (result == -1) {
-                result = findIncomingParentHandle(parentNodeI, megaApi);
-            }
-            Timber.d("B: %s", nodeToFind.getHandle());
-            return result;
-        }
     }
 
     @Deprecated
@@ -110,35 +84,6 @@ public class OfflineUtils {
         }
 
         return path + offlineNode.getPath();
-    }
-
-    public static File getOfflineParentFile(Context context, int from, MegaNode node, MegaApiAndroid megaApi) {
-        String path = context.getFilesDir().getAbsolutePath() + File.separator;
-
-        if (megaApi == null) {
-            megaApi = MegaApplication.getInstance().getMegaApi();
-        }
-
-        switch (from) {
-            case FROM_INCOMING_SHARES: {
-                path = path + OFFLINE_DIR + File.separator + findIncomingParentHandle(node, megaApi);
-                break;
-            }
-            case FROM_BACKUPS: {
-                path = path + OFFLINE_BACKUPS_DIR;
-                break;
-            }
-            default: {
-                MegaNode parentNode = MegaNodeUtil.getRootParentNode(megaApi, node);
-                if (parentNode.isInShare()) {
-                    path = path + OFFLINE_DIR + File.separator + findIncomingParentHandle(node, megaApi);
-                } else {
-                    path = path + OFFLINE_DIR;
-                }
-            }
-        }
-
-        return new File(path + File.separator + MegaApiUtils.createStringTree(node, context));
     }
 
     /**
