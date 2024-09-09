@@ -188,7 +188,11 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             manualUploadFilesLauncher.launch(POST_NOTIFICATIONS)
         } else {
-            openMultipleDocumentLauncher.launch(arrayOf("*/*"))
+            runCatching {
+                openMultipleDocumentLauncher.launch(arrayOf("*/*"))
+            }.onFailure {
+                Timber.e(it, "Activity not found")
+            }
         }
     }
 
