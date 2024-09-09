@@ -83,7 +83,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
-import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
@@ -94,12 +93,14 @@ import mega.privacy.android.app.main.megachat.chatAdapters.NodeAttachmentHistory
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.nodeattachment.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.presentation.chat.NodeAttachmentHistoryViewModel;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
+import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity;
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ChatImageNodeFetcher;
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource;
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel;
+import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
@@ -246,11 +247,10 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
         aB.setTitle(getString(R.string.title_chat_shared_files_info));
 
-        container = (RelativeLayout) findViewById(R.id.node_history_main_layout);
-
-        emptyLayout = (RelativeLayout) findViewById(R.id.empty_layout_node_history);
-        emptyTextView = (TextView) findViewById(R.id.empty_text_node_history);
-        emptyImageView = (ImageView) findViewById(R.id.empty_image_view_node_history);
+        container = findViewById(R.id.node_history_main_layout);
+        emptyLayout = findViewById(R.id.empty_layout_node_history);
+        emptyTextView = findViewById(R.id.empty_text_node_history);
+        emptyImageView = findViewById(R.id.empty_image_view_node_history);
 
         ColorUtils.setImageViewAlphaIfDark(this, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
 
@@ -266,19 +266,19 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
             textToShow = textToShow.replace("[/A]", "</font>");
             textToShow = textToShow.replace("[B]", "<font color=\'" + getColorHexString(this, R.color.grey_300_grey_600) + "\'>");
             textToShow = textToShow.replace("[/B]", "</font>");
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
         emptyTextView.setText(result);
 
-        linearLayoutList = (LinearLayout) findViewById(R.id.linear_layout_recycler_list);
-        linearLayoutGrid = (LinearLayout) findViewById(R.id.linear_layout_recycler_grid);
+        linearLayoutList = findViewById(R.id.linear_layout_recycler_list);
+        linearLayoutGrid = findViewById(R.id.linear_layout_recycler_grid);
 
         if (isList) {
             linearLayoutList.setVisibility(View.VISIBLE);
             linearLayoutGrid.setVisibility(View.GONE);
 
-            listView = (RecyclerView) findViewById(R.id.node_history_list_view);
+            listView = findViewById(R.id.node_history_list_view);
             listView.addItemDecoration(new SimpleDividerItemDecoration(this));
             mLayoutManager = new LinearLayoutManager(this);
             mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -288,7 +288,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
             linearLayoutList.setVisibility(View.GONE);
             linearLayoutGrid.setVisibility(View.VISIBLE);
 
-            listView = (NewGridRecyclerView) findViewById(R.id.file_grid_view_browser);
+            listView = findViewById(R.id.file_grid_view_browser);
         }
 
         listView.setClipToPadding(false);
@@ -333,9 +333,9 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
             if (chatRoom != null) {
                 messages = new ArrayList<>();
-                bufferMessages = new ArrayList<MegaChatMessage>();
+                bufferMessages = new ArrayList<>();
 
-                if (messages.size() != 0) {
+                if (!messages.isEmpty()) {
                     emptyLayout.setVisibility(View.GONE);
                     listView.setVisibility(View.VISIBLE);
                 } else {
@@ -347,7 +347,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                 if (resultOpen) {
                     Timber.d("Node history opened correctly");
 
-                    messages = new ArrayList<MegaChatMessage>();
+                    messages = new ArrayList<>();
 
                     if (isList) {
                         if (adapter == null) {
@@ -372,6 +372,22 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                 Timber.e("ERROR: node is NULL");
             }
         }
+
+        // Observe snackbar message event
+        ViewExtensionsKt.collectFlow(this, viewModel.getSnackbarMessageEvent(), Lifecycle.State.STARTED, messageId -> {
+            if (messageId == null) return Unit.INSTANCE;
+            showSnackbar(SNACKBAR_TYPE, getString(messageId), MEGACHAT_INVALID_HANDLE);
+            viewModel.onSnackbarMessageConsumed();
+            return Unit.INSTANCE;
+        });
+
+        // Observe event to save chat file to offline
+        ViewExtensionsKt.collectFlow(this, viewModel.getStartChatFileOfflineDownloadEvent(), Lifecycle.State.STARTED, chatFile -> {
+            if (chatFile == null) return Unit.INSTANCE;
+            startDownloadViewModel.onSaveOfflineClicked(chatFile);
+            viewModel.onStartChatFileOfflineDownloadEventConsumed();
+            return Unit.INSTANCE;
+        });
 
         // Observe copy request result
         ViewExtensionsKt.collectFlow(this, viewModel.getCopyResultFlow(), Lifecycle.State.STARTED, copyResult -> {
@@ -457,12 +473,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-
-        if (messages.size() > 0) {
-            selectMenuItem.setVisible(true);
-        } else {
-            selectMenuItem.setVisible(false);
-        }
+        selectMenuItem.setVisible(!messages.isEmpty());
 
         unSelectMenuItem.setVisible(false);
         thumbViewMenuItem.setVisible(false);
@@ -513,16 +524,8 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
                 actionMode = startSupportActionMode(new ActionBarCallBack());
             }
-            new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
+            new Handler(Looper.getMainLooper()).post(this::updateActionModeTitle);
         }
-    }
-
-    public boolean showSelectMenuItem() {
-        if (adapter != null) {
-            return adapter.isMultipleSelect();
-        }
-
-        return false;
     }
 
     public void itemClick(int position) {
@@ -533,16 +536,11 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
             MegaChatMessage m = messages.get(position);
 
             if (adapter.isMultipleSelect()) {
-
                 adapter.toggleSelection(position);
-
-                List<MegaChatMessage> messages = adapter.getSelectedMessages();
-                if (messages.size() > 0) {
+                if (!adapter.getSelectedMessages().isEmpty()) {
                     updateActionModeTitle();
                 }
-
             } else {
-
                 if (m != null) {
                     MegaNodeList nodeList = m.getMegaNodeList();
                     if (nodeList.size() == 1) {
@@ -788,8 +786,12 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                 PermissionUtils.checkNotificationsPermission(nodeAttachmentHistoryActivity);
                 clearSelections();
                 hideMultipleSelect();
-                chatC.saveForOfflineWithMessages(messagesSelected,
-                        megaChatApi.getChatRoom(chatId), NodeAttachmentHistoryActivity.this);
+                long messageId = messagesSelected.get(0).getMsgId();
+                if (StorageStateExtensionsKt.getStorageState() == StorageState.PayWall) {
+                    AlertsAndWarnings.showOverDiskQuotaPaywallWarning();
+                } else {
+                    viewModel.saveChatNodeToOffline(chatId, messageId);
+                }
             }
             return false;
         }
@@ -818,8 +820,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             Timber.d("onPrepareActionMode");
             List<MegaChatMessage> selected = adapter.getSelectedMessages();
-            if (selected.size() != 0) {
-
+            if (!selected.isEmpty()) {
                 MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
                 if (selected.size() == adapter.getItemCount()) {
                     menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -832,20 +833,13 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                 }
 
                 if (chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RM || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO && !chatRoom.isPreview()) {
-
                     menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                     menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                     menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                     menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
-
                 } else {
-
                     Timber.d("Chat with permissions");
-                    if (viewModel.isOnline() && !chatC.isInAnonymousMode()) {
-                        menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
-                    } else {
-                        menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
-                    }
+                    menu.findItem(R.id.chat_cab_menu_forward).setVisible(viewModel.isOnline() && !chatC.isInAnonymousMode());
 
                     if (selected.size() == 1) {
                         if (selected.get(0).getUserHandle() == megaChatApi.getMyUserHandle() && selected.get(0).isDeletable()) {
@@ -897,25 +891,16 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
                         if (viewModel.isOnline()) {
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
-                            if (chatC.isInAnonymousMode()) {
-                                menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
-                                importIcon.setVisible(false);
-                            } else {
-                                menu.findItem(R.id.chat_cab_menu_offline).setVisible(true);
-                                importIcon.setVisible(true);
-                            }
+                            importIcon.setVisible(!chatC.isInAnonymousMode());
                         } else {
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
                             importIcon.setVisible(false);
                         }
 
                         menu.findItem(R.id.chat_cab_menu_delete).setVisible(showDelete);
-                        if (viewModel.isOnline() && !chatC.isInAnonymousMode()) {
-                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(true);
-                        } else {
-                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
-                        }
+                        menu.findItem(R.id.chat_cab_menu_forward).setVisible(viewModel.isOnline() && !chatC.isInAnonymousMode());
+                        // Hide available offline option when multiple attachments are selected
+                        menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
                     }
                 }
             } else {
@@ -933,19 +918,16 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     public void showConfirmationDeleteMessages(final ArrayList<MegaChatMessage> messages, final MegaChatRoom chat) {
         Timber.d("Chat ID: %s", chat.getChatId());
 
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        ChatController cC = new ChatController(nodeAttachmentHistoryActivity);
-                        cC.deleteMessages(messages, chat);
-                        break;
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    ChatController cC = new ChatController(nodeAttachmentHistoryActivity);
+                    cC.deleteMessages(messages, chat);
+                    break;
 
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
+                case DialogInterface.BUTTON_NEGATIVE:
+                    //No button clicked
+                    break;
             }
         };
 
@@ -1005,15 +987,15 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                     ArrayList<MegaUser> users = new ArrayList<>();
                     ArrayList<MegaChatRoom> chats = new ArrayList<>();
 
-                    for (int i = 0; i < contactHandles.length; i++) {
-                        MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
+                    for (long contactHandle : contactHandles) {
+                        MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandle));
                         if (user != null) {
                             users.add(user);
                         }
                     }
 
-                    for (int i = 0; i < chatHandles.length; i++) {
-                        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
+                    for (long chatHandle : chatHandles) {
+                        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandle);
                         if (chatRoom != null) {
                             chats.add(chatRoom);
                         }
@@ -1132,7 +1114,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     public void fullHistoryReceivedOnLoad() {
         Timber.d("Messages size: %s", messages.size());
 
-        if (bufferMessages.size() != 0) {
+        if (!bufferMessages.isEmpty()) {
             Timber.d("Buffer size: %s", bufferMessages.size());
             emptyLayout.setVisibility(View.GONE);
             listView.setVisibility(View.VISIBLE);
@@ -1144,7 +1126,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                 messages.add(messageToShow);
             }
 
-            if (messages.size() != 0) {
+            if (!messages.isEmpty()) {
                 if (adapter == null) {
                     adapter = new NodeAttachmentHistoryAdapter(this, messages, listView, NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST);
                     listView.setLayoutManager(mLayoutManager);
@@ -1181,7 +1163,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         Timber.d("TYPE: %s", msg.getType());
 
         int lastIndex = 0;
-        if (messages.size() == 0) {
+        if (messages.isEmpty()) {
             messages.add(msg);
         } else {
             Timber.d("Status of message: %s", msg.getStatus());

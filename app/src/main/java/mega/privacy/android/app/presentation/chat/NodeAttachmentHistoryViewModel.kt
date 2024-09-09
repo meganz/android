@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.chat.model.MediaPlayerOpenedErrorState
 import mega.privacy.android.app.presentation.copynode.CopyRequestState
@@ -17,10 +18,13 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
+import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaChatMessage
@@ -38,8 +42,24 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
+    private val getChatFileUseCase: GetChatFileUseCase,
+    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val megaNavigator: MegaNavigator,
 ) : ViewModel() {
+
+    private val _snackbarMessageEvent = MutableStateFlow<Int?>(null)
+
+    /**
+     * Flow of [Int] res id to show a snackbar message.
+     */
+    val snackbarMessageEvent = _snackbarMessageEvent.asStateFlow()
+
+    private val _startChatFileOfflineDownloadEvent = MutableStateFlow<ChatFile?>(null)
+
+    /**
+     * Flow of [ChatFile] to start the download of a chat file.
+     */
+    val startChatFileOfflineDownloadEvent = _startChatFileOfflineDownloadEvent.asStateFlow()
 
     private val _copyResultFlow = MutableStateFlow<CopyRequestState?>(null)
 
@@ -179,6 +199,29 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
     }
 
     /**
+     * Save chat node to offline
+     *
+     * @param chatId    Chat ID where the node is.
+     * @param messageId Message ID where the node is.
+     */
+    fun saveChatNodeToOffline(chatId: Long, messageId: Long) {
+        viewModelScope.launch {
+            runCatching {
+                val chatFile = getChatFileUseCase(chatId = chatId, messageId = messageId)
+                    ?: throw IllegalStateException("Chat file not found")
+                val isAvailableOffline = isAvailableOfflineUseCase(chatFile)
+                if (isAvailableOffline) {
+                    _snackbarMessageEvent.emit(R.string.file_already_exists)
+                } else {
+                    _startChatFileOfflineDownloadEvent.emit(chatFile)
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
      * Remove chat node from offline
      *
      * @param nodeId node ID
@@ -188,6 +231,24 @@ class NodeAttachmentHistoryViewModel @Inject constructor(
             runCatching {
                 removeOfflineNodeUseCase(nodeId)
             }
+        }
+    }
+
+    /**
+     * Consume the snackbar message event
+     */
+    fun onSnackbarMessageConsumed() {
+        viewModelScope.launch {
+            _snackbarMessageEvent.emit(null)
+        }
+    }
+
+    /**
+     * Consume the start chat file offline download event
+     */
+    fun onStartChatFileOfflineDownloadEventConsumed() {
+        viewModelScope.launch {
+            _startChatFileOfflineDownloadEvent.emit(null)
         }
     }
 }

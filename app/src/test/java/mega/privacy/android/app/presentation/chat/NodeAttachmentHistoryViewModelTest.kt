@@ -3,7 +3,10 @@ package mega.privacy.android.app.presentation.chat
 import android.content.Context
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.model.MediaPlayerOpenedErrorState
 import mega.privacy.android.app.presentation.copynode.CopyRequestState
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
@@ -15,11 +18,14 @@ import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaChatMessage
 import org.junit.jupiter.api.AfterEach
@@ -33,6 +39,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NodeAttachmentHistoryViewModelTest {
@@ -42,6 +49,8 @@ class NodeAttachmentHistoryViewModelTest {
         mock()
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase = mock()
     private val megaNavigator: MegaNavigator = mock()
+    private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
+    private val getChatFileUseCase = mock<GetChatFileUseCase>()
 
     private lateinit var viewModel: NodeAttachmentHistoryViewModel
 
@@ -53,6 +62,8 @@ class NodeAttachmentHistoryViewModelTest {
             isConnectedToInternetUseCase,
             getNodeContentUriByHandleUseCase,
             mock(),
+            getChatFileUseCase,
+            isAvailableOfflineUseCase,
             megaNavigator
         )
     }
@@ -63,7 +74,9 @@ class NodeAttachmentHistoryViewModelTest {
         isConnectedToInternetUseCase,
         checkChatNodesNameCollisionAndCopyUseCase,
         getNodeContentUriByHandleUseCase,
-        megaNavigator
+        megaNavigator,
+        getChatFileUseCase,
+        isAvailableOfflineUseCase
     )
 
     @Test
@@ -215,6 +228,43 @@ class NodeAttachmentHistoryViewModelTest {
                 assertThat(awaitItem()).isEqualTo(expectedErrorState)
                 viewModel.updateMediaPlayerOpenedError(null)
                 assertThat(awaitItem()).isNull()
+            }
+        }
+
+
+    @Test
+    internal fun `test that snackbar message is shown when chat file is already available offline`() =
+        runTest {
+            val chatId = 1000L
+            val messageId = 2000L
+            val chatFile = mock<ChatDefaultFile>()
+            whenever(getChatFileUseCase(chatId, messageId)).thenReturn(chatFile)
+            whenever(isAvailableOfflineUseCase(chatFile)).thenReturn(true)
+
+            viewModel.saveChatNodeToOffline(chatId, messageId)
+            advanceUntilIdle()
+
+            viewModel.snackbarMessageEvent.test {
+                val result = awaitItem()
+                assertThat(result).isEqualTo(R.string.file_already_exists)
+            }
+        }
+
+    @Test
+    internal fun `test that startChatFileOfflineDownload event is triggered when chat file is not available offline`() =
+        runTest {
+            val chatId = 1000L
+            val messageId = 2000L
+            val chatFile = mock<ChatDefaultFile>()
+            whenever(getChatFileUseCase(chatId, messageId)).thenReturn(chatFile)
+            whenever(isAvailableOfflineUseCase(chatFile)).thenReturn(false)
+
+            viewModel.saveChatNodeToOffline(chatId, messageId)
+            advanceUntilIdle()
+
+            viewModel.startChatFileOfflineDownloadEvent.test {
+                val result = awaitItem()
+                assertThat(result).isEqualTo(chatFile)
             }
         }
 }
