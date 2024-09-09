@@ -15,8 +15,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
-import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
@@ -52,6 +50,7 @@ import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.photos.mediadiscovery.ShouldEnterMediaDiscoveryModeUseCase
 import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -112,6 +111,7 @@ class FileBrowserViewModelTest {
     }
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val accountDetailFakeFlow = MutableSharedFlow<AccountDetail>()
+    private val shouldEnterMediaDiscoveryModeUseCase = mock<ShouldEnterMediaDiscoveryModeUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -146,6 +146,7 @@ class FileBrowserViewModelTest {
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            shouldEnterMediaDiscoveryModeUseCase = shouldEnterMediaDiscoveryModeUseCase
         )
     }
 
@@ -216,26 +217,38 @@ class FileBrowserViewModelTest {
         }
 
     @Test
-    fun `test that media discovery cannot be entered when there are no nodes`() = runTest {
-        val newValue = 123456789L
-        whenever(getFileBrowserNodeChildrenUseCase.invoke(newValue)).thenReturn(emptyList())
-        underTest.setFileBrowserHandle(newValue)
-
-        val shouldEnter =
-            underTest.shouldEnterMediaDiscoveryMode(
-                newValue,
-                MediaDiscoveryViewSettings.INITIAL.ordinal
-            )
-        assertThat(shouldEnter).isFalse()
-    }
-
-    @Test
-    fun `test that media discovery cannot be entered when media discovery view settings is disabled`() =
+    fun `test that media discovery cannot be entered when shouldEnterMediaDiscoveryModeUseCase is false and setting is in initial state`() =
         runTest {
             val newValue = 123456789L
-            val list = listOf<TypedFileNode>(mock(), mock())
-            whenever(getFileBrowserNodeChildrenUseCase(newValue)).thenReturn(list)
-            underTest.setFileBrowserHandle(newValue)
+            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue)).thenReturn(false)
+
+            val shouldEnter =
+                underTest.shouldEnterMediaDiscoveryMode(
+                    newValue,
+                    MediaDiscoveryViewSettings.INITIAL.ordinal
+                )
+            assertThat(shouldEnter).isFalse()
+        }
+
+    @Test
+    fun `test that media discovery cannot be entered when shouldEnterMediaDiscoveryModeUseCase is false and setting is in enabled state`() =
+        runTest {
+            val newValue = 123456789L
+            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue)).thenReturn(false)
+
+            val shouldEnter =
+                underTest.shouldEnterMediaDiscoveryMode(
+                    newValue,
+                    MediaDiscoveryViewSettings.ENABLED.ordinal
+                )
+            assertThat(shouldEnter).isFalse()
+        }
+
+    @Test
+    fun `test that media discovery cannot be entered when shouldEnterMediaDiscoveryModeUseCase is false and setting is in disabled state`() =
+        runTest {
+            val newValue = 123456789L
+            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue)).thenReturn(false)
 
             val shouldEnter =
                 underTest.shouldEnterMediaDiscoveryMode(
@@ -246,22 +259,43 @@ class FileBrowserViewModelTest {
         }
 
     @Test
-    fun `test that media discovery cannot be entered when media discovery view settings is enabled and a folder node is found`() =
+    fun `test that media discovery can be entered when shouldEnterMediaDiscoveryModeUseCase is true and setting is in initial state `() =
         runTest {
             val newValue = 123456789L
-            val folderNode = mock<TypedFolderNode>()
-            whenever(getFileBrowserNodeChildrenUseCase.invoke(newValue)).thenReturn(
-                listOf(
-                    folderNode
-                )
-            )
+            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue)).thenReturn(true)
 
-            underTest.setFileBrowserHandle(newValue)
+            val shouldEnter =
+                underTest.shouldEnterMediaDiscoveryMode(
+                    newValue,
+                    MediaDiscoveryViewSettings.INITIAL.ordinal
+                )
+            assertThat(shouldEnter).isTrue()
+        }
+
+    @Test
+    fun `test that media discovery can be entered when shouldEnterMediaDiscoveryModeUseCase is true and setting is in enabled state `() =
+        runTest {
+            val newValue = 123456789L
+            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue)).thenReturn(true)
 
             val shouldEnter =
                 underTest.shouldEnterMediaDiscoveryMode(
                     newValue,
                     MediaDiscoveryViewSettings.ENABLED.ordinal
+                )
+            assertThat(shouldEnter).isTrue()
+        }
+
+    @Test
+    fun `test that media discovery cannot be entered when shouldEnterMediaDiscoveryModeUseCase is true and setting is in disabled state `() =
+        runTest {
+            val newValue = 123456789L
+            whenever(shouldEnterMediaDiscoveryModeUseCase(newValue)).thenReturn(true)
+
+            val shouldEnter =
+                underTest.shouldEnterMediaDiscoveryMode(
+                    newValue,
+                    MediaDiscoveryViewSettings.DISABLED.ordinal
                 )
             assertThat(shouldEnter).isFalse()
         }
@@ -587,6 +621,7 @@ class FileBrowserViewModelTest {
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
+        whenever(shouldEnterMediaDiscoveryModeUseCase(any())).thenReturn(false)
     }
 
     @AfterEach

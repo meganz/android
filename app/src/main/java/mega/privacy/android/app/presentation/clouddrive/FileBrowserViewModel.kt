@@ -29,15 +29,11 @@ import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSe
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.data.mapper.FileDurationMapper
-import mega.privacy.android.domain.entity.ImageFileTypeInfo
-import mega.privacy.android.domain.entity.SvgFileTypeInfo
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -48,13 +44,14 @@ import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
-import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.photos.mediadiscovery.ShouldEnterMediaDiscoveryModeUseCase
 import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -108,6 +105,7 @@ class FileBrowserViewModel @Inject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val shouldEnterMediaDiscoveryModeUseCase: ShouldEnterMediaDiscoveryModeUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -307,20 +305,8 @@ class FileBrowserViewModel @Inject constructor(
         folderHandle: Long,
         mediaDiscoveryViewSettings: Int,
     ): Boolean =
-        getFileBrowserNodeChildrenUseCase(folderHandle).let { nodes ->
-            if (nodes.isEmpty() || mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.DISABLED.ordinal) {
-                false
-            } else {
-                nodes.firstOrNull { node ->
-                    node is TypedFolderNode
-                            || (node as? FileNode)?.type is SvgFileTypeInfo
-                            || (node as? FileNode)?.type !is ImageFileTypeInfo
-                            && (node as? FileNode)?.type !is VideoFileTypeInfo
-                }?.let {
-                    false
-                } ?: true
-            }
-        }
+        mediaDiscoveryViewSettings != MediaDiscoveryViewSettings.DISABLED.ordinal
+                && shouldEnterMediaDiscoveryModeUseCase(folderHandle)
 
     /**
      * Refreshes the File Browser Nodes

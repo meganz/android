@@ -43,6 +43,7 @@ import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.Offline
@@ -287,6 +288,24 @@ internal class NodeRepositoryImpl @Inject constructor(
                 )
             }
         }.awaitAll()
+    }
+
+    override suspend fun getNodeChildrenFileTypes(
+        nodeId: NodeId,
+        order: SortOrder?,
+    ): List<FileTypeInfo> = withContext(ioDispatcher) {
+        val token = cancelTokenProvider.getOrCreateCancelToken()
+        val filter = megaSearchFilterMapper(
+            parentHandle = nodeId,
+        )
+        val childList = megaApiGateway.getChildren(
+            filter,
+            sortOrderIntMapper(order ?: SortOrder.ORDER_NONE),
+            token
+        )
+        childList.map { megaNode ->
+            fileTypeInfoMapper(megaNode.name, megaNode.duration)
+        }
     }
 
     override suspend fun getNodeHistoryVersions(handle: NodeId) = withContext(ioDispatcher) {

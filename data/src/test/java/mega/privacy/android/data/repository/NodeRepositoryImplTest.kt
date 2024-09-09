@@ -43,6 +43,7 @@ import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedImageNode
@@ -1454,6 +1455,40 @@ class NodeRepositoryImplTest {
         whenever(stringListMapper(megaStringList)).thenReturn(tags)
         val actual = underTest.getAllNodeTags(searchString)
         assertThat(actual).isEqualTo(tags)
+    }
+
+    @Test
+    fun `test that getNodeChildrenFileTypes return the correct file types`() = runTest {
+        val node = mock<MegaNode>() {
+            on { name }.thenReturn("123.jpg")
+            on { duration }.thenReturn(0)
+        }
+        val nodeId = NodeId(node.handle)
+        val filter = mock<MegaSearchFilter>()
+        val token = mock<MegaCancelToken>()
+        val targetFileType = StaticImageFileTypeInfo("", "")
+
+        whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+        whenever(sortOrderIntMapper(SortOrder.ORDER_NONE)).thenReturn(MegaApiJava.ORDER_NONE)
+        whenever(
+            megaSearchFilterMapper(
+                parentHandle = nodeId,
+            )
+        ).thenReturn(filter)
+        whenever(
+            megaApiGateway.getChildren(
+                filter,
+                sortOrderIntMapper(SortOrder.ORDER_NONE),
+                token
+            )
+        ).thenReturn(
+            listOf(node)
+        )
+        whenever(fileTypeInfoMapper.invoke(node.name, node.duration))
+            .thenReturn(targetFileType)
+
+        val fileTypes = underTest.getNodeChildrenFileTypes(nodeId)
+        assertThat(fileTypes.first()).isEqualTo(targetFileType)
     }
 
     private fun provideNodeId() = Stream.of(

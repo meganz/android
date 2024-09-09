@@ -537,18 +537,16 @@ internal class DefaultPhotosRepository @Inject constructor(
      */
     private suspend fun mapPhotoNodesToImages(megaNodes: List<MegaNode>): List<Photo> =
         coroutineScope {
-            megaNodes.map { megaNode ->
-                async {
-                    runCatching {
-                        (fileTypeInfoMapper(
-                            megaNode.name,
-                            megaNode.duration
-                        ) !is SvgFileTypeInfo && megaNode.isValidPhotoNode())
-                            .takeIf { it }
-                            ?.let { mapMegaNodeToImage(megaNode) }
-                    }.getOrNull()
-                }
-            }.awaitAll().filterNotNull()
+            megaNodes.mapNotNull { megaNode ->
+                runCatching {
+                    (fileTypeInfoMapper(
+                        megaNode.name,
+                        megaNode.duration
+                    ) !is SvgFileTypeInfo && megaNode.isValidPhotoNode())
+                        .takeIf { it }
+                        ?.let { mapMegaNodeToImage(megaNode) }
+                }.getOrNull()
+            }
         }
 
     /**
@@ -558,18 +556,16 @@ internal class DefaultPhotosRepository @Inject constructor(
      */
     private suspend fun mapPhotoNodesToVideos(megaNodes: List<MegaNode>): List<Photo> =
         coroutineScope {
-            megaNodes.map { megaNode ->
-                async {
-                    runCatching {
-                        (fileTypeInfoMapper(
-                            megaNode.name,
-                            megaNode.duration
-                        ) is VideoFileTypeInfo && megaNode.isValidPhotoNode())
-                            .takeIf { it }
-                            ?.let { mapMegaNodeToVideo(megaNode) }
-                    }.getOrNull()
-                }
-            }.awaitAll().filterNotNull()
+            megaNodes.mapNotNull { megaNode ->
+                runCatching {
+                    (fileTypeInfoMapper(
+                        megaNode.name,
+                        megaNode.duration
+                    ) is VideoFileTypeInfo && megaNode.isValidPhotoNode())
+                        .takeIf { it }
+                        ?.let { mapMegaNodeToVideo(megaNode) }
+                }.getOrNull()
+            }
         }
 
     /**

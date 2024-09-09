@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.Offline
@@ -136,6 +137,17 @@ interface NodeRepository {
      * @return
      */
     suspend fun getNodeChildren(nodeId: NodeId, order: SortOrder? = null): List<UnTypedNode>
+
+    /**
+     * Get node children file types
+     * @param nodeId [NodeId]
+     * @param order [SortOrder]
+     * @return list of [FileTypeInfo]
+     */
+    suspend fun getNodeChildrenFileTypes(
+        nodeId: NodeId,
+        order: SortOrder? = null,
+    ): List<FileTypeInfo>
 
     /**
      * Get the history versions of the node
