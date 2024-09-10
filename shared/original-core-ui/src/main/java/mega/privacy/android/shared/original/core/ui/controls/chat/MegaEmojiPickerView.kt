@@ -44,29 +44,6 @@ fun MegaEmojiPickerView(
 }
 
 /**
- * Emoji picker view.
- */
-@Composable
-fun MegaEmojiPickerView(
-    showEmojiPicker: Boolean = true,
-    preloadedPicker: EmojiPickerView,
-    modifier: Modifier,
-) = Column {
-    AndroidView(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(MegaOriginalTheme.colors.background.pageBackground)
-            .testTag(TEST_TAG_EMOJI_PICKER_VIEW),
-        factory = {
-            preloadedPicker
-        },
-        update = { view: EmojiPickerView ->
-            view.isVisible = showEmojiPicker
-        },
-    )
-}
-
-/**
  * Tag used to identify the emoji picker view.
  */
 const val TEST_TAG_EMOJI_PICKER_VIEW = "emoji_picker_view"

@@ -98,6 +98,7 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
 
         messageOptionsModal(
             navController = navController,
+            navigateToEmojiPicker = navController::navigateToEmojiPickerModal,
         ) {
             navController.popBackStack(
                 ConversationRoute,
