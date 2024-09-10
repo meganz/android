@@ -22,15 +22,10 @@ class GenericDescriptionWithCharacterLimitTextFieldTest {
     @Test
     fun `test that ui components are shown when text field characters are within the range`() {
         var message = "This is a description with a character limit"
-        val emptyErrorMessage = "This field cannot be empty"
-        val errorMinLengthMessage = "This field must have at least 10 characters"
         val characterLimit = 120
         composeTestRule.setContent {
             GenericDescriptionWithCharacterLimitTextField(
                 maxCharacterLimit = 120,
-                minCharacterLimit = 10,
-                emptyErrorMessage = emptyErrorMessage,
-                errorMinLengthMessage = errorMinLengthMessage,
                 value = message,
                 modifier = Modifier
                     .padding(top = 10.dp),
@@ -53,17 +48,14 @@ class GenericDescriptionWithCharacterLimitTextFieldTest {
     }
 
     @Test
-    fun `test that ui components are shown correctly when text field is empty`() {
+    fun `test that ui components are shown correctly when error message is provided`() {
         var message = ""
-        val emptyErrorMessage = "This field cannot be empty"
-        val errorMinLengthMessage = "This field must have at least 10 characters"
+        val errorMessage = "This field cannot be empty"
         val characterLimit = 120
         composeTestRule.setContent {
             GenericDescriptionWithCharacterLimitTextField(
                 maxCharacterLimit = 120,
-                minCharacterLimit = 10,
-                emptyErrorMessage = emptyErrorMessage,
-                errorMinLengthMessage = errorMinLengthMessage,
+                errorMessage = errorMessage,
                 value = message,
                 modifier = Modifier
                     .padding(top = 10.dp),
@@ -85,42 +77,6 @@ class GenericDescriptionWithCharacterLimitTextFieldTest {
         composeTestRule.onNodeWithTag(TEXT_FIELD_LIMIT_ERROR_ROW_TEST_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(TEXT_FIELD_LIMIT_ICON_ERROR_TEST_TAG)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(emptyErrorMessage).assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that ui components are shown correctly when text field has characters less than the minimum`() {
-        var message = "this is "
-        val emptyErrorMessage = "This field cannot be empty"
-        val errorMinLengthMessage = "This field must have at least 10 characters"
-        val characterLimit = 120
-        composeTestRule.setContent {
-            GenericDescriptionWithCharacterLimitTextField(
-                maxCharacterLimit = 120,
-                minCharacterLimit = 10,
-                emptyErrorMessage = emptyErrorMessage,
-                errorMinLengthMessage = errorMinLengthMessage,
-                value = message,
-                modifier = Modifier
-                    .padding(top = 10.dp),
-                initiallyFocused = true,
-                showClearIcon = true,
-                onValueChange = {
-                    message = it
-                }, onClearText = {
-                    message = ""
-                }
-            )
-        }
-        composeTestRule.onNodeWithTag(TEXT_FIELD_LIMIT_TEXT_COUNTER_TEST_TAG)
-            .assertIsDisplayed()
-            .assert(hasText("${message.length}/${characterLimit}"))
-        composeTestRule.onNodeWithTag(TEXT_FIELD_WITH_CHARACTER_LIMIT_VIEW_TEXT_FIELD)
-            .assertIsDisplayed()
-            .assert(hasText(message))
-        composeTestRule.onNodeWithTag(TEXT_FIELD_LIMIT_ERROR_ROW_TEST_TAG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEXT_FIELD_LIMIT_ICON_ERROR_TEST_TAG)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithText(errorMinLengthMessage).assertIsDisplayed()
+        composeTestRule.onNodeWithText(errorMessage).assertIsDisplayed()
     }
 }

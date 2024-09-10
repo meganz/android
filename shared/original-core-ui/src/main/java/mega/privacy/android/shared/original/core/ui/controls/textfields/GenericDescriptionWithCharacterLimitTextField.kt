@@ -56,24 +56,20 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 @Composable
 fun GenericDescriptionWithCharacterLimitTextField(
     maxCharacterLimit: Int,
-    emptyErrorMessage: String,
-    errorMinLengthMessage: String,
+    onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    minCharacterLimit: Int = 0,
+    errorMessage: String? = null,
     showClearIcon: Boolean = true,
     initiallyFocused: Boolean = false,
     imeAction: ImeAction = ImeAction.Done,
     value: String = "",
-    onValueChange: (String) -> Unit,
     onClearText: () -> Unit = {},
 ) {
     var textFieldValue by remember { mutableStateOf(TextFieldValue(value)) }
     var isFocused by rememberSaveable { mutableStateOf(initiallyFocused) }
     val focusRequester = remember { FocusRequester() }
-    val isMinCharLimitError =
-        textFieldValue.text.length < minCharacterLimit || textFieldValue.text.isEmpty()
     val isMaxCharLimitError = textFieldValue.text.length > maxCharacterLimit
-    val isError = isMinCharLimitError || isMaxCharLimitError
+    val isError = errorMessage != null || isMaxCharLimitError
     val keyboardOption = KeyboardOptions(
         keyboardType = KeyboardType.Text,
         imeAction = imeAction,
@@ -143,7 +139,7 @@ fun GenericDescriptionWithCharacterLimitTextField(
                 .testTag(TEXT_FIELD_LIMIT_TEXT_COUNTER_TEST_TAG)
         )
 
-        if (isMinCharLimitError) {
+        if (errorMessage != null) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -163,7 +159,7 @@ fun GenericDescriptionWithCharacterLimitTextField(
                     colorFilter = ColorFilter.tint(MegaOriginalTheme.colors.support.error)
                 )
                 MegaText(
-                    text = if (textFieldValue.text.isNotEmpty() && textFieldValue.text.length < minCharacterLimit) errorMinLengthMessage else emptyErrorMessage,
+                    text = errorMessage,
                     textColor = TextColor.Error,
                     style = MaterialTheme.typography.body3,
                     textAlign = TextAlign.Start,
@@ -188,8 +184,7 @@ private fun TextFieldWithCharacterLimitEmptyPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         GenericDescriptionWithCharacterLimitTextField(
             maxCharacterLimit = 120,
-            emptyErrorMessage = "This field is required",
-            errorMinLengthMessage = "This field must have at least 10 characters",
+            errorMessage = "This field is required",
             onValueChange = {}
         )
     }
@@ -201,9 +196,6 @@ private fun TextFieldWithCharacterLimitDefaultPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         GenericDescriptionWithCharacterLimitTextField(
             maxCharacterLimit = 120,
-            minCharacterLimit = 10,
-            emptyErrorMessage = "This field is required",
-            errorMinLengthMessage = "This field must have at least 10 characters",
             value = "This is a description with a character limit",
             initiallyFocused = true,
             onValueChange = {}
@@ -217,9 +209,6 @@ private fun TextFieldWithMaxCharacterLimitErrorPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         GenericDescriptionWithCharacterLimitTextField(
             maxCharacterLimit = 120,
-            minCharacterLimit = 10,
-            emptyErrorMessage = "This field is required",
-            errorMinLengthMessage = "This field must have at least 10 characters",
             value = "This is a description with a character limit, but it's too long and takes times to fully read it because the number of characters of it exceeds the allowed limit",
             onValueChange = {}
         )
@@ -232,9 +221,7 @@ private fun TextFieldWithMinCharacterLimitErrorPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         GenericDescriptionWithCharacterLimitTextField(
             maxCharacterLimit = 120,
-            minCharacterLimit = 10,
-            emptyErrorMessage = "This field is required",
-            errorMinLengthMessage = "This field must have at least 10 characters",
+            errorMessage = "Message must be at least 10 characters",
             value = "This is..",
             onValueChange = {}
         )

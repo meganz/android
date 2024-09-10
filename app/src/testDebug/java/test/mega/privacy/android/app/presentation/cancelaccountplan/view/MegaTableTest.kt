@@ -5,16 +5,12 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
-import mega.privacy.android.app.presentation.cancelaccountplan.view.TableCell
-import mega.privacy.android.app.presentation.cancelaccountplan.view.MegaTable
-import mega.privacy.android.app.presentation.cancelaccountplan.view.TABLE_ROW_DIVIDER
-import mega.privacy.android.app.presentation.cancelaccountplan.view.TABLE_ROW_TEST_TAG
+import mega.privacy.android.app.fromId
 import mega.privacy.android.shared.resources.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import mega.privacy.android.app.fromId
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

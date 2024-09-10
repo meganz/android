@@ -10,13 +10,13 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.presentation.cancelaccountplan.model.UICancellationSurveyAnswer
 import mega.privacy.android.shared.resources.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.presentation.cancelaccountplan.model.UICancellationSurveyAnswer
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

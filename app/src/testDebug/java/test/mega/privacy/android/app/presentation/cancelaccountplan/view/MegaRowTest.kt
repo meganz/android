@@ -6,9 +6,6 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
-import mega.privacy.android.app.presentation.cancelaccountplan.view.TableCell
-import mega.privacy.android.app.presentation.cancelaccountplan.view.MegaTableRow
-import mega.privacy.android.app.presentation.cancelaccountplan.view.TABLE_CELL_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -7,15 +7,11 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
-import mega.privacy.android.app.presentation.cancelaccountplan.view.TableCell
-import mega.privacy.android.app.presentation.cancelaccountplan.view.MegaTableCell
-import mega.privacy.android.app.presentation.cancelaccountplan.view.TABLE_ICON_CELL_TEST_TAG
-import mega.privacy.android.app.presentation.cancelaccountplan.view.TABLE_TEXT_CELL_TEST_TAG
+import mega.privacy.android.app.hasDrawable
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import mega.privacy.android.app.hasDrawable
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

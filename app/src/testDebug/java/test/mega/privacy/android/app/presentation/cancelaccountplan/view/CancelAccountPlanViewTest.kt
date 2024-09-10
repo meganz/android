@@ -8,6 +8,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancelAccountPlanUiState
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.shared.resources.R
@@ -15,8 +17,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
