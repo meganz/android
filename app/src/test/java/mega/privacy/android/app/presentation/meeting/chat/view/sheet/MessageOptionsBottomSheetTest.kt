@@ -35,7 +35,9 @@ class MessageOptionsBottomSheetTest {
         composeRule.setContent {
             MessageOptionsBottomSheet(
                 onReactionClicked = {},
+                onMoreReactionsClicked = {},
                 actions = emptyList(),
+                messageId = -1L,
             )
         }
     }

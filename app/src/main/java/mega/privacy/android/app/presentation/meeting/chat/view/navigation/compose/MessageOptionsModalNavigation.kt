@@ -13,6 +13,7 @@ private const val messageIdArg = "messageId"
 @OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.messageOptionsModal(
     navController: NavHostController,
+    navigateToEmojiPicker: (Long) -> Unit,
     closeBottomSheets: () -> Unit,
 ) {
     bottomSheet(route = "messageOptionsModal/{$messageIdArg}") { backStackEntry ->
@@ -22,10 +23,12 @@ internal fun NavGraphBuilder.messageOptionsModal(
             ?: throw IllegalArgumentException("messageId cannot be null for messageOptionsModal")
 
         MessageOptionsBottomSheet(
+            messageId = messageId,
             onReactionClicked = {
                 viewModel.onAddReaction(messageId, it)
                 closeBottomSheets()
             },
+            onMoreReactionsClicked = navigateToEmojiPicker,
             actions = viewModel.getApplicableBotomsheetActions { closeBottomSheets() },
         )
     }
