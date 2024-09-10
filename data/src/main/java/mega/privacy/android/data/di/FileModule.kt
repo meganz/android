@@ -19,17 +19,17 @@ class FileModule {
     @Provides
     fun provideLogFileDirectory(
         @ApplicationContext applicationContext: Context
-        ): File = getLogDirectory(applicationContext.filesDir)
+        ): File = getLogDirectory(applicationContext.getExternalFilesDir(null), "MEGA Logs")
 
     @LogZipFileDirectory
     @Singleton
     @Provides
     fun provideLogZipFileDirectory(
         @ApplicationContext applicationContext: Context,
-    ): File = getLogDirectory(applicationContext.getExternalFilesDir(null))
+    ): File = getLogDirectory(applicationContext.getExternalFilesDir(null), "MEGA Logs Zip")
 
-    private fun getLogDirectory(baseDirectory: File?): File {
-        val localDir = File(baseDirectory, "MEGA Logs")
+    private fun getLogDirectory(baseDirectory: File?, child: String): File {
+        val localDir = File(baseDirectory, child)
         if (!localDir.exists()) {
             localDir.mkdirs()
         }
