@@ -2,7 +2,6 @@ package mega.privacy.android.domain.usecase.offline
 
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
-import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -24,7 +23,7 @@ internal class SyncOfflineFilesUseCaseTest {
     private val clearOfflineUseCase: ClearOfflineUseCase = mock()
     private val getOfflineFilesUseCase: GetOfflineFilesUseCase = mock()
     private val nodeRepository: NodeRepository = mock()
-    private val fileSystemRepository: FileSystemRepository = mock()
+    private val hasOfflineFilesUseCase: HasOfflineFilesUseCase = mock()
 
     @BeforeAll
     fun setUp() {
@@ -32,21 +31,18 @@ internal class SyncOfflineFilesUseCaseTest {
             clearOfflineUseCase = clearOfflineUseCase,
             getOfflineFilesUseCase = getOfflineFilesUseCase,
             nodeRepository = nodeRepository,
-            fileSystemRepository = fileSystemRepository
+            hasOfflineFilesUseCase = hasOfflineFilesUseCase
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(clearOfflineUseCase, getOfflineFilesUseCase, nodeRepository, fileSystemRepository)
+        reset(clearOfflineUseCase, getOfflineFilesUseCase, nodeRepository, hasOfflineFilesUseCase)
     }
 
     @Test
-    fun `test that node information is removed if file doesn't exist`() = runTest {
-        val offlineFolder = mock<File> {
-            on { exists() } doReturn true
-        }
-        whenever(fileSystemRepository.getOfflineFolder()) doReturn offlineFolder
+    fun `test that node information is removed when file doesn't exist`() = runTest {
+        whenever(hasOfflineFilesUseCase()) doReturn true
         val offlineNodes = listOf(mock<OtherOfflineNodeInformation>())
         whenever(nodeRepository.getAllOfflineNodes()).thenReturn(offlineNodes)
         val offlineFile = mock<File> {
@@ -63,10 +59,8 @@ internal class SyncOfflineFilesUseCaseTest {
     @Test
     fun `test that getOfflineFilesUseCase is not invoked when offline nodes doesn't exist`() =
         runTest {
-            val offlineFolder = mock<File> {
-                on { exists() } doReturn true
-            }
-            whenever(fileSystemRepository.getOfflineFolder()) doReturn offlineFolder
+            whenever(hasOfflineFilesUseCase()) doReturn true
+
             whenever(nodeRepository.getAllOfflineNodes()).thenReturn(emptyList())
 
             underTest()
@@ -75,11 +69,9 @@ internal class SyncOfflineFilesUseCaseTest {
         }
 
     @Test
-    fun `test that node information is removed if folder is empty`() = runTest {
-        val offlineFolder = mock<File> {
-            on { exists() } doReturn true
-        }
-        whenever(fileSystemRepository.getOfflineFolder()) doReturn offlineFolder
+    fun `test that node information is removed when folder is empty`() = runTest {
+        whenever(hasOfflineFilesUseCase()) doReturn true
+
         val offlineNodes = listOf(mock<OtherOfflineNodeInformation> {
             on { isFolder } doReturn true
             on { handle } doReturn "123"
@@ -100,10 +92,8 @@ internal class SyncOfflineFilesUseCaseTest {
 
     @Test
     fun `test that child folders are deleted first`() = runTest {
-        val offlineFolder = mock<File> {
-            on { exists() } doReturn true
-        }
-        whenever(fileSystemRepository.getOfflineFolder()) doReturn offlineFolder
+        whenever(hasOfflineFilesUseCase()) doReturn true
+
         val offlineNodes = listOf(mock<OtherOfflineNodeInformation> {
             on { isFolder } doReturn true
             on { handle } doReturn "123"
@@ -131,18 +121,28 @@ internal class SyncOfflineFilesUseCaseTest {
     }
 
     @Test
-    fun `test that offline database is cleared if offline directory doesn't exist but entries exists`() =
+    fun `test that offline is cleared when offline directory doesn't exist but database entries exists`() =
         runTest {
-            val offlineFolder = mock<File> {
-                on { exists() } doReturn false
-            }
-            whenever(fileSystemRepository.getOfflineFolder()) doReturn offlineFolder
+            whenever(hasOfflineFilesUseCase()) doReturn false
+
             val offlineNodes = listOf(mock<OtherOfflineNodeInformation> {
                 on { isFolder } doReturn true
                 on { handle } doReturn "123"
                 on { id } doReturn 1
             })
             whenever(nodeRepository.getAllOfflineNodes()).thenReturn(offlineNodes)
+
+            underTest()
+
+            verify(clearOfflineUseCase).invoke()
+        }
+
+    @Test
+    fun `test that offline is cleared when offline directory exists but database entries doesn't exists`() =
+        runTest {
+            whenever(hasOfflineFilesUseCase()) doReturn true
+
+            whenever(nodeRepository.getAllOfflineNodes()).thenReturn(emptyList())
 
             underTest()
 

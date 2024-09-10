@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase.offline
 
-import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
 
@@ -11,14 +10,15 @@ class SyncOfflineFilesUseCase @Inject constructor(
     private val clearOfflineUseCase: ClearOfflineUseCase,
     private val getOfflineFilesUseCase: GetOfflineFilesUseCase,
     private val nodeRepository: NodeRepository,
-    private val fileSystemRepository: FileSystemRepository,
+    private val hasOfflineFilesUseCase: HasOfflineFilesUseCase,
 ) {
     /**
      * Invoke
      */
     suspend operator fun invoke() {
         val offlineNodes = nodeRepository.getAllOfflineNodes()
-        if (fileSystemRepository.getOfflineFolder().exists() && offlineNodes.isNotEmpty()) {
+        val offlineFilesExist = hasOfflineFilesUseCase()
+        if (offlineFilesExist && offlineNodes.isNotEmpty()) {
             getOfflineFilesUseCase(offlineNodes)
                 .asSequence()
                 .partition { it.value.exists() }
@@ -41,7 +41,7 @@ class SyncOfflineFilesUseCase @Inject constructor(
                         }.takeIf { it.isNotEmpty() }
                         ?.let { nodeRepository.removeOfflineNodeByIds(it) }
                 }
-        } else if (offlineNodes.isNotEmpty()) {
+        } else if (offlineNodes.isNotEmpty() || offlineFilesExist) {
             clearOfflineUseCase()
         }
     }

@@ -38,16 +38,19 @@ class RemoveOfflineNodeUseCase @Inject constructor(
             if (parentId != -1) {
                 updateParentOfflineStatus(parentId)
             }
-            val path = when (it) {
-                is BackupsOfflineNodeInformation -> fileRepository.getOfflineBackupsPath()
-                else -> fileRepository.getOfflinePath()
-            }
-            deleteFileFromPath(path = "$path${it.path}${it.name}")
+            deleteFileByNode(it)
         }
     }
 
-    private suspend fun deleteFileFromPath(path: String) {
-        fileRepository.deleteFolderAndItsFiles(path)
+    private suspend fun deleteFileByNode(offlineNodeInformation: OfflineNodeInformation) {
+        with(offlineNodeInformation) {
+            val offlinePath = when (this) {
+                is BackupsOfflineNodeInformation -> fileRepository.getOfflineBackupsPath()
+                else -> fileRepository.getOfflinePath()
+            }
+            val filePath = "$offlinePath${path}${name}"
+            fileRepository.deleteFolderAndItsFiles(filePath)
+        }
     }
 
     private suspend fun deleteChildrenInDb(offlineInfoChildren: List<OfflineNodeInformation>?) {
@@ -62,9 +65,12 @@ class RemoveOfflineNodeUseCase @Inject constructor(
         }
     }
 
+    /**
+     * Delete empty parent folders recursively
+     */
     private suspend fun updateParentOfflineStatus(parentId: Int) {
         val siblings = nodeRepository.getOfflineNodesByParentId(parentId)
-        siblings?.let {
+        siblings.let {
             if (it.isNotEmpty()) {
                 return
             }
@@ -72,6 +78,7 @@ class RemoveOfflineNodeUseCase @Inject constructor(
             parentNode?.let { offlineInfo ->
                 val grandParentId = offlineInfo.parentId
                 nodeRepository.removeOfflineNodeById(parentId)
+                deleteFileByNode(offlineInfo)
                 updateParentOfflineStatus(grandParentId)
             }
         }
