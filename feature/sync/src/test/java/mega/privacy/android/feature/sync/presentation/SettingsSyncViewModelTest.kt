@@ -11,6 +11,8 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.ClearSyncDebrisUseC
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncDebrisSizeInBytesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSyncByWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.worker.GetSyncFrequencyUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.worker.SetSyncFrequencyUseCase
 import mega.privacy.android.feature.sync.ui.model.SyncFrequency
 import mega.privacy.android.feature.sync.ui.model.SyncOption
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncAction
@@ -41,6 +43,8 @@ class SettingsSyncViewModelTest {
     private val getSyncDebrisSizeUseCase: GetSyncDebrisSizeInBytesUseCase = mock()
     private val clearSyncDebrisUseCase: ClearSyncDebrisUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val getSyncFrequencyUseCase: GetSyncFrequencyUseCase = mock()
+    private val setSyncFrequencyUseCase: SetSyncFrequencyUseCase = mock()
 
     private lateinit var underTest: SettingsSyncViewModel
 
@@ -54,7 +58,15 @@ class SettingsSyncViewModelTest {
 
     @AfterEach
     fun tearDown() {
-        reset(monitorSyncByWiFiUseCase, setSyncByWiFiUseCase)
+        reset(
+            monitorSyncByWiFiUseCase,
+            setSyncByWiFiUseCase,
+            getSyncDebrisSizeUseCase,
+            clearSyncDebrisUseCase,
+            getFeatureFlagValueUseCase,
+            getSyncFrequencyUseCase,
+            setSyncFrequencyUseCase
+        )
     }
 
     @Test
@@ -134,30 +146,49 @@ class SettingsSyncViewModelTest {
     }
 
     @Test
-    fun `test that AndroidSyncWorkManager feature flag updates ui state upon viewmodel init`() =
+    fun `test that enabled AndroidSyncWorkManager feature flag shows frequency upon view model init`() =
         runTest {
             whenever(getFeatureFlagValueUseCase(SyncFeatures.AndroidSyncWorkManager)).thenReturn(
                 true
+            )
+            whenever(getSyncFrequencyUseCase()).thenReturn(15)
+
+            initViewModel()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.showSyncFrequency).isEqualTo(true)
+                assertThat(state.syncFrequency).isEqualTo(SyncFrequency.EVERY_15_MINUTES)
+            }
+        }
+
+    @Test
+    fun `test that disabled AndroidSyncWorkManager feature flag does not shows frequency`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(SyncFeatures.AndroidSyncWorkManager)).thenReturn(
+                false
             )
 
             initViewModel()
 
             underTest.uiState.test {
-                assertThat(awaitItem().showSyncFrequency).isEqualTo(true)
+                assertThat(awaitItem().showSyncFrequency).isEqualTo(false)
             }
         }
 
     @Test
-    fun `test that set frequency selected updates ui state`() = runTest {
-        val frequency = SyncFrequency.EVERY_30_MINUTES
-        initViewModel()
+    fun `test that set frequency selected updates ui state and invokes set frequency usecase`() =
+        runTest {
+            val frequency = SyncFrequency.EVERY_30_MINUTES
+            initViewModel()
 
-        underTest.handleAction(SettingsSyncAction.SyncFrequencySelected(frequency))
+            underTest.handleAction(SettingsSyncAction.SyncFrequencySelected(frequency))
 
-        underTest.uiState.test {
-            assertThat(awaitItem().syncFrequency).isEqualTo(frequency)
+            underTest.uiState.test {
+                assertThat(awaitItem().syncFrequency).isEqualTo(frequency)
+            }
+            verify(setSyncFrequencyUseCase).invoke(frequency.minutes)
         }
-    }
 
     private fun initViewModel() {
         underTest = SettingsSyncViewModel(
@@ -165,7 +196,9 @@ class SettingsSyncViewModelTest {
             setSyncByWiFiUseCase,
             getSyncDebrisSizeUseCase,
             clearSyncDebrisUseCase,
-            getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase,
+            getSyncFrequencyUseCase,
+            setSyncFrequencyUseCase
         )
     }
 }

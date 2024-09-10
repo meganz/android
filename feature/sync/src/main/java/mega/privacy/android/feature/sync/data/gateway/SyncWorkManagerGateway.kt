@@ -6,7 +6,7 @@ package mega.privacy.android.feature.sync.data.gateway
  */
 internal interface SyncWorkManagerGateway {
 
-    suspend fun enqueueSyncWorkerRequest()
+    suspend fun enqueueSyncWorkerRequest(frequencyInMinutes: Int)
 
     suspend fun cancelSyncWorkerRequest()
 }

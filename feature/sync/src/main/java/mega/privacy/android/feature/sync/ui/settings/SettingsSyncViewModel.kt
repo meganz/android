@@ -12,6 +12,9 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.ClearSyncDebrisUseC
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncDebrisSizeInBytesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSyncByWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.worker.GetSyncFrequencyUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.worker.SetSyncFrequencyUseCase
+import mega.privacy.android.feature.sync.ui.model.SyncFrequency
 import mega.privacy.android.feature.sync.ui.model.SyncOption
 import mega.privacy.android.shared.resources.R
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
@@ -25,6 +28,8 @@ internal class SettingsSyncViewModel @Inject constructor(
     private val getSyncDebrisSizeUseCase: GetSyncDebrisSizeInBytesUseCase,
     private val clearSyncDebrisUseCase: ClearSyncDebrisUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getSyncFrequencyUseCase: GetSyncFrequencyUseCase,
+    private val setSyncFrequencyUseCase: SetSyncFrequencyUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsSyncUiState())
@@ -45,14 +50,23 @@ internal class SettingsSyncViewModel @Inject constructor(
             }
         }
         fetchSyncDebris()
-        loadIsSyncFrequencyEnabled()
+        loadSyncFrequency()
     }
 
-    private fun loadIsSyncFrequencyEnabled() {
+    private fun loadSyncFrequency() {
         viewModelScope.launch {
             runCatching {
                 getFeatureFlagValueUseCase(SyncFeatures.AndroidSyncWorkManager)
             }.onSuccess { isSyncFrequencyEnabled ->
+                if (isSyncFrequencyEnabled) {
+                    runCatching {
+                        getSyncFrequencyUseCase()
+                    }.onSuccess { frequencyInMinutes ->
+                        _uiState.update {
+                            it.copy(syncFrequency = SyncFrequency.fromMinutes(frequencyInMinutes))
+                        }
+                    }
+                }
                 _uiState.update {
                     it.copy(showSyncFrequency = isSyncFrequencyEnabled)
                 }
@@ -77,6 +91,13 @@ internal class SettingsSyncViewModel @Inject constructor(
             }
 
             is SettingsSyncAction.SyncFrequencySelected -> {
+                viewModelScope.launch {
+                    runCatching {
+                        setSyncFrequencyUseCase(action.frequency.minutes)
+                    }.onFailure {
+                        Timber.e(it)
+                    }
+                }
                 _uiState.update {
                     it.copy(syncFrequency = action.frequency)
                 }

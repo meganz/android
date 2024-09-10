@@ -26,4 +26,8 @@ interface SyncPreferencesRepository {
     suspend fun deleteUserPausedSync(syncId: Long)
 
     suspend fun isSyncPausedByTheUser(syncId: Long): Boolean
+
+    suspend fun setSyncFrequencyInMinutes(frequencyInMinutes: Int)
+
+    suspend fun getSyncFrequencyMinutes(): Int
 }

@@ -11,4 +11,8 @@ internal interface SyncPreferencesDatastore {
     suspend fun setSyncOnlyByWiFi(checked: Boolean)
 
     fun monitorSyncOnlyByWiFi(): Flow<Boolean?>
+
+    suspend fun setSyncFrequencyInMinutes(frequencyInMinutes: Int)
+
+    suspend fun getSyncFrequencyMinutes(): Int?
 }

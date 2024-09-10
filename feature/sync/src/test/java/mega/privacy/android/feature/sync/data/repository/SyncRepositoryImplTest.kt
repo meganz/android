@@ -154,8 +154,11 @@ class SyncRepositoryImplTest {
 
     @Test
     fun `test that startSyncWorker invokes gateway enqueueSyncWorkerRequest method`() = runTest {
-        underTest.startSyncWorker()
-        verify(syncWorkManagerGateway).enqueueSyncWorkerRequest()
+        val frequency = 15
+
+        underTest.startSyncWorker(frequencyInMinutes = frequency)
+
+        verify(syncWorkManagerGateway).enqueueSyncWorkerRequest(frequency)
     }
 
     @Test

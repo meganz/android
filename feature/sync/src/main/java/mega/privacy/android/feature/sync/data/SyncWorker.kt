@@ -37,7 +37,7 @@ class SyncWorker @AssistedInject constructor(
             val syncs = monitorSyncsUseCase().first()
             Timber.d("SyncWorker syncs: $syncs")
             if (syncs.all { it.syncStatus == SyncStatus.SYNCED }) {
-                Timber.d("SyncWorker finished")
+                Timber.d("SyncWorker finished, syncs: $syncs")
                 return Result.success()
             }
         }

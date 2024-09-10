@@ -168,8 +168,8 @@ internal class SyncRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun startSyncWorker() {
-        syncWorkManagerGateway.enqueueSyncWorkerRequest()
+    override suspend fun startSyncWorker(frequencyInMinutes: Int) {
+        syncWorkManagerGateway.enqueueSyncWorkerRequest(frequencyInMinutes)
     }
 
     override suspend fun stopSyncWorker() {

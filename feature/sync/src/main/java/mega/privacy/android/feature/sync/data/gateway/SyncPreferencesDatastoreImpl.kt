@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -20,6 +21,7 @@ internal class SyncPreferencesDatastoreImpl @Inject constructor(
 
     private val onboardingShownKey = booleanPreferencesKey("onboardingShown")
     private val syncOnlyByWiFiKey = booleanPreferencesKey("syncOnlyByWiFi")
+    private val syncFrequencyKey = intPreferencesKey("syncFrequency")
 
     override suspend fun setOnboardingShown(shown: Boolean) {
         dataStore.edit {
@@ -38,6 +40,15 @@ internal class SyncPreferencesDatastoreImpl @Inject constructor(
 
     override fun monitorSyncOnlyByWiFi(): Flow<Boolean?> =
         dataStore.data.map { it[syncOnlyByWiFiKey] }
+
+    override suspend fun setSyncFrequencyInMinutes(frequencyInMinutes: Int) {
+        dataStore.edit {
+            it[syncFrequencyKey] = frequencyInMinutes
+        }
+    }
+
+    override suspend fun getSyncFrequencyMinutes(): Int? =
+        dataStore.data.map { it[syncFrequencyKey] }.first()
 }
 
 internal val Context.syncPrefsDataStore: DataStore<Preferences> by preferencesDataStore(

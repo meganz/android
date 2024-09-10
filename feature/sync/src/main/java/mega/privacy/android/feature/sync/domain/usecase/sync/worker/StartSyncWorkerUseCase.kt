@@ -8,9 +8,14 @@ import javax.inject.Inject
  */
 class StartSyncWorkerUseCase @Inject constructor(
     private val syncRepository: SyncRepository,
+    private val getSyncFrequencyUseCase: GetSyncFrequencyUseCase
 ) {
 
+    /**
+     * Start the sync worker which will sync the folders when the app is closed
+     */
     suspend operator fun invoke() {
-        syncRepository.startSyncWorker()
+        val syncFrequency = getSyncFrequencyUseCase()
+        syncRepository.startSyncWorker(syncFrequency)
     }
 }

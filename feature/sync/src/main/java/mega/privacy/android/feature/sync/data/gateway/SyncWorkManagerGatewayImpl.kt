@@ -18,13 +18,15 @@ internal class SyncWorkManagerGatewayImpl @Inject constructor(
     private val crashReporter: CrashReporter,
 ) : SyncWorkManagerGateway {
 
-    override suspend fun enqueueSyncWorkerRequest() {
+    override suspend fun enqueueSyncWorkerRequest(
+        frequencyInMinutes: Int
+    ) {
         workManager.debugWorkInfo(crashReporter)
 
         if (!(isWorkerEnqueuedOrRunning())) {
             val workRequest =
                 PeriodicWorkRequestBuilder<SyncWorker>(
-                    SYNC_WORKER_RUN_INTERVAL_IN_MINUTES,
+                    frequencyInMinutes.toLong(),
                     TimeUnit.MINUTES
                 )
                     .setConstraints(
@@ -40,7 +42,7 @@ internal class SyncWorkManagerGatewayImpl @Inject constructor(
                 ExistingPeriodicWorkPolicy.KEEP,
                 workRequest
             )
-            Timber.d("SyncWorker is enqueued")
+            Timber.d("SyncWorker is enqueued with frequency: $frequencyInMinutes minutes")
         } else {
             Timber.d("SyncWorker is already running, cannot proceed with additional enqueue request")
         }
@@ -58,9 +60,5 @@ internal class SyncWorkManagerGatewayImpl @Inject constructor(
             ?.map { workInfo -> workInfo.state == WorkInfo.State.ENQUEUED || workInfo.state == WorkInfo.State.RUNNING }
             ?.contains(true)
             ?: false
-    }
-
-    private companion object {
-        const val SYNC_WORKER_RUN_INTERVAL_IN_MINUTES = 15L
     }
 }

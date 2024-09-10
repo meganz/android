@@ -10,4 +10,11 @@ enum class SyncFrequency(val minutes: Int) {
     EVERY_30_MINUTES(30),
     EVERY_45_MINUTES(45),
     EVERY_HOUR(60);
+
+    companion object {
+        /**
+         * Get the SyncFrequency from the minutes
+         */
+        fun fromMinutes(minutes: Int) = entries.first { it.minutes == minutes }
+    }
 }

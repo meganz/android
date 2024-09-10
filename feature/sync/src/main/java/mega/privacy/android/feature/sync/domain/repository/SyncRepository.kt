@@ -84,9 +84,12 @@ interface SyncRepository {
     suspend fun tryNodeSync(nodeId: NodeId)
 
     /**
-     * Starts the sync worker that will sync folders when the app is closed
+     * Starts a periodic sync worker that will sync folders when the app is closed
+     * with specified frequency
+     *
+     * @param frequencyInMinutes The frequency in minutes to run the sync worker
      */
-    suspend fun startSyncWorker()
+    suspend fun startSyncWorker(frequencyInMinutes: Int)
 
     /**
      * Stops the sync worker
