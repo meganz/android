@@ -121,7 +121,7 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     init {
         //pause transfers if db indicates it should be paused
-        scope.launch {
+        scope.launch(ioDispatcher) {
             if (localStorageGateway.getTransferQueueStatus()) {
                 pauseTransfers(true)
             }
