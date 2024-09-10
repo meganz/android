@@ -1,6 +1,7 @@
 package mega.privacy.android.shared.original.core.ui.controls.appbar
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -25,12 +26,15 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.menus.MenuActions
 import mega.privacy.android.shared.original.core.ui.controls.text.MarqueeText
@@ -279,11 +284,22 @@ internal fun BaseMegaAppBar(
     enabled: Boolean = true,
     elevation: Dp = LocalMegaAppBarElevation.current,
 ) {
+    val backgroundColor by animateColorAsState(targetValue =
+        (if (elevation == 0.dp) MegaOriginalTheme.colors.background.pageBackground else MegaOriginalTheme.colors.background.surface1)
+            .copy(LocalMegaAppBarColors.current.backgroundAlpha))
+    //set the status bar color to match toolbar color
+    if (!LocalView.current.isInEditMode) {
+        val systemUiController = rememberSystemUiController()
+        DisposableEffect(systemUiController, backgroundColor) {
+            systemUiController.setStatusBarColor(
+                color = backgroundColor, darkIcons = systemUiController.statusBarDarkContentEnabled
+            )
+            onDispose { }
+        }
+    }
     TopAppBar(
         title = titleAndSubtitle,
-        backgroundColor = MegaOriginalTheme.colors.background.pageBackground.copy(
-            LocalMegaAppBarColors.current.backgroundAlpha
-        ),
+        backgroundColor = backgroundColor,
         modifier = modifier.testTag(TEST_TAG_APP_BAR),
         navigationIcon = appBarType.takeIf { it != AppBarType.NONE }?.composeLet {
             Box {
