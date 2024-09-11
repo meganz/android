@@ -92,9 +92,12 @@ class SyncWorkerTest {
             1, "first", "first", RemoteFolder(1232L, "first"), SyncStatus.SYNCED
         )
         val secondSync = FolderPair(
-            2, "second", "second", RemoteFolder(1232L, "second"), SyncStatus.SYNCED
+            2, "second", "second", RemoteFolder(2222L, "second"), SyncStatus.SYNCED
         )
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(firstSync, secondSync)))
+        val thirdSync = FolderPair(
+            3, "third", "third", RemoteFolder(3333L, "third"), SyncStatus.PAUSED
+        )
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(firstSync, secondSync, thirdSync)))
 
         val result = underTest.doWork()
 

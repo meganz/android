@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.data.repository
 
+import androidx.work.NetworkType
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,6 +19,7 @@ import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncWorkManagerGateway
 import mega.privacy.android.feature.sync.data.mapper.FolderPairMapper
+import mega.privacy.android.feature.sync.data.mapper.SyncByWifiToNetworkTypeMapper
 import mega.privacy.android.feature.sync.data.mapper.stalledissue.StalledIssueTypeMapper
 import mega.privacy.android.feature.sync.data.mapper.stalledissue.StalledIssuesMapper
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
@@ -55,6 +57,7 @@ class SyncRepositoryImplTest {
     private val scheduler = TestCoroutineScheduler()
     private val unconfinedTestDispatcher = UnconfinedTestDispatcher(scheduler)
     private val testScope = CoroutineScope(unconfinedTestDispatcher)
+    private val syncByWifiToNetworkTypeMapper: SyncByWifiToNetworkTypeMapper = mock()
 
 
     @BeforeAll
@@ -70,6 +73,7 @@ class SyncRepositoryImplTest {
             ioDispatcher = unconfinedTestDispatcher,
             syncErrorMapper = syncErrorMapper,
             syncWorkManagerGateway = syncWorkManagerGateway,
+            syncByWifiToNetworkTypeMapper = syncByWifiToNetworkTypeMapper,
             appScope = testScope,
         )
     }
@@ -155,10 +159,11 @@ class SyncRepositoryImplTest {
     @Test
     fun `test that startSyncWorker invokes gateway enqueueSyncWorkerRequest method`() = runTest {
         val frequency = 15
+        whenever(syncByWifiToNetworkTypeMapper(true)).thenReturn(NetworkType.UNMETERED)
 
-        underTest.startSyncWorker(frequencyInMinutes = frequency)
+        underTest.startSyncWorker(frequencyInMinutes = frequency, true)
 
-        verify(syncWorkManagerGateway).enqueueSyncWorkerRequest(frequency)
+        verify(syncWorkManagerGateway).enqueueSyncWorkerRequest(frequency, NetworkType.UNMETERED)
     }
 
     @Test

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
+import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import timber.log.Timber
@@ -36,11 +37,15 @@ class SyncWorker @AssistedInject constructor(
             delay(SYNC_WORKER_RECHECK_DELAY)
             val syncs = monitorSyncsUseCase().first()
             Timber.d("SyncWorker syncs: $syncs")
-            if (syncs.all { it.syncStatus == SyncStatus.SYNCED }) {
+            if (isSyncingCompleted(syncs)) {
                 Timber.d("SyncWorker finished, syncs: $syncs")
                 return Result.success()
             }
         }
+    }
+
+    private fun isSyncingCompleted(syncs: List<FolderPair>): Boolean {
+        return syncs.all { it.syncStatus == SyncStatus.SYNCED || it.syncStatus == SyncStatus.PAUSED }
     }
 
     companion object {

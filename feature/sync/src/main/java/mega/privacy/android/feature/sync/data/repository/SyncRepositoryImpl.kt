@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.data.repository
 
+import androidx.work.NetworkType
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +26,7 @@ import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncWorkManagerGateway
 import mega.privacy.android.feature.sync.data.mapper.FolderPairMapper
+import mega.privacy.android.feature.sync.data.mapper.SyncByWifiToNetworkTypeMapper
 import mega.privacy.android.feature.sync.data.mapper.stalledissue.StalledIssuesMapper
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
@@ -43,6 +45,7 @@ internal class SyncRepositoryImpl @Inject constructor(
     private val folderPairMapper: FolderPairMapper,
     private val stalledIssuesMapper: StalledIssuesMapper,
     private val syncErrorMapper: SyncErrorMapper,
+    private val syncByWifiToNetworkTypeMapper: SyncByWifiToNetworkTypeMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val appScope: CoroutineScope,
 ) : SyncRepository {
@@ -168,8 +171,9 @@ internal class SyncRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun startSyncWorker(frequencyInMinutes: Int) {
-        syncWorkManagerGateway.enqueueSyncWorkerRequest(frequencyInMinutes)
+    override suspend fun startSyncWorker(frequencyInMinutes: Int, wifiOnly: Boolean) {
+        val networkType = syncByWifiToNetworkTypeMapper(wifiOnly)
+        syncWorkManagerGateway.enqueueSyncWorkerRequest(frequencyInMinutes, networkType)
     }
 
     override suspend fun stopSyncWorker() {

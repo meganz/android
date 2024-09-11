@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.sync.domain.usecase.sync.worker
 
+import kotlinx.coroutines.flow.first
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import javax.inject.Inject
 
 /**
@@ -8,7 +10,8 @@ import javax.inject.Inject
  */
 class StartSyncWorkerUseCase @Inject constructor(
     private val syncRepository: SyncRepository,
-    private val getSyncFrequencyUseCase: GetSyncFrequencyUseCase
+    private val getSyncFrequencyUseCase: GetSyncFrequencyUseCase,
+    private val getSyncByWiFiUseCase: MonitorSyncByWiFiUseCase
 ) {
 
     /**
@@ -16,6 +19,7 @@ class StartSyncWorkerUseCase @Inject constructor(
      */
     suspend operator fun invoke() {
         val syncFrequency = getSyncFrequencyUseCase()
-        syncRepository.startSyncWorker(syncFrequency)
+        val syncByWifi = getSyncByWiFiUseCase().first()
+        syncRepository.startSyncWorker(syncFrequency, syncByWifi)
     }
 }

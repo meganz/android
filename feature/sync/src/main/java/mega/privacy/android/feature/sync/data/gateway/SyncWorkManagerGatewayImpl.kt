@@ -19,7 +19,8 @@ internal class SyncWorkManagerGatewayImpl @Inject constructor(
 ) : SyncWorkManagerGateway {
 
     override suspend fun enqueueSyncWorkerRequest(
-        frequencyInMinutes: Int
+        frequencyInMinutes: Int,
+        networkType: NetworkType,
     ) {
         workManager.debugWorkInfo(crashReporter)
 
@@ -31,7 +32,7 @@ internal class SyncWorkManagerGatewayImpl @Inject constructor(
                 )
                     .setConstraints(
                         Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED)
+                            .setRequiredNetworkType(networkType)
                             .setRequiresBatteryNotLow(true)
                             .build()
                     )

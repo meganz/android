@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.Configuration
+import androidx.work.NetworkType
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.impl.utils.SynchronousExecutor
@@ -50,7 +51,10 @@ class SyncWorkManagerGatewayImplTest {
     @Test
     fun `test that gateway starts and cancels sync worker`() =
         runTest {
-            underTest.enqueueSyncWorkerRequest(frequencyInMinutes = 15)
+            underTest.enqueueSyncWorkerRequest(
+                frequencyInMinutes = 15,
+                networkType = NetworkType.UNMETERED
+            )
 
             val syncWorker = workManager.getWorkInfosByTagFlow(SyncWorker.SYNC_WORKER_TAG)
             syncWorker.test {

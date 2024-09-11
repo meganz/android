@@ -88,8 +88,9 @@ interface SyncRepository {
      * with specified frequency
      *
      * @param frequencyInMinutes The frequency in minutes to run the sync worker
+     * @param wifiOnly If the sync should be done only when connected to WiFi
      */
-    suspend fun startSyncWorker(frequencyInMinutes: Int)
+    suspend fun startSyncWorker(frequencyInMinutes: Int, wifiOnly: Boolean)
 
     /**
      * Stops the sync worker
