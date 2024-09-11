@@ -669,7 +669,7 @@
     <!--Subtitle text from Meeting screen empty view-->
     <string name="meeting_recent_list_empty_subtitle">Uw vergaderingen, familiegesprekken en privégesprekken worden beschermd door onze zero-knowledge codering. [A]Meer informatie[/A]</string>
     <!--Warning message to inform the user the minimum number of characters to enter into the edit text field for the survey-->
-    <string name="account_cancel_subscription_survey_minimum_character_limit">Message must be at least 10 characters</string>
+    <string name="account_cancel_subscription_survey_minimum_character_limit">Het bericht moet minstens 10 tekens lang zijn</string>
     <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
     <string name="account_cancel_subscription_survey_enter_details">Voer details in</string>
     <!-- the bonus title of join without account on left meeting page-->

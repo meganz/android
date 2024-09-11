@@ -153,7 +153,7 @@
     <!-- Duration filter title of the video section  -->
     <string name="video_section_videos_duration_filter_title">ระยะเวลา</string>
     <!-- All Duration option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_all_duration">\’ระยะเวลาทั้งหมด</string>
+    <string name="video_section_videos_duration_option_all_duration">ระยะเวลาทั้งหมด</string>
     <!-- Less than 10 seconds option of the video section duration filter  -->
     <string name="video_section_videos_duration_option_less_than_10_seconds">น้อยกว่า 10 วินาที</string>
     <!-- Between 10 and 60 seconds option of the video section duration filter  -->

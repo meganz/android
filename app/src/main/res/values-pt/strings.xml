@@ -397,7 +397,7 @@
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Item movido</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Item movido para a lixeira</string>
+    <string name="context_correctly_moved_to_rubbish">Item movido para a Lixeira</string>
     <!-- error message -->
     <string name="context_no_moved">Erro. Não foi movido</string>
     <!-- success message when sharing a folder -->
@@ -3369,7 +3369,7 @@
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Você está a ponto de excluir a sua pasta de backup. Ao fazer isso, serão removidos todos os backups que você configurou. Você tem certeza de que quer fazer isso?</string>
     <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_folder_title">Mover “%1s” à Lixeira</string>
+    <string name="backup_remove_folder_title">Mover “%1s” para a Lixeira</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Somente leitura</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
