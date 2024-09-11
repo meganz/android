@@ -23,11 +23,10 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
+import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.attacher.MegaAttacher
-import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -99,12 +98,17 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     private val waitingRoomManagementViewModel by viewModels<WaitingRoomManagementViewModel>()
 
     private lateinit var addContactLauncher: ActivityResultLauncher<Intent>
-    private lateinit var sendToChatLauncher: ActivityResultLauncher<Unit?>
+    private val sendToChatLauncher = registerForActivityResult(SendToChatActivityContract()) {
+        if (it != null) {
+            viewModel.sendToChat(
+                data = it,
+                link = scheduledMeetingManagementViewModel.state.value.meetingLink
+            )
+        }
+    }
     private lateinit var editSchedMeetLauncher: ActivityResultLauncher<Intent>
 
     private var bottomSheetDialogFragment: BaseBottomSheetDialogFragment? = null
-
-    private var nodeAttacher: MegaAttacher? = null
 
     private var forceAppUpdateDialog: AlertDialog? = null
 
@@ -142,14 +146,6 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                 }
             }
 
-        sendToChatLauncher = registerForActivityResult(ChatExplorerActivityContract()) { data ->
-            if (data != null) {
-                scheduledMeetingManagementViewModel.sendToChat(data) { intent ->
-                    handleActivityResult(intent)
-                }
-            }
-        }
-
         editSchedMeetLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
@@ -183,6 +179,19 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             }
         }
 
+        collectFlow(viewModel.sendLinkToChatResult) {
+            it?.let { sendLinkToChatResult ->
+                showSnackbarWithChat(
+                    resources.getQuantityString(
+                        R.plurals.links_sent,
+                        1
+                    ),
+                    sendLinkToChatResult.chatId
+                )
+                viewModel.onShareLinkResultHandled()
+            }
+        }
+
         collectFlow(viewModel.uiState) { state ->
             if (state.finish) {
                 Timber.d("Finish activity")
@@ -197,7 +206,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
 
             if (state.openSendToChat) {
                 viewModel.openSendToChat(false)
-                sendToChatLauncher.launch(Unit)
+                sendToChatLauncher.launch(longArrayOf())
             }
 
             state.showChangePermissionsDialog?.let {
@@ -259,21 +268,6 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             viewModel.onForceUpdateDialogDismissed()
         }
         forceAppUpdateDialog?.show()
-    }
-
-    /**
-     * Finishes the send to chat action.
-     *
-     * @param data Intent containing the info to send.
-     */
-    private fun handleActivityResult(data: Intent?) {
-        nodeAttacher = MegaAttacher(this as ActivityLauncher)
-        nodeAttacher?.handleActivityResult(
-            Constants.REQUEST_CODE_SELECT_CHAT,
-            RESULT_OK,
-            data,
-            this@ScheduledMeetingInfoActivity as SnackbarShower
-        )
     }
 
     /**
@@ -570,14 +564,6 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                 viewModel.setWaitingRoom()
             }
         }
-    }
-
-    /**
-     * onDestroy
-     */
-    override fun onDestroy() {
-        nodeAttacher = null
-        super.onDestroy()
     }
 
     companion object {

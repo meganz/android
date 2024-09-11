@@ -40,8 +40,8 @@ abstract class BaseLinkViewModel(
     fun sendToChat(
         data: SendToChatResult,
         link: String?,
-        key: String?,
-        password: String?,
+        key: String? = null,
+        password: String? = null,
     ) {
         link?.let {
             sendToChat(data, listOf(it), key, password)

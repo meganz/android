@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
@@ -19,6 +18,7 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.getLink.BaseLinkViewModel
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
@@ -52,10 +52,12 @@ import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
+import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithEmailUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
@@ -135,7 +137,9 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
-) : ViewModel() {
+    get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
+    sendTextMessageUseCase: SendTextMessageUseCase,
+) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
 
     private val _uiState = MutableStateFlow(ScheduledMeetingInfoUiState())
     val uiState = _uiState.asStateFlow()

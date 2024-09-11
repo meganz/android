@@ -61,8 +61,6 @@ public class Constants {
     public static final String ACTION_SHOW_WARNING_ACCOUNT_BLOCKED = "ACTION_SHOW_WARNING_ACCOUNT_BLOCKED";
 
     public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
-    public static final String EXTRA_LINK = "EXTRA_LINK";
-    public static final String EXTRA_SEVERAL_LINKS = "EXTRA_SEVERAL_LINKS";
     public static final String EXTRA_KEY = "EXTRA_KEY";
     public static final String EXTRA_PASSWORD = "EXTRA_PASSWORD";
 

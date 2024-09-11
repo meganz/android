@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.meeting
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -734,21 +733,6 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
                     }
                 }
         }
-
-
-    /**
-     * Shares the link to chat
-     *
-     * @param data       Intent containing the info to share the content to chats.
-     * @param action     Action to perform.
-     */
-    fun sendToChat(
-        data: Intent?,
-        action: (Intent?) -> Unit,
-    ) {
-        data?.putExtra(Constants.EXTRA_LINK, _state.value.meetingLink)
-        action.invoke(data)
-    }
 
     /**
      * Copy meeting link to clipboard

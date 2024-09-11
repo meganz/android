@@ -3,7 +3,6 @@ package mega.privacy.android.app.components.attacher
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextUtils
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.notification.getMonitorStorageStateEvent
@@ -17,10 +16,6 @@ import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.AlertsAndWarnings
-import mega.privacy.android.app.utils.Constants.EXTRA_KEY
-import mega.privacy.android.app.utils.Constants.EXTRA_LINK
-import mega.privacy.android.app.utils.Constants.EXTRA_PASSWORD
-import mega.privacy.android.app.utils.Constants.EXTRA_SEVERAL_LINKS
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT
 import mega.privacy.android.app.utils.Constants.SELECTED_CHATS
@@ -114,10 +109,6 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
 
         val nodeHandlesToAttach = data.getLongArrayExtra(NODE_HANDLES)
         val contactHandlesToAttach = data.getLongArrayExtra(USER_HANDLES)
-        val severalLinksToAttach = data.getStringArrayListExtra(EXTRA_SEVERAL_LINKS)
-        val linkToAttach = data.getStringExtra(EXTRA_LINK)
-        val linkKey = data.getStringExtra(EXTRA_KEY)
-        val linkPassword = data.getStringExtra(EXTRA_PASSWORD)
 
         processContactsAndChats(chatIds, contactEmails) { managedChatIds ->
             if (managedChatIds.isEmpty()) {
@@ -134,21 +125,11 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
                 nodeHandlesToAttach != null && nodeHandlesToAttach.isNotEmpty() -> {
                     attachNodesToChats(nodeHandlesToAttach, managedChatIds, snackbarShower)
                 }
+
                 contactHandlesToAttach != null && contactHandlesToAttach.isNotEmpty() -> {
                     attachContactsToChats(contactHandlesToAttach, managedChatIds, snackbarShower)
                 }
-                !linkToAttach.isNullOrEmpty() -> {
-                    attachLinkToChats(
-                        linkToAttach,
-                        linkKey,
-                        linkPassword,
-                        managedChatIds,
-                        snackbarShower
-                    )
-                }
-                !severalLinksToAttach.isNullOrEmpty() -> {
-                    attachSeveralLinksToChats(severalLinksToAttach, managedChatIds, snackbarShower)
-                }
+
                 else -> {
                     attaching = false
                 }
@@ -182,6 +163,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
                     )
                 )
             }
+
             contactHandles != null && contactHandles.isNotEmpty() -> {
                 snackbarShower.showSnackbar(
                     app.resources.getQuantityString(
@@ -424,59 +406,6 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
 
         snackbarShower.showSnackbarWithChat(
             null, if (chatIds.size == 1) chatIds[0] else MEGACHAT_INVALID_HANDLE
-        )
-    }
-
-    private fun attachLinkToChats(
-        link: String,
-        key: String?,
-        password: String?,
-        chatIds: List<Long>,
-        snackbarShower: SnackbarShower,
-    ) {
-        for (chatId in chatIds) {
-            megaChatApi.sendMessage(chatId, link)
-            if (!TextUtils.isEmpty(key)) {
-                megaChatApi.sendMessage(chatId, key)
-            } else if (!TextUtils.isEmpty(password)) {
-                megaChatApi.sendMessage(chatId, password)
-            }
-        }
-
-        val message = if (!TextUtils.isEmpty(key)) {
-            app.getString(R.string.link_and_key_sent)
-        } else if (!TextUtils.isEmpty(password)) {
-            app.getString(R.string.link_and_password_sent)
-        } else {
-            app.resources.getQuantityString(R.plurals.links_sent, 1)
-        }
-
-        snackbarShower.showSnackbarWithChat(
-            message, if (chatIds.size == 1) chatIds[0] else MEGACHAT_INVALID_HANDLE
-        )
-    }
-
-    /**
-     * Attach several links to a list of chats.
-     *
-     * @param links          List of links to be attached.
-     * @param chatIds        List of chat identifiers to attach the links.
-     * @param snackbarShower Callback to show Snackbars.
-     */
-    private fun attachSeveralLinksToChats(
-        links: List<String>,
-        chatIds: List<Long>,
-        snackbarShower: SnackbarShower,
-    ) {
-        for (chatId in chatIds) {
-            for (link in links) {
-                megaChatApi.sendMessage(chatId, link)
-            }
-        }
-
-        snackbarShower.showSnackbarWithChat(
-            app.resources.getQuantityString(R.plurals.links_sent, links.size),
-            if (chatIds.size == 1) chatIds[0] else MEGACHAT_INVALID_HANDLE
         )
     }
 
