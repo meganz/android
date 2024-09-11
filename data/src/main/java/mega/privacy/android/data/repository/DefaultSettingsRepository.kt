@@ -3,14 +3,12 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
@@ -46,7 +44,6 @@ import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_VA
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.exception.SettingNotFoundException
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SettingsRepository
 import nz.mega.sdk.MegaApiJava
@@ -77,7 +74,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property uiPreferencesGateway [UIPreferencesGateway]
  * @property startScreenMapper [StartScreenMapper]
  * @property fileManagementPreferencesGateway [FileManagementPreferencesGateway]
- * @property appScope [CoroutineScope]
  */
 @ExperimentalContracts
 internal class DefaultSettingsRepository @Inject constructor(
@@ -93,28 +89,11 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val uiPreferencesGateway: UIPreferencesGateway,
     private val startScreenMapper: StartScreenMapper,
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
-    @ApplicationScope private val appScope: CoroutineScope,
 ) : SettingsRepository {
     private val showHiddenNodesFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     @Volatile
     private var isShowHiddenNodesPopulated: Boolean = false
-
-    init {
-        appScope.launch {
-            initialisePreferences()
-        }
-    }
-
-    private suspend fun initialisePreferences() {
-        if (databaseHandler.preferences == null) {
-            Timber.w("databaseHandler.preferences is NULL")
-            databaseHandler.setStorageAskAlways(true)
-            val defaultDownloadLocation = fileGateway.buildDefaultDownloadDir()
-            defaultDownloadLocation.mkdirs()
-            databaseHandler.setStorageDownloadLocation(defaultDownloadLocation.absolutePath)
-        }
-    }
 
     override suspend fun isPasscodeLockPreferenceEnabled() =
         withContext(ioDispatcher) {
