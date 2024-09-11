@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
 import mega.privacy.android.shared.resources.R as sharedR
+import android.icu.text.BreakIterator
 import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -117,13 +118,26 @@ fun FileInfoDescriptionField(
                     modifier = Modifier
                         .padding(top = 8.dp)
                         .align(Alignment.End),
-                    text = "${description.length}/$descriptionLimit",
+                    text = "${countGraphemeClusters(description)}/$descriptionLimit",
                     textColor = TextColor.Primary,
                     style = MaterialTheme.typography.caption,
                 )
             }
         }
     }
+}
+
+/**
+ * Count composed emotes correctly
+ */
+fun countGraphemeClusters(text: String): Int {
+    val breakIterator = BreakIterator.getCharacterInstance()
+    breakIterator.setText(text)
+    var count = 0
+    while (breakIterator.next() != BreakIterator.DONE) {
+        count++
+    }
+    return count
 }
 
 private const val DESCRIPTION_LIMIT = 300
