@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.main.InvitationContactInfo
+import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_LETTER_HEADER
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL_INPUT_EMAIL
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT_HEADER
@@ -95,7 +96,7 @@ class InviteContactViewModel @Inject constructor(
                     it.copy(
                         isLoading = false,
                         areContactsInitialized = true,
-                        filteredContacts = invitationContactInfo
+                        filteredContacts = allContacts
                     )
                 }
             }.onFailure { throwable ->
@@ -153,34 +154,58 @@ class InviteContactViewModel @Inject constructor(
 
             val phoneContacts: MutableList<InvitationContactInfo> = mutableListOf()
             allContacts.forEach { invitationContactInfo ->
-                val type = invitationContactInfo.type
-                val name = invitationContactInfo.getContactName().lowercase()
-                val nameWithoutSpace = name.replace(regex = "\\s".toRegex(), replacement = "")
-                val displayLabel = invitationContactInfo
-                    .displayInfo
-                    .lowercase()
-                    .replace(
-                        regex = "\\s".toRegex(),
-                        replacement = ""
-                    )
+                if (invitationContactInfo.type == TYPE_PHONE_CONTACT) {
+                    val type = invitationContactInfo.type
+                    val name = invitationContactInfo.getContactName().lowercase()
+                    val nameWithoutSpace = name.replace(regex = "\\s".toRegex(), replacement = "")
+                    val displayLabel = invitationContactInfo
+                        .displayInfo
+                        .lowercase()
+                        .replace(
+                            regex = "\\s".toRegex(),
+                            replacement = ""
+                        )
 
-                if (
-                    isAPhoneContact(query.lowercase(), type, name, displayLabel, nameWithoutSpace)
-                ) {
-                    phoneContacts.add(invitationContactInfo)
+                    if (isAPhoneContact(
+                            query.lowercase(),
+                            type,
+                            name,
+                            displayLabel,
+                            nameWithoutSpace
+                        )
+                    ) {
+                        phoneContacts.add(invitationContactInfo)
+                    }
                 }
             }
 
-            _uiState.update {
-                val newFilteredContacts = if (phoneContacts.isNotEmpty()) {
+            val newFilteredContacts = if (phoneContacts.isNotEmpty()) {
+                val result = phoneContacts.groupBy { contact ->
+                    when {
+                        contact.name.isEmpty() -> "..."
+                        contact.name[0].isLetter() -> contact.name[0].uppercase()
+                        else -> "..."
+                    }
+                }.toSortedMap(compareBy { if (it == "...") "zzz" else it }).flatMap {
                     listOf(
-                        // Header
+                        // Letter Header
                         InvitationContactInfo(
-                            id = ID_PHONE_CONTACTS_HEADER,
-                            type = TYPE_PHONE_CONTACT_HEADER
+                            id = it.key.hashCode().toLong(),
+                            type = TYPE_LETTER_HEADER,
+                            displayInfo = it.key
                         )
-                    ).plus(phoneContacts)
-                } else emptyList()
+                    ).plus(it.value)
+                }
+                listOf(
+                    // Header
+                    InvitationContactInfo(
+                        id = ID_PHONE_CONTACTS_HEADER,
+                        type = TYPE_PHONE_CONTACT_HEADER
+                    )
+                ).plus(result)
+            } else emptyList()
+
+            _uiState.update {
                 it.copy(filteredContacts = newFilteredContacts)
             }
         }

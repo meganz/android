@@ -44,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -78,6 +79,7 @@ import coil.compose.AsyncImage
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.InvitationContactInfo
+import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_LETTER_HEADER
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL_INPUT_EMAIL
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL_INPUT_PHONE
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT
@@ -499,7 +501,7 @@ private fun SelectedContactView(
 ) {
     val scrollState = rememberScrollState()
 
-    var lastItemSize by remember { mutableStateOf(contactNames.size) }
+    var lastItemSize by remember { mutableIntStateOf(contactNames.size) }
     LaunchedEffect(contactNames.size) {
         // Only scroll if the user add new contact.
         if (contactNames.size > lastItemSize) {
@@ -670,6 +672,17 @@ private fun ContactListBody(
             when (item.type) {
                 TYPE_PHONE_CONTACT_HEADER -> {
                     PhoneContactsHeader(modifier = Modifier.fillMaxWidth())
+                }
+
+                TYPE_LETTER_HEADER -> {
+                    MegaText(
+                        modifier = modifier
+                            .padding(top = 10.dp, bottom = 10.dp, start = 16.dp)
+                            .testTag(PHONE_CONTACTS_HEADER_TEXT_TAG),
+                        text = item.displayInfo,
+                        textColor = TextColor.Primary,
+                        style = MaterialTheme.typography.subtitle1
+                    )
                 }
 
                 TYPE_PHONE_CONTACT -> {

@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_LETTER_HEADER
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL_INPUT_EMAIL
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_MANUAL_INPUT_PHONE
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT
@@ -24,12 +25,12 @@ import mega.privacy.android.domain.entity.contacts.EmailInvitationsInputValidity
 import mega.privacy.android.domain.entity.contacts.EmailInvitationsInputValidity.Valid
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.LocalContact
+import mega.privacy.android.domain.usecase.call.AreThereOngoingVideoCallsUseCase
 import mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithEmailsUseCase
 import mega.privacy.android.domain.usecase.contact.ValidateEmailInputForInvitationUseCase
-import mega.privacy.android.domain.usecase.call.AreThereOngoingVideoCallsUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -125,7 +126,8 @@ class InviteContactViewModelTest {
     @Test
     fun `test that filtered contacts list should be initialized when given a contact list`() =
         runTest {
-            val localContacts = listOf(LocalContact(id = 1L))
+            val localContacts =
+                listOf(LocalContact(id = 1L, phoneNumbers = listOf("email@email.com")))
 
             initializeContacts { localContacts }
 
@@ -147,16 +149,19 @@ class InviteContactViewModelTest {
         initializeContacts { localContacts }
         val mappedContacts = invitationContactInfoUiMapper(localContacts)
 
-        underTest.toggleContactHighlightedInfo(mappedContacts[1].copy(isHighlighted = true))
-        underTest.toggleContactHighlightedInfo(mappedContacts[2])
+        underTest.toggleContactHighlightedInfo(mappedContacts[4].copy(isHighlighted = true))
+        underTest.toggleContactHighlightedInfo(mappedContacts[4])
 
         val expected = listOf(
             mappedContacts[0], // Header item
-            mappedContacts[1].copy(isHighlighted = false),
-            mappedContacts[2].copy(isHighlighted = true)
+            mappedContacts[1],// Letter Header
+            mappedContacts[2].copy(isHighlighted = false),
+            mappedContacts[3],
+            mappedContacts[4].copy(isHighlighted = true)
         )
         underTest.uiState.test {
-            assertThat(expectMostRecentItem().filteredContacts).isEqualTo(expected)
+            val filteredContacts = awaitItem().filteredContacts
+            assertThat(filteredContacts).isEqualTo(expected)
         }
         assertThat(underTest.allContacts).isEqualTo(expected)
     }
@@ -170,13 +175,15 @@ class InviteContactViewModelTest {
         initializeContacts { localContacts }
         val mappedContacts = invitationContactInfoUiMapper(localContacts)
 
-        underTest.toggleContactHighlightedInfo(mappedContacts[1], true)
-        underTest.toggleContactHighlightedInfo(mappedContacts[2].copy(isHighlighted = true), false)
+        underTest.toggleContactHighlightedInfo(mappedContacts[2], true)
+        underTest.toggleContactHighlightedInfo(mappedContacts[4].copy(isHighlighted = true), false)
 
         val expected = listOf(
             mappedContacts[0], // Header item
-            mappedContacts[1].copy(isHighlighted = true),
-            mappedContacts[2].copy(isHighlighted = false)
+            mappedContacts[1],// Letter Header
+            mappedContacts[2].copy(isHighlighted = true),
+            mappedContacts[3],// Letter Header
+            mappedContacts[4].copy(isHighlighted = false)
         )
         underTest.uiState.test {
             assertThat(expectMostRecentItem().filteredContacts).isEqualTo(expected)
@@ -245,9 +252,10 @@ class InviteContactViewModelTest {
 
             underTest.uiState.test {
                 val expected = invitationContactInfoUiMapper(localContacts).filterNot {
-                    it.name == localContacts[2].name
+                    it.name == localContacts[2].name || it.displayInfo == localContacts[2].name[0].uppercase()
                 }
-                assertThat(expectMostRecentItem().filteredContacts).isEqualTo(expected)
+                val actual = expectMostRecentItem().filteredContacts
+                assertThat(actual).isEqualTo(expected)
             }
         }
 
@@ -272,11 +280,11 @@ class InviteContactViewModelTest {
         initializeContacts { localContacts }
 
         underTest.uiState.test {
-            val expected = mutableListOf<InvitationContactInfo>()
+            val contacts = mutableListOf<InvitationContactInfo>()
             localContacts.forEach {
                 val phoneNumberList = it.phoneNumbers + it.emails
                 if (phoneNumberList.isNotEmpty()) {
-                    expected.add(
+                    contacts.add(
                         InvitationContactInfo(
                             id = it.id,
                             name = it.name,
@@ -286,6 +294,22 @@ class InviteContactViewModelTest {
                         )
                     )
                 }
+            }
+            val expected = contacts.groupBy { contact ->
+                when {
+                    contact.name.isEmpty() -> "..."
+                    contact.name[0].isLetter() -> contact.name[0].uppercase()
+                    else -> "..."
+                }
+            }.toSortedMap(compareBy { if (it == "...") "zzz" else it }).flatMap {
+                listOf(
+                    // Letter Header
+                    InvitationContactInfo(
+                        id = it.key.hashCode().toLong(),
+                        type = TYPE_LETTER_HEADER,
+                        displayInfo = it.key
+                    )
+                ).plus(it.value)
             }
             assertThat(expectMostRecentItem().filteredContacts).isEqualTo(
                 listOf(
@@ -631,7 +655,7 @@ class InviteContactViewModelTest {
                 val expected = invitationContactInfoUiMapper(localContacts)
                 assertThat(
                     expectMostRecentItem().invitationContactInfoWithMultipleContacts
-                ).isEqualTo(expected[1]) // The 0 index is header item
+                ).isEqualTo(expected[2]) // The 0,1 index is header item
             }
         }
 
@@ -648,7 +672,7 @@ class InviteContactViewModelTest {
             underTest.addContactInfo(displayInfo, type)
 
             underTest.uiState.test {
-                assertThat(expectMostRecentItem().selectedContactInformation).isEmpty()
+                assertThat(awaitItem().selectedContactInformation).hasSize(2)
             }
         }
 
@@ -666,7 +690,7 @@ class InviteContactViewModelTest {
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().selectedContactInformation).isEqualTo(
                     listOf(
-                        invitationContactInfoUiMapper(localContacts)[1].copy(isHighlighted = true) // The 0 index is header item
+                        invitationContactInfoUiMapper(localContacts)[2].copy(isHighlighted = true) // The 0 index is header item
                     )
                 )
             }
@@ -702,10 +726,10 @@ class InviteContactViewModelTest {
             )
             initializeContacts { localContacts }
             val mappedContacts = invitationContactInfoUiMapper(localContacts)
-            underTest.addSelectedContactInformation(mappedContacts[1].copy(displayInfo = firstEmail))
-            underTest.addSelectedContactInformation(mappedContacts[1].copy(displayInfo = secondEmail))
+            underTest.addSelectedContactInformation(mappedContacts[2].copy(displayInfo = firstEmail))
+            underTest.addSelectedContactInformation(mappedContacts[2].copy(displayInfo = secondEmail))
 
-            underTest.onContactChipClick(mappedContacts[1].copy(displayInfo = firstEmail))
+            underTest.onContactChipClick(mappedContacts[2].copy(displayInfo = firstEmail))
 
             underTest.uiState.test {
                 assertThat(
@@ -713,7 +737,8 @@ class InviteContactViewModelTest {
                 ).isEqualTo(
                     listOf(
                         mappedContacts[0], // Header item
-                        mappedContacts[1].copy(isHighlighted = true)
+                        mappedContacts[1], // Letter Header item
+                        mappedContacts[2].copy(isHighlighted = true)
                     )
                 )
             }
@@ -730,9 +755,9 @@ class InviteContactViewModelTest {
             )
             initializeContacts { localContacts }
             val mappedContacts = invitationContactInfoUiMapper(localContacts)
-            underTest.addSelectedContactInformation(mappedContacts[1].copy(displayInfo = email))
+            underTest.addSelectedContactInformation(mappedContacts[2].copy(displayInfo = email))
 
-            underTest.onContactChipClick(mappedContacts[1].copy(displayInfo = email))
+            underTest.onContactChipClick(mappedContacts[2].copy(displayInfo = email))
 
             underTest.uiState.test {
                 assertThat(
@@ -740,7 +765,8 @@ class InviteContactViewModelTest {
                 ).isEqualTo(
                     listOf(
                         mappedContacts[0], // Header item
-                        mappedContacts[1].copy(isHighlighted = false)
+                        mappedContacts[1], // Letter Header
+                        mappedContacts[2].copy(isHighlighted = false)
                     )
                 )
             }

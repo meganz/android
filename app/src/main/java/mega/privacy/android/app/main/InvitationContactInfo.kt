@@ -49,6 +49,11 @@ data class InvitationContactInfo @JvmOverloads constructor(
         const val TYPE_PHONE_CONTACT_HEADER = 1
 
         /**
+         * Letter header
+         */
+        const val TYPE_LETTER_HEADER = 2
+
+        /**
          * Contact items
          */
         const val TYPE_PHONE_CONTACT = 3
