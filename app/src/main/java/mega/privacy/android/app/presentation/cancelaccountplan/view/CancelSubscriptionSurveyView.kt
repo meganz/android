@@ -69,7 +69,11 @@ internal fun CancelSubscriptionSurveyView(
             190.dp
         }
     } else {
-        20.dp
+        if (isScreenOrientationLandscape()) {
+            48.dp
+        } else {
+            24.dp
+        }
     }
 
     Column(
@@ -124,6 +128,7 @@ internal fun CancelSubscriptionSurveyView(
                         context.getString(reason.answerValue)
                     }
                 showError = false
+                othersErrorMessage = null
             },
             modifier = Modifier
                 .padding(top = 20.dp)
