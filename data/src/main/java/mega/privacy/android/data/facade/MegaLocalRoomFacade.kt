@@ -1,5 +1,6 @@
 package mega.privacy.android.data.facade
 
+import dagger.Lazy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -47,94 +48,94 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import javax.inject.Inject
 
 internal class MegaLocalRoomFacade @Inject constructor(
-    private val contactDao: ContactDao,
+    private val contactDao: Lazy<ContactDao>,
     private val contactEntityMapper: ContactEntityMapper,
     private val contactModelMapper: ContactModelMapper,
-    private val completedTransferDao: CompletedTransferDao,
-    private val activeTransferDao: ActiveTransferDao,
+    private val completedTransferDao: Lazy<CompletedTransferDao>,
+    private val activeTransferDao: Lazy<ActiveTransferDao>,
     private val completedTransferModelMapper: CompletedTransferModelMapper,
     private val completedTransferEntityMapper: CompletedTransferEntityMapper,
     private val completedTransferLegacyModelMapper: CompletedTransferLegacyModelMapper,
     private val activeTransferEntityMapper: ActiveTransferEntityMapper,
-    private val sdTransferDao: SdTransferDao,
+    private val sdTransferDao: Lazy<SdTransferDao>,
     private val sdTransferModelMapper: SdTransferModelMapper,
     private val sdTransferEntityMapper: SdTransferEntityMapper,
-    private val backupDao: BackupDao,
+    private val backupDao: Lazy<BackupDao>,
     private val backupEntityMapper: BackupEntityMapper,
     private val backupModelMapper: BackupModelMapper,
     private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper,
-    private val cameraUploadsRecordDao: CameraUploadsRecordDao,
+    private val cameraUploadsRecordDao: Lazy<CameraUploadsRecordDao>,
     private val cameraUploadsRecordEntityMapper: CameraUploadsRecordEntityMapper,
     private val cameraUploadsRecordModelMapper: CameraUploadsRecordModelMapper,
     private val encryptData: EncryptData,
     private val decryptData: DecryptData,
-    private val offlineDao: OfflineDao,
+    private val offlineDao: Lazy<OfflineDao>,
     private val offlineModelMapper: OfflineModelMapper,
     private val offlineEntityMapper: OfflineEntityMapper,
-    private val chatPendingChangesDao: ChatPendingChangesDao,
+    private val chatPendingChangesDao: Lazy<ChatPendingChangesDao>,
     private val chatRoomPendingChangesEntityMapper: ChatRoomPendingChangesEntityMapper,
     private val chatRoomPendingChangesModelMapper: ChatRoomPendingChangesModelMapper,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
-        contactDao.insertOrUpdateContact(contactEntityMapper(contact))
+        contactDao.get().insertOrUpdateContact(contactEntityMapper(contact))
     }
 
     override suspend fun updateContactNameByEmail(firstName: String?, email: String?) {
         if (email.isNullOrBlank()) return
-        contactDao.getContactByEmail(encryptData(email))?.let { entity ->
-            contactDao.insertOrUpdateContact(entity.copy(firstName = encryptData(firstName)))
+        contactDao.get().getContactByEmail(encryptData(email))?.let { entity ->
+            contactDao.get().insertOrUpdateContact(entity.copy(firstName = encryptData(firstName)))
         }
     }
 
     override suspend fun updateContactLastNameByEmail(lastName: String?, email: String?) {
         if (email.isNullOrBlank()) return
-        contactDao.getContactByEmail(encryptData(email))?.let { entity ->
-            contactDao.insertOrUpdateContact(entity.copy(lastName = encryptData(lastName)))
+        contactDao.get().getContactByEmail(encryptData(email))?.let { entity ->
+            contactDao.get().insertOrUpdateContact(entity.copy(lastName = encryptData(lastName)))
         }
     }
 
     override suspend fun updateContactMailByHandle(handle: Long, email: String?) {
-        contactDao.getContactByHandle(encryptData(handle.toString()))?.let { entity ->
-            contactDao.insertOrUpdateContact(entity.copy(mail = encryptData(email)))
+        contactDao.get().getContactByHandle(encryptData(handle.toString()))?.let { entity ->
+            contactDao.get().insertOrUpdateContact(entity.copy(mail = encryptData(email)))
         }
     }
 
     override suspend fun updateContactFistNameByHandle(handle: Long, firstName: String?) {
-        contactDao.getContactByHandle(encryptData(handle.toString()))?.let { entity ->
-            contactDao.insertOrUpdateContact(entity.copy(firstName = encryptData(firstName)))
+        contactDao.get().getContactByHandle(encryptData(handle.toString()))?.let { entity ->
+            contactDao.get().insertOrUpdateContact(entity.copy(firstName = encryptData(firstName)))
         }
     }
 
     override suspend fun updateContactLastNameByHandle(handle: Long, lastName: String?) {
-        contactDao.getContactByHandle(encryptData(handle.toString()))?.let { entity ->
-            contactDao.insertOrUpdateContact(entity.copy(lastName = encryptData(lastName)))
+        contactDao.get().getContactByHandle(encryptData(handle.toString()))?.let { entity ->
+            contactDao.get().insertOrUpdateContact(entity.copy(lastName = encryptData(lastName)))
         }
     }
 
     override suspend fun updateContactNicknameByHandle(handle: Long, nickname: String?) {
-        contactDao.getContactByHandle(encryptData(handle.toString()))?.let { entity ->
-            contactDao.insertOrUpdateContact(entity.copy(nickName = encryptData(nickname)))
+        contactDao.get().getContactByHandle(encryptData(handle.toString()))?.let { entity ->
+            contactDao.get().insertOrUpdateContact(entity.copy(nickName = encryptData(nickname)))
         }
     }
 
     override suspend fun getContactByHandle(handle: Long): Contact? =
-        contactDao.getContactByHandle(encryptData(handle.toString()))
+        contactDao.get().getContactByHandle(encryptData(handle.toString()))
             ?.let { contactModelMapper(it) }
 
     override suspend fun getContactByEmail(email: String?): Contact? =
-        contactDao.getContactByEmail(encryptData(email))?.let { contactModelMapper(it) }
+        contactDao.get().getContactByEmail(encryptData(email))?.let { contactModelMapper(it) }
 
-    override suspend fun deleteAllContacts() = contactDao.deleteAllContact()
+    override suspend fun deleteAllContacts() = contactDao.get().deleteAllContact()
 
-    override suspend fun getContactCount() = contactDao.getContactCount()
+    override suspend fun getContactCount() = contactDao.get().getContactCount()
 
     override suspend fun getAllContacts(): List<Contact> {
-        val entities = contactDao.getAllContact().first()
+        val entities = contactDao.get().getAllContact().first()
         return entities.map { contactModelMapper(it) }
     }
 
     override fun getCompletedTransfers(size: Int?) =
-        completedTransferDao.getAllCompletedTransfers()
+        completedTransferDao.get().getAllCompletedTransfers()
             .map { list ->
                 list.map { completedTransferModelMapper(it) }
                     .toMutableList()
@@ -143,12 +144,12 @@ internal class MegaLocalRoomFacade @Inject constructor(
             }
 
     override suspend fun addCompletedTransfer(transfer: CompletedTransfer) {
-        completedTransferDao.insertOrUpdateCompletedTransfer(completedTransferEntityMapper(transfer))
+        completedTransferDao.get().insertOrUpdateCompletedTransfer(completedTransferEntityMapper(transfer))
     }
 
     override suspend fun addCompletedTransfers(transfers: List<CompletedTransfer>) {
         transfers.map { completedTransferEntityMapper(it) }.let { mappedTransfers ->
-            completedTransferDao.insertOrUpdateCompletedTransfers(
+            completedTransferDao.get().insertOrUpdateCompletedTransfers(
                 mappedTransfers,
                 MAX_INSERT_LIST_SIZE
             )
@@ -156,34 +157,34 @@ internal class MegaLocalRoomFacade @Inject constructor(
     }
 
     override suspend fun getCompletedTransfersCount() =
-        completedTransferDao.getCompletedTransfersCount()
+        completedTransferDao.get().getCompletedTransfersCount()
 
     override suspend fun deleteAllCompletedTransfers() =
-        completedTransferDao.deleteAllCompletedTransfers()
+        completedTransferDao.get().deleteAllCompletedTransfers()
 
     override suspend fun getCompletedTransfersByState(states: List<Int>): List<CompletedTransfer> {
         val encryptedStates = states.mapNotNull { encryptData(it.toString()) }
-        return completedTransferDao.getCompletedTransfersByState(encryptedStates)
+        return completedTransferDao.get().getCompletedTransfersByState(encryptedStates)
             .map { entity -> completedTransferModelMapper(entity) }
     }
 
     override suspend fun deleteCompletedTransfersByState(states: List<Int>): List<CompletedTransfer> {
         val encryptedStates = states.mapNotNull { encryptData(it.toString()) }
-        val entities = completedTransferDao.getCompletedTransfersByState(encryptedStates)
+        val entities = completedTransferDao.get().getCompletedTransfersByState(encryptedStates)
         deleteCompletedTransferBatch(entities.mapNotNull { it.id })
         return entities.map { entity -> completedTransferModelMapper(entity) }
     }
 
     override suspend fun deleteCompletedTransfer(completedTransfer: CompletedTransfer) {
-        completedTransferDao.deleteCompletedTransferByIds(
+        completedTransferDao.get().deleteCompletedTransferByIds(
             listOf(completedTransfer.id ?: return)
         )
     }
 
     override suspend fun deleteOldestCompletedTransfers() {
-        val count = completedTransferDao.getCompletedTransfersCount()
+        val count = completedTransferDao.get().getCompletedTransfersCount()
         if (count > MAX_COMPLETED_TRANSFER_ROWS) {
-            val transfers = completedTransferDao.getAllCompletedTransfers().first()
+            val transfers = completedTransferDao.get().getAllCompletedTransfers().first()
                 .map { completedTransferModelMapper(it) }
             val deletedTransfers =
                 transfers.sortedWith(compareByDescending { it.timestamp })
@@ -197,77 +198,77 @@ internal class MegaLocalRoomFacade @Inject constructor(
     }
 
     override suspend fun migrateLegacyCompletedTransfers() {
-        completedTransferDao.getAllLegacyCompletedTransfers()
+        completedTransferDao.get().getAllLegacyCompletedTransfers()
             .takeIf { it.isNotEmpty() }
             ?.let { legacyEntities ->
                 val firstHundred = legacyEntities
                     .sortedWith(compareByDescending { it.timestamp })
                     .take(100)
                 addCompletedTransfers(firstHundred.map { completedTransferLegacyModelMapper(it) })
-                completedTransferDao.deleteAllLegacyCompletedTransfers()
+                completedTransferDao.get().deleteAllLegacyCompletedTransfers()
             }
     }
 
     override suspend fun getActiveTransferByTag(tag: Int) =
-        activeTransferDao.getActiveTransferByTag(tag)
+        activeTransferDao.get().getActiveTransferByTag(tag)
 
     override fun getActiveTransfersByType(transferType: TransferType) =
-        activeTransferDao.getActiveTransfersByType(transferType).map { activeTransferEntities ->
+        activeTransferDao.get().getActiveTransfersByType(transferType).map { activeTransferEntities ->
             activeTransferEntities.map { it }
         }
 
     override suspend fun getCurrentActiveTransfersByType(transferType: TransferType) =
-        activeTransferDao.getCurrentActiveTransfersByType(transferType).map { it }
+        activeTransferDao.get().getCurrentActiveTransfersByType(transferType).map { it }
 
     override suspend fun getCurrentActiveTransfers(): List<ActiveTransfer> =
-        activeTransferDao.getCurrentActiveTransfers()
+        activeTransferDao.get().getCurrentActiveTransfers()
 
     override suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer) =
-        activeTransferDao.insertOrUpdateActiveTransfer(activeTransferEntityMapper(activeTransfer))
+        activeTransferDao.get().insertOrUpdateActiveTransfer(activeTransferEntityMapper(activeTransfer))
 
     override suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>) =
         activeTransfers.map { activeTransferEntityMapper(it) }.let { mappedActiveTransfers ->
-            activeTransferDao.insertOrUpdateActiveTransfers(
+            activeTransferDao.get().insertOrUpdateActiveTransfers(
                 mappedActiveTransfers,
                 MAX_INSERT_LIST_SIZE
             )
         }
 
     override suspend fun deleteAllActiveTransfersByType(transferType: TransferType) =
-        activeTransferDao.deleteAllActiveTransfersByType(transferType)
+        activeTransferDao.get().deleteAllActiveTransfersByType(transferType)
 
-    override suspend fun deleteAllActiveTransfers() = activeTransferDao.deleteAllActiveTransfers()
+    override suspend fun deleteAllActiveTransfers() = activeTransferDao.get().deleteAllActiveTransfers()
 
     override suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>) =
-        activeTransferDao.setActiveTransferAsFinishedByTag(tags)
+        activeTransferDao.get().setActiveTransferAsFinishedByTag(tags)
 
     override suspend fun getAllSdTransfers(): List<SdTransfer> {
-        val entities = sdTransferDao.getAllSdTransfers().first()
+        val entities = sdTransferDao.get().getAllSdTransfers().first()
         return entities.map { sdTransferModelMapper(it) }
     }
 
     override suspend fun getSdTransferByTag(tag: Int): SdTransfer? =
-        sdTransferDao.getSdTransferByTag(tag)?.let {
+        sdTransferDao.get().getSdTransferByTag(tag)?.let {
             sdTransferModelMapper(it)
         }
 
     override suspend fun insertSdTransfer(transfer: SdTransfer) =
-        sdTransferDao.insertSdTransfer(sdTransferEntityMapper(transfer))
+        sdTransferDao.get().insertSdTransfer(sdTransferEntityMapper(transfer))
 
     override suspend fun deleteSdTransferByTag(tag: Int) {
-        sdTransferDao.deleteSdTransferByTag(tag)
+        sdTransferDao.get().deleteSdTransferByTag(tag)
     }
 
-    override suspend fun getCompletedTransferById(id: Int) = completedTransferDao
+    override suspend fun getCompletedTransferById(id: Int) = completedTransferDao.get()
         .getCompletedTransferById(id)?.let { completedTransferModelMapper(it) }
 
     override suspend fun insertOrUpdateCameraUploadsRecords(records: List<CameraUploadsRecord>) =
-        cameraUploadsRecordDao.insertOrUpdateCameraUploadsRecords(
+        cameraUploadsRecordDao.get().insertOrUpdateCameraUploadsRecords(
             records.map { cameraUploadsRecordEntityMapper(it) }
         )
 
     override suspend fun getAllCameraUploadsRecords(): List<CameraUploadsRecord> =
-        cameraUploadsRecordDao.getAllCameraUploadsRecords().map {
+        cameraUploadsRecordDao.get().getAllCameraUploadsRecords().map {
             cameraUploadsRecordModelMapper(it)
         }
 
@@ -276,7 +277,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
         types: List<CameraUploadsRecordType>,
         folderTypes: List<CameraUploadFolderType>,
     ): List<CameraUploadsRecord> =
-        cameraUploadsRecordDao.getCameraUploadsRecordsBy(
+        cameraUploadsRecordDao.get().getCameraUploadsRecordsBy(
             uploadStatus,
             types,
             folderTypes,
@@ -290,7 +291,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
         folderType: CameraUploadFolderType,
         uploadStatus: CameraUploadsRecordUploadStatus,
     ) {
-        cameraUploadsRecordDao.updateCameraUploadsRecordUploadStatus(
+        cameraUploadsRecordDao.get().updateCameraUploadsRecordUploadStatus(
             mediaId,
             timestamp,
             folderType,
@@ -304,7 +305,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
         folderType: CameraUploadFolderType,
         generatedFingerprint: String,
     ) {
-        cameraUploadsRecordDao.updateCameraUploadsRecordGeneratedFingerprint(
+        cameraUploadsRecordDao.get().updateCameraUploadsRecordGeneratedFingerprint(
             mediaId,
             timestamp,
             folderType,
@@ -313,18 +314,18 @@ internal class MegaLocalRoomFacade @Inject constructor(
     }
 
     override suspend fun deleteCameraUploadsRecords(folderTypes: List<CameraUploadFolderType>) =
-        cameraUploadsRecordDao.deleteCameraUploadsRecordsByFolderType(folderTypes)
+        cameraUploadsRecordDao.get().deleteCameraUploadsRecordsByFolderType(folderTypes)
 
     override suspend fun deleteBackupById(backupId: Long) {
         encryptData(backupId.toString())?.let {
-            backupDao.deleteBackupByBackupId(it)
+            backupDao.get().deleteBackupByBackupId(it)
         }
     }
 
     override suspend fun setBackupAsOutdated(backupId: Long) {
         encryptData(backupId.toString())?.let { encryptedBackupId ->
             encryptData("true")?.let { encryptedTrue ->
-                backupDao.updateBackupAsOutdated(
+                backupDao.get().updateBackupAsOutdated(
                     encryptedBackupId = encryptedBackupId,
                     encryptedIsOutdated = encryptedTrue
                 )
@@ -334,13 +335,13 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun saveBackup(backup: Backup) {
         backupEntityMapper(backup)?.let {
-            backupDao.insertOrUpdateBackup(it)
+            backupDao.get().insertOrUpdateBackup(it)
         }
     }
 
     override suspend fun getCuBackUp(): Backup? {
         return encryptData("false")?.let { encryptedFalse ->
-            backupDao.getBackupByType(
+            backupDao.get().getBackupByType(
                 backupType = backupInfoTypeIntMapper(BackupInfoType.CAMERA_UPLOADS),
                 encryptedIsOutdated = encryptedFalse
             ).lastOrNull()
@@ -349,7 +350,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun getMuBackUp(): Backup? {
         return encryptData("false")?.let { encryptedFalse ->
-            backupDao.getBackupByType(
+            backupDao.get().getBackupByType(
                 backupInfoTypeIntMapper(BackupInfoType.MEDIA_UPLOADS),
                 encryptedFalse
             ).lastOrNull()
@@ -358,7 +359,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun getCuBackUpId(): Long? {
         return encryptData("false")?.let { encryptedFalse ->
-            backupDao.getBackupIdByType(
+            backupDao.get().getBackupIdByType(
                 backupInfoTypeIntMapper(BackupInfoType.CAMERA_UPLOADS),
                 encryptedFalse
             ).lastOrNull()
@@ -367,7 +368,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun getMuBackUpId(): Long? {
         return encryptData("false")?.let { encryptedFalse ->
-            backupDao.getBackupIdByType(
+            backupDao.get().getBackupIdByType(
                 backupInfoTypeIntMapper(BackupInfoType.MEDIA_UPLOADS),
                 encryptedFalse
             ).lastOrNull()
@@ -376,81 +377,81 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun getBackupById(id: Long): Backup? {
         return encryptData(id.toString())?.let { encryptedBackupId ->
-            backupDao.getBackupById(encryptedBackupId)
+            backupDao.get().getBackupById(encryptedBackupId)
         }?.let { backupModelMapper(it) }
     }
 
     override suspend fun updateBackup(backup: Backup) {
         backupEntityMapper(backup)?.let {
-            backupDao.insertOrUpdateBackup(it)
+            backupDao.get().insertOrUpdateBackup(it)
         }
     }
 
     override suspend fun deleteAllBackups() {
-        backupDao.deleteAllBackups()
+        backupDao.get().deleteAllBackups()
     }
 
     override suspend fun isOfflineInformationAvailable(nodeHandle: Long) =
-        offlineDao.getOfflineByHandle("${encryptData("$nodeHandle")}") != null
+        offlineDao.get().getOfflineByHandle("${encryptData("$nodeHandle")}") != null
 
     override suspend fun getOfflineInformation(nodeHandle: Long) =
-        offlineDao.getOfflineByHandle("${encryptData("$nodeHandle")}")?.let {
+        offlineDao.get().getOfflineByHandle("${encryptData("$nodeHandle")}")?.let {
             offlineModelMapper(it)
         }
 
     override suspend fun saveOfflineInformation(offline: Offline) =
         offlineEntityMapper(offline).let {
-            offlineDao.insertOrUpdateOffline(it)
+            offlineDao.get().insertOrUpdateOffline(it)
         }
 
-    override suspend fun clearOffline() = offlineDao.deleteAllOffline()
+    override suspend fun clearOffline() = offlineDao.get().deleteAllOffline()
 
-    override fun monitorOfflineUpdates() = offlineDao.monitorOffline()
+    override fun monitorOfflineUpdates() = offlineDao.get().monitorOffline()
         .map { it.map { offlineEntity -> offlineModelMapper(offlineEntity) } }
 
 
     override suspend fun getAllOfflineInfo() =
-        offlineDao.getOfflineFiles()?.map { offlineModelMapper(it) } ?: emptyList()
+        offlineDao.get().getOfflineFiles()?.map { offlineModelMapper(it) } ?: emptyList()
 
     override suspend fun removeOfflineInformation(nodeId: String) {
         encryptData(nodeId)?.let {
-            offlineDao.deleteOfflineByHandle(it)
+            offlineDao.get().deleteOfflineByHandle(it)
         }
     }
 
     override suspend fun getOfflineInfoByParentId(parentId: Int): List<Offline> =
-        offlineDao.getOfflineByParentId(parentId)?.map {
+        offlineDao.get().getOfflineByParentId(parentId)?.map {
             offlineModelMapper(it)
         } ?: emptyList()
 
     override suspend fun getOfflineLineById(id: Int): Offline? =
-        offlineDao.getOfflineById(id)?.let {
+        offlineDao.get().getOfflineById(id)?.let {
             offlineModelMapper(it)
         }
 
     override suspend fun removeOfflineInformationById(id: Int) {
-        offlineDao.deleteOfflineById(id)
+        offlineDao.get().deleteOfflineById(id)
     }
 
     override suspend fun removeOfflineInformationByIds(ids: List<Int>) {
-        offlineDao.deleteOfflineByIds(ids)
+        offlineDao.get().deleteOfflineByIds(ids)
     }
 
     private suspend fun deleteCompletedTransferBatch(ids: List<Int>) {
-        completedTransferDao.deleteCompletedTransferByIds(
+        completedTransferDao.get().deleteCompletedTransferByIds(
             ids,
             MAX_INSERT_LIST_SIZE
         )
     }
 
     override suspend fun setChatPendingChanges(chatPendingChanges: ChatPendingChanges) {
-        chatPendingChangesDao.upsertChatPendingChanges(
+        chatPendingChangesDao.get().upsertChatPendingChanges(
             chatRoomPendingChangesEntityMapper(chatPendingChanges)
         )
     }
 
     override fun monitorChatPendingChanges(chatId: Long): Flow<ChatPendingChanges?> =
-        chatPendingChangesDao.getChatPendingChanges(chatId)
+        chatPendingChangesDao.get().getChatPendingChanges(chatId)
             .map { entity -> entity?.let { chatRoomPendingChangesModelMapper(it) } }
 
     companion object {

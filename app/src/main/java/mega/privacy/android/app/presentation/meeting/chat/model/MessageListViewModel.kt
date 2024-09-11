@@ -14,6 +14,7 @@ import androidx.paging.insertHeaderItem
 import androidx.paging.insertSeparators
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -39,6 +41,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.room.update.MessageReceived
 import mega.privacy.android.domain.entity.chat.room.update.MessageUpdate
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.chat.message.MonitorChatRoomMessageUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesUseCase
@@ -74,6 +77,7 @@ class MessageListViewModel @Inject constructor(
     private val monitorReactionUpdatesUseCase: MonitorReactionUpdatesUseCase,
     private val monitorContactCacheUpdates: MonitorContactCacheUpdates,
     monitorPendingMessagesUseCase: MonitorPendingMessagesUseCase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val conversationArgs = ChatArgs(savedStateHandle)
@@ -222,7 +226,8 @@ class MessageListViewModel @Inject constructor(
                         }
                     }
             }
-        }.cachedIn(viewModelScope) //this cachedIn is to avoid losing the resulting on rotation
+        }.flowOn(ioDispatcher)
+        .cachedIn(viewModelScope) //this cachedIn is to avoid losing the resulting on rotation
 
     /**
      * Paged messages

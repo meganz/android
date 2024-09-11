@@ -1,6 +1,7 @@
 package mega.privacy.android.data.facade.chat
 
 import androidx.room.withTransaction
+import dagger.Lazy
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.database.chat.ChatDatabase
 import mega.privacy.android.data.database.dao.ChatMessageMetaDao
@@ -30,7 +31,7 @@ import javax.inject.Inject
  * @property database In memory chat database
  */
 internal class ChatStorageFacade @Inject constructor(
-    private val database: ChatDatabase,
+    private val database: Lazy<ChatDatabase>,
 ) : ChatStorageGateway {
 
     /**
@@ -40,7 +41,7 @@ internal class ChatStorageFacade @Inject constructor(
      * @return paging source
      */
     override fun getTypedMessageRequestPagingSource(chatId: Long) =
-        database.typedMessageDao().getAllAsPagingSource(chatId)
+        database.get().typedMessageDao().getAllAsPagingSource(chatId)
 
     /**
      * Store messages
@@ -54,7 +55,7 @@ internal class ChatStorageFacade @Inject constructor(
         geolocations: List<ChatGeolocationEntity>,
         chatNodes: List<ChatNodeEntity>,
     ) {
-        with(database) {
+        with(database.get()) {
             val chatNodeDao = chatNodeDao()
             val typedMessageDao = typedMessageDao()
             val metaDao = chatMessageMetaDao()
@@ -90,7 +91,7 @@ internal class ChatStorageFacade @Inject constructor(
      * @param chatId Chat ID
      */
     override suspend fun clearChatMessages(chatId: Long) {
-        with(database) {
+        with(database.get()) {
             val chatNodeDao = chatNodeDao()
             val metaDao = chatMessageMetaDao()
             val typedMessageDao = typedMessageDao()
@@ -110,69 +111,69 @@ internal class ChatStorageFacade @Inject constructor(
      * @return next message
      */
     override suspend fun getNextMessage(chatId: Long, timestamp: Long) =
-        database.typedMessageDao().getMessageWithNextGreatestTimestamp(chatId, timestamp)
+        database.get().typedMessageDao().getMessageWithNextGreatestTimestamp(chatId, timestamp)
 
 
     override suspend fun storePendingMessage(
         pendingMessageEntity: PendingMessageEntity,
-    ) = database.pendingMessageDao().insert(pendingMessageEntity)
+    ) = database.get().pendingMessageDao().insert(pendingMessageEntity)
 
     override suspend fun storePendingMessages(
         pendingMessageEntities: List<PendingMessageEntity>,
-    ) = database.pendingMessageDao().insert(pendingMessageEntities)
+    ) = database.get().pendingMessageDao().insert(pendingMessageEntities)
 
     override suspend fun updatePendingMessage(vararg updatePendingMessageRequests: UpdatePendingMessageRequest) {
         updatePendingMessageRequests.singleOrNull()?.let { updatePendingMessageRequest ->
             when (updatePendingMessageRequest) {
                 is UpdatePendingMessageStateRequest ->
-                    database.pendingMessageDao().update(updatePendingMessageRequest)
+                    database.get().pendingMessageDao().update(updatePendingMessageRequest)
 
                 is UpdatePendingMessageStateAndNodeHandleRequest ->
-                    database.pendingMessageDao().update(updatePendingMessageRequest)
+                    database.get().pendingMessageDao().update(updatePendingMessageRequest)
 
                 is UpdatePendingMessageTransferTagRequest ->
-                    database.pendingMessageDao().update(updatePendingMessageRequest)
+                    database.get().pendingMessageDao().update(updatePendingMessageRequest)
 
                 is UpdatePendingMessageStateAndPathRequest ->
-                    database.pendingMessageDao().update(updatePendingMessageRequest)
+                    database.get().pendingMessageDao().update(updatePendingMessageRequest)
             }
         } ?: run {
-            database.pendingMessageDao().updateMultiple(updatePendingMessageRequests.toList())
+            database.get().pendingMessageDao().updateMultiple(updatePendingMessageRequests.toList())
         }
     }
 
     override suspend fun deletePendingMessage(pendingMessageId: Long) {
-        database.pendingMessageDao().delete(pendingMessageId)
+        database.get().pendingMessageDao().delete(pendingMessageId)
     }
 
     override fun fetchPendingMessages(chatId: Long): Flow<List<PendingMessageEntity>> =
-        database.pendingMessageDao().fetchPendingMessagesForChat(chatId)
+        database.get().pendingMessageDao().fetchPendingMessagesForChat(chatId)
 
     override fun fetchPendingMessages(vararg states: PendingMessageState): Flow<List<PendingMessageEntity>> =
-        database.pendingMessageDao().fetchPendingMessagesByState(states.toList())
+        database.get().pendingMessageDao().fetchPendingMessagesByState(states.toList())
 
     override suspend fun getPendingMessage(pendingMessageId: Long): PendingMessageEntity? =
-        database.pendingMessageDao().get(pendingMessageId)
+        database.get().pendingMessageDao().get(pendingMessageId)
 
     override suspend fun getPendingMessagesByState(state: PendingMessageState): List<PendingMessageEntity> =
-        database.pendingMessageDao().getByState(state)
+        database.get().pendingMessageDao().getByState(state)
 
     override suspend fun getMessageIdsByType(chatId: Long, type: ChatMessageType): List<Long> =
-        database.typedMessageDao().getMessageIdsByType(chatId, type)
+        database.get().typedMessageDao().getMessageIdsByType(chatId, type)
 
     override suspend fun getMessageReactions(chatId: Long, msgId: Long): String? =
-        database.typedMessageDao().getMessageReactions(chatId, msgId)
+        database.get().typedMessageDao().getMessageReactions(chatId, msgId)
 
     override suspend fun updateMessageReactions(
         chatId: Long,
         msgId: Long,
         reactions: String,
     ) {
-        database.typedMessageDao().updateMessageReactions(chatId, msgId, reactions)
+        database.get().typedMessageDao().updateMessageReactions(chatId, msgId, reactions)
     }
 
     override suspend fun truncateMessages(chatId: Long, truncateTimestamp: Long) {
-        with(database) {
+        with(database.get()) {
             val chatNodeDao = chatNodeDao()
             val metaDao = chatMessageMetaDao()
             val typedMessageDao = typedMessageDao()
@@ -198,17 +199,17 @@ internal class ChatStorageFacade @Inject constructor(
     }
 
     override suspend fun clearChatPendingMessages(chatId: Long) {
-        database.pendingMessageDao().deleteAllForChat(chatId)
+        database.get().pendingMessageDao().deleteAllForChat(chatId)
     }
 
     override suspend fun updateExistsInMessage(chatId: Long, msgId: Long, exists: Boolean) {
-        database.typedMessageDao().updateExists(chatId, msgId, exists)
+        database.get().typedMessageDao().updateExists(chatId, msgId, exists)
     }
 
     override suspend fun getExistsInMessage(chatId: Long, msgId: Long) =
-        database.typedMessageDao().getExists(chatId, msgId)
+        database.get().typedMessageDao().getExists(chatId, msgId)
 
     override suspend fun clearAllData() {
-        database.clearAllTables()
+        database.get().clearAllTables()
     }
 }

@@ -8,6 +8,7 @@ import android.provider.Settings
 import android.util.Base64
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
+import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -31,7 +32,6 @@ import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.settings.ChatSettings.Companion.VIBRATION_ON
 import mega.privacy.android.domain.entity.user.UserCredentials
-import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -43,15 +43,14 @@ import javax.inject.Inject
  */
 class SqliteDatabaseHandler @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val crashReporter: CrashReporter,
     private val storageStateMapper: StorageStateMapper,
     private val storageStateIntMapper: StorageStateIntMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
-    private val sqLiteOpenHelper: SupportSQLiteOpenHelper,
+    private val sqLiteOpenHelper: Lazy<SupportSQLiteOpenHelper>,
     private val legacyDatabaseMigration: LegacyDatabaseMigration,
 ) : LegacyDatabaseHandler {
-    private val writableDatabase: SupportSQLiteDatabase by lazy { sqLiteOpenHelper.writableDatabase }
-    private val readableDatabase: SupportSQLiteDatabase by lazy { sqLiteOpenHelper.readableDatabase }
+    private val writableDatabase: SupportSQLiteDatabase by lazy { sqLiteOpenHelper.get().writableDatabase }
+    private val readableDatabase: SupportSQLiteDatabase by lazy { sqLiteOpenHelper.get().readableDatabase }
 
     //get the credential of last login
     override val credentials: UserCredentials?

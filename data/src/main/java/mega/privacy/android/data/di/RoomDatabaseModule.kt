@@ -45,14 +45,9 @@ internal object RoomDatabaseModule {
         sqlCipherManager: SQLCipherManager,
     ): ByteArray? {
         return try {
-            val passphrase = sqlCipherManager.getPassphrase()
-            sqlCipherManager.migrateToSecureDatabase(MegaDatabaseConstant.DATABASE_NAME, passphrase)
-            sqlCipherManager.migrateToSecureDatabase(CHAT_DATABASE_NAME, passphrase)
-            passphrase
+            sqlCipherManager.getPassphrase()
         } catch (e: Exception) {
             Timber.e(e, "Failed to migrate database to secure database")
-            sqlCipherManager.destructSecureDatabase(MegaDatabaseConstant.DATABASE_NAME)
-            sqlCipherManager.destructSecureDatabase(CHAT_DATABASE_NAME)
             null
         }
     }
@@ -62,15 +57,19 @@ internal object RoomDatabaseModule {
     internal fun provideMegaDatabase(
         @ApplicationContext applicationContext: Context,
         legacyDatabaseMigration: LegacyDatabaseMigration,
+        sqlCipherManager: SQLCipherManager,
         @Named("database_passphrase") passphrase: ByteArray?,
     ): MegaDatabase {
-        return if (passphrase != null) {
+        return try {
+            if (passphrase == null) throw NullPointerException("Passphrase is null")
+            sqlCipherManager.migrateToSecureDatabase(MegaDatabaseConstant.DATABASE_NAME, passphrase)
             MegaDatabase.init(
                 applicationContext,
                 SupportFactory(passphrase, null, false),
                 legacyDatabaseMigration
             )
-        } else {
+        } catch (e: Exception) {
+            sqlCipherManager.destructSecureDatabase(MegaDatabaseConstant.DATABASE_NAME)
             MegaDatabase.init(
                 applicationContext,
                 FrameworkSQLiteOpenHelperFactory(),
@@ -84,13 +83,17 @@ internal object RoomDatabaseModule {
     internal fun provideChatDatabase(
         @ApplicationContext applicationContext: Context,
         @Named("database_passphrase") passphrase: ByteArray?,
+        sqlCipherManager: SQLCipherManager,
     ): ChatDatabase {
-        return if (passphrase != null) {
+        return try {
+            if (passphrase == null) throw NullPointerException("Passphrase is null")
+            sqlCipherManager.migrateToSecureDatabase(CHAT_DATABASE_NAME, passphrase)
             ChatDatabase.init(
                 applicationContext,
                 SupportFactory(passphrase, null, false),
             )
-        } else {
+        } catch (e: Exception) {
+            sqlCipherManager.destructSecureDatabase(CHAT_DATABASE_NAME)
             ChatDatabase.init(
                 applicationContext,
                 FrameworkSQLiteOpenHelperFactory(),

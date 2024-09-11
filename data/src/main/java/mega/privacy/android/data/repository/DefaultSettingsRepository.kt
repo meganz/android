@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
@@ -101,7 +101,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     private var isShowHiddenNodesPopulated: Boolean = false
 
     init {
-        runBlocking {
+        appScope.launch {
             initialisePreferences()
         }
     }

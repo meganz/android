@@ -31,7 +31,7 @@ class ChatStorageFacadeTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = ChatStorageFacade(database)
+        underTest = ChatStorageFacade { database }
     }
 
     @ParameterizedTest

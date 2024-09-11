@@ -2,6 +2,7 @@ package mega.privacy.android.app.globalmanagement
 
 import android.app.Application
 import android.content.Intent
+import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -49,7 +50,7 @@ class BackgroundRequestListener @Inject constructor(
     private val application: Application,
     private val myAccountInfo: MyAccountInfo,
     private val megaChatApi: MegaChatApiAndroid,
-    private val dbH: DatabaseHandler,
+    private val dbH: Lazy<DatabaseHandler>,
     @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val getFullAccountInfoUseCase: GetFullAccountInfoUseCase,
@@ -113,18 +114,18 @@ class BackgroundRequestListener @Inject constructor(
                             Timber.d("Non-contact")
                             when (request.paramType) {
                                 MegaApiJava.USER_ATTR_FIRSTNAME -> {
-                                    dbH.setNonContactEmail(
+                                    dbH.get().setNonContactEmail(
                                         request.email,
                                         user.handle.toString() + ""
                                     )
-                                    dbH.setNonContactFirstName(
+                                    dbH.get().setNonContactFirstName(
                                         request.text,
                                         user.handle.toString() + ""
                                     )
                                 }
 
                                 MegaApiJava.USER_ATTR_LASTNAME -> {
-                                    dbH.setNonContactLastName(
+                                    dbH.get().setNonContactLastName(
                                         request.text,
                                         user.handle.toString() + ""
                                     )
@@ -163,7 +164,7 @@ class BackgroundRequestListener @Inject constructor(
                 }
             }
             val listener = GetAttrUserListener(application, true)
-            if (dbH.myChatFilesFolderHandle == INVALID_HANDLE) {
+            if (dbH.get().myChatFilesFolderHandle == INVALID_HANDLE) {
                 megaApi.getMyChatFilesFolder(listener)
             }
             MegaApplication.getInstance().setupMegaChatApi()
