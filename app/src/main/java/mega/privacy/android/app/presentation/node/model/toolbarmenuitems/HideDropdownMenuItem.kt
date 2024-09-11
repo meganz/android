@@ -41,7 +41,8 @@ class HideDropdownMenuItem @Inject constructor(
         resultCount: Int,
     ): Boolean {
         val isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
-        if (!isHiddenNodesEnabled || !hasNodeAccessPermission || !noNodeTakenDown) {
+
+        if (!isHiddenNodesEnabled || !hasNodeAccessPermission || !noNodeTakenDown || !noNodeInBackups) {
             return false
         }
 

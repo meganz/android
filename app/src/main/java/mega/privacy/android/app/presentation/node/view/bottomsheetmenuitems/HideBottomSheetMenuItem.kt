@@ -93,7 +93,8 @@ class HideBottomSheetMenuItem @Inject constructor(
     ): Boolean {
         val isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
         if (!isHiddenNodesEnabled) return false
-        if (isNodeInRubbish || accessPermission != AccessPermission.OWNER || node.isTakenDown)
+
+        if (isNodeInRubbish || accessPermission != AccessPermission.OWNER || node.isTakenDown || isInBackups)
             return false
         this.isPaid =
             monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false

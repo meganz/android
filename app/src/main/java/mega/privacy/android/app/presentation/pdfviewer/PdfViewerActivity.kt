@@ -1209,11 +1209,13 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         val isPaidAccount = viewModel.uiState.value.accountType?.isPaid == true
         val isHiddenNodesEnabledAndNotInShare =
             isHiddenNodesEnabled && !isInSharedItems && !isInShare
+        val isNodeInBackups = viewModel.uiState.value.isNodeInBackups
 
         val shouldShowHideNode = node != null
                 && isHiddenNodesEnabledAndNotInShare
                 && !node.isMarkedSensitive
                 && !isSensitiveInherited
+                && !isNodeInBackups
                 || !isPaidAccount
 
         val shouldShowUnhideNode = node != null
@@ -1221,6 +1223,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 && node.isMarkedSensitive
                 && !isSensitiveInherited
                 && isPaidAccount
+                && !isNodeInBackups
 
         hideMenuItem.isVisible = shouldShowHideNode
         unhideMenuItem.isVisible = shouldShowUnhideNode

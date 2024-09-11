@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.pdfviewer
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
@@ -24,12 +25,14 @@ import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -59,7 +62,12 @@ internal class PdfViewerViewModelTest {
             invoke()
         }.thenReturn(false)
     }
-
+    private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>() {
+        onBlocking {
+            invoke(any())
+        }.thenReturn(false)
+    }
+    private val savedStateHandle = mock<SavedStateHandle>()
 
     @BeforeEach
     fun setUp() {
@@ -72,6 +80,8 @@ internal class PdfViewerViewModelTest {
             checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             getChatFileUseCase = getChatFileUseCase,
+            isNodeInBackupsUseCase = isNodeInBackupsUseCase,
+            savedStateHandle = savedStateHandle,
         )
     }
 

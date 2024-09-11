@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.pdfviewer
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +22,9 @@ import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import java.net.URL
 import javax.inject.Inject
@@ -39,7 +42,12 @@ class PdfViewerViewModel @Inject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val getChatFileUseCase: GetChatFileUseCase,
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
+    private val handle: Long
+        get() = savedStateHandle["HANDLE"] ?: INVALID_HANDLE
 
     private val _state = MutableStateFlow(PdfViewerState())
 
@@ -52,6 +60,14 @@ class PdfViewerViewModel @Inject constructor(
     init {
         monitorAccountDetail()
         monitorIsHiddenNodesOnboarded()
+        checkIsNodeInBackups()
+    }
+
+    private fun checkIsNodeInBackups() {
+        viewModelScope.launch {
+            val isNodeInBackups = isNodeInBackupsUseCase(handle)
+            _state.update { it.copy(isNodeInBackups = isNodeInBackups) }
+        }
     }
 
     /**

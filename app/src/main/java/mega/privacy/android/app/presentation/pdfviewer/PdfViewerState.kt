@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.node.chat.ChatFile
  * @property accountType                    the account type
  * @property isHiddenNodesOnboarded         if the user has been onboarded with hidden nodes
  * @property startChatOfflineDownloadEvent  Event to start chat node offline download
+ * @property isNodeInBackups                if the node is in backups
  */
 data class PdfViewerState(
     val snackBarMessage: Int? = null,
@@ -27,5 +28,6 @@ data class PdfViewerState(
     val pdfStreamData: ByteArray? = null,
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean = false,
-    val startChatOfflineDownloadEvent: StateEventWithContent<ChatFile> = consumed()
+    val startChatOfflineDownloadEvent: StateEventWithContent<ChatFile> = consumed(),
+    val isNodeInBackups: Boolean = false,
 )

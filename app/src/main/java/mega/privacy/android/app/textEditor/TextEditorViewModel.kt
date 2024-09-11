@@ -8,6 +8,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -77,6 +78,7 @@ import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedD
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadBackgroundFile
@@ -131,6 +133,8 @@ class TextEditorViewModel @Inject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     companion object {
@@ -140,6 +144,9 @@ class TextEditorViewModel @Inject constructor(
         const val EDIT_MODE = "EDIT_MODE"
         const val SHOW_LINE_NUMBERS = "SHOW_LINE_NUMBERS"
     }
+
+    private val handle: Long
+        get() = savedStateHandle[INTENT_EXTRA_KEY_HANDLE] ?: INVALID_HANDLE
 
     private val textEditorData: MutableLiveData<TextEditorData> = MutableLiveData(TextEditorData())
     private val mode: MutableLiveData<String> = MutableLiveData()
@@ -169,6 +176,14 @@ class TextEditorViewModel @Inject constructor(
         monitorAccountDetail()
         monitorIsHiddenNodesOnboarded()
         monitorNodeUpdates()
+        checkIsNodeInBackups()
+    }
+
+    private fun checkIsNodeInBackups() {
+        viewModelScope.launch {
+            val isNodeInBackups = isNodeInBackupsUseCase(handle)
+            _uiState.update { it.copy(isNodeInBackups = isNodeInBackups) }
+        }
     }
 
     private fun monitorNodeUpdates() {

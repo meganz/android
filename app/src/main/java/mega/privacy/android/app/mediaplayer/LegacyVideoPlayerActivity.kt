@@ -1190,19 +1190,22 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                             val isRootParentInShare = megaApi.getRootParentNode(node).isInShare
                             val accountType = viewModel.state.value.accountType
                             val isPaidAccount = accountType?.isPaid == true
+                            val isNodeInBackup = megaApi.isInInbox(node)
 
-                            val shouldShowHideNode = isHiddenNodesEnabled &&
-                                    !isInSharedItems &&
-                                    !isRootParentInShare &&
-                                    (!node.isMarkedSensitive || !isPaidAccount) &&
-                                    !isSensitiveInherited
+                            val shouldShowHideNode = isHiddenNodesEnabled
+                                    && !isInSharedItems
+                                    && !isRootParentInShare
+                                    && (!node.isMarkedSensitive || !isPaidAccount)
+                                    && !isSensitiveInherited
+                                    && !isNodeInBackup
 
-                            val shouldShowUnhideNode = isHiddenNodesEnabled &&
-                                    !isInSharedItems &&
-                                    !isRootParentInShare &&
-                                    node.isMarkedSensitive &&
-                                    isPaidAccount &&
-                                    !isSensitiveInherited
+                            val shouldShowUnhideNode = isHiddenNodesEnabled
+                                    && !isInSharedItems
+                                    && !isRootParentInShare
+                                    && node.isMarkedSensitive
+                                    && isPaidAccount
+                                    && !isSensitiveInherited
+                                    && !isNodeInBackup
 
                             menu.findItem(R.id.hide)?.apply {
                                 isVisible = shouldShowHideNode
@@ -1242,19 +1245,22 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                             val isRootParentInShare = megaApi.getRootParentNode(node).isInShare
                             val accountType = viewModel.state.value.accountType
                             val isPaidAccount = accountType?.isPaid == true
+                            val isNodeInBackup = megaApi.isInInbox(node)
 
-                            val shouldShowHideNode = isHiddenNodesEnabled &&
-                                    !isInSharedItems &&
-                                    !isRootParentInShare &&
-                                    (!node.isMarkedSensitive || !isPaidAccount) &&
-                                    !isSensitiveInherited
+                            val shouldShowHideNode = isHiddenNodesEnabled
+                                    && !isInSharedItems
+                                    && !isRootParentInShare
+                                    && (!node.isMarkedSensitive || !isPaidAccount)
+                                    && !isSensitiveInherited
+                                    && !isNodeInBackup
 
-                            val shouldShowUnhideNode = isHiddenNodesEnabled &&
-                                    !isInSharedItems &&
-                                    !isRootParentInShare &&
-                                    node.isMarkedSensitive &&
-                                    isPaidAccount &&
-                                    !isSensitiveInherited
+                            val shouldShowUnhideNode = isHiddenNodesEnabled
+                                    && !isInSharedItems
+                                    && !isRootParentInShare
+                                    && node.isMarkedSensitive
+                                    && isPaidAccount
+                                    && !isSensitiveInherited
+                                    && !isNodeInBackup
 
                             menu.findItem(R.id.hide)?.apply {
                                 isVisible = shouldShowHideNode

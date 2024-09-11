@@ -547,7 +547,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         navController.addOnDestinationChangedListener { _, dest, args ->
             setupToolbarColors()
             when (dest.id) {
-                R.id.audio_main_player
+                R.id.audio_main_player,
                 -> {
                     if (dest.id == R.id.audio_main_player) {
                         supportActionBar?.title = ""
@@ -973,19 +973,22 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                         megaApi.getRootParentNode(node).isInShare
                                     val accountType = viewModel.state.value.accountType
                                     val isPaidAccount = accountType?.isPaid == true
+                                    val isNodeInBackup = megaApi.isInInbox(node)
 
-                                    val shouldShowHideNode = isHiddenNodesEnabled &&
-                                            !isInSharedItems &&
-                                            !isRootParentInShare &&
-                                            (!node.isMarkedSensitive || !isPaidAccount) &&
-                                            !isSensitiveInherited
+                                    val shouldShowHideNode = isHiddenNodesEnabled
+                                            && !isInSharedItems
+                                            && !isRootParentInShare
+                                            && (!node.isMarkedSensitive || !isPaidAccount)
+                                            && !isSensitiveInherited
+                                            && !isNodeInBackup
 
-                                    val shouldShowUnhideNode = isHiddenNodesEnabled &&
-                                            !isInSharedItems &&
-                                            !isRootParentInShare &&
-                                            node.isMarkedSensitive &&
-                                            isPaidAccount &&
-                                            !isSensitiveInherited
+                                    val shouldShowUnhideNode = isHiddenNodesEnabled
+                                            && !isInSharedItems
+                                            && !isRootParentInShare
+                                            && node.isMarkedSensitive
+                                            && isPaidAccount
+                                            && !isSensitiveInherited
+                                            && !isNodeInBackup
 
                                     menu.findItem(R.id.hide)?.isVisible = shouldShowHideNode
                                     menu.findItem(R.id.unhide)?.isVisible = shouldShowUnhideNode
