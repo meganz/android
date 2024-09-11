@@ -12,7 +12,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
-import mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
@@ -23,6 +22,7 @@ import mega.privacy.android.domain.entity.statistics.EndedEmptyCallTimeout
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastJoinedSuccessfullyUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastLocalVideoChangedDueToProximitySensorUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -50,6 +50,7 @@ class ChatManagement @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val megaChatApi: MegaChatApiAndroid,
     private val broadcastJoinedSuccessfullyUseCase: BroadcastJoinedSuccessfullyUseCase,
+    private val broadcastLocalVideoChangedDueToProximitySensorUseCase: BroadcastLocalVideoChangedDueToProximitySensorUseCase
 ) {
     private val app: MegaApplication = getInstance()
     private var countDownTimerToEndCall: CountDownTimer? = null
@@ -617,6 +618,15 @@ class ChatManagement @Inject constructor(
     }
 
     /**
+     * Broadcasting changes in local video
+     */
+    private fun broadcastChangesInLocalVideoDueToProximitySensor(shouldVideoBeEnabled: Boolean) {
+        applicationScope.launch {
+            broadcastLocalVideoChangedDueToProximitySensorUseCase(shouldVideoBeEnabled)
+        }
+    }
+
+    /**
      * Method for checking when there are changes in the proximity sensor
      *
      * @param isNear True, if the device is close to the ear. False, if it is far away
@@ -631,13 +641,12 @@ class ChatManagement @Inject constructor(
             !getVideoStatus(call.chatid) -> {
                 isInTemporaryState = false
             }
+
             isNear -> {
                 Timber.d("Proximity sensor, video off")
                 isDisablingLocalVideo = false
                 isInTemporaryState = true
-                LiveEventBus.get(
-                    EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE, Boolean::class.java
-                ).post(false)
+                broadcastChangesInLocalVideoDueToProximitySensor(false)
                 if (call.hasLocalVideo() && !isDisablingLocalVideo) {
                     CallUtil.enableOrDisableLocalVideo(
                         false, call.chatid, DisableAudioVideoCallListener(
@@ -646,13 +655,12 @@ class ChatManagement @Inject constructor(
                     )
                 }
             }
+
             else -> {
                 Timber.d("Proximity sensor, video on")
                 isDisablingLocalVideo = false
                 isInTemporaryState = false
-                LiveEventBus.get(
-                    EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE, Boolean::class.java
-                ).post(true)
+                broadcastChangesInLocalVideoDueToProximitySensor(true)
                 if (!call.hasLocalVideo() && !isDisablingLocalVideo) {
                     CallUtil.enableOrDisableLocalVideo(
                         true, call.chatid, DisableAudioVideoCallListener(

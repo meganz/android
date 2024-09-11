@@ -832,6 +832,12 @@ internal class CallRepositoryImpl @Inject constructor(
     override suspend fun broadcastAudioOutput(audioDevice: AudioDevice) =
         appEventGateway.broadcastAudioOutput(audioDevice)
 
+    override fun monitorLocalVideoChangedDueToProximitySensor(): Flow<Boolean> =
+        appEventGateway.monitorLocalVideoChangedDueToProximitySensor()
+
+    override suspend fun broadcastLocalVideoChangedDueToProximitySensor(isVideoOn: Boolean) =
+        appEventGateway.broadcastLocalVideoChangedDueToProximitySensor(isVideoOn)
+
     override suspend fun mutePeers(
         chatId: Long,
         clientId: Long,

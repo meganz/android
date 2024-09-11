@@ -568,6 +568,20 @@ interface CallRepository {
     fun monitorAudioOutput(): Flow<AudioDevice>
 
     /**
+     * Broadcast that local video has changed due to proximity sensor.
+     *
+     * @param isVideoOn  True, if video is on, false if it's off.
+     */
+    suspend fun broadcastLocalVideoChangedDueToProximitySensor(isVideoOn: Boolean)
+
+    /**
+     * Monitor that local video has changed due to proximity sensor.
+     *
+     * @return Flow of Boolean.
+     */
+    fun monitorLocalVideoChangedDueToProximitySensor(): Flow<Boolean>
+
+    /**
      * Mute peers
      *
      * @param chatId            The chat id.

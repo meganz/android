@@ -67,6 +67,7 @@ internal class AppEventFacade @Inject constructor(
     private val callEnded = MutableSharedFlow<Long>()
     private val callScreenOpened = MutableSharedFlow<Boolean>()
     private val audioOutput = MutableSharedFlow<AudioDevice>()
+    private val localVideoChangedDueToProximitySensor = MutableSharedFlow<Boolean>()
 
     private val updateUserData = MutableSharedFlow<Unit>()
 
@@ -215,6 +216,12 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadcastAudioOutput(audioDevice: AudioDevice) =
         audioOutput.emit(audioDevice)
+
+    override fun monitorLocalVideoChangedDueToProximitySensor() =
+        localVideoChangedDueToProximitySensor.asSharedFlow()
+
+    override suspend fun broadcastLocalVideoChangedDueToProximitySensor(isVideoOn: Boolean) =
+        localVideoChangedDueToProximitySensor.emit(isVideoOn)
 
     override suspend fun broadcastUpdateUserData() {
         updateUserData.emit(Unit)

@@ -50,7 +50,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
@@ -223,14 +222,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var orientation: Int = Configuration.ORIENTATION_PORTRAIT
 
     val inMeetingViewModel: InMeetingViewModel by activityViewModels()
-
-    private val enableOrDisableLocalVideoObserver = Observer<Boolean> { shouldBeEnabled ->
-        val chatId = inMeetingViewModel.getChatId()
-        if (chatId != MEGACHAT_INVALID_HANDLE && inMeetingViewModel.getCall() != null && shouldBeEnabled != sharedModel.micLiveData.value) {
-            MegaApplication.getChatManagement().isDisablingLocalVideo = true
-            sharedModel.clickCamera(shouldBeEnabled)
-        }
-    }
 
     private val nameChangeObserver = Observer<Long> { peerId ->
         if (peerId != MegaApiJava.INVALID_HANDLE) {
@@ -699,9 +690,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun initLiveEventBus() {
-        LiveEventBus.get(EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE, Boolean::class.java)
-            .observe(this, enableOrDisableLocalVideoObserver)
-
         LiveEventBus.get(EVENT_CONTACT_NAME_CHANGE, Long::class.java)
             .observe(this, nameChangeObserver)
 
@@ -826,6 +814,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             if (joinedAsGuest) {
                 inMeetingViewModel.onJoinedAsGuestConsumed()
                 controlWhenJoinedAChat(inMeetingViewModel.state.value.currentChatId)
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.isVideoEnabledDueToProximitySensor }
+            .distinctUntilChanged()) {
+            it?.let { shouldBeEnabled ->
+                if (inMeetingViewModel.getChatId() != MEGACHAT_INVALID_HANDLE && inMeetingViewModel.getCall() != null && shouldBeEnabled != sharedModel.micLiveData.value) {
+                    MegaApplication.getChatManagement().isDisablingLocalVideo = true
+                    sharedModel.clickCamera(shouldBeEnabled)
+                }
             }
         }
 

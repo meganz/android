@@ -108,6 +108,7 @@ import mega.privacy.android.domain.usecase.meeting.IsAudioLevelMonitorEnabledUse
 import mega.privacy.android.domain.usecase.meeting.JoinMeetingAsGuestUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorLocalVideoChangedDueToProximitySensorUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestHighResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestLowResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
@@ -211,6 +212,7 @@ class InMeetingViewModel @Inject constructor(
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     private val amIAloneOnAnyCallUseCase: AmIAloneOnAnyCallUseCase,
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
+    private val monitorLocalVideoChangedDueToProximitySensorUseCase: MonitorLocalVideoChangedDueToProximitySensorUseCase,
     @ApplicationContext private val context: Context,
 ) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -338,6 +340,7 @@ class InMeetingViewModel @Inject constructor(
         startMonitorChatSessionUpdates()
         startMonitorChatListItemUpdates()
         getMyUserHandle()
+        startMonitoringLocalVideoChanges()
 
         viewModelScope.launch {
             runCatching {
@@ -1212,6 +1215,23 @@ class InMeetingViewModel @Inject constructor(
             if (!isAudioLevelMonitorEnabledUseCase(chatId)) {
                 enableAudioLevelMonitorUseCase(true, chatId)
             }
+        }
+    }
+
+    /**
+     * Monitor changes in the local video due to proximity sensor
+     */
+    private fun startMonitoringLocalVideoChanges() {
+        viewModelScope.launch {
+            monitorLocalVideoChangedDueToProximitySensorUseCase()
+                .catch { Timber.e(it) }
+                .collect { isVideoOn ->
+                    _state.update {
+                        it.copy(
+                            isVideoEnabledDueToProximitySensor = isVideoOn,
+                        )
+                    }
+                }
         }
     }
 
