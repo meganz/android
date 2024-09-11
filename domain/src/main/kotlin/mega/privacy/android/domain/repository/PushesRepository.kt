@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.ChatRequest
 
 /**
  * Pushes repository.
@@ -35,10 +34,9 @@ interface PushesRepository {
      * Notifies a push has been received.
      *
      * @param beep   True if should beep, false otherwise.
-     * @param chatId Chat identifier.
      * @return Result of the request. Required for creating the notification.
      */
-    suspend fun pushReceived(beep: Boolean, chatId: Long)
+    suspend fun pushReceived(beep: Boolean)
 
     /**
      * Clear push token

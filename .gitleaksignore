@@ -222,6 +222,8 @@ app/agconnect-services.json:generic-api-key:6
 app/src/main/java/mega/privacy/android/app/MegaApplication.java:generic-api-key:69
 app/src/main/java/mega/privacy/android/app/DatabaseHandler.java:hashicorp-tf-password:41
 app/google-services.json:gcp-api-key:24
+feature/sync/src/main/java/mega/privacy/android/feature/sync/domain/usecase/sync/worker/StartSyncWorkerUseCase.kt:etsy-access-token:14
+feature/sync/src/test/java/mega/privacy/android/feature/sync/domain/usecase/worker/StartSyncWorkerUseCaseTest.kt:etsy-access-token:20
 src/nz/mega/android/utils/Util.java:generic-api-key:103
 src/nz/mega/android/FortumoPayment.java:generic-api-key:28
 src/nz/mega/android/MegaApplication.java:generic-api-key:39

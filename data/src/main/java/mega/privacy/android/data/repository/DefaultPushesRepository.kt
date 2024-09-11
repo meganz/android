@@ -73,7 +73,7 @@ internal class DefaultPushesRepository @Inject constructor(
             .apply()
     }
 
-    override suspend fun pushReceived(beep: Boolean, chatId: Long) =
+    override suspend fun pushReceived(beep: Boolean) =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
                 val listener = OptionalMegaChatRequestListenerInterface(
@@ -86,7 +86,7 @@ internal class DefaultPushesRepository @Inject constructor(
                         }
                     }
                 )
-                megaChatApi.pushReceived(beep, chatId, listener)
+                megaChatApi.pushReceived(beep, listener)
 
                 continuation.invokeOnCancellation { megaChatApi.removeRequestListener(listener) }
             }

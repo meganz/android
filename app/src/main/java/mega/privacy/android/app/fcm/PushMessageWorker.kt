@@ -131,8 +131,9 @@ class PushMessageWorker @AssistedInject constructor(
                     }
 
                     runCatching {
-                        pushReceivedUseCase(shouldBeep, chatId)
+                        pushReceivedUseCase(shouldBeep)
                     }.onSuccess {
+                        Timber.d("Push received success chatID: $chatId msgId:$msgId")
                         if (!isChatNotifiableUseCase(chatId) || !areNotificationsEnabled())
                             return@with
 

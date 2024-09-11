@@ -19,7 +19,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.fcm.PushMessageWorker
 import mega.privacy.android.app.notifications.ChatMessageNotificationManager
 import mega.privacy.android.app.notifications.PromoPushNotificationManager
 import mega.privacy.android.app.notifications.ScheduledMeetingPushMessageNotificationManager
@@ -141,7 +140,7 @@ class PushMessageWorkerTest {
     @Test
     fun `test that retryPendingConnections is invoked if fast login success`() = runTest {
         whenever(backgroundFastLoginUseCase()).thenReturn("good_session")
-        whenever(pushReceivedUseCase.invoke(any(), any())).thenReturn(Unit)
+        whenever(pushReceivedUseCase.invoke(any())).thenReturn(Unit)
 
         underTest.doWork()
         verify(retryPendingConnectionsUseCase).invoke(false)
@@ -186,7 +185,7 @@ class PushMessageWorkerTest {
         runTest {
             val push = PushMessage.ChatPushMessage(true, 1L, 2L)
             whenever(pushMessageMapper(any())).thenReturn(push)
-            whenever(pushReceivedUseCase(push.shouldBeep, push.chatId)).thenReturn(Unit)
+            whenever(pushReceivedUseCase(push.shouldBeep)).thenReturn(Unit)
             whenever(isChatNotifiableUseCase(push.chatId)).thenReturn(false)
             val result = underTest.doWork()
 

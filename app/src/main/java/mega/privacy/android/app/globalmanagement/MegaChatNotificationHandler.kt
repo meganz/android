@@ -104,7 +104,7 @@ class MegaChatNotificationHandler @Inject constructor(
 
             applicationScope.launch {
                 runCatching {
-                    pushReceivedUseCase(shouldBeep, chatId)
+                    pushReceivedUseCase(shouldBeep)
                 }.onSuccess {
                     if (!isChatNotifiableUseCase(chatId) || !areNotificationsEnabled())
                         return@launch
