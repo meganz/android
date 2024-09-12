@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.sync.domain.usecase.sync.worker
 
 import mega.privacy.android.domain.usecase.appstart.AppStopTask
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import javax.inject.Inject
 
 /**
@@ -8,9 +10,12 @@ import javax.inject.Inject
  */
 class StartSyncWorkerTask @Inject constructor(
     private val startSyncWorkerUseCase: StartSyncWorkerUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : AppStopTask {
 
     override suspend fun invoke() {
-        startSyncWorkerUseCase()
+        if (getFeatureFlagValueUseCase(SyncFeatures.AndroidSyncWorkManager)) {
+            startSyncWorkerUseCase()
+        }
     }
 }
