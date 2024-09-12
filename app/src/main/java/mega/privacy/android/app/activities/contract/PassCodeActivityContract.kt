@@ -4,9 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
-import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity.Companion.ACTION_RESET_PASSCODE_LOCK
-import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity.Companion.ACTION_SET_PASSCODE_LOCK
+import mega.privacy.android.app.activities.settingsActivities.passcodelock.PasscodeLockActivity
+import mega.privacy.android.app.activities.settingsActivities.passcodelock.PasscodeLockActivity.Companion.ACTION_RESET_PASSCODE_LOCK
+import mega.privacy.android.app.activities.settingsActivities.passcodelock.PasscodeLockActivity.Companion.ACTION_SET_PASSCODE_LOCK
 
 class PassCodeActivityContract : ActivityResultContract<Boolean, Boolean>() {
 

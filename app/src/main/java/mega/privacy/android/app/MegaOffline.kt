@@ -1,10 +1,7 @@
 package mega.privacy.android.app
 
-import android.content.Context
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.OfflineUtils
 
 /**
  * Data class for a node available offline.
@@ -60,28 +57,6 @@ data class MegaOffline(
      */
     val isFolder: Boolean
         get() = type == FOLDER
-
-    /**
-     * Gets modification date of the MegaOffline node
-     *
-     * @param context Required Context for offline node
-     */
-    fun getModificationDate(context: Context?): Long {
-        val offlineNode = OfflineUtils.getOfflineFile(context, this)
-        return if (FileUtil.isFileAvailable(offlineNode)) offlineNode.lastModified() else 0
-    }
-
-    /**
-     * Gets size of the MegaOffline node
-     *
-     * @param context Required Context for offline node
-     */
-    fun getSize(context: Context?): Long {
-        val offlineNode = OfflineUtils.getOfflineFile(context, this)
-        return if (FileUtil.isFileAvailable(offlineNode)) {
-            if (offlineNode.isFile) offlineNode.length() else FileUtil.getDirSize(offlineNode)
-        } else 0
-    }
 
     companion object {
         /** Value to indicate that the node available offline is a folder */

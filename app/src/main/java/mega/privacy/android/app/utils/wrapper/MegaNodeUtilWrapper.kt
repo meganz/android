@@ -6,8 +6,6 @@ import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
-import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.DrawerItem
@@ -360,23 +358,6 @@ interface MegaNodeUtilWrapper {
      * @param location location info
      */
     fun handleLocationClick(activity: Activity, adapterType: Int, location: LocationInfo)
-
-    /**
-     * Auto play a node when it's downloaded.
-     *
-     * @param context Android context
-     * @param autoPlayInfo auto play info
-     * @param activityLauncher interface to launch activity
-     * @param snackbarShower interface to show snackbar
-     * @param coroutineScope CoroutineScope
-     */
-    fun autoPlayNode(
-        context: Context,
-        autoPlayInfo: AutoPlayInfo,
-        activityLauncher: ActivityLauncher,
-        snackbarShower: SnackbarShower,
-        coroutineScope: CoroutineScope,
-    )
 
     /**
      * Launch [ZipBrowserActivity] to preview a zip file.

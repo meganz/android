@@ -877,18 +877,6 @@ public class Util {
     }
 
     /**
-     * Check if exist ongoing transfers
-     *
-     * @param megaApi
-     * @return true if exist ongoing transfers, false otherwise
-     * @deprecated In favour of {@link mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase} use case.
-     */
-    @Deprecated
-    public static boolean existOngoingTransfers(MegaApiAndroid megaApi) {
-        return megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0;
-    }
-
-    /**
      * Draw activity content under status bar.
      *
      * @param activity           the activity

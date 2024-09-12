@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
+import mega.privacy.android.app.activities.settingsActivities.passcodelock.PasscodeLockActivity
 import mega.privacy.android.app.databinding.BottomSheetPasscodeOptionsBinding
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.PIN_4

@@ -24,7 +24,6 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -70,7 +69,6 @@ import mega.privacy.android.app.utils.Constants.SEPARATOR
 import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
-import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
 import mega.privacy.android.app.utils.FileUtil.getTappedNodeLocalFile
 import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
@@ -1862,24 +1860,8 @@ object MegaNodeUtil {
         return false
     }
 
-    @JvmStatic
-    fun containsMediaFile(handles: List<MegaNode>): Boolean {
-        handles.forEach {
-            val mime = MimeTypeList.typeForName(it?.name)
-            if (!mime.isSvgMimeType && (mime.isImage || mime.isVideoMimeType)) return true
-        }
-
-        return false
-    }
-
     fun MegaNode.getFileName(): String =
         "$base64Handle.${MimeTypeList.typeForName(name)?.extension}"
-
-    fun MegaNode.getThumbnailFileName(): String =
-        "$base64Handle${JPG_EXTENSION}"
-
-    fun MegaNode.getPreviewFileName(): String =
-        "$base64Handle${JPG_EXTENSION}"
 
     fun MegaNode.isImage(): Boolean =
         this.isFile && MimeTypeList.typeForName(name).isImage
@@ -1899,32 +1881,6 @@ object MegaNodeUtil {
             else -> INVALID_VALUE.toLong()
         }
 
-
-    /**
-     * Check if a specific MegaOffline is valid for Image Viewer
-     *
-     * @return  True if it's valid, false otherwise
-     */
-    @JvmStatic
-    fun MegaOffline.isValidForImageViewer(): Boolean =
-        !isFolder && (MimeTypeList.typeForName(name).isImage
-                || MimeTypeList.typeForName(name).isGIF
-                || (MimeTypeList.typeForName(name).isVideoMimeType || MimeTypeList.typeForName(
-            name
-        ).isMp4Video))
-
-    /**
-     * Check if provided node File is valid for the specified MegaNode
-     *
-     * @param node      MegaNode to be compared with
-     * @param nodeFile  Node file to be compared with
-     * @return          true if its valid, false otherwise
-     */
-    @JvmStatic
-    fun MegaApiAndroid.checkValidNodeFile(node: MegaNode, nodeFile: File?): Boolean =
-        nodeFile?.canRead() == true && nodeFile.length() == node.size
-                && node.fingerprint == getFingerprint(nodeFile.absolutePath)
-
     /**
      * Generate MegaNode information preformatted text
      *
@@ -1933,17 +1889,6 @@ object MegaNodeUtil {
     fun MegaNode.getInfoText(context: Context): String {
         val nodeSizeText = getSizeString(size, context)
         val nodeDateText = formatLongDateTime(getLastAvailableTime())
-        return TextUtil.getFileInfo(nodeSizeText, nodeDateText)
-    }
-
-    /**
-     * Generate MegaOffline information preformatted text
-     *
-     * @return MegaOffline information
-     */
-    fun MegaOffline.getInfoText(context: Context): String {
-        val nodeSizeText = getSizeString(getSize(context), context)
-        val nodeDateText = formatLongDateTime(getModificationDate(context))
         return TextUtil.getFileInfo(nodeSizeText, nodeDateText)
     }
 }

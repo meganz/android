@@ -9,7 +9,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.DrawerItem
@@ -172,22 +171,6 @@ class MegaNodeUtilFacade @Inject constructor(
 
     override fun handleLocationClick(activity: Activity, adapterType: Int, location: LocationInfo) {
         MegaNodeUtil.handleLocationClick(activity, adapterType, location)
-    }
-
-    override fun autoPlayNode(
-        context: Context,
-        autoPlayInfo: AutoPlayInfo,
-        activityLauncher: ActivityLauncher,
-        snackbarShower: SnackbarShower,
-        coroutineScope: CoroutineScope,
-    ) {
-        MegaNodeUtil.autoPlayNode(
-            context,
-            autoPlayInfo,
-            activityLauncher,
-            snackbarShower,
-            coroutineScope
-        )
     }
 
     override fun openZip(

@@ -283,7 +283,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessFileDialog
-import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.UploadUtil
@@ -7390,12 +7389,13 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 when (transfer.isOffline) {
                     true -> {
                         selectDrawerItem(DrawerItem.HOMEPAGE)
-                        openFullscreenOfflineFragment(
-                            OfflineUtils.removeInitialOfflinePath(
-                                transfer.path,
-                                this
-                            ) + Constants.SEPARATOR
-                        )
+                        // Removes the "Offline" root parent of a path.
+                        // Used to open the location of an offline node in the app.
+                        val path = transfer.path.replace(
+                            getString(R.string.section_saved_for_offline_new),
+                            ""
+                        ) + Constants.SEPARATOR
+                        openFullscreenOfflineFragment(path)
                     }
 
                     false -> {

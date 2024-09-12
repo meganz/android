@@ -1,4 +1,4 @@
-package mega.privacy.android.app.activities.settingsActivities
+package mega.privacy.android.app.activities.settingsActivities.passcodelock
 
 import android.os.Bundle
 import android.os.Handler
@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityPasscodeBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
@@ -40,9 +41,7 @@ import mega.privacy.android.app.presentation.logout.LogoutViewModel
 import mega.privacy.android.app.utils.Constants.PIN_4
 import mega.privacy.android.app.utils.Constants.PIN_6
 import mega.privacy.android.app.utils.Constants.PIN_ALPHANUMERIC
-import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.PasscodeUtil
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.hideKeyboardView
 import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
@@ -116,7 +115,8 @@ class PasscodeLockActivity : BaseActivity() {
     private var fingerprintSkipped = false
     private var forgetPasscode = false
     private var passwordAlreadyTyped = false
-    private val viewModel by viewModels<LogoutViewModel>()
+    private val viewModel by viewModels<PasscodeLockViewModel>()
+    private val logoutViewModel by viewModels<LogoutViewModel>()
 
     /**
      * Handle events when a Back Press is detected
@@ -203,7 +203,7 @@ class PasscodeLockActivity : BaseActivity() {
                 passwordAlreadyTyped = savedInstanceState.getBoolean(PASSWORD_ALREADY_TYPED, false)
 
                 if (savedInstanceState.getBoolean(IS_CONFIRM_LOGOUT_SHOWN, false)) {
-                    askConfirmLogout()
+                    viewModel.checkLogoutConfirmation()
                 }
             } else {
                 passcodeType = passcodePreferenceWrapper.getPasscodeType()
@@ -215,8 +215,16 @@ class PasscodeLockActivity : BaseActivity() {
             initPasscodeScreen()
             setListeners()
         }
+        setupObservers()
+    }
 
-
+    private fun setupObservers() {
+        collectFlow(viewModel.uiState) { state ->
+            state.logoutEvent?.let {
+                askConfirmLogout(state.logoutEvent.first, state.logoutEvent.second)
+                viewModel.onLogoutEventConsumed()
+            }
+        }
     }
 
     override fun onResume() {
@@ -247,28 +255,25 @@ class PasscodeLockActivity : BaseActivity() {
     /**
      * If user has offline files or ongoing transfers shows a confirmation dialog before proceed to logout.
      * Otherwise, if user has no offline files or ongoing transfers, then proceeds to logout.
+     *
+     * @param existOfflineFiles
+     * @param existOutgoingTransfers
      */
-    private fun askConfirmLogout() {
-        val existOfflineFiles = OfflineUtils.existsOffline(this)
-        val existOutgoingTransfers = Util.existOngoingTransfers(megaApi)
-
+    private fun askConfirmLogout(existOfflineFiles: Boolean, existOutgoingTransfers: Boolean) {
         if (!existOfflineFiles && !existOutgoingTransfers) {
             logout()
             return
         }
 
-        var message = ""
-        if (existOfflineFiles && existOutgoingTransfers) {
-            message = getString(R.string.logout_warning_offline_and_transfers)
-        } else if (existOfflineFiles) {
-            message = getString(R.string.logout_warning_offline)
-        } else if (existOutgoingTransfers) {
-            message = getString(R.string.logout_warning_transfers)
+        val messageId = when {
+            existOfflineFiles && existOutgoingTransfers -> R.string.logout_warning_offline_and_transfers
+            existOfflineFiles -> R.string.logout_warning_offline
+            else -> R.string.logout_warning_transfers
         }
 
         MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
             .setTitle(getString(R.string.proceed_to_logout))
-            .setMessage(message)
+            .setMessage(getString(messageId))
             .setPositiveButton(getString(R.string.action_logout)) { _, _ ->
                 isConfirmLogoutDialogShown = false
                 logout()
@@ -287,7 +292,7 @@ class PasscodeLockActivity : BaseActivity() {
      */
     private fun logout() {
         resetAttempts()
-        viewModel.logout()
+        logoutViewModel.logout()
     }
 
     /**
@@ -533,7 +538,7 @@ class PasscodeLockActivity : BaseActivity() {
 
         binding.logoutButton.setOnClickListener {
             Analytics.tracker.trackEvent(PasscodeLogoutButtonPressedEvent)
-            askConfirmLogout()
+            viewModel.checkLogoutConfirmation()
         }
 
         binding.forgetPasscodeButton.setOnClickListener {

@@ -9,7 +9,6 @@ import java.io.File;
 
 import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
@@ -37,21 +36,6 @@ public class OfflineUtils {
 
         Timber.d("Not found offline file");
         return false;
-    }
-
-    @Deprecated
-    public static File getOfflineFolder(Context context, String path) {
-        File offlineFolder = new File(context.getFilesDir() + File.separator + path);
-
-        if (offlineFolder == null) return null;
-
-        if (offlineFolder.exists()) return offlineFolder;
-
-        if (offlineFolder.mkdirs()) {
-            return offlineFolder;
-        } else {
-            return null;
-        }
     }
 
     @Deprecated
@@ -84,30 +68,5 @@ public class OfflineUtils {
         }
 
         return path + offlineNode.getPath();
-    }
-
-    /**
-     * existsOffline
-     * @param context current context
-     * @deprecated Use HasOfflineFilesUseCase instead
-     */
-    @Deprecated
-    public static boolean existsOffline(Context context) {
-        File offlineFolder = OfflineUtils.getOfflineFolder(context, OFFLINE_DIR);
-        return isFileAvailable(offlineFolder)
-                && offlineFolder.length() > 0
-                && offlineFolder.listFiles() != null
-                && offlineFolder.listFiles().length > 0;
-    }
-
-    /**
-     * Removes the "Offline" root parent of a path.
-     * Used to open the location of an offline node in the app.
-     *
-     * @param path path from which the "Offline" root parent has to be removed
-     * @return The path without the "Offline" root parent.
-     */
-    public static String removeInitialOfflinePath(String path, Context context) {
-        return path.replace(context.getString(R.string.section_saved_for_offline_new), "");
     }
 }
