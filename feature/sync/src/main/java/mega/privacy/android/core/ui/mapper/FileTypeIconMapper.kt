@@ -229,7 +229,7 @@ private val indesignMap = mutableMapOf(
 )
 
 
-private val pfgMap = mutableMapOf(
+private val pdfMap = mutableMapOf(
     Pair(
         "pdf",
         listOf(
@@ -495,7 +495,7 @@ private val mergedMap =
     textExtensionMap + webDataMap + threeDMap + audioMap + cadMap + compressedMap +
             executableMap + excelMap + dmgMap + webLandMap +
             fontMap + illustratorMap + imageMap +
-            indesignMap + pfgMap + photoShopMap +
+            indesignMap + pdfMap + photoShopMap +
             powerPointMap + premiereMap + rawMap + spreadShitMap + torrentMap +
             vectorMap + worldMap + pagesMap + xdMap + keyNodeMap +
             numbersMap + urlMap + openFileMap + afterEffectsMap + videoMap

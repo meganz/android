@@ -63,6 +63,7 @@ class UploadDestinationViewModel @Inject constructor(
                     ImportUiItem(
                         filePath = file.path,
                         fileName = file.name,
+                        fileIcon = fileTypeIconMapper(file.name.substringAfterLast('.')),
                         error = importFileErrorMessageMapper(file.name)
                     )
                 }
@@ -81,7 +82,7 @@ class UploadDestinationViewModel @Inject constructor(
         val importTextItem = ImportUiItem(
             filePath = null,
             fileName = subject,
-            fileIcon = if (isUrl) R.drawable.ic_url_medium_solid else fileTypeIconMapper(text),
+            fileIcon = if (isUrl) R.drawable.ic_url_medium_solid else R.drawable.ic_generic_medium_solid,
         )
         _uiState.update { it.copy(importUiItems = listOf(importTextItem)) }
     }

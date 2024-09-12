@@ -46,9 +46,9 @@ fun UploadDestinationRowItem(
             .padding(8.dp)
     ) {
         ThumbnailView(
-            data = importUiItem.filePath ?: importUiItem.fileIcon,
+            data = importUiItem.filePath,
             contentScale = ContentScale.Crop,
-            defaultImage = iconPackR.drawable.ic_generic_medium_solid,
+            defaultImage = importUiItem.fileIcon ?: iconPackR.drawable.ic_generic_medium_solid,
             modifier = Modifier
                 .padding(end = 16.dp)
                 .size(48.dp)

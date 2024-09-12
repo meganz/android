@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.upload
 
-import androidx.annotation.IdRes
-
 /**
  * UI item for import files
  *
@@ -15,7 +13,7 @@ import androidx.annotation.IdRes
 data class ImportUiItem(
     val filePath: String?,
     val fileName: String,
-    @IdRes val fileIcon: Int? = null,
+    val fileIcon: Int? = null,
     val error: String? = null,
     val isUrl: Boolean = false,
 )

@@ -199,7 +199,7 @@ class UploadDestinationViewModelTest {
             whenever(getFileForUploadUseCase("file2", false)).thenReturn(file2)
             val fileUriList = listOf(uri1, uri2)
             viewModel.updateUri(fileUriList)
-            val importUiItem = ImportUiItem(fileName = "file1", filePath = "path1")
+            val importUiItem = ImportUiItem(fileName = "file1", filePath = "path1", fileIcon = 0)
             viewModel.editFileName(importUiItem)
             viewModel.updateFileName("fileNew")
             assertThat(viewModel.uiState.value.importUiItems.first().fileName).isEqualTo("fileNew")
