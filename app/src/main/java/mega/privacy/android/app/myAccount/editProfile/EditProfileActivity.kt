@@ -59,12 +59,10 @@ import mega.privacy.android.app.utils.Constants.MAX_WIDTH_APPBAR_LAND
 import mega.privacy.android.app.utils.Constants.MAX_WIDTH_APPBAR_PORT
 import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
 import mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE
-import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.canVoluntaryVerifyPhoneNumber
 import mega.privacy.android.app.utils.Util.checkTakePicture
 import mega.privacy.android.app.utils.Util.dp2px
-import mega.privacy.android.app.utils.Util.existOngoingTransfers
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboard
@@ -284,8 +282,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         }
 
         binding.logoutButton.setOnClickListener { viewModel.logout(this@EditProfileActivity) }
-
-        setupLogoutWarnings()
     }
 
     private fun allowNameAndEmailEdition() {
@@ -327,7 +323,14 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         lifecycleScope.launch {
             editProfileViewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect {
-                    setUpAvatar(it.avatarFile, it.avatarColor)
+                    setUpAvatar(
+                        avatarFile = it.avatarFile,
+                        color = it.avatarColor
+                    )
+                    setupLogoutWarnings(
+                        existOfflineFiles = it.offlineFilesExist,
+                        existOutgoingTransfers = it.transfersExist
+                    )
                 }
         }
     }
@@ -531,11 +534,11 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     /**
      * Checks if there are offline files and transfers.
      * If yes, shows the corresponding warning text at the end. If not, hides the text.
+     *
+     * @param existOfflineFiles
+     * @param existOutgoingTransfers
      */
-    fun setupLogoutWarnings() {
-        val existOfflineFiles = OfflineUtils.existsOffline(this)
-        val existOutgoingTransfers = existOngoingTransfers(megaApi)
-
+    private fun setupLogoutWarnings(existOfflineFiles: Boolean, existOutgoingTransfers: Boolean) {
         binding.logoutWarningText.apply {
             isVisible = existOfflineFiles || existOutgoingTransfers
             text = getString(

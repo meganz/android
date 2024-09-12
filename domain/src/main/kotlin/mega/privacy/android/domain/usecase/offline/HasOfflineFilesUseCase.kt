@@ -17,6 +17,6 @@ class HasOfflineFilesUseCase @Inject constructor(private val fileSystemRepositor
      */
     suspend operator fun invoke(): Boolean {
         val offlineFolder = File(fileSystemRepository.getOfflinePath())
-        return offlineFolder.exists() && offlineFolder.listFiles().isNotEmpty()
+        return offlineFolder.exists() && offlineFolder.listFiles()?.isNotEmpty() == true
     }
 }

@@ -18,6 +18,8 @@ import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserLastName
+import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
+import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -34,6 +36,8 @@ class EditProfileViewModel @Inject constructor(
     private val getCurrentUserFirstName: GetCurrentUserFirstName,
     private val getCurrentUserLastName: GetCurrentUserLastName,
     private val monitorUserUpdates: MonitorUserUpdates,
+    private val hasOfflineFilesUseCase: HasOfflineFilesUseCase,
+    private val ongoingTransfersExistUseCase: OngoingTransfersExistUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(EditProfileState())
 
@@ -66,6 +70,8 @@ class EditProfileViewModel @Inject constructor(
         }
         getUserFistName(false)
         getUserLastName(false)
+        checkOfflineFiles()
+        checkOngoingTransfers()
     }
 
     private fun getUserFistName(forceRefresh: Boolean) = viewModelScope.launch {
@@ -79,6 +85,25 @@ class EditProfileViewModel @Inject constructor(
             .onSuccess { _state.update { state -> state.copy(lastName = it) } }
             .onFailure { Timber.w("Exception getting user last name.", it) }
     }
+
+    /**
+     * Check if there are offline files
+     */
+    fun checkOfflineFiles() = viewModelScope.launch {
+        runCatching { hasOfflineFilesUseCase() }
+            .onSuccess { _state.update { state -> state.copy(offlineFilesExist = it) } }
+            .onFailure { Timber.w("Exception while checking offline files.", it) }
+    }
+
+    /**
+     * Check if there are ongoing transfers
+     */
+    fun checkOngoingTransfers() = viewModelScope.launch {
+        runCatching { ongoingTransfersExistUseCase() }
+            .onSuccess { _state.update { state -> state.copy(transfersExist = it) } }
+            .onFailure { Timber.w("Exception while checking ongoing transfers.", it) }
+    }
+
 
     /**
      * Update my avatar file

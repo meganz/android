@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.extensions.withCoroutineExceptions
 import mega.privacy.android.app.presentation.editProfile.EditProfileViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.user.UserChanges
@@ -19,6 +20,8 @@ import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserLastName
+import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
+import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -28,7 +31,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
-import mega.privacy.android.app.extensions.withCoroutineExceptions
 import java.io.File
 import kotlin.test.assertEquals
 
@@ -40,6 +42,8 @@ internal class EditProfileViewModelTest {
 
     private val getMyAvatarColorUseCase = mock<GetMyAvatarColorUseCase>()
     private val getMyAvatarFileUseCase = mock<GetMyAvatarFileUseCase>()
+    private val hasOfflineFilesUseCase = mock<HasOfflineFilesUseCase>()
+    private val ongoingTransfersExistUseCase = mock<OngoingTransfersExistUseCase>()
     private val monitorMyAvatarFile = mock<MonitorMyAvatarFile>()
     private val colorMyAvatar = Color.RED
     private val monitorMyAvatarFileFlow = MutableSharedFlow<File?>()
@@ -73,6 +77,8 @@ internal class EditProfileViewModelTest {
             getCurrentUserFirstName = getCurrentUserFirstName,
             getCurrentUserLastName = getCurrentUserLastName,
             monitorUserUpdates = monitorUserUpdates,
+            hasOfflineFilesUseCase = hasOfflineFilesUseCase,
+            ongoingTransfersExistUseCase = ongoingTransfersExistUseCase
         )
     }
 
@@ -138,5 +144,27 @@ internal class EditProfileViewModelTest {
                 }
             }
         }
+
+    @Test
+    internal fun `test that offlineFilesExist is set correctly`() = runTest {
+        whenever(hasOfflineFilesUseCase()).thenReturn(true)
+
+        underTest.checkOfflineFiles()
+
+        underTest.state.test {
+            assertThat(awaitItem().offlineFilesExist).isTrue()
+        }
+    }
+
+    @Test
+    internal fun `test that transfersExist is set correctly`() = runTest {
+        whenever(ongoingTransfersExistUseCase()).thenReturn(true)
+
+        underTest.checkOngoingTransfers()
+
+        underTest.state.test {
+            assertThat(awaitItem().transfersExist).isTrue()
+        }
+    }
 }
 
