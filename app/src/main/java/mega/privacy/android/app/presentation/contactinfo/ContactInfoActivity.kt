@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.contactinfo
 
 import mega.privacy.android.icon.pack.R as iconPackR
 import android.Manifest
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -53,13 +54,13 @@ import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityCo
 import mega.privacy.android.app.activities.contract.SelectFolderToShareActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.AppBarStateChangeListener
-import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE
 import mega.privacy.android.app.databinding.ActivityChatContactPropertiesBinding
 import mega.privacy.android.app.databinding.LayoutMenuReturnCallBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
+import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
 import mega.privacy.android.app.main.controllers.NodeController
@@ -81,6 +82,8 @@ import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewMo
 import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
+import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
@@ -92,6 +95,9 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.NODE_HANDLES
+import mega.privacy.android.app.utils.Constants.SELECTED_CHATS
+import mega.privacy.android.app.utils.Constants.SELECTED_USERS
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.TimeUtils
@@ -155,6 +161,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private val viewModel by viewModels<ContactInfoViewModel>()
     private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
     private val waitingRoomManagementViewModel by viewModels<WaitingRoomManagementViewModel>()
+    private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>()
 
     private var permissionsDialog: AlertDialog? = null
     private var statusDialog: AlertDialog? = null
@@ -166,7 +173,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private var contactStateIcon = 0
     private var contactStateIconPaddingLeft = 0
     private var stateToolbar = AppBarStateChangeListener.State.IDLE
-    private val megaAttacher = MegaAttacher(this)
     private var forceAppUpdateDialog: AlertDialog? = null
 
     private var drawableShare: Drawable? = null
@@ -358,9 +364,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return
         }
-        if (savedInstanceState != null) {
-            megaAttacher.restoreState(savedInstanceState)
-        }
         configureActivityLaunchers()
 
         // State icon resource id default value.
@@ -396,11 +399,16 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun configureFileToShareLauncher() {
         selectFileResultLauncher =
             registerForActivityResult(SelectFileToShareActivityContract()) { result ->
-                result?.putStringArrayListExtra(
-                    Constants.SELECTED_CONTACTS,
-                    arrayListOf(viewModel.userEmail)
-                )
-                megaAttacher.handleSelectFileResult(result, this)
+                result?.let {
+                    val nodes = it.getLongArrayExtra(NODE_HANDLES)
+                    val email = viewModel.userEmail
+                    if (nodes != null && nodes.isNotEmpty() && !email.isNullOrEmpty()) {
+                        nodeAttachmentViewModel.attachNodesToChatByEmail(
+                            nodeId = nodes.map { handle -> NodeId(handle) },
+                            email = email
+                        )
+                    }
+                }
             }
     }
 
@@ -536,6 +544,15 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 }
             }
         }
+
+        activityChatContactBinding.root.addView(
+            createNodeAttachmentView(
+                activity = this,
+                viewModel = nodeAttachmentViewModel,
+            ) { message, id ->
+                showSnackbarWithChat(message, id)
+            }
+        )
     }
 
     private fun modifyNickName() {
@@ -651,26 +668,25 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private val shareContactResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            megaAttacher.handleActivityResult(
-                Constants.REQUEST_CODE_SELECT_CHAT,
-                it.resultCode,
-                it.data,
-                this
-            )
+            val data = it.data
+            if (it.resultCode == Activity.RESULT_OK && data != null) {
+                val email = viewModel.userEmail
+                if (!email.isNullOrEmpty()) {
+                    val chatIds = data.getLongArrayExtra(SELECTED_CHATS) ?: longArrayOf()
+                    val userHandles = data.getLongArrayExtra(SELECTED_USERS) ?: longArrayOf()
+                    nodeAttachmentViewModel.attachContactToChat(
+                        email = email,
+                        chatIds = chatIds,
+                        userHandles = userHandles
+                    )
+                }
+            }
         }
 
     private fun verifyCredentialsClicked() {
         val intent = Intent(this, AuthenticityCredentialsActivity::class.java)
         intent.putExtra(Constants.EMAIL, viewModel.userEmail)
         startActivity(intent)
-    }
-
-    /**
-     * onSavedInstanceState life cycle callback
-     */
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        megaAttacher.saveState(outState)
     }
 
     private fun visibilityStateIcon(userChatStatus: UserChatStatus) {

@@ -12,6 +12,8 @@ import mega.privacy.android.domain.exception.StorageStatePayWallException
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.GetNodesToAttachUseCase
+import mega.privacy.android.domain.usecase.chat.message.AttachContactsUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -24,6 +26,8 @@ class NodeAttachmentViewModel @Inject constructor(
     private val getNodesToAttachUseCase: GetNodesToAttachUseCase,
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
+    private val getContactHandleUseCase: GetContactHandleUseCase,
+    private val attachContactsUseCase: AttachContactsUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(NodeAttachmentUiState())
 
@@ -41,6 +45,44 @@ class NodeAttachmentViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(event = NodeAttachmentEvent.AttachNode(nodeIds))
         }
+    }
+
+    /**
+     * Attach nodes to chat by email
+     */
+    fun attachNodesToChatByEmail(nodeId: List<NodeId>, email: String) {
+        viewModelScope.launch {
+            runCatching {
+                getContactHandleUseCase(email)
+            }.onSuccess {
+                if (it != null) {
+                    attachNodesToChat(nodeId, longArrayOf(), longArrayOf(it))
+                } else {
+                    Timber.d("No contact handle found")
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Attach contact to chat
+     *
+     * @param email
+     * @param chatIds
+     * @param userHandles
+     */
+    fun attachContactToChat(email: String, chatIds: LongArray, userHandles: LongArray) {
+        processAttachNodesToChat(
+            chatIds = chatIds,
+            userHandles = userHandles,
+            onSuccess = { allChatIds ->
+                allChatIds.forEach {
+                    attachContactsUseCase(it, listOf(email))
+                }
+            }
+        )
     }
 
     /**
@@ -77,6 +119,20 @@ class NodeAttachmentViewModel @Inject constructor(
      * @param chatIds
      */
     fun attachNodesToChat(nodeIds: List<NodeId>, chatIds: LongArray, userHandles: LongArray) {
+        processAttachNodesToChat(
+            chatIds,
+            userHandles,
+            onSuccess = { allChatIds ->
+                attachMultipleNodesUseCase(nodeIds, allChatIds)
+            }
+        )
+    }
+
+    private fun processAttachNodesToChat(
+        chatIds: LongArray,
+        userHandles: LongArray,
+        onSuccess: suspend (List<Long>) -> Unit,
+    ) {
         viewModelScope.launch {
             // ignore the user handles that create chat failed
             val chatIdsFromUserHandles = userHandles.map { userHandle ->
@@ -88,7 +144,7 @@ class NodeAttachmentViewModel @Inject constructor(
             }.filterNotNull()
             val allChatIds = chatIdsFromUserHandles + chatIds.toList()
             runCatching {
-                attachMultipleNodesUseCase(nodeIds, allChatIds)
+                onSuccess(allChatIds)
             }.onSuccess {
                 _uiState.update { state ->
                     state.copy(event = NodeAttachmentEvent.AttachNodeSuccess(allChatIds))
