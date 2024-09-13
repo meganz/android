@@ -24,12 +24,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
-import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
-import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_NEXT
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_PLAYING
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_PREVIOUS
+import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
+import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
+import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.playlist.finalizeItem
 import mega.privacy.android.app.mediaplayer.playlist.updateNodeName
@@ -145,6 +145,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     private val playlistItemMapper: PlaylistItemMapper,
     private val megaApiFolderHttpServerIsRunningUseCase: MegaApiFolderHttpServerIsRunningUseCase,
     private val megaApiFolderHttpServerStartUseCase: MegaApiFolderHttpServerStartUseCase,
@@ -1330,7 +1331,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     }
 
     override fun clear() {
-        sharingScope.launch {
+        applicationScope.launch {
             compositeDisposable.dispose()
 
             if (needStopStreamingServer) {

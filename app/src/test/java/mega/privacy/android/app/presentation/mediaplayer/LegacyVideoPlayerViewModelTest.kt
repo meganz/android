@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.media3.common.MediaItem
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -149,7 +150,8 @@ internal class LegacyVideoPlayerViewModelTest {
             getThumbnailUseCase = getThumbnailUseCase,
             getOfflineNodeInformationByIdUseCase = getOfflineNodeInformationByIdUseCase,
             saveVideoRecentlyWatchedUseCase = saveVideoRecentlyWatchedUseCase,
-            getFileUriUseCase = getFileUriUseCase
+            getFileUriUseCase = getFileUriUseCase,
+            applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
         )
         savedStateHandle[underTest.subtitleDialogShowKey] = false
         savedStateHandle[underTest.subtitleShowKey] = false
