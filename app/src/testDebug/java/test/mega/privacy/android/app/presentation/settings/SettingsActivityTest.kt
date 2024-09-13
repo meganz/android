@@ -9,21 +9,19 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
+import mega.privacy.android.app.RecyclerViewAssertions.Companion.onViewHolder
+import mega.privacy.android.app.RecyclerViewAssertions.Companion.withRowContaining
 import mega.privacy.android.app.presentation.settings.SettingsActivity
+import mega.privacy.android.domain.usecase.IsUseHttpsEnabledUseCase
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
-import org.mockito.kotlin.whenever
-import mega.privacy.android.app.RecyclerViewAssertions
-import mega.privacy.android.app.RecyclerViewAssertions.Companion.onViewHolder
-import mega.privacy.android.app.RecyclerViewAssertions.Companion.withRowContaining
-
-import mega.privacy.android.app.di.TestSettingsAdvancedUseCases
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.wheneverBlocking
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -31,6 +29,7 @@ import mega.privacy.android.app.di.TestSettingsAdvancedUseCases
 class SettingsActivityTest{
 
     var hiltRule = HiltAndroidRule(this)
+    private val isUseHttpsEnabled = mock<IsUseHttpsEnabledUseCase>()
 
     @get:Rule
     var ruleChain: RuleChain = RuleChain
@@ -39,7 +38,7 @@ class SettingsActivityTest{
 
     @Before
     fun setUp() {
-        runBlocking { whenever(TestSettingsAdvancedUseCases.isUseHttpsEnabled()).thenReturn(true) }
+        wheneverBlocking { isUseHttpsEnabled() }.thenReturn(true)
         hiltRule.inject()
     }
 

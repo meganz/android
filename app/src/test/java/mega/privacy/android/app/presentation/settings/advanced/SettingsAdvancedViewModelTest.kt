@@ -11,11 +11,11 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.settings.advanced.SettingsAdvancedViewModel
+import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.usecase.IsUseHttpsEnabled
+import mega.privacy.android.domain.usecase.IsUseHttpsEnabledUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
-import mega.privacy.android.domain.usecase.SetUseHttps
+import mega.privacy.android.domain.usecase.SetUseHttpsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,14 +25,13 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import mega.privacy.android.app.extensions.asHotFlow
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SettingsAdvancedViewModelTest {
     private lateinit var underTest: SettingsAdvancedViewModel
 
-    private val isUseHttpsEnabled = mock<IsUseHttpsEnabled>()
+    private val isUseHttpsEnabled = mock<IsUseHttpsEnabledUseCase>()
 
     private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
 
@@ -42,7 +41,7 @@ class SettingsAdvancedViewModelTest {
         )
     }
 
-    private val setUseHttps = mock<SetUseHttps>()
+    private val setUseHttps = mock<SetUseHttpsUseCase>()
 
     @BeforeEach
     fun setUp() {

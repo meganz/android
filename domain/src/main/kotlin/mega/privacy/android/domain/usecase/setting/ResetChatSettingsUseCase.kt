@@ -11,5 +11,7 @@ class ResetChatSettingsUseCase @Inject constructor(private val chatRepository: C
     /**
      * Invoke.
      */
-    suspend operator fun invoke() = chatRepository.resetChatSettings()
+    suspend operator fun invoke() {
+        chatRepository.resetChatSettings()
+    }
 }

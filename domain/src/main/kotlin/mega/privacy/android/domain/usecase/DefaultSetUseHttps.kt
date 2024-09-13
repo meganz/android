@@ -10,11 +10,14 @@ import javax.inject.Inject
  * @property settingsRepository
  * @property networkRepository
  */
-class DefaultSetUseHttps @Inject constructor(
+class SetUseHttpsUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val networkRepository: NetworkRepository,
-) : SetUseHttps {
-    override suspend fun invoke(enabled: Boolean): Boolean {
+) {
+    /**
+     * Invoke the use case
+     */
+    suspend operator fun invoke(enabled: Boolean): Boolean {
         settingsRepository.setUseHttpsPreference(enabled)
         networkRepository.setUseHttps(enabled)
 

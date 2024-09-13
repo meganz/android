@@ -13,8 +13,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.settings.advanced.SettingsAdvancedFragment
+import mega.privacy.android.app.RecyclerViewAssertions
+import mega.privacy.android.app.launchFragmentInHiltContainer
+import mega.privacy.android.app.presentation.settings.onPreferences
+import mega.privacy.android.domain.usecase.IsUseHttpsEnabledUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.SetUseHttpsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matcher
@@ -26,10 +30,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import mega.privacy.android.app.RecyclerViewAssertions
-import mega.privacy.android.app.di.TestSettingsAdvancedUseCases
-import mega.privacy.android.app.launchFragmentInHiltContainer
-import mega.privacy.android.app.presentation.settings.onPreferences
+import org.mockito.kotlin.wheneverBlocking
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -40,6 +41,8 @@ class SettingsAdvancedFragmentTest {
 
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
+    private val isUseHttpsEnabledUseCase = mock<IsUseHttpsEnabledUseCase>()
+    private val setUseHttpsUseCase = mock<SetUseHttpsUseCase>()
 
     @Before
     fun setUp() {
@@ -49,7 +52,7 @@ class SettingsAdvancedFragmentTest {
     @Ignore("These tests are not stable. Refactor SettingsAdvancedFragment to use compose view.")
     @Test
     fun `test that checkbox is checked if preference is set to true`() {
-        runBlocking { whenever(TestSettingsAdvancedUseCases.isUseHttpsEnabled()).thenReturn(true) }
+        wheneverBlocking { isUseHttpsEnabledUseCase() }.thenReturn(true)
 
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
 
@@ -59,7 +62,7 @@ class SettingsAdvancedFragmentTest {
     @Ignore("These tests are not stable. Refactor SettingsAdvancedFragment to use compose view.")
     @Test
     fun `test that checkbox is not checked if preference is false`() {
-        runBlocking { whenever(TestSettingsAdvancedUseCases.isUseHttpsEnabled()).thenReturn(false) }
+        wheneverBlocking { isUseHttpsEnabledUseCase() }.thenReturn(false)
 
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
 
@@ -146,13 +149,13 @@ class SettingsAdvancedFragmentTest {
 
         verifyPreference(ViewMatchers.isChecked())
 
-        runBlocking { verify(TestSettingsAdvancedUseCases.setUseHttps).invoke(true) }
+        runBlocking { verify(setUseHttpsUseCase).invoke(true) }
     }
 
     @Ignore("These tests are not stable. Refactor SettingsAdvancedFragment to use compose view.")
     @Test
     fun `test that the set use case is called with false when checkbox is unchecked`() {
-        runBlocking { whenever(TestSettingsAdvancedUseCases.isUseHttpsEnabled()).thenReturn(true) }
+        wheneverBlocking { isUseHttpsEnabledUseCase() }.thenReturn(true)
         setInitialState()
 
         launchFragmentInHiltContainer<SettingsAdvancedFragment>()
@@ -166,7 +169,7 @@ class SettingsAdvancedFragmentTest {
 
         verifyPreference(ViewMatchers.isNotChecked())
 
-        runBlocking { verify(TestSettingsAdvancedUseCases.setUseHttps).invoke(false) }
+        runBlocking { verify(setUseHttpsUseCase).invoke(false) }
     }
 
     private fun setInitialState(

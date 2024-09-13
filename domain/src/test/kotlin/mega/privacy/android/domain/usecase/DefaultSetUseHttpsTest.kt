@@ -12,7 +12,7 @@ import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
 class DefaultSetUseHttpsTest {
-    private lateinit var underTest: SetUseHttps
+    private lateinit var underTest: SetUseHttpsUseCase
 
     private val settingsRepository = mock<SettingsRepository>()
 
@@ -20,7 +20,7 @@ class DefaultSetUseHttpsTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultSetUseHttps(settingsRepository = settingsRepository,
+        underTest = SetUseHttpsUseCase(settingsRepository = settingsRepository,
             networkRepository = networkRepository)
     }
 

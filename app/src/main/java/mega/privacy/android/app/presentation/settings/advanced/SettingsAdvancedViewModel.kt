@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.settings.advanced.model.SettingsAdvancedState
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.IsUseHttpsEnabled
+import mega.privacy.android.domain.usecase.IsUseHttpsEnabledUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
-import mega.privacy.android.domain.usecase.SetUseHttps
+import mega.privacy.android.domain.usecase.SetUseHttpsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import javax.inject.Inject
 
@@ -35,8 +35,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SettingsAdvancedViewModel @Inject constructor(
-    private val setUseHttps: SetUseHttps,
-    isUseHttpsEnabled: IsUseHttpsEnabled,
+    private val setUseHttps: SetUseHttpsUseCase,
+    isUseHttpsEnabled: IsUseHttpsEnabledUseCase,
     rootNodeExistsUseCase: RootNodeExistsUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
@@ -68,7 +68,7 @@ class SettingsAdvancedViewModel @Inject constructor(
         { state: SettingsAdvancedState -> state.copy(useHttpsEnabled = enabled) }
     }
 
-    private suspend fun checkPreferenceCheckedState(isUseHttpsEnabled: IsUseHttpsEnabled) =
+    private suspend fun checkPreferenceCheckedState(isUseHttpsEnabled: IsUseHttpsEnabledUseCase) =
         flowOf(isUseHttpsEnabled())
             .map { enabled ->
                 { state: SettingsAdvancedState -> state.copy(useHttpsChecked = enabled) }
