@@ -190,7 +190,7 @@ internal fun TransfersWidgetView(
                         .padding(5.dp)
                         .size(16.dp)
                         .background(
-                            color = MegaOriginalTheme.colors.background.pageBackground,
+                            color = MegaOriginalTheme.colors.background.surface1,
                             shape = CircleShape
                         )
                         .padding(2.dp)
