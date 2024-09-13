@@ -15,12 +15,12 @@ class CallIsSystemInDarkThemeDetectorTest {
 
                         import androidx.compose.foundation.isSystemInDarkTheme
                         import androidx.compose.runtime.Composable
-                        import mega.privacy.android.presentation.theme.AndroidTheme
+                        import mega.privacy.android.presentation.theme.OriginalTempTheme
 
                         @Composable
                         fun AskForDisplayOverDialog() {
                             val isDark = isSystemInDarkTheme()
-                            AndroidTheme(isDark = isDark) {
+                            OriginalTempTheme(isDark = isDark) {
 
                             }
                         }
@@ -31,8 +31,8 @@ class CallIsSystemInDarkThemeDetectorTest {
             .expect(
                 """
                         src/mega/privacy/android/presentation/controls/test.kt:10: Warning: isSystemInDarkTheme does not allow, you should use GetThemeMode UseCase [IsSystemInDarkTheme]
-                            AndroidTheme(isDark = isDark) {
-                            ~~~~~~~~~~~~
+                            OriginalTempTheme(isDark = isDark) {
+                            ~~~~~~~~~~~~~~~~~
                         0 errors, 1 warnings
                     """
             )
@@ -48,11 +48,11 @@ class CallIsSystemInDarkThemeDetectorTest {
 
                         import androidx.compose.foundation.isSystemInDarkTheme
                         import androidx.compose.runtime.Composable
-                        import mega.privacy.android.presentation.theme.AndroidTheme
+                        import mega.privacy.android.presentation.theme.OriginalTempTheme
 
                         @Composable
                         fun AskForDisplayOverDialog() {
-                            AndroidTheme(isDark = isSystemInDarkTheme()) {
+                            OriginalTempTheme(isDark = isSystemInDarkTheme()) {
 
                             }
                         }
@@ -63,8 +63,8 @@ class CallIsSystemInDarkThemeDetectorTest {
             .expect(
                 """
                         src/mega/privacy/android/presentation/controls/test.kt:9: Warning: isSystemInDarkTheme does not allow, you should use GetThemeMode UseCase [IsSystemInDarkTheme]
-                            AndroidTheme(isDark = isSystemInDarkTheme()) {
-                            ~~~~~~~~~~~~
+                            OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+                            ~~~~~~~~~~~~~~~~~
                         0 errors, 1 warnings
                     """
             )
@@ -81,13 +81,13 @@ class CallIsSystemInDarkThemeDetectorTest {
                         import androidx.compose.foundation.isSystemInDarkTheme
                         import androidx.compose.runtime.Composable
                         import androidx.compose.ui.tooling.preview.Preview
-                        import mega.privacy.android.presentation.theme.AndroidTheme
+                        import mega.privacy.android.presentation.theme.OriginalTempTheme
 
                         @Preview
                         @Composable
                         fun PreviewAskForDisplayOverDialog() {
                             val isDark = isSystemInDarkTheme()
-                            AndroidTheme(isDark = isDark) {
+                            OriginalTempTheme(isDark = isDark) {
 
                             }
                         }

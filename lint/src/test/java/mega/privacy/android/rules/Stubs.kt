@@ -49,7 +49,7 @@ object Stubs {
             package mega.privacy.android.presentation.theme
             import androidx.compose.runtime.Composable
             @Composable
-            fun AndroidTheme(
+            fun OriginalTempTheme(
                 isDark: Boolean,
                 content: @Composable () -> Unit,
             ) {

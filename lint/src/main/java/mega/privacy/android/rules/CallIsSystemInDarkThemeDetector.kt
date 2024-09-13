@@ -105,12 +105,12 @@ internal class CallIsSystemInDarkThemeDetector : Detector(), Detector.UastScanne
     }
 
     companion object {
-        private const val THEME_METHOD = "AndroidTheme"
+        private const val THEME_METHOD = "OriginalTempTheme"
         private const val COMPOSABLE_ANNOTATION = "androidx.compose.runtime.Composable"
         private const val PREVIEW_COMPOSABLE_ANNOTATION =
             "androidx.compose.ui.tooling.preview.Preview"
         private const val PREVIEW_COMBINED_ANNOTATIONS_PACKAGE =
-            "mega.privacy.android.core.ui.preview"
+            "mega.privacy.android.shared.original.core.ui.preview"
 
         private const val DESCRIPTION =
             "isSystemInDarkTheme does not allow, you should use GetThemeMode UseCase"
