@@ -15,7 +15,9 @@ import android.os.StatFs
 import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.MediaStore.MediaColumns.DATA
+import android.provider.MediaStore.MediaColumns.DATE_ADDED
 import android.provider.MediaStore.MediaColumns.DATE_MODIFIED
+import android.provider.MediaStore.MediaColumns.DATE_TAKEN
 import android.provider.MediaStore.MediaColumns.DISPLAY_NAME
 import android.provider.MediaStore.MediaColumns.SIZE
 import android.provider.MediaStore.VOLUME_EXTERNAL
@@ -442,14 +444,33 @@ internal class FileFacade @Inject constructor(
         }
     }
 
-    private suspend fun copyFile(sourceFile: DocumentFile, targetFile: File) {
+    private fun copyFile(sourceFile: DocumentFile, targetFile: File) {
         context.contentResolver.openInputStream(sourceFile.uri)?.use { inputStream ->
             targetFile.outputStream().use { output ->
                 inputStream.copyTo(output)
             }
-            targetFile.setLastModified(sourceFile.lastModified())
+            (sourceFile.lastModified().takeIf { it > 0 }
+                ?: getLastModifiedFromContentResolver(sourceFile.uri)).let { lastModified ->
+                lastModified.takeIf { it > 0 }?.let {
+                    targetFile.setLastModified(lastModified)
+                }
+            }
         }
     }
+
+    private fun getLastModifiedFromContentResolver(uri: Uri) =
+        context.contentResolver.acquireContentProviderClient(uri)
+            ?.use { client ->
+                client.query(uri, null, null, null, null)
+                    ?.use { cursor ->
+                        cursor.moveToFirst()
+                        val index = cursor.getColumnIndex(DATE_MODIFIED).takeIf { it != -1 }
+                            ?: cursor.getColumnIndex(DATE_ADDED).takeIf { it != -1 }
+                            ?: cursor.getColumnIndex(DATE_TAKEN).takeIf { it != -1 }
+                            ?: 0
+                        index.takeIf { it != 0 }?.let { cursor.getLong(it) }
+                    } ?: 0
+            } ?: 0
 
     override fun downscaleImage(file: File, destination: File, maxPixels: Long) {
         val orientation = AndroidGfxProcessor.getExifOrientation(file.absolutePath)

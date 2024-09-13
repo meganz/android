@@ -489,9 +489,23 @@ public class ShareInfo implements Serializable {
                 }
             }
         }
-        int lastModifiedIndex = cursor.getColumnIndex("last_modified");
+        int lastModifiedIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED);
         if (lastModifiedIndex != -1) {
             this.lastModified = cursor.getLong(lastModifiedIndex);
+        }
+
+        if (lastModified == 0) {
+            lastModifiedIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED);
+            if (lastModifiedIndex != -1) {
+                this.lastModified = cursor.getLong(lastModifiedIndex);
+            }
+        }
+
+        if (lastModified == 0) {
+            lastModifiedIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_TAKEN);
+            if (lastModifiedIndex != -1) {
+                this.lastModified = cursor.getLong(lastModifiedIndex);
+            }
         }
 
         if (size == -1 || inputStream == null) {
