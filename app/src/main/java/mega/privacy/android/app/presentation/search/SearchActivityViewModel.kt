@@ -44,6 +44,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
@@ -64,6 +65,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * @property typeFilterToSearchMapper [TypeFilterToSearchMapper]
  * @property emptySearchViewMapper [EmptySearchViewMapper]
  * @property cancelCancelTokenUseCase [CancelCancelTokenUseCase]
+ * @property isNodeInRubbishBinUseCase [IsNodeInRubbishBinUseCase]
  * @property setViewType [SetViewType]
  * @property monitorViewType [MonitorViewType]
  * @property getCloudSortOrder [GetCloudSortOrder]
@@ -81,6 +83,7 @@ class SearchActivityViewModel @Inject constructor(
     private val dateFilterOptionStringResMapper: DateFilterOptionStringResMapper,
     private val emptySearchViewMapper: EmptySearchViewMapper,
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val setViewType: SetViewType,
     private val monitorViewType: MonitorViewType,
     private val getCloudSortOrder: GetCloudSortOrder,
@@ -221,7 +224,11 @@ class SearchActivityViewModel @Inject constructor(
             }
         } else {
             val nodeUIItems = searchResults.distinctBy { it.id.longValue }.map { typedNode ->
-                NodeUIItem(node = typedNode, isSelected = false)
+                NodeUIItem(
+                    node = typedNode,
+                    isSelected = false,
+                    isRubbishBin = isNodeInRubbishBinUseCase(typedNode.id)
+                )
             }
             _state.update { state ->
                 val cloudSortOrder = getCloudSortOrder()

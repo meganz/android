@@ -121,7 +121,7 @@ fun <T : TypedNode> NodeListView(
                     showPublicLinkCreationTime = showPublicLinkCreationTime
                 ),
                 description = nodeUiItem.node.description,
-                tags = nodeUiItem.node.tags,
+                tags = nodeUiItem.node.tags.takeIf { !nodeUiItem.isRubbishBin && !nodeUiItem.node.isIncomingShare },
                 icon = nodeUiItem.node.getNodeItemThumbnail(fileTypeIconMapper = fileTypeIconMapper),
                 thumbnailData = ThumbnailRequest(nodeUiItem.id, isPublicNode),
                 isSelected = nodeUiItem.isSelected,
