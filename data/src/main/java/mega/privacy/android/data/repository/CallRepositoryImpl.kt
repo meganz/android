@@ -832,6 +832,15 @@ internal class CallRepositoryImpl @Inject constructor(
     override suspend fun broadcastAudioOutput(audioDevice: AudioDevice) =
         appEventGateway.broadcastAudioOutput(audioDevice)
 
+    override fun monitorWaitingForOtherParticipantsHasEnded(): Flow<Pair<Long, Boolean>> =
+        appEventGateway.monitorWaitingForOtherParticipantsHasEnded()
+
+    override suspend fun broadcastWaitingForOtherParticipantsHasEnded(
+        chatId: Long,
+        isEnded: Boolean,
+    ) =
+        appEventGateway.broadcastWaitingForOtherParticipantsHasEnded(chatId, isEnded)
+
     override fun monitorLocalVideoChangedDueToProximitySensor(): Flow<Boolean> =
         appEventGateway.monitorLocalVideoChangedDueToProximitySensor()
 

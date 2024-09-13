@@ -5,14 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.CountDownTimer
-import android.util.Pair
 import androidx.preference.PreferenceManager
-import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
-import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.utils.CallUtil
@@ -22,6 +19,7 @@ import mega.privacy.android.domain.entity.statistics.EndedEmptyCallTimeout
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastJoinedSuccessfullyUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastWaitingForOtherParticipantsHasEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastLocalVideoChangedDueToProximitySensorUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import nz.mega.sdk.MegaChatApiAndroid
@@ -50,7 +48,9 @@ class ChatManagement @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val megaChatApi: MegaChatApiAndroid,
     private val broadcastJoinedSuccessfullyUseCase: BroadcastJoinedSuccessfullyUseCase,
+    private val broadcastWaitingForOtherParticipantsHasEndedUseCase: BroadcastWaitingForOtherParticipantsHasEndedUseCase,
     private val broadcastLocalVideoChangedDueToProximitySensorUseCase: BroadcastLocalVideoChangedDueToProximitySensorUseCase
+
 ) {
     private val app: MegaApplication = getInstance()
     private var countDownTimerToEndCall: CountDownTimer? = null
@@ -142,6 +142,15 @@ class ChatManagement @Inject constructor(
     fun broadcastJoinedSuccessfully() {
         applicationScope.launch {
             broadcastJoinedSuccessfullyUseCase()
+        }
+    }
+
+    /**
+     * Broadcasting that waiting for other participants has ended
+     */
+    fun broadcastWaitingForOtherParticipantsHasEnded(chatId: Long) {
+        applicationScope.launch {
+            broadcastWaitingForOtherParticipantsHasEndedUseCase(chatId, true)
         }
     }
 
@@ -459,11 +468,7 @@ class ChatManagement @Inject constructor(
                 override fun onFinish() {
                     val call = megaChatApi.getChatCall(chatId)
                     if (call != null) {
-                        LiveEventBus.get(
-                            EVENT_UPDATE_WAITING_FOR_OTHERS, Pair::class.java
-                        ).post(
-                            Pair.create(chatId, false)
-                        )
+                        broadcastWaitingForOtherParticipantsHasEnded(chatId)
                         applicationScope.launch {
                             runCatching {
                                 hangChatCallUseCase(call.callId)
@@ -600,6 +605,7 @@ class ChatManagement @Inject constructor(
                         )
                     }
                 }
+
                 Intent.ACTION_USER_PRESENT -> {
                     isDisablingLocalVideo = false
                     isInTemporaryState = false

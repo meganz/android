@@ -40,6 +40,7 @@ internal class AppEventFacade @Inject constructor(
     private val chatArchived = MutableSharedFlow<String>()
     private val homeBadgeCount = MutableSharedFlow<Int>()
     private val isJoinedSuccessfullyToChat = MutableSharedFlow<Boolean>()
+    private val isWaitingForOtherParticipantsEnded = MutableSharedFlow<Pair<Long, Boolean>>()
     private val leaveChat = MutableSharedFlow<Long>()
     private val chatSignalPresence = MutableSharedFlow<Unit>()
     private val accountBlocked = MutableSharedFlow<AccountBlockedDetail>()
@@ -161,6 +162,15 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadcastJoinedSuccessfully() =
         isJoinedSuccessfullyToChat.emit(true)
+
+    override fun monitorWaitingForOtherParticipantsHasEnded(): Flow<Pair<Long, Boolean>> =
+        isWaitingForOtherParticipantsEnded.toSharedFlow(appScope)
+
+    override suspend fun broadcastWaitingForOtherParticipantsHasEnded(
+        chatId: Long,
+        isEnded: Boolean,
+    ) =
+        isWaitingForOtherParticipantsEnded.emit(Pair(chatId, isEnded))
 
     override fun monitorLeaveChat(): Flow<Long> = leaveChat.toSharedFlow(appScope)
 

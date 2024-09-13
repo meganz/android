@@ -2,9 +2,7 @@ package mega.privacy.android.app.usecase.call
 
 import android.os.Handler
 import android.os.Looper
-import android.util.Pair
 import androidx.lifecycle.MutableLiveData
-import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -22,7 +20,6 @@ import kotlinx.coroutines.rx3.rxFlowable
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.CustomCountDownTimer
-import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
@@ -41,6 +38,7 @@ import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallsReconnectingStatusUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastWaitingForOtherParticipantsHasEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -65,6 +63,7 @@ class MonitorCallSoundsUseCase @Inject constructor(
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val amIAloneOnAnyCallUseCase: AmIAloneOnAnyCallUseCase,
+    private val broadcastWaitingForOtherParticipantsHasEndedUseCase: BroadcastWaitingForOtherParticipantsHasEndedUseCase,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @MainImmediateDispatcher private val mainImmediateDispatcher: CoroutineDispatcher,
 ) {
@@ -185,10 +184,9 @@ class MonitorCallSoundsUseCase @Inject constructor(
                                             MegaApplication.getChatManagement()
                                                 .startCounterToFinishCall(chatId)
 
-                                            LiveEventBus.get(
-                                                EVENT_UPDATE_WAITING_FOR_OTHERS,
-                                                Pair::class.java
-                                            ).post(Pair.create(chatId, onlyMeInTheCall))
+                                            broadcastWaitingForOtherParticipantsHasEnded(
+                                                chatId
+                                            )
 
                                             megaChatApi.getChatCall(chatId)?.let { call ->
                                                 if (call.hasLocalAudio()) {
@@ -299,6 +297,15 @@ class MonitorCallSoundsUseCase @Inject constructor(
             }
 
         }, BackpressureStrategy.LATEST).asFlow()
+
+    /**
+     * Broadcasting that waiting for other participants has ended
+     */
+    private fun broadcastWaitingForOtherParticipantsHasEnded(chatId: Long) {
+        sharingScope.launch {
+            broadcastWaitingForOtherParticipantsHasEndedUseCase(chatId, false)
+        }
+    }
 
     /**
      * Hang call

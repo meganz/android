@@ -11,11 +11,9 @@ import android.widget.RelativeLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
@@ -40,7 +38,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
-import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.GetUserEmailListener
@@ -108,6 +105,7 @@ import mega.privacy.android.domain.usecase.meeting.IsAudioLevelMonitorEnabledUse
 import mega.privacy.android.domain.usecase.meeting.JoinMeetingAsGuestUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorWaitingForOtherParticipantsHasEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorLocalVideoChangedDueToProximitySensorUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestHighResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestLowResolutionVideoUseCase
@@ -212,6 +210,7 @@ class InMeetingViewModel @Inject constructor(
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
     private val amIAloneOnAnyCallUseCase: AmIAloneOnAnyCallUseCase,
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
+    private val monitorWaitingForOtherParticipantsHasEndedUseCase: MonitorWaitingForOtherParticipantsHasEndedUseCase,
     private val monitorLocalVideoChangedDueToProximitySensorUseCase: MonitorLocalVideoChangedDueToProximitySensorUseCase,
     @ApplicationContext private val context: Context,
 ) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
@@ -321,25 +320,12 @@ class InMeetingViewModel @Inject constructor(
         MutableStateFlow<Pair<Int, ((Context) -> String)?>>(Pair(TYPE_JOIN, null))
     val getParticipantsChanges: StateFlow<Pair<Int, ((Context) -> String)?>> get() = _getParticipantsChanges
 
-    private val waitingForOthersBannerObserver =
-        Observer<Pair<Long, Boolean>> { result ->
-            val chatId: Long = result.first
-            val onlyMeInTheCall: Boolean = result.second
-            if (_state.value.currentChatId == chatId) {
-                if (onlyMeInTheCall) {
-                    _showWaitingForOthersBanner.value = false
-                    if (!MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
-                        _showOnlyMeBanner.value = true
-                    }
-                }
-            }
-        }
-
     init {
         startMonitorChatCallUpdates()
         startMonitorChatSessionUpdates()
         startMonitorChatListItemUpdates()
         getMyUserHandle()
+        startMonitorWaitingForOtherParticipantsHasEnded()
         startMonitoringLocalVideoChanges()
 
         viewModelScope.launch {
@@ -420,9 +406,6 @@ class InMeetingViewModel @Inject constructor(
                 onError = Timber::e
             )
             .addTo(composite)
-
-        LiveEventBus.get<Pair<Long, Boolean>>(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
-            .observeForever(waitingForOthersBannerObserver)
     }
 
 
@@ -674,6 +657,21 @@ class InMeetingViewModel @Inject constructor(
                 }
         }
     }
+
+    private fun startMonitorWaitingForOtherParticipantsHasEnded() =
+        viewModelScope.launch {
+            monitorWaitingForOtherParticipantsHasEndedUseCase()
+                .collectLatest { (id, isEnded) ->
+                    if (_state.value.currentChatId == id) {
+                        if (isEnded) {
+                            _showWaitingForOthersBanner.value = false
+                            if (!MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
+                                _showOnlyMeBanner.value = true
+                            }
+                        }
+                    }
+                }
+        }
 
     /**
      * Get chat list item updates
@@ -2777,8 +2775,6 @@ class InMeetingViewModel @Inject constructor(
 
         composite.clear()
 
-        LiveEventBus.get<Pair<Long, Boolean>>(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
-            .removeObserver(waitingForOthersBannerObserver)
     }
 
     /**

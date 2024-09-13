@@ -5,9 +5,6 @@ object EventConstants {
     const val EVENT_MEETING_AVATAR_CHANGE = "meeting_avatar_change"
     const val EVENT_MEETING_GET_AVATAR = "meeting_get_avatar"
 
-    /** Event Keys related to calls*/
-    const val EVENT_UPDATE_WAITING_FOR_OTHERS = "update_waiting_for_others"
-
     /** Event Keys related to sessions*/
     const val EVENT_USER_VISIBILITY_CHANGE = "user_visibility_change"
 }

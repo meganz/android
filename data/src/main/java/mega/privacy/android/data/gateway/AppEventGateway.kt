@@ -212,6 +212,18 @@ internal interface AppEventGateway {
     suspend fun broadcastJoinedSuccessfully()
 
     /**
+     * Monitor if waiting for others participants has ended
+     *
+     * @return Flow [Boolean]
+     */
+    fun monitorWaitingForOtherParticipantsHasEnded(): Flow<Pair<Long, Boolean>>
+
+    /**
+     * Broadcast if waiting for others participants has ended
+     */
+    suspend fun broadcastWaitingForOtherParticipantsHasEnded(chatId: Long, isEnded: Boolean)
+
+    /**
      * Monitor if should leave a chat.
      *
      * @return Flow [Long] ID of the chat to leave.
