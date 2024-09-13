@@ -170,7 +170,7 @@ class ChatRepositoryImplTest {
             chatInitStateMapper = chatInitStateMapper,
             pendingMessageListMapper = mock(),
             chatPreviewMapper = chatPreviewMapper,
-            databaseHandler = databaseHandler,
+            databaseHandler = { databaseHandler },
             megaLocalRoomGateway = megaLocalRoomGateway,
             chatStorageGateway = chatStorageGateway,
             typedMessageEntityMapper = mock(),

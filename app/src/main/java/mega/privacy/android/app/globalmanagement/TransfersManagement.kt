@@ -11,7 +11,6 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.Util.isOnline
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.SdTransfer
@@ -36,12 +35,10 @@ import javax.inject.Singleton
  * Singleton class for transfers management.
  *
  * @property megaApi    MegaApiAndroid instance to check transfers status.
- * @property dbH        [DatabaseHandler] for getting and updating transfers' related info.
  */
 @Singleton
 class TransfersManagement @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val dbH: DatabaseHandler,
     private val broadcastFailedTransferUseCase: BroadcastFailedTransferUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,

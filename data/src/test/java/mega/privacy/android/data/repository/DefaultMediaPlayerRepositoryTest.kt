@@ -83,7 +83,7 @@ class DefaultMediaPlayerRepositoryTest {
             megaApi = megaApi,
             megaApiFolder = megaApiFolder,
             megaLocalRoomGateway = megaLocalRoomGateway,
-            dbHandler = dbHandler,
+            dbHandler = { dbHandler },
             fileNodeMapper = fileNodeMapper,
             typedAudioNodeMapper = typedAudioNodeMapper,
             typedVideoNodeMapper = typedVideoNodeMapper,

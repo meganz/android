@@ -63,6 +63,7 @@ import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
@@ -102,6 +103,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val sdCardGateway: SDCardGateway,
     private val deviceGateway: DeviceGateway,
     private val inProgressTransferMapper: InProgressTransferMapper,
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
 ) : TransferRepository {
 
     private val monitorPausedTransfers = MutableStateFlow(false)
@@ -121,9 +123,11 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     init {
         //pause transfers if db indicates it should be paused
-        scope.launch(ioDispatcher) {
-            if (localStorageGateway.getTransferQueueStatus()) {
-                pauseTransfers(true)
+        scope.launch {
+            monitorFetchNodesFinishUseCase().collect {
+                if (localStorageGateway.getTransferQueueStatus()) {
+                    pauseTransfers(true)
+                }
             }
         }
     }

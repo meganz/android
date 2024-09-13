@@ -14,7 +14,7 @@ import org.mockito.kotlin.reset
 class SyncSolvedIssuesGatewayImplTest {
 
     private val syncSolvedIssuesDao: SyncSolvedIssuesDao = mock()
-    private val underTest = SyncSolvedIssuesGatewayImpl(syncSolvedIssuesDao)
+    private val underTest = SyncSolvedIssuesGatewayImpl { syncSolvedIssuesDao }
 
     @AfterEach
     fun tearDown() {

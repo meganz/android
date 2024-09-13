@@ -2,6 +2,7 @@ package mega.privacy.android.data.preferences.migration
 
 import androidx.datastore.core.DataMigration
 import androidx.datastore.preferences.core.Preferences
+import dagger.Lazy
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.preferences.CameraUploadsSettingsPreferenceDataStore
@@ -13,7 +14,7 @@ import javax.inject.Inject
  * Handles the Preference migration from the old [MegaPreferences] to the new [CameraUploadsSettingsPreferenceDataStore]
  */
 internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constructor(
-    private val databaseHandler: DatabaseHandler,
+    private val databaseHandler: Lazy<DatabaseHandler>,
     private val cameraUploadsSettingsPreferenceDataStoreFactory: CameraUploadsSettingsPreferenceDataStoreFactory,
 ) : DataMigration<Preferences> {
     override suspend fun cleanUp() {
@@ -26,7 +27,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
     override suspend fun migrate(currentData: Preferences): Preferences {
         val newPreferences = currentData.toMutablePreferences()
         val store = cameraUploadsSettingsPreferenceDataStoreFactory(newPreferences)
-        val oldPreferences = databaseHandler.preferences
+        val oldPreferences = databaseHandler.get().preferences
         if (oldPreferences == null) {
             setDefaults(store)
         } else {

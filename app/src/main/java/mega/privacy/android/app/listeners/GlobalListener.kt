@@ -14,6 +14,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
@@ -28,7 +29,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CH
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
@@ -75,8 +75,7 @@ import javax.inject.Inject
  */
 @OptIn(FlowPreview::class)
 class GlobalListener @Inject constructor(
-    private val dbH: DatabaseHandler,
-    private val megaChatNotificationHandler: MegaChatNotificationHandler,
+    private val dbH: Lazy<DatabaseHandler>,
     @ApplicationContext private val appContext: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val storageStateMapper: StorageStateMapper,
@@ -209,7 +208,9 @@ class GlobalListener @Inject constructor(
         applicationScope.launch {
             runCatching { getPaymentMethodUseCase(true) }.onFailure { Timber.e(it) }
             runCatching { getPricing(true) }.onFailure { Timber.e(it) }
-            runCatching { dbH.resetExtendedAccountDetailsTimestamp() }.onFailure { Timber.e(it) }
+            runCatching {
+                dbH.get().resetExtendedAccountDetailsTimestamp()
+            }.onFailure { Timber.e(it) }
             runCatching { getAccountDetailsUseCase(forceRefresh = true) }.onFailure { Timber.e(it) }
             runCatching { getNumberOfSubscription(true) }.onFailure { Timber.e(it) }
         }

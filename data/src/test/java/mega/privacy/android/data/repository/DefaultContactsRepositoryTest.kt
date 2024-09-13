@@ -147,7 +147,7 @@ class DefaultContactsRepositoryTest {
             credentialsPreferencesGateway = credentialsPreferencesGateway,
             contactRequestActionMapper = contactRequestActionMapper,
             contactWrapper = contactWrapper,
-            databaseHandler = databaseHandler,
+            databaseHandler = { databaseHandler },
             chatConnectionStateMapper = chatConnectionStateMapper,
             context = context,
             megaLocalRoomGateway = megaLocalRoomGateway,

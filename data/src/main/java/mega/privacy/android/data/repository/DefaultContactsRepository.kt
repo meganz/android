@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 
 import android.content.Context
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -110,7 +111,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val credentialsPreferencesGateway: CredentialsPreferencesGateway,
     private val contactWrapper: ContactWrapper,
     private val contactRequestActionMapper: ContactRequestActionMapper,
-    private val databaseHandler: DatabaseHandler,
+    private val databaseHandler: Lazy<DatabaseHandler>,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     @ApplicationContext private val context: Context,
     private val userChatStatusMapper: UserChatStatusMapper,
@@ -679,7 +680,7 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override suspend fun clearContactDatabase() = withContext(ioDispatcher) {
         Timber.d("clear Database")
-        databaseHandler.clearContacts()
+        databaseHandler.get().clearContacts()
     }
 
     override suspend fun createOrUpdateContact(
@@ -846,10 +847,11 @@ internal class DefaultContactsRepository @Inject constructor(
                 onRequestFinish = { request: MegaRequest, error: MegaError ->
                     when (error.errorCode) {
                         MegaError.API_OK -> {
-                            databaseHandler.setLastPublicHandle(request.nodeHandle)
-                            databaseHandler.setLastPublicHandleTimeStamp()
-                            databaseHandler.lastPublicHandleType =
-                                MegaApiJava.AFFILIATE_TYPE_CONTACT
+                            databaseHandler.get().apply {
+                                setLastPublicHandle(request.nodeHandle)
+                                setLastPublicHandleTimeStamp()
+                                lastPublicHandleType = MegaApiJava.AFFILIATE_TYPE_CONTACT
+                            }
                             continuation.resumeWith(
                                 Result.success(
                                     ContactLink(

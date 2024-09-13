@@ -29,7 +29,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
     @BeforeEach
     internal fun setUp() {
         underTest = CameraUploadsSettingsPreferenceDataStoreMigration(
-            databaseHandler = databaseHandler,
+            databaseHandler = { databaseHandler },
             cameraUploadsSettingsPreferenceDataStoreFactory = mock {
                 on { invoke(anyOrNull()) }.thenReturn(
                     dataStore

@@ -21,7 +21,7 @@ internal class UserPausedSyncGatewayImplTest {
 
     @BeforeEach
     fun setUp() {
-        underTest = UserPausedSyncGatewayImpl(userPausedSyncDao)
+        underTest = UserPausedSyncGatewayImpl { userPausedSyncDao }
     }
 
     @Test

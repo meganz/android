@@ -68,6 +68,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
@@ -106,6 +107,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val megaNodeMapper: MegaNodeMapper,
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
     private val cancelTokenProvider: CancelTokenProvider,
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
 ) : PhotosRepository {
     @Volatile
     private var isInitialized: Boolean = false
@@ -133,13 +135,19 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     private var monitorNodeUpdatesJob: Job? = null
 
+    private var monitorOfflineNodeJob: Job? = null
+
     private val constraints: List<suspend (Node) -> Boolean> = listOf(
         ::checkMediaNode,
         ::checkCloudDriveNode,
     )
 
     init {
-        monitorOfflineNodes()
+        appScope.launch {
+            monitorFetchNodesFinishUseCase().collect {
+                monitorOfflineNodes()
+            }
+        }
     }
 
     override fun monitorPhotos(): Flow<List<Photo>> {
@@ -156,7 +164,8 @@ internal class DefaultPhotosRepository @Inject constructor(
     }
 
     private fun monitorOfflineNodes() {
-        nodeRepository.monitorOfflineNodeUpdates()
+        monitorOfflineNodeJob?.cancel()
+        monitorOfflineNodeJob = nodeRepository.monitorOfflineNodeUpdates()
             .onEach(::handleOfflineNodes)
             .launchIn(appScope)
     }

@@ -19,7 +19,7 @@ class CredentialsPreferencesMigrationTest {
 
     @BeforeEach
     internal fun setUp() {
-        underTest = CredentialsPreferencesMigration(databaseHandler)
+        underTest = CredentialsPreferencesMigration { databaseHandler }
     }
 
     @Test

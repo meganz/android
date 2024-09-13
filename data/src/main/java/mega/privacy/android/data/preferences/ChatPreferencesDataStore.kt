@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -38,7 +39,7 @@ internal class ChatPreferencesDataStore @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val videoQualityMapper: VideoQualityMapper,
-    private val dbH: DatabaseHandler
+    private val dbH: Lazy<DatabaseHandler>,
 ) : ChatPreferencesGateway {
     private val chatImageQualityPreferenceKey = stringPreferencesKey("CHAT_IMAGE_QUALITY")
     private val lastContactPermissionRequestedTimePreferenceKey =
@@ -59,7 +60,7 @@ internal class ChatPreferencesDataStore @Inject constructor(
             }
 
     override suspend fun getChatVideoQualityPreference(): VideoQuality =
-        videoQualityMapper(dbH.chatVideoQuality) ?: VideoQuality.ORIGINAL
+        videoQualityMapper(dbH.get().chatVideoQuality) ?: VideoQuality.ORIGINAL
 
 
     override suspend fun setChatImageQualityPreference(quality: ChatImageQuality) {

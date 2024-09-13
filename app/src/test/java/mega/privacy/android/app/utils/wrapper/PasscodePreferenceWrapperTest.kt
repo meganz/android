@@ -44,7 +44,6 @@ class PasscodePreferenceWrapperTest {
     @BeforeEach
     internal fun setUp() {
         underTest = PasscodePreferenceWrapper(
-            databaseHandler = databaseHandler,
             monitorPasscodeLockPreferenceUseCase = monitorPasscodeLockPreferenceUseCase,
             passcodeRepository = passcodeRepository,
             accountRepository = accountRepository,

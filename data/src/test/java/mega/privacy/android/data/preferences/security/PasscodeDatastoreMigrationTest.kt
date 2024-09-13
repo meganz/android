@@ -25,7 +25,7 @@ internal class PasscodeDatastoreMigrationTest {
     @BeforeEach
     internal fun setUp() {
         underTest = PasscodeDatastoreMigration(
-            databaseHandler = databaseHandler,
+            databaseHandler = { databaseHandler },
             passcodeDataStoreFactory = mock { on { invoke(anyOrNull()) }.thenReturn(passcodeDataStore) },
         )
     }

@@ -2,12 +2,13 @@ package mega.privacy.android.data.preferences.security
 
 import androidx.datastore.core.DataMigration
 import androidx.datastore.preferences.core.Preferences
+import dagger.Lazy
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaPreferences
 import javax.inject.Inject
 
 internal class PasscodeDatastoreMigration @Inject constructor(
-    private val databaseHandler: DatabaseHandler,
+    private val databaseHandler: Lazy<DatabaseHandler>,
     private val passcodeDataStoreFactory: PasscodeDataStoreFactory,
 ) : DataMigration<Preferences> {
 
@@ -23,7 +24,7 @@ internal class PasscodeDatastoreMigration @Inject constructor(
         val newPreferences = currentData.toMutablePreferences()
         val store = passcodeDataStoreFactory(newPreferences)
 
-        val oldPreferences = databaseHandler.preferences
+        val oldPreferences = databaseHandler.get().preferences
         if (oldPreferences == null) {
             setDefaults(store)
         } else {
@@ -52,13 +53,13 @@ internal class PasscodeDatastoreMigration @Inject constructor(
     ) {
         store.setValues(
             enabled = oldPreferences.passcodeLockEnabled.toBoolean(),
-            attempts = databaseHandler.attributes?.attempts ?: 0,
+            attempts = databaseHandler.get().attributes?.attempts ?: 0,
             passcode = oldPreferences.passcodeLockCode,
             state = oldPreferences.passcodeLockEnabled.toBoolean(),
             timeOutMilliseconds = oldPreferences.passcodeLockRequireTime?.toLongOrNull(),
             backgroundUTC = null,
             passcodeType = oldPreferences.passcodeLockType,
-            biometricsEnabled = databaseHandler.isFingerprintLockEnabled,
+            biometricsEnabled = databaseHandler.get().isFingerprintLockEnabled,
         )
     }
 

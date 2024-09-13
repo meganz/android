@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -139,7 +140,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
-    private val dbHandler: DatabaseHandler,
+    private val dbHandler: Lazy<DatabaseHandler>,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val userUpdateMapper: UserUpdateMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
@@ -159,7 +160,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val accountPreferencesGateway: AccountPreferencesGateway,
     private val passwordStrengthMapper: PasswordStrengthMapper,
     private val appEventGateway: AppEventGateway,
-    private val ephemeralCredentialsGateway: EphemeralCredentialsGateway,
+    private val ephemeralCredentialsGateway: Lazy<EphemeralCredentialsGateway>,
     private val accountBlockedDetailMapper: AccountBlockedDetailMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val fileGateway: FileGateway,
@@ -369,12 +370,12 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun getAccountDetailsTimeStampInSeconds(): String? =
         withContext(ioDispatcher) {
-            dbHandler.attributes?.accountDetailsTimeStamp
+            dbHandler.get().attributes?.accountDetailsTimeStamp
         }
 
     override suspend fun getExtendedAccountDetailsTimeStampInSeconds(): String? =
         withContext(ioDispatcher) {
-            dbHandler.attributes?.extendedAccountDetailsTimeStamp
+            dbHandler.get().attributes?.extendedAccountDetailsTimeStamp
         }
 
     override suspend fun getSpecificAccountDetail(
@@ -424,11 +425,11 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     override suspend fun resetAccountDetailsTimeStamp() = withContext(ioDispatcher) {
-        dbHandler.resetAccountDetailsTimeStamp()
+        dbHandler.get().resetAccountDetailsTimeStamp()
     }
 
     override suspend fun resetExtendedAccountDetailsTimestamp() = withContext(ioDispatcher) {
-        dbHandler.resetExtendedAccountDetailsTimestamp()
+        dbHandler.get().resetExtendedAccountDetailsTimestamp()
     }
 
     override suspend fun createContactLink(renew: Boolean): String = withContext(ioDispatcher) {
@@ -566,7 +567,7 @@ internal class DefaultAccountRepository @Inject constructor(
         val session = megaApiGateway.dumpSession
         val credentials = userCredentialsMapper(email, session, null, null, myUserHandle.toString())
         credentialsPreferencesGateway.save(credentials)
-        ephemeralCredentialsGateway.clear()
+        ephemeralCredentialsGateway.get().clear()
 
         accountSessionMapper(email, session, myUserHandle)
     }
@@ -875,12 +876,12 @@ internal class DefaultAccountRepository @Inject constructor(
         appEventGateway.broadcastMyAccountUpdate(data)
 
     override fun monitorEphemeralCredentials() =
-        ephemeralCredentialsGateway.monitorEphemeralCredentials()
+        ephemeralCredentialsGateway.get().monitorEphemeralCredentials()
 
     override suspend fun saveEphemeral(ephemeral: EphemeralCredentials) =
-        ephemeralCredentialsGateway.save(ephemeral)
+        ephemeralCredentialsGateway.get().save(ephemeral)
 
-    override suspend fun clearEphemeral() = ephemeralCredentialsGateway.clear()
+    override suspend fun clearEphemeral() = ephemeralCredentialsGateway.get().clear()
 
     override fun monitorRefreshSession() = appEventGateway.monitorRefreshSession()
 

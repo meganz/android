@@ -45,6 +45,7 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
@@ -95,6 +96,7 @@ class DefaultTransfersRepositoryTest {
     private val sdCardGateway = mock<SDCardGateway>()
     private val deviceGateway = mock<DeviceGateway>()
     private val inProgressTransferMapper = mock<InProgressTransferMapper>()
+    private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
 
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -106,6 +108,7 @@ class DefaultTransfersRepositoryTest {
     private suspend fun createDefaultTransfersRepository(paused: Boolean = false): DefaultTransfersRepository {
         //need to stub this method as it's called on init
         whenever(localStorageGateway.getTransferQueueStatus()).thenReturn(paused)
+        whenever(monitorFetchNodesFinishUseCase()).thenReturn(flowOf(true))
         stubPauseTransfers(paused)
         return DefaultTransfersRepository(
             megaApiGateway = megaApiGateway,
@@ -126,6 +129,7 @@ class DefaultTransfersRepositoryTest {
             sdCardGateway = sdCardGateway,
             deviceGateway = deviceGateway,
             inProgressTransferMapper = inProgressTransferMapper,
+            monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
         )
     }
 

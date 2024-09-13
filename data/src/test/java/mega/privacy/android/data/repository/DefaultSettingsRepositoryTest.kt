@@ -63,7 +63,7 @@ internal class DefaultSettingsRepositoryTest {
     @BeforeAll
     fun setUp() {
         underTest = DefaultSettingsRepository(
-            databaseHandler = databaseHandler,
+            databaseHandler = { databaseHandler },
             context = context,
             megaApiGateway = apiFacade,
             megaLocalStorageGateway = megaLocalStorageGateway,

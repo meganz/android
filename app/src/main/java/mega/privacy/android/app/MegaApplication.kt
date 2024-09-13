@@ -19,6 +19,7 @@ import com.google.android.gms.ads.MobileAds
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.Lazy
 import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import kotlinx.coroutines.CoroutineScope
@@ -74,7 +75,7 @@ import javax.inject.Provider
  * @property megaApi
  * @property megaApiFolder
  * @property megaChatApi
- * @property dbH
+ * @property _dbH
  * @property getMiscFlagsUseCase
  * @property isUserLoggedIn
  * @property myAccountInfo
@@ -112,7 +113,15 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     lateinit var megaChatApi: MegaChatApiAndroid
 
     @Inject
-    lateinit var dbH: LegacyDatabaseHandler
+    lateinit var _dbH: Lazy<LegacyDatabaseHandler>
+
+    /**
+     * Database handler
+     */
+    val dbH: LegacyDatabaseHandler
+        get() {
+            return _dbH.get()
+        }
 
     @Inject
     lateinit var getMiscFlagsUseCase: GetMiscFlagsUseCase
@@ -242,14 +251,10 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                 Timber.e(it, "MobileAds initialization failed")
             }
             runCatching { updateApiServerUseCase() }
-            dbH.resetExtendedAccountDetailsTimestamp()
             // clear the cache files stored in the external cache folder.
             clearPublicCache()
         }
 
-        val useHttpsOnly = java.lang.Boolean.parseBoolean(dbH.useHttpsOnly)
-        Timber.d("Value of useHttpsOnly: %s", useHttpsOnly)
-        megaApi.useHttpsOnly(useHttpsOnly)
         myAccountInfo.resetDefaults()
         ContextUtils.initialize(applicationContext)
 

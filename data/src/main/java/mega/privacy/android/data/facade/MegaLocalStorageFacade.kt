@@ -1,5 +1,6 @@
 package mega.privacy.android.data.facade
 
+import dagger.Lazy
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.model.MegaAttributes
@@ -22,17 +23,17 @@ import javax.inject.Inject
  * @property dbHandler
  */
 internal class MegaLocalStorageFacade @Inject constructor(
-    private val dbHandler: DatabaseHandler,
+    private val dbHandler: Lazy<DatabaseHandler>,
 ) : MegaLocalStorageGateway {
 
     override suspend fun getCloudSortOrder(): Int =
-        dbHandler.preferences?.preferredSortCloud?.toInt() ?: ORDER_DEFAULT_ASC
+        dbHandler.get().preferences?.preferredSortCloud?.toInt() ?: ORDER_DEFAULT_ASC
 
     override suspend fun getCameraSortOrder(): Int =
-        dbHandler.preferences?.preferredSortCameraUpload?.toInt() ?: ORDER_MODIFICATION_DESC
+        dbHandler.get().preferences?.preferredSortCameraUpload?.toInt() ?: ORDER_MODIFICATION_DESC
 
     override suspend fun getOthersSortOrder(): Int =
-        dbHandler.preferences?.preferredSortOthers?.toInt() ?: ORDER_DEFAULT_ASC
+        dbHandler.get().preferences?.preferredSortOthers?.toInt() ?: ORDER_DEFAULT_ASC
 
     override suspend fun getLinksSortOrder(): Int =
         when (val order = getCloudSortOrder()) {
@@ -54,121 +55,121 @@ internal class MegaLocalStorageFacade @Inject constructor(
         }
 
     override suspend fun setOfflineSortOrder(order: Int) {
-        dbHandler.setPreferredSortCloud(order.toString())
+        dbHandler.get().setPreferredSortCloud(order.toString())
     }
 
     override suspend fun setCloudSortOrder(order: Int) {
-        dbHandler.setPreferredSortCloud(order.toString())
+        dbHandler.get().setPreferredSortCloud(order.toString())
     }
 
     override suspend fun setCameraSortOrder(order: Int) {
-        dbHandler.setPreferredSortCameraUpload(order.toString())
+        dbHandler.get().setPreferredSortCameraUpload(order.toString())
     }
 
     override suspend fun setOthersSortOrder(order: Int) {
-        dbHandler.setPreferredSortOthers(order.toString())
+        dbHandler.get().setPreferredSortOthers(order.toString())
     }
 
-    override suspend fun doPreferencesExist(): Boolean = dbHandler.preferences != null
+    override suspend fun doPreferencesExist(): Boolean = dbHandler.get().preferences != null
 
     override suspend fun getNonContactByHandle(userHandle: Long): NonContactInfo? =
-        dbHandler.findNonContactByHandle(userHandle.toString())
+        dbHandler.get().findNonContactByHandle(userHandle.toString())
 
     override suspend fun setNonContactEmail(userHandle: Long, email: String) {
-        dbHandler.setNonContactEmail(email, userHandle.toString())
+        dbHandler.get().setNonContactEmail(email, userHandle.toString())
     }
 
     override suspend fun getContactByEmail(email: String?) =
-        dbHandler.findContactByEmail(email)
+        dbHandler.get().findContactByEmail(email)
 
     override suspend fun setUserHasLoggedIn() {
-        dbHandler.setFirstTime(false)
+        dbHandler.get().setFirstTime(false)
     }
 
     override suspend fun getStorageDownloadLocation(): String? =
-        dbHandler.preferences?.storageDownloadLocation
+        dbHandler.get().preferences?.storageDownloadLocation
 
     override suspend fun isStorageAskAlways(): Boolean =
-        dbHandler.preferences?.storageAskAlways?.toBoolean() ?: true
+        dbHandler.get().preferences?.storageAskAlways?.toBoolean() ?: true
 
     override suspend fun setStorageAskAlways(isStorageAskAlways: Boolean) {
-        dbHandler.setStorageAskAlways(isStorageAskAlways)
+        dbHandler.get().setStorageAskAlways(isStorageAskAlways)
     }
 
     override suspend fun isAskSetDownloadLocation(): Boolean =
-        dbHandler.askSetDownloadLocation
+        dbHandler.get().askSetDownloadLocation
 
     override suspend fun setAskSetDownloadLocation(value: Boolean) {
-        dbHandler.askSetDownloadLocation = value
+        dbHandler.get().askSetDownloadLocation = value
     }
 
     override suspend fun setStorageDownloadLocation(storageDownloadLocation: String) {
-        dbHandler.setStorageDownloadLocation(storageDownloadLocation)
+        dbHandler.get().setStorageDownloadLocation(storageDownloadLocation)
     }
 
     override suspend fun isAskBeforeLargeDownloads() =
-        dbHandler.attributes?.askSizeDownload?.equals(true.toString()) ?: true
+        dbHandler.get().attributes?.askSizeDownload?.equals(true.toString()) ?: true
 
     override suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean) {
-        dbHandler.setAttrAskSizeDownload(askForConfirmation.toString())
+        dbHandler.get().setAttrAskSizeDownload(askForConfirmation.toString())
     }
 
     override fun setPasscodeLockEnabled(isPasscodeLockEnabled: Boolean) {
-        dbHandler.isPasscodeLockEnabled = isPasscodeLockEnabled
+        dbHandler.get().isPasscodeLockEnabled = isPasscodeLockEnabled
     }
 
     override suspend fun setPasscodeLockCode(passcodeLockCode: String) {
-        dbHandler.passcodeLockCode = passcodeLockCode
+        dbHandler.get().passcodeLockCode = passcodeLockCode
     }
 
     override suspend fun setShowCopyright(showCopyrights: Boolean) {
-        dbHandler.setShowCopyright(showCopyrights)
+        dbHandler.get().setShowCopyright(showCopyrights)
     }
 
     override suspend fun getAttributes(): MegaAttributes? =
-        dbHandler.attributes
+        dbHandler.get().attributes
 
-    override suspend fun getChatFilesFolderHandle() = dbHandler.myChatFilesFolderHandle
+    override suspend fun getChatFilesFolderHandle() = dbHandler.get().myChatFilesFolderHandle
 
-    override suspend fun setLastPublicHandle(handle: Long) = dbHandler.setLastPublicHandle(handle)
+    override suspend fun setLastPublicHandle(handle: Long) = dbHandler.get().setLastPublicHandle(handle)
 
-    override suspend fun setLastPublicHandleTimeStamp() = dbHandler.setLastPublicHandleTimeStamp()
+    override suspend fun setLastPublicHandleTimeStamp() = dbHandler.get().setLastPublicHandleTimeStamp()
 
     override suspend fun setLastPublicHandleType(type: Int) {
-        dbHandler.lastPublicHandleType = type
+        dbHandler.get().lastPublicHandleType = type
     }
 
-    override suspend fun getChatSettings(): ChatSettings? = dbHandler.chatSettings
+    override suspend fun getChatSettings(): ChatSettings? = dbHandler.get().chatSettings
 
     override suspend fun setChatSettings(chatSettings: ChatSettings) {
-        dbHandler.chatSettings = chatSettings
+        dbHandler.get().chatSettings = chatSettings
     }
 
-    override suspend fun clearPreferences() = dbHandler.clearPreferences()
+    override suspend fun clearPreferences() = dbHandler.get().clearPreferences()
 
-    override suspend fun setFirstTime(firstTime: Boolean) = dbHandler.setFirstTime(firstTime)
+    override suspend fun setFirstTime(firstTime: Boolean) = dbHandler.get().setFirstTime(firstTime)
 
     override suspend fun getFirstTime(): Boolean? =
-        dbHandler.preferences?.firstTime?.toBooleanStrictOrNull()
+        dbHandler.get().preferences?.firstTime?.toBooleanStrictOrNull()
 
-    override suspend fun clearContacts() = dbHandler.clearContacts()
+    override suspend fun clearContacts() = dbHandler.get().clearContacts()
 
-    override suspend fun clearNonContacts() = dbHandler.clearNonContacts()
+    override suspend fun clearNonContacts() = dbHandler.get().clearNonContacts()
 
-    override suspend fun clearChatItems() = dbHandler.clearChatItems()
+    override suspend fun clearChatItems() = dbHandler.get().clearChatItems()
 
-    override suspend fun clearAttributes() = dbHandler.clearAttributes()
+    override suspend fun clearAttributes() = dbHandler.get().clearAttributes()
 
-    override suspend fun clearChatSettings() = dbHandler.clearChatSettings()
+    override suspend fun clearChatSettings() = dbHandler.get().clearChatSettings()
 
     override suspend fun setTransferQueueStatus(isPause: Boolean) {
-        dbHandler.transferQueueStatus = isPause
+        dbHandler.get().transferQueueStatus = isPause
     }
 
-    override suspend fun getTransferQueueStatus() = dbHandler.transferQueueStatus
+    override suspend fun getTransferQueueStatus() = dbHandler.get().transferQueueStatus
 
     override fun removePendingMessageByChatId(chatId: Long) =
-        dbHandler.removePendingMessageByChatId(chatId)
+        dbHandler.get().removePendingMessageByChatId(chatId)
 
-    override fun shouldShowCopyright(): Boolean = dbHandler.shouldShowCopyright
+    override fun shouldShowCopyright(): Boolean = dbHandler.get().shouldShowCopyright
 }

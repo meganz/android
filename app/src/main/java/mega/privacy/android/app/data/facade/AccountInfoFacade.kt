@@ -2,6 +2,7 @@ package mega.privacy.android.app.data.facade
 
 import android.content.Context
 import android.content.Intent
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +40,7 @@ class AccountInfoFacade @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
-    private val db: DatabaseHandler,
+    private val db: Lazy<DatabaseHandler>,
 ) : AccountInfoWrapper {
     private val accountDetail = MutableStateFlow(AccountDetail())
 
@@ -53,7 +54,7 @@ class AccountInfoFacade @Inject constructor(
     override suspend fun handleAccountDetail(request: MegaRequest) {
         val storage = request.numDetails and MyAccountInfo.HAS_STORAGE_DETAILS != 0
         if (storage && megaApiGateway.getRootNode() != null) {
-            db.setAccountDetailsTimeStamp()
+            db.get().setAccountDetailsTimeStamp()
         }
         val megaAccountDetails = request.megaAccountDetails ?: return
         // backward compatible, it will replace by new AccountDetail domain entity
@@ -63,7 +64,7 @@ class AccountInfoFacade @Inject constructor(
         if (sessions) {
             val megaAccountSession = megaAccountDetails.getSession(0) ?: return
             Timber.d("getMegaAccountSESSION not Null")
-            db.setExtendedAccountDetailsTimestamp()
+            db.get().setExtendedAccountDetailsTimestamp()
             val mostRecentSession: Long = megaAccountSession.mostRecentUsage
             val date: String = TimeUtils.formatDateAndTime(
                 context,
@@ -107,7 +108,7 @@ class AccountInfoFacade @Inject constructor(
         val json = purchase.receipt
         Timber.d("ORIGINAL JSON:$json") //Print JSON in logs to help debug possible payments issues
 
-        val attributes: MegaAttributes? = db.attributes
+        val attributes: MegaAttributes? = db.get().attributes
 
         val lastPublicHandle = attributes?.lastPublicHandle ?: megaApiGateway.getInvalidHandle()
         val listener = OptionalMegaRequestListenerInterface(

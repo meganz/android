@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -77,7 +78,7 @@ import kotlin.coroutines.suspendCoroutine
  */
 @ExperimentalContracts
 internal class DefaultSettingsRepository @Inject constructor(
-    private val databaseHandler: DatabaseHandler,
+    private val databaseHandler: Lazy<DatabaseHandler>,
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
@@ -97,7 +98,7 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun isPasscodeLockPreferenceEnabled() =
         withContext(ioDispatcher) {
-            databaseHandler.preferences
+            databaseHandler.get().preferences
                 ?.passcodeLockEnabled
                 ?.toBooleanStrictOrNull()
         }
@@ -264,10 +265,10 @@ internal class DefaultSettingsRepository @Inject constructor(
 
 
     override suspend fun isUseHttpsPreferenceEnabled(): Boolean =
-        databaseHandler.useHttpsOnly.toBoolean()
+        databaseHandler.get().useHttpsOnly.toBoolean()
 
     override suspend fun setUseHttpsPreference(enabled: Boolean) {
-        databaseHandler.setUseHttpsOnly(enabled)
+        databaseHandler.get().setUseHttpsOnly(enabled)
     }
 
     override fun getChatImageQuality(): Flow<ChatImageQuality> =
@@ -490,7 +491,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     }
 
     override suspend fun getDownloadToSdCardUri() = withContext(ioDispatcher) {
-        databaseHandler.sdCardUri
+        databaseHandler.get().sdCardUri
     }
 
     private suspend fun getShowHiddenNodesPreference() = withContext(ioDispatcher) {

@@ -15,7 +15,6 @@ import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_AF
 import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_AFTER_5M
 import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_AFTER_5S
 import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_IMMEDIATE
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.passcode.PasscodeTimeout
 import mega.privacy.android.domain.entity.passcode.PasscodeType
 import mega.privacy.android.domain.repository.AccountRepository
@@ -27,11 +26,9 @@ import javax.inject.Singleton
 /**
  * Passcode preference wrapper
  *
- * @property databaseHandler
  */
 @Singleton
 class PasscodePreferenceWrapper @Inject constructor(
-    private val databaseHandler: DatabaseHandler,
     private val monitorPasscodeLockPreferenceUseCase: MonitorPasscodeLockPreferenceUseCase,
     private val passcodeRepository: PasscodeRepository,
     private val accountRepository: AccountRepository,

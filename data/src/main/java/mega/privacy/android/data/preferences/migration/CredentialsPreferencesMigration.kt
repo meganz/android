@@ -2,12 +2,13 @@ package mega.privacy.android.data.preferences.migration
 
 import androidx.datastore.core.DataMigration
 import androidx.datastore.preferences.core.Preferences
+import dagger.Lazy
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.preferences.CredentialsPreferencesDataStore.Companion.migrate
 import javax.inject.Inject
 
 internal class CredentialsPreferencesMigration @Inject constructor(
-    private val databaseHandler: DatabaseHandler,
+    private val databaseHandler: Lazy<DatabaseHandler>,
 ) : DataMigration<Preferences> {
 
     override suspend fun cleanUp() {
@@ -18,11 +19,11 @@ internal class CredentialsPreferencesMigration @Inject constructor(
         currentData.asMap().keys.isEmpty()
 
     override suspend fun migrate(currentData: Preferences): Preferences {
-        databaseHandler.credentials?.let {
+        databaseHandler.get().credentials?.let {
             return currentData.toMutablePreferences().apply {
                 migrate(this, it)
             }.also {
-                databaseHandler.clearCredentials()
+                databaseHandler.get().clearCredentials()
             }
         }
         return currentData

@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -155,7 +156,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val appEventGateway: AppEventGateway,
     private val pendingMessageListMapper: PendingMessageListMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
-    private val databaseHandler: DatabaseHandler,
+    private val databaseHandler: Lazy<DatabaseHandler>,
     private val chatStorageGateway: ChatStorageGateway,
     private val typedMessageEntityMapper: TypedMessageEntityMapper,
     private val richPreviewEntityMapper: RichPreviewEntityMapper,
@@ -1026,7 +1027,8 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun getParticipantFirstName(handle: Long, contemplateEmail: Boolean): String? =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.getContactByHandle(handle)?.shortName?.takeIf { it.isNotBlank() }
-                ?: databaseHandler.findNonContactByHandle(handle.toString())?.shortName?.takeIf { it.isNotBlank() }
+                ?: databaseHandler.get()
+                    .findNonContactByHandle(handle.toString())?.shortName?.takeIf { it.isNotBlank() }
                 ?: megaChatApiGateway.getUserAliasFromCache(handle)?.takeIf { it.isNotBlank() }
                 ?: megaChatApiGateway.getUserFirstnameFromCache(handle)?.takeIf { it.isNotBlank() }
                 ?: megaChatApiGateway.getUserLastnameFromCache(handle)?.takeIf { it.isNotBlank() }
@@ -1037,7 +1039,8 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun getParticipantFullName(handle: Long): String? = withContext(ioDispatcher) {
         megaLocalRoomGateway.getContactByHandle(handle)?.fullName?.takeIf { it.isNotBlank() }
-            ?: databaseHandler.findNonContactByHandle(handle.toString())?.fullName?.takeIf { it.isNotBlank() }
+            ?: databaseHandler.get()
+                .findNonContactByHandle(handle.toString())?.fullName?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserAliasFromCache(handle)?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserFullNameFromCache(handle)?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserFirstnameFromCache(handle)?.takeIf { it.isNotBlank() }

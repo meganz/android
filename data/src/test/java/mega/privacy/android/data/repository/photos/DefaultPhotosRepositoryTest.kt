@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository.photos
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -36,6 +37,7 @@ import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
@@ -86,6 +88,9 @@ class DefaultPhotosRepositoryTest {
     private val success = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
     private val cancelTokenProvider = mock<CancelTokenProvider>()
     private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
+    private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase> {
+        onBlocking { invoke() }.thenReturn(emptyFlow())
+    }
 
     @Before
     fun setUp() {
@@ -316,6 +321,7 @@ class DefaultPhotosRepositoryTest {
         sensitivesRetriever = megaStringMapSensitivesRetriever,
         cancelTokenProvider = cancelTokenProvider,
         megaSearchFilterMapper = megaSearchFilterMapper,
+        monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
     )
 
     private fun createMegaNode(
