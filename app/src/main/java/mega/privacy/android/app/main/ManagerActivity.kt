@@ -328,6 +328,8 @@ import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseC
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import mega.privacy.android.feature.sync.ui.SyncMonitorViewModel
 import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
+import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
+import mega.privacy.android.feature.sync.ui.views.SyncPromotionViewModel
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.widgets.setTransfersWidgetContent
@@ -399,6 +401,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private val syncMonitorViewModel: SyncMonitorViewModel by viewModels()
     private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
     private val transfersViewModel: TransfersViewModel by viewModels()
+    private val syncPromotionViewModel: SyncPromotionViewModel by viewModels()
 
     /**
      * [MegaNavigator]
@@ -552,6 +555,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private lateinit var callRecordingConsentDialogComposeView: ComposeView
     private lateinit var documentScanningErrorDialogComposeView: ComposeView
     private lateinit var freePlanLimitParticipantsDialogComposeView: ComposeView
+    private lateinit var syncPromotionBottomSheetComposeView: ComposeView
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var navigationView: NavigationView
     private lateinit var adsContainerView: FrameLayout
@@ -1049,6 +1053,8 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             findViewById(R.id.document_scanning_error_dialog_compose_view)
         freePlanLimitParticipantsDialogComposeView =
             findViewById(R.id.free_plan_limit_dialog_compose_view)
+        syncPromotionBottomSheetComposeView =
+            findViewById(R.id.sync_promotion_bottom_sheet_compose_view)
         adsContainerView = findViewById(R.id.ads_web_compose_view)
         fragmentLayout = findViewById(R.id.fragment_layout)
         bottomNavigationView =
@@ -1148,6 +1154,8 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
         }
 
+        setSyncPromotionBottomSheetComposeView()
+
         freePlanLimitParticipantsDialogComposeView.apply {
             isVisible = true
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -1221,6 +1229,52 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             findViewById<ComposeView>(R.id.call_in_progress_layout).setContent {
                 OngoingCallBanner(viewModel = callInProgressViewModel) { isShow ->
                     changeAppBarElevation(isShow, ELEVATION_CALL_IN_PROGRESS)
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
+    private fun setSyncPromotionBottomSheetComposeView() {
+        syncPromotionBottomSheetComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val isDark = themeMode.isDarkMode()
+                val state by syncPromotionViewModel.state.collectAsStateWithLifecycle()
+                val coroutineScope = rememberCoroutineScope()
+                val syncPromotionBottomSheetState = rememberModalBottomSheetState(
+                    initialValue = ModalBottomSheetValue.Hidden,
+                    confirmValueChange = {
+                        true
+                    },
+                    skipHalfExpanded = true,
+                )
+
+                OriginalTempTheme(isDark = isDark) {
+                    LaunchedEffect(state.shouldShowSyncPromotion) {
+                        Timber.d("shouldShowSyncPromotion ${state.shouldShowSyncPromotion}")
+                        if (state.shouldShowSyncPromotion) {
+                            if (!isOnboarding()) {
+                                syncPromotionBottomSheetState.show()
+                            }
+                            syncPromotionViewModel.setSyncPromotionShown()
+                        } else {
+                            syncPromotionBottomSheetState.hide()
+                        }
+                    }
+                    BottomSheet(
+                        modalSheetState = syncPromotionBottomSheetState,
+                        sheetBody = {
+                            SyncPromotionBottomSheet(
+                                modifier = Modifier.semantics { testTagsAsResourceId = true },
+                                isFreeAccount = state.isFreeAccount,
+                                upgradeAccountClicked = { navigator.openUpgradeAccount(this@ManagerActivity) },
+                                hideSheet = { coroutineScope.launch { syncPromotionViewModel.onConsumeShouldShowSyncPromotion() } })
+                        },
+                        expandedRoundedCorners = true,
+                    )
                 }
             }
         }
@@ -2232,6 +2286,26 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 askForNotificationsPermission()
             }
         }
+    }
+
+    /**
+     * Checks the onboarding is pending on in progress
+     *
+     * @return True in case the the onboarding is pending on in progress. False otherwise.
+     */
+    private fun isOnboarding(): Boolean {
+        when {
+            viewModel.state.value.isFirstLogin -> return true
+
+            firstTimeAfterInstallation || askPermissions || newCreationAccount -> {
+                if (!initialPermissionsAlreadyAsked && !onAskingPermissionsFragment) {
+                    return true
+                }
+            }
+
+            requestNotificationsPermissionFirstLogin -> return true
+        }
+        return false
     }
 
     /**
@@ -4888,6 +4962,10 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun goBack() {
         retryConnectionsAndSignalPresence()
+        if (syncPromotionViewModel.state.value.shouldShowSyncPromotion) {
+            syncPromotionViewModel.onConsumeShouldShowSyncPromotion()
+            return
+        }
         if (drawerLayout.isDrawerOpen(navigationView)) {
             drawerLayout.closeDrawer(GravityCompat.START)
             return

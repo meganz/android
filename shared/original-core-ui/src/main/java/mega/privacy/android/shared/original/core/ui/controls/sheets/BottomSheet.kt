@@ -84,6 +84,7 @@ fun BottomSheet(
  * @param content scaffold/layout in which bottom sheet is shown
  * @param sheetBody list of composable which will be included in sheet content below sheet header
  * @param scrimColor when bottom sheet displayed this color will overlay on background content
+ * @param expandedRoundedCorners rounded corners even when the state is expanded
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -93,10 +94,11 @@ fun BottomSheet(
     modifier: Modifier = Modifier,
     sheetGesturesEnabled: Boolean = true,
     scrimColor: Color = MegaOriginalTheme.colors.background.blur,
+    expandedRoundedCorners: Boolean = false,
     content: (@Composable () -> Unit)? = null,
 ) {
     val roundedCornerRadius by animateDpAsState(
-        if (modalSheetState.currentValue == ModalBottomSheetValue.Expanded) 0.dp else 12.dp,
+        if (modalSheetState.currentValue == ModalBottomSheetValue.Expanded && !expandedRoundedCorners) 0.dp else 12.dp,
         label = "rounded corner radius animation"
     )
 

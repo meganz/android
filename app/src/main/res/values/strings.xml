@@ -135,7 +135,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">New to MEGA?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">Create account</string>
+    <string name="create_account">Sign up</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">Enter your email address</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -161,7 +161,7 @@
     <!-- when the user tries to share something to MEGA without being logged -->
     <string name="login_before_share">Log in to share with MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
-    <string name="reg_link_expired">Your confirmation link is no longer valid. Your account may already be activated or you may have cancelled your registration.</string>
+    <string name="reg_link_expired">Your confirmation link is no longer valid. Your account may already be activated or you may have cancelled your signup.</string>
     <!-- First Name of the user -->
     <string name="first_name_text">First name</string>
     <!-- Last name of the user -->
@@ -1356,7 +1356,7 @@
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">Install a MEGA Mobile App</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
-    <string name="title_regitration">Registration bonus</string>
+    <string name="title_regitration">Signup bonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Install a MEGA Desktop App</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -1386,7 +1386,7 @@
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">You have received %1$s storage space for installing the MEGA Mobile App.</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="result_paragraph_info_achievement_registration">You have received %1$s storage space as your free registration bonus.</string>
+    <string name="result_paragraph_info_achievement_registration">You have received %1$s storage space as your free signup bonus.</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Share folder</item>
@@ -4345,12 +4345,18 @@
         <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>

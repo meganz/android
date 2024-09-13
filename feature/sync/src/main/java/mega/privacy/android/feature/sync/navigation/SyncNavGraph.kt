@@ -43,7 +43,7 @@ private const val syncEmptyRoute = "$syncRoute/empty"
 /**
  * Route to the add new sync screen
  */
-private const val syncNewFolderRoute = "$syncRoute/new-folder"
+const val syncNewFolderRoute = "$syncRoute/new-folder"
 
 /**
  * Route to the MEGA folder picker screen
@@ -66,6 +66,22 @@ internal fun NavGraphBuilder.syncNavGraph(
         },
         route = syncRoute
     ) {
+
+        /**
+         * Method to specifically navigate from syncNewFolderRoute to syncListRoute
+         * It avoids duplicated navigation due the use of shortcuts, deep links, etc.
+         */
+        fun navFromNewFolderRouteToListRoute() {
+            navController.navigate(syncListRoute) {
+                popUpTo(syncNewFolderRoute) {
+                    inclusive = true
+                }
+            }
+            if (navController.previousBackStackEntry?.destination?.route == navController.currentBackStackEntry?.destination?.route) {
+                navController.popBackStack()
+            }
+        }
+
         composable(route = syncEmptyRoute) {
             Analytics.tracker.trackEvent(AddSyncScreenEvent)
             SyncEmptyScreen {
@@ -73,7 +89,13 @@ internal fun NavGraphBuilder.syncNavGraph(
                 navController.navigate(syncNewFolderRoute)
             }
         }
-        composable(route = syncNewFolderRoute) {
+        composable(
+            route = syncNewFolderRoute,
+            deepLinks = listOf(navDeepLink {
+                uriPattern = "https://mega.nz/$syncNewFolderRoute"
+                action = Intent.ACTION_VIEW
+            }),
+        ) {
             SyncNewFolderScreenRoute(
                 hiltViewModel(),
                 syncPermissionsManager,
@@ -81,21 +103,13 @@ internal fun NavGraphBuilder.syncNavGraph(
                     navController.navigate(syncMegaPicker)
                 },
                 openNextScreen = {
-                    navController.navigate(syncListRoute)
+                    navFromNewFolderRouteToListRoute()
                 },
                 openUpgradeAccount = {
                     openUpgradeAccountPage()
                 },
                 onBackClicked = {
-                    if (openNewSync) {
-                        navController.navigate(syncListRoute) {
-                            popUpTo(syncNewFolderRoute) {
-                                inclusive = true
-                            }
-                        }
-                    } else {
-                        navController.popBackStack()
-                    }
+                    navFromNewFolderRouteToListRoute()
                 },
             )
         }
