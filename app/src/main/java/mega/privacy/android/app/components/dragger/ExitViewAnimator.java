@@ -14,7 +14,6 @@ import androidx.core.view.ViewPropertyAnimatorListenerAdapter;
 import androidx.core.view.ViewPropertyAnimatorUpdateListener;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.samples.zoomable.ZoomableDraweeView;
 
 import timber.log.Timber;
 
@@ -34,14 +33,7 @@ public class ExitViewAnimator<D extends DraggableView> extends ReturnOriginViewA
 
         if (currentView != null) {
             if (screenPosition != null) {
-                if (currentView instanceof ZoomableDraweeView) {
-                    ZoomableDraweeView zoomableDraweeView = (ZoomableDraweeView) currentView;
-                    RectF bounds = new RectF();
-                    zoomableDraweeView.getHierarchy().getActualImageBounds(bounds);
-                    scaleX = ((float) screenPosition[2]) / (bounds.right - bounds.left);
-                    scaleY = ((float) screenPosition[3]) / (bounds.bottom - bounds.top);
-                    Timber.d("ZoomableDraweeView scale: %s %s", scaleX, scaleY);
-                } else if (currentView instanceof SimpleDraweeView) {
+                if (currentView instanceof SimpleDraweeView) {
                     SimpleDraweeView simpleDraweeView = (SimpleDraweeView) currentView;
                     RectF bounds = new RectF();
                     simpleDraweeView.getHierarchy().getActualImageBounds(bounds);

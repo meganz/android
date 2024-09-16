@@ -280,7 +280,6 @@ dependencies {
     // Fresco
     implementation(lib.bundles.fresco)
     implementation(lib.facebook.inferannotation)
-    implementation(files("src/main/libs/fresco-zoomable.aar"))
 
     // Retrofit
     implementation(lib.retrofit)
