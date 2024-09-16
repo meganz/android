@@ -50,6 +50,9 @@ internal fun SettingsSyncRoute(
         syncFrequencySelected = { selectedFrequency ->
             viewModel.handleAction(SettingsSyncAction.SyncFrequencySelected(selectedFrequency))
         },
+        snackbarShown = {
+            viewModel.handleAction(SettingsSyncAction.SnackbarShown)
+        }
     )
 }
 
@@ -59,6 +62,7 @@ private fun SettingSyncScreen(
     syncDebrisCleared: () -> Unit,
     syncOptionSelected: (SyncOption) -> Unit,
     syncFrequencySelected: (SyncFrequency) -> Unit,
+    snackbarShown: () -> Unit
 ) {
     val scaffoldState = rememberScaffoldState()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -164,6 +168,7 @@ private fun SettingSyncScreen(
                     message
                 )
             )
+            snackbarShown()
         }
     }
 }

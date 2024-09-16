@@ -99,7 +99,10 @@ internal class SettingsSyncViewModel @Inject constructor(
                     }
                 }
                 _uiState.update {
-                    it.copy(syncFrequency = action.frequency)
+                    it.copy(
+                        syncFrequency = action.frequency,
+                        snackbarMessage = R.string.settings_sync_option_updated_message
+                    )
                 }
             }
         }
@@ -107,7 +110,13 @@ internal class SettingsSyncViewModel @Inject constructor(
 
     private fun setSyncByWiFi(option: SyncOption) {
         viewModelScope.launch {
-            setSyncByWiFiUseCase(option == SyncOption.WI_FI_ONLY)
+            runCatching {
+                setSyncByWiFiUseCase(option == SyncOption.WI_FI_ONLY)
+            }.onSuccess {
+                _uiState.update {
+                    it.copy(snackbarMessage = R.string.settings_sync_option_updated_message)
+                }
+            }.onFailure(Timber::e)
         }
     }
 

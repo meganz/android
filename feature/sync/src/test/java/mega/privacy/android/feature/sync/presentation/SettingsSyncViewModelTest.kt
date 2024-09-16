@@ -190,6 +190,30 @@ class SettingsSyncViewModelTest {
             verify(setSyncFrequencyUseCase).invoke(frequency.minutes)
         }
 
+    @Test
+    fun `test that after changing sync option snackbar is shown`() = runTest {
+        whenever(clearSyncDebrisUseCase()).thenReturn(Unit)
+
+        initViewModel()
+        underTest.handleAction(SyncOptionSelected(SyncOption.WI_FI_ONLY))
+
+        underTest.uiState.test {
+            assertThat(awaitItem().snackbarMessage).isEqualTo(R.string.settings_sync_option_updated_message)
+        }
+    }
+
+    @Test
+    fun `test that after changing sync frequency snackbar is shown`() = runTest {
+        whenever(clearSyncDebrisUseCase()).thenReturn(Unit)
+
+        initViewModel()
+        underTest.handleAction(SettingsSyncAction.SyncFrequencySelected(SyncFrequency.EVERY_30_MINUTES))
+
+        underTest.uiState.test {
+            assertThat(awaitItem().snackbarMessage).isEqualTo(R.string.settings_sync_option_updated_message)
+        }
+    }
+
     private fun initViewModel() {
         underTest = SettingsSyncViewModel(
             monitorSyncByWiFiUseCase,
