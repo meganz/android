@@ -24,23 +24,4 @@ interface ActiveTransfer : TypedTransfer {
      * True if the transfer finished without actually transferring bytes because it was already transferred
      */
     val isAlreadyTransferred: Boolean
-
-    /**
-     * [TransferState]
-     */
-    val state: TransferState
-
-    /**
-     * Local path related to this transfer.
-     * For uploads, this property is the path to the source file.
-     * For downloads, it is the path of the destination file.
-     **/
-    val localPath: String
-
-    /**
-     * Handle related to this transfer.
-     * For downloads, this property is the handle of the source node.
-     * It's not used for ActiveTransfer uploads as once it has a handle is not active anymore.
-     **/
-    val nodeHandle: Long
 }
