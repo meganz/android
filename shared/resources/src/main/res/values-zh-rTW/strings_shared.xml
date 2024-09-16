@@ -662,4 +662,20 @@
     <string name="account_cancel_subscription_survey_enter_details">輸入詳細訊息</string>
     <!-- the bonus title of join without account on left meeting page-->
     <string name="meeting_guest_left_meeting_bonus_title">獲得免費雲端儲存</string>
+    <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_whats_new_label">有什麼新功能</string>
+    <!-- Title of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_title">輕鬆，自動的同步</string>
+    <!-- Body message of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_body_message">將您裝置上的資料夾與MEGA同步，以便在任何地方存取您檔案的最新版本</string>
+    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
+    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">同步資料夾</string>
+    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
+    <string name="sync_promotion_bottom_sheet_primary_button_text_free">升級以使用同步</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">瞭解更多</string>
+    <!-- Sync option dialog cancel button -->
+    <string name="settings_sync_option_cancel">取消</string>
+    <!-- Snackbar message displayed when sync option is selected -->
+    <string name="settings_sync_option_updated_message">Sync option updated</string>
 </resources>

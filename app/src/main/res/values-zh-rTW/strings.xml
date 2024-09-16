@@ -133,7 +133,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">還沒有MEGA帳戶？</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">建立帳戶</string>
+    <string name="create_account">建立MEGA帳戶</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">請輸入您的電子信箱地址</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -159,7 +159,7 @@
     <!-- when the user tries to share something to MEGA without being logged -->
     <string name="login_before_share">登入以使用MEGA進行共享</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
-    <string name="reg_link_expired">您的確認連結已無效。您的帳戶可能已啟用，或您可能已取消註冊</string>
+    <string name="reg_link_expired">您的確認連結已失效。您的帳戶可能已啟用，或您可能已取消註冊。</string>
     <!-- First Name of the user -->
     <string name="first_name_text">名字</string>
     <!-- Last name of the user -->
@@ -1356,7 +1356,7 @@
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">您已經由安裝MEGA手機應用程式而獲得%1$s儲存空間獎勵。</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="result_paragraph_info_achievement_registration">您已經收到%1$s的儲存空間，這是免費的註冊獎勵喔。</string>
+    <string name="result_paragraph_info_achievement_registration">您已收到%1$s儲存空間作為免費註冊的獎勵。</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">共享資料夾</item>
@@ -1859,7 +1859,7 @@
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">點擊即可加入通話</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
-    <string name="invite_contacts">邀請聯絡人</string>
+    <string name="invite_contacts">邀請</string>
     <!-- Label shown when the user wants to share something with other contacts -->
     <string name="share_with">與&#8230;共享</string>
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
@@ -1895,7 +1895,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">啟用或停用您整個帳戶的檔案版本控制功能。\n停用檔案版本控制並不會讓您的聯絡人無法在共享資料夾建立新版本的檔案。</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">點選，輸入姓名或電子郵件地址</string>
+    <string name="type_mail">搜尋聯絡人或輸入電子郵件地址</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">將%s新增為您的聯絡人？</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->

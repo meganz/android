@@ -137,7 +137,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">¿Nuevo en MEGA?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">Crear cuenta</string>
+    <string name="create_account">Crea una cuenta de MEGA</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">Introduce tu email</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -1386,7 +1386,7 @@
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">Instala la app móvil de MEGA</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
-    <string name="title_regitration">Bono por registro de cuenta</string>
+    <string name="title_regitration">Signup bonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Instala una aplicación de escritorio de MEGA</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -1416,7 +1416,7 @@
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">Has obtenido %1$s de espacio de almacenamiento por instalar la aplicación de MEGA para móvil.</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="result_paragraph_info_achievement_registration">Has obtenido %1$s de espacio de almacenamiento por haberte registrado.</string>
+    <string name="result_paragraph_info_achievement_registration">You have received %1$s storage space as your free signup bonus.</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Compartir carpeta</item>
@@ -1945,7 +1945,7 @@
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Toca para unirte a la llamada</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
-    <string name="invite_contacts">Invitar contactos</string>
+    <string name="invite_contacts">Invitar</string>
     <!-- Label shown when the user wants to share something with other contacts -->
     <string name="share_with">Compartir con</string>
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
@@ -1983,7 +1983,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Activa o desactiva el control de versiones de archivos para toda tu cuenta.\nDesactivar el control de versiones no impedirá que tus contactos creen nuevas versiones en carpetas compartidas.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Toca, introduce el nombre o el correo electrónico</string>
+    <string name="type_mail">Search contacts or type email address</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">¿Añadir a %s a tus contactos?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->

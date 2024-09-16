@@ -153,17 +153,17 @@
     <!-- Duration filter title of the video section  -->
     <string name="video_section_videos_duration_filter_title">Durasi</string>
     <!-- All Duration option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_all_duration">All durations</string>
+    <string name="video_section_videos_duration_option_all_duration">Semua durasi</string>
     <!-- Less than 10 seconds option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_less_than_10_seconds">Less than 10 seconds</string>
+    <string name="video_section_videos_duration_option_less_than_10_seconds">Kurang dari 10 detik</string>
     <!-- Between 10 and 60 seconds option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_10_and_60_seconds">Between 10 and 60 seconds</string>
+    <string name="video_section_videos_duration_option_between_10_and_60_seconds">Antara 10 dan 60 detik</string>
     <!-- Between 1 and 4 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_1_and_4_minutes">Between 1 and 4 minutes</string>
+    <string name="video_section_videos_duration_option_between_1_and_4_minutes">Antara 1 dan 4 menit</string>
     <!-- Between 4 and 20 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_4_and_20_minutes">Between 4 and 20 minutes</string>
+    <string name="video_section_videos_duration_option_between_4_and_20_minutes">Antara 4 dan 20 menit</string>
     <!-- More than 20 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_more_than_20_minutes">More than 20 minutes</string>
+    <string name="video_section_videos_duration_option_more_than_20_minutes">Lebih dari 20 menit</string>
     <!-- Create playlist dialog title of the video section playlists tab -->
     <string name="video_section_playlists_create_playlist_dialog_title">Masukkan nama daftar putar</string>
     <!-- Rename playlist dialog title of the video section playlists tab -->
@@ -171,7 +171,7 @@
     <!-- Error message when the playlist name already exists -->
     <string name="video_section_playlists_error_message_playlist_name_exists">A playlist with this name already exists. Enter a different name.</string>
     <!-- Delete playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_delete_playlist_dialog_title">Delete playlist?</string>
+    <string name="video_section_playlists_delete_playlist_dialog_title">Hapus playlist?</string>
     <!-- Delete button title of the video section playlists tab delete playlist dialog -->
     <string name="video_section_playlists_delete_playlist_dialog_delete_button">Hapus</string>
     <!-- Text that indicates that there’s no playlist to show. -->
@@ -179,7 +179,7 @@
     <!-- Delete option title of the video section playlist bottom sheet -->
     <string name="video_section_playlist_bottom_sheet_option_title_delete">Hapus daftar putar</string>
     <!-- Remove videos dialog title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_remove_videos_dialog_title">Remove from playlist?</string>
+    <string name="video_section_playlist_detail_remove_videos_dialog_title">Hapus dari playlist?</string>
     <!-- Remove button title of the video section playlist detail remove videos dialog -->
     <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Hapus</string>
     <!-- Play all button title of the video section playlist detail -->
@@ -390,9 +390,9 @@
     <!-- Label to indicate that is a Pro only feature -->
     <string name="general_pro_only_label">Hanya Pro</string>
     <!-- Label for the file info information screen tags field -->
-    <string name="file_info_information_tags_label">Tags</string>
+    <string name="file_info_information_tags_label">Tag</string>
     <!-- label for tags page tag description -->
-    <string name="add_tags_label_tag_description">Use tags to help you find and organise your data. Try tagging by year, location, project, or subject.</string>
+    <string name="add_tags_label_tag_description">Gunakan tag untuk membantu anda menemukan dan mengatur data anda. Coba tag berdasarkan tahun, lokasi, proyek, atau subjek.</string>
     <!-- label for tag text field in add tags page -->
     <string name="add_tags_text_label_tag">Tag</string>
     <!-- label for add tags page add button -->
@@ -406,7 +406,7 @@
     <!-- error label for add tags page when tag character limit reached -->
     <string name="add_tags_error_max_characters">Tags must be %1$d characters or less</string>
     <!-- title label for tags page -->
-    <string name="add_tags_page_title_label">Tags</string>
+    <string name="add_tags_page_title_label">Tag</string>
     <!-- The placeholder for read only files/folders with no description in info screen-->
     <string name="file_info_information_no_description_placeholder">Tidak ada deskripsi</string>
     <!-- Top bar title of the page that adds the video to the video playlist -->
@@ -466,11 +466,11 @@
     <!-- error label for add tags page when tag character limit reached -->
     <string name="add_tags_error_maximum_characters">Maksimal 32 karakter</string>
     <!-- Hidden item -->
-    <string name="hidden_item">Hidden item</string>
+    <string name="hidden_item">Item tersembunyi</string>
     <!-- Share hidden item link description -->
-    <string name="share_hidden_item_link_description">This item is set to hidden. Once you share the item, anyone with the link will be able to see it. It will still be hidden in your Cloud drive.</string>
+    <string name="share_hidden_item_link_description">Item ini diatur ke tersembunyi. Setelah anda membagikan item, siapa pun yang memiliki tautan akan dapat melihatnya. Itu masih akan disembunyikan di drive Cloud anda.</string>
     <!-- Share hidden item links description -->
-    <string name="share_hidden_item_links_description">One or more of these items is set to hidden. Once you share the hidden items, anyone with the link will be able to see them. The items will still be hidden in your Cloud drive.</string>
+    <string name="share_hidden_item_links_description">Satu atau lebih item ini diatur ke tersembunyi. Setelah anda membagikan item tersembunyi, siapa pun yang memiliki tautan akan dapat melihatnya. Item masih akan disembunyikan di drive Cloud anda.</string>
     <!-- Title shown when cancelling the subscription -->
     <string name="account_cancellation_instructions_cancel_subscription_title">Batalkan Langganan</string>
     <!-- Title shown when reactivating the subscription -->
@@ -508,7 +508,7 @@
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. Masuk ke akun MEGA anda.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
-    <string name="account_cancellation_instructions_click_main_menu">3. Click the main menu.</string>
+    <string name="account_cancellation_instructions_click_main_menu">3. Klik menu utama.</string>
     <!-- Step 4: instruction step no.4 to Click Settings of the MEGA account on MEGA website -->
     <string name="account_cancellation_instructions_click_settings">4. Click [A]Settings.[/A]</string>
     <!-- Step 5: instruction step no.5 to Click on Plan section of the MEGA account on MEGA website-->
@@ -585,15 +585,15 @@
         <item quantity="other">Found %1$s and %2$d files.</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">No tags</string>
+    <string name="file_info_information_no_tags_label">Tidak ada tag</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Membatalkan transfer&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
     <string name="report_issue_error_minimum_characters">Enquiries must be at least 10 characters</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Describe the issue with at least 10 characters</string>
+    <string name="report_issue_description_placeholder_message">Jelaskan masalah dengan setidaknya 10 karakter</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_title">Keep conversations private</string>
+    <string name="chat_recent_list_empty_title">Jaga percakapan tetap pribadi</string>
     <!--Subtitle text from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_subtitle">All your messages, group chats, and calls are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
     <!-- Label of the action button of inviting a friend from contact screen -->
@@ -601,17 +601,17 @@
     <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat_title">Invite friends with confidence</string>
     <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
-    <string name="invite_contacts_to_start_chat_subtitle">With top-notch security and verification codes, reach out without fear of scams, data mining, or information theft</string>
+    <string name="invite_contacts_to_start_chat_subtitle">Dengan kode keamanan dan verifikasi terbaik, hubungi tanpa takut penipuan, penambangan data, atau pencurian informasi</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
     <string name="invite_contacts_action_label">Undang</string>
     <!-- Share hidden folder description -->
-    <string name="share_hidden_folder_description">There are hidden items in this folder. Sharing the folder will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <string name="share_hidden_folder_description">Ada item tersembunyi di folder ini. Berbagi folder berarti bahwa item tersembunyi terlihat oleh orang-orang yang anda bagikan. Item masih akan disembunyikan di drive Cloud anda.</string>
     <!-- Share hidden folders description -->
-    <string name="share_hidden_folders_description">There are hidden items in one or more of these folders. Sharing the folders will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <string name="share_hidden_folders_description">Ada item tersembunyi di satu atau lebih folder ini. Berbagi folder berarti bahwa item tersembunyi terlihat oleh orang-orang yang anda bagikan. Item masih akan disembunyikan di drive Cloud anda.</string>
     <!-- Title shown at the top of the survey screen when cancelling the subscription -->
-    <string name="account_cancel_subscription_survey_title">We’re sorry to see you leave! Can you tell us why you’re cancelling your subscription?</string>
+    <string name="account_cancel_subscription_survey_title">Kami menyesal melihat anda pergi! Bisakah anda memberi tahu kami mengapa anda membatalkan langganan anda?</string>
     <!-- Message explaining the immediate effect of subscription cancellation -->
-    <string name="account_cancel_subscription_survey_cancellation_message">Your subscription will be cancelled immediately and you will be moved to a free MEGA account when your current plan expires. Note: Cancelling your subscription won’t delete your account.</string>
+    <string name="account_cancel_subscription_survey_cancellation_message">Langganan anda akan segera dibatalkan dan anda akan dipindahkan ke akun MEGA gratis ketika paket anda saat ini berakhir. Catatan: Membatalkan langganan tidak akan menghapus akun anda.</string>
     <!-- Warning message shown in a red box when no reason is selected -->
     <string name="account_cancel_subscription_survey_no_reason_selected">Pilih alasan untuk membatalkan langganan anda</string>
     <!-- Option in the survey indicating that the plan is too expensive -->
@@ -635,13 +635,13 @@
     <!-- Option in the survey for other reasons, with a prompt to provide details -->
     <string name="account_cancel_subscription_survey_option_other">Lainnya (harap berikan detailnya)</string>
     <!-- Checkbox allowing MEGA to contact the user for further discussion -->
-    <string name="account_cancel_subscription_survey_allow_contact">I allow MEGA to contact me to talk about this topic further</string>
+    <string name="account_cancel_subscription_survey_allow_contact">Saya mengizinkan MEGA untuk menghubungi saya untuk membicarakan topik ini lebih lanjut</string>
     <!-- Button label to cancel the subscription -->
     <string name="account_cancel_subscription_survey_cancel_button">Batalkan Langganan</string>
     <!-- Button label to not cancel the subscription -->
     <string name="account_cancel_subscription_survey_do_not_cancel_button">Jangan batalkan</string>
     <!-- Video recently watched title of the video section  -->
-    <string name="video_section_title_video_recently_watched">Recently watched</string>
+    <string name="video_section_title_video_recently_watched">Baru-baru ini ditonton</string>
     <!-- Text that there is no recent activity of the video recently watched page  -->
     <string name="video_section_empty_hint_no_recently_activity">Tidak Ada Aktivitas Terbaru</string>
     <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
@@ -659,7 +659,7 @@
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">Tutup</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
-    <string name="meeting_recent_list_empty_title">Protect your calls</string>
+    <string name="meeting_recent_list_empty_title">Lindungi panggilan anda</string>
     <!--Subtitle text from Meeting screen empty view-->
     <string name="meeting_recent_list_empty_subtitle">Your meetings, family calls, and private conversations are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
     <!--Warning message to inform the user the minimum number of characters to enter into the edit text field for the survey-->
@@ -668,4 +668,20 @@
     <string name="account_cancel_subscription_survey_enter_details">Masukkan detail</string>
     <!-- the bonus title of join without account on left meeting page-->
     <string name="meeting_guest_left_meeting_bonus_title">Dapatkan penyimpanan cloud gratis</string>
+    <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_whats_new_label">Apa yang baru</string>
+    <!-- Title of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_title">Easy, automated sync</string>
+    <!-- Body message of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_body_message">Sync a folder on your device with MEGA to access the latest version of your files anywhere</string>
+    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
+    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sync folders</string>
+    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
+    <string name="sync_promotion_bottom_sheet_primary_button_text_free">Upgrade to use sync</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">Pelajari selengkapnya</string>
+    <!-- Sync option dialog cancel button -->
+    <string name="settings_sync_option_cancel">Batal</string>
+    <!-- Snackbar message displayed when sync option is selected -->
+    <string name="settings_sync_option_updated_message">Sync option updated</string>
 </resources>

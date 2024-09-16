@@ -133,7 +133,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Baru di MEGA?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">Buat akun</string>
+    <string name="create_account">Buat akun MEGA</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">Masukkan email anda</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -1356,7 +1356,7 @@
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">Anda telah menerima %1$s ruang penyimpanan untuk menginstal Aplikasi Seluler MEGA.</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="result_paragraph_info_achievement_registration">Anda telah menerima ruang penyimpanan %1$s sebagai  bonus pendaftaran gratis anda.</string>
+    <string name="result_paragraph_info_achievement_registration">Anda telah menerima %1$s ruang penyimpanan sebagai bonus pendaftaran gratis anda.</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">Bagikan folder</item>
@@ -1859,7 +1859,7 @@
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Ketuk untuk bergabung dengan panggilan</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
-    <string name="invite_contacts">Undang kontak</string>
+    <string name="invite_contacts">Undang</string>
     <!-- Label shown when the user wants to share something with other contacts -->
     <string name="share_with">Berbagi dengan</string>
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
@@ -1895,7 +1895,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Aktifkan atau nonaktifkan versi file untuk seluruh akun anda.\nAnda masih dapat menerima versi file dari folder bersama jika kontak anda telah mengaktifkan ini.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Ketuk, masukkan nama atau alamat email</string>
+    <string name="type_mail">Cari kontak atau ketik alamat email</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Tambahkan %s ke kontak anda?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->

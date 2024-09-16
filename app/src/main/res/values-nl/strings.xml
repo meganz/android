@@ -135,7 +135,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Nieuw bij MEGA?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">Account Creëren</string>
+    <string name="create_account">MEGA-account aanmaken</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">Vul uw email in</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -161,7 +161,7 @@
     <!-- when the user tries to share something to MEGA without being logged -->
     <string name="login_before_share">Log in om te delen met MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
-    <string name="reg_link_expired">Uw bevestigingslink is niet langer geldig. Uw account kan al geactiveerd zijn of u kunt uw registratie geannuleerd hebben.</string>
+    <string name="reg_link_expired">Uw bevestigingslink is niet langer geldig. Uw account is mogelijk al geactiveerd of u heeft uw aanmelding geannuleerd.</string>
     <!-- First Name of the user -->
     <string name="first_name_text">Voornaam</string>
     <!-- Last name of the user -->
@@ -1356,7 +1356,7 @@
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">Installeer een mobiele app</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
-    <string name="title_regitration">Registratie bonus</string>
+    <string name="title_regitration">Inschrijfbonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Installeer een MEGA Desktop Applicatie</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -1386,7 +1386,7 @@
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">U heeft %1$s opslagruimte gekregen voor het installeren van de MEGA Mobile Applicatie.</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="result_paragraph_info_achievement_registration">U heeft %1$s opslag ruimte ontvangen als uw gratis registratie bonus.</string>
+    <string name="result_paragraph_info_achievement_registration">U heeft %1$s opslagruimte als gratis aanmeldingsbonus ontvangen.</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Map delen</item>
@@ -1902,7 +1902,7 @@
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Tik om aan te sluiten bij de oproep</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
-    <string name="invite_contacts">Contacten uitnodigen</string>
+    <string name="invite_contacts">Uitnodigen</string>
     <!-- Label shown when the user wants to share something with other contacts -->
     <string name="share_with">Delen met</string>
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
@@ -1939,7 +1939,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Versionering inschakelen of uitschakelen voor uw gehele account. \nVersionering uischakelen zorgt er niet voor dat uw contacten nieuwe versies kunnen creëren in gedeelde mappen.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Tik op, voer naam of e-mailadres in</string>
+    <string name="type_mail">Zoek contacten of typ een e-mailadres</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Wilt u %s tot uw contacten toevoegen?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->

@@ -133,7 +133,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">还没有MEGA帐户？</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">创建帐户</string>
+    <string name="create_account">注册</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">请输入您的电子邮件地址</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -143,7 +143,7 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">无网络连接</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">You’ve been logged out of this device from another location</string>
+    <string name="error_server_expired_session">您已从其它位置登出此设备</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">正在生成加密密钥</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
@@ -159,7 +159,7 @@
     <!-- when the user tries to share something to MEGA without being logged -->
     <string name="login_before_share">登入以使用MEGA共享</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
-    <string name="reg_link_expired">您的确认链接已失效。您的帐户可能已被激活或您可能已取消注册。</string>
+    <string name="reg_link_expired">您的确认链接已失效。您的帐户可能已被激活，或者您可能已经取消注册。</string>
     <!-- First Name of the user -->
     <string name="first_name_text">名</string>
     <!-- Last name of the user -->
@@ -179,7 +179,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">密码不匹配</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">This email address has already signed up for an account with MEGA</string>
+    <string name="error_email_registered">此电子邮件地址已注册MEGA帐户</string>
     <!--  -->
     <string name="create_account_creating_account">正在连接到服务器：正在创建帐户</string>
     <!--  -->
@@ -1340,7 +1340,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">如何运作</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invite your friends to sign up for a free MEGA account and to install a MEGA Mobile App. You will receive free storage as a bonus for every signup and app installation.</string>
+    <string name="first_paragraph_achievement_invite_friends">邀请您的朋友注册一个免费MEGA帐户并安装MEGA移动应用程序。每次完成注册并安装应用程序后，您都将获得免费存储空间作为奖励。</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">免费存储空间奖励仅适用于已安装MEGA手机应用程序或MEGA桌面应用程序的新邀请用户。</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -1356,7 +1356,7 @@
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">您已通过安装MEGA手机应用程序获得了%1$s的存储空间。</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="result_paragraph_info_achievement_registration">您已收到%1$s的存储空间作为免费注册奖励。</string>
+    <string name="result_paragraph_info_achievement_registration">您已收到%1$s存储空间作为您的免费注册奖励。</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">共享文件夹</item>
@@ -1859,7 +1859,7 @@
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">点击加入通话</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
-    <string name="invite_contacts">邀请联系人</string>
+    <string name="invite_contacts">邀请</string>
     <!-- Label shown when the user wants to share something with other contacts -->
     <string name="share_with">分享</string>
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
@@ -1895,7 +1895,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">为整个帐户启用或禁用文件历史版本。\n禁用文件历史版本功能不会阻止您的联系人在共享文件夹中创建新版本。</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">点按，输入姓名或电子邮件地址</string>
+    <string name="type_mail">搜索联系人或键入电子邮件地址</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">将%s添加为您的联系人？</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2339,7 +2339,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">您在云盘的照片</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Camera uploads is an essential feature for any mobile device and we have got you covered. Sign up for an account now.</string>
+    <string name="content_tour_four">相机上传是任何移动设备的必备功能，我们已经为您提供这项服务。立即注册一个帐户。</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">请输入您的密码</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2429,7 +2429,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">登录MEGA</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">Sign up for a MEGA account</string>
+    <string name="create_account_title">注册一个MEGA帐户</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">近期</string>
     <!-- Label to reference a chats section -->
@@ -3569,7 +3569,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">由于多次被指控侵犯版权，您的MEGA帐户已被停用。这意味着您无法访问您的帐户或其中的数据。\n检查您的电子邮件收件箱，了解有关如何提交抗辩通知的更多信息。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to sign up for a new MEGA account.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">您的帐户因违反MEGA的服务条款而被终止。\n您将无法重新获得对存储数据的访问权限，也无法获得注册新MEGA帐户的授权。</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">会议</string>
     <!-- Title of the location option displayed in the chat room toolbar -->

@@ -686,4 +686,20 @@
     <string name="account_cancel_subscription_survey_enter_details">Saisissez des détails</string>
     <!-- the bonus title of join without account on left meeting page-->
     <string name="meeting_guest_left_meeting_bonus_title">Obtenir du stockage nuagique gratuit</string>
+    <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_whats_new_label">Nouveautés</string>
+    <!-- Title of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_title">Synchronisation simple et automatique</string>
+    <!-- Body message of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_body_message">Sync a folder on your device with MEGA to access the latest version of your files anywhere</string>
+    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
+    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Synchroniser les dossiers</string>
+    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
+    <string name="sync_promotion_bottom_sheet_primary_button_text_free">Effectuer une mise à niveau pour utiliser la synchronisation</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">En apprendre davantage</string>
+    <!-- Sync option dialog cancel button -->
+    <string name="settings_sync_option_cancel">Annuler</string>
+    <!-- Snackbar message displayed when sync option is selected -->
+    <string name="settings_sync_option_updated_message">Sync option updated</string>
 </resources>

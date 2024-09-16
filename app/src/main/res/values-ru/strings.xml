@@ -139,7 +139,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Впервые в MEGA?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">Зарегистрироваться</string>
+    <string name="create_account">Зарегистрироваться в MEGA</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">Введите адрес электронной почты</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -165,7 +165,7 @@
     <!-- when the user tries to share something to MEGA without being logged -->
     <string name="login_before_share">Для использования MEGA войдите в систему</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
-    <string name="reg_link_expired">Ссылка подтверждения более не действительна. Ваш аккаунт может быть уже активирован или вы могли отменить регистрацию.</string>
+    <string name="reg_link_expired">Cсылка для подтверждения больше не действительна. Возможно, ваш аккаунт уже активирован или вы отменили регистрацию.</string>
     <!-- First Name of the user -->
     <string name="first_name_text">Имя</string>
     <!-- Last name of the user -->
@@ -1416,7 +1416,7 @@
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">Установить мобильное приложение</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
-    <string name="title_regitration">Бонусы за регистрацию</string>
+    <string name="title_regitration">Бонус за регистрацию</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Установить MEGA на ПК</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -1446,7 +1446,7 @@
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">Вы получили %1$s места на диске за установку мобильного приложения MEGA.</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="result_paragraph_info_achievement_registration">При регистрации вы получаете %1$s места на диске в качестве бонуса.</string>
+    <string name="result_paragraph_info_achievement_registration">За регистрацию вы получаете %1$s на диске в качестве бонуса.</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Поделиться папкой</item>
@@ -1988,7 +1988,7 @@
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Коснитесь, чтобы присоединиться</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
-    <string name="invite_contacts">Пригласить контакты</string>
+    <string name="invite_contacts">Пригласить</string>
     <!-- Label shown when the user wants to share something with other contacts -->
     <string name="share_with">Поделиться с</string>
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
@@ -2027,7 +2027,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Включите или отключите управление версиями файлов для всего аккаунта.\nОтключение версий файлов не запретит вашим контактам создавать новые версии в общих папках.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Коснитесь, введите имя или электронную почту</string>
+    <string name="type_mail">Ищите контакты или введите адрес электронной почты</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Добавить пользователя %s в контакты?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->

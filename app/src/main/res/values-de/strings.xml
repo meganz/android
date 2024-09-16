@@ -135,7 +135,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Neu bei MEGA?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">Account erstellen</string>
+    <string name="create_account">MEGA-Account erstellen</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">Ihre E-Mail-Adresse</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -161,7 +161,7 @@
     <!-- when the user tries to share something to MEGA without being logged -->
     <string name="login_before_share">Einloggen, um Freigaben in MEGA zu erstellen</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
-    <string name="reg_link_expired">Der Bestätigungslink ist nicht mehr gültig. Entweder haben Sie Ihren Account bereits aktiviert, oder die Registrierung wurde abgebrochen.</string>
+    <string name="reg_link_expired">Ihr Bestätigungslink ist nicht mehr gültig. Möglicherweise ist Ihr Account bereits aktiviert oder Sie haben Ihre Registrierung abgebrochen.</string>
     <!-- First Name of the user -->
     <string name="first_name_text">Vorname(n)</string>
     <!-- Last name of the user -->
@@ -1356,7 +1356,7 @@
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">MEGA-Mobil-App installieren</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
-    <string name="title_regitration">Anmeldebonus</string>
+    <string name="title_regitration">Registrierungsbonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">MEGA-Desktop-App installieren</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -1386,7 +1386,7 @@
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">Sie haben %1$s Extraspeicherplatz für die Installation der MEGA-Mobil-App erhalten.</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="result_paragraph_info_achievement_registration">Sie haben %1$s Speicherplatz als Bonus für Ihre Anmeldung erhalten.</string>
+    <string name="result_paragraph_info_achievement_registration">Sie haben %1$s Speicherplatz als kostenlosen Registrierungsbonus erhalten.</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Ordner freigeben</item>
@@ -1902,7 +1902,7 @@
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Konferenz beitreten</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
-    <string name="invite_contacts">Kontaktanfragen verschicken</string>
+    <string name="invite_contacts">Einladen</string>
     <!-- Label shown when the user wants to share something with other contacts -->
     <string name="share_with">Freigeben an</string>
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
@@ -1939,7 +1939,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Dateiversionierung für den gesamten Account ein- und ausschalten.\nDas Ausschalten der Dateiversionierung hindert Ihre Kontakte nicht daran, in Ordnerfreigaben neue Versionen zu erstellen.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Antippen und Namen oder E-Mail-Adresse eingeben</string>
+    <string name="type_mail">Kontakte durchsuchen oder E-Mail-Adresse eingeben</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">%s zu Ihren Kontakten hinzufügen?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
