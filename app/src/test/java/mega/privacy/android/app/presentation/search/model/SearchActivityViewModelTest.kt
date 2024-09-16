@@ -40,7 +40,6 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
@@ -66,7 +65,6 @@ class SearchActivityViewModelTest {
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
-    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase = mock()
     private val searchFilterMapper: SearchFilterMapper = mock()
     private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper = mock()
     private val typeFilterToSearchMapper: TypeFilterToSearchMapper = mock()
@@ -106,7 +104,6 @@ class SearchActivityViewModelTest {
             stateHandle = stateHandle,
             getCloudSortOrder = getCloudSortOrder,
             cancelCancelTokenUseCase = cancelCancelTokenUseCase,
-            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             searchFilterMapper = searchFilterMapper,
             nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
             typeFilterToSearchMapper = typeFilterToSearchMapper,
@@ -149,7 +146,6 @@ class SearchActivityViewModelTest {
             stateHandle,
             getCloudSortOrder,
             cancelCancelTokenUseCase,
-            isNodeInRubbishBinUseCase,
             searchFilterMapper,
             nodeSourceTypeToSearchTargetMapper,
             typeFilterToSearchMapper,
@@ -337,7 +333,6 @@ class SearchActivityViewModelTest {
             val nodeSourceType = NodeSourceType.CLOUD_DRIVE
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
-            whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(false)
 
             nodeList.add(typedFileNode)
             nodeList.add(typedFolderNode)
@@ -390,7 +385,6 @@ class SearchActivityViewModelTest {
 
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
-            whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(false)
             whenever(
                 searchUseCase(
                     parentHandle = NodeId(parentHandle),
@@ -447,7 +441,6 @@ class SearchActivityViewModelTest {
 
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
-        whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(false)
         whenever(
             searchUseCase(
                 parentHandle = NodeId(parentHandle),
@@ -500,7 +493,6 @@ class SearchActivityViewModelTest {
 
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
-        whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(false)
         whenever(
             searchUseCase(
                 parentHandle = NodeId(parentHandle),
