@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.original.core.ui.controls.snackbars
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -18,17 +19,21 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaColors
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
 
 
+/**
+ * snackbar test tag
+ */
 const val SNACKBAR_TEST_TAG = "mega_snackbar:snackbar_body"
 
 /**
  * Snack bar following Mega theme
  */
+@SuppressLint("MegaSnackbar")
 @Composable
 fun MegaSnackbar(
     snackbarData: SnackbarData,

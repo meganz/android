@@ -58,5 +58,43 @@ object Stubs {
         """.trimIndent()
     ).indented().within("src")
 
-    val stubs = arrayOf(previewAnnotation, composeAnnotation, androidTheme, isSystemInDarkTheme)
+    private val snackbarComponent: TestFile = kotlin(
+        "androidx/compose/material/Snackbar.kt",
+        """
+            package androidx.compose.material
+            @Composable
+            fun Snackbar(
+                snackbarData: SnackbarData?,
+            )
+        """.trimIndent()
+    ).indented().within("src")
+
+    private val snackbarHostStateShow: TestFile = kotlin(
+        "androidx/compose/material/SnackbarHost.kt",
+        """
+            package androidx.compose.material
+
+            enum class SnackbarDuration {
+                Short,
+                Long,
+                Indefinite
+            }
+            class SnackbarHostState {
+                fun showSnackbar(
+                    message: String,
+                    actionLabel: String? = null,
+                    duration: SnackbarDuration = SnackbarDuration.Short
+                )
+            }
+        """.trimIndent()
+    ).indented().within("src")
+
+    val stubs = arrayOf(
+        previewAnnotation,
+        composeAnnotation,
+        androidTheme,
+        isSystemInDarkTheme,
+        snackbarComponent,
+        snackbarHostStateShow,
+    )
 }

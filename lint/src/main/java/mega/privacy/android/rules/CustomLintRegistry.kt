@@ -16,7 +16,9 @@ class CustomLintRegistry : IssueRegistry() {
             TranslatedStringTemplateDetector.ISSUE,
             NonIndexStringTemplateDetector.ISSUE,
             XrayImportDetector.ISSUE,
-            ParameterOrderDetector.ISSUE
+            ParameterOrderDetector.ISSUE,
+            SnackbarDetector.ISSUE,
+            ShowSnackbarDetector.ISSUE,
         )
 
     override val api: Int = CURRENT_API

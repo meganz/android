@@ -1,13 +1,13 @@
 package mega.privacy.android.shared.original.core.ui.utils
 
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
+import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 
 /**
- * Shows or queues to be shown a [Snackbar] at the bottom of the [Scaffold] at
+ * Shows or queues to be shown a [MegaSnackbar] at the bottom of the [Scaffold] at
  * which this state is attached and suspends until snackbar is disappeared.
  *
  * The duration will be set automatically depending on [message] length or [actionLabel]:
