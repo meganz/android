@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.contact.invite
 
-import android.content.pm.PackageManager
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
@@ -26,12 +25,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.MockedStatic
 import org.mockito.Mockito.mockStatic
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class InviteContactScreenTest {
@@ -192,17 +188,6 @@ class InviteContactScreenTest {
     }
 
     @Test
-    fun `test that the default contact list body is displayed the first time the user opens the screen in his or her whole life`() {
-        with(composeRule) {
-            denyPermission()
-
-            setScreen()
-
-            onNodeWithTag(DEFAULT_BODY_LOADING_TEXT_TAG).assertIsDisplayed()
-        }
-    }
-
-    @Test
     fun `test that the loading body is displayed when loading`() {
         with(composeRule) {
             setScreen(uiState = InviteContactUiState(isLoading = true))
@@ -265,15 +250,6 @@ class InviteContactScreenTest {
                 .performScrollToNode(hasText(secondContact.displayInfo))
                 .assertIsDisplayed()
         }
-    }
-
-    private fun denyPermission() {
-        whenever(
-            ContextCompat.checkSelfPermission(
-                any(),
-                any()
-            )
-        ) doReturn PackageManager.PERMISSION_DENIED
     }
 
     private fun ComposeContentTestRule.setScreen(

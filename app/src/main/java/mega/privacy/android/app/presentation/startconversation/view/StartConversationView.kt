@@ -290,6 +290,7 @@ private fun HeaderItem(text: String) {
 
 @Composable
 private fun EmptyContactsView(onInviteContactsClicked: () -> Unit) {
+    val isDark = isSystemInDarkTheme()
     Column(
         modifier = Modifier
             .padding(horizontal = 40.dp)
@@ -307,7 +308,7 @@ private fun EmptyContactsView(onInviteContactsClicked: () -> Unit) {
                 modifier = Modifier
                     .padding(vertical = 10.dp)
                     .size(120.dp),
-                painter = painterResource(id = IconR.drawable.ic_empty_user),
+                painter = painterResource(id = if (isDark) IconR.drawable.ic_empty_user_dark else IconR.drawable.ic_empty_user),
                 contentDescription = "Empty contacts image",
             )
         }

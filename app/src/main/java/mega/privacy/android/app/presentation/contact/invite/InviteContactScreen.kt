@@ -2,12 +2,14 @@ package mega.privacy.android.app.presentation.contact.invite
 
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.net.Uri
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +22,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -69,14 +72,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
 import kotlinx.coroutines.delay
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.InvitationContactInfo
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_LETTER_HEADER
@@ -101,6 +110,7 @@ import mega.privacy.android.app.utils.Constants.PHONE_NUMBER_REGEX
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaFloatingActionButton
+import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.chip.TransparentChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
@@ -114,7 +124,10 @@ import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.mobile.analytics.event.InviteContactsButtonPressedEvent
+import mega.privacy.mobile.analytics.event.ScanQRCodeButtonPressedEvent
 import timber.log.Timber
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -230,10 +243,14 @@ internal fun InviteContactRoute(
             onOpenPersonalQRCode = onOpenPersonalQRCode,
             onSearchQueryChange = viewModel::onSearchQueryChange,
             onInviteContactClick = {
+                Analytics.tracker.trackEvent(InviteContactsButtonPressedEvent)
                 viewModel.inviteContacts()
                 localKeyboardController?.hide()
             },
-            onScanQRCodeClick = viewModel::validateCameraAvailability,
+            onScanQRCodeClick = {
+                Analytics.tracker.trackEvent(ScanQRCodeButtonPressedEvent)
+                viewModel.validateCameraAvailability()
+            },
             onAddContactInfo = viewModel::addContactInfo,
             onContactListItemClick = viewModel::validateContactListItemClick,
             onDoneImeActionClick = {
@@ -298,12 +315,15 @@ internal fun InviteContactRoute(
         }
 
         SnackbarHost(
-            modifier = Modifier.navigationBarsPadding().align(Alignment.BottomCenter),
+            modifier = Modifier
+                .navigationBarsPadding()
+                .align(Alignment.BottomCenter),
             hostState = snackBarHostState
         )
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun InviteContactScreen(
     uiState: InviteContactUiState,
@@ -330,25 +350,39 @@ internal fun InviteContactScreen(
         isInviteButtonEnabled = uiState.selectedContactInformation.isNotEmpty() && isInputValid
     }
 
-    var showDefaultBody by rememberSaveable { mutableStateOf(true) }
+    val permissionState = rememberPermissionState(Manifest.permission.READ_CONTACTS)
     var isPermissionGranted by rememberSaveable { mutableStateOf(false) }
-
+    val context = LocalContext.current
     val readContactsLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                Timber.d("Read contacts permission granted")
-                showDefaultBody = false
-                isPermissionGranted = true
-                onInitializeContacts()
-            } else {
-                Timber.d("Read contacts permission denied")
-                showDefaultBody = false
+            when {
+                isGranted -> {
+                    Timber.d("Read contacts permission granted")
+                    isPermissionGranted = true
+                    onInitializeContacts()
+                }
+
+                else -> {
+                    Timber.d("Read contacts permission denied")
+                    val intent =
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        }
+                    context.startActivity(intent)
+                }
             }
         }
 
-    LaunchedEffect(Unit) {
-        if (!isPermissionGranted) {
-            readContactsLauncher.launch(Manifest.permission.READ_CONTACTS)
+    LifecycleResumeEffect(Unit) {
+        if (permissionState.status.isGranted) {
+            if (!uiState.areContactsInitialized) {
+                Timber.d("Read contacts permission granted")
+                isPermissionGranted = true
+                onInitializeContacts()
+            }
+        }
+        onPauseOrDispose {
+
         }
     }
 
@@ -441,19 +475,15 @@ internal fun InviteContactScreen(
                     .testTag(SCAN_QR_CODE_TEXT_TAG),
                 text = stringResource(id = R.string.menu_item_scan_code),
                 textColor = TextColor.Accent,
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.subtitle2.copy(
+                    fontWeight = FontWeight.W600,
+                    fontSize = 14.sp
+                ),
             )
 
             Divider()
 
             when {
-                // rememberSaveable won't work in a fragment because the fragment itself will be destroyed.
-                // The workaround is to add !uiState.isContactsInitialized until we fully migrate
-                // to a single activity.
-                showDefaultBody && !uiState.areContactsInitialized -> DefaultContactListBody(
-                    modifier = Modifier.fillMaxWidth()
-                )
-
                 uiState.isLoading -> ContactListLoadingBody(
                     modifier = Modifier.fillMaxWidth(),
                     isDarkMode = isDarkMode
@@ -475,9 +505,11 @@ internal fun InviteContactScreen(
                 }
 
                 !isPermissionGranted -> ContactsPermissionDeniedBody(
-                    modifier = Modifier.fillMaxWidth(),
-                    isDarkMode = isDarkMode
-                )
+                    isDarkMode = isDarkMode,
+                ) {
+                    Timber.d("Read contacts permission launched")
+                    readContactsLauncher.launch(Manifest.permission.READ_CONTACTS)
+                }
             }
         }
     }
@@ -570,33 +602,6 @@ private fun ContactChipBar(
                 onClick = { onClick(it) }
             )
         }
-    }
-}
-
-@Composable
-private fun DefaultContactListBody(
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        MegaText(
-            modifier = Modifier.testTag(DEFAULT_BODY_LOADING_TEXT_TAG),
-            text = stringResource(id = R.string.contacts_list_empty_text_loading_share),
-            textColor = TextColor.Disabled,
-            style = MaterialTheme.typography.body2
-        )
-
-        MegaText(
-            modifier = Modifier
-                .padding(start = 34.dp, end = 34.dp, top = 12.dp)
-                .testTag(DEFAULT_BODY_DESCRIPTION_TEXT_TAG),
-            text = stringResource(id = R.string.invite_contacts_to_start_chat),
-            textColor = TextColor.Disabled,
-            style = MaterialTheme.typography.body2,
-            textAlign = TextAlign.Center
-        )
     }
 }
 
@@ -796,20 +801,56 @@ private fun getDefaultAvatarBitmap(contactName: String): Bitmap =
 private fun ContactsPermissionDeniedBody(
     isDarkMode: Boolean,
     modifier: Modifier = Modifier,
+    onGrantPermissionClicked: () -> Unit,
 ) {
+    PhoneContactsHeader(modifier = Modifier.fillMaxWidth())
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .padding(horizontal = 40.dp)
+            .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        PhoneContactsHeader(modifier = Modifier.fillMaxWidth())
 
-        EmptyContactsImage(isDarkMode)
+        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Spacer(modifier = Modifier.height(50.dp))
+        }
+        val isPortrait =
+            LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+        if (isPortrait) {
+            Image(
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .size(120.dp),
+                painter = painterResource(id = if (isDarkMode) mega.privacy.android.icon.pack.R.drawable.ic_empty_user_dark else mega.privacy.android.icon.pack.R.drawable.ic_empty_user),
+                contentDescription = "Empty contacts image",
+            )
+        }
+        MegaText(
+            modifier = Modifier.padding(start = 10.dp, top = 0.dp, end = 10.dp, bottom = 16.dp),
+            text = stringResource(sharedR.string.title_enable_access_contact),
+            style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.W500),
+            textColor = TextColor.Primary
+        )
 
         MegaText(
-            modifier = Modifier.testTag(PERMISSION_DENIED_TEXT_TAG),
-            text = stringResource(id = R.string.no_contacts_permissions),
-            textColor = TextColor.Disabled,
-            style = MaterialTheme.typography.body2
+            modifier = Modifier
+                .padding(start = 10.dp, top = 0.dp, end = 10.dp, bottom = 16.dp)
+                .testTag(PERMISSION_DENIED_TEXT_TAG),
+            text = stringResource(sharedR.string.subtitle_enable_access_contact),
+            style = MaterialTheme.typography.body1.copy(
+                fontWeight = FontWeight.W400,
+                fontSize = 14.sp
+            ),
+            textAlign = TextAlign.Center,
+            textColor = TextColor.Secondary,
+        )
+
+        RaisedDefaultMegaButton(
+            textId = sharedR.string.grant_permission,
+            onClick = onGrantPermissionClicked,
+            modifier = Modifier
+                .padding(bottom = 20.dp)
+                .align(Alignment.CenterHorizontally)
         )
     }
 }
@@ -895,12 +936,12 @@ private fun InviteContactScreenWithSelectedContactsPreview() {
             uiState = InviteContactUiState(
                 areContactsInitialized = true,
                 filteredContacts = listOf(
-                    InvitationContactInfo(name = "Abc"),
-                    InvitationContactInfo(name = "Abc ss", displayInfo = "(021) 232-3232"),
-                    InvitationContactInfo(name = "Abc 2"),
-                    InvitationContactInfo(name = "Abc 3"),
-                    InvitationContactInfo(name = "Abc 4"),
-                    InvitationContactInfo(name = "Abc 5"),
+                    InvitationContactInfo(id = 1, name = "Abc"),
+                    InvitationContactInfo(id = 2, name = "Abc ss", displayInfo = "(021) 232-3232"),
+                    InvitationContactInfo(id = 3, name = "Abc 2"),
+                    InvitationContactInfo(id = 4, name = "Abc 3"),
+                    InvitationContactInfo(id = 5, name = "Abc 4"),
+                    InvitationContactInfo(id = 6, name = "Abc 5"),
                 ),
                 selectedContactInformation = listOf(
                     InvitationContactInfo(name = "Abc"),
@@ -933,9 +974,6 @@ internal const val SCAN_QR_CODE_TEXT_TAG = "invite_contact_screen:text_scan_qr_c
 internal const val CONTACT_CHIP_BAR_TAG =
     "selected_contact_view:chip_bar_selected_contact_chips_wrapper"
 internal const val SELECTED_CONTACT_CHIP_TAG = "contact_chip_bar:chip_selected_contact"
-internal const val DEFAULT_BODY_LOADING_TEXT_TAG = "default_contact_list_body:text_loading"
-internal const val DEFAULT_BODY_DESCRIPTION_TEXT_TAG =
-    "default_contact_list_body:text_default_description"
 internal const val EMPTY_CONTACTS_IMAGE_TAG = "empty_contacts_image:image_empty_contacts"
 internal const val CONTACT_LIST_LOADING_TEXT_TAG = "default_contact_list_loading_body:text_loading"
 internal const val CIRCULAR_LOADING_INDICATOR_TAG =
