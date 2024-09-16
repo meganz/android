@@ -161,42 +161,64 @@ String buildLintSummaryTable(Map lintReportSummaryMap) {
             ["Module name", "Fatal", "Error", "Warning", "Information", "Error Message"]
     ]
 
-    // Iterate through all the values in LINT_REPORT_SUMMARY_MAP and add a row per module
-    // The standard method of iterating a map returns an error when used with a Jenkins pipeline,
-    // which is why the map iteration is set up in this manner
+    // Build the table with data from lintReportSummaryMap
     for (def key in lintReportSummaryMap.keySet()) {
         def lintJsonContent = lintReportSummaryMap[key]
+        table.add([
+                "$key",
+                "$lintJsonContent.fatalCount",
+                "$lintJsonContent.errorCount",
+                "$lintJsonContent.warningCount",
+                "$lintJsonContent.informationCount",
+                "$lintJsonContent.errorMessage"
+        ])
+    }
 
-        table.add(
-                [
-                        "$key",
-                        "$lintJsonContent.fatalCount",
-                        "$lintJsonContent.errorCount",
-                        "$lintJsonContent.warningCount",
-                        "$lintJsonContent.informationCount",
-                        "$lintJsonContent.errorMessage"
-                ]
-        )
-
+    // Calculate the maximum width of each column
+    def numCols = table[0].size()
+    def colWidths = new int[numCols]
+    table.each { row ->
+        row.eachWithIndex { cell, idx ->
+            cell = cell ?: ""
+            if (cell.length() > colWidths[idx]) {
+                colWidths[idx] = cell.length()
+            }
+        }
     }
 
     def title = "*Lint Report Summary*"
+    def totalWidth = colWidths.sum() + (numCols * 3) // Extra space for padding
     def out = new StringBuffer()
     out << "```"
-    out << title.center(65, "-")
+    out << title.center(totalWidth, "-")
     out << "\n"
-    table.each {
-        out << it[0].padRight(14)
-        out << it[1].center(7)
-        out << it[2].center(7)
-        out << it[3].center(9)
-        out << it[4].center(13)
-        out << it[5].center(15)
+
+    // Function to format each row
+    def formatRow = { row ->
+        def line = ""
+        row.eachWithIndex { cell, idx ->
+            cell = cell ?: ""
+            if (idx == 0 || idx == numCols - 1) {
+                // Left-align the first and last columns
+                line += cell.padRight(colWidths[idx] + 3)
+            } else {
+                // Right-align the numeric columns
+                line += cell.padLeft(colWidths[idx] + 3)
+            }
+        }
+        line
+    }
+
+    // Print each row with proper alignment
+    table.each { row ->
+        out << formatRow(row)
         out << '\n'
     }
+
     out << "```"
     out.toString()
 }
+
 
 /**
  * Executes a specific Gradle Task to parse the raw Lint Results and returns a Lint Summary
