@@ -198,7 +198,7 @@
     </plurals>
     <!-- Message when removing the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_remove_videos_message">
-        <item quantity="other">Đã loại&#160;bỏ %1$d&#160;mục khỏi “%2$s”</item>
+        <item quantity="other">Đã loại bỏ %1$d mục khỏi “%2$s”</item>
     </plurals>
     <!-- Text of the video section playlist detail video number -->
     <plurals name="video_section_playlist_detail_video_number">
@@ -333,7 +333,7 @@
     <!-- Third subtitle of the tour screen -->
     <string name="cloud_drive_tour_third_subtitle">Thêm tên liên&#160;lạc, tạo kết&#160;nối, cộng&#160;tác với nhau, trao&#160;đổi qua gọi thoại và video mà không cần phải rời khỏi MEGA.</string>
     <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">Camera uploads is an essential feature for any mobile device and we have got you covered. Sign up for an account now.</string>
+    <string name="cloud_drive_tour_fourth_subtitle">Đăng&#160;tải camêra là tính&#160;năng thiết&#160;yếu cho mọi thiết&#160;bị di&#160;động, và MEGA có cung&#160;cấp cho mọi người dùng. Tạo tài&#160;khoản ngay.</string>
     <!-- Fifth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fifth_subtitle">Gọi họp video an&#160;toàn với mã&#160;hóa vô&#160;kiến&#160;thức.</string>
     <!-- Titles of the tour screen to onboard users with the MEGA application -->
@@ -421,13 +421,13 @@
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">Tính năng</string>
     <!-- Column header indicating features available with the free plan -->
-    <string name="account_cancel_account_screen_plan_free_plan">Free</string>
+    <string name="account_cancel_account_screen_plan_free_plan">Miễn phí</string>
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">Lưu trữ</string>
     <!-- Storage amount available in the free plan. %1s represents the amount of storage and the unit -->
-    <string name="account_cancel_account_screen_plan_free_storage">%1giây</string>
+    <string name="account_cancel_account_screen_plan_free_storage">%1s</string>
     <!-- Row label for transfer feature in the comparison table -->
-    <string name="account_cancel_account_screen_plan_transfer">Truyền Tải</string>
+    <string name="account_cancel_account_screen_plan_transfer">Truyền tải</string>
     <!-- Transfer limit in the free plan -->
     <string name="account_cancel_account_screen_plan_free_limited_transfer">Bị giới hạn</string>
     <!-- Feature indicating password protection for links, available in the pro plan -->
@@ -469,7 +469,7 @@
     <!-- Share hidden item links description -->
     <string name="share_hidden_item_links_description">Một hay nhiều mục này được đặt ẩn đi. Khi bạn chia&#160;sẻ các mục này, bất kỳ ai có đường liên&#160;kết sẽ có thể xem thấy hết nhưng các mục vẫn sẽ được ẩn đi trong Ổ&#160;Mây của bạn.</string>
     <!-- Title shown when cancelling the subscription -->
-    <string name="account_cancellation_instructions_cancel_subscription_title">Hủy Gói Đăng Ký Dịch Vụ</string>
+    <string name="account_cancellation_instructions_cancel_subscription_title">Hủy gói đăng&#160;ký</string>
     <!-- Title shown when reactivating the subscription -->
     <string name="account_cancellation_instructions_reactivate_subscription_title">Kích&#160;hoạt lại gói đăng&#160;ký</string>
     <!-- Title shown when cancelling the current plan in the instructions screen, informing the user about the account is not managed by google -->
@@ -587,15 +587,15 @@
     <!-- placeholder message for report issue-->
     <string name="report_issue_description_placeholder_message">Mô&#160;tả vấn&#160;đề với ít nhất 10 ký&#160;tự</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_title">Keep conversations private</string>
+    <string name="chat_recent_list_empty_title">Giữ các cuộc trò&#160;chuyện được riêng&#160;tư</string>
     <!--Subtitle text from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_subtitle">All your messages, group chats, and calls are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <string name="chat_recent_list_empty_subtitle">Tất cả tin&#160;nhắn, trò&#160;chuyện nhóm và cuộc gọi của bạn đều được bảo&#160;vệ bằng mã hóa vô&#160;kiến&#160;thức của chúng&#160;tôi. [A]Tìm&#160;hiểu thêm[/A]</string>
     <!-- Label of the action button of inviting a friend from contact screen -->
     <string name="chat_recent_invite_friend">Mời bạn bè</string>
     <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
-    <string name="invite_contacts_to_start_chat_title">Invite friends with confidence</string>
+    <string name="invite_contacts_to_start_chat_title">Tự&#160;tin mời bạn&#160;bè</string>
     <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
-    <string name="invite_contacts_to_start_chat_subtitle">With top-notch security and verification codes, reach out without fear of scams, data mining, or information theft</string>
+    <string name="invite_contacts_to_start_chat_subtitle">Sử&#160;dụng mã xác&#160;minh và cấp bảo&#160;mật hàng đầu, tiếp&#160;cận mà không sợ lừa&#160;đảo, bị khai&#160;thác dữ&#160;liệu hoặc trộm&#160;cắp thông&#160;tin</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
     <string name="invite_contacts_action_label">Mời</string>
     <!-- Share hidden folder description -->
@@ -631,7 +631,7 @@
     <!-- Checkbox allowing MEGA to contact the user for further discussion -->
     <string name="account_cancel_subscription_survey_allow_contact">Tôi cho phép MEGA liên&#160;hệ với tôi để bàn thêm về chủ&#160;đề này</string>
     <!-- Button label to cancel the subscription -->
-    <string name="account_cancel_subscription_survey_cancel_button">Hủy Gói Đăng Ký Dịch Vụ</string>
+    <string name="account_cancel_subscription_survey_cancel_button">Hủy gói đăng&#160;ký</string>
     <!-- Button label to not cancel the subscription -->
     <string name="account_cancel_subscription_survey_do_not_cancel_button">Đừng hủy</string>
     <!-- Video recently watched title of the video section  -->
@@ -647,19 +647,35 @@
     <!-- Title of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_title">Quét không được hoàn&#160;tất</string>
     <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
-    <string name="document_scanning_error_type_insufficient_ram">Your phone doesn’t meet the minimum memory requirements to complete the scan</string>
+    <string name="document_scanning_error_type_insufficient_ram">Điện&#160;thoại của bạn không đáp&#160;ứng đủ yêu&#160;cầu bộ nhớ tối&#160;thiểu để hoàn&#160;tất quá&#160;trình quét</string>
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
-    <string name="document_scanning_error_type_generic_error">We’re having trouble scanning this document. Please try again.</string>
+    <string name="document_scanning_error_type_generic_error">Chúng&#160;tôi gặp sự&#160;cố khi quét tài&#160;liệu này. Vui lòng thử lại.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">Đóng</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
-    <string name="meeting_recent_list_empty_title">Protect your calls</string>
+    <string name="meeting_recent_list_empty_title">Bảo vệ cuộc gọi của bạn</string>
     <!--Subtitle text from Meeting screen empty view-->
-    <string name="meeting_recent_list_empty_subtitle">Your meetings, family calls, and private conversations are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <string name="meeting_recent_list_empty_subtitle">Các cuộc họp, cuộc gọi gia&#160;đình và cuộc trò&#160;chuyện riêng&#160;tư của bạn được bảo&#160;vệ bằng mã hóa vô&#160;kiến&#160;thức của chúng&#160;tôi. [A]Tìm&#160;hiểu thêm[/A]</string>
     <!--Warning message to inform the user the minimum number of characters to enter into the edit text field for the survey-->
-    <string name="account_cancel_subscription_survey_minimum_character_limit">Message must be at least 10 characters</string>
+    <string name="account_cancel_subscription_survey_minimum_character_limit">Tin&#160;nhắn phải có ít nhất 10 ký&#160;tự</string>
     <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
     <string name="account_cancel_subscription_survey_enter_details">Nhập chi&#160;tiết</string>
     <!-- the bonus title of join without account on left meeting page-->
     <string name="meeting_guest_left_meeting_bonus_title">Nhận lấy không&#160;gian lưu&#160;trữ đám&#160;mây miễn&#160;phí</string>
+    <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_whats_new_label">Có gì mới</string>
+    <!-- Title of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_title">Đồng&#160;bộ hóa tự&#160;động và dễ&#160;dàng</string>
+    <!-- Body message of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_body_message">Đồng&#160;bộ hóa thư&#160;mục trên thiết&#160;bị của bạn với MEGA để truy&#160;cập phiên&#160;bản mới nhất của tệp&#160;tin ở bất cứ nơi đâu</string>
+    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
+    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Đồng bộ thư mục</string>
+    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
+    <string name="sync_promotion_bottom_sheet_primary_button_text_free">Nâng&#160;cấp để dùng đồng&#160;bộ hóa</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">Tìm&#160;hiểu thêm</string>
+    <!-- Sync option dialog cancel button -->
+    <string name="settings_sync_option_cancel">Hủy</string>
+    <!-- Snackbar message displayed when sync option is selected -->
+    <string name="settings_sync_option_updated_message">Sync option updated</string>
 </resources>

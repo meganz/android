@@ -133,7 +133,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">เป็นผู้ใช้ MEGA ใหม่</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">สร้างบัญชี</string>
+    <string name="create_account">สร้างบัญชี MEGA</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">กรอกที่อยู่อีเมลของคุณ</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -159,7 +159,7 @@
     <!-- when the user tries to share something to MEGA without being logged -->
     <string name="login_before_share">ลงชื่อเข้าใช้เพื่อแชร์กับ MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
-    <string name="reg_link_expired">ลิงก์ยืนยันของคุณใช้ไม่ได้อีกต่อไป บัญชีของคุณอาจถูกเปิดใช้งานหรือคุณอาจยกเลิกการลงทะเบียนแล้ว</string>
+    <string name="reg_link_expired">Your confirmation link is no longer valid. Your account may already be activated or you may have cancelled your signup.</string>
     <!-- First Name of the user -->
     <string name="first_name_text">ชื่อ</string>
     <!-- Last name of the user -->
@@ -1326,7 +1326,7 @@
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">ติดตั้งแอป MEGA บนมือถือ</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
-    <string name="title_regitration">โบนัสการลงทะเบียน</string>
+    <string name="title_regitration">Signup bonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">ติดตั้งแอปเดสก์ท็อป MEGA</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -1356,7 +1356,7 @@
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">คุณได้รับพื้นที่จัดเก็บ %1$s จากการติดตั้งแอป MEGA บนมือถือ</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="result_paragraph_info_achievement_registration">คุณได้รับพื้นที่เก็บข้อมูลขนาด %1$s เป็นโบนัสการลงทะเบียนฟรีของคุณ</string>
+    <string name="result_paragraph_info_achievement_registration">You have received %1$s storage space as your free signup bonus.</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">แชร์โฟลเดอร์</item>
@@ -1859,7 +1859,7 @@
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">แตะเพื่อเข้าร่วมการโทร</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
-    <string name="invite_contacts">เชิญผู้ติดต่อ</string>
+    <string name="invite_contacts">เชิญ</string>
     <!-- Label shown when the user wants to share something with other contacts -->
     <string name="share_with">แชร์กับ</string>
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
@@ -1895,7 +1895,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">เปิดหรือปิดใช้งานการกำหนดเวอร์ชันไฟล์สำหรับทั้งบัญชีของคุณ\nการปิดใช้งานการกำหนดเวอร์ชันไฟล์ ไม่ได้มีการป้องกันผู้ติดต่อของคุณเพื่อสร้างเวอร์ชันใหม่ในโฟลเดอร์ที่แชร์</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">แตะ เพื่อกรอกชื่อหรืออีเมล</string>
+    <string name="type_mail">Search contacts or type email address</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">เพิ่ม %s ในรายชื่อติดต่อของคุณหรือไม่</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->

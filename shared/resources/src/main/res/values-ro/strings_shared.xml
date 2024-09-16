@@ -686,4 +686,20 @@
     <string name="account_cancel_subscription_survey_enter_details">Introduceți detalii</string>
     <!-- the bonus title of join without account on left meeting page-->
     <string name="meeting_guest_left_meeting_bonus_title">Obțineți spațiu de stocare în cloud gratuit</string>
+    <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_whats_new_label">Ce este nou</string>
+    <!-- Title of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_title">Sincronizare ușoară și automată</string>
+    <!-- Body message of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_body_message">Sync a folder on your device with MEGA to access the latest version of your files anywhere</string>
+    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
+    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sincronizați folderele</string>
+    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
+    <string name="sync_promotion_bottom_sheet_primary_button_text_free">Faceți upgrade pentru a folosi sincronizarea</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">Aflați mai multe</string>
+    <!-- Sync option dialog cancel button -->
+    <string name="settings_sync_option_cancel">Anulați</string>
+    <!-- Snackbar message displayed when sync option is selected -->
+    <string name="settings_sync_option_updated_message">Sync option updated</string>
 </resources>

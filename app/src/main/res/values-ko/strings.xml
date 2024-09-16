@@ -133,7 +133,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">MEGA가 처음이신가요?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">계정 생성</string>
+    <string name="create_account">MEGA 계정 생성</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">이메일을 입력하세요</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -159,7 +159,7 @@
     <!-- when the user tries to share something to MEGA without being logged -->
     <string name="login_before_share">MEGA로 공유하려면 로그인하세요</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
-    <string name="reg_link_expired">확인 링크가 더 이상 유효하지 않습니다. 계정이 이미 활성화되었거나 가입을 취소했을 수 있습니다.</string>
+    <string name="reg_link_expired">Your confirmation link is no longer valid. Your account may already be activated or you may have cancelled your signup.</string>
     <!-- First Name of the user -->
     <string name="first_name_text">이름</string>
     <!-- Last name of the user -->
@@ -1326,7 +1326,7 @@
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">MEGA 모바일 앱 설치</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
-    <string name="title_regitration">가입 보너스</string>
+    <string name="title_regitration">Signup bonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">MEGA 데스크톱 앱 설치</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -1356,7 +1356,7 @@
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">MEGA 모바일 앱을 설치하여 저장소 공간 %1$s를 받았습니다.</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="result_paragraph_info_achievement_registration">당신은 무료 가입 보너스로 %1$s의 저장 공간을 받았습니다.</string>
+    <string name="result_paragraph_info_achievement_registration">You have received %1$s storage space as your free signup bonus.</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">폴더 공유</item>
@@ -1859,7 +1859,7 @@
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">통화에 참여하려면 탭하세요</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
-    <string name="invite_contacts">연락처 초대</string>
+    <string name="invite_contacts">초대</string>
     <!-- Label shown when the user wants to share something with other contacts -->
     <string name="share_with">다른 사람과 공유</string>
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
@@ -1895,7 +1895,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">계정 전체에 대한 파일 버전 관리를 활성화하거나 비활성화 합니다.\n파일 버전 관리를 해제하는 것이 연락처가 공유된 폴더에 새로운 버전을 만드는 것을 막을 수 없습니다.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">탭하고, 이름 또는 이메일 주소를 입력하세요</string>
+    <string name="type_mail">Search contacts or type email address</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">%s을/를 연락처에 추가할까요?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->

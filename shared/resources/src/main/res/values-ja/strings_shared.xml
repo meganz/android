@@ -517,7 +517,7 @@
     <!-- Label for cancellation instructions on a mobile device -->
     <string name="account_cancellation_instructions_on_mobile_device">モバイルデバイスの場合</string>
     <!-- Step 1: instruction step no.1 to visit the MEGA website on the mobile device-->
-    <string name="account_cancellation_instructions_mobile_visit_website">1. ウェブブラウザで[A]]www.mega.nz[/A]にアクセスする。</string>
+    <string name="account_cancellation_instructions_mobile_visit_website">1. ウェブブラウザで[A]www.mega.nz[/A]にアクセスする。</string>
     <!-- Step 2: instruction step no.2 to Log in to MEGA account on the mobile device from the browser-->
     <string name="account_cancellation_instructions_mobile_login_account">2. MEGAアカウントにログインする。</string>
     <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
@@ -662,4 +662,20 @@
     <string name="account_cancel_subscription_survey_enter_details">詳細を入力してください</string>
     <!-- the bonus title of join without account on left meeting page-->
     <string name="meeting_guest_left_meeting_bonus_title">無料クラウドストレージを入手</string>
+    <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_whats_new_label">新機能</string>
+    <!-- Title of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_title">簡単に自動同期</string>
+    <!-- Body message of the bottom sheet to promote Sync feature -->
+    <string name="sync_promotion_bottom_sheet_body_message">デバイス上のフォルダをMEGAと同期すると、どこからでもお持ちのファイルの最新バージョンにアクセスできます</string>
+    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
+    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">フォルダを同期</string>
+    <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
+    <string name="sync_promotion_bottom_sheet_primary_button_text_free">アップグレードして同期を使用する</string>
+    <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
+    <string name="sync_promotion_bottom_sheet_secondary_button_text">もっと詳しく知る</string>
+    <!-- Sync option dialog cancel button -->
+    <string name="settings_sync_option_cancel">キャンセル</string>
+    <!-- Snackbar message displayed when sync option is selected -->
+    <string name="settings_sync_option_updated_message">Sync option updated</string>
 </resources>
