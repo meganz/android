@@ -2,9 +2,13 @@ package mega.privacy.android.app.activities.settingsActivities
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.ViewGroup
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,12 +31,6 @@ open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack 
     protected lateinit var binding: ActivitySettingsBinding
 
     private val isDark by lazy { Util.isDarkMode(this) }
-    private val transparentColor by lazy {
-        ContextCompat.getColor(
-            this,
-            android.R.color.transparent
-        )
-    }
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private var withElevation = false
 
@@ -40,8 +38,24 @@ open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack 
      * onCreate
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
         binding = ActivitySettingsBinding.inflate(layoutInflater)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                leftMargin = insets.left
+                bottomMargin = insets.bottom
+                rightMargin = insets.right
+            }
+
+            binding.toolbarSettings.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = insets.top
+            }
+
+            WindowInsetsCompat.CONSUMED
+        }
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbarSettings)
@@ -101,17 +115,10 @@ open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack 
 
         this.withElevation = withElevation
         val darkAndElevation = withElevation && isDark
-
-        if (darkAndElevation) {
-            ColorUtils.changeStatusBarColorForElevation(this, true)
-        } else {
-            window?.statusBarColor = transparentColor
-        }
-
-        binding.toolbarSettings.setBackgroundColor(
-            if (darkAndElevation) ColorUtils.getColorForElevation(this, elevation)
-            else transparentColor
-        )
+        val color = if (darkAndElevation) ColorUtils.getColorForElevation(this, elevation)
+        else getColor(R.color.app_background)
+        binding.appBarLayoutSettings.setBackgroundColor(color)
+        binding.toolbarSettings.setBackgroundColor(color)
 
         binding.appBarLayoutSettings.elevation = if (withElevation && !isDark) elevation else 0F
     }
