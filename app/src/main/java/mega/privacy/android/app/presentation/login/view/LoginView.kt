@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -67,7 +66,6 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -340,6 +338,7 @@ private fun RequireLogin(
         if (state.enabledFlags.contains(AppFeatures.LoginReportIssueButton)) {
             Row(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .clickable {
                         onReportIssue()
                     }
@@ -349,15 +348,6 @@ private fun RequireLogin(
                     modifier = Modifier.testTag(TROUBLE_LOGIN_TAG),
                     text = stringResource(id = R.string.general_login_label_trouble_logging_in),
                     style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorPrimary)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    modifier = Modifier.testTag(REPORT_ISSUE_TAG),
-                    text = stringResource(id = R.string.general_login_button_report_your_issue),
-                    style = MaterialTheme.typography.subtitle2.copy(
-                        color = MaterialTheme.colors.textColorPrimary,
-                        textDecoration = TextDecoration.Underline
-                    )
                 )
             }
         }
