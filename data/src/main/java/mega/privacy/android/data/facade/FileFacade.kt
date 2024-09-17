@@ -463,12 +463,18 @@ internal class FileFacade @Inject constructor(
             ?.use { client ->
                 client.query(uri, null, null, null, null)
                     ?.use { cursor ->
+                        var lastModified = 0L
+
                         cursor.moveToFirst()
-                        val index = cursor.getColumnIndex(DATE_MODIFIED).takeIf { it != -1 }
-                            ?: cursor.getColumnIndex(DATE_ADDED).takeIf { it != -1 }
-                            ?: cursor.getColumnIndex(DATE_TAKEN).takeIf { it != -1 }
-                            ?: 0
-                        index.takeIf { it != 0 }?.let { cursor.getLong(it) }
+                        cursor.getColumnIndex(DATE_MODIFIED).takeIf { it != -1 }?.let { index ->
+                            lastModified = cursor.getLong(index) * 1000
+                        } ?: cursor.getColumnIndex(DATE_ADDED).takeIf { it != -1 }?.let { index ->
+                            lastModified = cursor.getLong(index) * 1000
+                        } ?: cursor.getColumnIndex(DATE_TAKEN).takeIf { it != -1 }?.let { index ->
+                            lastModified = cursor.getLong(index)
+                        }
+
+                        lastModified
                     } ?: 0
             } ?: 0
 
