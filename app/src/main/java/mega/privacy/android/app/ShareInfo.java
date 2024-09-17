@@ -491,13 +491,13 @@ public class ShareInfo implements Serializable {
         }
         int lastModifiedIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED);
         if (lastModifiedIndex != -1) {
-            this.lastModified = cursor.getLong(lastModifiedIndex);
+            this.lastModified = cursor.getLong(lastModifiedIndex) * 1000;
         }
 
         if (lastModified == 0) {
             lastModifiedIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED);
             if (lastModifiedIndex != -1) {
-                this.lastModified = cursor.getLong(lastModifiedIndex);
+                this.lastModified = cursor.getLong(lastModifiedIndex) * 1000;
             }
         }
 
