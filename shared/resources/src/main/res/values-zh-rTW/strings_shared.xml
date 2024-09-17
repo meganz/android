@@ -677,5 +677,11 @@
     <!-- Sync option dialog cancel button -->
     <string name="settings_sync_option_cancel">取消</string>
     <!-- Snackbar message displayed when sync option is selected -->
-    <string name="settings_sync_option_updated_message">Sync option updated</string>
+    <string name="settings_sync_option_updated_message">Sync options updated</string>
+    <!-- Title of the Contact Permission Explanation -->
+    <string name="title_enable_access_contact">啟用邀請朋友的存取權限</string>
+    <!-- Sub title of the Contact Permission Explanation -->
+    <string name="subtitle_enable_access_contact">為了邀請朋友，您必須允許MEGA存取您的聯絡人列表</string>
+    <!-- Button text of Contact Permission Explanation -->
+    <string name="grant_permission">允許存取</string>
 </resources>

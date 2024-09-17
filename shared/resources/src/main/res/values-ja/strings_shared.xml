@@ -677,5 +677,11 @@
     <!-- Sync option dialog cancel button -->
     <string name="settings_sync_option_cancel">キャンセル</string>
     <!-- Snackbar message displayed when sync option is selected -->
-    <string name="settings_sync_option_updated_message">Sync option updated</string>
+    <string name="settings_sync_option_updated_message">同期オプションが更新されました</string>
+    <!-- Title of the Contact Permission Explanation -->
+    <string name="title_enable_access_contact">友人を招待するためのアクセスを有効化</string>
+    <!-- Sub title of the Contact Permission Explanation -->
+    <string name="subtitle_enable_access_contact">友人を招待するには、MEGAがあなたの連絡先リストにアクセスできるようにする必要があります</string>
+    <!-- Button text of Contact Permission Explanation -->
+    <string name="grant_permission">アクセスを許可</string>
 </resources>

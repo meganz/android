@@ -698,5 +698,11 @@
     <!-- Sync option dialog cancel button -->
     <string name="settings_sync_option_cancel">Annulla</string>
     <!-- Snackbar message displayed when sync option is selected -->
-    <string name="settings_sync_option_updated_message">Sync option updated</string>
+    <string name="settings_sync_option_updated_message">Sync options updated</string>
+    <!-- Title of the Contact Permission Explanation -->
+    <string name="title_enable_access_contact">Enable access to invite friends</string>
+    <!-- Sub title of the Contact Permission Explanation -->
+    <string name="subtitle_enable_access_contact">In order to invite friends, you must allow MEGA to access your contact list</string>
+    <!-- Button text of Contact Permission Explanation -->
+    <string name="grant_permission">Permetti l\’accesso</string>
 </resources>

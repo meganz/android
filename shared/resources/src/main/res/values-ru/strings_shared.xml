@@ -713,5 +713,11 @@
     <!-- Sync option dialog cancel button -->
     <string name="settings_sync_option_cancel">Отмена</string>
     <!-- Snackbar message displayed when sync option is selected -->
-    <string name="settings_sync_option_updated_message">Sync option updated</string>
+    <string name="settings_sync_option_updated_message">Параметры синхронизации обновлены</string>
+    <!-- Title of the Contact Permission Explanation -->
+    <string name="title_enable_access_contact">Откройте доступ, чтобы пригласить друзей</string>
+    <!-- Sub title of the Contact Permission Explanation -->
+    <string name="subtitle_enable_access_contact">Чтобы приглашать друзей, нужно разрешить MEGA доступ к вашему списку контактов</string>
+    <!-- Button text of Contact Permission Explanation -->
+    <string name="grant_permission">Открыть доступ</string>
 </resources>

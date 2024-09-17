@@ -1909,7 +1909,7 @@
     <!-- Text button -->
     <string name="general_close">Zamknij</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Aplikacja do uwierzytelniania dwuskładnikowego</string>
+    <string name="no_authentication_apps_title">Two-factor authenticator app</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Czy chcesz otworzyć Google Play, aby zainstalować aplikację uwierzytelniającego?</string>
     <!-- Label Play Store -->
