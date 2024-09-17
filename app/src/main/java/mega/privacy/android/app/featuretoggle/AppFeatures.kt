@@ -44,7 +44,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     MapLocation(
         "Enable map location feature",
-        false,
+        true,
     ),
 
     /**
