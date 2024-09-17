@@ -154,7 +154,7 @@ class LoginFragment : Fragment() {
                 onLostAuthenticatorDevice = ::onLostAuthenticationDevice,
                 onBackPressed = { onBackPressed(uiState) },
                 onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed,
-                onReportIssue = ::openReportIssueFragment,
+                onReportIssue = ::openLoginIssueHelpdeskPage,
             )
         }
 
@@ -165,8 +165,11 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun openReportIssueFragment() {
-        (requireActivity() as LoginActivity).showFragment(LoginFragmentType.ReportIssue)
+    private fun openLoginIssueHelpdeskPage() {
+        Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse(Companion.LOGIN_HELP_URL)
+            startActivity(this)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -923,5 +926,9 @@ class LoginFragment : Fragment() {
             putExtra(Intent.EXTRA_STREAM, it)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
+    }
+
+    companion object {
+        private const val LOGIN_HELP_URL = "https://help.mega.io/accounts/login-issues"
     }
 }
