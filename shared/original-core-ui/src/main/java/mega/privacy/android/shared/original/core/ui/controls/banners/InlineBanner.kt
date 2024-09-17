@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
@@ -97,7 +96,6 @@ private fun InlineBaseBanner(
                         text = actionButtonText,
                         color = MegaOriginalTheme.colors.link.primary,
                         style = MaterialTheme.typography.button.copy(
-                            textDecoration = TextDecoration.Underline,
                             fontWeight = FontWeight.Medium
                         )
                     )
