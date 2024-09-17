@@ -4,6 +4,7 @@ import android.util.Size
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
@@ -28,6 +29,7 @@ import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.meeting.WaitingRoomStatus
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
@@ -114,6 +116,7 @@ class WaitingRoomViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val openChatLinkUseCase: OpenChatLinkUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(WaitingRoomState())
@@ -138,7 +141,15 @@ class WaitingRoomViewModel @Inject constructor(
      * On ViewModel cleared
      */
     override fun onCleared() {
-        enableCamera(false)
+        applicationScope.launch {
+            runCatching {
+                startVideoDeviceUseCase(false)
+            }.onSuccess {
+                _state.update { it.copy(cameraEnabled = false) }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
         super.onCleared()
     }
 

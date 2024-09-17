@@ -124,7 +124,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="13dp"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="4dp"
                     android:src="@drawable/ic_call"
                     app:tint="@color/teal_300_teal_200" />
 
@@ -132,7 +132,7 @@
                     android:id="@+id/answer_button_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="4dp"
                     android:layout_toEndOf="@id/answer_image"
                     android:textColor="@color/teal_300_teal_200"
                     android:textAppearance="@style/TextAppearance.Mega.Subtitle2" />

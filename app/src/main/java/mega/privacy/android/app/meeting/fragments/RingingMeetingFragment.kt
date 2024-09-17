@@ -3,7 +3,6 @@ package mega.privacy.android.app.meeting.fragments
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -28,7 +26,6 @@ import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor
 import mega.privacy.android.app.utils.CallUtil.getDefaultAvatarCall
 import mega.privacy.android.app.utils.CallUtil.getImageAvatarCall
-import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR
 import mega.privacy.android.app.utils.Constants.AVATAR_SIZE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
@@ -150,30 +147,6 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         }
         collectFlows()
 
-        var bitmap: Bitmap?
-
-        // Set caller's name and avatar
-        inMeetingViewModel.state.value.chat?.let {
-            if (inMeetingViewModel.isOneToOneCall()) {
-                val callerId = it.peerHandlesList[0]
-
-                bitmap = getImageAvatarCall(callerId)
-                if (bitmap == null) {
-                    bitmap = getDefaultAvatarCall(context, callerId)
-                }
-            } else {
-                bitmap = getDefaultAvatar(
-                    getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR),
-                    it.title,
-                    AVATAR_SIZE,
-                    true,
-                    true
-                )
-            }
-
-            binding.avatar.setImageBitmap(bitmap)
-        }
-
         sharedModel.cameraPermissionCheck.observe(viewLifecycleOwner) { allowed ->
             if (allowed) {
                 permissionsRequester = permissionsBuilder(
@@ -214,6 +187,31 @@ class RingingMeetingFragment : MeetingBaseFragment() {
     }
 
     private fun collectFlows() {
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.chat }
+            .distinctUntilChanged()) {
+            it?.run {
+                if (inMeetingViewModel.isOneToOneCall()) {
+                    val callerId = it.peerHandlesList[0]
+                    getImageAvatarCall(callerId)?.let { bitmap ->
+                        binding.avatar.setImageBitmap(bitmap)
+                    } ?: run {
+                        binding.avatar.setImageBitmap(getDefaultAvatarCall(context, callerId))
+                    }
+                } else {
+                    binding.avatar.setImageBitmap(
+                        getDefaultAvatar(
+                            getSpecificAvatarColor(AVATAR_GROUP_CHAT_COLOR),
+                            it.title,
+                            AVATAR_SIZE,
+                            true,
+                            true
+                        )
+                    )
+                }
+            }
+        }
+
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.chatTitle }
             .distinctUntilChanged()) {
             if (it.isNotBlank()) {
