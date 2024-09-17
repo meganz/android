@@ -9,13 +9,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.NotificationState
 import mega.privacy.android.app.presentation.notification.model.mapper.NotificationMapper
 import mega.privacy.android.domain.usecase.AcknowledgeUserAlertsUseCase
 import mega.privacy.android.domain.usecase.MonitorUserAlertsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.notifications.GetPromoNotificationsUseCase
 import mega.privacy.android.domain.usecase.notifications.SetLastReadNotificationUseCase
 import timber.log.Timber
@@ -28,7 +26,6 @@ import javax.inject.Inject
  * @property monitorUserAlertsUseCase Monitor user alerts use case
  * @property getPromoNotificationsUseCase Get promo notifications use case
  * @property setLastReadNotificationUseCase Set last read notification use case
- * @property getFeatureFlagValueUseCase Get feature flag value use case
  * @property notificationMapper Notification mapper
  * @constructor Create empty Notification view model
  */
@@ -39,7 +36,6 @@ class NotificationViewModel @Inject constructor(
     private val monitorUserAlertsUseCase: MonitorUserAlertsUseCase,
     private val getPromoNotificationsUseCase: GetPromoNotificationsUseCase,
     private val setLastReadNotificationUseCase: SetLastReadNotificationUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val notificationMapper: NotificationMapper,
 ) : ViewModel() {
 
@@ -65,12 +61,7 @@ class NotificationViewModel @Inject constructor(
 
     private suspend fun getPromoNotifications() =
         runCatching {
-            isPromoNotificationsEnabled = getFeatureFlagValueUseCase(AppFeatures.PromoNotifications)
-            if (isPromoNotificationsEnabled) {
-                getPromoNotificationsUseCase()
-            } else {
-                emptyList()
-            }
+            getPromoNotificationsUseCase()
         }.onFailure {
             Timber.e("Failed to fetch promo notifications with error: ${it.message}")
         }.getOrDefault(emptyList())

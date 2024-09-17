@@ -10,9 +10,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getState
-import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.usecase.HasBackupsChildren
@@ -21,7 +19,6 @@ import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.GetCurrentUserStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorMyChatOnlineStatusUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -42,7 +39,6 @@ internal class ManagerDrawerViewModel @Inject constructor(
     private val monitorVerificationStatus: MonitorVerificationStatus,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getEnabledNotificationsUseCase: GetEnabledNotificationsUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
 ) : ViewModel() {
@@ -172,11 +168,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
     private fun shouldShowPromoTag() {
         viewModelScope.launch {
             runCatching {
-                val promoNotificationCount =
-                    if (getFeatureFlagValueUseCase(AppFeatures.PromoNotifications))
-                        getEnabledNotificationsUseCase().size
-                    else
-                        0
+                val promoNotificationCount = getEnabledNotificationsUseCase().size
                 _state.update { it.copy(showPromoTag = promoNotificationCount > 0) }
             }
         }

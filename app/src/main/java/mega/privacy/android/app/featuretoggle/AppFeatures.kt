@@ -111,11 +111,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     MeetingNotificationSettings("Enable Meeting notification settings", false),
 
     /**
-     * To enable showing promo notifications in Notifications screen
-     */
-    PromoNotifications("Enable promotional notifications", true),
-
-    /**
      * To enable the new add and manage description feature to node
      */
     NodeWithDescription(

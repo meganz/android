@@ -28,7 +28,6 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
@@ -105,7 +104,6 @@ class GlobalListener @Inject constructor(
                     runCatching {
                         val notifications = getNotificationCountUseCase(
                             withChatNotifications = false,
-                            promoFeatureFlag = AppFeatures.PromoNotifications
                         )
                         broadcastHomeBadgeCountUseCase(notifications)
                     }.getOrElse { Timber.e(it) }
@@ -172,7 +170,6 @@ class GlobalListener @Inject constructor(
         val notificationCount = runCatching {
             getNotificationCountUseCase(
                 withChatNotifications = false,
-                promoFeatureFlag = AppFeatures.PromoNotifications
             )
         }
             .getOrNull() ?: 0

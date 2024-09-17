@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.notification.NotificationViewModel
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.mapper.NotificationMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -19,7 +18,6 @@ import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
 import mega.privacy.android.domain.entity.notifications.PromoNotification
 import mega.privacy.android.domain.usecase.AcknowledgeUserAlertsUseCase
 import mega.privacy.android.domain.usecase.MonitorUserAlertsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.notifications.GetPromoNotificationsUseCase
 import mega.privacy.android.domain.usecase.notifications.SetLastReadNotificationUseCase
 import org.junit.jupiter.api.BeforeEach
@@ -29,7 +27,6 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -50,7 +47,6 @@ class NotificationViewModelTest {
     }
 
     private val acknowledgeUserAlertsUseCase = mock<AcknowledgeUserAlertsUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getPromoNotificationsUseCase = mock<GetPromoNotificationsUseCase>()
     private val setLastReadNotificationUseCase = mock<SetLastReadNotificationUseCase>()
     private val notificationMapper = mock<NotificationMapper>()
@@ -61,7 +57,6 @@ class NotificationViewModelTest {
         reset(
             monitorUserAlertsUseCase,
             acknowledgeUserAlertsUseCase,
-            getFeatureFlagValueUseCase,
             getPromoNotificationsUseCase,
             setLastReadNotificationUseCase,
             notificationMapper
@@ -74,7 +69,6 @@ class NotificationViewModelTest {
             monitorUserAlertsUseCase = monitorUserAlertsUseCase,
             getPromoNotificationsUseCase = getPromoNotificationsUseCase,
             setLastReadNotificationUseCase = setLastReadNotificationUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             notificationMapper = notificationMapper,
         )
     }
@@ -83,7 +77,6 @@ class NotificationViewModelTest {
     fun `test that initial value is an empty list and scroll to top is false`() = runTest {
 
         whenever(monitorUserAlertsUseCase()).thenReturn(mock())
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
         whenever(getPromoNotificationsUseCase()).thenReturn(mock())
         whenever(notificationMapper(any())).thenReturn(mock())
 
@@ -130,7 +123,6 @@ class NotificationViewModelTest {
 
         val alert = mock<IncomingPendingContactRequestAlert>()
         whenever(monitorUserAlertsUseCase()).thenReturn(flowOf(listOf(alert)))
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
         whenever(getPromoNotificationsUseCase()).thenReturn(listOf(expectedPromoNotification))
         whenever(notificationMapper(alert)).thenReturn(expectedNotification)
 
@@ -165,7 +157,6 @@ class NotificationViewModelTest {
         val newNotification = initialNotification.copy(title = { "New title" })
         whenever(notificationMapper(initialAlert)).thenReturn(initialNotification)
         whenever(notificationMapper(newAlert)).thenReturn(newNotification)
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
         whenever(getPromoNotificationsUseCase()).thenReturn(emptyList())
 
         whenever(monitorUserAlertsUseCase()).thenReturn(
@@ -193,26 +184,16 @@ class NotificationViewModelTest {
     }
 
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that promo notifications are fetched based on feature flag value`(featureFlag: Boolean) =
+    @Test
+    fun `test that promo notifications are fetched`() =
         runTest {
             whenever(notificationMapper(any())).thenReturn(mock())
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(featureFlag)
             whenever(getPromoNotificationsUseCase()).thenReturn(emptyList())
             val alert = mock<IncomingPendingContactRequestAlert>()
             whenever(monitorUserAlertsUseCase()).thenReturn(flowOf(listOf(alert)))
             initViewModel()
             scheduler.advanceUntilIdle()
-            if (featureFlag) {
-                verifyBlocking(getPromoNotificationsUseCase, GetPromoNotificationsUseCase::invoke)
-            } else {
-                verifyBlocking(
-                    getPromoNotificationsUseCase,
-                    times(0),
-                    GetPromoNotificationsUseCase::invoke
-                )
-            }
+            verifyBlocking(getPromoNotificationsUseCase, GetPromoNotificationsUseCase::invoke)
         }
 
 
@@ -255,7 +236,6 @@ class NotificationViewModelTest {
     ) =
         runTest {
             whenever(notificationMapper(any())).thenReturn(mock())
-            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
             whenever(getPromoNotificationsUseCase()).thenReturn(promoNotificationsList)
             val alert = mock<IncomingPendingContactRequestAlert>()
             whenever(monitorUserAlertsUseCase()).thenReturn(flowOf(listOf(alert)))

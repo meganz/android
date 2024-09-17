@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
-import mega.privacy.android.app.main.drawer.ManagerDrawerViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
@@ -20,7 +19,6 @@ import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.GetCurrentUserStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorMyChatOnlineStatusUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -36,7 +34,6 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -57,9 +54,6 @@ internal class ManagerDrawerViewModelTest {
     private val monitorMyChatOnlineStatusUseCase: MonitorMyChatOnlineStatusUseCase = mock()
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock {
-        onBlocking { invoke(any()) }.thenReturn(false)
-    }
     private val monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase = mock()
     private val monitorVerificationStatus: MonitorVerificationStatus = mock()
     private val getEnabledNotificationsUseCase: GetEnabledNotificationsUseCase = mock()
@@ -101,9 +95,6 @@ internal class ManagerDrawerViewModelTest {
         getCurrentUserChatStatusUseCase.stub {
             onBlocking { invoke() }.thenReturn(UserChatStatus.Invalid)
         }
-        getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(false)
-        }
     }
 
     private fun initTestClass() {
@@ -118,7 +109,6 @@ internal class ManagerDrawerViewModelTest {
             monitorVerificationStatus,
             rootNodeExistsUseCase,
             monitorConnectivityUseCase,
-            getFeatureFlagValueUseCase,
             getEnabledNotificationsUseCase,
             monitorMyAccountUpdateUseCase,
         )
@@ -195,15 +185,13 @@ internal class ManagerDrawerViewModelTest {
             }
         }
 
-    @ParameterizedTest(name = "test that when size of list of enabled notifications is {0} and PromoNotifications feature flag is set to {1} then showPromoTag is updated to {2}")
+    @ParameterizedTest(name = "test that when size of list of enabled notifications is {0} then showPromoTag is updated to {1}")
     @MethodSource("provideShowPromoTagParameters")
     fun `test that showPromoTag is updated when there is a change in the number of available promo notifications`(
         promoNotificationsCount: List<Int>,
-        featureFlagValue: Boolean,
         expectedShowPromoTag: Boolean,
     ) = runTest {
         whenever(getEnabledNotificationsUseCase()).thenReturn(promoNotificationsCount)
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(featureFlagValue)
 
         initTestClass()
 
@@ -213,9 +201,7 @@ internal class ManagerDrawerViewModelTest {
     }
 
     private fun provideShowPromoTagParameters() = listOf(
-        Arguments.of(emptyList<Int>(), false, false),
-        Arguments.of(emptyList<Int>(), true, false),
-        Arguments.of(listOf(1, 2), false, false),
-        Arguments.of(listOf(1, 2, 3), true, true),
+        Arguments.of(emptyList<Int>(), false),
+        Arguments.of(listOf(1, 2, 3), true),
     )
 }
