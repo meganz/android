@@ -674,7 +674,7 @@
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">Cerrar</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
-    <string name="meeting_recent_list_empty_title">Protect your calls</string>
+    <string name="meeting_recent_list_empty_title">Protege tus llamadas</string>
     <!--Subtitle text from Meeting screen empty view-->
     <string name="meeting_recent_list_empty_subtitle">Your meetings, family calls, and private conversations are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
     <!--Warning message to inform the user the minimum number of characters to enter into the edit text field for the survey-->
@@ -698,5 +698,11 @@
     <!-- Sync option dialog cancel button -->
     <string name="settings_sync_option_cancel">Cancelar</string>
     <!-- Snackbar message displayed when sync option is selected -->
-    <string name="settings_sync_option_updated_message">Sync option updated</string>
+    <string name="settings_sync_option_updated_message">Sync options updated</string>
+    <!-- Title of the Contact Permission Explanation -->
+    <string name="title_enable_access_contact">Enable access to invite friends</string>
+    <!-- Sub title of the Contact Permission Explanation -->
+    <string name="subtitle_enable_access_contact">In order to invite friends, you must allow MEGA to access your contact list</string>
+    <!-- Button text of Contact Permission Explanation -->
+    <string name="grant_permission">Permitir acceso</string>
 </resources>

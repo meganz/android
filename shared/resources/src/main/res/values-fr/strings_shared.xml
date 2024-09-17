@@ -691,7 +691,7 @@
     <!-- Title of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_title">Synchronisation simple et automatique</string>
     <!-- Body message of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_body_message">Sync a folder on your device with MEGA to access the latest version of your files anywhere</string>
+    <string name="sync_promotion_bottom_sheet_body_message">Synchronisez un dossier sur votre appareil avec MEGA pour accéder à la version la plus récente de vos fichiers où que vous soyez</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Synchroniser les dossiers</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
@@ -701,5 +701,11 @@
     <!-- Sync option dialog cancel button -->
     <string name="settings_sync_option_cancel">Annuler</string>
     <!-- Snackbar message displayed when sync option is selected -->
-    <string name="settings_sync_option_updated_message">Sync option updated</string>
+    <string name="settings_sync_option_updated_message">Options de synchronisation mises à jour</string>
+    <!-- Title of the Contact Permission Explanation -->
+    <string name="title_enable_access_contact">Activez l\’accès pour inviter des amis</string>
+    <!-- Sub title of the Contact Permission Explanation -->
+    <string name="subtitle_enable_access_contact">Pour inviter des amis, vous devez autoriser MEGA à accéder à votre liste de contacts</string>
+    <!-- Button text of Contact Permission Explanation -->
+    <string name="grant_permission">Autoriser l’accès</string>
 </resources>
