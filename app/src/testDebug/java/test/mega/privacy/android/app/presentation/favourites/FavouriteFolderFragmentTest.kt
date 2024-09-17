@@ -17,7 +17,8 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.favourites.FavouriteFolderFragment
+import mega.privacy.android.app.di.TestWrapperModule
+import mega.privacy.android.app.launchFragmentInHiltContainer
 import mega.privacy.android.app.presentation.favourites.adapter.FavouritesViewHolder
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
@@ -34,8 +35,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import mega.privacy.android.app.di.TestWrapperModule
-import mega.privacy.android.app.launchFragmentInHiltContainer
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -168,13 +167,6 @@ class FavouriteFolderFragmentTest {
                 favourite
             )
             whenever(FavouritesTestModule.getThumbnailUseCase(1)).thenReturn(null)
-
-            whenever(
-                FavouritesTestModule.megaUtilWrapper.availableOffline(
-                    anyOrNull(),
-                    anyOrNull()
-                )
-            ).thenReturn(true)
         }
     }
 

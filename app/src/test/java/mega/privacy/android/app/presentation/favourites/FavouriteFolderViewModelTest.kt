@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.favourites.FavouriteFolderViewModel
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
@@ -172,12 +171,6 @@ class FavouriteFolderViewModelTest {
                 )
             ).thenReturn(mock<FavouriteFolder>())
             whenever(fetchNodeWrapper(anyOrNull())).thenReturn(megaNode)
-            whenever(
-                megaUtilWrapper.availableOffline(
-                    anyOrNull(),
-                    anyOrNull()
-                )
-            ).thenReturn(true)
             initViewModel()
             underTest.childrenNodesState.test {
                 val actual = awaitItem()
@@ -211,12 +204,6 @@ class FavouriteFolderViewModelTest {
                 )
             ).thenReturn(mock<FavouriteFolder>())
             whenever(fetchNodeWrapper(anyOrNull())).thenReturn(megaNode)
-            whenever(
-                megaUtilWrapper.availableOffline(
-                    anyOrNull(),
-                    anyOrNull()
-                )
-            ).thenReturn(true)
             initViewModel()
             underTest.childrenNodesState.test {
                 val actual = awaitItem()

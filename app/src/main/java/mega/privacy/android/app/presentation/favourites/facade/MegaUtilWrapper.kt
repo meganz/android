@@ -15,18 +15,6 @@ interface MegaUtilWrapper {
     fun isOnline(context: Context): Boolean
 
     /**
-     * Determine the current node whether is available offline
-     * @param context Context
-     * @param nodeId current nodeId
-     * @return true is available offline
-     */
-    @Deprecated(
-        message = "Method replaced with use case IsAvailableOffline",
-        level = DeprecationLevel.WARNING
-    )
-    suspend fun availableOffline(context: Context, nodeId: Long): Boolean
-
-    /**
      * Opens an URL node.
      *
      * @param context Current context.

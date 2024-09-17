@@ -187,10 +187,7 @@ class FavouriteFolderViewModel @Inject constructor(
                             favourite = favouriteMapper(
                                 node,
                                 favouriteInfo,
-                                megaUtilWrapper.availableOffline(
-                                    context,
-                                    favouriteInfo.id.longValue
-                                ),
+                                favouriteInfo.isAvailableOffline,
                                 stringUtilWrapper,
                                 false
                             ) { name ->
