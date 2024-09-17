@@ -132,7 +132,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
             finish()
             return
         }
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        onBackPressedDispatcher.addCallback(onBackPressedCallback)
         chatRequestHandler.setIsLoggingRunning(true)
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
