@@ -60,21 +60,24 @@ class FavouriteActionModeCallback(
             runCatching {
                 val isHiddenNodesEnabled =
                     mainActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
-                val selectedNodes = viewModel.getItemsSelected().mapNotNull { it.value.typedNode }
+                val selectedNodes =
+                    viewModel.getItemsSelected().mapNotNull { it.value.typedNode }
                 val isHidingActionAllowed = selectedNodes.all {
                     viewModel.isHidingActionAllowed(it.id)
-                } && !selectedNodes.any { it.isSensitiveInherited }
+                }
 
                 if (isHiddenNodesEnabled && isHidingActionAllowed) {
+                    val includeSensitiveInheritedNode =
+                        selectedNodes.any { it.isSensitiveInherited }
                     val isPaid =
                         viewModel.getIsPaidAccount()
 
                     val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
                     menu.findItem(R.id.cab_menu_hide)?.isVisible =
-                        hasNonSensitiveNode || !isPaid
+                        !isPaid || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
 
                     menu.findItem(R.id.cab_menu_unhide)?.isVisible =
-                        !hasNonSensitiveNode && isPaid
+                        isPaid && !hasNonSensitiveNode && !includeSensitiveInheritedNode
                 } else {
                     menu.findItem(R.id.cab_menu_hide)?.isVisible = false
                     menu.findItem(R.id.cab_menu_unhide)?.isVisible = false

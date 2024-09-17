@@ -422,11 +422,16 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         && accountType != null
                         && isHiddenNodesOnboarded != null
                         && state.isHidingActionAllowed
-                        && megaApi.getParentNode(node)?.let {
-                            megaApi.isSensitiveInherited(it)
-                        } != true
                     ) {
-                        View.VISIBLE
+                        val parentNode = megaApi.getParentNode(node)
+                        val isSensitiveInherited =
+                            parentNode?.let { megaApi.isSensitiveInherited(it) } == true
+
+                        if (!isSensitiveInherited || !accountType.isPaid) {
+                            View.VISIBLE
+                        } else {
+                            View.GONE
+                        }
                     } else {
                         View.GONE
                     }

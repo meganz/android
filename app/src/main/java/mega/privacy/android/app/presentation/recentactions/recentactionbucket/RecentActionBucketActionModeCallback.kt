@@ -76,13 +76,15 @@ class RecentActionBucketActionModeCallback constructor(
             val selectedNodes = viewModel.getSelectedNodes()
             val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
 
-            if (isHiddenNodesEnabled && !isInShareBucket && !includeSensitiveInheritedNode) {
+            if (isHiddenNodesEnabled && !isInShareBucket) {
                 val accountType = viewModel.state.value.accountDetail?.levelDetail?.accountType
                 val isPaid = accountType?.isPaid ?: false
 
                 val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
-                menu.findItem(R.id.cab_menu_hide)?.isVisible = hasNonSensitiveNode || !isPaid
-                menu.findItem(R.id.cab_menu_unhide)?.isVisible = !hasNonSensitiveNode && isPaid
+                menu.findItem(R.id.cab_menu_hide)?.isVisible =
+                    !isPaid || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
+                menu.findItem(R.id.cab_menu_unhide)?.isVisible =
+                    isPaid && !hasNonSensitiveNode && !includeSensitiveInheritedNode
             }
         }
     }

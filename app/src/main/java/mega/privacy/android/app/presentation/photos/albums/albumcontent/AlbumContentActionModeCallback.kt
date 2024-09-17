@@ -120,7 +120,7 @@ class AlbumContentActionModeCallback(
                 val selectedPhotos = fragment.albumContentViewModel.getSelectedPhotos()
                 val includeSensitiveInheritedNode = selectedPhotos.any { it.isSensitiveInherited }
 
-                if (isHiddenNodesEnabled && !includeSensitiveInheritedNode) {
+                if (isHiddenNodesEnabled) {
                     val hasNonSensitiveNode = selectedPhotos.any { !it.isSensitive }
                     val accountType =
                         fragment.albumContentViewModel.state.value.accountType
@@ -128,10 +128,10 @@ class AlbumContentActionModeCallback(
                         fragment.albumContentViewModel.state.value.isHiddenNodesOnboarded
 
                     menu.findItem(R.id.cab_menu_hide)?.isVisible =
-                        accountType != null && (!accountType.isPaid || hasNonSensitiveNode && isHiddenNodesOnboarded != null)
+                        accountType != null && (!accountType.isPaid || (hasNonSensitiveNode && isHiddenNodesOnboarded != null && !includeSensitiveInheritedNode))
 
                     menu.findItem(R.id.cab_menu_unhide)?.isVisible =
-                        accountType?.isPaid == true && !hasNonSensitiveNode
+                        accountType?.isPaid == true && !hasNonSensitiveNode && !includeSensitiveInheritedNode
                 } else {
                     menu.findItem(R.id.cab_menu_hide)?.isVisible = false
                     menu.findItem(R.id.cab_menu_unhide)?.isVisible = false

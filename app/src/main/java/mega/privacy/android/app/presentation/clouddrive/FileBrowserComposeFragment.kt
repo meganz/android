@@ -526,19 +526,20 @@ class FileBrowserComposeFragment : Fragment() {
                 fileBrowserViewModel.isHidingActionAllowed(NodeId(it))
             }
 
-            val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
-
-            if (!isHidingActionAllowed || includeSensitiveInheritedNode) {
+            if (!isHidingActionAllowed) {
                 menu.findItem(R.id.cab_menu_hide)?.isVisible = false
                 menu.findItem(R.id.cab_menu_unhide)?.isVisible = false
                 return
             }
+            val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
 
             val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
             val isPaid = fileBrowserViewModel.state.value.accountType?.isPaid ?: false
 
-            menu.findItem(R.id.cab_menu_hide)?.isVisible = hasNonSensitiveNode || !isPaid
-            menu.findItem(R.id.cab_menu_unhide)?.isVisible = !hasNonSensitiveNode && isPaid
+            menu.findItem(R.id.cab_menu_hide)?.isVisible =
+                !isPaid || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
+            menu.findItem(R.id.cab_menu_unhide)?.isVisible =
+                isPaid && !hasNonSensitiveNode && !includeSensitiveInheritedNode
         }
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {

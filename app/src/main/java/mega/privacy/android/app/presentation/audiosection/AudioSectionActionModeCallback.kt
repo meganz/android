@@ -54,17 +54,17 @@ internal class AudioSectionActionModeCallback(
                 managerActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
             val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
 
-            if (isHiddenNodesEnabled && !includeSensitiveInheritedNode) {
+            if (isHiddenNodesEnabled) {
                 val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
                 val isPaid =
                     audioSectionViewModel.state.value.accountDetail?.levelDetail?.accountType?.isPaid
                         ?: false
 
                 menu?.findItem(R.id.cab_menu_hide)?.isVisible =
-                    (hasNonSensitiveNode || !isPaid)
+                    !isPaid || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
 
                 menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
-                    !hasNonSensitiveNode && isPaid
+                    isPaid && !hasNonSensitiveNode && !includeSensitiveInheritedNode
             } else {
                 menu?.findItem(R.id.cab_menu_hide)?.isVisible = false
                 menu?.findItem(R.id.cab_menu_unhide)?.isVisible = false

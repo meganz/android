@@ -983,13 +983,15 @@ class VideoSectionViewModel @Inject constructor(
             val isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
             val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
 
-            if (isHiddenNodesEnabled && !includeSensitiveInheritedNode) {
+            if (isHiddenNodesEnabled) {
                 val hasNonSensitiveNode =
                     getSelectedNodes().any { !it.isMarkedSensitive }
                 val isPaid =
                     _state.value.accountDetail?.levelDetail?.accountType?.isPaid ?: false
-                isHideMenuActionVisible = hasNonSensitiveNode || !isPaid
-                isUnhideMenuActionVisible = !hasNonSensitiveNode && isPaid
+                isHideMenuActionVisible =
+                    !isPaid || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
+                isUnhideMenuActionVisible =
+                    isPaid && !hasNonSensitiveNode && !includeSensitiveInheritedNode
             }
 
             isRemoveLinkMenuActionVisible = if (selectedNodes.size == 1) {

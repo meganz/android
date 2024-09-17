@@ -1262,7 +1262,7 @@ class VideoSectionViewModelTest {
         }
 
     @Test
-    fun `test that the state is updated correctly when the selected node is sensitive inherited`() =
+    fun `test that the state is updated correctly when the selected node is sensitive inherited and account is free user`() =
         runTest {
             val mockTypedNode = mock<TypedNode> {
                 on { isSensitiveInherited }.thenReturn(true)
@@ -1281,7 +1281,7 @@ class VideoSectionViewModelTest {
 
                 underTest.checkActionsVisible()
                 val actual = awaitItem()
-                assertThat(actual.isHideMenuActionVisible).isFalse()
+                assertThat(actual.isHideMenuActionVisible).isTrue()
                 assertThat(actual.isUnhideMenuActionVisible).isFalse()
                 cancelAndIgnoreRemainingEvents()
             }

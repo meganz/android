@@ -32,7 +32,7 @@ class MediaDiscoveryActionModeCallback(
                 )
             }
 
-            if (isHiddenNodesEnabled && !includeSensitiveInheritedNode) {
+            if (isHiddenNodesEnabled) {
                 val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
 
                 val isPaid =
@@ -40,9 +40,9 @@ class MediaDiscoveryActionModeCallback(
                         ?: false
 
                 menu?.findItem(R.id.cab_menu_hide)?.isVisible =
-                    hasNonSensitiveNode || !isPaid
+                    !isPaid || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
                 menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
-                    !hasNonSensitiveNode && isPaid
+                    isPaid && !hasNonSensitiveNode && !includeSensitiveInheritedNode
             } else {
                 menu?.findItem(R.id.cab_menu_hide)?.isVisible = false
                 menu?.findItem(R.id.cab_menu_unhide)?.isVisible = false
