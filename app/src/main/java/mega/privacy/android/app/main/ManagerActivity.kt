@@ -1256,7 +1256,9 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     LaunchedEffect(state.shouldShowSyncPromotion) {
                         Timber.d("shouldShowSyncPromotion ${state.shouldShowSyncPromotion}")
                         if (state.shouldShowSyncPromotion) {
-                            if (!isOnboarding()) {
+                            if (isOnboarding()) {
+                                syncPromotionViewModel.onConsumeShouldShowSyncPromotion()
+                            } else {
                                 syncPromotionBottomSheetState.show()
                             }
                             syncPromotionViewModel.setSyncPromotionShown()
