@@ -1193,11 +1193,12 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                             val isNodeInBackup = megaApi.isInInbox(node)
 
                             val shouldShowHideNode = isHiddenNodesEnabled
-                                    && !isInSharedItems
+                                    && (!isPaidAccount
+                                    || (!isInSharedItems
                                     && !isRootParentInShare
-                                    && (!node.isMarkedSensitive || !isPaidAccount)
-                                    && !isSensitiveInherited
                                     && !isNodeInBackup
+                                    && !node.isMarkedSensitive
+                                    && !isSensitiveInherited))
 
                             val shouldShowUnhideNode = isHiddenNodesEnabled
                                     && !isInSharedItems
@@ -1247,12 +1248,14 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                             val isPaidAccount = accountType?.isPaid == true
                             val isNodeInBackup = megaApi.isInInbox(node)
 
+
                             val shouldShowHideNode = isHiddenNodesEnabled
-                                    && !isInSharedItems
+                                    && (!isPaidAccount
+                                    || (!isInSharedItems
                                     && !isRootParentInShare
-                                    && (!node.isMarkedSensitive || !isPaidAccount)
-                                    && !isSensitiveInherited
                                     && !isNodeInBackup
+                                    && !node.isMarkedSensitive
+                                    && !isSensitiveInherited))
 
                             val shouldShowUnhideNode = isHiddenNodesEnabled
                                     && !isInSharedItems

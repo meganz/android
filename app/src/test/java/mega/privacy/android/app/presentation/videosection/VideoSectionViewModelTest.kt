@@ -22,9 +22,11 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.videoRecentlyWatchedRoute
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
@@ -101,11 +103,8 @@ class VideoSectionViewModelTest {
     private val getVideoRecentlyWatchedUseCase = mock<GetVideoRecentlyWatchedUseCase>()
     private val clearRecentlyWatchedVideosUseCase = mock<ClearRecentlyWatchedVideosUseCase>()
     private val removeRecentlyWatchedItemUseCase = mock<RemoveRecentlyWatchedItemUseCase>()
-    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
-        on {
-            invoke()
-        }.thenReturn(flowOf(AccountDetail()))
-    }
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
+    private val fakeMonitorAccountDetailFlow = MutableSharedFlow<AccountDetail>()
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
         onBlocking {
             invoke()
@@ -130,6 +129,17 @@ class VideoSectionViewModelTest {
         on { title }.thenReturn("playlist")
         on { videos }.thenReturn(listOf(expectedVideo, expectedVideo))
     }
+    private fun mockAccountDetail(paidAccount: Boolean): AccountDetail {
+        val testAccountType = mock<AccountType> {
+            on { isPaid }.thenReturn(paidAccount)
+        }
+        val testLevelDetail = mock<AccountLevelDetail> {
+            on { accountType }.thenReturn(testAccountType)
+        }
+        return mock<AccountDetail> {
+            on { levelDetail }.thenReturn(testLevelDetail)
+        }
+    }
 
     @BeforeEach
     fun setUp() {
@@ -139,6 +149,9 @@ class VideoSectionViewModelTest {
         )
         wheneverBlocking { monitorVideoPlaylistSetsUpdateUseCase() }.thenReturn(
             fakeMonitorVideoPlaylistSetsUpdateFlow
+        )
+        wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(
+            fakeMonitorAccountDetailFlow
         )
         wheneverBlocking { getVideoPlaylistsUseCase() }.thenReturn(listOf())
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
@@ -1267,22 +1280,52 @@ class VideoSectionViewModelTest {
             val mockTypedNode = mock<TypedNode> {
                 on { isSensitiveInherited }.thenReturn(true)
             }
+            val testAccountDetail = mockAccountDetail(false)
             initVideosReturned()
+
             whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
             whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
             initUnderTest()
-
-            underTest.state.drop(1).test {
+            testScheduler.advanceUntilIdle()
+            fakeMonitorAccountDetailFlow.emit(testAccountDetail)
+            underTest.state.drop(2).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
 
                 underTest.onItemLongClicked(expectedVideo, 0)
                 assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(1)
 
-                underTest.checkActionsVisible()
                 val actual = awaitItem()
                 assertThat(actual.isHideMenuActionVisible).isTrue()
                 assertThat(actual.isUnhideMenuActionVisible).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the state is updated correctly when the selected node is not sensitive inherited and account is paid user`() =
+        runTest {
+            val mockTypedNode = mock<TypedNode> {
+                on { isSensitiveInherited }.thenReturn(false)
+                on { isMarkedSensitive }.thenReturn(true)
+            }
+            val testAccountDetail = mockAccountDetail(true)
+            initVideosReturned()
+
+            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+            whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
+            initUnderTest()
+            testScheduler.advanceUntilIdle()
+            fakeMonitorAccountDetailFlow.emit(testAccountDetail)
+            underTest.state.drop(2).test {
+                underTest.refreshNodes()
+                assertThat(awaitItem().allVideos).isNotEmpty()
+
+                underTest.onItemLongClicked(expectedVideo, 0)
+                assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(1)
+                val actual = awaitItem()
+                assertThat(actual.isHideMenuActionVisible).isFalse()
+                assertThat(actual.isUnhideMenuActionVisible).isTrue()
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -1393,7 +1436,7 @@ class VideoSectionViewModelTest {
             initUnderTest()
 
             underTest.onTabSelected(VideoSectionTab.Playlists)
-            underTest.state.drop(2).test {
+            underTest.state.drop(1).test {
                 underTest.checkActionsVisible()
                 val actual = awaitItem()
                 assertThat(actual.isHideMenuActionVisible).isFalse()
