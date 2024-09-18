@@ -87,7 +87,7 @@ extra["targetSdkVersion"] = 34
 extra["buildTools"] = "35.0.0"
 
 // Prebuilt MEGA SDK version
-extra["megaSdkVersion"] = "20240904.161146-rel"
+extra["megaSdkVersion"] = "20240918.153243-rel"
 
 //JDK and Java Version
 extra["jdk"] = "17"
@@ -111,4 +111,3 @@ tasks.register("runUnitTest") {
     dependsOn(":shared:original-core-ui:testDebugUnitTestCoverage")
     dependsOn(":legacy-core-ui:testDebugUnitTestCoverage")
 }
-
