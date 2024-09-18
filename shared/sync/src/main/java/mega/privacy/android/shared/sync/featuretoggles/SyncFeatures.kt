@@ -18,6 +18,16 @@ enum class SyncFeatures(
 ) : Feature {
 
     /**
+     * Backup for Android feature flag
+     *
+     * Activate this flag if you want to enable the Backup for Android feature
+     */
+    BackupForAndroid(
+        "Enable the Backup for Android feature",
+        false
+    ),
+
+    /**
      * Sync Frequency feature flag
      *
      * Activate this flag if you want to set a custom sync frequency in settings
