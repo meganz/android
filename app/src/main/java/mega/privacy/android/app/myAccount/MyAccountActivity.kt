@@ -37,6 +37,7 @@ import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUN
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_MASTER_KEY
 import mega.privacy.android.app.databinding.ActivityMyAccountBinding
 import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBinding
+import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM_NO_NAVIGATION
@@ -136,6 +137,7 @@ class MyAccountActivity : PasscodeActivity(),
         }
 
         binding = ActivityMyAccountBinding.inflate(layoutInflater)
+        consumeInsetsWithToolbar(customToolbar = binding.toolbar)
         setContentView(binding.root)
         onBackPressedDispatcher.addCallback(this, onBackPressCallback)
         setupView()
@@ -399,7 +401,6 @@ class MyAccountActivity : PasscodeActivity(),
      */
     private fun updateActionBar(background: Int) {
         if (!isDarkMode(this)) {
-            window?.statusBarColor = background
             binding.toolbar.setBackgroundColor(background)
         }
     }
@@ -410,25 +411,9 @@ class MyAccountActivity : PasscodeActivity(),
      * @param withElevation True if should set elevation, false otherwise.
      */
     private fun changeElevation(withElevation: Boolean) {
-        val isDark = isDarkMode(this)
-        val darkAndElevation = withElevation && isDark
-        val background = ContextCompat.getColor(this, R.color.grey_020_grey_087)
-
-        if (darkAndElevation) {
-            ColorUtils.changeStatusBarColorForElevation(this, true)
-        } else {
-            window?.statusBarColor = background
-        }
-
         val elevation = resources.getDimension(R.dimen.toolbar_elevation)
 
-        binding.toolbar.setBackgroundColor(
-            if (darkAndElevation) ColorUtils.getColorForElevation(this, elevation)
-            else background
-        )
-
-        supportActionBar?.elevation =
-            if (withElevation && !isDark) elevation else 0F
+        supportActionBar?.elevation = if (withElevation) elevation else 0F
     }
 
     /**
