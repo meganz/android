@@ -18,12 +18,12 @@ enum class SyncFeatures(
 ) : Feature {
 
     /**
-     * Android Sync Work Manager feature flag.
+     * Sync Frequency feature flag
      *
-     * Activate this flag if you want to use WorkManager instead of SyncBackgroundService
+     * Activate this flag if you want to set a custom sync frequency in settings
      */
-    AndroidSyncWorkManager(
-        "Enable the new Android Sync WorkManager to run instead of Service",
+    SyncFrequencySettings(
+        "Enable the Sync Frequency in settings",
         false
     );
 

@@ -10,12 +10,9 @@ import javax.inject.Inject
  */
 class StartSyncWorkerTask @Inject constructor(
     private val startSyncWorkerUseCase: StartSyncWorkerUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : AppStopTask {
 
     override suspend fun invoke() {
-        if (getFeatureFlagValueUseCase(SyncFeatures.AndroidSyncWorkManager)) {
-            startSyncWorkerUseCase()
-        }
+        startSyncWorkerUseCase()
     }
 }

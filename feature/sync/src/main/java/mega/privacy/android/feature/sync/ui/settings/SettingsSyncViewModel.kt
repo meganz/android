@@ -56,7 +56,7 @@ internal class SettingsSyncViewModel @Inject constructor(
     private fun loadSyncFrequency() {
         viewModelScope.launch {
             runCatching {
-                getFeatureFlagValueUseCase(SyncFeatures.AndroidSyncWorkManager)
+                getFeatureFlagValueUseCase(SyncFeatures.SyncFrequencySettings)
             }.onSuccess { isSyncFrequencyEnabled ->
                 if (isSyncFrequencyEnabled) {
                     runCatching {

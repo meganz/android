@@ -44,7 +44,6 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property uploadEvent                                Event to trigger upload actions
  * @property handleScanDocumentResult                   Decides if the legacy or modern Document Scanner should be used
  * @property documentScanningErrorTypeUiItem            The specific Error return when using the modern Document Scanner
- * @property isAndroidSyncWorkManagerFeatureFlagEnabled Feature flag to use Android Sync Work Manager instead of SyncBackgroundService
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -74,5 +73,4 @@ data class ManagerState(
     val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload> = consumed(),
     val handleScanDocumentResult: HandleScanDocumentResult? = null,
     val documentScanningErrorTypeUiItem: DocumentScanningErrorTypeUiItem? = null,
-    val isAndroidSyncWorkManagerFeatureFlagEnabled: Boolean = false,
 )

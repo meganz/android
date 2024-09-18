@@ -2077,18 +2077,11 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 viewModel.markHandleCheckLinkResult()
             }
 
-            if (managerState.androidSyncServiceEnabled && !managerState.isAndroidSyncWorkManagerFeatureFlagEnabled) {
-                syncNavigator.startSyncService(this)
-            } else {
-                syncNavigator.stopSyncService(this)
-            }
 
             if (managerState.uploadEvent is StateEventWithContentTriggered) {
                 startDownloadViewModel.onUploadClicked(managerState.uploadEvent.content)
             }
-            if (managerState.isAndroidSyncWorkManagerFeatureFlagEnabled) {
-                syncMonitorViewModel.startMonitoring()
-            }
+            syncMonitorViewModel.startMonitoring()
         }
         this.collectFlow(
             viewModel.monitorConnectivityEvent,

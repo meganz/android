@@ -146,9 +146,9 @@ class SettingsSyncViewModelTest {
     }
 
     @Test
-    fun `test that enabled AndroidSyncWorkManager feature flag shows frequency upon view model init`() =
+    fun `test that enabled SyncFrequencySettings feature flag shows frequency upon view model init`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(SyncFeatures.AndroidSyncWorkManager)).thenReturn(
+            whenever(getFeatureFlagValueUseCase(SyncFeatures.SyncFrequencySettings)).thenReturn(
                 true
             )
             whenever(getSyncFrequencyUseCase()).thenReturn(15)
@@ -163,9 +163,9 @@ class SettingsSyncViewModelTest {
         }
 
     @Test
-    fun `test that disabled AndroidSyncWorkManager feature flag does not shows frequency`() =
+    fun `test that disabled SyncFrequencySettings feature flag does not shows frequency`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(SyncFeatures.AndroidSyncWorkManager)).thenReturn(
+            whenever(getFeatureFlagValueUseCase(SyncFeatures.SyncFrequencySettings)).thenReturn(
                 false
             )
 

@@ -349,7 +349,6 @@ class ManagerViewModel @Inject constructor(
     init {
         checkUsersCallLimitReminders()
         getApiFeatureFlag()
-        loadAndroidSyncWorkManagerFeatureFlag()
 
         viewModelScope.launch {
             val order = getCloudSortOrder()
@@ -537,21 +536,6 @@ class ManagerViewModel @Inject constructor(
         }
     }
 
-    private fun loadAndroidSyncWorkManagerFeatureFlag() {
-        viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(SyncFeatures.AndroidSyncWorkManager)
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }.onSuccess { flag ->
-                _state.update { state ->
-                    state.copy(
-                        isAndroidSyncWorkManagerFeatureFlagEnabled = flag,
-                    )
-                }
-            }
-        }
-    }
 
     /**
      * Start offline sync worker
