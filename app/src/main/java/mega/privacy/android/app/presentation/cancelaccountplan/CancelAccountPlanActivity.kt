@@ -102,18 +102,9 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                                         )
 
                                         CancellationInstructionsType.PlayStore,
-                                        -> if (uiState.showCancellationSurvey) {
-                                            navController.navigate(
-                                                cancellationSurveyRoute
-                                            )
-                                        } else {
-                                            uiState.isMonthlySubscription?.let { isMonthlySubscription ->
-                                                redirectToCancelPlayStoreSubscription(
-                                                    accountType,
-                                                    isMonthlySubscription
-                                                )
-                                            }
-                                        }
+                                        -> navController.navigate(
+                                            cancellationSurveyRoute
+                                        )
                                     }
                                 }
                             })

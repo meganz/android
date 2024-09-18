@@ -18,7 +18,6 @@ import mega.privacy.android.domain.entity.AccountType
  * @param isLoading UI state to show the loading state
  * @param subscriptionId subscription ID if user has one associated with their account
  * @property cancellationReasons list of cancellation reasons
- * @param showCancellationSurvey true to show the cancellation survey
  */
 data class CancelAccountPlanUiState(
     val cancellationInstructionsType: CancellationInstructionsType? = null,
@@ -43,5 +42,4 @@ data class CancelAccountPlanUiState(
         UICancellationSurveyAnswer.Answer10,
         UICancellationSurveyAnswer.Answer8,
     ),
-    val showCancellationSurvey: Boolean = false,
 )

@@ -177,14 +177,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     NewUploadDestinationActivity(
         "Enable upload destination activity",
         false
-    ),
-
-    /**
-     * To show cancellation survey
-     */
-    CancellationSurvey(
-        "Enable Cancellation survey feature",
-        false
     );
 
     companion object : FeatureFlagValueProvider {

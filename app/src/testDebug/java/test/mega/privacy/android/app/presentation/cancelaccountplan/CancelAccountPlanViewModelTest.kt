@@ -27,7 +27,6 @@ import mega.privacy.android.domain.usecase.account.CancelSubscriptionWithSurveyA
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetAppSubscriptionOptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -57,7 +56,6 @@ internal class CancelAccountPlanViewModelTest {
     private val accountDetailFlow = MutableStateFlow(AccountDetail())
     private val cancelSubscriptionWithSurveyAnswersUseCase =
         mock<CancelSubscriptionWithSurveyAnswersUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private val expectedSubscriptionId = "testSubscriptionId"
 
@@ -111,7 +109,6 @@ internal class CancelAccountPlanViewModelTest {
             formattedSizeMapper = formattedSizeMapper,
             accountNameMapper = accountNameMapper,
             cancelSubscriptionWithSurveyAnswersUseCase = cancelSubscriptionWithSurveyAnswersUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -125,7 +122,6 @@ internal class CancelAccountPlanViewModelTest {
             formattedSizeMapper,
             accountNameMapper,
             cancelSubscriptionWithSurveyAnswersUseCase,
-            getFeatureFlagValueUseCase
         )
     }
 

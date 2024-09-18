@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancelAccountPlanUiState
 import mega.privacy.android.app.presentation.cancelaccountplan.model.UICancellationSurveyAnswer
 import mega.privacy.android.app.presentation.cancelaccountplan.model.mapper.CancellationInstructionsTypeMapper
@@ -21,7 +20,6 @@ import mega.privacy.android.domain.usecase.account.CancelSubscriptionWithSurveyA
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetAppSubscriptionOptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -35,7 +33,6 @@ import javax.inject.Inject
  * @param getAppSubscriptionOptionsUseCase use case to get the app subscription options
  * @param monitorAccountDetailUseCase use case to monitor account detail
  * @param cancelSubscriptionWithSurveyAnswersUseCase use case to send Cancellation survey answers to API
- * @param getFeatureFlagValueUseCase use case to get the value of a feature flag
  *
  * @property uiState current UI state
  */
@@ -48,7 +45,6 @@ class CancelAccountPlanViewModel @Inject constructor(
     private val getAppSubscriptionOptionsUseCase: GetAppSubscriptionOptionsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val cancelSubscriptionWithSurveyAnswersUseCase: CancelSubscriptionWithSurveyAnswersUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(CancelAccountPlanUiState())
 
@@ -116,20 +112,6 @@ class CancelAccountPlanViewModel @Inject constructor(
                     }
             }.onFailure {
                 Timber.e(it)
-            }
-        }
-        viewModelScope.launch {
-            runCatching {
-                val isEnabled =
-                    getFeatureFlagValueUseCase(AppFeatures.CancellationSurvey)
-                _state.update {
-                    it.copy(showCancellationSurvey = isEnabled)
-                }
-            }.onFailure {
-                Timber.e(
-                    it,
-                    "Failed to check for new cancel subscription feature"
-                )
             }
         }
     }
