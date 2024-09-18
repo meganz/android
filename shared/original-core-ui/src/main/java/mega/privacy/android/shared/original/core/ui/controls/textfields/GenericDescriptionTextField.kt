@@ -34,7 +34,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
@@ -122,10 +121,7 @@ fun GenericDescriptionTextField(
         CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
             @OptIn(ExperimentalMaterialApi::class)
             BasicTextField(
-                value = TextFieldValue(value),
-                onValueChange = { textFieldValue: TextFieldValue ->
-                    onValueChange(textFieldValue.text)
-                },
+                value = value,
                 maxLines = maxLines,
                 enabled = isEnabled,
                 modifier = modifier
@@ -151,6 +147,7 @@ fun GenericDescriptionTextField(
                         size = newSize
                     }
                     .testTag(GENERIC_DESCRIPTION_TEXT_FIELD_TEXT),
+                onValueChange = onValueChange,
                 textStyle = MaterialTheme.typography.subtitle2.copy(
                     color = MegaOriginalTheme.colors.text.primary,
                     textAlign = TextAlign.Start
