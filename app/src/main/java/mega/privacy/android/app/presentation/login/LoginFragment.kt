@@ -805,19 +805,33 @@ class LoginFragment : Fragment() {
 
     /**
      * Performs on back pressed.
+     *
+     * # Disable back press when:
+     * - Refreshing
+     * # Minimize app when:
+     * - Login is in progress
+     * - Nodes are being fetched
+     * # Show logout confirmation when:
+     * - 2FA is required
      */
     fun onBackPressed(uiState: LoginState) {
         Timber.d("onBackPressed")
-        //refresh, point to staging server, enable chat. block the back button
-        if (Constants.ACTION_REFRESH == intentAction || Constants.ACTION_REFRESH_API_SERVER == intentAction) {
-            return
-        }
+        with(uiState) {
+            when {
+                Constants.ACTION_REFRESH == intentAction || Constants.ACTION_REFRESH_API_SERVER == intentAction ->
+                    return
 
-        if (loginMutex.isLocked || uiState.isLoginInProgress || uiState.is2FARequired || uiState.multiFactorAuthState != null) {
-            showConfirmLogoutDialog()
-        } else {
-            LoginActivity.isBackFromLoginPage = true
-            (requireActivity() as LoginActivity).showFragment(LoginFragmentType.Tour)
+                is2FARequired || multiFactorAuthState != null ->
+                    showConfirmLogoutDialog()
+
+                loginMutex.isLocked || isLoginInProgress || isFastLoginInProgress || fetchNodesUpdate != null ->
+                    activity?.moveTaskToBack(true)
+
+                else -> {
+                    LoginActivity.isBackFromLoginPage = true
+                    (requireActivity() as LoginActivity).showFragment(LoginFragmentType.Tour)
+                }
+            }
         }
     }
 
