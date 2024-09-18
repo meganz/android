@@ -50,13 +50,13 @@ class NodeAttachmentViewModel @Inject constructor(
     /**
      * Attach nodes to chat by email
      */
-    fun attachNodesToChatByEmail(nodeId: List<NodeId>, email: String) {
+    fun attachNodesToChatByEmail(nodeIds: List<NodeId>, email: String) {
         viewModelScope.launch {
             runCatching {
                 getContactHandleUseCase(email)
             }.onSuccess {
                 if (it != null) {
-                    attachNodesToChat(nodeId, longArrayOf(), longArrayOf(it))
+                    attachNodesToChat(nodeIds, longArrayOf(), longArrayOf(it))
                 } else {
                     Timber.d("No contact handle found")
                 }
@@ -77,7 +77,7 @@ class NodeAttachmentViewModel @Inject constructor(
         processAttachNodesToChat(
             chatIds = chatIds,
             userHandles = userHandles,
-            onSuccess = { allChatIds ->
+            onAction = { allChatIds ->
                 allChatIds.forEach {
                     attachContactsUseCase(it, listOf(email))
                 }
@@ -122,7 +122,7 @@ class NodeAttachmentViewModel @Inject constructor(
         processAttachNodesToChat(
             chatIds,
             userHandles,
-            onSuccess = { allChatIds ->
+            onAction = { allChatIds ->
                 attachMultipleNodesUseCase(nodeIds, allChatIds)
             }
         )
@@ -131,7 +131,7 @@ class NodeAttachmentViewModel @Inject constructor(
     private fun processAttachNodesToChat(
         chatIds: LongArray,
         userHandles: LongArray,
-        onSuccess: suspend (List<Long>) -> Unit,
+        onAction: suspend (List<Long>) -> Unit,
     ) {
         viewModelScope.launch {
             // ignore the user handles that create chat failed
@@ -144,7 +144,7 @@ class NodeAttachmentViewModel @Inject constructor(
             }.filterNotNull()
             val allChatIds = chatIdsFromUserHandles + chatIds.toList()
             runCatching {
-                onSuccess(allChatIds)
+                onAction(allChatIds)
             }.onSuccess {
                 _uiState.update { state ->
                     state.copy(event = NodeAttachmentEvent.AttachNodeSuccess(allChatIds))

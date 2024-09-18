@@ -22,6 +22,10 @@ import mega.privacy.android.app.contacts.list.adapter.ContactActionsListAdapter
 import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
 import mega.privacy.android.app.contacts.list.dialog.ContactBottomSheetDialogFragment
 import mega.privacy.android.app.databinding.FragmentContactListBinding
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbarWithChat
+import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
+import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.utils.AlertDialogUtil.createForceAppUpdateDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
@@ -57,6 +61,7 @@ class ContactListFragment : Fragment() {
     private var contactSheet: ContactBottomSheetDialogFragment? = null
 
     private var forceAppUpdateDialog: AlertDialog? = null
+    private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,6 +70,14 @@ class ContactListFragment : Fragment() {
     ): View {
         binding = FragmentContactListBinding.inflate(inflater, container, false)
         setHasOptionsMenu(true)
+        binding.root.addView(
+            createNodeAttachmentView(
+                activity = requireActivity(),
+                viewModel = nodeAttachmentViewModel,
+            ) { message, id ->
+                (requireActivity() as? SnackbarShower)?.showSnackbarWithChat(message, id)
+            }
+        )
         return binding.root
     }
 

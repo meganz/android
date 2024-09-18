@@ -404,7 +404,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     val email = viewModel.userEmail
                     if (nodes != null && nodes.isNotEmpty() && !email.isNullOrEmpty()) {
                         nodeAttachmentViewModel.attachNodesToChatByEmail(
-                            nodeId = nodes.map { handle -> NodeId(handle) },
+                            nodeIds = nodes.map { handle -> NodeId(handle) },
                             email = email
                         )
                     }

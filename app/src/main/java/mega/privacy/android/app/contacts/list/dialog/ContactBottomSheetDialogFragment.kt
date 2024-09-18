@@ -1,7 +1,6 @@
 package mega.privacy.android.app.contacts.list.dialog
 
 import android.Manifest
-import android.app.Activity.RESULT_OK
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -24,8 +23,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.SelectChatsToAttachActivityContract
 import mega.privacy.android.app.activities.contract.SelectFileToShareActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToShareActivityContract
-import mega.privacy.android.app.components.attacher.MegaAttacher
-import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.list.ContactListViewModel
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.BottomSheetContactDetailBinding
@@ -33,11 +30,15 @@ import mega.privacy.android.app.main.FileExplorerActivity.Companion.EXTRA_SELECT
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT
+import mega.privacy.android.app.utils.Constants.NODE_HANDLES
+import mega.privacy.android.app.utils.Constants.SELECTED_CHATS
 import mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS
+import mega.privacy.android.app.utils.Constants.SELECTED_USERS
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.ContactAvatar
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.navigation.MegaNavigator
@@ -90,7 +91,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         arguments?.getLong(USER_HANDLE, INVALID_HANDLE) ?: INVALID_HANDLE
     }
 
-    private val nodeAttacher: MegaAttacher by lazy { MegaAttacher(this) }
+    private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>(ownerProducer = { requireParentFragment() })
     private var removeContactDialog: AlertDialog? = null
     private var nodePermissionsDialog: AlertDialog? = null
     private var selectedContacts: ArrayList<String>? = null
@@ -108,11 +109,11 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             registerForActivityResult(SelectFileToShareActivityContract()) { result ->
                 if (result != null) {
                     viewModel.getContactEmail(userHandle).observe(viewLifecycleOwner) { email ->
-                        email?.let {
-                            nodeAttacher.handleSelectFileResult(
-                                result,
-                                it,
-                                activity as ContactsActivity
+                        val nodes = result.getLongArrayExtra(NODE_HANDLES)
+                        if (nodes != null && nodes.isNotEmpty() && !email.isNullOrEmpty()) {
+                            nodeAttachmentViewModel.attachNodesToChatByEmail(
+                                nodeIds = nodes.map { handle -> NodeId(handle) },
+                                email = email
                             )
                         }
                         dismiss()
@@ -132,13 +133,19 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         selectChatLauncher =
             registerForActivityResult(SelectChatsToAttachActivityContract()) { result ->
                 if (result != null) {
-                    nodeAttacher.handleActivityResult(
-                        REQUEST_CODE_SELECT_CHAT,
-                        RESULT_OK,
-                        result,
-                        activity as ContactsActivity
-                    )
-                    dismiss()
+                    viewModel.getContactEmail(userHandle).observe(viewLifecycleOwner) { email ->
+                        if (!email.isNullOrEmpty()) {
+                            val chatIds = result.getLongArrayExtra(SELECTED_CHATS) ?: longArrayOf()
+                            val userHandles =
+                                result.getLongArrayExtra(SELECTED_USERS) ?: longArrayOf()
+                            nodeAttachmentViewModel.attachContactToChat(
+                                email = email,
+                                chatIds = chatIds,
+                                userHandles = userHandles
+                            )
+                        }
+                        dismiss()
+                    }
                 }
             }
     }
