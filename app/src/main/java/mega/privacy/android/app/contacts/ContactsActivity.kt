@@ -3,7 +3,7 @@ package mega.privacy.android.app.contacts
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.core.content.ContextCompat
+import androidx.activity.enableEdgeToEdge
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -16,12 +16,11 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.contacts.list.ContactListFragment
 import mega.privacy.android.app.contacts.requests.ContactRequestsFragment
 import mega.privacy.android.app.databinding.ActivityContactsBinding
-import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
+import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.CallUtil.checkCameraPermission
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 
 /**
@@ -96,7 +95,7 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdgeAndConsumeInsets()
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
@@ -109,6 +108,7 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         setupNavigation()
+        consumeInsetsWithToolbar(customToolbar = binding.toolbar)
     }
 
     private fun setupNavigation() {
@@ -168,6 +168,7 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
                     currentFragment.startCall()
                 }
             }
+
             Constants.REQUEST_CAMERA -> if (grantResults.isNotEmpty()) {
                 val currentFragment = getCurrentFragment()
                 if (currentFragment is ContactListFragment) {
@@ -184,10 +185,6 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
      */
     fun showElevation(show: Boolean) {
         binding.toolbar.elevation = if (show) toolbarElevation else 0F
-        if (Util.isDarkMode(this)) {
-            val color = if (show) R.color.action_mode_background else R.color.dark_grey
-            window.statusBarColor = ContextCompat.getColor(this, color)
-        }
     }
 
     override fun onSupportNavigateUp(): Boolean =
