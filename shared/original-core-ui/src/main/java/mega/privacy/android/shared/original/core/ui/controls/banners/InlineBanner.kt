@@ -94,7 +94,7 @@ private fun InlineBaseBanner(
                 ) {
                     Text(
                         text = actionButtonText,
-                        color = MegaOriginalTheme.colors.link.primary,
+                        color = MegaOriginalTheme.colors.support.info,
                         style = MaterialTheme.typography.button.copy(
                             fontWeight = FontWeight.Medium
                         )
