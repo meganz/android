@@ -12,6 +12,9 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import javax.inject.Inject
+import javax.inject.Singleton
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 
 /**
@@ -19,12 +22,14 @@ import javax.inject.Inject
  *
  * @property context
  */
+@Singleton
 class LogbackLogConfigurationGateway @Inject constructor(
     @ApplicationContext private val context: Context,
-    @LogFileDirectory private val logFileDirectory: Lazy<File>
+    @LogFileDirectory private val logFileDirectory: Lazy<File>,
 ) : LogConfigurationGateway {
+    private val mutex = Mutex()
 
-    override suspend fun resetLoggingConfiguration() {
+    override suspend fun resetLoggingConfiguration() = mutex.withLock {
         val loggingContext = LoggerFactory.getILoggerFactory() as LoggerContext
         val loggers = loggingContext.copyOfListenerList
         loggingContext.reset()
