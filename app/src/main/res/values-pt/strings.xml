@@ -1384,7 +1384,7 @@
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">Bônus de indicação</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">Instalar o nosso aplicativo para celular</string>
+    <string name="title_install_app">Instalar o aplicativo móvel</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Bônus de cadastro</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
@@ -1867,7 +1867,7 @@
     <!-- Text button -->
     <string name="general_close">Fechar</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-factor authenticator app</string>
+    <string name="no_authentication_apps_title">Aplicativo para autenticação de dois fatores</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Você quer acessar a Google Play Store para instalar um aplicativo de autenticação?</string>
     <!-- Label Play Store -->
