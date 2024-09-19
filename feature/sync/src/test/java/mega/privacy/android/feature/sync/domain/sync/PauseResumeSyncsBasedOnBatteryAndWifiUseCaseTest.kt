@@ -4,12 +4,12 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
-import mega.privacy.android.feature.sync.data.service.SyncBackgroundService
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase.Companion.LOW_BATTERY_LEVEL
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.IsSyncPausedByTheUserUseCase
@@ -118,7 +118,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
         underTest(
             connectedToInternet = true,
             syncOnlyByWifi = true,
-            batteryInfo = BatteryInfo(SyncBackgroundService.LOW_BATTERY_LEVEL - 1, false),
+            batteryInfo = BatteryInfo(LOW_BATTERY_LEVEL - 1, false),
             isFreeAccount = false
         )
 
@@ -136,7 +136,7 @@ class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
             underTest(
                 connectedToInternet = true,
                 syncOnlyByWifi = false,
-                batteryInfo = BatteryInfo(SyncBackgroundService.LOW_BATTERY_LEVEL - 1, true),
+                batteryInfo = BatteryInfo(LOW_BATTERY_LEVEL - 1, true),
                 isFreeAccount = false
             )
 

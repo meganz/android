@@ -15,10 +15,5 @@
             android:launchMode="singleTop"
             android:exported="false"/>
 
-        <service
-            android:name=".data.service.SyncBackgroundService"
-            android:foregroundServiceType="dataSync"
-            android:exported="false"/>
-
     </application>
 </manifest>

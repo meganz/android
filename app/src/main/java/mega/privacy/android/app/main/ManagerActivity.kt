@@ -327,7 +327,6 @@ import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import mega.privacy.android.feature.sync.ui.SyncMonitorViewModel
-import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionViewModel
 import mega.privacy.android.navigation.MegaNavigator
@@ -484,9 +483,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var isFirstLaunchUseCase: IsFirstLaunchUseCase
-
-    @Inject
-    lateinit var syncNavigator: SyncNavigator
 
     @Inject
     lateinit var workManager: WorkManager

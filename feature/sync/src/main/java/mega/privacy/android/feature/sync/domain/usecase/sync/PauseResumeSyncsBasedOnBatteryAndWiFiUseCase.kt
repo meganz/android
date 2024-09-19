@@ -3,7 +3,6 @@ package mega.privacy.android.feature.sync.domain.usecase.sync
 import kotlinx.coroutines.flow.first
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
-import mega.privacy.android.feature.sync.data.service.SyncBackgroundService
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.IsSyncPausedByTheUserUseCase
 import javax.inject.Inject
 
@@ -42,12 +41,19 @@ class PauseResumeSyncsBasedOnBatteryAndWiFiUseCase @Inject constructor(
         val activeSyncs =
             monitorSyncsUseCase().first().filter { !isSyncPausedByTheUserUseCase(it.id) }
         val isLowBatteryLevel =
-            batteryInfo.level < SyncBackgroundService.LOW_BATTERY_LEVEL && !batteryInfo.isCharging
+            batteryInfo.level < LOW_BATTERY_LEVEL && !batteryInfo.isCharging
 
         if (internetNotAvailable || syncOnlyByWifi && userNotOnWifi || isLowBatteryLevel || isFreeAccount) {
             activeSyncs.forEach { pauseSyncUseCase(it.id) }
         } else {
             activeSyncs.forEach { resumeSyncUseCase(it.id) }
         }
+    }
+
+    companion object {
+        /**
+         * Low battery level
+         */
+        const val LOW_BATTERY_LEVEL = 20
     }
 }
