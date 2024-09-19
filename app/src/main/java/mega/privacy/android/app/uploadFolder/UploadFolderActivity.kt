@@ -12,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,7 +30,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.ActivityUploadFolderBinding
-import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
+import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.Scrollable
@@ -47,7 +48,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_COLLISION_RESULTS
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -104,7 +104,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
      * onCreate
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdgeAndConsumeInsets()
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         onBackPressedDispatcher.addCallback(onBackPressedCallback)
@@ -140,7 +140,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             }
 
         binding = ActivityUploadFolderBinding.inflate(layoutInflater)
-
+        consumeInsetsWithToolbar(customToolbar = binding.toolbar)
         setContentView(binding.root)
         setupView()
         setupObservers()
@@ -205,13 +205,7 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             binding.list.canScrollVertically(RecyclerView.NO_POSITION) || actionMode != null
                     || binding.progressBar.isVisible
 
-        binding.appBar.elevation = if (showElevation) elevation else 0F
-
-        if (Util.isDarkMode(this@UploadFolderActivity)) {
-            val color = if (showElevation) elevationColor else noElevationColor
-            window.statusBarColor = color
-            binding.toolbar.setBackgroundColor(color)
-        }
+        binding.toolbar.elevation = if (showElevation) elevation else 0F
     }
 
     /**
