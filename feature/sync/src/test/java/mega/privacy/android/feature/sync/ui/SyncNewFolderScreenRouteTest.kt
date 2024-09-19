@@ -8,6 +8,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.StateFlow
+import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.core.test.AnalyticsTestRule
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
@@ -16,8 +18,11 @@ import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
 import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON
 import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.shared.original.core.ui.controls.appbar.APP_BAR_BACK_BUTTON_TAG
+import mega.privacy.mobile.analytics.event.SyncNewFolderScreenBackNavigationEvent
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
@@ -29,8 +34,11 @@ import org.robolectric.annotation.Config
 @Config(qualifiers = "fr-rFr-w1080dp-h1920dp")
 class SyncNewFolderScreenRouteTest {
 
+    private val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    private val analyticsTestRule = AnalyticsTestRule()
+
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsTestRule).around(composeTestRule)
 
     private val viewModel: SyncNewFolderViewModel = mock()
     private val state: StateFlow<SyncNewFolderState> = mock()
@@ -178,5 +186,25 @@ class SyncNewFolderScreenRouteTest {
 
         composeTestRule.onNodeWithText("We need to access your device storage in order to sync your local folder. Click here to grant access.")
             .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that click the app bar back button sends the right analytics tracker event`() {
+        whenever(state.value).thenReturn(SyncNewFolderState())
+        whenever(viewModel.state).thenReturn(state)
+        composeTestRule.setContent {
+            SyncNewFolderScreenRoute(
+                viewModel,
+                syncPermissionsManager = syncPermissionsManager,
+                openNextScreen = {},
+                openSelectMegaFolderScreen = {},
+                openUpgradeAccount = {},
+                onBackClicked = {}
+            )
+        }
+
+        composeTestRule.onNodeWithTag(APP_BAR_BACK_BUTTON_TAG).assertExists().assertIsDisplayed()
+            .performClick()
+        assertThat(analyticsTestRule.events).contains(SyncNewFolderScreenBackNavigationEvent)
     }
 }

@@ -33,6 +33,9 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.layout.size
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetLearnMoreButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetSyncFoldersButtonPressedEvent
 
 /**
  * Composable function to show the bottom sheet for Sync Promotion
@@ -94,6 +97,9 @@ fun SyncPromotionBottomSheet(
                 if (isFreeAccount) {
                     upgradeAccountClicked()
                 } else {
+                    Analytics.tracker.trackEvent(
+                        SyncPromotionBottomSheetSyncFoldersButtonPressedEvent
+                    )
                     context.startActivity(Intent(Intent.ACTION_VIEW).apply {
                         data = ADD_NEW_SYNC_URI.toUri()
                     })
@@ -107,6 +113,7 @@ fun SyncPromotionBottomSheet(
         OutlinedWithoutBackgroundMegaButton(
             text = stringResource(sharedR.string.sync_promotion_bottom_sheet_secondary_button_text),
             onClick = {
+                Analytics.tracker.trackEvent(SyncPromotionBottomSheetLearnMoreButtonPressedEvent)
                 context.startActivity(Intent(Intent.ACTION_VIEW).apply {
                     data = LEARN_MORE_URI.toUri()
                 })

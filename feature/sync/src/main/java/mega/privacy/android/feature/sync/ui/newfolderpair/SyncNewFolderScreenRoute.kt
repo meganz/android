@@ -9,6 +9,7 @@ import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.Lo
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.NextClicked
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.AndroidSyncStartSyncButtonEvent
+import mega.privacy.mobile.analytics.event.SyncNewFolderScreenBackNavigationEvent
 
 @Composable
 internal fun SyncNewFolderScreenRoute(
@@ -31,7 +32,10 @@ internal fun SyncNewFolderScreenRoute(
             viewModel.handleAction(NextClicked)
         },
         syncPermissionsManager = syncPermissionsManager,
-        onBackClicked = onBackClicked,
+        onBackClicked = {
+            Analytics.tracker.trackEvent(SyncNewFolderScreenBackNavigationEvent)
+            onBackClicked()
+        },
         showStorageOverQuota = state.value.showStorageOverQuota,
         onDismissStorageOverQuota = { viewModel.handleAction(SyncNewFolderAction.StorageOverquotaShown) },
         onOpenUpgradeAccount = { openUpgradeAccount() },

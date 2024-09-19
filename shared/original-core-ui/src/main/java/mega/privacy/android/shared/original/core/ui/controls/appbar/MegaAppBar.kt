@@ -562,7 +562,11 @@ private fun MegaAppBarPreviewWithMarqueeSubtitle() {
     }
 }
 
-internal const val APP_BAR_BACK_BUTTON_TAG = "appbar:button_back"
+/**
+ * Test Tag App Bar Back Button
+ */
+const val APP_BAR_BACK_BUTTON_TAG = "appbar:button_back"
+
 internal const val APP_BAR_BADGE = "appbar:text_badge"
 internal const val TEST_TAG_MEGA_APP_BAR_SUBTITLE = "mega_app_bar_subtitle:text"
 

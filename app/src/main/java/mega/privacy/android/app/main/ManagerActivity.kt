@@ -343,6 +343,7 @@ import mega.privacy.mobile.analytics.event.OutgoingSharesTabEvent
 import mega.privacy.mobile.analytics.event.ScheduleMeetingPressedEvent
 import mega.privacy.mobile.analytics.event.SharedItemsScreenEvent
 import mega.privacy.mobile.analytics.event.StartMeetingNowPressedEvent
+import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetDismissedEvent
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -4954,6 +4955,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun goBack() {
         retryConnectionsAndSignalPresence()
         if (syncPromotionViewModel.state.value.shouldShowSyncPromotion) {
+            Analytics.tracker.trackEvent(SyncPromotionBottomSheetDismissedEvent)
             syncPromotionViewModel.onConsumeShouldShowSyncPromotion()
             return
         }
