@@ -11,7 +11,6 @@ import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -27,6 +26,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.databinding.ActivityNameCollisionBinding
 import mega.privacy.android.app.databinding.ViewNameCollisionOptionBinding
+import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.OptionalRequestListener
 import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
@@ -45,7 +45,6 @@ import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.node.NameCollision
@@ -62,10 +61,6 @@ class NameCollisionActivity : PasscodeActivity() {
     private lateinit var binding: ActivityNameCollisionBinding
 
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
-    private val elevationColor by lazy {
-        ContextCompat.getColor(this, R.color.action_mode_background)
-    }
-    private val noElevationColor by lazy { ContextCompat.getColor(this, R.color.dark_grey) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -117,6 +112,7 @@ class NameCollisionActivity : PasscodeActivity() {
         if (!viewModel.isCopyToOrigin) {
             setTheme(R.style.Theme_Mega)
             binding = ActivityNameCollisionBinding.inflate(layoutInflater)
+            consumeInsetsWithToolbar(customToolbar = binding.toolbar)
             setContentView(binding.root)
             setupView()
         }
@@ -144,12 +140,6 @@ class NameCollisionActivity : PasscodeActivity() {
             val showElevation = v.canScrollVertically(RecyclerView.NO_POSITION)
 
             binding.toolbar.elevation = if (showElevation) elevation else 0F
-
-            if (Util.isDarkMode(this@NameCollisionActivity)) {
-                val color = if (showElevation) elevationColor else noElevationColor
-                window.statusBarColor = color
-                binding.toolbar.setBackgroundColor(color)
-            }
         }
 
         binding.learnMore.setOnClickListener {
