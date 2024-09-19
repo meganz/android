@@ -2,8 +2,6 @@ package mega.privacy.android.app.utils;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
-import static android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
-import static android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS;
 import static com.google.android.material.textfield.TextInputLayout.END_ICON_NONE;
 import static com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
@@ -62,8 +60,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.Window;
-import android.view.WindowInsetsController;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -874,47 +870,6 @@ public class Util {
         icon.setColorFilter(ContextCompat.getColor(context, idColor), PorterDuff.Mode.SRC_ATOP);
 
         return icon;
-    }
-
-    /**
-     * Draw activity content under status bar.
-     *
-     * @param activity           the activity
-     * @param drawUnderStatusBar whether draw under status bar
-     */
-    public static void setDrawUnderStatusBar(Activity activity, boolean drawUnderStatusBar) {
-        Window window = activity.getWindow();
-        if (window == null) {
-            return;
-        }
-
-        if (drawUnderStatusBar) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window.setDecorFitsSystemWindows(false);
-                if (!Util.isDarkMode(activity)) {
-                    WindowInsetsController wic = window.getDecorView().getWindowInsetsController();
-                    wic.setSystemBarsAppearance(APPEARANCE_LIGHT_STATUS_BARS, APPEARANCE_LIGHT_STATUS_BARS);
-                    wic.setSystemBarsAppearance(APPEARANCE_LIGHT_NAVIGATION_BARS, APPEARANCE_LIGHT_NAVIGATION_BARS);
-                }
-            } else {
-                int visibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-
-                if (Util.isDarkMode(activity)) {
-                    visibility |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
-                } else {
-                    // View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-                    visibility |= 0x00002000 | 0x00000010;
-                }
-
-                window.getDecorView().setSystemUiVisibility(visibility);
-                window.setStatusBarColor(Color.TRANSPARENT);
-            }
-
-            window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        } else {
-            ColorUtils.setStatusBarTextColor(activity);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        }
     }
 
     /**

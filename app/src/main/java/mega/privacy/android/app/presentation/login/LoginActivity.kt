@@ -257,8 +257,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container_login, loginFragment ?: return)
                     .commitNowAllowingStateLoss()
-
-                Util.setDrawUnderStatusBar(this, false)
             }
 
             Constants.CREATE_ACCOUNT_FRAGMENT -> {
@@ -271,8 +269,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container_login, createAccountFragment ?: return)
                     .commitNowAllowingStateLoss()
-
-                Util.setDrawUnderStatusBar(this, false)
             }
 
             Constants.TOUR_FRAGMENT -> {
@@ -290,8 +286,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container_login, tourFragment)
                     .commitNowAllowingStateLoss()
-
-                Util.setDrawUnderStatusBar(this@LoginActivity, true)
             }
 
             Constants.CONFIRM_EMAIL_FRAGMENT -> {
@@ -307,19 +301,13 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                         .replace(R.id.fragment_container_login, confirmEmailFragment)
                         .commitNowAllowingStateLoss()
                 }
-
-                Util.setDrawUnderStatusBar(this, false)
             }
-
 
             Constants.REPORT_ISSUE_VIA_EMAIL_FRAGMENT -> {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container_login, ReportIssueViaEmailFragment())
                     .commitNowAllowingStateLoss()
-
-                Util.setDrawUnderStatusBar(this, false)
             }
-
         }
         if ((application as MegaApplication).isEsid) {
             showAlertLoggedOut()

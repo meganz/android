@@ -28,7 +28,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT
 import mega.privacy.android.app.utils.TimeUtils.formatDate
 import mega.privacy.android.app.utils.TimeUtils.getHumanizedTimeMs
-import mega.privacy.android.app.utils.Util.setDrawUnderStatusBar
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import timber.log.Timber
@@ -73,8 +72,6 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
         viewModel.getUserData()
 
         setContentView(R.layout.activity_over_disk_quota_paywall)
-
-        setDrawUnderStatusBar(this, true)
 
         overDiskQuotaPaywallText = findViewById(R.id.over_disk_quota_paywall_text)
         deletionWarningText = findViewById(R.id.over_disk_quota_paywall_deletion_warning)
