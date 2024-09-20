@@ -15,6 +15,9 @@
  */
 package com.github.barteksc.pdfviewer;
 
+import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
+import static mega.privacy.android.app.utils.Util.isOnline;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -31,9 +34,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
-import com.google.android.material.textfield.TextInputLayout;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.widget.AppCompatEditText;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -43,6 +43,9 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.exception.PageRenderingException;
 import com.github.barteksc.pdfviewer.link.DefaultLinkHandler;
@@ -68,6 +71,7 @@ import com.github.barteksc.pdfviewer.util.Constants;
 import com.github.barteksc.pdfviewer.util.FitPolicy;
 import com.github.barteksc.pdfviewer.util.MathUtils;
 import com.github.barteksc.pdfviewer.util.Util;
+import com.google.android.material.textfield.TextInputLayout;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 import com.shockwave.pdfium.util.Size;
@@ -84,9 +88,6 @@ import java.util.concurrent.Executors;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import timber.log.Timber;
-
-import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
-import static mega.privacy.android.app.utils.Util.*;
 
 /**
  * It supports animations, zoom, cache, and swipe.
@@ -295,6 +296,7 @@ public class PDFView extends RelativeLayout {
 
                 Throwable finalError = error;
                 handler.post(() -> {
+                    if (recycled) return;
                     if (finalError != null) {
                         pdfView.loadError(finalError);
                     } else if (!decodingExecutorService.isShutdown()) {
