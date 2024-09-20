@@ -2281,13 +2281,15 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     /**
-     * Checks the onboarding is pending on in progress
+     * Checks the onboarding is pending or in progress
      *
-     * @return True in case the the onboarding is pending on in progress. False otherwise.
+     * @return True in case the the onboarding is pending or in progress. False otherwise.
      */
     private fun isOnboarding(): Boolean {
         when {
-            viewModel.state.value.isFirstLogin -> return true
+            drawerItem == DrawerItem.ASK_PERMISSIONS -> return true
+
+            viewModel.state.value.isFirstLogin && drawerItem != DrawerItem.PHOTOS -> return true
 
             firstTimeAfterInstallation || askPermissions || newCreationAccount -> {
                 if (!initialPermissionsAlreadyAsked && !onAskingPermissionsFragment) {
