@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
@@ -696,4 +696,10 @@
     <string name="subtitle_enable_access_contact">In order to invite friends, you must allow MEGA to access your contact list</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">Allow access</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
+    <string name="document_scanning_confirmation_file_type_pdf">PDF</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Document is uploaded as a JPEG file. This option can only be selected when there is only one scanned document-->
+    <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
+    <string name="document_scanning_confirmation_destination_chat">Chat</string>
 </resources>
