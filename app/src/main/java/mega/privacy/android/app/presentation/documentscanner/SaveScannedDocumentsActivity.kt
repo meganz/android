@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.documentscanner
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,6 +35,8 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
+    private val viewModel by viewModels<SaveScannedDocumentsViewModel>()
+
     /**
      * onCreate
      */
@@ -48,7 +51,14 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
                 OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                     PasscodeContainer(
                         passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                        content = { SaveScannedDocumentsScreen() },
+                        content = {
+                            SaveScannedDocumentsScreen(
+                                viewModel = viewModel,
+                                onUploadScansStarted = {
+                                    // Implement functionality to upload the scanned document/s
+                                }
+                            )
+                        },
                     )
                 }
             }

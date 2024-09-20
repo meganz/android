@@ -11,9 +11,15 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 
 /**
  * A Composable holding all Save Scanned Documents screens using the Navigation Controller
+ *
+ * @param viewModel The ViewModel responsible for all business logic
+ * @param onUploadScansStarted Lambda to indicate that the scanned document/s should begin uploading
  */
 @Composable
-internal fun SaveScannedDocumentsScreen() {
+internal fun SaveScannedDocumentsScreen(
+    viewModel: SaveScannedDocumentsViewModel,
+    onUploadScansStarted: () -> Unit,
+) {
     val navHostController = rememberNavController()
 
     MegaScaffold(
@@ -23,6 +29,8 @@ internal fun SaveScannedDocumentsScreen() {
         SaveScannedDocumentsNavHostController(
             modifier = Modifier.padding(padding),
             navHostController = navHostController,
+            viewModel = viewModel,
+            onUploadScansStarted = onUploadScansStarted,
         )
     }
 }
