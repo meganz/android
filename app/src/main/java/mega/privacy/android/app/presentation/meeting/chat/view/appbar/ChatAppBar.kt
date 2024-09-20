@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -184,7 +183,6 @@ internal fun ChatAppBar(
             }
         },
         maxActionsToShow = MENU_ACTIONS_TO_SHOW,
-        elevation = 0.dp,
     )
 }
 

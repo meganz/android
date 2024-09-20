@@ -19,6 +19,7 @@ class CustomLintRegistry : IssueRegistry() {
             ParameterOrderDetector.ISSUE,
             SnackbarDetector.ISSUE,
             ShowSnackbarDetector.ISSUE,
+            ScaffoldDetector.ISSUE,
         )
 
     override val api: Int = CURRENT_API

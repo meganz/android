@@ -472,7 +472,9 @@ internal fun ChatView(
                             }
                         }
                     }
-                }
+                },
+                scrollableContentState = scrollState,
+                scrollableContentIsReversed = true,
             )
             { paddingValues ->
                 if (chatId != -1L) {

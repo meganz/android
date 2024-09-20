@@ -33,6 +33,6 @@ class SnackbarDetectorTest {
         ).issues(SnackbarDetector.ISSUE)
             .run()
             .expectWarningCount(1)
-            .expectContains(SnackbarDetector.EXPLANATION.replace("`", ""))
+            .expectContains(SnackbarDetector().explanation().replace("`", ""))
     }
 }

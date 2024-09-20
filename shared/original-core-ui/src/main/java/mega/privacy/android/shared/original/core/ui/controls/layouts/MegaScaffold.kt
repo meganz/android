@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.original.core.ui.controls.layouts
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.fadeIn
@@ -8,6 +9,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,8 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AppBarDefaults
@@ -28,11 +28,9 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,7 +38,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.LocalMegaAppBarElevation
@@ -54,7 +51,6 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.BackgroundColor
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.accumulateDirectionalScrollOffsets
-import mega.privacy.android.shared.original.core.ui.utils.scrollOffsetFlow
 
 /**
  * MegaScaffold is a wrapper around Scaffold that provides a convenient way to show a snackBar from any view inside this scaffold.
@@ -62,15 +58,16 @@ import mega.privacy.android.shared.original.core.ui.utils.scrollOffsetFlow
  *
  * @param modifier Modifier
  * @param scaffoldState ScaffoldState
- * @param topBar TopBar, the elevation will be updated if the content is scrolled and uses any of this states: [rememberScrollStateForMegaScaffold], [rememberLazyListStateForMegaScaffold] or [rememberLazyGridStateForMegaScaffold].
+ * @param topBar TopBar, the elevation will be updated if the content is scrolled and the content state is set as [scrollableContentState]
  * @param bottomBar BottomBar
  * @param floatingActionButton FloatingActionButton
- * @param hideFloatingActionButtonOnScrollUp if true the fab button will be hidden when the content is scrolled down and shown when is scrolled up again and uses any of this states: [rememberScrollStateForMegaScaffold], [rememberLazyListStateForMegaScaffold] or [rememberLazyGridStateForMegaScaffold].
+ * @param scrollableContentState [ScrollableState] of the content. It will be used to set the [topBar] elevation and to hide the [floatingActionButton] in case [hideFloatingActionButtonOnScrollUp] is true
+ * @param scrollableContentIsReversed set to true if the scrollable content associated to [scrollableContentState] is reversed to set the elevation for [topBar] correctly
+ * @param hideFloatingActionButtonOnScrollUp if true and the scroll state is set as [scrollableContentState] the fab button will be hidden when the content is scrolled down and shown when is scrolled up again
  * @param content content of your screen. The lambda receives an [PaddingValues] that should be
  * applied to the content root via Modifier.padding to properly offset top and bottom bars. If
  * you're using VerticalScroller, apply this modifier to the child of the scroller, and not on
  * the scroller itself.
- * @see [rememberScrollStateForMegaScaffold], [rememberLazyListStateForMegaScaffold], [rememberLazyGridStateForMegaScaffold]
  */
 @Composable
 fun MegaScaffold(
@@ -79,26 +76,35 @@ fun MegaScaffold(
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
+    scrollableContentState: ScrollableState? = null,
+    scrollableContentIsReversed: Boolean = false,
     hideFloatingActionButtonOnScrollUp: Boolean = false,
     content: @Composable (PaddingValues) -> Unit,
 ) {
-    val scaffoldContentScrollOffset = remember { ScaffoldContentScrollOffset() }
-    val isScrolled by remember {
+    val scaffoldContentScrollOffset by remember(scrollableContentState) {
         derivedStateOf {
-            scaffoldContentScrollOffset.value != 0
+            scrollableContentState?.getApproximateScrollOffset() ?: -1
+        }
+    }
+    val isScrolled by remember(scrollableContentIsReversed, scrollableContentState) {
+        derivedStateOf {
+            if (scrollableContentIsReversed) {
+                scrollableContentState?.canScrollForward == true
+            } else {
+                scrollableContentState?.canScrollBackward == true
+            }
         }
     }
     CompositionLocalProvider(
         LocalSnackBarHostState provides scaffoldState.snackbarHostState,
         LocalMegaAppBarElevation provides if (isScrolled) AppBarDefaults.TopAppBarElevation else 0.dp,
-        LocalScaffoldContentScrollOffset provides scaffoldContentScrollOffset,
     ) {
         if (hideFloatingActionButtonOnScrollUp) {
             var isFabVisible by remember { mutableStateOf(true) }
 
             val localDensity = LocalDensity.current
             LaunchedEffect(Unit) {
-                snapshotFlow { scaffoldContentScrollOffset.value }
+                snapshotFlow { scaffoldContentScrollOffset }
                     .map { with(localDensity) { it.toDp() } }
                     .accumulateDirectionalScrollOffsets()
                     .collect { accumulatedDelta ->
@@ -132,6 +138,7 @@ fun MegaScaffold(
     }
 }
 
+@SuppressLint("MegaScaffold")
 @Composable
 private fun MegaScaffold(
     modifier: Modifier = Modifier,
@@ -163,18 +170,16 @@ private fun MegaScaffold(
 @Composable
 private fun MegaScaffoldPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        val scrollState = rememberScrollState()
         MegaScaffold(
             modifier = Modifier.background(MegaOriginalTheme.backgroundColor(backgroundColor = BackgroundColor.PageBackground)),
             topBar = { MegaAppBar(appBarType = AppBarType.NONE, title = "Top bar title") },
             floatingActionButton = { MegaFloatingActionButton(onClick = { }) {} },
             hideFloatingActionButtonOnScrollUp = true,
+            scrollableContentState = scrollState,
         )
         {
-            Column(
-                modifier = Modifier.verticalScroll(
-                    rememberScrollStateForMegaScaffold()
-                )
-            ) {
+            Column(modifier = Modifier.verticalScroll(scrollState)) {
                 (0..100).forEach {
                     MegaText(
                         text = "Item - $it",
@@ -189,47 +194,23 @@ private fun MegaScaffoldPreview() {
     }
 }
 
-/**
- * Creates and remembers a [ScrollState] to be used in the main content of the [MegaScaffold].
- * It will update internally provided values. [MegaScaffold] will use them to monitor the scroll state to set the top bar elevation or set the floating action button viwibility when corresponds.
- */
-@Composable
-fun rememberScrollStateForMegaScaffold(): ScrollState = rememberScrollState().also {
-    UpdateScrollOffset(it.scrollOffsetFlow(), false)
-}
-
-/**
- * Creates and remembers a [LazyListState] to be used in the main content of the [MegaScaffold].
- * It will update internally provided values. [MegaScaffold] will use them to monitor the scroll state to set the top bar elevation or set the floating action button viwibility when corresponds.
- */
-@Composable
-fun rememberLazyListStateForMegaScaffold(): LazyListState =
-    rememberLazyListState().also {
-        UpdateScrollOffset(it.scrollOffsetFlow())
-    }
-
-/**
- * Creates and remembers a [LazyGridState] to be used in the main content of the [MegaScaffold].
- * It will update internally provided values. [MegaScaffold] will use them to monitor the scroll state to set the top bar elevation or set the floating action button viwibility when corresponds.
- */
-@Composable
-fun rememberLazyGridStateForMegaScaffold(): LazyGridState =
-    rememberLazyGridState().also {
-        UpdateScrollOffset(it.scrollOffsetFlow())
-    }
-
-
-@Composable
-private fun UpdateScrollOffset(offsetFlow: Flow<Int>, isApproximate: Boolean = true) {
-    val scaffoldContentScrollOffset = LocalScaffoldContentScrollOffset.current
-    LaunchedEffect(Unit) {
-        scaffoldContentScrollOffset?.value = 0
-        offsetFlow.collect { scrollOffset ->
-            scaffoldContentScrollOffset?.value = scrollOffset
-            scaffoldContentScrollOffset?.isApproximate = isApproximate
+private fun ScrollableState.getApproximateScrollOffset(): Int? =
+    when (this) {
+        is ScrollState -> value
+        is LazyListState -> {
+            firstVisibleItemIndex *
+                    (layoutInfo.visibleItemsInfo.firstOrNull()?.size ?: 1) +
+                    firstVisibleItemScrollOffset
         }
+
+        is LazyGridState -> {
+            firstVisibleItemIndex *
+                    (layoutInfo.visibleItemsInfo.firstOrNull()?.size?.height ?: 1) +
+                    firstVisibleItemScrollOffset
+        }
+
+        else -> null
     }
-}
 
 /**
  * Provides SnackbarHostState to be used to show a snackBar from any view inside this scaffold.
@@ -240,19 +221,4 @@ val LocalSnackBarHostState = compositionLocalOf<SnackbarHostState?> { null }
 private const val animationScale = 0.2f
 private const val animationDuration = 300
 private val animationSpecs = TweenSpec<Float>(durationMillis = animationDuration)
-
-@Stable
-private class ScaffoldContentScrollOffset {
-    var value: Int by mutableIntStateOf(0)
-        internal set
-
-    /**
-     * Indicates that the scroll value is an approximation and should only be used to check if it is equals to 0 or if delta changes are positive or negative. By their nature, we can't know the exact scroll offset of Lazy lists or grids.
-     */
-    var isApproximate by mutableStateOf(true)
-
-}
-
-private val LocalScaffoldContentScrollOffset =
-    compositionLocalOf<ScaffoldContentScrollOffset?> { null }
 

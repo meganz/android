@@ -69,6 +69,15 @@ object Stubs {
         """.trimIndent()
     ).indented().within("src")
 
+    private val scaffoldComponent: TestFile = kotlin(
+        "androidx/compose/material/Scaffold.kt",
+        """
+            package androidx.compose.material
+            @Composable
+            fun Scaffold(content: @Composable (PaddingValues) -> Unit)
+        """.trimIndent()
+    ).indented().within("src")
+
     private val snackbarHostStateShow: TestFile = kotlin(
         "androidx/compose/material/SnackbarHost.kt",
         """
@@ -96,5 +105,6 @@ object Stubs {
         isSystemInDarkTheme,
         snackbarComponent,
         snackbarHostStateShow,
+        scaffoldComponent,
     )
 }
