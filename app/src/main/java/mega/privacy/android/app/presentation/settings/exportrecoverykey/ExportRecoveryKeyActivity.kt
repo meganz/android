@@ -19,7 +19,6 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.view.ExportRecoveryKeyView
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -171,19 +170,12 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
         withContext(Dispatchers.IO) {
             val uri = result.data ?: return@withContext false
             runCatching {
-                contentResolver.takePersistableUriPermission(
-                    uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                            or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                )
+                contentResolver.openOutputStream(uri)?.use {
+                    it.write(key.toByteArray())
+                }
             }.onFailure {
-                Timber.e(it, "Failed to take persistable permission for uri: $uri")
-            }
-            FileUtil.saveTextOnContentUri(
-                this@ExportRecoveryKeyActivity.contentResolver,
-                uri,
-                key
-            )
+                Timber.e(it, "Failed to write recovery key to uri: $uri")
+            }.isSuccess
         }
 
     /**

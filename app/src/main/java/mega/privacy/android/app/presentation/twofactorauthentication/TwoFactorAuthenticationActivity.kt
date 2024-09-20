@@ -27,7 +27,6 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationView
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ThemeMode
@@ -185,11 +184,12 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
      */
     private suspend fun isSaveToTextFileSuccessful(key: String, result: Intent): Boolean =
         withContext(Dispatchers.IO) {
-            FileUtil.saveTextOnContentUri(
-                this@TwoFactorAuthenticationActivity.contentResolver,
-                result.data,
-                key
-            )
+            runCatching {
+                val uri = result.data ?: return@runCatching false
+                contentResolver.openOutputStream(uri)?.use {
+                    it.write(key.toByteArray())
+                }
+            }.isSuccess
         }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

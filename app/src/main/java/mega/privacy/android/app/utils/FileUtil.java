@@ -3,18 +3,15 @@ package mega.privacy.android.app.utils;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.buildTempFile;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
-import static mega.privacy.android.app.utils.Constants.COPY_FILE_BUFFER_SIZE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
-import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
 import static mega.privacy.android.app.utils.Util.getSizeString;
 import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -22,8 +19,6 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
-import android.os.storage.StorageManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -32,19 +27,11 @@ import android.webkit.MimeTypeMap;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -71,8 +58,6 @@ public class FileUtil {
 
     public static final String DOWNLOAD_DIR = "MEGA Downloads";
 
-    public static final String LOG_DIR = "MEGA Logs";
-
     public static final String OLD_MK_FILE = MAIN_DIR + File.separator + "MEGAMasterKey.txt";
 
     public static final String OLD_RK_FILE = MAIN_DIR + File.separator + "MEGARecoveryKey.txt";
@@ -80,13 +65,10 @@ public class FileUtil {
     public static final String JPG_EXTENSION = ".jpg";
     public static final String TXT_EXTENSION = ".txt";
     public static final String _3GP_EXTENSION = ".3gp";
-    public static final String MP4_EXTENSION = ".mp4";
     public static final String ANY_TYPE_FILE = "*/*";
 
     private static final String VOLUME_EXTERNAL = "external";
     private static final String VOLUME_INTERNAL = "internal";
-
-    private static final String PRIMARY_VOLUME_NAME = "primary";
 
     public static String getRecoveryKeyFileName(Context context) {
         return context.getString(R.string.general_rk) + TXT_EXTENSION;
@@ -98,12 +80,6 @@ public class FileUtil {
 
     public static boolean isInternalIntent(MegaNode node) {
         return !MimeTypeList.typeForName(node.getName()).isVideoNotSupported() && !MimeTypeList.typeForName(node.getName()).isAudioNotSupported();
-    }
-
-    public static boolean isOpusFile(MegaNode node) {
-        String[] s = node.getName().split("\\.");
-
-        return s.length > 1 && s[s.length - 1].equals("opus");
     }
 
     private static boolean isOnMegaDownloads(MegaNode node) {
@@ -181,60 +157,6 @@ public class FileUtil {
         return false;
     }
 
-    public static boolean setURLIntentParams(Context context, MegaNode node, Intent intent,
-                                             String localPath, SnackbarShower snackbarShower) {
-        File mediaFile = new File(localPath);
-        InputStream instream = null;
-        boolean paramsSetSuccessfully = false;
-
-        try {
-            // open the file for reading
-            instream = new FileInputStream(mediaFile.getAbsolutePath());
-            // if file the available for reading
-            InputStreamReader inputreader = new InputStreamReader(instream);
-            BufferedReader buffreader = new BufferedReader(inputreader);
-
-            String line1 = buffreader.readLine();
-            if (line1 != null) {
-                String line2 = buffreader.readLine();
-                String url = line2.replace("URL=", "");
-                intent.setData(Uri.parse(url));
-                paramsSetSuccessfully = true;
-            }
-        } catch (Exception ex) {
-            Timber.e(ex, "EXCEPTION reading file");
-        } finally {
-            // close the file.
-            try {
-                if (instream != null) {
-                    instream.close();
-                }
-            } catch (IOException e) {
-                Timber.e(e, "EXCEPTION closing InputStream");
-            }
-        }
-        if (paramsSetSuccessfully) {
-            return true;
-        }
-        Timber.e("Not expected format: Exception on processing url file");
-        return setLocalIntentParams(context, node, intent, localPath, true, snackbarShower);
-    }
-
-    public static Boolean deleteFolderAndSubFolders(File folder) {
-        if (folder == null) return false;
-
-        Timber.d("deleteFolderAndSubFolders: %s", folder.getAbsolutePath());
-        File[] files = folder.listFiles();
-        if (folder.isDirectory() && files != null) {
-            for (File file : files) {
-                if(deleteFolderAndSubFolders(file)){
-                   Timber.d("Delete unsuccessful for %s", file.getAbsolutePath());
-                }
-            }
-        }
-        return folder.delete();
-    }
-
     public static File createTemporalTextFile(Context context, String name, String data) {
         String fileName = name + TXT_EXTENSION;
 
@@ -265,29 +187,6 @@ public class FileUtil {
             Timber.e(e, "File write failed");
             return null;
         }
-    }
-
-    public static long getDirSize(File dir) {
-
-        long size = 0;
-        if (dir == null) {
-            return -1;
-        }
-
-        File[] files = dir.listFiles();
-
-        if (files != null) {
-            for (File file : files) {
-                if (file.isFile()) {
-                    size += file.length();
-                } else {
-                    size += getDirSize(file);
-                }
-            }
-            return size;
-        }
-        Timber.d("Dir size: %s", size);
-        return size;
     }
 
     /**
@@ -442,21 +341,6 @@ public class FileUtil {
         return candidates;
     }
 
-    /*
-     * Check is file belongs to the app
-     */
-    public static boolean isLocal(Context context, File file) {
-        File tmp = context.getDir("tmp", 0);
-        return tmp != null && tmp.getParent() != null && file.getAbsolutePath().contains(tmp.getParent());
-    }
-
-    /*
-     * Check is file belongs to the app and temporary
-     */
-    public static boolean isLocalTemp(Context context, File file) {
-        return isLocal(context, file) && file.getAbsolutePath().endsWith(".tmp");
-    }
-
     /**
      * Copies a file from source to dest
      *
@@ -478,28 +362,6 @@ public class FileUtil {
 
             sendBroadcastToUpdateGallery(MegaApplication.getInstance(), dest);
         }
-    }
-
-    /**
-     * Copy an Uri to file
-     *
-     * @param uri  Source Uri.
-     * @param dest Final copied file.
-     * @throws IOException if some error happens while copying.
-     */
-    public static void copyUriToFile(Uri uri, File dest) throws IOException {
-        InputStream inputStream = MegaApplication.getInstance().getContentResolver().openInputStream(uri);
-        FileOutputStream outputStream = new FileOutputStream(dest);
-
-        byte[] buffer = new byte[COPY_FILE_BUFFER_SIZE];
-        int length;
-
-        while ((length = inputStream.read(buffer)) != -1) {
-            outputStream.write(buffer, 0, length);
-        }
-
-        inputStream.close();
-        outputStream.close();
     }
 
     /**
@@ -571,23 +433,8 @@ public class FileUtil {
         return file != null && file.exists();
     }
 
-    /**
-     * Checks if the file already exists in targetPath.
-     *
-     * @param file       File to check.
-     * @param targetPath Path where the file is checked for.
-     */
-    public static boolean fileExistsInTargetPath(File file, String targetPath) {
-        File destFile = new File(targetPath, file.getName());
-        return destFile.exists() && destFile.length() == file.length();
-    }
-
     public static boolean isFileDownloadedLatest(File downloadedFile, MegaNode node) {
         return downloadedFile.lastModified() - node.getModificationTime() * 1000 >= 0;
-    }
-
-    public static File buildExternalStorageFile(String filePath) {
-        return new File(Environment.getExternalStorageDirectory().getAbsolutePath() + filePath);
     }
 
     public static File buildDefaultDownloadDir(Context context) {
@@ -597,96 +444,6 @@ public class FileUtil {
         } else {
             return context.getFilesDir();
         }
-    }
-
-    /**
-     * Find the local path of a video node.
-     *
-     * @param node MegaNode in cloud drive which should be a video.
-     * @return Corresponding local path of the node.
-     */
-    public static String findVideoLocalPath(Context context, MegaNode node) {
-        String path = queryByNameAndSize(context, MediaStore.Video.Media.INTERNAL_CONTENT_URI, node);
-        if (path == null) {
-            path = queryByNameAndSize(context, MediaStore.Video.Media.EXTERNAL_CONTENT_URI, node);
-        }
-
-        if (path == null) {
-            path = queryByNameOrSize(context, MediaStore.Video.Media.INTERNAL_CONTENT_URI, node);
-            if (path == null) {
-                path = queryByNameOrSize(context, MediaStore.Video.Media.EXTERNAL_CONTENT_URI, node);
-            }
-        }
-        // if needed, can add file system scanning here.
-        return path;
-    }
-
-    private static String queryByNameOrSize(Context context, Uri uri, MegaNode node) {
-        String selection = MediaStore.Video.Media.DISPLAY_NAME + " = ? OR " + MediaStore.Video.Media.SIZE + " = ?";
-        return query(context, uri, selection, node);
-    }
-
-    private static String queryByNameAndSize(Context context, Uri uri, MegaNode node) {
-        String selection = MediaStore.Video.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Video.Media.SIZE + " = ?";
-        return query(context, uri, selection, node);
-    }
-
-    @Nullable
-    private static String query(Context context, Uri uri, String selection, MegaNode node) {
-        String fileName = node.getName();
-        long fileSize = node.getSize();
-        String[] selectionArgs = {fileName, String.valueOf(fileSize)};
-        Cursor cursor = context.getContentResolver().query(uri, new String[]{MediaStore.Video.Media.DATA}, selection, selectionArgs, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-            String path = cursor.getString(dataColumn);
-            cursor.close();
-            File localFile = new File(path);
-            if (localFile.exists()) {
-                return path;
-            }
-        }
-        return null;
-    }
-
-    public static void purgeDirectory(File dir) {
-        Timber.d("Removing cache files");
-        if (!dir.exists()) {
-            return;
-        }
-
-        try {
-            if (dir.listFiles() == null) return;
-
-            for (File file : dir.listFiles()) {
-                if (file.isDirectory()) {
-                    purgeDirectory(file);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * @param fileName The original file name
-     * @return the file name without extension. For example, 1.jpg would return 1
-     */
-    static String getFileNameWithoutExtension(String fileName) {
-        int index = fileName.lastIndexOf(".");
-        if ((index != -1) && ((index + 1) < fileName.length())) {
-            return fileName.substring(0, fileName.lastIndexOf("."));
-        } else {
-            return "";
-        }
-    }
-
-    /**
-     * @param filename The original file name
-     * @return whether the file name is purely number
-     */
-    static boolean isFileNameNumeric(String filename) {
-        return getFileNameWithoutExtension(filename).matches("-?\\d+(\\.\\d+)?");
     }
 
     public static String addPdfFileExtension(String title) {
@@ -829,134 +586,11 @@ public class FileUtil {
         } else return volumePath;
     }
 
-    private static String getVolumePath(final String volumeId, Context context) {
-        try {
-            StorageManager mStorageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
-            Class<?> storageVolumeClazz = Class.forName("android.os.storage.StorageVolume");
-            Method getVolumeList = mStorageManager.getClass().getMethod("getVolumeList");
-            Method getUuid = storageVolumeClazz.getMethod("getUuid");
-            Method getPath = storageVolumeClazz.getMethod("getPath");
-            Method isPrimary = storageVolumeClazz.getMethod("isPrimary");
-            Object result = getVolumeList.invoke(mStorageManager);
-
-            final int length = Array.getLength(result);
-            for (int i = 0; i < length; i++) {
-                Object storageVolumeElement = Array.get(result, i);
-                String uuid = (String) getUuid.invoke(storageVolumeElement);
-                Boolean primary = (Boolean) isPrimary.invoke(storageVolumeElement);
-
-                // primary volume?
-                if (primary && PRIMARY_VOLUME_NAME.equals(volumeId))
-                    return (String) getPath.invoke(storageVolumeElement);
-
-                // other volumes?
-                if (uuid != null && uuid.equals(volumeId))
-                    return (String) getPath.invoke(storageVolumeElement);
-            }
-            // not found.
-            return null;
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-
-    private static String getVolumeIdFromTreeUri(final Uri treeUri) {
-        final String docId = DocumentsContract.getTreeDocumentId(treeUri);
-        final String[] split = docId.split(":");
-        if (split.length > 0) return split[0];
-        else return null;
-    }
-
     private static String getDocumentPathFromTreeUri(final Uri treeUri) {
         final String docId = DocumentsContract.getTreeDocumentId(treeUri);
         final String[] split = docId.split(":");
         if ((split.length >= 2) && (split[1] != null)) return split[1];
         else return File.separator;
-    }
-
-    public static File getFileFromContentUri(Context context, Uri uri) {
-        File file = new File(context.getCacheDir(), uri.getLastPathSegment());
-        InputStream in = null;
-        OutputStream out = null;
-
-        try {
-            in = context.getContentResolver().openInputStream(uri);
-            out = new FileOutputStream(file);
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return file;
-    }
-
-    /**
-     * Gets the string to show as content of a folder.
-     *
-     * @param file The folder to get its string content.
-     * @return The string to show as content of the folder.
-     */
-    public static String getFileFolderInfo(File file, Context context) {
-        File[] fList = file.listFiles();
-        if (fList == null) {
-            return context.getString(R.string.file_browser_empty_folder);
-        }
-
-        int numFolders = 0;
-        int numFiles = 0;
-
-        for (File f : fList) {
-            if (f.isDirectory()) {
-                numFolders++;
-            } else {
-                numFiles++;
-            }
-        }
-
-        return getFolderInfo(numFolders, numFiles, context);
-    }
-
-    /**
-     * Gets the total size of a File.
-     *
-     * @param file The File to get its total size.
-     * @return The total size.
-     */
-    public static long getTotalSize(File file) {
-        if (file.isFile()) {
-            return file.length();
-        }
-
-        File[] files = file.listFiles();
-        if (files == null) {
-            return 0;
-        }
-
-        long totalSize = 0;
-        for (File child : files) {
-            if (child.isFile()) {
-                totalSize += child.length();
-            } else {
-                totalSize += getTotalSize(child);
-            }
-        }
-
-        return totalSize;
     }
 
     /**
@@ -1030,116 +664,5 @@ public class FileUtil {
      */
     public static String getFileInfo(File file, Context context) {
         return TextUtil.getFileInfo(getSizeString(file.length(), context), formatLongDateTime(file.lastModified() / 1000));
-    }
-
-    /**
-     * Saves some text on a file.
-     *
-     * @param context Current context.
-     * @param content The content to store.
-     * @param path    The selected location to save the file.
-     * @return True if content was correctly saved, false otherwise.
-     */
-    public static boolean saveTextOnFile(Context context, String content, String path) {
-        try {
-            // If export the file to SD card.
-            if (SDCardUtils.isLocalFolderOnSDCard(context, path)) {
-                // Export to cache folder root first.
-                File temp = new File(context.getCacheDir() + File.separator + getRecoveryKeyFileName(context));
-
-                if (!saveContentOnFile(content, new FileWriter(temp))) {
-                    return false;
-                }
-
-                // Copy to target location on SD card.
-                SDCardOperator sdCardOperator = new SDCardOperator(context);
-                DatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
-                sdCardOperator.initDocumentFileRoot(dbH.getSdCardUri());
-                sdCardOperator.moveFile(path.substring(0, path.lastIndexOf(File.separator)), temp);
-
-                // Delete the temp file.
-                temp.delete();
-            } else {
-                return saveContentOnFile(content, new FileWriter(path));
-            }
-        } catch (SDCardOperator.SDCardException | IOException e) {
-            Timber.e(e, "IOException saving content.");
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Saves some text on a file.
-     *
-     * @param content    Text content to save.
-     * @param fileWriter The selected location to save the file.
-     * @return True if content was correctly saved, false otherwise.
-     */
-    private static boolean saveContentOnFile(String content, FileWriter fileWriter) {
-        try {
-            BufferedWriter out = new BufferedWriter(fileWriter);
-            out.write(content);
-            out.close();
-        } catch (IOException e) {
-            Timber.e(e, "IOException saving content.");
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Saves some text in a file received as content Uri.
-     *
-     * @param contentResolver Needed content resolver to open the file descriptor.
-     * @param contentUri      Content Uri in which the content has to be saved.
-     * @param content         Content text to save in the content uri.
-     * @return True if everything goes well in the save process, false otherwise.
-     */
-    public static boolean saveTextOnContentUri(ContentResolver contentResolver, Uri contentUri, String content) {
-        try {
-            ParcelFileDescriptor file = contentResolver.openFileDescriptor(contentUri, "w");
-            FileOutputStream fileOutputStream = new FileOutputStream(file.getFileDescriptor());
-            fileOutputStream.write(content.getBytes());
-            fileOutputStream.close();
-            file.close();
-        } catch (IOException e) {
-            Timber.e(e, "IOException creating RK file");
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Delete file without throwing exceptions.
-     *
-     * @param file File to be deleted
-     * @return True if it was deleted successfully, false otherwise
-     */
-    public static boolean deleteFileSafely(File file) {
-        try {
-            return file.delete();
-        } catch (Exception ignored) {
-            return false;
-        }
-    }
-
-    /**
-     * Check if a specific file is valid for Image Viewer
-     *
-     * @param file File to be checked
-     * @return True if it's valid, false otherwise
-     */
-    public static boolean isValidForImageViewer(File file) {
-        if (file.isFile() && file.exists() && file.canRead()) {
-            MimeTypeList mimeTypeList = MimeTypeList.typeForName(file.getName());
-            return mimeTypeList.isImage() || mimeTypeList.isGIF()
-                    || mimeTypeList.isVideoMimeType() || mimeTypeList.isMp4Video();
-        } else {
-            return false;
-        }
     }
 }
