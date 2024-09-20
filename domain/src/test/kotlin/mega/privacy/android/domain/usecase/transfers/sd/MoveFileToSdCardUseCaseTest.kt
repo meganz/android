@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -48,4 +49,17 @@ class MoveFileToSdCardUseCaseTest {
         underTest(file, destination, subFolders)
         verify(fileSystemRepository).moveFileToSd(file, destination, subFolders)
     }
+
+    @Test
+    fun `test that when destination uri is not valid then it throws an excepcion`() =
+        runTest {
+            val file = mock<File>()
+            val destination = "/storage/root/cache/"
+            val subFolders = listOf("subfolder1", "subfolder2")
+            whenever(settingsRepository.getDownloadToSdCardUri()).thenReturn(null)
+            assertThrows<IllegalArgumentException> {
+                underTest(file, destination, subFolders)
+                verify(fileSystemRepository).moveFileToSd(file, destination, subFolders)
+            }
+        }
 }

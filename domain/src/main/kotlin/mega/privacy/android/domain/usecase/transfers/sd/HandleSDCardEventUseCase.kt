@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.transfer.DestinationUriAndSubFolders
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.getSDCardTransferUri
 import mega.privacy.android.domain.entity.transfer.isSDCardDownload
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -46,7 +47,7 @@ class HandleSDCardEventUseCase @Inject constructor(
                         transfer.fileName,
                         transfer.totalBytes.toString(),
                         transfer.nodeHandle.toString(),
-                        path,
+                        transfer.getSDCardTransferUri() ?: path,
                         transfer.appData
                     )
                 )
