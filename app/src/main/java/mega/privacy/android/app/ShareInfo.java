@@ -124,6 +124,11 @@ public class ShareInfo implements Serializable {
                 Timber.d("Instance of URI");
                 Timber.d(streamObject.toString());
                 shareInfo.processUri(intent.getAction(), (Uri) streamObject, context);
+
+                String scannedDocumentFilename = extras.getString(FileExplorerActivity.EXTRA_DOCUMENT_SCAN_FILENAME);
+                if (scannedDocumentFilename != null) {
+                    shareInfo.title = scannedDocumentFilename;
+                }
             } else if (streamObject == null) {
                 Timber.d("Stream object is null!");
                 return null;

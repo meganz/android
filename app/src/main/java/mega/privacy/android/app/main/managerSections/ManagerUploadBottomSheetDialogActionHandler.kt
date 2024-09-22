@@ -166,19 +166,27 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
         if (result.resultCode == RESULT_OK) {
             GmsDocumentScanningResult.fromActivityResultIntent(result.data)?.let { data ->
                 with(data) {
+                    val imageUris = pages?.mapNotNull { page ->
+                        page.imageUri
+                    } ?: emptyList()
+
+                    // The PDF URI must exist before moving to the Scan Confirmation page
                     pdf?.uri?.let { pdfUri ->
-                        Timber.d("The PDF URI is: $pdfUri")
-                        // Do something with the PDF
-                    }
-                    pages?.forEach { page ->
-                        page.imageUri.path?.let { imagePath ->
-                            Timber.d("The Image Path is: $imagePath")
-                            // Do something with the image
+                        val intent = Intent(
+                            managerActivity, SaveScannedDocumentsActivity::class.java
+                        ).apply {
+                            putExtra(
+                                SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE,
+                                parentNodeManager.currentParentHandle,
+                            )
+                            putExtra(SaveScannedDocumentsActivity.EXTRA_SCAN_PDF_URI, pdfUri)
+                            putExtra(
+                                SaveScannedDocumentsActivity.EXTRA_SCAN_SOLO_IMAGE_URI,
+                                if (imageUris.size == 1) imageUris[0] else null,
+                            )
                         }
-                    }
-                    val intent =
-                        Intent(managerActivity, SaveScannedDocumentsActivity::class.java)
-                    managerActivity.startActivity(intent)
+                        managerActivity.startActivity(intent)
+                    } ?: Timber.e("The PDF file could not be retrieved after scanning")
                 }
             }
         }

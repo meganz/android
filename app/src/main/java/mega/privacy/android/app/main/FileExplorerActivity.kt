@@ -2728,6 +2728,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         const val EXTRA_MEGA_SELECTED_FOLDER = "EXTRA_MEGA_SELECTED_FOLDER"
 
         /**
+         * Intent extra for the filename used on the scanned document/s
+         */
+        const val EXTRA_DOCUMENT_SCAN_FILENAME = "EXTRA_DOCUMENT_SCAN_FILENAME"
+
+        /**
          * Intent action for processed info.
          */
         @JvmField
