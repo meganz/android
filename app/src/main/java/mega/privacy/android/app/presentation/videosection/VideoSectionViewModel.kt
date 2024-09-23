@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -37,7 +38,8 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionStat
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTabState
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
-import mega.privacy.android.app.presentation.videosection.view.recentlywatched.videoRecentlyWatchedRoute
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -182,16 +184,17 @@ class VideoSectionViewModel @Inject constructor(
     private fun refreshNodesIfAnyUpdates() {
         viewModelScope.launch {
             merge(
-                monitorNodeUpdatesUseCase(),
+                monitorNodeUpdatesUseCase().filter {
+                    it.changes.keys.any { node ->
+                        node is FileNode && node.type is VideoFileTypeInfo
+                    }
+                },
                 monitorOfflineNodeUpdatesUseCase()
             ).conflate()
                 .catch {
                     Timber.e(it)
                 }.collect {
                     setPendingRefreshNodes()
-                    if (_state.value.currentDestinationRoute == videoRecentlyWatchedRoute) {
-                        loadRecentlyWatchedVideos()
-                    }
                 }
         }
     }

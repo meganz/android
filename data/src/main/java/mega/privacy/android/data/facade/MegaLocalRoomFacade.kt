@@ -13,6 +13,7 @@ import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
+import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
@@ -31,6 +32,9 @@ import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferLega
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
+import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
+import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
+import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Offline
@@ -74,6 +78,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val chatPendingChangesDao: ChatPendingChangesDao,
     private val chatRoomPendingChangesEntityMapper: ChatRoomPendingChangesEntityMapper,
     private val chatRoomPendingChangesModelMapper: ChatRoomPendingChangesModelMapper,
+    private val videoRecentlyWatchedDao: VideoRecentlyWatchedDao,
+    private val videoRecentlyWatchedEntityMapper: VideoRecentlyWatchedEntityMapper,
+    private val videoRecentlyWatchedItemMapper: VideoRecentlyWatchedItemMapper,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
         contactDao.insertOrUpdateContact(contactEntityMapper(contact))
@@ -447,6 +454,29 @@ internal class MegaLocalRoomFacade @Inject constructor(
         chatPendingChangesDao.upsertChatPendingChanges(
             chatRoomPendingChangesEntityMapper(chatPendingChanges)
         )
+    }
+
+    override suspend fun getAllRecentlyWatchedVideos() =
+        videoRecentlyWatchedDao.getAllRecentlyWatchedVideos().map { entities ->
+            entities.map { entity ->
+                videoRecentlyWatchedItemMapper(entity.videoHandle, entity.watchedTimestamp)
+            }
+        }
+
+    override suspend fun removeRecentlyWatchedVideo(handle: Long) =
+        videoRecentlyWatchedDao.removeRecentlyWatchedVideo(handle)
+
+    override suspend fun clearRecentlyWatchedVideos() =
+        videoRecentlyWatchedDao.clearRecentlyWatchedVideos()
+
+    override suspend fun saveRecentlyWatchedVideo(item: VideoRecentlyWatchedItem) {
+        val entity = videoRecentlyWatchedEntityMapper(item)
+        videoRecentlyWatchedDao.insertOrUpdateRecentlyWatchedVideo(entity)
+    }
+
+    override suspend fun saveRecentlyWatchedVideos(items: List<VideoRecentlyWatchedItem>) {
+        val entities = items.map { videoRecentlyWatchedEntityMapper(it) }
+        videoRecentlyWatchedDao.insertOrUpdateRecentlyWatchedVideos(entities)
     }
 
     override fun monitorChatPendingChanges(chatId: Long): Flow<ChatPendingChanges?> =

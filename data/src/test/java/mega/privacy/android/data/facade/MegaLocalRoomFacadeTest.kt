@@ -15,6 +15,7 @@ import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
+import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
@@ -22,6 +23,7 @@ import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
 import mega.privacy.android.data.database.entity.SdTransferEntity
+import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
 import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_INSERT_LIST_SIZE
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
@@ -40,6 +42,9 @@ import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferLega
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
+import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
+import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
+import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.backup.Backup
@@ -96,6 +101,9 @@ internal class MegaLocalRoomFacadeTest {
     private val chatRoomPendingChangesEntityMapper: ChatRoomPendingChangesEntityMapper = mock()
     private val chatRoomPendingChangesModelMapper: ChatRoomPendingChangesModelMapper = mock()
     private val completedTransferLegacyModelMapper = mock<CompletedTransferLegacyModelMapper>()
+    private val videoRecentlyWatchedDao: VideoRecentlyWatchedDao = mock()
+    private val videoRecentlyWatchedEntityMapper: VideoRecentlyWatchedEntityMapper = mock()
+    private val videoRecentlyWatchedItemMapper: VideoRecentlyWatchedItemMapper = mock()
 
     @BeforeAll
     fun setUp() {
@@ -127,6 +135,9 @@ internal class MegaLocalRoomFacadeTest {
             chatPendingChangesDao = chatPendingChangesDao,
             chatRoomPendingChangesEntityMapper = chatRoomPendingChangesEntityMapper,
             chatRoomPendingChangesModelMapper = chatRoomPendingChangesModelMapper,
+            videoRecentlyWatchedDao = videoRecentlyWatchedDao,
+            videoRecentlyWatchedItemMapper = videoRecentlyWatchedItemMapper,
+            videoRecentlyWatchedEntityMapper = videoRecentlyWatchedEntityMapper
         )
     }
 
@@ -152,6 +163,9 @@ internal class MegaLocalRoomFacadeTest {
             chatRoomPendingChangesEntityMapper,
             chatRoomPendingChangesModelMapper,
             completedTransferLegacyModelMapper,
+            videoRecentlyWatchedDao,
+            videoRecentlyWatchedItemMapper,
+            videoRecentlyWatchedEntityMapper
         )
     }
 
@@ -701,5 +715,80 @@ internal class MegaLocalRoomFacadeTest {
             underTest.migrateLegacyCompletedTransfers()
 
             verify(completedTransferDao, never()).deleteAllLegacyCompletedTransfers()
+        }
+
+    @Test
+    fun `test that removeRecentlyWatchedVideo invokes as expected`() =
+        runTest {
+            val testVideoHandle = 123456L
+            underTest.removeRecentlyWatchedVideo(testVideoHandle)
+            verify(videoRecentlyWatchedDao).removeRecentlyWatchedVideo(testVideoHandle)
+        }
+
+    @Test
+    fun `test that clearRecentlyWatchedVideos invokes as expected`() =
+        runTest {
+            underTest.clearRecentlyWatchedVideos()
+            verify(videoRecentlyWatchedDao).clearRecentlyWatchedVideos()
+        }
+
+    @Test
+    fun `test that saveRecentlyWatchedVideo insert the mapped entity`() = runTest {
+        val testItem = mock<VideoRecentlyWatchedItem>()
+        val testEntity = mock<VideoRecentlyWatchedEntity>()
+        whenever(videoRecentlyWatchedEntityMapper(testItem)).thenReturn(testEntity)
+
+        underTest.saveRecentlyWatchedVideo(testItem)
+        verify(videoRecentlyWatchedDao).insertOrUpdateRecentlyWatchedVideo(testEntity)
+    }
+
+    @Test
+    fun `test that saveRecentlyWatchedVideos insert the mapped entities`() = runTest {
+        val testItems = (1..100).map {
+            mock<VideoRecentlyWatchedItem>()
+        }
+        val testEntities = (1..100).map {
+            mock<VideoRecentlyWatchedEntity>()
+        }
+        testItems.forEachIndexed { index, item ->
+            whenever(videoRecentlyWatchedEntityMapper(item)).thenReturn(testEntities[index])
+        }
+
+        underTest.saveRecentlyWatchedVideos(testItems)
+        verify(videoRecentlyWatchedDao).insertOrUpdateRecentlyWatchedVideos(testEntities)
+    }
+
+    @Test
+    fun `test that getAllRecentlyWatchedVideos returns as expected`() =
+        runTest {
+            val testItems = (1..100L).map { value ->
+                mock<VideoRecentlyWatchedItem> {
+                    on { videoHandle }.thenReturn(value)
+                    on { watchedTimestamp }.thenReturn(value)
+                }
+            }
+            val testEntities = (1..100L).map { value ->
+                mock<VideoRecentlyWatchedEntity> {
+                    on { videoHandle }.thenReturn(value)
+                    on { watchedTimestamp }.thenReturn(value)
+                }
+            }
+            whenever(videoRecentlyWatchedDao.getAllRecentlyWatchedVideos()).thenReturn(
+                flowOf(
+                    testEntities
+                )
+            )
+            testItems.forEachIndexed { index, item ->
+                whenever(
+                    videoRecentlyWatchedItemMapper(
+                        testEntities[index].videoHandle,
+                        testEntities[index].watchedTimestamp
+                    )
+                ).thenReturn(item)
+            }
+            underTest.getAllRecentlyWatchedVideos().test {
+                assertThat(awaitItem()).isEqualTo(testItems)
+                awaitComplete()
+            }
         }
 }

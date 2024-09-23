@@ -20,12 +20,13 @@ import mega.privacy.android.app.presentation.videosection.model.LocationFilterOp
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
-import mega.privacy.android.app.presentation.videosection.view.recentlywatched.videoRecentlyWatchedRoute
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.ExportedData
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
@@ -256,10 +257,13 @@ class VideoSectionViewModelTest {
     @Test
     fun `test that isPendingRefresh is correctly updated when monitorNodeUpdatesUseCase is triggered`() =
         runTest {
+            val testFileNode = mock<FileNode> {
+                on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
+            }
             testScheduler.advanceUntilIdle()
 
             underTest.state.drop(1).test {
-                fakeMonitorNodeUpdatesFlow.emit(NodeUpdate(emptyMap()))
+                fakeMonitorNodeUpdatesFlow.emit(NodeUpdate(mapOf(testFileNode to emptyList())))
                 assertThat(awaitItem().isPendingRefresh).isTrue()
 
                 underTest.markHandledPendingRefresh()
@@ -1508,54 +1512,6 @@ class VideoSectionViewModelTest {
                 assertThat(awaitItem().removeRecentlyWatchedItemSuccess).isEqualTo(triggered)
                 underTest.resetRemoveRecentlyWatchedItemSuccess()
                 assertThat(awaitItem().removeRecentlyWatchedItemSuccess).isEqualTo(consumed)
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `test that state is correctly updated when monitorOfflineNodeUpdatesUseCase is triggered`() =
-        runTest {
-            val testHandle = 1L
-            val testTimestamp = 1000L
-            val testWatchDate = "12 April 2024"
-            val testVideoNodes = listOf(initTypedVideoNode(testHandle, testTimestamp))
-            val testVideoEntity = initVideoUIEntity(testHandle, testWatchDate)
-            val expectedRecentlyWatchedItems = mapOf((testWatchDate to listOf(testVideoEntity)))
-            whenever(videoUIEntityMapper(anyOrNull())).thenReturn(testVideoEntity)
-            whenever(getVideoRecentlyWatchedUseCase()).thenReturn(testVideoNodes)
-
-            testScheduler.advanceUntilIdle()
-            underTest.setCurrentDestinationRoute(videoRecentlyWatchedRoute)
-
-            underTest.state.drop(2).test {
-                fakeMonitorOfflineNodeUpdatesFlow.emit(emptyList())
-                assertThat(awaitItem().groupedVideoRecentlyWatchedItems).isEqualTo(
-                    expectedRecentlyWatchedItems
-                )
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
-    @Test
-    fun `test that state is correctly updated when monitorNodeUpdatesUseCase is triggered`() =
-        runTest {
-            val testHandle = 1L
-            val testTimestamp = 1000L
-            val testWatchDate = "12 April 2024"
-            val testVideoNodes = listOf(initTypedVideoNode(testHandle, testTimestamp))
-            val testVideoEntity = initVideoUIEntity(testHandle, testWatchDate)
-            val expectedRecentlyWatchedItems = mapOf((testWatchDate to listOf(testVideoEntity)))
-            whenever(videoUIEntityMapper(anyOrNull())).thenReturn(testVideoEntity)
-            whenever(getVideoRecentlyWatchedUseCase()).thenReturn(testVideoNodes)
-
-            testScheduler.advanceUntilIdle()
-            underTest.setCurrentDestinationRoute(videoRecentlyWatchedRoute)
-
-            underTest.state.drop(2).test {
-                fakeMonitorNodeUpdatesFlow.emit(NodeUpdate(emptyMap()))
-                assertThat(awaitItem().groupedVideoRecentlyWatchedItems).isEqualTo(
-                    expectedRecentlyWatchedItems
-                )
                 cancelAndIgnoreRemainingEvents()
             }
         }

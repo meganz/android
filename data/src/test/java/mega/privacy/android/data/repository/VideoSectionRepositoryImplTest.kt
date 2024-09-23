@@ -641,7 +641,7 @@ class VideoSectionRepositoryImplTest {
         }
 
     @Test
-    fun `test that saveVideoRecentlyWatched function is invoked with the correct parameters`() =
+    fun `test that saveVideoRecentlyWatched function is invoked as expected with migrating the old data`() =
         runTest {
             val testHandle = 12345L
             val testTimestamp = 100000L
@@ -650,102 +650,86 @@ class VideoSectionRepositoryImplTest {
             }
             val addedHandle = 54321L
             val addedTimestamp = 200000L
-            val testJsonString = Json.encodeToString(testVideoRecentlyWatchedData)
             val addedRecentlyWatchedItem = VideoRecentlyWatchedItem(addedHandle, addedTimestamp)
-            testVideoRecentlyWatchedData.add(addedRecentlyWatchedItem)
-            val newJsonString = Json.encodeToString(testVideoRecentlyWatchedData)
-            initUnderTest()
+            val jsonString = Json.encodeToString(testVideoRecentlyWatchedData)
             whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull())).thenReturn(
-                flowOf(testJsonString)
+                flowOf(jsonString)
             )
-            whenever(videoRecentlyWatchedItemMapper(addedHandle, addedTimestamp)).thenReturn(
+            whenever(videoRecentlyWatchedItemMapper(anyOrNull(), anyOrNull())).thenReturn(
                 addedRecentlyWatchedItem
             )
+            initUnderTest()
             underTest.saveVideoRecentlyWatched(addedHandle, addedTimestamp)
+            verify(megaLocalRoomGateway).saveRecentlyWatchedVideos(testVideoRecentlyWatchedData)
             verify(appPreferencesGateway).putString(
                 "PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS",
-                newJsonString
+                Json.encodeToString(emptyList<VideoRecentlyWatchedItem>())
             )
+            verify(megaLocalRoomGateway).saveRecentlyWatchedVideo(addedRecentlyWatchedItem)
         }
 
     @Test
-    fun `test that saveVideoRecentlyWatched function updated the existing value when added video node is existing`() =
+    fun `test that getRecentlyWatchedVideoNodes returns the correct result with migrating the old data`() =
         runTest {
             val testHandle = 12345L
             val testTimestamp = 100000L
             val testVideoRecentlyWatchedData = mutableListOf<VideoRecentlyWatchedItem>().apply {
                 add(VideoRecentlyWatchedItem(testHandle, testTimestamp))
             }
-            val addedHandle = 12345L
-            val addedTimestamp = 200000L
-            val testJsonString = Json.encodeToString(testVideoRecentlyWatchedData)
-            val addedRecentlyWatchedItem = VideoRecentlyWatchedItem(addedHandle, addedTimestamp)
-            testVideoRecentlyWatchedData[0] = addedRecentlyWatchedItem
-            val newJsonString = Json.encodeToString(testVideoRecentlyWatchedData)
+            val jsonString = Json.encodeToString(testVideoRecentlyWatchedData)
+            whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull())).thenReturn(
+                flowOf(jsonString)
+            )
+            val testHandles = listOf(12345L, 23456L, 34567L)
+            val testTimestamps = listOf(100000L, 200000L, 300000L)
+
+            val testItems = testHandles.mapIndexed { index, handle ->
+                VideoRecentlyWatchedItem(
+                    handle, testTimestamps[index]
+                )
+            }
+
+            val testMegaNodes = testHandles.map { handle ->
+                initMegaNode(handle)
+            }
+            val testFileNodes = testHandles.map {
+                mock<TypedFileNode>()
+            }
+            val testTypedVideoNodes = testHandles.mapIndexed { index, handle ->
+                initTypedVideoNode(handle, testTimestamps[index])
+            }
+            testMegaNodes.mapIndexed { index, node ->
+                whenever(megaApiGateway.getMegaNodeByHandle(node.handle)).thenReturn(node)
+                whenever(fileNodeMapper(node, false, null)).thenReturn(testFileNodes[index])
+                whenever(
+                    typedVideoNodeMapper(
+                        fileNode = testFileNodes[index],
+                        duration = 100,
+                        watchedTimestamp = testTimestamps[index]
+                    )
+                )
+                    .thenReturn(testTypedVideoNodes[index])
+            }
+
             initUnderTest()
             whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull())).thenReturn(
-                flowOf(testJsonString)
+                flowOf(jsonString)
             )
-            whenever(videoRecentlyWatchedItemMapper(addedHandle, addedTimestamp)).thenReturn(
-                addedRecentlyWatchedItem
-            )
-            underTest.saveVideoRecentlyWatched(addedHandle, addedTimestamp)
+            whenever(megaLocalRoomGateway.getAllRecentlyWatchedVideos()).thenReturn(flowOf(testItems))
+            whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(emptyList())
+
+            val actual = underTest.getRecentlyWatchedVideoNodes()
+            verify(megaLocalRoomGateway).saveRecentlyWatchedVideos(testVideoRecentlyWatchedData)
             verify(appPreferencesGateway).putString(
                 "PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS",
-                newJsonString
+                Json.encodeToString(emptyList<VideoRecentlyWatchedItem>())
             )
+            assertThat(actual.isNotEmpty()).isTrue()
+            assertThat(actual.size).isEqualTo(3)
+            testTimestamps.sortedByDescending { it }.mapIndexed { index, expectedTimestamp ->
+                assertThat(actual[index].watchedTimestamp).isEqualTo(expectedTimestamp)
+            }
         }
-
-    @Test
-    fun `test that getRecentlyWatchedVideoNodes returns the correct result`() = runTest {
-        val testHandles = listOf(12345L, 23456L, 34567L)
-        val testTimestamps = listOf(100000L, 200000L, 300000L)
-        val testVideoRecentlyWatchedData = mutableListOf<VideoRecentlyWatchedItem>()
-        testHandles.mapIndexed { index, handle ->
-            testVideoRecentlyWatchedData.add(
-                VideoRecentlyWatchedItem(
-                    handle,
-                    testTimestamps[index]
-                )
-            )
-        }
-        val testJsonString = Json.encodeToString(testVideoRecentlyWatchedData)
-
-        val testMegaNodes = testHandles.map { handle ->
-            initMegaNode(handle)
-        }
-        val testFileNodes = testHandles.map {
-            mock<TypedFileNode>()
-        }
-        val testTypedVideoNodes = testHandles.mapIndexed { index, handle ->
-            initTypedVideoNode(handle, testTimestamps[index])
-        }
-        testMegaNodes.mapIndexed { index, node ->
-            whenever(megaApiGateway.getMegaNodeByHandle(node.handle)).thenReturn(node)
-            whenever(fileNodeMapper(node, false, null)).thenReturn(testFileNodes[index])
-            whenever(
-                typedVideoNodeMapper(
-                    fileNode = testFileNodes[index],
-                    duration = 100,
-                    watchedTimestamp = testTimestamps[index]
-                )
-            )
-                .thenReturn(testTypedVideoNodes[index])
-        }
-
-        initUnderTest()
-        whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull())).thenReturn(
-            flowOf(testJsonString)
-        )
-        whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(emptyList())
-
-        val actual = underTest.getRecentlyWatchedVideoNodes()
-        assertThat(actual.isNotEmpty()).isTrue()
-        assertThat(actual.size).isEqualTo(3)
-        testTimestamps.sortedByDescending { it }.mapIndexed { index, expectedTimestamp ->
-            assertThat(actual[index].watchedTimestamp).isEqualTo(expectedTimestamp)
-        }
-    }
 
     private fun initMegaNode(nodeHandle: Long) = mock<MegaNode> {
         on { handle }.thenReturn(nodeHandle)
@@ -761,35 +745,14 @@ class VideoSectionRepositoryImplTest {
     @Test
     fun `test that clearRecentlyWatchedVideos function is invoked as expected`() = runTest {
         underTest.clearRecentlyWatchedVideos()
-        val jsonString = Json.encodeToString(emptyList<VideoRecentlyWatchedItem>())
-        verify(appPreferencesGateway).putString(
-            "PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS",
-            jsonString
-        )
+        verify(megaLocalRoomGateway).clearRecentlyWatchedVideos()
     }
 
     @Test
-    fun `test that removeRecentlyWatchedItem function is invoked with the correct parameters`() =
+    fun `test that removeRecentlyWatchedItem function is invoked as expected`() =
         runTest {
-            val testHandle = 12345L
-            val testTimestamp = 100000L
-            val testRecentlyWatchedItem = VideoRecentlyWatchedItem(testHandle, testTimestamp)
-            val addedHandle = 54321L
-            val addedTimestamp = 200000L
-            val addedRecentlyWatchedItem = VideoRecentlyWatchedItem(addedHandle, addedTimestamp)
-            val testVideoRecentlyWatchedData =
-                mutableListOf(addedRecentlyWatchedItem, testRecentlyWatchedItem)
-            val testJsonString = Json.encodeToString(testVideoRecentlyWatchedData)
-            initUnderTest()
-            whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull())).thenReturn(
-                flowOf(testJsonString)
-            )
-            testVideoRecentlyWatchedData.removeAll { it.videoHandle == addedHandle }
-            val expectedJson = Json.encodeToString(testVideoRecentlyWatchedData)
-            underTest.removeRecentlyWatchedItem(addedHandle)
-            verify(appPreferencesGateway).putString(
-                "PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS",
-                expectedJson
-            )
+            val testHandle = 123456L
+            underTest.removeRecentlyWatchedItem(testHandle)
+            verify(megaLocalRoomGateway).removeRecentlyWatchedVideo(testHandle)
         }
 }

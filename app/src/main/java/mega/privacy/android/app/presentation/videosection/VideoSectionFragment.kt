@@ -22,6 +22,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -41,6 +43,7 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenu
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionFeatureScreen
+import mega.privacy.android.app.presentation.videosection.view.recentlywatched.videoRecentlyWatchedRoute
 import mega.privacy.android.app.presentation.videosection.view.videoSectionRoute
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.Constants.ORDER_VIDEO_PLAYLIST
@@ -227,6 +230,7 @@ class VideoSectionFragment : Fragment() {
     /**
      * onViewCreated
      */
+    @OptIn(FlowPreview::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         (activity as? ManagerActivity)?.let { managerActivity ->
             managerActivity.supportActionBar?.hide()
@@ -236,11 +240,15 @@ class VideoSectionFragment : Fragment() {
         }
 
         viewLifecycleOwner.collectFlow(
-            videoSectionViewModel.state.map { it.isPendingRefresh }.distinctUntilChanged()
+            videoSectionViewModel.state.map { it.isPendingRefresh }.debounce(500L)
+                .distinctUntilChanged()
         ) { isPendingRefresh ->
             if (isPendingRefresh) {
                 with(videoSectionViewModel) {
                     refreshNodes()
+                    if (state.value.currentDestinationRoute == videoRecentlyWatchedRoute) {
+                        loadRecentlyWatchedVideos()
+                    }
                     markHandledPendingRefresh()
                 }
             }

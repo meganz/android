@@ -28,6 +28,7 @@ import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.dao.TypedMessageDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
+import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import net.sqlcipher.database.SupportFactory
 import timber.log.Timber
 import java.io.File
@@ -204,5 +205,10 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideTypedMessageRequestDao(chatDatabase: ChatDatabase): TypedMessageDao =
         chatDatabase.typedMessageDao()
+
+    @Provides
+    @Singleton
+    internal fun provideVideoRecentlyWatchedDao(database: MegaDatabase): VideoRecentlyWatchedDao =
+        database.videoRecentlyWatchedDao()
 
 }
