@@ -54,4 +54,10 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
             }
         }
     }
+
+    companion object {
+        const val EXTRA_CLOUD_DRIVE_PARENT_HANDLE = "EXTRA_CLOUD_DRIVE_PARENT_HANDLE"
+        const val EXTRA_SCAN_PDF_URI = "EXTRA_SCAN_PDF_URI"
+        const val EXTRA_SCAN_SOLO_IMAGE_URI = "EXTRA_SCAN_SOLO_IMAGE_URI"
+    }
 }
