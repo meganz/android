@@ -188,6 +188,11 @@ internal class DefaultContactsRepository @Inject constructor(
             .sortList()
     }
 
+    override suspend fun getAllContactsName() = withContext(ioDispatcher) {
+        megaApiGateway.getContacts()
+            .associate { it.email to getUserFullName(it.handle, false) }
+    }
+
     /**
      * Requests last green if the user is not online.
      *

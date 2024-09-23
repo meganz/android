@@ -80,6 +80,13 @@ interface ContactsRepository {
     suspend fun getVisibleContacts(): List<ContactItem>
 
     /**
+     * Gets all contacts name(including unknown, blocked etc) with the cached data, not the updated one.
+     *
+     * @return A map of contact emails and names.
+     */
+    suspend fun getAllContactsName(): Map<String, String>
+
+    /**
      * Gets the updated main data of a contact.
      *
      * @param contactItem [ContactItem] whose data is going to be requested.

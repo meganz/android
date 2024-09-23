@@ -33,6 +33,7 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaPushNotificationSettings
 import nz.mega.sdk.MegaPushNotificationSettingsAndroid
+import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRecentActionBucketList
 import nz.mega.sdk.MegaRecentActionBucketListAndroid
 import nz.mega.sdk.MegaRequest
@@ -87,6 +88,9 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.createSupportTicket(ticketContent, ANDROID_SUPPORT_ISSUE, listener)
     }
+
+    override fun getNodesFromMegaNodeList(nodeList: MegaNodeList): List<MegaNode> =
+        MegaApiJava.nodeListToArray(nodeList)?.toList() ?: emptyList()
 
     override fun startUpload(
         localPath: String,
@@ -749,6 +753,9 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun copyBucketList(bucketList: MegaRecentActionBucketList): MegaRecentActionBucketList =
         MegaRecentActionBucketListAndroid.copy(bucketList)
+
+    override fun copyBucket(bucket: MegaRecentActionBucket): MegaRecentActionBucket =
+        megaApi.copyBucket(bucket)
 
     override fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaError =
         megaApi.checkAccessErrorExtended(node, level)

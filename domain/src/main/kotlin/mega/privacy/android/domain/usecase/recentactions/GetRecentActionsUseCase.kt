@@ -10,16 +10,16 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.sync.withPermit
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.recentactions.NodeInfoForRecentActions
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import mega.privacy.android.domain.usecase.AddNodeType
-import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import javax.inject.Inject
 
 /**
@@ -28,10 +28,10 @@ import javax.inject.Inject
 class GetRecentActionsUseCase @Inject constructor(
     private val recentActionsRepository: RecentActionsRepository,
     private val addNodeType: AddNodeType,
-    private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
-    private val getNodeByIdUseCase: GetNodeByIdUseCase,
-    private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
+    private val getCurrentUserEmail: GetCurrentUserEmail,
+    private val nodeRepository: NodeRepository,
+    private val contactsRepository: ContactsRepository,
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher,
 ) {
 
@@ -41,9 +41,9 @@ class GetRecentActionsUseCase @Inject constructor(
      * @return a list of recent actions
      */
     suspend operator fun invoke(): List<RecentActionBucket> = coroutineScope {
-        val visibleContactsDeferred = async { getVisibleContactsUseCase() }
+        val visibleContactsDeferred = async { contactsRepository.getAllContactsName() }
         val recentActionsDeferred = async { recentActionsRepository.getRecentActions() }
-        val currentUserEmailDeferred = async { getAccountDetailsUseCase(false).email }
+        val currentUserEmailDeferred = async { getCurrentUserEmail(false) }
 
         val visibleContacts = visibleContactsDeferred.await()
         val currentUserEmail = currentUserEmailDeferred.await()
@@ -63,19 +63,30 @@ class GetRecentActionsUseCase @Inject constructor(
                         val typedNodes = bucket.nodes.map { node ->
                             addNodeType(node)
                         }.filterIsInstance<TypedFileNode>()
-                        val userName =
-                            visibleContacts.find {
-                                bucket.userEmail == it.email
-                            }?.contactData?.fullName.orEmpty()
+                        val userName = visibleContacts[bucket.userEmail] ?: bucket.userEmail
                         val currentUserIsOwner = currentUserEmail == bucket.userEmail
-                        val parentNode = getNodeByIdUseCase(bucket.parentNodeId)
-                        val sharesType = if (parentNode == null) {
+                        val parentNodeInfo =
+                            recentActionsRepository.getNodeInfo(bucket.parentNodeId)
+                        val nodeAccessLevel = nodeRepository.getNodeAccessPermission(
+                            nodeId = typedNodes.first().id
+                        )
+                        val sharesType = if (parentNodeInfo == null) {
                             RecentActionsSharesType.NONE
-                        } else {
-                            mutex.withLock {
-                                sharesTypeCache.getOrPut(parentNode.id.longValue) {
-                                    getParentSharesType(parentNode)
+                        } else if (currentUserIsOwner) {
+                            if (nodeAccessLevel == AccessPermission.OWNER) {
+                                mutex.withLock {
+                                    sharesTypeCache.getOrPut(parentNodeInfo.id.longValue) {
+                                        getParentSharesType(parentNodeInfo)
+                                    }
                                 }
+                            } else {
+                                RecentActionsSharesType.INCOMING_SHARES
+                            }
+                        } else {
+                            if (nodeAccessLevel == AccessPermission.OWNER) {
+                                RecentActionsSharesType.OUTGOING_SHARES
+                            } else {
+                                RecentActionsSharesType.INCOMING_SHARES
                             }
                         }
                         val isNodeKeyVerified =
@@ -86,7 +97,6 @@ class GetRecentActionsUseCase @Inject constructor(
                                             areCredentialsVerified(bucket.userEmail)
                                         }
                                     }
-
                         RecentActionBucket(
                             timestamp = bucket.timestamp,
                             userEmail = bucket.userEmail,
@@ -95,7 +105,7 @@ class GetRecentActionsUseCase @Inject constructor(
                             isMedia = bucket.isMedia,
                             nodes = typedNodes,
                             userName = userName,
-                            parentFolderName = parentNode?.name.orEmpty(),
+                            parentFolderName = parentNodeInfo?.name.orEmpty(),
                             parentFolderSharesType = sharesType,
                             currentUserIsOwner = currentUserIsOwner,
                             isKeyVerified = isNodeKeyVerified,
@@ -119,15 +129,14 @@ class GetRecentActionsUseCase @Inject constructor(
      * @param node
      * @return the shares type
      */
-    private suspend fun getParentSharesType(node: TypedNode?): RecentActionsSharesType {
-        return if (node is FolderNode) {
+    private suspend fun getParentSharesType(node: NodeInfoForRecentActions?): RecentActionsSharesType {
+        return if (node?.isFolder == true) {
             when {
                 node.isIncomingShare -> RecentActionsSharesType.INCOMING_SHARES
-                node.isShared -> RecentActionsSharesType.OUTGOING_SHARES
+                node.isOutgoingShare -> RecentActionsSharesType.OUTGOING_SHARES
                 node.isPendingShare -> RecentActionsSharesType.PENDING_OUTGOING_SHARES
                 else -> {
-                    val parentNode = getNodeByIdUseCase(node.parentId)
-                    getParentSharesType(parentNode)
+                    getParentSharesType(recentActionsRepository.getNodeInfo(node.parentId))
                 }
             }
         } else {

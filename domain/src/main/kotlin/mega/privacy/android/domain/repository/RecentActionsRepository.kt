@@ -1,6 +1,8 @@
 package mega.privacy.android.domain.repository
 
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.recentactions.NodeInfoForRecentActions
 
 
 /**
@@ -17,4 +19,12 @@ interface RecentActionsRepository {
      * @return a list of recent actions.
      */
     suspend fun getRecentActions(): List<RecentActionBucketUnTyped>
+
+    /**
+     * Gets the node info required for recent action only
+     *
+     * @param nodeId [NodeId]
+     * @return [NodeInfoForRecentActions]
+     */
+    suspend fun getNodeInfo(nodeId: NodeId): NodeInfoForRecentActions?
 }
