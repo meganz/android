@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -136,7 +137,10 @@ internal class SyncNewFolderViewModelTest {
         })
         whenever(
             syncFolderPairUseCase.invoke(
-                name = remoteFolder.name, localPath = "", remotePath = remoteFolder
+                syncType = SyncType.TYPE_TWOWAY,
+                name = remoteFolder.name,
+                localPath = "",
+                remotePath = remoteFolder,
             )
         ).thenReturn(true)
         val state = SyncNewFolderState(
@@ -147,9 +151,10 @@ internal class SyncNewFolderViewModelTest {
         underTest.handleAction(SyncNewFolderAction.NextClicked)
 
         verify(syncFolderPairUseCase).invoke(
+            syncType = SyncType.TYPE_TWOWAY,
             name = remoteFolder.name,
             localPath = state.selectedLocalFolder,
-            remotePath = remoteFolder
+            remotePath = remoteFolder,
         )
         assertThat(underTest.state.value.openSyncListScreen).isEqualTo(triggered)
     }

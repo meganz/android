@@ -5,6 +5,7 @@ import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaSync
+import nz.mega.sdk.MegaSync.SyncType
 import nz.mega.sdk.MegaSyncList
 import nz.mega.sdk.MegaSyncStallList
 import nz.mega.sdk.MegaSyncStats
@@ -22,13 +23,14 @@ internal interface SyncGateway {
     /**
      * Creates a new folder pair between localPath and MEGA folder
      *
+     * @param syncType - sync type of the folder pair
      * @param name - name of the folder pair
      * @param localPath - local path on the device
      * @param remoteFolderId - MEGA folder handle
-     * @return Boolean - indicates whether the folder was set up
-     * successfully or not
+     * @return Boolean - indicates whether the folder was set up successfully or not
      */
     suspend fun syncFolderPair(
+        syncType: SyncType,
         name: String?,
         localPath: String,
         remoteFolderId: Long

@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.data.repository
 
-import androidx.work.NetworkType
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -17,8 +16,10 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.backup.SyncErrorMapper
+import mega.privacy.android.data.mapper.sync.SyncTypeMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.exception.MegaSyncException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -45,6 +46,7 @@ internal class SyncRepositoryImpl @Inject constructor(
     private val folderPairMapper: FolderPairMapper,
     private val stalledIssuesMapper: StalledIssuesMapper,
     private val syncErrorMapper: SyncErrorMapper,
+    private val syncTypeMapper: SyncTypeMapper,
     private val syncByWifiToNetworkTypeMapper: SyncByWifiToNetworkTypeMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val appScope: CoroutineScope,
@@ -53,11 +55,17 @@ internal class SyncRepositoryImpl @Inject constructor(
     private val _refreshShow = MutableSharedFlow<Unit>()
 
     override suspend fun setupFolderPair(
+        syncType: SyncType,
         name: String?,
         localPath: String,
         remoteFolderId: Long,
     ): Boolean = withContext(ioDispatcher) {
-        syncGateway.syncFolderPair(name, localPath, remoteFolderId)
+        syncGateway.syncFolderPair(
+            syncType = syncTypeMapper(syncType),
+            name = name,
+            localPath = localPath,
+            remoteFolderId = remoteFolderId
+        )
     }
 
     override suspend fun pauseSync(folderPairId: Long) = withContext(ioDispatcher) {

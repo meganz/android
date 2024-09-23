@@ -10,9 +10,11 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.backup.SyncErrorMapper
+import mega.privacy.android.data.mapper.sync.SyncTypeMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.MegaSyncException
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
@@ -25,17 +27,22 @@ import mega.privacy.android.feature.sync.data.mapper.stalledissue.StalledIssuesM
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaSyncList
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertAll
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.stream.Stream
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -51,6 +58,7 @@ class SyncRepositoryImplTest {
         StalledIssueTypeMapper()
     )
     private val syncErrorMapper: SyncErrorMapper = mock()
+    private val syncTypeMapper: SyncTypeMapper = mock()
 
     private val fakeGlobalUpdatesFlow = MutableSharedFlow<GlobalUpdate>()
     private val fakeSyncUpdatesFlow = MutableSharedFlow<MegaSyncListenerEvent>()
@@ -72,6 +80,7 @@ class SyncRepositoryImplTest {
             stalledIssuesMapper = stalledIssuesMapper,
             ioDispatcher = unconfinedTestDispatcher,
             syncErrorMapper = syncErrorMapper,
+            syncTypeMapper = syncTypeMapper,
             syncWorkManagerGateway = syncWorkManagerGateway,
             syncByWifiToNetworkTypeMapper = syncByWifiToNetworkTypeMapper,
             appScope = testScope,
@@ -87,10 +96,25 @@ class SyncRepositoryImplTest {
         )
     }
 
-    @Test
-    fun `test that setupFolderPair invokes gateway syncFolderPair method`() = runTest {
-        underTest.setupFolderPair("name", "localPath", 123)
-        verify(syncGateway).syncFolderPair("name", "localPath", 123)
+    @ParameterizedTest(name = " if sync type is {0}")
+    @MethodSource("provideSyncTypeMapperParametersDirect")
+    fun `test that setupFolderPair invokes gateway syncFolderPair method`(
+        syncTypeMapperOriginValue: SyncType,
+        syncTypeMapperResultValue: MegaSync.SyncType
+    ) = runTest {
+        whenever(syncTypeMapper(syncTypeMapperOriginValue)).thenReturn(syncTypeMapperResultValue)
+        underTest.setupFolderPair(
+            syncType = syncTypeMapperOriginValue,
+            name = "name",
+            localPath = "localPath",
+            remoteFolderId = 123,
+        )
+        verify(syncGateway).syncFolderPair(
+            syncType = syncTypeMapperResultValue,
+            name = "name",
+            localPath = "localPath",
+            remoteFolderId = 123,
+        )
     }
 
     @Test
@@ -171,4 +195,10 @@ class SyncRepositoryImplTest {
         underTest.stopSyncWorker()
         verify(syncWorkManagerGateway).cancelSyncWorkerRequest()
     }
+
+    private fun provideSyncTypeMapperParametersDirect(): Stream<Arguments> = Stream.of(
+        Arguments.of(SyncType.TYPE_TWOWAY, MegaSync.SyncType.TYPE_TWOWAY),
+        Arguments.of(SyncType.TYPE_BACKUP, MegaSync.SyncType.TYPE_BACKUP),
+        Arguments.of(SyncType.TYPE_UNKNOWN, MegaSync.SyncType.TYPE_UNKNOWN),
+    )
 }

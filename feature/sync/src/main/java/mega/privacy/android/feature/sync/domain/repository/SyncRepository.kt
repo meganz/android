@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.exception.MegaSyncException
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
@@ -15,8 +16,19 @@ interface SyncRepository {
 
     /**
      * Establishes a pair between local and remote directories and starts the syncing process
+     *
+     * @param syncType - sync type of the folder pair
+     * @param name - name of the folder pair
+     * @param localPath - local path on the device
+     * @param remoteFolderId - MEGA folder handle
+     * @return Boolean - indicates whether the folder was set up successfully or not
      */
-    suspend fun setupFolderPair(name: String?, localPath: String, remoteFolderId: Long): Boolean
+    suspend fun setupFolderPair(
+        syncType: SyncType,
+        name: String?,
+        localPath: String,
+        remoteFolderId: Long,
+    ): Boolean
 
     /**
      * Returns all setup folder pairs.

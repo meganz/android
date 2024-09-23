@@ -19,6 +19,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaSync
+import nz.mega.sdk.MegaSync.SyncType
 import nz.mega.sdk.MegaSyncList
 import nz.mega.sdk.MegaSyncStallList
 import nz.mega.sdk.MegaSyncStats
@@ -58,6 +59,7 @@ internal class SyncGatewayImpl @Inject constructor(
     private var stalledIssuesListener: StalledIssuesReceiver? = null
 
     override suspend fun syncFolderPair(
+        syncType: SyncType,
         name: String?,
         localPath: String,
         remoteFolderId: Long,
@@ -73,7 +75,7 @@ internal class SyncGatewayImpl @Inject constructor(
                 }
             )
             megaApi.syncFolder(
-                MegaSync.SyncType.TYPE_TWOWAY,
+                syncType,
                 localPath,
                 name,
                 remoteFolderId,
@@ -116,8 +118,8 @@ internal class SyncGatewayImpl @Inject constructor(
     }
 
     override suspend fun getSyncStalledIssues(): MegaSyncStallList? {
-        if (megaApi.isSyncStalled) {
-            return suspendCancellableCoroutine { continuation ->
+        return if (megaApi.isSyncStalled) {
+            suspendCancellableCoroutine { continuation ->
                 stalledIssuesListener = StalledIssuesReceiver { megaSyncStallList ->
                     megaApi.removeRequestListener(stalledIssuesListener)
                     stalledIssuesListener = null
@@ -126,7 +128,7 @@ internal class SyncGatewayImpl @Inject constructor(
                 megaApi.requestMegaSyncStallList(stalledIssuesListener)
             }
         } else {
-            return null
+            null
         }
     }
 

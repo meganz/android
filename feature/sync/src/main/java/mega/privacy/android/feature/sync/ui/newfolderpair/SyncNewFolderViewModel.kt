@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
@@ -75,6 +76,7 @@ internal class SyncNewFolderViewModel @Inject constructor(
                         else -> {
                             state.value.selectedMegaFolder?.let { remoteFolder ->
                                 syncFolderPairUseCase(
+                                    syncType = SyncType.TYPE_TWOWAY,
                                     name = remoteFolder.name,
                                     localPath = state.value.selectedLocalFolder,
                                     remotePath = remoteFolder,
