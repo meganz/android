@@ -467,13 +467,25 @@ internal class FileFacade @Inject constructor(
 
                         cursor.moveToFirst()
                         cursor.getColumnIndex(DATE_MODIFIED).takeIf { it != -1 }?.let { index ->
+                            /* As MediaStore documentation states, the date is in seconds.
+                            As we work with this property using milliseconds, we need to convert it. */
                             lastModified = cursor.getLong(index) * 1000
                         } ?: cursor.getColumnIndex(DATE_ADDED).takeIf { it != -1 }?.let { index ->
+                            /* As MediaStore documentation states, the date is in seconds.
+                            As we work with this property using milliseconds, we need to convert it. */
                             lastModified = cursor.getLong(index) * 1000
                         } ?: cursor.getColumnIndex(DATE_TAKEN).takeIf { it != -1 }?.let { index ->
                             lastModified = cursor.getLong(index)
                         }
 
+                        if (lastModified > (System.currentTimeMillis() * 10)) {
+                            /* Some OS does not follow MediaStore documentation and implements the values using
+                            their own units. This ensures we set the date to the correct value in case the OS
+                            does not follow it. */
+                            lastModified /= 1000
+                        }
+
+                        Timber.d("Last modified: %s", lastModified);
                         lastModified
                     } ?: 0
             } ?: 0

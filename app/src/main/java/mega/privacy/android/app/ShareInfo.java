@@ -491,12 +491,16 @@ public class ShareInfo implements Serializable {
         }
         int lastModifiedIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED);
         if (lastModifiedIndex != -1) {
+                /* As MediaStore documentation states, the date is in seconds.
+                As we work with this property using milliseconds, we need to convert it. */
             this.lastModified = cursor.getLong(lastModifiedIndex) * 1000;
         }
 
         if (lastModified == 0) {
             lastModifiedIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED);
             if (lastModifiedIndex != -1) {
+                /* As MediaStore documentation states, the date is in seconds.
+                As we work with this property using milliseconds, we need to convert it. */
                 this.lastModified = cursor.getLong(lastModifiedIndex) * 1000;
             }
         }
@@ -507,6 +511,15 @@ public class ShareInfo implements Serializable {
                 this.lastModified = cursor.getLong(lastModifiedIndex);
             }
         }
+
+        if (lastModified != 0 && lastModified > (System.currentTimeMillis() * 10)) {
+            /* Some OS does not follow MediaStore documentation and implements the values using
+            their own units. This ensures we set the date to the correct value in case the OS
+            does not follow it. */
+            lastModified /= 1000;
+        }
+
+        Timber.d("Last modified: %s", lastModified);
 
         if (size == -1 || inputStream == null) {
             Timber.d("Keep going");
