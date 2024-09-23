@@ -50,7 +50,7 @@ internal fun NavGraphBuilder.passCodeSettings(
             state = uiState,
             onDisablePasscode = viewModel::disablePasscode,
             onDisableBiometrics = viewModel::disableBiometrics,
-            navigateToChangePasscode = { launcher.launch(false) },
+            navigateToSetOrChangePasscode = launcher::launch,
             navigateToSelectTimeout = navigateToSelectTimeout,
             hasBiometricCapability = hasBiometricCapability,
             authenticateBiometrics = { onSuccess, onComplete ->
