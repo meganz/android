@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.original.core.ui.controls.appbar
 
+import android.os.Build
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -10,8 +11,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
@@ -287,8 +290,8 @@ internal fun BaseMegaAppBar(
     val backgroundColor by animateColorAsState(targetValue =
         (if (elevation == 0.dp) MegaOriginalTheme.colors.background.pageBackground else MegaOriginalTheme.colors.background.surface1)
             .copy(LocalMegaAppBarColors.current.backgroundAlpha))
-    //set the status bar color to match toolbar color
-    if (!LocalView.current.isInEditMode) {
+    // set the status bar color to match toolbar color, it has no effect on android 15
+    if (!LocalView.current.isInEditMode && Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
         val systemUiController = rememberSystemUiController()
         DisposableEffect(systemUiController, backgroundColor) {
             systemUiController.setStatusBarColor(
@@ -299,6 +302,7 @@ internal fun BaseMegaAppBar(
     }
     TopAppBar(
         title = titleAndSubtitle,
+        windowInsets = WindowInsets.systemBars,
         backgroundColor = backgroundColor,
         modifier = modifier.testTag(TEST_TAG_APP_BAR),
         navigationIcon = appBarType.takeIf { it != AppBarType.NONE }?.composeLet {
