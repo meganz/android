@@ -67,7 +67,6 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
 ) : VideoSectionRepository {
     private val videoPlaylistsMap: MutableMap<Long, UserSet> = mutableMapOf()
     private val videoSetsMap: MutableMap<NodeId, MutableSet<Long>> = mutableMapOf()
-    private val recentlyWatchedVideosData = mutableListOf<VideoRecentlyWatchedItem>()
 
     override suspend fun getAllVideos(order: SortOrder): List<TypedVideoNode> =
         withContext(ioDispatcher) {
@@ -305,44 +304,39 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
 
     override suspend fun getVideoPlaylistSets(): List<UserSet> = getAllUserSets()
 
-    override suspend fun saveVideoRecentlyWatched(handle: Long, timestamp: Long) {
-        initVideoRecentlyWatchedData()
-        recentlyWatchedVideosData.indexOfFirst { it.videoHandle == handle }.let { index ->
-            if (index == -1) {
-                recentlyWatchedVideosData.add(videoRecentlyWatchedItemMapper(handle, timestamp))
-            } else {
-                recentlyWatchedVideosData[index] =
-                    recentlyWatchedVideosData[index].copy(watchedTimestamp = timestamp)
-            }
-
-            appPreferencesGateway.putString(
-                PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS,
-                Json.encodeToString(recentlyWatchedVideosData)
+    override suspend fun saveVideoRecentlyWatched(handle: Long, timestamp: Long) =
+        withContext(ioDispatcher) {
+            migrateOldDataToDatabase()
+            megaLocalRoomGateway.saveRecentlyWatchedVideo(
+                videoRecentlyWatchedItemMapper(
+                    handle,
+                    timestamp
+                )
             )
         }
-    }
 
-    private suspend fun initVideoRecentlyWatchedData() {
-        if (recentlyWatchedVideosData.isEmpty()) {
-            getRecentlyWatchedData()?.let {
-                recentlyWatchedVideosData.addAll(it)
+    private suspend fun migrateOldDataToDatabase() = withContext(ioDispatcher) {
+        val items: List<VideoRecentlyWatchedItem>? =
+            appPreferencesGateway.monitorString(
+                PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS,
+                null
+            ).firstOrNull()?.let { jsonString ->
+                Json.decodeFromString(jsonString)
             }
-        }
-    }
+        if (items.isNullOrEmpty()) return@withContext
 
-    private suspend fun getRecentlyWatchedData(): List<VideoRecentlyWatchedItem>? =
-        appPreferencesGateway.monitorString(
+        megaLocalRoomGateway.saveRecentlyWatchedVideos(items)
+
+        appPreferencesGateway.putString(
             PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS,
-            null
-        ).firstOrNull()?.let { jsonString ->
-            Json.decodeFromString(jsonString)
-        }
+            Json.encodeToString(emptyList<VideoRecentlyWatchedItem>())
+        )
+    }
 
     override suspend fun getRecentlyWatchedVideoNodes(): List<TypedVideoNode> =
         withContext(ioDispatcher) {
-            initVideoRecentlyWatchedData()
             val offlineItems = getAllOfflineNodeHandle()
-            recentlyWatchedVideosData.mapNotNull { item ->
+            getRecentlyWatchedData()?.mapNotNull { item ->
                 megaApiGateway.getMegaNodeByHandle(item.videoHandle)?.let { megaNode ->
                     typedVideoNodeMapper(
                         fileNode = megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()]),
@@ -350,28 +344,24 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                         watchedTimestamp = item.watchedTimestamp
                     )
                 }
-            }.sortedByDescending { it.watchedTimestamp }
+            }?.sortedByDescending { it.watchedTimestamp } ?: emptyList()
         }
 
-    override suspend fun clearRecentlyWatchedVideos() = withContext(ioDispatcher) {
-        recentlyWatchedVideosData.clear()
-        appPreferencesGateway.putString(
-            PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS,
-            Json.encodeToString(recentlyWatchedVideosData)
-        )
+    private suspend fun getRecentlyWatchedData(): List<VideoRecentlyWatchedItem>? {
+        migrateOldDataToDatabase()
+        return megaLocalRoomGateway.getAllRecentlyWatchedVideos().firstOrNull()
     }
 
-    override suspend fun removeRecentlyWatchedItem(handle: Long) {
-        initVideoRecentlyWatchedData()
-        recentlyWatchedVideosData.removeAll { it.videoHandle == handle }
-        appPreferencesGateway.putString(
-            PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS,
-            Json.encodeToString(recentlyWatchedVideosData)
-        )
+    override suspend fun clearRecentlyWatchedVideos() = withContext(ioDispatcher) {
+        megaLocalRoomGateway.clearRecentlyWatchedVideos()
     }
+
+    override suspend fun removeRecentlyWatchedItem(handle: Long) =
+        megaLocalRoomGateway.removeRecentlyWatchedVideo(handle)
 
     companion object {
         private const val PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS =
             "PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS"
     }
 }
+

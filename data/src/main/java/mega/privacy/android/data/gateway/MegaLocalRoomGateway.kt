@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Offline
@@ -460,4 +461,37 @@ interface MegaLocalRoomGateway {
      * @param chatPendingChanges [ChatPendingChanges]
      */
     suspend fun setChatPendingChanges(chatPendingChanges: ChatPendingChanges)
+
+    /**
+     * Get all recently watched videos
+     *
+     * @return flow of [VideoRecentlyWatchedItem] list
+     */
+    suspend fun getAllRecentlyWatchedVideos(): Flow<List<VideoRecentlyWatchedItem>>
+
+    /**
+     * Remove recently watched video
+     *
+     * @param handle removed video handle
+     */
+    suspend fun removeRecentlyWatchedVideo(handle: Long)
+
+    /**
+     * Clear recently watched videos
+     */
+    suspend fun clearRecentlyWatchedVideos()
+
+    /**
+     * Save recently watched video
+     *
+     * @param item saved [VideoRecentlyWatchedItem]
+     */
+    suspend fun saveRecentlyWatchedVideo(item: VideoRecentlyWatchedItem)
+
+    /**
+     * Save recently watched videos
+     *
+     * @param items [VideoRecentlyWatchedItem] list
+     */
+    suspend fun saveRecentlyWatchedVideos(items: List<VideoRecentlyWatchedItem>)
 }

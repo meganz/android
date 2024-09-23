@@ -8,7 +8,7 @@ object MegaDatabaseConstant {
     /**
      * Database Version
      */
-    const val DATABASE_VERSION = 89
+    const val DATABASE_VERSION = 90
 
     /**
      * Database Name
@@ -74,4 +74,9 @@ object MegaDatabaseConstant {
      * Passphrase File Name
      */
     const val PASSPHRASE_FILE_NAME = "passphrase.bin"
+
+    /**
+     * Table recently watched video
+     */
+    const val TABLE_RECENTLY_WATCHED_VIDEO = "recentlywatchedvideo"
 }

@@ -14,6 +14,7 @@ import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.SdTransferDao
+import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
 import mega.privacy.android.data.mapper.backup.BackupInfoTypeIntMapper
@@ -32,6 +33,9 @@ import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferLega
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
+import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
+import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
+import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Offline
@@ -75,6 +79,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val chatPendingChangesDao: Lazy<ChatPendingChangesDao>,
     private val chatRoomPendingChangesEntityMapper: ChatRoomPendingChangesEntityMapper,
     private val chatRoomPendingChangesModelMapper: ChatRoomPendingChangesModelMapper,
+    private val videoRecentlyWatchedDao: Lazy<VideoRecentlyWatchedDao>,
+    private val videoRecentlyWatchedEntityMapper: VideoRecentlyWatchedEntityMapper,
+    private val videoRecentlyWatchedItemMapper: VideoRecentlyWatchedItemMapper,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
         contactDao.get().insertOrUpdateContact(contactEntityMapper(contact))
@@ -144,7 +151,8 @@ internal class MegaLocalRoomFacade @Inject constructor(
             }
 
     override suspend fun addCompletedTransfer(transfer: CompletedTransfer) {
-        completedTransferDao.get().insertOrUpdateCompletedTransfer(completedTransferEntityMapper(transfer))
+        completedTransferDao.get()
+            .insertOrUpdateCompletedTransfer(completedTransferEntityMapper(transfer))
     }
 
     override suspend fun addCompletedTransfers(transfers: List<CompletedTransfer>) {
@@ -213,9 +221,10 @@ internal class MegaLocalRoomFacade @Inject constructor(
         activeTransferDao.get().getActiveTransferByTag(tag)
 
     override fun getActiveTransfersByType(transferType: TransferType) =
-        activeTransferDao.get().getActiveTransfersByType(transferType).map { activeTransferEntities ->
-            activeTransferEntities.map { it }
-        }
+        activeTransferDao.get().getActiveTransfersByType(transferType)
+            .map { activeTransferEntities ->
+                activeTransferEntities.map { it }
+            }
 
     override suspend fun getCurrentActiveTransfersByType(transferType: TransferType) =
         activeTransferDao.get().getCurrentActiveTransfersByType(transferType).map { it }
@@ -224,7 +233,8 @@ internal class MegaLocalRoomFacade @Inject constructor(
         activeTransferDao.get().getCurrentActiveTransfers()
 
     override suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer) =
-        activeTransferDao.get().insertOrUpdateActiveTransfer(activeTransferEntityMapper(activeTransfer))
+        activeTransferDao.get()
+            .insertOrUpdateActiveTransfer(activeTransferEntityMapper(activeTransfer))
 
     override suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>) =
         activeTransfers.map { activeTransferEntityMapper(it) }.let { mappedActiveTransfers ->
@@ -237,7 +247,8 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun deleteAllActiveTransfersByType(transferType: TransferType) =
         activeTransferDao.get().deleteAllActiveTransfersByType(transferType)
 
-    override suspend fun deleteAllActiveTransfers() = activeTransferDao.get().deleteAllActiveTransfers()
+    override suspend fun deleteAllActiveTransfers() =
+        activeTransferDao.get().deleteAllActiveTransfers()
 
     override suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>) =
         activeTransferDao.get().setActiveTransferAsFinishedByTag(tags)
@@ -448,6 +459,29 @@ internal class MegaLocalRoomFacade @Inject constructor(
         chatPendingChangesDao.get().upsertChatPendingChanges(
             chatRoomPendingChangesEntityMapper(chatPendingChanges)
         )
+    }
+
+    override suspend fun getAllRecentlyWatchedVideos() =
+        videoRecentlyWatchedDao.get().getAllRecentlyWatchedVideos().map { entities ->
+            entities.map { entity ->
+                videoRecentlyWatchedItemMapper(entity.videoHandle, entity.watchedTimestamp)
+            }
+        }
+
+    override suspend fun removeRecentlyWatchedVideo(handle: Long) =
+        videoRecentlyWatchedDao.get().removeRecentlyWatchedVideo(handle)
+
+    override suspend fun clearRecentlyWatchedVideos() =
+        videoRecentlyWatchedDao.get().clearRecentlyWatchedVideos()
+
+    override suspend fun saveRecentlyWatchedVideo(item: VideoRecentlyWatchedItem) {
+        val entity = videoRecentlyWatchedEntityMapper(item)
+        videoRecentlyWatchedDao.get().insertOrUpdateRecentlyWatchedVideo(entity)
+    }
+
+    override suspend fun saveRecentlyWatchedVideos(items: List<VideoRecentlyWatchedItem>) {
+        val entities = items.map { videoRecentlyWatchedEntityMapper(it) }
+        videoRecentlyWatchedDao.get().insertOrUpdateRecentlyWatchedVideos(entities)
     }
 
     override fun monitorChatPendingChanges(chatId: Long): Flow<ChatPendingChanges?> =
