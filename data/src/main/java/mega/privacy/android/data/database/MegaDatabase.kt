@@ -65,6 +65,7 @@ import timber.log.Timber
         AutoMigration(84, 85),
         AutoMigration(86, 87),
         AutoMigration(87, 88),
+        AutoMigration(88, 89),
         AutoMigration(89, 90),
     ],
 )
