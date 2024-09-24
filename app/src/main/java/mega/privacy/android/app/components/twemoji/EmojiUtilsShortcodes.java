@@ -40,17 +40,6 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
     }
 
     /**
-     * Checks if an Emoji exists for the unicode, short code, decimal or
-     * hexadecimal html entity
-     *
-     * @param code unicode, short code, decimal html entity or hexadecimal html
-     * @return is emoji
-     */
-    public static boolean isEmoji(String code) {
-        return getEmoji(code) != null;
-    }
-
-    /**
      * Converts emoji short codes or html entities in string with emojis
      *
      * @param text String to emojify
@@ -141,57 +130,6 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
     }
 
     /**
-     * Counts valid emojis passed string
-     *
-     * @param text String to count emoji characters in.
-     * @return returns count of emojis
-     */
-    public static int countEmojis(String text) {
-        String htmlifiedText = htmlify(text);
-        // regex to identify html entitities in htmlified text
-        Matcher matcher = htmlEntityPattern.matcher(htmlifiedText);
-
-        int counter = 0;
-        while (matcher.find()) {
-            String emojiCode = matcher.group();
-            if (isEmoji(emojiCode)) {
-                counter++;
-            }
-        }
-        return counter;
-    }
-
-    /**
-     * Converts unicode characters in text to corresponding decimal html
-     * entities
-     *
-     * @param text String to htmlify
-     * @return htmlified String
-     */
-    public static String htmlify(String text) {
-        String emojifiedStr = emojify(text);
-        return htmlifyHelper(emojifiedStr, false, false);
-    }
-
-    public static String htmlify(String text, boolean asSurrogate) {
-        String emojifiedStr = emojify(text);
-        return htmlifyHelper(emojifiedStr, false, asSurrogate);
-    }
-
-    /**
-     * Converts unicode characters in text to corresponding hexadecimal html
-     * entities
-     *
-     * @param text String to hexHtmlify
-     * @return hexadecimal htmlified string
-     */
-    public static String hexHtmlify(String text) {
-        String emojifiedStr = emojify(text);
-        return htmlifyHelper(emojifiedStr, true, false);
-    }
-
-
-    /**
      * Converts emojis, hex, decimal htmls, emoticons in a string to short codes
      *
      * @param text String to shortcodify
@@ -211,18 +149,4 @@ public class EmojiUtilsShortcodes extends AbstractEmoji {
         return emojifiedText;
     }
 
-    /**
-     * Removes all emoji characters from the passed string. This method does not remove html characters, shortcodes.
-     * To remove all shortcodes, html characters, emojify and then pass the emojified string to this method.
-     *
-     * @param emojiText String to remove emoji's from.
-     * @return emoji stripped string
-     */
-    public static String removeAllEmojis(String emojiText) {
-
-        for (EmojiShortcodes emoji : EmojiManagerShortcodes.emojiData) {
-            emojiText = emojiText.replace(emoji.getEmoji(), "");
-        }
-        return emojiText;
-    }
 }
