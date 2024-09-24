@@ -10,9 +10,9 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx3.asFlowable
@@ -26,7 +26,6 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
-import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
@@ -36,9 +35,11 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
+import mega.privacy.android.domain.usecase.call.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallsReconnectingStatusUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastWaitingForOtherParticipantsHasEndedUseCase
+import mega.privacy.android.domain.usecase.meeting.GetParticipantsChangesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -59,7 +60,7 @@ class MonitorCallSoundsUseCase @Inject constructor(
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val monitorCallsReconnectingStatusUseCase: MonitorCallsReconnectingStatusUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
-    private val callsPreferencesGateway: CallsPreferencesGateway,
+    private val getCallsSoundNotifications: GetCallsSoundNotifications,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val amIAloneOnAnyCallUseCase: AmIAloneOnAnyCallUseCase,
@@ -265,31 +266,20 @@ class MonitorCallSoundsUseCase @Inject constructor(
                     }
             }
 
-            getParticipantsChangesUseCase.getChangesFromParticipants()
-                .subscribeBy(
-                    onNext = { result ->
-                        sharingScope.launch {
-                            callsPreferencesGateway
-                                .getCallsSoundNotificationsPreference()
-                                .collectLatest { soundNotifications ->
-                                    val isEnabled =
-                                        soundNotifications == CallsSoundNotifications.Enabled
-                                    if (isEnabled) {
-                                        when (result.typeChange) {
-                                            TYPE_JOIN -> emitter.onNext(CallSoundType.PARTICIPANT_JOINED_CALL)
-                                            TYPE_LEFT -> emitter.onNext(CallSoundType.PARTICIPANT_LEFT_CALL)
-                                        }
-                                    }
-                                    this.cancel()
-                                }
-                        }
+            sharingScope.launch {
+                getParticipantsChangesUseCase()
+                    .collectLatest { result ->
+                        val isEnabled = getCallsSoundNotifications()
+                            .firstOrNull() == CallsSoundNotifications.Enabled
 
-                    },
-                    onError = { error ->
-                        Timber.e(error.stackTraceToString())
+                        if (isEnabled) {
+                            when (result.typeChange) {
+                                TYPE_JOIN -> emitter.onNext(CallSoundType.PARTICIPANT_JOINED_CALL)
+                                TYPE_LEFT -> emitter.onNext(CallSoundType.PARTICIPANT_LEFT_CALL)
+                            }
+                        }
                     }
-                )
-                .addTo(disposable)
+            }
 
             emitter.setCancellable {
                 removeWaitingForOthersCountDownTimer()

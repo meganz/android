@@ -50,7 +50,6 @@ import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.ParticipantsChange
 import mega.privacy.android.app.presentation.meeting.model.ParticipantsChangeType
 import mega.privacy.android.app.usecase.call.AmIAloneOnAnyCallUseCase
-import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
@@ -101,12 +100,13 @@ import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ChatLogoutUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableAudioLevelMonitorUseCase
+import mega.privacy.android.domain.usecase.meeting.GetParticipantsChangesUseCase
 import mega.privacy.android.domain.usecase.meeting.IsAudioLevelMonitorEnabledUseCase
 import mega.privacy.android.domain.usecase.meeting.JoinMeetingAsGuestUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorWaitingForOtherParticipantsHasEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorLocalVideoChangedDueToProximitySensorUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorWaitingForOtherParticipantsHasEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestHighResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.RequestLowResolutionVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
@@ -356,11 +356,11 @@ class InMeetingViewModel @Inject constructor(
             }
         }
 
-        getParticipantsChangesUseCase.getChangesFromParticipants()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { (chatId, typeChange, peers) ->
+        viewModelScope.launch {
+            getParticipantsChangesUseCase()
+                .catch { Timber.e(it) }
+                .collect { (chatId, typeChange, peers) ->
+                    Timber.d("Participants changes collected $chatId $typeChange $peers")
                     if (_state.value.currentChatId == chatId) {
                         state.value.chat?.let { chat ->
                             if (chat.isMeeting || chat.isGroup) {
@@ -368,13 +368,10 @@ class InMeetingViewModel @Inject constructor(
                                     getParticipantChanges(list, typeChange)
                                 }
                             }
-
                         }
                     }
-                },
-                onError = Timber::e
-            )
-            .addTo(composite)
+                }
+        }
 
         amIAloneOnAnyCallUseCase()
             .asFlowable(viewModelScope.coroutineContext)
@@ -978,38 +975,40 @@ class InMeetingViewModel @Inject constructor(
      * @param type Type of change
      */
     private fun getParticipantChanges(list: ArrayList<Long>, type: Int) {
-        val action = when (val numParticipants = list.size) {
-            1 -> { context: Context ->
-                context.getString(
-                    if (type == TYPE_JOIN)
-                        R.string.meeting_call_screen_one_participant_joined_call
-                    else
-                        R.string.meeting_call_screen_one_participant_left_call,
-                    getParticipantName(list.first())
-                )
+        if (list.isNotEmpty()) {
+            val action = when (val numParticipants = list.size) {
+                1 -> { context: Context ->
+                    context.getString(
+                        if (type == TYPE_JOIN)
+                            R.string.meeting_call_screen_one_participant_joined_call
+                        else
+                            R.string.meeting_call_screen_one_participant_left_call,
+                        getParticipantName(list.first())
+                    )
+                }
+
+                2 -> { context: Context ->
+                    context.getString(
+                        if (type == TYPE_JOIN)
+                            R.string.meeting_call_screen_two_participants_joined_call
+                        else
+                            R.string.meeting_call_screen_two_participants_left_call,
+                        getParticipantName(list.first()), getParticipantName(list.last())
+                    )
+                }
+
+                else -> { context: Context ->
+                    context.resources.getQuantityString(
+                        if (type == TYPE_JOIN) R.plurals.meeting_call_screen_more_than_two_participants_joined_call
+                        else
+                            R.plurals.meeting_call_screen_more_than_two_participants_left_call,
+                        numParticipants, getParticipantName(list.first()), (numParticipants - 1)
+                    )
+                }
             }
 
-            2 -> { context: Context ->
-                context.getString(
-                    if (type == TYPE_JOIN)
-                        R.string.meeting_call_screen_two_participants_joined_call
-                    else
-                        R.string.meeting_call_screen_two_participants_left_call,
-                    getParticipantName(list.first()), getParticipantName(list.last())
-                )
-            }
-
-            else -> { context: Context ->
-                context.resources.getQuantityString(
-                    if (type == TYPE_JOIN) R.plurals.meeting_call_screen_more_than_two_participants_joined_call
-                    else
-                        R.plurals.meeting_call_screen_more_than_two_participants_left_call,
-                    numParticipants, getParticipantName(list.first()), (numParticipants - 1)
-                )
-            }
+            _getParticipantsChanges.value = Pair(first = type, second = action)
         }
-
-        _getParticipantsChanges.value = Pair(first = type, second = action)
     }
 
     /**
