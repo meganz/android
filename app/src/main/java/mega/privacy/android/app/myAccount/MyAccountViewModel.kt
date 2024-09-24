@@ -138,7 +138,6 @@ import javax.inject.Inject
  * @property isUrlMatchesRegexUseCase Checks if the URL Matches any of the Regex Patterns provided
  * @property [confirmCancelAccountUseCase] [ConfirmCancelAccountUseCase]
  * @property confirmChangeEmailUseCase
- * @property filePrepareUseCase
  * @property getAccountDetailsUseCase
  * @property getExtendedAccountDetail
  * @property getNumberOfSubscription
@@ -174,7 +173,6 @@ class MyAccountViewModel @Inject constructor(
     private val isUrlMatchesRegexUseCase: IsUrlMatchesRegexUseCase,
     private val confirmCancelAccountUseCase: ConfirmCancelAccountUseCase,
     private val confirmChangeEmailUseCase: ConfirmChangeEmailUseCase,
-    private val filePrepareUseCase: FilePrepareUseCase,
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getNumberOfSubscription: GetNumberOfSubscription,

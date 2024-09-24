@@ -13,7 +13,6 @@ public class Constants {
 
     public static final int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
 
-    public static final int REQUEST_CODE_GET_FILES = 1000;
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_MOVE = 1001;
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_COPY = 1002;
     public static final int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;

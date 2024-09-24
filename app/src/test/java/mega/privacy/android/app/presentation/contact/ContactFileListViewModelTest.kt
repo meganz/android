@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.contact
 
+import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
@@ -13,6 +14,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
@@ -20,13 +22,16 @@ import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -52,6 +57,7 @@ internal class ContactFileListViewModelTest {
     private val moveNodesUseCase: MoveNodesUseCase = mock()
     private val copyNodesUseCase: CopyNodesUseCase = mock()
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase = mock()
+    private val filePrepareUseCase: FilePrepareUseCase = mock()
     private val nodeNameCollision = mock<NodeNameCollision.Default> {
         on { nodeHandle }.thenReturn(2L)
         on { collisionHandle }.thenReturn(123L)
@@ -66,6 +72,11 @@ internal class ContactFileListViewModelTest {
     private val nodes = listOf(1L, 2L)
     private val targetNode = 100L
 
+    @BeforeAll
+    fun setup() {
+        initTestClass()
+    }
+
     @BeforeEach
     fun resetMocks() {
         reset(
@@ -75,7 +86,8 @@ internal class ContactFileListViewModelTest {
             checkNodesNameCollisionUseCase,
             moveNodesUseCase,
             copyNodesUseCase,
-            getNodeContentUriByHandleUseCase
+            getNodeContentUriByHandleUseCase,
+            filePrepareUseCase
         )
     }
 
@@ -87,7 +99,8 @@ internal class ContactFileListViewModelTest {
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
-            getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase
+            getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
+            filePrepareUseCase = filePrepareUseCase
         )
     }
 
@@ -366,4 +379,16 @@ internal class ContactFileListViewModelTest {
             assertThat(actual).isEqualTo(expectedContentUri)
             verify(getNodeContentUriByHandleUseCase).invoke(paramHandle)
         }
+
+    @Test
+    fun `test that prepare file is invoked and returns as expected`() = runTest {
+        val uri = mock<Uri>() {
+            on { toString() } doReturn "uri"
+        }
+        val entity = mock<DocumentEntity>()
+        whenever(filePrepareUseCase(listOf(uri).map { UriPath(it.toString()) }))
+            .thenReturn(listOf(entity))
+        val actual = underTest.prepareFiles(listOf(uri))
+        assertThat(actual).isEqualTo(listOf(entity))
+    }
 }

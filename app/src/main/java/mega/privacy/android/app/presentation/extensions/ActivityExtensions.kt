@@ -34,19 +34,6 @@ fun Activity.changeStatusBarColor(scrolled: Boolean, isDark: Boolean) {
 }
 
 /**
- * Start an [Intent] to select files to be uploaded
- */
-fun Activity.uploadFilesManually() {
-    this.startActivityForResult(
-        Intent.createChooser(
-            Intent(Intent.ACTION_OPEN_DOCUMENT)
-                .putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-                .setType("*/*"), null
-        ), Constants.REQUEST_CODE_GET_FILES
-    )
-}
-
-/**
  * Start an [Intent] to select a folder to be uploaded
  */
 fun Activity.uploadFolderManually() {

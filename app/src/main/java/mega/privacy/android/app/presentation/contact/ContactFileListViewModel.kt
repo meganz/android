@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.contact
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +18,9 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
@@ -40,6 +43,7 @@ class ContactFileListViewModel @Inject constructor(
     private val moveNodesUseCase: MoveNodesUseCase,
     private val copyNodesUseCase: CopyNodesUseCase,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
+    private val filePrepareUseCase: FilePrepareUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ContactFileListUiState())
 
@@ -204,7 +208,10 @@ class ContactFileListViewModel @Inject constructor(
         uploadFiles(pathsAndNames, NodeId(destination))
     }
 
-    private fun uploadFiles(
+    /**
+     * Uploads a list of files to the specified destination.
+     */
+    fun uploadFiles(
         pathsAndNames: Map<String, String?>,
         destinationId: NodeId,
     ) {
@@ -221,6 +228,12 @@ class ContactFileListViewModel @Inject constructor(
     }
 
     internal suspend fun getNodeContentUri(handle: Long) = getNodeContentUriByHandleUseCase(handle)
+
+    /**
+     * Prepare files
+     */
+    suspend fun prepareFiles(uris: List<Uri>) =
+        filePrepareUseCase(uris.map { UriPath(it.toString()) })
 
     /**
      * Consume upload event

@@ -7,6 +7,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
@@ -28,19 +29,15 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE
-import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
@@ -49,7 +46,6 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
-import mega.privacy.android.app.presentation.extensions.uploadFilesManually
 import mega.privacy.android.app.presentation.extensions.uploadFolderManually
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
@@ -67,6 +63,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogS
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
+import mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessFileDialog
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.UploadUtil
 import mega.privacy.android.app.utils.Util
@@ -108,9 +105,6 @@ import javax.inject.Inject
 internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerInterface,
     MegaRequestListenerInterface, UploadBottomSheetDialogActionListener, ActionNodeCallback,
     SnackbarShower {
-
-    @Inject
-    lateinit var filePrepareUseCase: FilePrepareUseCase
 
     @Inject
     lateinit var getNodeByHandleUseCase: GetNodeByHandleUseCase
@@ -193,7 +187,17 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
      * if the Notification Permission is granted or not
      */
     private val manualUploadFilesLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { _: Boolean? -> this.uploadFilesManually() }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { _: Boolean? -> uploadFilesManually() }
+
+    /**
+     * Launch the system file picker to select multiple files
+     */
+    private val openMultipleDocumentLauncher =
+        registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) {
+            if (it.isNotEmpty()) {
+                handleFileUris(it)
+            }
+        }
 
     /**
      * When manually uploading a Folder and the device is running Android 13 and above, this Launcher
@@ -218,7 +222,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             manualUploadFilesLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
-            this.uploadFilesManually()
+            uploadFilesManually()
         }
     }
 
@@ -587,31 +591,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                 targetNode = toHandle,
                 type = NodeNameCollisionType.MOVE
             )
-        } else if (requestCode == Constants.REQUEST_CODE_GET_FILES && resultCode == RESULT_OK) {
-            if (intent == null) {
-                return
-            }
-            intent.action = Intent.ACTION_GET_CONTENT
-            try {
-                statusDialog = createProgressDialog(
-                    this,
-                    resources.getQuantityString(
-                        R.plurals.upload_prepare,
-                        1
-                    )
-                ).also { it.show() }
-            } catch (e: Exception) {
-                return
-            }
-            composite.add(
-                filePrepareUseCase.prepareFiles(intent)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { shareInfo: List<ShareInfo>?, throwable: Throwable? ->
-                        if (throwable == null) {
-                            onIntentProcessed(shareInfo)
-                        }
-                    })
         } else if (requestCode == Constants.REQUEST_CODE_GET_FOLDER) {
             UploadUtil.getFolder(this, resultCode, intent, parentHandle)
         } else if (requestCode == Constants.REQUEST_CODE_GET_FOLDER_CONTENT) {
@@ -681,9 +660,9 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     /**
      * Handle processed upload intent.
      *
-     * @param infos List<ShareInfo> containing all the upload info.
-    </ShareInfo> */
-    private fun onIntentProcessed(infos: List<ShareInfo>?) {
+     * @param infos list of DocumentEntity
+     */
+    private fun onIntentProcessed(infos: List<DocumentEntity>) {
         val parentNode = megaApi.getNodeByHandle(parentHandle)
         if (parentNode == null) {
             dismissAlertDialogIfExists(statusDialog)
@@ -694,7 +673,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             )
             return
         }
-        if (infos == null) {
+        if (infos.isEmpty()) {
             dismissAlertDialogIfExists(statusDialog)
             Util.showErrorAlertDialog(
                 getString(R.string.upload_can_not_open),
@@ -711,14 +690,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         lifecycleScope.launch {
             runCatching {
                 checkFileNameCollisionsUseCase(
-                    files = infos.map {
-                        DocumentEntity(
-                            name = it.originalFileName,
-                            size = it.size,
-                            lastModified = it.lastModified,
-                            uri = UriPath(it.fileAbsolutePath),
-                        )
-                    },
+                    files = infos,
                     parentNodeId = NodeId(parentNode.handle)
                 )
             }.onSuccess { collisions ->
@@ -728,10 +700,14 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                 }
                 val collidedSharesPath = collisions.map { it.path.value }.toSet()
                 val sharesWithoutCollision = infos.filter {
-                    collidedSharesPath.contains(it.fileAbsolutePath).not()
+                    collidedSharesPath.contains(it.uri.value).not()
                 }
                 if (sharesWithoutCollision.isNotEmpty()) {
-                    viewModel.uploadShareInfo(sharesWithoutCollision, parentNode.handle)
+                    viewModel.uploadFiles(
+                        pathsAndNames = sharesWithoutCollision.map { it.uri.value }
+                            .associateWith { null },
+                        destinationId = NodeId(parentNode.handle)
+                    )
                 }
             }.onFailure {
                 dismissAlertDialogIfExists(statusDialog)
@@ -940,6 +916,27 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_contact_file_list, menu)
         return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun handleFileUris(uris: List<Uri>) {
+        lifecycleScope.launch {
+            runCatching {
+                statusDialog = showProcessFileDialog(this@ContactFileListActivity, intent)
+                val documents = viewModel.prepareFiles(uris)
+                onIntentProcessed(documents)
+            }.onFailure {
+                dismissAlertDialogIfExists(statusDialog)
+                Timber.e(it)
+            }
+        }
+    }
+
+    private fun uploadFilesManually() {
+        runCatching {
+            openMultipleDocumentLauncher.launch(arrayOf("*/*"))
+        }.onFailure {
+            Timber.e(it)
+        }
     }
 
     companion object {
