@@ -14,6 +14,7 @@ import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
+import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
@@ -22,6 +23,7 @@ import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
+import mega.privacy.android.data.database.entity.PendingTransferEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
 import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_INSERT_LIST_SIZE
@@ -40,6 +42,8 @@ import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapp
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferLegacyModelMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
+import mega.privacy.android.data.mapper.transfer.pending.PendingTransferEntityMapper
+import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
@@ -55,6 +59,11 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploa
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
+import mega.privacy.android.domain.entity.transfer.pending.UpdateAlreadyTransferredFilesCount
+import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferState
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -104,9 +113,13 @@ internal class MegaLocalRoomFacadeTest {
     private val videoRecentlyWatchedDao: VideoRecentlyWatchedDao = mock()
     private val videoRecentlyWatchedEntityMapper: VideoRecentlyWatchedEntityMapper = mock()
     private val videoRecentlyWatchedItemMapper: VideoRecentlyWatchedItemMapper = mock()
+    private val pendingTransferDao = mock<PendingTransferDao>()
+    private val pendingTransferEntityMapper = mock<PendingTransferEntityMapper>()
+    private val pendingTransferModelMapper = mock<PendingTransferModelMapper>()
 
     @BeforeAll
     fun setUp() {
+
         underTest = MegaLocalRoomFacade(
             contactDao = { contactDao },
             contactEntityMapper = contactEntityMapper,
@@ -137,7 +150,10 @@ internal class MegaLocalRoomFacadeTest {
             chatRoomPendingChangesModelMapper = chatRoomPendingChangesModelMapper,
             videoRecentlyWatchedDao = { videoRecentlyWatchedDao },
             videoRecentlyWatchedItemMapper = videoRecentlyWatchedItemMapper,
-            videoRecentlyWatchedEntityMapper = videoRecentlyWatchedEntityMapper
+            videoRecentlyWatchedEntityMapper = videoRecentlyWatchedEntityMapper,
+            pendingTransferDao = { pendingTransferDao },
+            pendingTransferEntityMapper = pendingTransferEntityMapper,
+            pendingTransferModelMapper = pendingTransferModelMapper,
         )
     }
 
@@ -165,7 +181,10 @@ internal class MegaLocalRoomFacadeTest {
             completedTransferLegacyModelMapper,
             videoRecentlyWatchedDao,
             videoRecentlyWatchedItemMapper,
-            videoRecentlyWatchedEntityMapper
+            videoRecentlyWatchedEntityMapper,
+            pendingTransferDao,
+            pendingTransferModelMapper,
+            pendingTransferEntityMapper,
         )
     }
 
@@ -790,5 +809,115 @@ internal class MegaLocalRoomFacadeTest {
                 assertThat(awaitItem()).isEqualTo(testItems)
                 awaitComplete()
             }
+        }
+
+    @Test
+    fun `test that insertPendingTransfers invokes dao batch insert with mapped entities`() =
+        runTest {
+            val element = mock<PendingTransfer>()
+            val mapped = mock<PendingTransferEntity>()
+            whenever(pendingTransferEntityMapper(element)) doReturn mapped
+            underTest.insertPendingTransfers(listOf(element))
+            verify(pendingTransferDao).insertOrUpdatePendingTransfers(
+                listOf(mapped),
+                MAX_INSERT_LIST_SIZE
+
+            )
+        }
+
+    @Test
+    fun `test that getPendingTransfersByType return mapped dao result`() = runTest {
+        val type = TransferType.DOWNLOAD
+        val pendingTransferEntity = mock<PendingTransferEntity>()
+        val pendingTransfer = mock<PendingTransfer>()
+        val result = flowOf(listOf(pendingTransferEntity))
+        val expected = listOf(pendingTransfer)
+
+        whenever(pendingTransferModelMapper(pendingTransferEntity)) doReturn pendingTransfer
+        whenever(pendingTransferDao.getPendingTransfersByType(type)) doReturn result
+        underTest.getPendingTransfersByType(type).test {
+            val actual = awaitItem()
+            assertThat(actual).isEqualTo(expected)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that getPendingTransfersByTypeAndState return mapped dao result`() = runTest {
+        val type = TransferType.DOWNLOAD
+        val state = PendingTransferState.NotSentToSdk
+        val pendingTransferEntity = mock<PendingTransferEntity>()
+        val pendingTransfer = mock<PendingTransfer>()
+        val result = flowOf(listOf(pendingTransferEntity))
+        val expected = listOf(pendingTransfer)
+
+        whenever(pendingTransferModelMapper(pendingTransferEntity)) doReturn pendingTransfer
+        whenever(pendingTransferDao.getPendingTransfersByTypeAndState(type, state)) doReturn result
+        underTest.getPendingTransfersByTypeAndState(type, state).test {
+            val actual = awaitItem()
+            assertThat(actual).isEqualTo(expected)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that getPendingTransferByTag return mapped dao result`() = runTest {
+        val tag = 343
+        val pendingTransferEntity = mock<PendingTransferEntity>()
+        val expected = mock<PendingTransfer>()
+
+        whenever(pendingTransferModelMapper(pendingTransferEntity)) doReturn expected
+        whenever(pendingTransferDao.getPendingTransferByTag(tag)) doReturn pendingTransferEntity
+        val actual = underTest.getPendingTransfersByTag(tag)
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that updatePendingTransfers invokes dao method correctly when it's a single update`() =
+        runTest {
+            val updatePendingTransferRequests = mock<UpdatePendingTransferState>()
+
+            underTest.updatePendingTransfers(updatePendingTransferRequests)
+
+            verify(pendingTransferDao).update(updatePendingTransferRequests)
+        }
+
+    @Test
+    fun `test that updatePendingTransfers invokes dao method correctly when there are multiple updates`() =
+        runTest {
+            val updatePendingTransferRequests1 = mock<UpdatePendingTransferState>()
+            val updatePendingTransferRequests2 = mock<UpdateAlreadyTransferredFilesCount>()
+
+            underTest.updatePendingTransfers(
+                updatePendingTransferRequests1,
+                updatePendingTransferRequests2
+            )
+
+            verify(pendingTransferDao)
+                .updateMultiple(
+                    listOf(
+                        updatePendingTransferRequests1,
+                        updatePendingTransferRequests2
+                    )
+                )
+        }
+
+    @Test
+    fun `test that deletePendingTransferByTag invokes dao method with correct parameter`() =
+        runTest {
+            val tag = 6456
+
+            underTest.deletePendingTransferByTag(tag)
+
+            verify(pendingTransferDao).deletePendingTransferByTag(tag)
+        }
+
+    @Test
+    fun `test that deleteAllPendingTransfers invokes dao method correctly`() =
+        runTest {
+            underTest.deleteAllPendingTransfers()
+
+            verify(pendingTransferDao).deleteAllPendingTransfers()
         }
 }

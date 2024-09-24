@@ -14,6 +14,9 @@ import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
+import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferRequest
 
 /**
  * Mega local room gateway
@@ -494,4 +497,46 @@ interface MegaLocalRoomGateway {
      * @param items [VideoRecentlyWatchedItem] list
      */
     suspend fun saveRecentlyWatchedVideos(items: List<VideoRecentlyWatchedItem>)
+
+    /**
+     * Insert pending transfers
+     * @param pendingTransfer
+     */
+    suspend fun insertPendingTransfers(pendingTransfers: List<PendingTransfer>)
+
+    /**
+     * Get pending transfers by type
+     * @return A list of all pending transfers of this type
+     */
+    fun getPendingTransfersByType(transferType: TransferType): Flow<List<PendingTransfer>>
+
+    /**
+     * Get pending transfers by type and state
+     * @return A list of all pending transfers of this type and state
+     */
+    fun getPendingTransfersByTypeAndState(
+        transferType: TransferType,
+        pendingTransferState: PendingTransferState,
+    ): Flow<List<PendingTransfer>>
+
+    /**
+     * Get pending transfers by tag
+     * @return The pending transfer with this tag or null if not found
+     */
+    suspend fun getPendingTransfersByTag(tag: Int): PendingTransfer?
+
+    /**
+     * Update pending transfers
+     */
+    suspend fun updatePendingTransfers(vararg updatePendingTransferRequests: UpdatePendingTransferRequest)
+
+    /**
+     * Delete pending transfer by tag
+     */
+    suspend fun deletePendingTransferByTag(tag: Int)
+
+    /**
+     * Delete all pending transfers
+     */
+    suspend fun deleteAllPendingTransfers()
 }

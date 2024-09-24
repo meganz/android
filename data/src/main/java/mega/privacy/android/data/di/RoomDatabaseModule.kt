@@ -24,6 +24,7 @@ import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
+import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.dao.TypedMessageDao
@@ -213,5 +214,10 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideVideoRecentlyWatchedDao(database: MegaDatabase): VideoRecentlyWatchedDao =
         database.videoRecentlyWatchedDao()
+
+    @Provides
+    @Singleton
+    internal fun providePendingTransferDao(database: MegaDatabase): PendingTransferDao =
+        database.pendingTransferDao()
 
 }

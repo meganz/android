@@ -13,6 +13,7 @@ import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
+import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
@@ -31,6 +32,8 @@ import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapp
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferLegacyModelMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
+import mega.privacy.android.data.mapper.transfer.pending.PendingTransferEntityMapper
+import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
@@ -49,6 +52,12 @@ import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
+import mega.privacy.android.domain.entity.transfer.pending.UpdateAlreadyTransferredFilesCount
+import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferRequest
+import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferState
+import mega.privacy.android.domain.entity.transfer.pending.UpdateScanningFoldersData
 import javax.inject.Inject
 
 internal class MegaLocalRoomFacade @Inject constructor(
@@ -82,6 +91,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val videoRecentlyWatchedDao: Lazy<VideoRecentlyWatchedDao>,
     private val videoRecentlyWatchedEntityMapper: VideoRecentlyWatchedEntityMapper,
     private val videoRecentlyWatchedItemMapper: VideoRecentlyWatchedItemMapper,
+    private val pendingTransferDao: Lazy<PendingTransferDao>,
+    private val pendingTransferEntityMapper: PendingTransferEntityMapper,
+    private val pendingTransferModelMapper: PendingTransferModelMapper,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
         contactDao.get().insertOrUpdateContact(contactEntityMapper(contact))
@@ -487,6 +499,49 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override fun monitorChatPendingChanges(chatId: Long): Flow<ChatPendingChanges?> =
         chatPendingChangesDao.get().getChatPendingChanges(chatId)
             .map { entity -> entity?.let { chatRoomPendingChangesModelMapper(it) } }
+
+    override suspend fun insertPendingTransfers(pendingTransfers: List<PendingTransfer>) {
+        pendingTransferDao.get()
+            .insertOrUpdatePendingTransfers(
+                pendingTransfers.map { pendingTransferEntityMapper(it) },
+                MAX_INSERT_LIST_SIZE
+            )
+    }
+
+    override fun getPendingTransfersByType(transferType: TransferType) =
+        pendingTransferDao.get().getPendingTransfersByType(transferType)
+            .map { it.map { pendingTransferModelMapper(it) } }
+
+    override fun getPendingTransfersByTypeAndState(
+        transferType: TransferType,
+        pendingTransferState: PendingTransferState,
+    ) = pendingTransferDao.get()
+        .getPendingTransfersByTypeAndState(transferType, pendingTransferState)
+        .map { it.map { pendingTransferModelMapper(it) } }
+
+    override suspend fun getPendingTransfersByTag(tag: Int): PendingTransfer? =
+        pendingTransferDao.get().getPendingTransferByTag(tag)
+            ?.let { pendingTransferModelMapper(it) }
+
+    override suspend fun updatePendingTransfers(vararg updatePendingTransferRequests: UpdatePendingTransferRequest) {
+        updatePendingTransferRequests.singleOrNull()?.let { request ->
+            when (request) {
+                is UpdateAlreadyTransferredFilesCount -> pendingTransferDao.get().update(request)
+                is UpdatePendingTransferState -> pendingTransferDao.get().update(request)
+                is UpdateScanningFoldersData -> pendingTransferDao.get().update(request)
+            }
+        } ?: run {
+            pendingTransferDao.get().updateMultiple(updatePendingTransferRequests.toList())
+        }
+    }
+
+    override suspend fun deletePendingTransferByTag(tag: Int) {
+        pendingTransferDao.get().deletePendingTransferByTag(tag)
+    }
+
+    override suspend fun deleteAllPendingTransfers() {
+        pendingTransferDao.get().deleteAllPendingTransfers()
+    }
 
     companion object {
         private const val MAX_COMPLETED_TRANSFER_ROWS = 100
