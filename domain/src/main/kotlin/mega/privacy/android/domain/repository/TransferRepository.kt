@@ -375,6 +375,11 @@ interface TransferRepository {
     suspend fun pauseTransfers(isPause: Boolean): Boolean
 
     /**
+     * Sets the pause transfers queue as false, which should be the default value after login.
+     */
+    suspend fun resetPauseTransfers()
+
+    /**
      * Delete all completed transfers
      */
     suspend fun deleteAllCompletedTransfers()

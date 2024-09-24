@@ -587,6 +587,12 @@ internal class DefaultTransfersRepository @Inject constructor(
         return@withContext isPauseResponse
     }
 
+    override suspend fun resetPauseTransfers() = withContext(ioDispatcher) {
+        monitorPausedTransfers.emit(false)
+        localStorageGateway.setTransferQueueStatus(false)
+        monitorAskedResumeTransfers.emit(false)
+    }
+
     override suspend fun deleteAllCompletedTransfers() = withContext(ioDispatcher) {
         megaLocalRoomGateway.deleteAllCompletedTransfers()
     }

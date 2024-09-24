@@ -1490,4 +1490,14 @@ class DefaultTransfersRepositoryTest {
             verify(megaApiGateway).cancelTransfers(eq(MegaTransfer.TYPE_UPLOAD), any())
             verify(megaApiGateway).cancelTransfers(eq(MegaTransfer.TYPE_DOWNLOAD), any())
         }
+
+    @Test
+    fun `test that resetPauseTransfers invokes `() = runTest {
+        underTest.resetPauseTransfers()
+        val flow1 = underTest.monitorPausedTransfers()
+        assertThat(flow1.value).isFalse()
+        verify(localStorageGateway).setTransferQueueStatus(false)
+        val flow2 = underTest.monitorAskedResumeTransfers()
+        assertThat(flow2.value).isFalse()
+    }
 }

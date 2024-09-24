@@ -81,6 +81,8 @@ class LocalLogoutAppUseCaseTest {
         underTest.invoke()
 
         verify(transferRepository).cancelTransfers()
+        verify(transferRepository).deleteAllActiveTransfers()
+        verify(transferRepository).resetPauseTransfers()
         verify(accountRepository).resetAccountAuth()
         verify(accountRepository).cancelAllNotifications()
         verify(accountRepository).clearAppDataAndCache()

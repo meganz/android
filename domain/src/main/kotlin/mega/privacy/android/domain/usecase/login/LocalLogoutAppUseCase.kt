@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.login
 
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.BillingRepository
@@ -12,7 +13,6 @@ import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.psa.ClearPsaUseCase
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import javax.inject.Inject
 
@@ -38,7 +38,11 @@ class LocalLogoutAppUseCase @Inject constructor(
      * Invoke.
      */
     suspend operator fun invoke() {
-        transferRepository.cancelTransfers()
+        with(transferRepository) {
+            cancelTransfers()
+            deleteAllActiveTransfers()
+            resetPauseTransfers()
+        }
         with(accountRepository) {
             resetAccountAuth()
             cancelAllNotifications()
