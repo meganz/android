@@ -16,6 +16,7 @@ import mega.privacy.android.app.presentation.settings.passcode.view.tile.REQUIRE
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
@@ -80,12 +81,12 @@ class PasscodeSettingsViewTest {
 
     @Test
     fun `test that view navigates to enable passcode if not yet enabled on toggle`() {
-        val navigateToChangePasscode = mock<() -> Unit>()
-        initialiseView(isEnabled = false, navigateToChangePasscode = navigateToChangePasscode)
+        val navigateToChangePasscode = mock<(Boolean) -> Unit>()
+        initialiseView(isEnabled = false, navigateToSetOrChangePasscode = navigateToChangePasscode)
 
         composeTestRule.onNodeWithTag(ENABLE_PASSCODE_TILE).performClick()
 
-        verify(navigateToChangePasscode).invoke()
+        verify(navigateToChangePasscode).invoke(any())
     }
 
     @Test
@@ -133,11 +134,37 @@ class PasscodeSettingsViewTest {
         verify(disableBiometrics).invoke()
     }
 
+    @Test
+    fun `test that navigateToSetOrChangePasscode is called with isEdit set to false when setting the passcode`() {
+        val navigateToSetOrChangePasscode = mock<(Boolean) -> Unit>()
+        initialiseView(
+            isEnabled = false,
+            navigateToSetOrChangePasscode = navigateToSetOrChangePasscode
+        )
+
+        composeTestRule.onNodeWithTag(ENABLE_PASSCODE_TILE).performClick()
+
+        verify(navigateToSetOrChangePasscode).invoke(false)
+    }
+
+    @Test
+    fun `test that navigateToSetOrChangePasscode is called with isEdit set to true when changing the passcode`() {
+        val navigateToSetOrChangePasscode = mock<(Boolean) -> Unit>()
+        initialiseView(
+            isEnabled = true,
+            navigateToSetOrChangePasscode = navigateToSetOrChangePasscode
+        )
+
+        composeTestRule.onNodeWithTag(CHANGE_PASSCODE_TILE).performClick()
+
+        verify(navigateToSetOrChangePasscode).invoke(true)
+    }
+
     private fun initialiseView(
         isEnabled: Boolean = false,
         hasBiometricCapability: Boolean = false,
         isBiometricsEnabled: Boolean = false,
-        navigateToChangePasscode: () -> Unit = {},
+        navigateToSetOrChangePasscode: (Boolean) -> Unit = {},
         onDisablePasscode: () -> Unit = {},
         onDisableBiometrics: () -> Unit = {},
         navigateToSelectTimeout: () -> Unit = {},
@@ -154,7 +181,7 @@ class PasscodeSettingsViewTest {
                 ),
                 onDisablePasscode = onDisablePasscode,
                 onDisableBiometrics = onDisableBiometrics,
-                navigateToChangePasscode = navigateToChangePasscode,
+                navigateToSetOrChangePasscode = navigateToSetOrChangePasscode,
                 navigateToSelectTimeout = navigateToSelectTimeout,
                 hasBiometricCapability = hasBiometricCapability,
                 authenticateBiometrics = authenticateBiometrics

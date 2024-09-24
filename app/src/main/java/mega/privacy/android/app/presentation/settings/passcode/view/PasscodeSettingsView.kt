@@ -39,6 +39,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -46,7 +47,7 @@ internal fun PasscodeSettingsView(
     state: PasscodeSettingsUIState,
     onDisablePasscode: () -> Unit,
     onDisableBiometrics: () -> Unit,
-    navigateToChangePasscode: () -> Unit,
+    navigateToSetOrChangePasscode: (isEdit: Boolean) -> Unit,
     navigateToSelectTimeout: () -> Unit,
     hasBiometricCapability: Boolean,
     authenticateBiometrics: @Composable (onSuccess: () -> Unit, onComplete: () -> Unit) -> Unit,
@@ -87,12 +88,14 @@ internal fun PasscodeSettingsView(
                 EnablePasscodeTile(
                     isChecked = state.isEnabled,
                     onItemClicked = {
-                        if (state.isEnabled) onDisablePasscode() else navigateToChangePasscode()
+                        if (state.isEnabled) onDisablePasscode() else navigateToSetOrChangePasscode(
+                            false
+                        )
                     }
                 )
                 if (state.isEnabled) {
                     ChangePasscodeTile(
-                        onItemClicked = navigateToChangePasscode
+                        onItemClicked = { navigateToSetOrChangePasscode(true) }
                     )
                     if (hasBiometricCapability) {
                         FingerprintIdTile(
@@ -118,7 +121,7 @@ internal fun PasscodeSettingsView(
                 authenticateBiometrics(
                     {
                         coroutineScope.launch {
-                            scaffoldState.snackbarHostState.showSnackbar(message)
+                            scaffoldState.snackbarHostState.showAutoDurationSnackbar(message)
                         }
                         showBiometricPrompt = false
                     },
@@ -156,7 +159,7 @@ private fun PasscodeSettingsViewPreview(
             onDisableBiometrics = {
                 state = state.copy(isBiometricsEnabled = !state.isBiometricsEnabled)
             },
-            navigateToChangePasscode = {},
+            navigateToSetOrChangePasscode = {},
             authenticateBiometrics = { _, _ -> },
             navigateToSelectTimeout = {},
             hasBiometricCapability = params.second,
