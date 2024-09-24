@@ -95,9 +95,9 @@ class GetRecentActionsUseCaseTest {
 
     @Test
     fun `test that recentActionsRepository getRecentActions is invoked`() = runBlockingTest {
-        whenever(recentActionsRepository.getRecentActions()).thenReturn(emptyList())
-        underTest()
-        verify(recentActionsRepository).getRecentActions()
+        whenever(recentActionsRepository.getRecentActions(any())).thenReturn(emptyList())
+        underTest(false)
+        verify(recentActionsRepository).getRecentActions(false)
     }
 
     @Test
@@ -128,9 +128,9 @@ class GetRecentActionsUseCaseTest {
                     nodes = listOf(nodes[2], nodes[3])
                 ),
             )
-            whenever(recentActionsRepository.getRecentActions()).thenReturn(list)
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(list)
 
-            underTest()
+            underTest(false)
 
             (0..3).forEach {
                 verify(addNodeType).invoke(nodes[it])
@@ -153,11 +153,11 @@ class GetRecentActionsUseCaseTest {
                     nodes = listOf(node1, node2)
                 ),
             )
-            whenever(recentActionsRepository.getRecentActions()).thenReturn(list)
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(list)
             whenever(addNodeType(node1)).thenReturn(mock<TypedFileNode>())
             whenever(addNodeType(node2)).thenReturn(mock<TypedFolderNode>())
 
-            val result = underTest()
+            val result = underTest(false)
 
             assertThat(result[0].nodes.size).isEqualTo(1)
         }
@@ -191,20 +191,20 @@ class GetRecentActionsUseCaseTest {
             )
             whenever(addNodeType(file1)).thenReturn(DefaultTypedFileNode(file1))
             whenever(addNodeType(file2)).thenReturn(DefaultTypedFileNode(file2))
-            whenever(recentActionsRepository.getRecentActions()).thenReturn(list)
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(list)
 
-            underTest()
+            underTest(false)
 
             verify(areCredentialsVerifiedUseCase).invoke(any())
         }
 
     @Test
     fun `test that isCurrentUserOwner is invoked for each RecentActionBucket`() = runTest {
-        whenever(recentActionsRepository.getRecentActions()).thenReturn(
+        whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
             listOf(dummyRecentActionBucketUnTyped)
         )
 
-        underTest()
+        underTest(false)
 
         verify(getCurrentUserEmail).invoke(false)
     }
@@ -216,11 +216,11 @@ class GetRecentActionsUseCaseTest {
         }
         whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
         whenever(getCurrentUserEmail(false)).thenReturn("ccc@gmail.com")
-        whenever(recentActionsRepository.getRecentActions()).thenReturn(
+        whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
             listOf(dummyRecentActionBucketUnTyped)
         )
 
-        val result = underTest()
+        val result = underTest(false)
 
         assertThat(result[0].currentUserIsOwner).isFalse()
         verify(getCurrentUserEmail).invoke(false)
@@ -248,9 +248,9 @@ class GetRecentActionsUseCaseTest {
                     nodes = emptyList()
                 ),
             )
-            whenever(recentActionsRepository.getRecentActions()).thenReturn(list)
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(list)
 
-            val result = underTest()
+            val result = underTest(false)
 
             assertThat(result).isEmpty()
         }
@@ -264,11 +264,11 @@ class GetRecentActionsUseCaseTest {
             whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
             whenever(getCurrentUserEmail(false)).thenReturn(userEmail)
             whenever(contactsRepository.getAllContactsName()).thenReturn(contactsMap)
-            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
                 listOf(dummyRecentActionBucketUnTyped)
             )
 
-            val result = underTest()
+            val result = underTest(false)
 
             assertThat(result[0].userName).isEqualTo(expected)
         }
@@ -280,11 +280,11 @@ class GetRecentActionsUseCaseTest {
             whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
             whenever(getCurrentUserEmail(false)).thenReturn(userEmail)
             whenever(contactsRepository.getAllContactsName()).thenReturn(emptyMap())
-            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
                 listOf(dummyRecentActionBucketUnTyped)
             )
 
-            val result = underTest()
+            val result = underTest(false)
 
             assertThat(result[0].userName).isEqualTo(userEmail)
         }
@@ -299,11 +299,11 @@ class GetRecentActionsUseCaseTest {
             whenever(recentActionsRepository.getNodeInfo(NodeId(321L))).thenReturn(parentNode)
             whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
             whenever(recentActionsRepository.getNodeInfo(NodeId(1L))).thenReturn(null)
-            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
                 listOf(dummyRecentActionBucketUnTyped)
             )
 
-            val result = underTest()
+            val result = underTest(false)
 
             assertThat(result[0].parentFolderName).isEqualTo(expected)
         }
@@ -319,11 +319,11 @@ class GetRecentActionsUseCaseTest {
             whenever(recentActionsRepository.getNodeInfo(NodeId(321L))).thenReturn(parentNode)
             whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
             whenever(recentActionsRepository.getNodeInfo(NodeId(1L))).thenReturn(null)
-            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
                 listOf(dummyRecentActionBucketUnTyped)
             )
 
-            val result = underTest()
+            val result = underTest(false)
 
             assertThat(result[0].parentFolderName).isEqualTo(expected)
         }
@@ -342,11 +342,11 @@ class GetRecentActionsUseCaseTest {
             whenever(recentActionsRepository.getNodeInfo(NodeId(321L))).thenReturn(parentNode)
             whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
             whenever(recentActionsRepository.getNodeInfo(NodeId(1L))).thenReturn(null)
-            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
                 listOf(dummyRecentActionBucketUnTyped)
             )
 
-            val result = underTest()
+            val result = underTest(false)
 
             assertThat(result[0].parentFolderSharesType).isEqualTo(expected)
         }
@@ -362,11 +362,11 @@ class GetRecentActionsUseCaseTest {
             whenever(recentActionsRepository.getNodeInfo(NodeId(321L))).thenReturn(parentNode)
             whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
             whenever(recentActionsRepository.getNodeInfo(NodeId(1L))).thenReturn(null)
-            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
                 listOf(dummyRecentActionBucketUnTyped)
             )
 
-            val result = underTest()
+            val result = underTest(false)
 
             assertThat(result[0].parentFolderSharesType).isEqualTo(expected)
         }
@@ -386,11 +386,11 @@ class GetRecentActionsUseCaseTest {
             )
             whenever(recentActionsRepository.getNodeInfo(NodeId(321L))).thenReturn(parentNode)
             whenever(recentActionsRepository.getNodeInfo(NodeId(1L))).thenReturn(null)
-            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
                 listOf(dummyRecentActionBucketUnTyped)
             )
 
-            val result = underTest()
+            val result = underTest(false)
 
             assertThat(result[0].parentFolderSharesType).isEqualTo(expected)
         }
@@ -409,11 +409,11 @@ class GetRecentActionsUseCaseTest {
             whenever(getCurrentUserEmail(false)).thenReturn("aaa@aaa.com")
             whenever(recentActionsRepository.getNodeInfo(NodeId(321L))).thenReturn(parentNode)
             whenever(recentActionsRepository.getNodeInfo(NodeId(1L))).thenReturn(null)
-            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
                 listOf(dummyRecentActionBucketUnTyped)
             )
 
-            val result = underTest()
+            val result = underTest(false)
 
             assertThat(result[0].parentFolderSharesType).isEqualTo(expected)
         }
@@ -435,11 +435,11 @@ class GetRecentActionsUseCaseTest {
             )
             whenever(recentActionsRepository.getNodeInfo(NodeId(321L))).thenReturn(parentNode)
             whenever(recentActionsRepository.getNodeInfo(NodeId(1L))).thenReturn(null)
-            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
                 listOf(dummyRecentActionBucketUnTyped)
             )
 
-            val result = underTest()
+            val result = underTest(false)
 
             assertThat(result[0].parentFolderSharesType).isEqualTo(expected)
         }
@@ -461,11 +461,11 @@ class GetRecentActionsUseCaseTest {
             )
             whenever(recentActionsRepository.getNodeInfo(NodeId(321L))).thenReturn(parentNode)
             whenever(recentActionsRepository.getNodeInfo(NodeId(1L))).thenReturn(null)
-            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+            whenever(recentActionsRepository.getRecentActions(any())).thenReturn(
                 listOf(dummyRecentActionBucketUnTyped)
             )
 
-            val result = underTest()
+            val result = underTest(false)
 
             assertThat(result[0].parentFolderSharesType).isEqualTo(expected)
         }

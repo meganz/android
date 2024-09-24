@@ -38,11 +38,18 @@ class GetRecentActionsUseCase @Inject constructor(
     /**
      * Get a list of recent actions
      *
+     * @param excludeSensitives Exclude sensitive nodes
      * @return a list of recent actions
      */
-    suspend operator fun invoke(): List<RecentActionBucket> = coroutineScope {
+    suspend operator fun invoke(
+        excludeSensitives: Boolean,
+    ): List<RecentActionBucket> = coroutineScope {
         val visibleContactsDeferred = async { contactsRepository.getAllContactsName() }
-        val recentActionsDeferred = async { recentActionsRepository.getRecentActions() }
+        val recentActionsDeferred = async {
+            recentActionsRepository.getRecentActions(
+                excludeSensitives = excludeSensitives,
+            )
+        }
         val currentUserEmailDeferred = async { getCurrentUserEmail(false) }
 
         val visibleContacts = visibleContactsDeferred.await()

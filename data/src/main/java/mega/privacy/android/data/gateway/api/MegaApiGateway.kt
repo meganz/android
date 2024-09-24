@@ -1042,11 +1042,13 @@ interface MegaApiGateway {
      *
      * @param days     Age of actions since added/modified nodes will be considered (in days).
      * @param maxNodes Maximum amount of nodes to be considered.
+     * @param excludeSensitives Exclude sensitive nodes from the list.
      * @param listener [MegaRequestListenerInterface]
      */
     fun getRecentActionsAsync(
         days: Long,
         maxNodes: Long,
+        excludeSensitives: Boolean,
         listener: MegaRequestListenerInterface,
     )
 

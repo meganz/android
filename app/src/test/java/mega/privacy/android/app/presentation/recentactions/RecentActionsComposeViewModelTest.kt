@@ -86,7 +86,7 @@ class RecentActionsComposeViewModelTest {
     }
 
     private suspend fun stubCommon() {
-        whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket2))
+        whenever(getRecentActionsUseCase(any())).thenReturn(listOf(megaRecentActionBucket2))
         whenever(monitorHideRecentActivityUseCase()).thenReturn(flow {
             emit(true)
             emit(false)
@@ -143,7 +143,7 @@ class RecentActionsComposeViewModelTest {
                     assertThat(awaitItem().totalSize()).isEqualTo(1)
                     advanceUntilIdle()
                     monitorNodeUpdatesFakeFlow.emit(NodeUpdate(emptyMap()))
-                    whenever(getRecentActionsUseCase()).thenReturn(
+                    whenever(getRecentActionsUseCase(any())).thenReturn(
                         listOf(megaRecentActionBucket, megaRecentActionBucket3)
                     )
                     assertThat(awaitItem().totalSize()).isEqualTo(2)
@@ -158,7 +158,7 @@ class RecentActionsComposeViewModelTest {
                     assertThat(awaitItem().totalSize()).isEqualTo(1)
                     advanceUntilIdle()
                     monitorNodeUpdatesFakeFlow.emit(NodeUpdate(emptyMap()))
-                    whenever(getRecentActionsUseCase()).thenReturn(
+                    whenever(getRecentActionsUseCase(any())).thenReturn(
                         listOf(
                             megaRecentActionBucket,
                             megaRecentActionBucket2,
@@ -199,7 +199,7 @@ class RecentActionsComposeViewModelTest {
                 awaitItem()
                 advanceUntilIdle()
                 monitorNodeUpdatesFakeFlow.emit(NodeUpdate(emptyMap()))
-                whenever(getRecentActionsUseCase()).thenReturn(
+                whenever(getRecentActionsUseCase(any())).thenReturn(
                     listOf(
                         megaRecentActionBucket,
                         megaRecentActionBucket2,

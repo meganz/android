@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -64,9 +65,9 @@ class DefaultUpdateRecentActionTest {
         runTest {
             val expected = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(1L), "1")
             val list = listOf(expected, expected, expected)
-            whenever(getRecentActionsUseCase()).thenReturn(list)
+            whenever(getRecentActionsUseCase(any())).thenReturn(list)
 
-            assertThat(underTest.invoke(expected, null)).isEqualTo(expected)
+            assertThat(underTest.invoke(expected, null, false)).isEqualTo(expected)
         }
 
     @Test
@@ -82,9 +83,9 @@ class DefaultUpdateRecentActionTest {
             val cachedActionList = listOf(current, item1, item2)
 
             val list = listOf(expected, item1, item2)
-            whenever(getRecentActionsUseCase()).thenReturn(list)
+            whenever(getRecentActionsUseCase(any())).thenReturn(list)
 
-            assertThat(underTest.invoke(current, cachedActionList)).isEqualTo(expected)
+            assertThat(underTest.invoke(current, cachedActionList, false)).isEqualTo(expected)
         }
 
     @Test
@@ -98,8 +99,8 @@ class DefaultUpdateRecentActionTest {
             val cachedActionList = listOf(current, item1, item2)
 
             val list = listOf(item1, item2)
-            whenever(getRecentActionsUseCase()).thenReturn(list)
+            whenever(getRecentActionsUseCase(any())).thenReturn(list)
 
-            assertThat(underTest.invoke(current, cachedActionList)).isEqualTo(null)
+            assertThat(underTest.invoke(current, cachedActionList, false)).isEqualTo(null)
         }
 }

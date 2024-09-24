@@ -16,9 +16,13 @@ interface RecentActionsRepository {
      * The recommended values for days and maxNodes parameters are to consider
      * interactions during the last 30 days and maximum 500 nodes. So they are set by default.
      *
+     * @param excludeSensitives exclude sensitive nodes
+     *
      * @return a list of recent actions.
      */
-    suspend fun getRecentActions(): List<RecentActionBucketUnTyped>
+    suspend fun getRecentActions(
+        excludeSensitives: Boolean,
+    ): List<RecentActionBucketUnTyped>
 
     /**
      * Gets the node info required for recent action only

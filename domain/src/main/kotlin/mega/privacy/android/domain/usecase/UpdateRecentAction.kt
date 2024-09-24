@@ -12,11 +12,13 @@ interface UpdateRecentAction {
      *
      * @param currentBucket the current recent action bucket to update
      * @param cachedActionList the list of recent action bucket to compare with
+     * @param excludeSensitives exclude sensitive nodes
      *
      * @return the update current bucket, null if the bucket does not exist anymore
      */
     suspend operator fun invoke(
         currentBucket: RecentActionBucket,
         cachedActionList: List<RecentActionBucket>?,
+        excludeSensitives: Boolean,
     ): RecentActionBucket?
 }

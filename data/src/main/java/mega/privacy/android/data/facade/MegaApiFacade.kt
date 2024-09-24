@@ -687,8 +687,9 @@ internal class MegaApiFacade @Inject constructor(
     override fun getRecentActionsAsync(
         days: Long,
         maxNodes: Long,
+        excludeSensitives: Boolean,
         listener: MegaRequestListenerInterface,
-    ) = megaApi.getRecentActionsAsync(days, maxNodes, listener)
+    ) = megaApi.getRecentActionsAsync(days, maxNodes, excludeSensitives, listener)
 
     override fun copyNode(
         nodeToCopy: MegaNode,
@@ -1544,7 +1545,7 @@ internal class MegaApiFacade @Inject constructor(
         reason: String,
         subscriptionId: String,
         canContact: Int,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) {
         megaApi.creditCardCancelSubscriptions(reason, subscriptionId, canContact, listener)
     }

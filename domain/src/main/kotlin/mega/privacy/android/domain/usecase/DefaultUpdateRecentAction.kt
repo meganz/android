@@ -18,9 +18,12 @@ class DefaultUpdateRecentAction @Inject constructor(
     override suspend fun invoke(
         currentBucket: RecentActionBucket,
         cachedActionList: List<RecentActionBucket>?,
+        excludeSensitives: Boolean,
     ): RecentActionBucket? = withContext(ioDispatcher) {
 
-        val recentActions = getRecentActionsUseCase()
+        val recentActions = getRecentActionsUseCase(
+            excludeSensitives = excludeSensitives,
+        )
 
         // Update the current bucket
         recentActions.firstOrNull { currentBucket.identifier == it.identifier }?.let {

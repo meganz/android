@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -28,6 +30,7 @@ import mega.privacy.android.domain.usecase.UpdateRecentAction
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -47,6 +50,7 @@ class RecentActionBucketViewModel @Inject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val getRootParentNodeUseCase: GetRootParentNodeUseCase,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
 ) : ViewModel() {
     private val _actionMode = MutableLiveData<Boolean>()
 
@@ -100,11 +104,14 @@ class RecentActionBucketViewModel @Inject constructor(
 
     val state = _state.asStateFlow()
 
+    @Volatile
+    private var showHiddenItems: Boolean = true
+
     init {
         viewModelScope.launch {
             monitorNodeUpdatesUseCase().collectLatest {
                 Timber.d("Received node update")
-                updateCurrentBucket()
+                updateCurrentBucket(excludeSensitives = !showHiddenItems)
                 clearSelection()
             }
         }
@@ -124,6 +131,8 @@ class RecentActionBucketViewModel @Inject constructor(
                 it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
             }
         }
+
+        monitorShowHiddenItems()
     }
 
     /**
@@ -261,9 +270,9 @@ class RecentActionBucketViewModel @Inject constructor(
     /**
      * Update the current bucket
      */
-    private suspend fun updateCurrentBucket() {
+    private suspend fun updateCurrentBucket(excludeSensitives: Boolean) {
         _bucket.value
-            ?.let { updateRecentAction(it, cachedActionList) }
+            ?.let { updateRecentAction(it, cachedActionList, excludeSensitives) }
             ?.let { _bucket.emit(it) }
             ?: run {
                 // No nodes contained in the bucket or the action bucket is no loner exists.
@@ -288,6 +297,16 @@ class RecentActionBucketViewModel @Inject constructor(
         _state.update {
             it.copy(isHiddenNodesOnboarded = true)
         }
+    }
+
+    private fun monitorShowHiddenItems() {
+        monitorShowHiddenItemsUseCase()
+            .conflate()
+            .onEach { show ->
+                showHiddenItems = show
+                updateCurrentBucket(excludeSensitives = !show)
+            }
+            .launchIn(viewModelScope)
     }
 
     internal suspend fun getNodeContentUri(handle: Long) = getNodeContentUriByHandleUseCase(handle)

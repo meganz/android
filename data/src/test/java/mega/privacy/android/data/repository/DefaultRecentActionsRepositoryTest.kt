@@ -72,8 +72,8 @@ class DefaultRecentActionsRepositoryTest {
         )
         val expected = (1..4).map { recentActionBucket }
 
-        whenever(megaApiGateway.getRecentActionsAsync(any(), any(), any())).thenAnswer {
-            (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+        whenever(megaApiGateway.getRecentActionsAsync(any(), any(), any(), any())).thenAnswer {
+            (it.arguments[3] as MegaRequestListenerInterface).onRequestFinish(
                 megaApiJava,
                 request,
                 error
@@ -83,7 +83,7 @@ class DefaultRecentActionsRepositoryTest {
         whenever(recentActionsMapper(any())).thenReturn(list)
         whenever(megaApiGateway.getNodesFromMegaNodeList(any())).thenReturn(listOf(mock<MegaNode>()))
 
-        val result = underTest.getRecentActions()
+        val result = underTest.getRecentActions(false)
 
         assertThat(result.size).isEqualTo(expected.size)
     }

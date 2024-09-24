@@ -28,9 +28,13 @@ internal class DefaultRecentActionsRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : RecentActionsRepository {
 
-    override suspend fun getRecentActions() = withContext(ioDispatcher) {
+    override suspend fun getRecentActions(
+        excludeSensitives: Boolean,
+    ) = withContext(ioDispatcher) {
         runCatching {
-            val list = getMegaRecentAction().map {
+            val list = getMegaRecentAction(
+                excludeSensitives = excludeSensitives
+            ).map {
                 megaApiGateway.copyBucket(it).let { bucket ->
                     bucket to megaApiGateway.getNodesFromMegaNodeList(bucket.nodes)
                 }
@@ -56,13 +60,15 @@ internal class DefaultRecentActionsRepository @Inject constructor(
         }
     }
 
-    private suspend fun getMegaRecentAction(): List<MegaRecentActionBucket> =
+    private suspend fun getMegaRecentAction(
+        excludeSensitives: Boolean,
+    ): List<MegaRecentActionBucket> =
         withContext(ioDispatcher) {
             val result = suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getRequestListener("getRecentActionsAsync") {
                     megaApiGateway.copyBucketList(it.recentActions)
                 }
-                megaApiGateway.getRecentActionsAsync(DAYS, MAX_NODES, listener)
+                megaApiGateway.getRecentActionsAsync(DAYS, MAX_NODES, excludeSensitives, listener)
             }
             recentActionsMapper(result)
         }

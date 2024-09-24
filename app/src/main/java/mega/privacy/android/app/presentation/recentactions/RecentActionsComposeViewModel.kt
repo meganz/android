@@ -54,7 +54,10 @@ class RecentActionsComposeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            updateRecentActions()
+            val showHiddenItems = _uiState.value.showHiddenItems
+            updateRecentActions(
+                excludeSensitives = !showHiddenItems,
+            )
         }
 
         viewModelScope.launch {
@@ -64,7 +67,10 @@ class RecentActionsComposeViewModel @Inject constructor(
                 }
                 .conflate()
                 .collect {
-                    updateRecentActions()
+                    val showHiddenItems = _uiState.value.showHiddenItems
+                    updateRecentActions(
+                        excludeSensitives = !showHiddenItems,
+                    )
                 }
         }
 
@@ -97,10 +103,13 @@ class RecentActionsComposeViewModel @Inject constructor(
 
         viewModelScope.launch {
             monitorShowHiddenItemsUseCase()
-                .collectLatest {
+                .collectLatest { showHiddenItems ->
                     _uiState.update { state ->
-                        state.copy(showHiddenItems = it)
+                        state.copy(showHiddenItems = showHiddenItems)
                     }
+                    updateRecentActions(
+                        excludeSensitives = !showHiddenItems,
+                    )
                 }
         }
     }
@@ -108,9 +117,13 @@ class RecentActionsComposeViewModel @Inject constructor(
     /**
      * Update the recent actions list
      */
-    private suspend fun updateRecentActions() {
+    private suspend fun updateRecentActions(
+        excludeSensitives: Boolean,
+    ) {
         runCatching {
-            getRecentActionsUseCase()
+            getRecentActionsUseCase(
+                excludeSensitives = excludeSensitives,
+            )
         }.onSuccess { list ->
             val groupedRecentActions = list
                 .map { recentActionBucketUiEntityMapper(it) }
