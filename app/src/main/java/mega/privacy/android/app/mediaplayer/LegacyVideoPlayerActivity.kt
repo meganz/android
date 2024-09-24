@@ -16,7 +16,6 @@ import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.database.ContentObserver
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
@@ -32,7 +31,6 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
@@ -86,7 +84,6 @@ import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
-import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
@@ -186,9 +183,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
     private var playbackPositionDialog: Dialog? = null
 
     private var tempNodeId: NodeId? = null
-
-    @ColorInt
-    private var statusBarColor: Int = Color.TRANSPARENT
 
     private val nameCollisionActivityContract = registerForActivityResult(
         NameCollisionActivityContract()
@@ -1421,10 +1415,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         with(WindowInsetsControllerCompat(window, window.decorView)) {
             isAppearanceLightNavigationBars = false
             isAppearanceLightStatusBars = false
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-                window.statusBarColor = statusBarColor
-                window.navigationBarColor = getColor(android.R.color.transparent)
-            }
             show(WindowInsetsCompat.Type.systemBars())
         }
     }
@@ -1453,14 +1443,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         @ColorRes val toolbarBackgroundColor: Int
         val toolbarElevation: Float
 
-        val elevationStatusBarColor =
-            if (showElevation) {
-                val elevation = resources.getDimension(R.dimen.toolbar_elevation)
-                ColorUtils.getColorForElevation(this, elevation)
-            } else {
-                ContextCompat.getColor(this, android.R.color.transparent)
-            }
-
         val elevationToolbarBackgroundColor =
             if (showElevation) {
                 R.color.action_mode_background
@@ -1478,19 +1460,16 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
             (isMainPlayer || isPlaylist) && !isDarkMode -> {
                 moveToDarkModeUI()
                 toolbarElevation = TOOLBAR_ELEVATION_ZERO
-                if (isMainPlayer) {
-                    toolbarBackgroundColor = R.color.grey_alpha_070
-                    statusBarColor = ContextCompat.getColor(this, R.color.black)
+                toolbarBackgroundColor = if (isMainPlayer) {
+                    R.color.grey_alpha_070
                 } else {
-                    toolbarBackgroundColor = elevationToolbarBackgroundColor
-                    statusBarColor = elevationStatusBarColor
+                    elevationToolbarBackgroundColor
                 }
             }
 
             isDarkMode -> {
                 toolbarElevation = TOOLBAR_ELEVATION_ZERO
                 toolbarBackgroundColor = elevationToolbarBackgroundColor
-                statusBarColor = elevationStatusBarColor
             }
 
             else -> {
@@ -1506,12 +1485,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                     } else {
                         android.R.color.transparent
                     }
-                statusBarColor = ContextCompat.getColor(this, R.color.white_dark_grey)
             }
-        }
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-            window.statusBarColor = statusBarColor
         }
         binding.toolbar.setBackgroundColor(ContextCompat.getColor(this, toolbarBackgroundColor))
         binding.toolbar.elevation = toolbarElevation
@@ -1526,9 +1500,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         WindowInsetsControllerCompat(window, window.decorView).apply {
             isAppearanceLightNavigationBars = false
             isAppearanceLightStatusBars = false
-        }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-            window.navigationBarColor = getColor(android.R.color.transparent)
         }
     }
 

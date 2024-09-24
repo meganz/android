@@ -17,7 +17,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
@@ -57,7 +56,6 @@ import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
@@ -715,7 +713,6 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         val isDarkMode = isDarkMode(this)
         val isMainPlayer = navController.currentDestination?.id == R.id.audio_main_player
         @ColorRes val toolbarBackgroundColor: Int
-        @ColorInt val statusBarColor: Int
         val toolbarElevation: Float
 
         binding.rootLayout.setBackgroundColor(
@@ -728,7 +725,6 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             isMainPlayer -> {
                 toolbarElevation = TOOLBAR_ELEVATION_ZERO
                 toolbarBackgroundColor = android.R.color.transparent
-                statusBarColor = ContextCompat.getColor(this, R.color.grey_020_grey_800)
             }
 
             isDarkMode -> {
@@ -738,13 +734,6 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                         R.color.action_mode_background
                     } else {
                         R.color.dark_grey
-                    }
-                statusBarColor =
-                    if (showElevation) {
-                        val elevation = resources.getDimension(R.dimen.toolbar_elevation)
-                        ColorUtils.getColorForElevation(this, elevation)
-                    } else {
-                        ContextCompat.getColor(this, android.R.color.transparent)
                     }
             }
 
@@ -761,11 +750,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                     } else {
                         android.R.color.transparent
                     }
-                statusBarColor = ContextCompat.getColor(this, R.color.white_dark_grey)
             }
         }
-
-        window.statusBarColor = statusBarColor
         binding.toolbar.setBackgroundColor(ContextCompat.getColor(this, toolbarBackgroundColor))
         binding.toolbar.elevation = toolbarElevation
     }
