@@ -27,7 +27,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -124,7 +123,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         public ImageView fileGridIconForFile;
         public ImageButton imageButtonThreeDotsForFile;
         public TextView textViewFileNameForFile;
-        public RadioButton fileGridSelected;
+        public ImageView fileGridSelected;
     }
 
     public void toggleAllSelection(int pos) {
@@ -392,7 +391,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             holderGrid.imageViewVideoIcon = v.findViewById(R.id.file_grid_video_icon);
             holderGrid.videoDuration = v.findViewById(R.id.file_grid_title_video_duration);
             holderGrid.videoInfoLayout = v.findViewById(R.id.item_file_videoinfo_layout);
-            holderGrid.fileGridSelected = v.findViewById(R.id.file_grid_radio_button);
+            holderGrid.fileGridSelected = v.findViewById(R.id.file_grid_check_icon);
 
             holderGrid.itemLayout.setTag(holderGrid);
             holderGrid.itemLayout.setOnClickListener(this);

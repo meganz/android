@@ -52,7 +52,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -188,7 +187,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
         public ImageView imageViewThumb;
         public ImageView imageViewIcon;
-        public RelativeLayout thumbLayout;
+        public ConstraintLayout thumbLayout;
         public ImageView imageViewVideoIcon;
         public TextView videoDuration;
         public RelativeLayout videoInfoLayout;
@@ -202,7 +201,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public ImageButton imageButtonThreeDotsForFile;
         public TextView textViewFileNameForFile;
         public ImageView takenDownImageForFile;
-        public RadioButton fileGridSelected;
+        public ImageView fileGridSelected;
+        public ImageView folderGridSelected;
     }
 
     public class ViewHolderSortBy extends ViewHolderBrowser {
@@ -757,7 +757,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holderGrid.imageViewVideoIcon = v.findViewById(R.id.file_grid_video_icon);
             holderGrid.videoDuration = v.findViewById(R.id.file_grid_title_video_duration);
             holderGrid.videoInfoLayout = v.findViewById(R.id.item_file_videoinfo_layout);
-            holderGrid.fileGridSelected = v.findViewById(R.id.file_grid_radio_button);
+            holderGrid.fileGridSelected = v.findViewById(R.id.file_grid_check_icon);
+            holderGrid.folderGridSelected = v.findViewById(R.id.folder_grid_check_icon);
             holderGrid.bottomContainer = v.findViewById(R.id.grid_bottom_container);
             holderGrid.bottomContainer.setTag(holderGrid);
             holderGrid.bottomContainer.setOnClickListener(this);
@@ -816,9 +817,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         MegaNode node = getItem(position);
         //Placeholder for folder when folder count is odd.
         if (node == null) {
-            holder.folderLayout.setVisibility(View.INVISIBLE);
+            holder.folderLayout.setVisibility(View.GONE);
             holder.fileLayout.setVisibility(View.GONE);
-            holder.itemLayout.setVisibility(View.INVISIBLE);
+            holder.itemLayout.setVisibility(View.GONE);
             return;
         }
 
@@ -845,9 +846,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.folderLayout.setVisibility(View.VISIBLE);
             holder.fileLayout.setVisibility(View.GONE);
 
-            setFolderGridSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? DrawerItem.SHARED_ITEMS : DrawerItem.CLOUD_DRIVE));
+            setFolderGridSelected(holder, position);
 
             holder.imageViewIcon.setVisibility(View.VISIBLE);
+            holder.imageViewIcon.setImageResource(getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? DrawerItem.SHARED_ITEMS : DrawerItem.CLOUD_DRIVE));
             holder.imageViewThumb.setVisibility(View.GONE);
             holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
 
@@ -860,8 +862,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.textViewFileName.setVisibility(View.VISIBLE);
 
             holder.textViewFileNameForFile.setText(node.getName());
-            long nodeSize = node.getSize();
-
             holder.fileGridIconForFile.setVisibility(View.VISIBLE);
             holder.fileGridIconForFile.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 
@@ -918,19 +918,14 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             if (isMultipleSelect()) {
                 holder.imageButtonThreeDotsForFile.setVisibility(View.GONE);
-                holder.fileGridSelected.setVisibility(View.VISIBLE);
+                holder.fileGridSelected.setVisibility(isItemChecked(position) ? View.VISIBLE : View.INVISIBLE);
             } else {
-                holder.imageButtonThreeDotsForFile.setVisibility(View.VISIBLE);
                 holder.fileGridSelected.setVisibility(View.GONE);
+                holder.imageButtonThreeDotsForFile.setVisibility(View.VISIBLE);
             }
 
-            if (isMultipleSelect() && isItemChecked(position)) {
-                holder.fileGridSelected.setChecked(true);
-                holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_item_grid_selected));
-            } else {
-                holder.fileGridSelected.setChecked(false);
-                holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
-            }
+            holder.itemLayout.setBackground(ContextCompat.getDrawable(context,
+                    isMultipleSelect() && isItemChecked(position) ? R.drawable.background_item_grid_selected : R.drawable.background_item_grid));
         }
     }
 
@@ -941,18 +936,17 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         holder.imageViewThumb.setImageBitmap(thumb);
     }
 
-    private void setFolderGridSelected(ViewHolderBrowserGrid holder, int position, int folderDrawableResId) {
-        if (isMultipleSelect() && isItemChecked(position)) {
-            RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageViewIcon.getLayoutParams();
-            paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, context.getResources().getDisplayMetrics());
-            paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, context.getResources().getDisplayMetrics());
-            holder.imageViewIcon.setLayoutParams(paramsMultiselect);
-            holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_item_grid_selected));
-            holder.imageViewIcon.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
+    private void setFolderGridSelected(ViewHolderBrowserGrid holder, int position) {
+        if (isMultipleSelect()) {
+            holder.imageButtonThreeDots.setVisibility(View.GONE);
+            holder.folderGridSelected.setVisibility(isItemChecked(position) ? View.VISIBLE : View.INVISIBLE);
         } else {
-            holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
-            holder.imageViewIcon.setImageResource(folderDrawableResId);
+            holder.folderGridSelected.setVisibility(View.GONE);
+            holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
         }
+
+        holder.itemLayout.setBackground(ContextCompat.getDrawable(context,
+                isMultipleSelect() && isItemChecked(position) ? R.drawable.background_item_grid_selected : R.drawable.background_item_grid));
     }
 
     private void setFolderListSelected(ViewHolderBrowserList holder, int position, int folderDrawableResId) {

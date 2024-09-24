@@ -101,69 +101,67 @@ private fun OfflineListContent(
     onOfflineItemClicked: (OfflineNodeUIItem) -> Unit,
     onItemLongClicked: (OfflineNodeUIItem) -> Unit,
     onOptionClicked: (OfflineNodeUIItem) -> Unit,
-) {
-    if (uiState.currentViewType == ViewType.LIST || isRootFolderOnly) {
-        LazyColumn(
-            contentPadding = PaddingValues(bottom = 86.dp)
-        ) {
-            items(uiState.offlineNodes) {
-                NodeListViewItem(
-                    title = it.offlineNode.name,
-                    subtitle = getOfflineNodeDescription(it.offlineNode),
-                    icon = if (it.offlineNode.isFolder) {
-                        IconPackR.drawable.ic_folder_medium_solid
-                    } else {
-                        fileTypeIconMapper(getFileExtension(it.offlineNode.name))
-                    },
-                    thumbnailData = it.offlineNode.thumbnail,
-                    onMoreClicked = {
-                        onOptionClicked(it)
-                    },
-                    onItemClicked = {
-                        onOfflineItemClicked(it)
-                    },
-                    onLongClick = {
-                        onItemLongClicked(it)
-                    },
-                    isSelected = it.isSelected
-                )
-                MegaDivider(dividerType = DividerType.BigStartPadding)
-            }
+) = if (uiState.currentViewType == ViewType.LIST || isRootFolderOnly) {
+    LazyColumn(
+        contentPadding = PaddingValues(bottom = 86.dp)
+    ) {
+        items(uiState.offlineNodes) {
+            NodeListViewItem(
+                title = it.offlineNode.name,
+                subtitle = getOfflineNodeDescription(it.offlineNode),
+                icon = if (it.offlineNode.isFolder) {
+                    IconPackR.drawable.ic_folder_medium_solid
+                } else {
+                    fileTypeIconMapper(getFileExtension(it.offlineNode.name))
+                },
+                thumbnailData = it.offlineNode.thumbnail,
+                onMoreClicked = it.takeIf { uiState.selectedNodeHandles.isEmpty() }
+                    ?.let { item -> { onOptionClicked(item) } },
+                onItemClicked = {
+                    onOfflineItemClicked(it)
+                },
+                onLongClick = {
+                    onItemLongClicked(it)
+                },
+                isSelected = it.isSelected
+            )
+            MegaDivider(dividerType = DividerType.BigStartPadding)
         }
-    } else {
-        val newList = rememberNodeListForGrid(
-            offlineNodeUIItem = uiState.offlineNodes,
-            spanCount = spanCount
-        )
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(spanCount),
-            modifier = Modifier
-                .padding(horizontal = 4.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            items(newList) {
-                NodeGridViewItem(
-                    isFolderNode = it.offlineNode.isFolder,
-                    name = it.offlineNode.name,
-                    iconRes = if (it.offlineNode.isFolder) {
-                        IconPackR.drawable.ic_folder_medium_solid
-                    } else {
-                        fileTypeIconMapper(getFileExtension(it.offlineNode.name))
-                    },
-                    thumbnailData = it.offlineNode.thumbnail,
-                    isSelected = it.isSelected,
-                    isTakenDown = false,
-                    inVisible = it.isInvisible,
-                    onClick = {
-                        onOfflineItemClicked(it)
-                    },
-                    onLongClick = {
-                        onItemLongClicked(it)
-                    },
-                    onMenuClick = {}
-                )
-            }
+    }
+} else {
+    val newList = rememberNodeListForGrid(
+        offlineNodeUIItem = uiState.offlineNodes,
+        spanCount = spanCount
+    )
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(spanCount),
+        modifier = Modifier
+            .padding(horizontal = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        items(newList) {
+            NodeGridViewItem(
+                isFolderNode = it.offlineNode.isFolder,
+                name = it.offlineNode.name,
+                iconRes = if (it.offlineNode.isFolder) {
+                    IconPackR.drawable.ic_folder_medium_solid
+                } else {
+                    fileTypeIconMapper(getFileExtension(it.offlineNode.name))
+                },
+                thumbnailData = it.offlineNode.thumbnail,
+                isSelected = it.isSelected,
+                isTakenDown = false,
+                isInvisible = it.isInvisible,
+                onClick = {
+                    onOfflineItemClicked(it)
+                },
+                onLongClick = {
+                    onItemLongClicked(it)
+                },
+                onMenuClick = it.takeIf { uiState.selectedNodeHandles.isEmpty() }
+                    ?.let { item -> { onOptionClicked(item) } }
+            )
         }
     }
 }

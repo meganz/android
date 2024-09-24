@@ -124,7 +124,7 @@ fun <T : TypedNode> NodeGridView(
                 onMenuClick = { onMenuClick(nodeUIItems[it]) }.takeIf { !inSelectionMode },
                 isVideoNode = (nodeUIItems[it].node as? FileNode)?.type is VideoFileTypeInfo,
                 isFolderNode = nodeUIItems[it].node is TypedFolderNode,
-                inVisible = nodeUIItems[it].isInvisible,
+                isInvisible = nodeUIItems[it].isInvisible,
                 isSensitive = nodeSourceType != NodeSourceType.INCOMING_SHARES
                         && nodeSourceType != NodeSourceType.OUTGOING_SHARES
                         && nodeSourceType != NodeSourceType.LINKS

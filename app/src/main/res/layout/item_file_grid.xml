@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:visibility="gone">
 
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/file_grid_thumbnail_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp">
@@ -23,47 +23,70 @@
                 android:id="@+id/file_grid_icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
                 android:background="@null"
                 android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/file_grid_filename"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_toStartOf="@+id/file_grid_taken_down"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_toEndOf="@+id/file_grid_icon"
                 android:ellipsize="middle"
                 android:singleLine="true"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/file_grid_taken_down"
+                app:layout_constraintStart_toEndOf="@+id/file_grid_icon"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/file_grid_taken_down"
                 style="@style/taken_down_icon"
-                android:layout_alignParentEnd="true"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="22dp"
-                android:layout_toStartOf="@+id/file_grid_three_dots"
+                android:layout_marginEnd="8dp"
                 android:src="@drawable/ic_alert_triangle_medium_regular_outline"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/file_grid_three_dots"
+                app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/color_button_brand"
                 tools:ignore="ContentDescription" />
 
             <ImageButton
                 android:id="@+id/file_grid_three_dots"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginHorizontal="8dp"
                 android:background="@null"
                 android:src="@drawable/ic_dots_vertical_grey"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/folder_grid_check_icon"
+                app:layout_constraintTop_toTopOf="parent"
                 app:tint="?android:attr/textColorSecondary"
                 tools:ignore="ContentDescription" />
-        </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/folder_grid_check_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone"
+                android:src="@drawable/ic_check_circle_small_regular_solid"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?android:attr/colorAccent"
+                tools:ignore="ContentDescription" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </RelativeLayout>
 
     <RelativeLayout
@@ -142,7 +165,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:layout_toStartOf="@+id/file_grid_taken_down_for_file"
                 android:ellipsize="middle"
                 android:singleLine="true"
                 android:textSize="14sp"
@@ -155,40 +177,40 @@
                 android:id="@+id/file_grid_taken_down_for_file"
                 style="@style/taken_down_icon"
                 android:layout_marginEnd="8dp"
-                android:layout_toStartOf="@+id/file_grid_three_dots_for_file"
                 android:src="@drawable/ic_alert_triangle_medium_regular_outline"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/file_grid_three_dots_for_file"
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/color_button_brand"
-                tools:ignore="ContentDescription"
-                tools:visibility="visible" />
+                tools:ignore="ContentDescription" />
 
             <ImageButton
                 android:id="@+id/file_grid_three_dots_for_file"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_toStartOf="@+id/file_grid_radio_button"
+                android:layout_toStartOf="@+id/file_grid_check_icon"
                 android:background="@null"
                 android:src="@drawable/ic_dots_vertical_grey"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/file_grid_radio_button"
+                app:layout_constraintEnd_toStartOf="@+id/file_grid_check_icon"
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="?android:attr/textColorSecondary"
                 tools:ignore="ContentDescription" />
 
-            <RadioButton
-                android:id="@+id/file_grid_radio_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
+            <ImageView
+                android:id="@+id/file_grid_check_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginHorizontal="8dp"
+                android:src="@drawable/ic_check_circle_small_regular_solid"
+                app:tint="?android:attr/colorAccent"
                 android:visibility="gone"
+                tools:ignore="ContentDescription"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:visibility="visible" />
+                app:layout_constraintTop_toTopOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </RelativeLayout>
 </RelativeLayout>

@@ -155,12 +155,11 @@ class FavouritesGridViewHolder(
                             folderGridTakenDown.isVisible = info.typedNode.isTakenDown
                             textViewSettings(folderGridFilename, info)
                             if (selectionMode) {
-                                folderGridRadioButton.visibility = View.VISIBLE
+                                folderGridCheckIcon.visibility = if(info.isSelected)View.VISIBLE else View.INVISIBLE
                                 folderGridThreeDots.visibility = View.GONE
-                                folderGridRadioButton.isChecked = info.isSelected
                             } else {
                                 folderGridThreeDots.visibility = View.VISIBLE
-                                folderGridRadioButton.visibility = View.GONE
+                                folderGridCheckIcon.visibility = View.GONE
                             }
                             folderGridThreeDots.setOnClickListener {
                                 onThreeDotsClicked(info)
@@ -177,12 +176,11 @@ class FavouritesGridViewHolder(
                             }
 
                             if (selectionMode) {
-                                fileGridRadioButton.visibility = View.VISIBLE
+                                fileGridCheckIcon.visibility = if(info.isSelected)View.VISIBLE else View.INVISIBLE
                                 fileGridThreeDots.visibility = View.GONE
-                                fileGridRadioButton.isChecked = info.isSelected
                             } else {
                                 fileGridThreeDots.visibility = View.VISIBLE
-                                fileGridRadioButton.visibility = View.GONE
+                                fileGridCheckIcon.visibility = View.GONE
                             }
                             if (MimeTypeList.typeForName(info.typedNode.name).isVideo) {
                                 videoInfo.isVisible = true

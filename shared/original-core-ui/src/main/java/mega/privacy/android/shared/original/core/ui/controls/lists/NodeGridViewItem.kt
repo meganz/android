@@ -1,11 +1,11 @@
 package mega.privacy.android.shared.original.core.ui.controls.lists
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,7 +42,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.icon.pack.R
-import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaRadioButton
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.images.GridThumbnailView
@@ -54,6 +52,7 @@ import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.color_button_brand
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.icon.pack.R as IconPackR
 
 /**
  * Node grid view item
@@ -83,12 +82,12 @@ fun NodeGridViewItem(
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     onMenuClick: (() -> Unit)? = null,
-    inVisible: Boolean = false,
+    isInvisible: Boolean = false,
     isSensitive: Boolean = false,
     showBlurEffect: Boolean = false,
 ) {
 
-    if (inVisible) {
+    if (isInvisible) {
         Spacer(
             modifier = Modifier
                 .height(48.dp)
@@ -237,30 +236,40 @@ private fun Footer(
             Image(
                 modifier = Modifier
                     .padding(start = 8.dp)
-                    .size(20.dp)
+                    .size(24.dp)
                     .testTag(GRID_VIEW_TAKEN_TEST_TAG),
                 painter = painterResource(id = R.drawable.ic_alert_triangle_medium_regular_outline),
                 colorFilter = ColorFilter.tint(MaterialTheme.colors.color_button_brand),
                 contentDescription = "Taken Down",
             )
         }
+        val optionIconSize = 32.dp
         if (onMenuClick != null) {
-            IconButton(onClick = onMenuClick) {
-                Icon(
-                    painter = painterResource(id = IconPackR.drawable.ic_more_vertical_medium_regular_outline),
-                    tint = MegaOriginalTheme.colors.icon.secondary,
-                    contentDescription = "More",
-                    modifier = Modifier
-                        .size(24.dp)
-                        .testTag(GRID_VIEW_MORE_ICON_TEST_TAG)
-                )
-            }
-        } else {
-            MegaRadioButton(
-                selected = isSelected,
-                onClick = onClick,
-                modifier = Modifier.testTag(GRID_VIEW_RADIO_SELECTION_TEST_TAG),
+            Icon(
+                painter = painterResource(id = IconPackR.drawable.ic_more_vertical_medium_regular_outline),
+                tint = MegaOriginalTheme.colors.icon.secondary,
+                contentDescription = "More",
+                modifier = Modifier
+                    .size(optionIconSize)
+                    .clickable { onMenuClick() }
+                    .padding(all = 4.dp)
+                    .testTag(GRID_VIEW_MORE_ICON_TEST_TAG)
             )
+        } else {
+            if (isSelected) {
+                Icon(
+                    painter = painterResource(id = IconPackR.drawable.ic_check_circle_medium_regular_solid),
+                    tint = MegaOriginalTheme.colors.icon.accent,
+                    contentDescription = "Selected",
+                    modifier = Modifier
+                        .size(optionIconSize)
+                        .clickable { onClick() }
+                        .padding(all = 4.dp)
+                        .testTag(GRID_VIEW_CHECK_SELECTION_TEST_TAG),
+                )
+            } else {
+                Spacer(modifier = Modifier.size(optionIconSize))
+            }
         }
     }
 }
@@ -349,7 +358,7 @@ private class NodeGridViewItemDataProvider : PreviewParameterProvider<NodeGridVi
             isVideoNode = true
         ),
         NodeGridViewItemData(
-            name = "NodeGridViewItem4",
+            name = "NodeGridViewItem4BigName",
             thumbnailData = "https://mega.io/wp-content/themes/megapages/megalib/images/megaicon.svg",
             duration = "12:3",
             isTakenDown = true,
@@ -368,7 +377,7 @@ const val NODE_TITLE_TEXT_TEST_TAG = "node_grid_view_item:node_title"
 /**
  * Text tag for selected item
  */
-const val GRID_VIEW_RADIO_SELECTION_TEST_TAG = "node_grid_view_item:node_selected"
+const val GRID_VIEW_CHECK_SELECTION_TEST_TAG = "node_grid_view_item:node_selected"
 
 
 /**

@@ -3,6 +3,7 @@ package mega.privacy.android.shared.original.core.ui.controls.lists
 import androidx.activity.ComponentActivity
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -64,8 +65,8 @@ class NodeGridViewItemTest {
         setComposeContent()
         composeTestRule.onNodeWithTag(NODE_TITLE_TEXT_TEST_TAG, useUnmergedTree = true)
             .assertExists()
-        composeTestRule.onNodeWithTag(GRID_VIEW_RADIO_SELECTION_TEST_TAG, useUnmergedTree = true)
-            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(GRID_VIEW_CHECK_SELECTION_TEST_TAG, useUnmergedTree = true)
+            .assertIsNotDisplayed()
         composeTestRule.onNodeWithTag(THUMBNAIL_FILE_TEST_TAG, useUnmergedTree = true)
             .assertExists()
         composeTestRule.onNodeWithTag(GRID_VIEW_TAKEN_TEST_TAG, useUnmergedTree = true)
@@ -85,8 +86,8 @@ class NodeGridViewItemTest {
         setComposeContent(isFolderNode = true)
         composeTestRule.onNodeWithTag(NODE_TITLE_TEXT_TEST_TAG, useUnmergedTree = true)
             .assertExists()
-        composeTestRule.onNodeWithTag(GRID_VIEW_RADIO_SELECTION_TEST_TAG, useUnmergedTree = true)
-            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(GRID_VIEW_CHECK_SELECTION_TEST_TAG, useUnmergedTree = true)
+            .assertIsNotDisplayed()
         composeTestRule.onNodeWithTag(THUMBNAIL_FILE_TEST_TAG, useUnmergedTree = true)
             .assertDoesNotExist()
         composeTestRule.onNodeWithTag(GRID_VIEW_TAKEN_TEST_TAG, useUnmergedTree = true)
@@ -103,8 +104,8 @@ class NodeGridViewItemTest {
 
     @Test
     fun `test that radio selection button is visible when more click option is null`() {
-        setComposeContent(onMenuClick = null)
-        composeTestRule.onNodeWithTag(GRID_VIEW_RADIO_SELECTION_TEST_TAG, useUnmergedTree = true)
+        setComposeContent(onMenuClick = null, isSelected = true)
+        composeTestRule.onNodeWithTag(GRID_VIEW_CHECK_SELECTION_TEST_TAG, useUnmergedTree = true)
             .assertExists()
         composeTestRule.onNodeWithTag(GRID_VIEW_MORE_ICON_TEST_TAG, useUnmergedTree = true)
             .assertDoesNotExist()
