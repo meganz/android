@@ -307,11 +307,11 @@
     <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
     <string name="account_pro_flexi_account_deactivated_dialog_body">Ваш аккаунт Pro&#160;Flexi был деактивирован из-за сбоя оплаты или из-за того, что вы отменили подписку. Вы не сможете получить доступ к данным, хранящимся в вашем аккаунте.\nДля оплаты и возобновления подписки войдите в MEGA через веб-браузер.</string>
     <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
-    <string name="general_low_tier_plan_starter_label">Starter</string>
+    <string name="general_low_tier_plan_starter_label">MEGA&#160;Starter</string>
     <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
-    <string name="general_low_tier_plan_basic_label">Basic</string>
+    <string name="general_low_tier_plan_basic_label">MEGA&#160;Basic</string>
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
-    <string name="general_low_tier_plan_essential_label">Essential</string>
+    <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_body">Загрузка будет приостановлена до тех пор, пока вы не начнете заряжать устройство. Загрузка по-прежнему будет приостановлена, если уровень заряда батареи ниже 20%.</string>
     <!-- Title of the synced folder list empty state -->
@@ -720,4 +720,10 @@
     <string name="subtitle_enable_access_contact">Чтобы приглашать друзей, нужно разрешить MEGA доступ к вашему списку контактов</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">Открыть доступ</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
+    <string name="document_scanning_confirmation_file_type_pdf">PDF</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Document is uploaded as a JPEG file. This option can only be selected when there is only one scanned document-->
+    <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
+    <string name="document_scanning_confirmation_destination_chat">Чат</string>
 </resources>

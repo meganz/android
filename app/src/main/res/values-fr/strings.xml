@@ -137,7 +137,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Première fois sur MEGA ?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">Créer un compte MEGA</string>
+    <string name="create_account">M’inscrire</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">Saisissez votre adresse courriel</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->

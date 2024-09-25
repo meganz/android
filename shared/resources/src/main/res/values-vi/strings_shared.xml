@@ -283,11 +283,11 @@
     <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
     <string name="account_pro_flexi_account_deactivated_dialog_body">Tài&#160;khoản Pro&#160;Flexi của bạn đã bị vô&#160;hiệu hóa do việc thanh&#160;toán đã không thành&#160;công hoặc bạn đã hủy gói đăng&#160;ký dịch&#160;vụ. Bạn sẽ không thể truy&#160;cập vào dữ&#160;liệu đã được lưu&#160;trữ trong tài&#160;khoản của mình. \nĐể thanh&#160;toán và kích&#160;hoạt lại gói đăng&#160;ký của bạn, hãy đăng&#160;nhập vào MEGA bằng trình&#160;duyệt web.</string>
     <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
-    <string name="general_low_tier_plan_starter_label">Starter</string>
+    <string name="general_low_tier_plan_starter_label">MEGA&#160;Starter</string>
     <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
-    <string name="general_low_tier_plan_basic_label">Basic</string>
+    <string name="general_low_tier_plan_basic_label">MEGA&#160;Basic</string>
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
-    <string name="general_low_tier_plan_essential_label">Essential</string>
+    <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_body">Cá phiên tải lên sẽ bị tạm dừng cho đến khi bạn sạc thiết&#160;bị của mình. Việc tải lên sẽ vẫn tạm dừng nếu pin của bạn dưới mức 20%.</string>
     <!-- Title of the synced folder list empty state -->
@@ -684,4 +684,10 @@
     <string name="subtitle_enable_access_contact">Để mời bạn&#160;bè, bạn phải cho phép MEGA truy&#160;cập sổ danh&#160;bạ của bạn.</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">Cho phép quyền truy&#160;cập</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
+    <string name="document_scanning_confirmation_file_type_pdf">PDF</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Document is uploaded as a JPEG file. This option can only be selected when there is only one scanned document-->
+    <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
+    <string name="document_scanning_confirmation_destination_chat">Chat</string>
 </resources>
