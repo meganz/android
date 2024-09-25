@@ -26,7 +26,6 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.AddContactActivity
-import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.DatePickerType.END_DATE
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.DatePickerType.START_DATE
@@ -96,8 +95,8 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
      * Perform Activity initialization
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         collectFlows()
 
@@ -204,12 +203,6 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                         onStartDateClicked = { showDatePicker(START_DATE) },
                         onEndTimeClicked = { showTimePicker(false) },
                         onEndDateClicked = { showDatePicker(END_DATE) },
-                        onScrollChange = { scrolled ->
-                            this@CreateScheduledMeetingActivity.changeStatusBarColor(
-                                scrolled,
-                                isDark
-                            )
-                        },
                         onDismiss = viewModel::dismissDialog,
                         onResetSnackbarMessage = viewModel::onSnackbarMessageConsumed,
                         onDiscardMeetingDialog = { finishCreateScheduledMeeting(RESULT_CANCELED) },
@@ -235,12 +228,6 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                 composable(CUSTOM_RECURRENCE_TAG) {
                     CustomRecurrenceView(
                         state = uiState,
-                        onScrollChange = { scrolled ->
-                            this@CreateScheduledMeetingActivity.changeStatusBarColor(
-                                scrolled,
-                                isDark
-                            )
-                        },
                         onAcceptClicked = {
                             viewModel.onAcceptClicked()
                             navController.navigate(CREATE_SCHEDULED_MEETING_TAG)

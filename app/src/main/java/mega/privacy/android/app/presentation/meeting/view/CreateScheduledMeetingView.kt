@@ -10,11 +10,15 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -125,7 +129,6 @@ internal fun CreateScheduledMeetingView(
     onUpgradeNowClicked: () -> Unit,
     onDescriptionValueChange: (String) -> Unit,
     onTitleValueChange: (String) -> Unit,
-    onScrollChange: (Boolean) -> Unit,
     onButtonClicked: (ScheduleMeetingAction) -> Unit = {},
     onRecurrenceDialogOptionClicked: (RecurrenceDialogOption) -> Unit,
 ) {
@@ -140,9 +143,10 @@ internal fun CreateScheduledMeetingView(
     val shouldShowWarningDialog =
         state.enabledWaitingRoomOption && state.enabledAllowAddParticipantsOption &&
                 managementState.waitingRoomReminder == WaitingRoomReminders.Enabled
-
     Scaffold(
-        modifier = Modifier.systemBarsPadding(),
+        modifier = Modifier
+            .navigationBarsPadding()
+            .imePadding(),
         scaffoldState = scaffoldState,
         snackbarHost = {
             SnackbarHost(hostState = it) { data ->
@@ -258,8 +262,6 @@ internal fun CreateScheduledMeetingView(
     }
 
     SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
-
-    onScrollChange(!firstItemVisible)
 }
 
 @Composable
@@ -529,6 +531,7 @@ private fun ScheduleMeetingAppBar(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.statusBars)
         ) {
             Row(
                 modifier = Modifier
@@ -553,15 +556,18 @@ private fun ScheduleMeetingAppBar(
                     modifier = Modifier
                         .wrapContentSize(Alignment.CenterEnd)
                 ) {
-                    IconButton(onClick = {
-                        if (!state.isCreatingMeeting && !state.isAddingParticipants && state.isValid()) {
-                            onAcceptClicked()
-                        }
-                    }) {
+                    val isValidForm = state.isValid() && !state.isAddingParticipants
+                    IconButton(
+                        enabled = isValidForm,
+                        onClick = {
+                            if (!state.isCreatingMeeting && isValidForm) {
+                                onAcceptClicked()
+                            }
+                        }) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_confirm),
                             contentDescription = "Accept schedule meeting button",
-                            tint = if (state.isValid() && !state.isAddingParticipants) MaterialTheme.colors.secondary
+                            tint = if (isValidForm) MaterialTheme.colors.secondary
                             else MaterialTheme.colors.grey_alpha_038_white_alpha_038
                         )
                     }
@@ -856,7 +862,6 @@ private fun PreviewCreateScheduledMeetingView() {
             onStartDateClicked = {},
             onEndTimeClicked = {},
             onEndDateClicked = {},
-            onScrollChange = {},
             onDismiss = {},
             onResetSnackbarMessage = {},
             onDiscardMeetingDialog = {},
@@ -900,7 +905,6 @@ private fun CreateScheduledMeetingViewWithFreePlanLimitWarningPreview() {
             onStartDateClicked = {},
             onEndTimeClicked = {},
             onEndDateClicked = {},
-            onScrollChange = {},
             onDismiss = {},
             onResetSnackbarMessage = {},
             onDiscardMeetingDialog = {},

@@ -8,12 +8,14 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
@@ -87,7 +89,6 @@ internal fun CustomRecurrenceView(
     onWeekdaysClicked: () -> Unit,
     onFocusChanged: () -> Unit,
     onDateClicked: () -> Unit,
-    onScrollChange: (Boolean) -> Unit,
     onIntervalChanged: (String) -> Unit,
     onMonthDayChanged: (String) -> Unit,
     onMonthWeekDayChanged: (Weekday) -> Unit,
@@ -102,7 +103,7 @@ internal fun CustomRecurrenceView(
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
-        modifier = Modifier.systemBarsPadding(),
+        modifier = Modifier.navigationBarsPadding(),
         scaffoldState = scaffoldState,
         snackbarHost = {
             SnackbarHost(hostState = it) { data ->
@@ -195,8 +196,6 @@ internal fun CustomRecurrenceView(
             }
         }
     }
-
-    onScrollChange(!firstItemVisible)
 }
 
 /**
@@ -222,6 +221,7 @@ private fun CustomRecurrenceAppBar(
                 fontWeight = FontWeight.Medium
             )
         },
+        windowInsets = WindowInsets.statusBars,
         navigationIcon = {
             IconButton(modifier = Modifier.testTag(TEST_TAG_BACK_ICON), onClick = onRejectClicked) {
                 Icon(
@@ -773,7 +773,6 @@ private fun PreviewCustomRecurrenceView() {
                 buttons = ScheduleMeetingAction.values().asList(),
                 snackbarMessageContent = consumed()
             ),
-            onScrollChange = {},
             onAcceptClicked = {},
             onRejectClicked = {},
             onIntervalChanged = {},

@@ -8,14 +8,6 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
 import mega.privacy.android.app.presentation.meeting.model.CustomRecurrenceState
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
-import mega.privacy.android.app.presentation.meeting.view.CustomRecurrenceView
-import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_ACCEPT_ICON
-import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_BACK_ICON
-import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_ENDS
-import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_DAILY
-import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_EVERY
-import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_MONTHLY
-import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_WEEKLY
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.Weekday
@@ -175,7 +167,6 @@ class CustomRecurrenceViewTest {
                     snackbarMessageContent = consumed()
                 ),
                 onAcceptClicked = mock,
-                onScrollChange = {},
                 onRejectClicked = {},
                 onIntervalChanged = {},
                 onFrequencyTypeChanged = {},
@@ -208,7 +199,6 @@ class CustomRecurrenceViewTest {
                     snackbarMessageContent = consumed()
                 ),
                 onRejectClicked = mock,
-                onScrollChange = {},
                 onAcceptClicked = {},
                 onIntervalChanged = {},
                 onFrequencyTypeChanged = {},
@@ -269,7 +259,6 @@ class CustomRecurrenceViewTest {
         composeTestRule.setContent {
             CustomRecurrenceView(
                 state = state,
-                onScrollChange = {},
                 onAcceptClicked = {},
                 onRejectClicked = {},
                 onIntervalChanged = {},

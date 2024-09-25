@@ -8,15 +8,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import mega.android.core.ui.tokens.theme.tokens.AndroidNewSemanticTokensDark
 import mega.android.core.ui.tokens.theme.tokens.AndroidNewSemanticTokensLight
 import mega.android.core.ui.tokens.theme.tokens.Background
@@ -139,17 +136,6 @@ fun OriginalTheme(
     }
     val colors = MegaColors(semanticTokens, !isDark)
 
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        val systemUiController = rememberSystemUiController()
-        DisposableEffect(systemUiController, isDark) {
-            systemUiController.setSystemBarsColor(
-                color = legacyColors.primary,
-                darkIcons = !isDark
-            )
-            onDispose { }
-        }
-    }
     val colorPalette by remember(colors) {
         mutableStateOf(colors)
     }

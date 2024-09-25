@@ -7,8 +7,6 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
-import mega.privacy.android.app.presentation.meeting.view.CreateScheduledMeetingView
-import mega.privacy.android.app.presentation.meeting.view.UPGRADE_ACCOUNT_BUTTON_TAG
 import mega.privacy.android.domain.entity.AccountType
 import org.junit.Rule
 import org.junit.Test
@@ -75,7 +73,6 @@ class CreateScheduledMeetingViewTest {
                 onUpgradeNowClicked = mock,
                 onDescriptionValueChange = { },
                 onTitleValueChange = { },
-                onScrollChange = { },
                 onRecurrenceDialogOptionClicked = { },
             )
         }
@@ -104,7 +101,6 @@ class CreateScheduledMeetingViewTest {
                 onUpgradeNowClicked = { },
                 onDescriptionValueChange = { },
                 onTitleValueChange = { },
-                onScrollChange = { },
                 onRecurrenceDialogOptionClicked = { },
             )
         }
