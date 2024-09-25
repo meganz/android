@@ -15,6 +15,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -40,7 +41,6 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
-import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.CreateChatListener
@@ -104,7 +104,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import nz.mega.sdk.MegaApiJava
@@ -137,11 +136,8 @@ import javax.inject.Inject
 /**
  * Activity used for several purposes like import content to the cloud, copies or movements.
  *
- * @property filePrepareUseCase        [FilePrepareUseCase]
  * @property getChatChangesUseCase     [GetChatChangesUseCase]
- * @property uploadUseCase             [UploadUseCase]
  * @property copyNodeUseCase           [CopyNodeUseCase]
- * @property getFeatureFlagValueUseCase [GetFeatureFlagValueUseCase]
  * @property loginMutex                Mutex.
  * @property isList                    True if the view is in list mode, false if it is in grid mode.
  * @property mode                      Mode for opening the file explorer: [UPLOAD], [MOVE], [COPY], [CAMERA], [IMPORT], [SELECT], [SELECT_CAMERA_FOLDER], [SHARE_LINK] or [SAVE]
@@ -157,9 +153,6 @@ import javax.inject.Inject
 class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener,
     ActionNodeCallback, SnackbarShower {
-
-    @Inject
-    lateinit var filePrepareUseCase: FilePrepareUseCase
 
     @Inject
     lateinit var getChatChangesUseCase: GetChatChangesUseCase
@@ -377,7 +370,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             intent.action = action
         }
 
-        if (importFileF) {
+        if (chatListItems.isNotEmpty()) {
+            onIntentProcessed(filePreparedInfos)
+        } else if (importFileF) {
             when {
                 importFragmentSelected != -1 -> chooseFragment(importFragmentSelected)
                 ACTION_UPLOAD_TO_CHAT == action -> chooseFragment(CHAT_FRAGMENT)
@@ -1025,7 +1020,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         newChatMenuItem?.isVisible = false
         searchView = searchMenuItem?.actionView as SearchView?
         val searchAutoComplete =
-            searchView?.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text)
+            searchView?.findViewById<AppCompatAutoCompleteTextView>(androidx.appcompat.R.id.search_src_text)
 
         searchAutoComplete?.hint = getString(R.string.hint_action_search)
         searchView?.findViewById<View>(androidx.appcompat.R.id.search_plate)
@@ -2381,16 +2376,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 resources.getQuantityString(R.plurals.upload_prepare, 1)
             )
 
-            filePrepareUseCase.prepareFiles(intent)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    { shareInfo: List<ShareInfo> ->
-                        onIntentProcessed(shareInfo)
-                    },
-                    { throwable: Throwable -> Timber.e(throwable) }
-                )
-                .addTo(composite)
+            viewModel.ownFilePrepareTask(this, intent)
         } else {
             onIntentProcessed(filePreparedInfos)
         }
