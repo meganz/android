@@ -15,7 +15,7 @@ class ClearChatDataLogoutTask @Inject constructor(
     /**
      * Invoke
      */
-    override suspend fun invoke() {
+    override suspend fun onLogoutSuccess() {
         clearAllChatDataUseCase()
     }
 }

@@ -16,7 +16,7 @@ class RemoveBackupFoldersLogoutTask @Inject constructor(
      * Invoke
      *
      */
-    override suspend fun invoke() {
+    override suspend fun onPreLogout() {
         removeBackupFolderUseCase(CameraUploadFolderType.Primary)
         removeBackupFolderUseCase(CameraUploadFolderType.Secondary)
     }

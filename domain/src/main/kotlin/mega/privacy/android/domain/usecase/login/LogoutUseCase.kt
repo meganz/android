@@ -20,11 +20,18 @@ class LogoutUseCase @Inject constructor(
         setLogoutInProgressFlagUseCase(true)
         runCatching {
             logoutTasks.forEach {
-                it()
+                it.onPreLogout()
             }
             loginRepository.logout()
+        }.onSuccess {
+            logoutTasks.forEach {
+                it.onLogoutSuccess()
+            }
         }.onFailure {
             setLogoutInProgressFlagUseCase(false)
+            logoutTasks.forEach { task ->
+                task.onLogoutFailed(it)
+            }
             throw it
         }
     }

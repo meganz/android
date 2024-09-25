@@ -27,14 +27,14 @@ class ClearPasscodeDataLogoutTaskTest {
 
     @Test
     internal fun `test that passcode attempts are set to 0`() = runTest {
-        underTest()
+        underTest.onLogoutSuccess()
 
         verify(passcodeRepository).setFailedAttempts(0)
     }
 
     @Test
     internal fun `test that passcode enabled state is set to false`() = runTest{
-        underTest()
+        underTest.onLogoutSuccess()
 
         verify(disablePasscodeUseCase).invoke()
     }

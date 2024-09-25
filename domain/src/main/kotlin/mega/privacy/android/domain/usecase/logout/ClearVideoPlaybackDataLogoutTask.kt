@@ -15,7 +15,7 @@ class ClearVideoPlaybackDataLogoutTask @Inject constructor(
     /**
      * Invoke
      */
-    override suspend fun invoke() {
+    override suspend fun onLogoutSuccess() {
         clearRecentlyWatchedVideosUseCase()
         mediaPlayerRepository.clearPlaybackInformation()
     }

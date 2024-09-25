@@ -6,6 +6,19 @@ package mega.privacy.android.domain.usecase.logout
  * Any logic that needs to be performed on logout should implement this interface and
  * injected into the set of similar tasks.
  */
-fun interface LogoutTask {
-    suspend operator fun invoke()
+interface LogoutTask {
+    /**
+     * Called before logout
+     */
+    suspend fun onPreLogout() {}
+
+    /**
+     * Called when logout is successful
+     */
+    suspend fun onLogoutSuccess() {}
+
+    /**
+     * Called when logout fails
+     */
+    suspend fun onLogoutFailed(throwable: Throwable) {}
 }

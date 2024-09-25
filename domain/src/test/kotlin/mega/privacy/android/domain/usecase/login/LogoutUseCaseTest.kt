@@ -6,6 +6,7 @@ import mega.privacy.android.domain.usecase.logout.LogoutTask
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
@@ -35,11 +36,15 @@ internal class LogoutUseCaseTest {
     }
 
     @Test
-    internal fun `test that logout tasks are called`() = runTest {
-        underTest()
-        verify(logoutTask1).invoke()
-        verify(logoutTask2).invoke()
-    }
+    internal fun `test that logout tasks on success methods are called if logged out successfully`() =
+        runTest {
+            underTest()
+            inOrder(loginRepository, logoutTask1, logoutTask2) {
+                verify(loginRepository).logout()
+                verify(logoutTask1).onLogoutSuccess()
+                verify(logoutTask2).onLogoutSuccess()
+            }
+        }
 
     @Test
     internal fun `test that logout is called`() = runTest {
@@ -57,4 +62,29 @@ internal class LogoutUseCaseTest {
 
         verify(setLogoutInProgressFlagUseCase).invoke(false)
     }
+
+    @Test
+    fun `test that logout tasks on pre logout method is called before logout`() = runTest {
+        underTest()
+
+        inOrder(loginRepository, logoutTask1, logoutTask2) {
+            verify(logoutTask1).onPreLogout()
+            verify(logoutTask2).onPreLogout()
+            verify(loginRepository).logout()
+        }
+    }
+
+    @Test
+    fun `test that logout tasks on logout failure methods are called on logout failure`() =
+        runTest {
+            val exception = Exception("Logout failed")
+            loginRepository.stub {
+                onBlocking { logout() }.thenAnswer { throw exception }
+            }
+
+            assertThrows<Exception> { underTest() }
+
+            verify(logoutTask1).onLogoutFailed(exception)
+            verify(logoutTask2).onLogoutFailed(exception)
+        }
 }

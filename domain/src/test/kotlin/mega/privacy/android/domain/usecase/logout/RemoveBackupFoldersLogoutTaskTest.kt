@@ -25,7 +25,7 @@ class RemoveBackupFoldersLogoutTaskTest {
     @Test
     internal fun `test that remove backup folder use case is called with correct parameters`() =
         runTest {
-            underTest()
+            underTest.onPreLogout()
 
             verify(removeBackupFolderUseCase).invoke(CameraUploadFolderType.Primary)
             verify(removeBackupFolderUseCase).invoke(CameraUploadFolderType.Secondary)
