@@ -283,11 +283,11 @@
     <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
     <string name="account_pro_flexi_account_deactivated_dialog_body">由於付款失敗或您已取消訂閱，您的Pro&#160;Flexi帳戶已被停用。您將無法存取儲存在您帳戶中的資料。\n若要進行付款並重新啟用您的訂閱，請透過網頁瀏覽器登入MEGA操作。</string>
     <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
-    <string name="general_low_tier_plan_starter_label">Starter</string>
+    <string name="general_low_tier_plan_starter_label">MEGA&#160;Starter</string>
     <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
-    <string name="general_low_tier_plan_basic_label">Basic</string>
+    <string name="general_low_tier_plan_basic_label">MEGA&#160;Basic</string>
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
-    <string name="general_low_tier_plan_essential_label">Essential</string>
+    <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_body">上傳將暫停，直到您開始為裝置充電。如果您的電池電量低於20%，上傳仍將保持暫停狀態。</string>
     <!-- Title of the synced folder list empty state -->
@@ -619,7 +619,7 @@
     <!-- Option in the survey indicating that the user needs features MEGA doesn't have -->
     <string name="account_cancel_subscription_survey_option_missing_features">我需要的功能MEGA沒有提供</string>
     <!-- Option in the survey indicating that the user is switching to a different provider -->
-    <string name="account_cancel_subscription_survey_option_switch_provider">我改用一個我更喜歡的提供商</string>
+    <string name="account_cancel_subscription_survey_option_switch_provider">我改用一個我更喜歡的供應商</string>
     <!-- Option in the survey indicating that the user finds MEGA confusing and difficult to use -->
     <string name="account_cancel_subscription_survey_option_confusing">我發現MEGA令人困惑而且難以使用</string>
     <!-- Option in the survey indicating dissatisfaction with support and customer service -->
@@ -629,7 +629,7 @@
     <!-- Option in the survey for other reasons, with a prompt to provide details -->
     <string name="account_cancel_subscription_survey_option_other">其它（請提供詳細訊息）</string>
     <!-- Checkbox allowing MEGA to contact the user for further discussion -->
-    <string name="account_cancel_subscription_survey_allow_contact">我允許MEGA聯繫我進一步討論這個主題</string>
+    <string name="account_cancel_subscription_survey_allow_contact">我允許MEGA就這個主題進一步聯繫我</string>
     <!-- Button label to cancel the subscription -->
     <string name="account_cancel_subscription_survey_cancel_button">取消訂閱</string>
     <!-- Button label to not cancel the subscription -->
@@ -679,9 +679,15 @@
     <!-- Snackbar message displayed when sync option is selected -->
     <string name="settings_sync_option_updated_message">同步選項已更新</string>
     <!-- Title of the Contact Permission Explanation -->
-    <string name="title_enable_access_contact">啟用邀請朋友的存取權限</string>
+    <string name="title_enable_access_contact">允許存取以邀請朋友</string>
     <!-- Sub title of the Contact Permission Explanation -->
     <string name="subtitle_enable_access_contact">為了邀請朋友，您必須允許MEGA存取您的聯絡人列表</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">允許存取</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
+    <string name="document_scanning_confirmation_file_type_pdf">PDF</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Document is uploaded as a JPEG file. This option can only be selected when there is only one scanned document-->
+    <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
+    <string name="document_scanning_confirmation_destination_chat">對話</string>
 </resources>

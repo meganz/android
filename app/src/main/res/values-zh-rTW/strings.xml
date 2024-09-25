@@ -133,7 +133,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">還沒有MEGA帳戶？</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">建立MEGA帳戶</string>
+    <string name="create_account">註冊</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">請輸入您的電子信箱地址</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -1783,7 +1783,7 @@
     <!-- Text button -->
     <string name="general_close">關閉</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-factor authenticator app</string>
+    <string name="no_authentication_apps_title">雙重驗證應用程式</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">您想開啟Google Play來安裝身份驗證程式嗎？</string>
     <!-- Label Play Store -->
@@ -3569,7 +3569,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">由於多次侵犯版權的指控，您的MEGA帳戶已被暫停。這意味著您無法存取您的帳戶或當中的資料。\n檢查您的電子郵件收件匣，瞭解有關如何提交反對通知的更多資訊。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">由於違反MEGA的服務條款，您的帳戶已被終止。\n您將無法重新存取您儲存的資料，也無法獲得註冊新MEGA帳戶的授權。</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">由於違反MEGA的服務條款，您的帳戶已被終止。\n您將無法再存取您儲存的資料，也無法獲得註冊新MEGA帳戶的授權。</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">會議</string>
     <!-- Title of the location option displayed in the chat room toolbar -->

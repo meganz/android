@@ -65,7 +65,7 @@
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="general_sync_failure_accessing_persistent_storage">No se ha podido leer la ubicación de la sincronización. Comprueba que se pueda acceder a la ubicación y que se hayan concedido los permisos para la ubicación de la carpeta.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">An unknown error occurred. Contact support@mega.nz.</string>
+    <string name="general_sync_message_unknown_error">Se ha producido un error. Ponte en contacto con support@mega.nz.</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
@@ -291,7 +291,7 @@
     <!-- Title of the insufficient storage error action -->
     <string name="sync_error_storage_over_quota_banner_action">Ampliar</string>
     <!-- The warning message shown when the User enables the Device Charging requirement in Settings Camera Uploads, enables Camera Uploads, begins uploading content and the Device is not charged -->
-    <string name="camera_uploads_phone_not_charging_message">Upload paused, device is not charging</string>
+    <string name="camera_uploads_phone_not_charging_message">La subida está en pausa, el dispositivo no se está cargando</string>
     <!-- Label of the Device Status informing the user that Nothing is set up for the Current Device -->
     <string name="device_center_list_view_item_status_nothing_setup">Ninguna sincronización configurada</string>
     <!-- The title of the warning dialog shown to a suspended Pro Flexi Account User -->
@@ -299,23 +299,23 @@
     <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
     <string name="account_pro_flexi_account_deactivated_dialog_body">Tu cuenta Pro&#160;Flexi ha sido desactivada porque has cancelado la suscripción o porque el pago ha fallado. No podrás acceder a los datos almacenados en tu cuenta. \nPara realizar el pago y reactivar la suscripción, inicia sesión en MEGA a través de un navegador.</string>
     <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
-    <string name="general_low_tier_plan_starter_label">Starter</string>
+    <string name="general_low_tier_plan_starter_label">MEGA&#160;Starter</string>
     <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
-    <string name="general_low_tier_plan_basic_label">Basic</string>
+    <string name="general_low_tier_plan_basic_label">MEGA&#160;Basic</string>
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
-    <string name="general_low_tier_plan_essential_label">Essential</string>
+    <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_body">Las subidas solo se realizarán cuando el dispositivo se esté cargando y la batería esté por encima del 20%.</string>
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_list_empty_state_title">Ninguna sincronización configurada</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Sync a folder on your device with a folder on MEGA.</string>
+    <string name="device_center_sync_list_empty_state_message">Sincroniza una carpeta de tu dispositivo con una carpeta de MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Añadir sincronización</string>
     <!-- Text for the Sync solved issues chip -->
     <string name="device_center_sync_solved_issues_chip_text">Problemas resueltos</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
-    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">This folder can’t be synced. Set it up to sync to MEGA using Camera uploads.</string>
+    <string name="device_center_new_sync_select_local_device_folder_currently_synced_message">No se puede sincronizar esta carpeta. Configúrala para que se sincronice con MEGA mediante las subidas de la cámara.</string>
     <!-- Label for the file info information screen description field -->
     <string name="file_info_information_description_label">Descripción</string>
     <!-- Placeholder for the file info information screen description field -->
@@ -377,27 +377,27 @@
     <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_title">Ampliar cuenta a Pro</string>
     <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync -->
-    <string name="device_center_sync_upgrade_dialog_message">Unlock the power to sync your mobile device to the cloud with our Pro plans.</string>
+    <string name="device_center_sync_upgrade_dialog_message">Mantén tu dispositivo móvil sincronizado con la nube con nuestros planes Pro.</string>
     <!-- Confirm button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_confirm_button">Ampliar</string>
     <!-- Cancel button text of the upgrade dialog displayed for free accounts when try to add a new sync -->
     <string name="device_center_sync_upgrade_dialog_cancel_button">Ahora no</string>
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Uploads folder conflict</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Conflicto de carpetas de subida</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">Your Camera uploads folder and secondary media uploads folder cannot be related to each other. Choose a different folder.</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">La carpeta de subidas de la cámara y la carpeta de subidas multimedia secundarias no pueden estar relacionadas entre sí. Elige una carpeta diferente.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Okay, got it</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Entendido</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
-    <string name="general_no_picker_warning">This device doesn’t have an app to select folders</string>
+    <string name="general_no_picker_warning">Este dispositivo no tiene ninguna aplicación para seleccionar carpetas</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to sync folders. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Automatically sync the folders on your mobile device</string>
+    <string name="account_upgrade_account_description_feature_sync">&#8226;&#160;Sincronización automática de las carpetas de tu dispositivo móvil</string>
     <!-- The error dialog text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_dialog_free_user">Your syncs have been paused. Syncing is a Pro plan feature.</string>
+    <string name="sync_error_dialog_free_user">Se han pausado tus sincronizaciones. La sincronización es una característica del plan Pro.</string>
     <!-- The error dialog confirm action text -->
     <string name="sync_error_dialog_free_user_confirm_action">Aceptar</string>
     <!-- The error banner text displayed when user opens Android Sync while having previously established syncs -->
-    <string name="sync_error_banner_free_user">Syncing is paused because your MEGA Pro plan was cancelled. Upgrade to continue syncing.</string>
+    <string name="sync_error_banner_free_user">La sincronización está en pausa porque tu plan Pro se ha cancelado. Amplía para continuar con la sincronización.</string>
     <!-- Hidden items -->
     <string name="hidden_items">Elementos ocultos</string>
     <!-- Label to indicate that is a Pro only feature -->
@@ -407,15 +407,15 @@
     <!-- label for tags page tag description -->
     <string name="add_tags_label_tag_description">Usa las etiquetas para encontrar y organizar tus datos. Puedes etiquetar por año, ubicación, proyecto o tema.</string>
     <!-- label for tag text field in add tags page -->
-    <string name="add_tags_text_label_tag">Tag</string>
+    <string name="add_tags_text_label_tag">Etiqueta</string>
     <!-- label for add tags page add button -->
-    <string name="add_tags_button_label_add">Add “#%1$s” tag</string>
+    <string name="add_tags_button_label_add">Añadir la etiqueta “%1$s”</string>
     <!-- label for add tags page existing tags label -->
-    <string name="add_tags_label_existing_tags">Existing tags</string>
+    <string name="add_tags_label_existing_tags">Etiquetas existentes</string>
     <!-- error label for add tags page when special characters added -->
-    <string name="add_tags_error_special_characters">Tags can’t contain spaces or non-alphanumeric symbols. Tags written with capital letters will be displayed in lowercase.</string>
+    <string name="add_tags_error_special_characters">Las etiquetas no pueden contener espacios ni símbolos no alfanuméricos. Las etiquetas escritas en mayúsculas se mostrarán en minúsculas.</string>
     <!-- error label for add tags page when tag count is maximum -->
-    <string name="add_tags_error_max_tags">The maximum number of tags is %1$d</string>
+    <string name="add_tags_error_max_tags">El número máximo de etiquetas es 1%1$d</string>
     <!-- error label for add tags page when tag character limit reached -->
     <string name="add_tags_error_max_characters">Tags must be %1$d characters or less</string>
     <!-- title label for tags page -->
@@ -423,7 +423,7 @@
     <!-- The placeholder for read only files/folders with no description in info screen-->
     <string name="file_info_information_no_description_placeholder">No hay descripción</string>
     <!-- Top bar title of the page that adds the video to the video playlist -->
-    <string name="video_to_playlist_top_bar_title">Add to playlist</string>
+    <string name="video_to_playlist_top_bar_title">Añadir a la lista de reproducción</string>
     <!-- Text of the create new playlist in the page that adds the video to the video playlist -->
     <string name="video_to_playlist_new_playlist_text">Nueva lista de reproducción</string>
     <!-- Text of the done button in the page that adds the video to the video playlist -->
@@ -431,9 +431,9 @@
     <!-- Title shown when cancelling the current plan, informing the user of features they'll miss out on -->
     <string name="account_cancel_account_screen_plan_miss_out_on_features">Te perderás estas características</string>
     <!-- Message shown when cancelling the plan, indicating that access to features will continue until the plan expires -->
-    <string name="account_cancel_account_screen_plan_access_until_expiration">You’ll still have access to these features until your MEGA plan expires, then you’ll be moved to a free account.</string>
+    <string name="account_cancel_account_screen_plan_access_until_expiration">Seguirás teniendo acceso a estas características hasta que caduque tu plan de MEGA y, luego, pasarás a una cuenta gratis.</string>
     <!-- Warning message about current storage usage when cancelling the plan -->
-    <string name="account_cancel_account_screen_plan_current_storage_warning">You are currently using %1s of storage, which you will risk losing.</string>
+    <string name="account_cancel_account_screen_plan_current_storage_warning">Estás usando %1s de almacenamiento, que correrás el riesgo de perder.</string>
     <!-- Column header in the feature comparison table -->
     <string name="account_cancel_account_screen_plan_feature">Característica</string>
     <!-- Column header indicating features available with the free plan -->
@@ -457,23 +457,23 @@
     <!-- Rewind duration available in the free plan -->
     <string name="account_cancel_account_screen_plan_rewind_free">Hasta 30 días (solo lectura)</string>
     <!-- Rewind duration available in the current plan. %1s represents the number of days. -->
-    <string name="account_cancel_account_screen_plan_rewind_current">Up to %1s days</string>
+    <string name="account_cancel_account_screen_plan_rewind_current">Hasta %1s días</string>
     <!-- Feature indicating MEGA VPN availability, available in the pro plan -->
     <string name="account_cancel_account_screen_plan_mega_vpn">MEGA&#160;VPN</string>
     <!-- Row label for call and meeting duration in the comparison table -->
-    <string name="account_cancel_account_screen_plan_call_meeting_duration">Call &amp;amp; meeting duration</string>
+    <string name="account_cancel_account_screen_plan_call_meeting_duration">Duración de llamadas y reuniones</string>
     <!-- Call and meeting duration limit in the free plan -->
     <string name="account_cancel_account_screen_plan_call_meeting_duration_free">Hasta 1 hora</string>
     <!-- Unlimited call and meeting duration available in the pro plan -->
     <string name="cancel_account_plan_call_meeting_duration_pro">Ilimitadas</string>
     <!-- Row label for call and meeting participants in the comparison table -->
-    <string name="account_cancel_account_plan_call_meeting_participants">Call &amp;amp; meeting participants</string>
+    <string name="account_cancel_account_plan_call_meeting_participants">Participantes de llamadas y reuniones</string>
     <!-- Limit on call and meeting participants in the free plan -->
     <string name="account_cancel_account_free_plan_call_meeting_participants">Hasta 100</string>
     <!-- Unlimited call and meeting participants available in the pro plan -->
     <string name="account_cancel_account_pro_plan_call_meeting_participants">Ilimitados</string>
     <!-- Button label to keep the current pro plan -->
-    <string name="account_cancel_account_plan_keep_pro_plan">Keep %1s</string>
+    <string name="account_cancel_account_plan_keep_pro_plan">Mantener %1s</string>
     <!-- Button label to continue with the cancellation -->
     <string name="account_cancel_account_plan_continue_cancellation">Cancelar subscripción</string>
     <!-- error label for add tags page when tag character limit reached -->
@@ -487,59 +487,59 @@
     <!-- Title shown when cancelling the subscription -->
     <string name="account_cancellation_instructions_cancel_subscription_title">Cancelar suscripción</string>
     <!-- Title shown when reactivating the subscription -->
-    <string name="account_cancellation_instructions_reactivate_subscription_title">Reactivate subscription</string>
+    <string name="account_cancellation_instructions_reactivate_subscription_title">Reactivar la suscripción</string>
     <!-- Title shown when cancelling the current plan in the instructions screen, informing the user about the account is not managed by google -->
-    <string name="account_cancellation_instructions_not_managed_by_google">Your subscription is not managed by Google</string>
+    <string name="account_cancellation_instructions_not_managed_by_google">Google no administra tu suscripción</string>
     <!-- Message shown when cancelling the current plan in the instructions screen, informing the user about how to cancel subscription -->
-    <string name="account_cancellation_instructions_message_apple_description">This is because you subscribed to MEGA via Apple. To cancel your subscription, you will need to:</string>
+    <string name="account_cancellation_instructions_message_apple_description">Te has suscrito a MEGA a través de Apple. Para cancelar tu suscripción:</string>
     <!-- Label for the subscription managed by App Store on Cancellation instructions screen-->
-    <string name="account_cancellation_instructions_ios_device">On an iOS Device</string>
+    <string name="account_cancellation_instructions_ios_device">En un dispositivo iOS</string>
     <!-- Step 1: instruction step no.1 to Open the settings App to cancel the subscription from iOS device-->
-    <string name="account_cancellation_instructions_open_settings">1. Open the [A]Settings[/A] app.</string>
+    <string name="account_cancellation_instructions_open_settings">1. Abra los [A]Ajustes[/A] de la aplicación.</string>
     <!-- Step 2: instruction step no.2 to Tap on the name in the iOS device-->
-    <string name="account_cancellation_instructions_tap_on_name">2. Tap on your name.</string>
+    <string name="account_cancellation_instructions_tap_on_name">2. Pulsa en tu nombre.</string>
     <!-- Step 3: instruction step no.3 to Select subscriptions section in the iOS device-->
-    <string name="account_cancellation_instructions_select_subscriptions">3. Tap [A]Subscriptions[/A].</string>
+    <string name="account_cancellation_instructions_select_subscriptions">3. Pulsa [A]Suscripciones[/A].</string>
     <!-- Step 4: instruction step no.4 to Select MEGA subscription in the iOS device -->
-    <string name="account_cancellation_instructions_select_mega_subscription">4. Tap your MEGA subscription.</string>
+    <string name="account_cancellation_instructions_select_mega_subscription">4. Pulsa tu suscripción a MEGA.</string>
     <!-- Step 5: instruction step no.5 to Select Cancel subscription of the App inside subscription section in the iOS device-->
-    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Tap [A]Cancel subscription[/A].</string>
+    <string name="account_cancellation_instructions_open_select_cancel_subscription">5. Pulsa [A]Cancelar suscripción[/A].</string>
     <!-- Message description to provide the user with more details on how to cancel your subscription on a computer or other device. -->
-    <string name="account_cancellation_instructions_detailed_instructions">[A]Tap here[/A] for detailed instructions on how to cancel your subscription on a computer or other device.</string>
+    <string name="account_cancellation_instructions_detailed_instructions">[A]Pulsa aquí[/A] para obtener instrucciones detalladas sobre cómo cancelar la suscripción en un equipo u otro dispositivo.</string>
     <!-- Title shown when needing to cancel the subscription using a web browser -->
     <string name="account_cancellation_instructions_cancellation_web_browser_needed">Debes cancelar tu suscripción usando un navegador web</string>
     <!-- Title shown when needing to reactivate the subscription using a web browser -->
-    <string name="account_cancellation_instructions_reactivation_web_browser_needed">You need to reactivate your subscription using a web browser</string>
+    <string name="account_cancellation_instructions_reactivation_web_browser_needed">Debes reactivar tu suscripción mediante un navegador web</string>
     <!-- Message shown when reactivating the current plan in the instructions screen, informing the user about how to reactivate the subscription -->
-    <string name="account_cancellation_instructions_reactivation_web_browser_description">This is because you subscribed to MEGA in your web browser. To reactivate your subscription, you will need to:</string>
+    <string name="account_cancellation_instructions_reactivation_web_browser_description">Te has suscrito a MEGA en tu navegador web. Para reactivar tu suscripción:</string>
     <!-- Description explaining why the subscription needs to be canceled using a web browser -->
     <string name="account_cancellation_instructions_web_browser_description">Te has suscrito a MEGA en tu navegador web. Para cancelar tu suscripción:</string>
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">En un equipo</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
-    <string name="account_cancellation_instructions_visit_website">1. Visit [A]www.mega.nz[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_visit_website">1. Visita [A]www.mega.nz[/A] en tu navegador web.</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. Inicia sesión en tu cuenta de MEGA.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
     <string name="account_cancellation_instructions_click_main_menu">3. Haz clic en el menú principal.</string>
     <!-- Step 4: instruction step no.4 to Click Settings of the MEGA account on MEGA website -->
-    <string name="account_cancellation_instructions_click_settings">4. Click [A]Settings.[/A]</string>
+    <string name="account_cancellation_instructions_click_settings">4. Haz clic en [A]Ajustes.[/A]</string>
     <!-- Step 5: instruction step no.5 to Click on Plan section of the MEGA account on MEGA website-->
-    <string name="account_cancellation_instructions_click_plan">5. Click [A]Plan[/A].</string>
+    <string name="account_cancellation_instructions_click_plan">5. Haz clic en [A]plan[/A].</string>
     <!-- Step 6: instruction step no.6 Click Cancel subscription of the MEGA account on MEGA website -->
-    <string name="account_cancellation_instructions_click_cancel_subscription">6. Click [A]Cancel subscription[/A].</string>
+    <string name="account_cancellation_instructions_click_cancel_subscription">6. Haz clic en [A]Cancelar suscripción[/A].</string>
     <!-- Alternative Step 6: instruction step no.5 Click Reactivate subscription when user's subscription has expired of the MEGA account on MEGA website-->
-    <string name="account_cancellation_instructions_click_reactivate_subscription">6. Click [A]Reactivate subscription[/A].</string>
+    <string name="account_cancellation_instructions_click_reactivate_subscription">6. Haz clic en [A]Reactivar la suscripción[/A].</string>
     <!-- Label for cancellation instructions on a mobile device -->
     <string name="account_cancellation_instructions_on_mobile_device">En un dispositivo móvil</string>
     <!-- Step 1: instruction step no.1 to visit the MEGA website on the mobile device-->
-    <string name="account_cancellation_instructions_mobile_visit_website">1. Visit [A]www.mega.nz[/A] in your web browser.</string>
+    <string name="account_cancellation_instructions_mobile_visit_website">1. Visita [A]www.mega.nz[/A] en tu navegador web.</string>
     <!-- Step 2: instruction step no.2 to Log in to MEGA account on the mobile device from the browser-->
     <string name="account_cancellation_instructions_mobile_login_account">2. Inicia sesión en tu cuenta de MEGA.</string>
     <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_avatar">3. Pulsa tu avatar.</string>
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
-    <string name="account_cancellation_instructions_tap_cancel_subscription">4. Tap [A]Cancel subscription[/A].</string>
+    <string name="account_cancellation_instructions_tap_cancel_subscription">4. Pulsa [A]Cancelar suscripción[/A].</string>
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
     <string name="sync_no_network_state">No hay conexión a internet</string>
     <!-- Menu option to create a new folder in the file manager -->
@@ -563,13 +563,14 @@
     <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
     <string name="transfers_scanning_folders_dialog_creating_folders_title">Creando carpetas&#8230;</string>
     <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
-    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Starting transfers&#8230;</string>
+    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Iniciando transferencias&#8230;</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">No cierres la aplicación. Si la cierras, las transferencias que aún no estén en cola se perderán.</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
-        <item quantity="one">Found 1 folder and %1$d file.</item>
-        <item quantity="other">Found 1 folder and %1$d files.</item>
+        <item quantity="one">Se han encontrado 1 carpeta y %1$d archivo.</item>
+        <item quantity="many">Se han encontrado 1 carpeta y %1$d archivos.</item>
+        <item quantity="other">Se han encontrado 1 carpeta y %1$d archivos.</item>
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
@@ -579,42 +580,44 @@
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
     <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
-        <item quantity="one">%1$d/%2$d folder</item>
-        <item quantity="other">%1$d/%2$d folders</item>
+        <item quantity="one">%1$d/%2$d carpeta</item>
+        <item quantity="many">%1$d/%2$d carpetas</item>
+        <item quantity="other">%1$d/%2$d carpetas</item>
     </plurals>
     <!-- Title of the clear debris item displayed in the sync settings menu -->
-    <string name="settings_sync_clear_debris_item_title">Clear .debris (local cache)</string>
+    <string name="settings_sync_clear_debris_item_title">Borrar .debris (caché local)</string>
     <!-- Title of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_title">Clear debris?</string>
+    <string name="settings_sync_clear_debris_dialog_title">¿Borrar caché local?</string>
     <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_body">Backups of the previous versions of your synced files will be permanently deleted from your device. \n\nCheck the .debris folder in your local device to see if you need to restore anything.</string>
+    <string name="settings_sync_clear_debris_dialog_body">Los backups de las versiones anteriores de los archivos sincronizados se eliminarán de forma permanente del dispositivo. \n\nRevisa la carpeta .debris de tu dispositivo local para ver si necesitas restaurar algo.</string>
     <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_cancel">Cancelar</string>
     <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_continue">Continuar</string>
     <!-- Snackbar message shown when user clears debris from settings menu -->
-    <string name="settings_sync_debris_cleared_message">.debris folder successfully cleared</string>
+    <string name="settings_sync_debris_cleared_message">La carpeta .debris se ha borrado correctamente</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="one">Found %1$s and %2$d file.</item>
-        <item quantity="other">Found %1$s and %2$d files.</item>
+        <item quantity="one">Se han encontrado %1$s y %2$d archivo.</item>
+        <item quantity="many">Se han encontrado %1$s y %2$d archivos.</item>
+        <item quantity="other">Se han encontrado %1$s y %2$d archivos.</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->
     <string name="file_info_information_no_tags_label">No hay etiquetas</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Cancelando transferencias&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Enquiries must be at least 10 characters</string>
+    <string name="report_issue_error_minimum_characters">La descripción debe tener al menos 10 caracteres</string>
     <!-- placeholder message for report issue-->
     <string name="report_issue_description_placeholder_message">Describe el problema con al menos 10 caracteres</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Mantén tus conversaciones privadas</string>
     <!--Subtitle text from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_subtitle">All your messages, group chats, and calls are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <string name="chat_recent_list_empty_subtitle">Todos tus chats de grupo, llamadas y mensajes están protegidos por nuestro cifrado de conocimiento cero. [A]Obtén más información[/A]</string>
     <!-- Label of the action button of inviting a friend from contact screen -->
     <string name="chat_recent_invite_friend">Invita a un amigo</string>
     <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
-    <string name="invite_contacts_to_start_chat_title">Invite friends with confidence</string>
+    <string name="invite_contacts_to_start_chat_title">Invita a tus amigos con confianza</string>
     <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat_subtitle">Con seguridad de primer nivel y códigos de verificación, comunícate sin temor a estafas, minería de datos o robo de información</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -660,25 +663,25 @@
     <!-- Text that there is no recent activity of the video recently watched page  -->
     <string name="video_section_empty_hint_no_recently_activity">No hay actividad reciente</string>
     <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
-    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Remove from recently watched</string>
+    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Eliminar de lo visto recientemente</string>
     <!-- Message that remove recently watched item from the video recently watched page  -->
-    <string name="video_section_message_remove_recently_watched_item">Removed from recently watched</string>
+    <string name="video_section_message_remove_recently_watched_item">Eliminado de lo visto recientemente</string>
     <!-- Message that clear recently watched in the video recently watched page  -->
-    <string name="video_section_message_clear_recently_watched">Recently watched has been cleared</string>
+    <string name="video_section_message_clear_recently_watched">Se ha borrado lo visto recientemente</string>
     <!-- Title of the Document Scanning Error Dialog -->
-    <string name="document_scanning_error_dialog_title">Scan incomplete</string>
+    <string name="document_scanning_error_dialog_title">Escaneo incompleto</string>
     <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
-    <string name="document_scanning_error_type_insufficient_ram">Your phone doesn’t meet the minimum memory requirements to complete the scan</string>
+    <string name="document_scanning_error_type_insufficient_ram">El teléfono no cumple con los requisitos mínimos de memoria para completar el escaneo</string>
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
-    <string name="document_scanning_error_type_generic_error">We’re having trouble scanning this document. Please try again.</string>
+    <string name="document_scanning_error_type_generic_error">No se ha podido escanear el documento, inténtalo de nuevo.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">Cerrar</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
     <string name="meeting_recent_list_empty_title">Protege tus llamadas</string>
     <!--Subtitle text from Meeting screen empty view-->
-    <string name="meeting_recent_list_empty_subtitle">Your meetings, family calls, and private conversations are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <string name="meeting_recent_list_empty_subtitle">Tus reuniones, llamadas familiares y conversaciones privadas están protegidas por nuestro cifrado de conocimiento cero. [A]Obtén más información[/A]</string>
     <!--Warning message to inform the user the minimum number of characters to enter into the edit text field for the survey-->
-    <string name="account_cancel_subscription_survey_minimum_character_limit">Message must be at least 10 characters</string>
+    <string name="account_cancel_subscription_survey_minimum_character_limit">El mensaje debe tener al menos 10 caracteres</string>
     <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
     <string name="account_cancel_subscription_survey_enter_details">Introducir motivo</string>
     <!-- the bonus title of join without account on left meeting page-->
@@ -686,23 +689,29 @@
     <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_whats_new_label">Novedades</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_title">Easy, automated sync</string>
+    <string name="sync_promotion_bottom_sheet_title">Sincronización sencilla y automatizada</string>
     <!-- Body message of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_body_message">Sync a folder on your device with MEGA to access the latest version of your files anywhere</string>
+    <string name="sync_promotion_bottom_sheet_body_message">Sincroniza una carpeta de tu dispositivo con MEGA para acceder a la última versión de tus archivos desde cualquier lugar</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sync folders</string>
+    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Carpetas sincronizadas</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_free">Upgrade to use sync</string>
+    <string name="sync_promotion_bottom_sheet_primary_button_text_free">Amplía para usar la sincronización</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
     <string name="sync_promotion_bottom_sheet_secondary_button_text">Más información</string>
     <!-- Sync option dialog cancel button -->
     <string name="settings_sync_option_cancel">Cancelar</string>
     <!-- Snackbar message displayed when sync option is selected -->
-    <string name="settings_sync_option_updated_message">Sync options updated</string>
+    <string name="settings_sync_option_updated_message">Opciones de sincronización actualizadas</string>
     <!-- Title of the Contact Permission Explanation -->
-    <string name="title_enable_access_contact">Enable access to invite friends</string>
+    <string name="title_enable_access_contact">Activa el acceso para invitar a tus amigos</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">In order to invite friends, you must allow MEGA to access your contact list</string>
+    <string name="subtitle_enable_access_contact">Para poder invitar a tus amigos, debes permitir que MEGA acceda a tu lista de contactos</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">Permitir acceso</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
+    <string name="document_scanning_confirmation_file_type_pdf">PDF</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Document is uploaded as a JPEG file. This option can only be selected when there is only one scanned document-->
+    <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
+    <string name="document_scanning_confirmation_destination_chat">Chat</string>
 </resources>

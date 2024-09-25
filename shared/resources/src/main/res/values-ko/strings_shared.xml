@@ -283,11 +283,11 @@
     <!-- The body of the warning dialog shown to a suspended Pro Flexi Account User -->
     <string name="account_pro_flexi_account_deactivated_dialog_body">당신의 Pro&#160;Flexi 계정은 결제 실패 또는 구독 취소로 인해 비활성화 되었습니다. 계정 안에 있는 데이터에 접근하지 못할 것입니다.\n결제를 하고 구독을 재활성화 하려면, 브라우저에서 MEGA에 로그인 하세요.</string>
     <!-- Label for new low-tier plan Starter. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
-    <string name="general_low_tier_plan_starter_label">Starter</string>
+    <string name="general_low_tier_plan_starter_label">MEGA&#160;Starter</string>
     <!-- Label for new low-tier plan Basic. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
-    <string name="general_low_tier_plan_basic_label">Basic</string>
+    <string name="general_low_tier_plan_basic_label">MEGA&#160;Basic</string>
     <!-- Label for new low-tier plan Essential. Do not translate. Can be shown on My account screen to indicate current user's plan. -->
-    <string name="general_low_tier_plan_essential_label">Essential</string>
+    <string name="general_low_tier_plan_essential_label">MEGA&#160;Essential</string>
     <!-- The Body Text of a Settings Camera Uploads Option that decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_body">장치 충전을 시작할 때까지 업로드가 일시정지 됩니다. 배터리가 20% 이하일 경우 업로드가 일시정지 상태로 유지됩니다.</string>
     <!-- Title of the synced folder list empty state -->
@@ -333,7 +333,7 @@
     <!-- Third subtitle of the tour screen -->
     <string name="cloud_drive_tour_third_subtitle">MEGA를 떠날 필요 없이 연락처를 추가하고, 네트워크를 형성하고, 협업하고, 음성과 영상 통화를 하세요.</string>
     <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">Camera uploads is an essential feature for any mobile device and we have got you covered. Sign up for an account now.</string>
+    <string name="cloud_drive_tour_fourth_subtitle">카메라 업로드는 어떠한 모바일 기기에서든 필요한 기능이며 우리는 이 기능이 준비되어 있습니다. 지금 가입하세요.</string>
     <!-- Fifth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fifth_subtitle">영지식 암호화 화상 회의.</string>
     <!-- Titles of the tour screen to onboard users with the MEGA application -->
@@ -576,27 +576,26 @@
     <string name="settings_sync_debris_cleared_message">.debris 폴더를 성공적으로 지웠습니다</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="one">Found %1$s and %2$d file.</item>
-        <item quantity="other">Found %1$s and %2$d files.</item>
+        <item quantity="other">%1$s와/과 파일 %2$d개 발견</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">No tags</string>
+    <string name="file_info_information_no_tags_label">태그 없음</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">전송 취소 중...</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">문의사항은 최소 10자 이상이어야 합니다</string>
+    <string name="report_issue_error_minimum_characters">문의사항은 최소 10자이어야 합니다</string>
     <!-- placeholder message for report issue-->
     <string name="report_issue_description_placeholder_message">문제에 대한 설명을 최소 10자 이상을 입력하세요</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_title">Keep conversations private</string>
+    <string name="chat_recent_list_empty_title">대화를 비공개로 유지</string>
     <!--Subtitle text from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_subtitle">All your messages, group chats, and calls are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <string name="chat_recent_list_empty_subtitle">당신의 모든 메시지, 단체 대화, 그리고 통화는 우리의 영지식 암호화로 보호됩니다. [A]더 알아보기[/A]</string>
     <!-- Label of the action button of inviting a friend from contact screen -->
     <string name="chat_recent_invite_friend">친구를 초대하세요</string>
     <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
-    <string name="invite_contacts_to_start_chat_title">Invite friends with confidence</string>
+    <string name="invite_contacts_to_start_chat_title">확신을 가지고 친구 초대</string>
     <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
-    <string name="invite_contacts_to_start_chat_subtitle">With top-notch security and verification codes, reach out without fear of scams, data mining, or information theft</string>
+    <string name="invite_contacts_to_start_chat_subtitle">최고 수준의 보안 및 인증 코드를 통하여, 사기, 데이터 마이닝 또는 정보 도난에 대한 두려움 없이 연락하세요</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
     <string name="invite_contacts_action_label">초대</string>
     <!-- Share hidden folder description -->
@@ -604,9 +603,9 @@
     <!-- Share hidden folders description -->
     <string name="share_hidden_folders_description">1개 이상의 폴더에 숨겨진 항목이 있습니다. 폴더를 공유하는 것은 숨겨진 항목이 공유하고자 하는 사람들에게 보인다는 것입니다. 항목은 클라우드 드라이브에서 숨긴 상태로 유지됩니다.</string>
     <!-- Title shown at the top of the survey screen when cancelling the subscription -->
-    <string name="account_cancel_subscription_survey_title">We’re sorry to see you leave! Can you tell us why you’re cancelling your subscription?</string>
+    <string name="account_cancel_subscription_survey_title">떠나시는 것을 보게 되어 안타깝습니다! 왜 구독을 취소하는지 알려주실 수 있나요?</string>
     <!-- Message explaining the immediate effect of subscription cancellation -->
-    <string name="account_cancel_subscription_survey_cancellation_message">Your subscription will be cancelled immediately and you will be moved to a free MEGA account when your current plan expires. Note: Cancelling your subscription won’t delete your account.</string>
+    <string name="account_cancel_subscription_survey_cancellation_message">당신의 구독은 즉시 취소되며 현재 요금제가 만료되면 무료 MEGA 계정으로 옮겨질 것입니다. 참고사항: 구독을 취소하는 것이 계정을 삭제하지는 않습니다.</string>
     <!-- Warning message shown in a red box when no reason is selected -->
     <string name="account_cancel_subscription_survey_no_reason_selected">구독을 취소하는 이유를 선택하세요</string>
     <!-- Option in the survey indicating that the plan is too expensive -->
@@ -630,35 +629,35 @@
     <!-- Option in the survey for other reasons, with a prompt to provide details -->
     <string name="account_cancel_subscription_survey_option_other">기타 (자세한 이유를 알려주세요)</string>
     <!-- Checkbox allowing MEGA to contact the user for further discussion -->
-    <string name="account_cancel_subscription_survey_allow_contact">I allow MEGA to contact me to talk about this topic further</string>
+    <string name="account_cancel_subscription_survey_allow_contact">MEGA가 이 주제에 대하여 나에게 연락하는 것을 허락합니다</string>
     <!-- Button label to cancel the subscription -->
     <string name="account_cancel_subscription_survey_cancel_button">구독 취소</string>
     <!-- Button label to not cancel the subscription -->
     <string name="account_cancel_subscription_survey_do_not_cancel_button">취소하지 마세요</string>
     <!-- Video recently watched title of the video section  -->
-    <string name="video_section_title_video_recently_watched">Recently watched</string>
+    <string name="video_section_title_video_recently_watched">최근에 본 항목</string>
     <!-- Text that there is no recent activity of the video recently watched page  -->
     <string name="video_section_empty_hint_no_recently_activity">최근 활동 없음</string>
     <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
-    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Remove from recently watched</string>
+    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">최근에 본 항목에서 제거</string>
     <!-- Message that remove recently watched item from the video recently watched page  -->
-    <string name="video_section_message_remove_recently_watched_item">Removed from recently watched</string>
+    <string name="video_section_message_remove_recently_watched_item">최근에 본 항목에서 제거함</string>
     <!-- Message that clear recently watched in the video recently watched page  -->
-    <string name="video_section_message_clear_recently_watched">Recently watched has been cleared</string>
+    <string name="video_section_message_clear_recently_watched">최근에 본 항목이 비워졌습니다</string>
     <!-- Title of the Document Scanning Error Dialog -->
-    <string name="document_scanning_error_dialog_title">Scan incomplete</string>
+    <string name="document_scanning_error_dialog_title">스캔 완료되지 않음</string>
     <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
-    <string name="document_scanning_error_type_insufficient_ram">Your phone doesn’t meet the minimum memory requirements to complete the scan</string>
+    <string name="document_scanning_error_type_insufficient_ram">당신의 전화기가 스캔을 완료하는 데에 필요한 최소 메모리 요구조건을 충족하지 못합니다</string>
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
-    <string name="document_scanning_error_type_generic_error">We’re having trouble scanning this document. Please try again.</string>
+    <string name="document_scanning_error_type_generic_error">이 문서를 스캔하는 데에 문제가 있습니다. 다시 시도하세요.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">닫기</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
-    <string name="meeting_recent_list_empty_title">Protect your calls</string>
+    <string name="meeting_recent_list_empty_title">통화 보호</string>
     <!--Subtitle text from Meeting screen empty view-->
-    <string name="meeting_recent_list_empty_subtitle">Your meetings, family calls, and private conversations are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <string name="meeting_recent_list_empty_subtitle">당신의 회의, 가족 통화, 그리고 비공개 대화는 우리의 영지식 암호화로 보호됩니다. [A]더 알아보기[/A]</string>
     <!--Warning message to inform the user the minimum number of characters to enter into the edit text field for the survey-->
-    <string name="account_cancel_subscription_survey_minimum_character_limit">Message must be at least 10 characters</string>
+    <string name="account_cancel_subscription_survey_minimum_character_limit">메시지는 최소 10자이어야 합니다</string>
     <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
     <string name="account_cancel_subscription_survey_enter_details">자세한 정보를 입력하세요</string>
     <!-- the bonus title of join without account on left meeting page-->
@@ -666,23 +665,29 @@
     <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_whats_new_label">새로운 점</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_title">Easy, automated sync</string>
+    <string name="sync_promotion_bottom_sheet_title">쉽고, 자동화된 동기화</string>
     <!-- Body message of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_body_message">Sync a folder on your device with MEGA to access the latest version of your files anywhere</string>
+    <string name="sync_promotion_bottom_sheet_body_message">당신의 장치의 폴더를 MEGA와 동기화하고 당신의 파일의 최신 버전에 어디서든 접근하세요</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sync folders</string>
+    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">폴더 동기화</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_free">Upgrade to use sync</string>
+    <string name="sync_promotion_bottom_sheet_primary_button_text_free">동기화를 이용하려면 업그레이드</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
     <string name="sync_promotion_bottom_sheet_secondary_button_text">더 알아보기</string>
     <!-- Sync option dialog cancel button -->
     <string name="settings_sync_option_cancel">취소</string>
     <!-- Snackbar message displayed when sync option is selected -->
-    <string name="settings_sync_option_updated_message">Sync options updated</string>
+    <string name="settings_sync_option_updated_message">동기화 옵션 업데이트됨</string>
     <!-- Title of the Contact Permission Explanation -->
-    <string name="title_enable_access_contact">Enable access to invite friends</string>
+    <string name="title_enable_access_contact">친구를 초대하려면 접근 허용</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">In order to invite friends, you must allow MEGA to access your contact list</string>
+    <string name="subtitle_enable_access_contact">친구를 초대하려면, MEGA가 당신의 연락처 목록에 접근하는 것을 허용해야 합니다</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">접근 허용</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
+    <string name="document_scanning_confirmation_file_type_pdf">PDF</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Document is uploaded as a JPEG file. This option can only be selected when there is only one scanned document-->
+    <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
+    <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
+    <string name="document_scanning_confirmation_destination_chat">대화</string>
 </resources>

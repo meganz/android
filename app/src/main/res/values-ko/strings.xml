@@ -159,7 +159,7 @@
     <!-- when the user tries to share something to MEGA without being logged -->
     <string name="login_before_share">MEGA로 공유하려면 로그인하세요</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
-    <string name="reg_link_expired">Your confirmation link is no longer valid. Your account may already be activated or you may have cancelled your signup.</string>
+    <string name="reg_link_expired">확인 링크가 더 이상 유효하지 않습니다. 계정이 이미 활성화되었거나 가입을 취소했을 수 있습니다.</string>
     <!-- First Name of the user -->
     <string name="first_name_text">이름</string>
     <!-- Last name of the user -->
@@ -179,7 +179,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">암호가 일치하지 않습니다</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">This email address has already signed up for an account with MEGA</string>
+    <string name="error_email_registered">이 이메일 주소는 이미 MEGA에 가입되어 있습니다</string>
     <!--  -->
     <string name="create_account_creating_account">서버에 연결 중: 계정 생성 중</string>
     <!--  -->
@@ -1326,7 +1326,7 @@
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">MEGA 모바일 앱 설치</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
-    <string name="title_regitration">Signup bonus</string>
+    <string name="title_regitration">가입 보너스</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">MEGA 데스크톱 앱 설치</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -1340,7 +1340,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">작동 원리</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invite your friends to sign up for a free MEGA account and to install a MEGA Mobile App. You will receive free storage as a bonus for every signup and app installation.</string>
+    <string name="first_paragraph_achievement_invite_friends">친구를 초대하여 무료 MEGA 계정에 가입하고 MEGA 모바일 앱을 설치하게 하세요. 가입과 앱 설치마다 당신은 무료 저장소를 보너스로 받게 됩니다.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">무료 저장소 보너스는 새 초대에만 적용되며 MEGA 모바일 앱 또는 MEGA 데스크톱 앱이 설치되어야 합니다.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -1356,7 +1356,7 @@
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">MEGA 모바일 앱을 설치하여 저장소 공간 %1$s를 받았습니다.</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="result_paragraph_info_achievement_registration">You have received %1$s storage space as your free signup bonus.</string>
+    <string name="result_paragraph_info_achievement_registration">당신은 무료 가입 보너스로 저장 공간 %1$s를 받았습니다.</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="other">폴더 공유</item>
@@ -1783,7 +1783,7 @@
     <!-- Text button -->
     <string name="general_close">닫기</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-factor authenticator app</string>
+    <string name="no_authentication_apps_title">2단계 인증기 앱</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">인증기 앱을 설치할 수 있도록 Google Play를 여시겠습니까?</string>
     <!-- Label Play Store -->
@@ -1895,7 +1895,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">계정 전체에 대한 파일 버전 관리를 활성화하거나 비활성화 합니다.\n파일 버전 관리를 해제하는 것이 연락처가 공유된 폴더에 새로운 버전을 만드는 것을 막을 수 없습니다.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Search contacts or type email address</string>
+    <string name="type_mail">연락처 검색 또는 이메일 주소 입력</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">%s을/를 연락처에 추가할까요?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2339,7 +2339,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">클라우드 속 당신의 사진</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Camera uploads is an essential feature for any mobile device and we have got you covered. Sign up for an account now.</string>
+    <string name="content_tour_four">카메라 업로드는 어떠한 모바일 기기에서든 필요한 기능이며 우리는 이 기능이 준비되어 있습니다. 지금 계정에 가입하세요.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">암호를 입력하세요</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2429,7 +2429,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">MEGA에 로그인</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">Sign up for a MEGA account</string>
+    <string name="create_account_title">MEGA 계정에 가입</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">최근</string>
     <!-- Label to reference a chats section -->
@@ -3569,7 +3569,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">당신의 MEGA 계정이 반복된 저작권 침해 혐의로 인해 정지 되었습니다. 이것은 당신의 계정이나 그 안의 데이터에 접근할 수 없다는 뜻입니다.\n이의 제기를 제출하는 방법에 대한 자세한 정보는 이메일 수신함을 확인하세요.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to sign up for a new MEGA account.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">당신의 계정이 MEGA의 이용 약관 위반으로 삭제되었습니다.\n저장된 데이터에 대한 접근 또는 새 MEGA 계정에 가입하는 것이 금지됩니다.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">회의</string>
     <!-- Title of the location option displayed in the chat room toolbar -->

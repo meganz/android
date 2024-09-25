@@ -1783,7 +1783,7 @@
     <!-- Text button -->
     <string name="general_close">关闭</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-factor authenticator app</string>
+    <string name="no_authentication_apps_title">双重验证应用程序</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">您想打开Google Play来安装验证应用程序吗？</string>
     <!-- Label Play Store -->
