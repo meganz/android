@@ -50,7 +50,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
@@ -128,7 +127,6 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -235,14 +233,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (peerId != MegaApiJava.INVALID_HANDLE) {
             Timber.d("Change in avatar")
             updateParticipantInfo(peerId, AVATAR_CHANGE)
-        }
-    }
-
-    // Observer for changing avatar
-    private val avatarChangeObserver = Observer<Long> { peerId ->
-        if (peerId != MegaApiJava.INVALID_HANDLE) {
-            Timber.d("Change in avatar")
-            inMeetingViewModel.getRemoteAvatar(peerId)
         }
     }
 
@@ -698,9 +688,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         LiveEventBus.get(EVENT_MEETING_GET_AVATAR, Long::class.java)
             .observe(this, getAvatarObserver)
-
-        LiveEventBus.get(EVENT_MEETING_AVATAR_CHANGE, Long::class.java)
-            .observe(this, avatarChangeObserver)
     }
 
     private fun initToolbar() {

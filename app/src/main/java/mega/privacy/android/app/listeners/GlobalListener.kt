@@ -25,7 +25,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder
 import mega.privacy.android.app.main.ManagerActivity
@@ -149,12 +148,6 @@ class GlobalListener @Inject constructor(
             if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME.toLong()) && isMyChange) {
                 api.getRubbishBinAutopurgePeriod(GetAttrUserListener(appContext))
                 return@forEach
-            }
-
-            // Receive the avatar change, send the event
-            if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong()) && user.isOwnChange == 0) {
-                LiveEventBus.get(EVENT_MEETING_AVATAR_CHANGE, Long::class.java)
-                    .post(user.handle)
             }
         }
     }

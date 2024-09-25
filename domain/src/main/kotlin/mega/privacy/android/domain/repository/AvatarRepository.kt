@@ -60,4 +60,9 @@ interface AvatarRepository {
      * @return true if success otherwise false
      */
     suspend fun updateMyAvatarWithNewEmail(oldEmail: String, newEmail: String): Boolean
+
+    /**
+     * Monitor user avatar updates
+     */
+    fun monitorUserAvatarUpdates(): Flow<Long>
 }

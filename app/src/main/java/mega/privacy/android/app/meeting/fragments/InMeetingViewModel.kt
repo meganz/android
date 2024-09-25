@@ -117,6 +117,7 @@ import mega.privacy.android.domain.usecase.meeting.raisehandtospeak.LowerHandToS
 import mega.privacy.android.domain.usecase.meeting.raisehandtospeak.RaiseHandToSpeakUseCase
 import mega.privacy.android.domain.usecase.meeting.raisehandtospeak.SetRaiseToHandSuggestionShownUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.user.MonitorUserAvatarUpdatesUseCase
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
@@ -208,10 +209,11 @@ class InMeetingViewModel @Inject constructor(
     private val setChatTitleUseCase: SetChatTitleUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
-    private val amIAloneOnAnyCallUseCase: AmIAloneOnAnyCallUseCase,
+    amIAloneOnAnyCallUseCase: AmIAloneOnAnyCallUseCase,
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     private val monitorWaitingForOtherParticipantsHasEndedUseCase: MonitorWaitingForOtherParticipantsHasEndedUseCase,
     private val monitorLocalVideoChangedDueToProximitySensorUseCase: MonitorLocalVideoChangedDueToProximitySensorUseCase,
+    private val monitorUserAvatarUpdatesUseCase: MonitorUserAvatarUpdatesUseCase,
     @ApplicationContext private val context: Context,
 ) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -403,6 +405,16 @@ class InMeetingViewModel @Inject constructor(
                 onError = Timber::e
             )
             .addTo(composite)
+
+        monitorAvatarUpdates()
+    }
+
+    private fun monitorAvatarUpdates() {
+        viewModelScope.launch {
+            monitorUserAvatarUpdatesUseCase()
+                .catch { Timber.d(it) }
+                .collect { peerId -> getRemoteAvatar(peerId) }
+        }
     }
 
 

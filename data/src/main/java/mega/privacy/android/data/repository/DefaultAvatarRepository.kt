@@ -4,6 +4,7 @@ import android.graphics.BitmapFactory
 import androidx.core.graphics.toColorInt
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
@@ -190,6 +191,18 @@ internal class DefaultAvatarRepository @Inject constructor(
             }
             return@withContext false
         }
+
+    override fun monitorUserAvatarUpdates(): Flow<Long> = megaApiGateway.globalUpdates
+        .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
+        .mapNotNull {
+            it.users?.find { user ->
+                user.isOwnChange == 0
+                        && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong())
+            }
+        }.map { user ->
+            deleteAvatarFile(user)
+            user.handle
+        }.flowOn(ioDispatcher)
 
     override suspend fun setAvatar(filePath: String?) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
