@@ -478,7 +478,7 @@ internal class FileFacade @Inject constructor(
                             lastModified = cursor.getLong(index)
                         }
 
-                        if (lastModified > (System.currentTimeMillis() * 10)) {
+                        if (lastModified > getCurrentTimeWithToleranceMultiplier(10)) {
                             /* Some OS does not follow MediaStore documentation and implements the values using
                             their own units. This ensures we set the date to the correct value in case the OS
                             does not follow it. */
@@ -489,6 +489,9 @@ internal class FileFacade @Inject constructor(
                         lastModified
                     } ?: 0
             } ?: 0
+
+    private fun getCurrentTimeWithToleranceMultiplier(toleranceMultiplier: Int) =
+        System.currentTimeMillis() * toleranceMultiplier
 
     override fun downscaleImage(file: File, destination: File, maxPixels: Long) {
         val orientation = AndroidGfxProcessor.getExifOrientation(file.absolutePath)
