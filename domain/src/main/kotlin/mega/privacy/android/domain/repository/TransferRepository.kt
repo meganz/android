@@ -13,6 +13,10 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
+import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferRequest
 import java.io.File
 
 /**
@@ -523,4 +527,26 @@ interface TransferRepository {
      * Remove a list of in progress transfers by tag.
      */
     suspend fun removeInProgressTransfers(tags: Set<Int>)
+
+    fun getPendingTransfersByType(
+        transferType: TransferType,
+    ): Flow<List<PendingTransfer>>
+
+    fun getPendingTransfersByTypeAndState(
+        transferType: TransferType,
+        pendingTransferState: PendingTransferState,
+    ): Flow<List<PendingTransfer>>
+
+    suspend fun insertPendingTransfers(pendingTransfer: List<InsertPendingTransferRequest>)
+    suspend fun updatePendingTransfers(
+        updatePendingTransferRequests: List<UpdatePendingTransferRequest>,
+    )
+
+    suspend fun updatePendingTransfer(
+        updatePendingTransferRequest: UpdatePendingTransferRequest,
+    )
+
+    suspend fun getPendingTransfersByTag(tag: Int): PendingTransfer?
+    suspend fun deletePendingTransferByTag(tag: Int)
+    suspend fun deleteAllPendingTransfers()
 }

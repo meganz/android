@@ -20,14 +20,14 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer.Scann
  * @property state the state of this pending transfer
  */
 data class PendingTransfer(
-    val pendingTransferId: Long? = null,
+    val pendingTransferId: Long,
     val transferTag: Int? = null,
     val transferType: TransferType,
     val nodeIdentifier: PendingTransferNodeIdentifier,
     val path: String,
     val appData: TransferAppData?,
     val isHighPriority: Boolean,
-    val scanningFoldersData: ScanningFoldersData,
+    val scanningFoldersData: ScanningFoldersData = ScanningFoldersData(),
     val startedFiles: Int = 0,
     val alreadyTransferred: Int = 0,
     val state: PendingTransferState = PendingTransferState.NotSentToSdk,

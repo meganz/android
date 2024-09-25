@@ -9,7 +9,7 @@ import javax.inject.Inject
  * Mapper for [PendingTransfer] to its database entity [PendingTransferEntity]
  */
 internal class PendingTransferEntityMapper @Inject constructor(
-    private val appDataMapper: TransferAppDataStringMapper,
+    private val transferAppDataStringMapper: TransferAppDataStringMapper,
 ) {
     operator fun invoke(pendingTransfer: PendingTransfer) = with(pendingTransfer) {
         PendingTransferEntity(
@@ -18,7 +18,7 @@ internal class PendingTransferEntityMapper @Inject constructor(
             transferType = transferType,
             nodeIdentifier = nodeIdentifier,
             path = path,
-            appData = appDataMapper(listOfNotNull(appData)),
+            appData = transferAppDataStringMapper(listOfNotNull(appData)),
             isHighPriority = isHighPriority,
             scanningFoldersData = with(scanningFoldersData) {
                 PendingTransferEntity.ScanningFoldersDataEntity(

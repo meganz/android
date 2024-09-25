@@ -42,6 +42,7 @@ import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapp
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferLegacyModelMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
+import mega.privacy.android.data.mapper.transfer.pending.InsertPendingTransferRequestMapper
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
@@ -60,6 +61,7 @@ import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdateAlreadyTransferredFilesCount
@@ -116,6 +118,7 @@ internal class MegaLocalRoomFacadeTest {
     private val pendingTransferDao = mock<PendingTransferDao>()
     private val pendingTransferEntityMapper = mock<PendingTransferEntityMapper>()
     private val pendingTransferModelMapper = mock<PendingTransferModelMapper>()
+    private val insertPendingTransferRequestMapper = mock<InsertPendingTransferRequestMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -154,6 +157,7 @@ internal class MegaLocalRoomFacadeTest {
             pendingTransferDao = { pendingTransferDao },
             pendingTransferEntityMapper = pendingTransferEntityMapper,
             pendingTransferModelMapper = pendingTransferModelMapper,
+            insertPendingTransferRequestMapper = insertPendingTransferRequestMapper,
         )
     }
 
@@ -185,6 +189,7 @@ internal class MegaLocalRoomFacadeTest {
             pendingTransferDao,
             pendingTransferModelMapper,
             pendingTransferEntityMapper,
+            insertPendingTransferRequestMapper,
         )
     }
 
@@ -814,9 +819,9 @@ internal class MegaLocalRoomFacadeTest {
     @Test
     fun `test that insertPendingTransfers invokes dao batch insert with mapped entities`() =
         runTest {
-            val element = mock<PendingTransfer>()
+            val element = mock<InsertPendingTransferRequest>()
             val mapped = mock<PendingTransferEntity>()
-            whenever(pendingTransferEntityMapper(element)) doReturn mapped
+            whenever(insertPendingTransferRequestMapper(element)) doReturn mapped
             underTest.insertPendingTransfers(listOf(element))
             verify(pendingTransferDao).insertOrUpdatePendingTransfers(
                 listOf(mapped),

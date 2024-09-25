@@ -32,6 +32,7 @@ import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapp
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferLegacyModelMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
+import mega.privacy.android.data.mapper.transfer.pending.InsertPendingTransferRequestMapper
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMapper
 import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
@@ -52,6 +53,7 @@ import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdateAlreadyTransferredFilesCount
@@ -94,6 +96,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val pendingTransferDao: Lazy<PendingTransferDao>,
     private val pendingTransferEntityMapper: PendingTransferEntityMapper,
     private val pendingTransferModelMapper: PendingTransferModelMapper,
+    private val insertPendingTransferRequestMapper: InsertPendingTransferRequestMapper,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
         contactDao.get().insertOrUpdateContact(contactEntityMapper(contact))
@@ -234,12 +237,10 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override fun getActiveTransfersByType(transferType: TransferType) =
         activeTransferDao.get().getActiveTransfersByType(transferType)
-            .map { activeTransferEntities ->
-                activeTransferEntities.map { it }
-            }
+
 
     override suspend fun getCurrentActiveTransfersByType(transferType: TransferType) =
-        activeTransferDao.get().getCurrentActiveTransfersByType(transferType).map { it }
+        activeTransferDao.get().getCurrentActiveTransfersByType(transferType)
 
     override suspend fun getCurrentActiveTransfers(): List<ActiveTransfer> =
         activeTransferDao.get().getCurrentActiveTransfers()
@@ -500,10 +501,10 @@ internal class MegaLocalRoomFacade @Inject constructor(
         chatPendingChangesDao.get().getChatPendingChanges(chatId)
             .map { entity -> entity?.let { chatRoomPendingChangesModelMapper(it) } }
 
-    override suspend fun insertPendingTransfers(pendingTransfers: List<PendingTransfer>) {
+    override suspend fun insertPendingTransfers(pendingTransfers: List<InsertPendingTransferRequest>) {
         pendingTransferDao.get()
             .insertOrUpdatePendingTransfers(
-                pendingTransfers.map { pendingTransferEntityMapper(it) },
+                pendingTransfers.map { insertPendingTransferRequestMapper(it) },
                 MAX_INSERT_LIST_SIZE
             )
     }

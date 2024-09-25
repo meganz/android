@@ -44,6 +44,11 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
+import mega.privacy.android.domain.entity.transfer.pending.UpdateAlreadyTransferredFilesCount
+import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferState
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import nz.mega.sdk.MegaError
@@ -1500,4 +1505,77 @@ class DefaultTransfersRepositoryTest {
         val flow2 = underTest.monitorAskedResumeTransfers()
         assertThat(flow2.value).isFalse()
     }
+
+    @Test
+    fun `test that getPendingTransfersByTag gateway result is returned when getPendingTransfersByTag is called`() =
+        runTest {
+            val tag = 15
+            val expected = mock<PendingTransfer>()
+            whenever(megaLocalRoomGateway.getPendingTransfersByTag(tag)).thenReturn(expected)
+            val actual = underTest.getPendingTransfersByTag(tag)
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    @ParameterizedTest
+    @EnumSource(TransferType::class)
+    fun `test that getPendingTransfersByType gateway result is returned when getPendingTransfersByType is called`(
+        transferType: TransferType,
+    ) = runTest {
+        val expected = flowOf(listOf(mock<PendingTransfer>()))
+        whenever(megaLocalRoomGateway.getPendingTransfersByType(transferType)).thenReturn(expected)
+        val actual = underTest.getPendingTransfersByType(transferType)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @EnumSource(PendingTransferState::class)
+    fun `test that getPendingTransfersByTypeAndState gateway result is returned when getPendingTransfersByTypeAndState is called`(
+        pendingTransferState: PendingTransferState,
+    ) = runTest {
+        val expected = flowOf(listOf(mock<PendingTransfer>()))
+        whenever(
+            megaLocalRoomGateway
+                .getPendingTransfersByTypeAndState(TransferType.DOWNLOAD, pendingTransferState)
+        )
+            .thenReturn(expected)
+        val actual = underTest
+            .getPendingTransfersByTypeAndState(TransferType.DOWNLOAD, pendingTransferState)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that insertPendingTransfers gateway is called with the correct parameters when insertPendingTransfers is called`() =
+        runTest {
+            val expected = listOf(mock<InsertPendingTransferRequest>())
+
+            underTest.insertPendingTransfers(expected)
+
+            verify(megaLocalRoomGateway).insertPendingTransfers(expected)
+        }
+
+    @Test
+    fun `test that updatePendingTransfer gateway is called with the correct parameters when updatePendingTransfer is called`() =
+        runTest {
+            val updatePendingTransferRequests = mock<UpdatePendingTransferState>()
+
+            underTest.updatePendingTransfer(updatePendingTransferRequests)
+
+            verify(megaLocalRoomGateway).updatePendingTransfers(updatePendingTransferRequests)
+        }
+
+    @Test
+    fun `test that updatePendingTransfers gateway is called with the correct parameters when updatePendingTransfers is called`() =
+        runTest {
+            val updatePendingTransferRequests1 = mock<UpdatePendingTransferState>()
+            val updatePendingTransferRequests2 = mock<UpdateAlreadyTransferredFilesCount>()
+
+            underTest.updatePendingTransfers(
+                listOf(updatePendingTransferRequests1, updatePendingTransferRequests2)
+            )
+
+            verify(megaLocalRoomGateway).updatePendingTransfers(
+                updatePendingTransferRequests1,
+                updatePendingTransferRequests2
+            )
+        }
 }

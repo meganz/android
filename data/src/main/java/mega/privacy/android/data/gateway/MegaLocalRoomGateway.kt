@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferRequest
@@ -502,7 +503,7 @@ interface MegaLocalRoomGateway {
      * Insert pending transfers
      * @param pendingTransfer
      */
-    suspend fun insertPendingTransfers(pendingTransfers: List<PendingTransfer>)
+    suspend fun insertPendingTransfers(pendingTransfers: List<InsertPendingTransferRequest>)
 
     /**
      * Get pending transfers by type
