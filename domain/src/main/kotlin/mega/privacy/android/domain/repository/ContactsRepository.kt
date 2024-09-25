@@ -84,7 +84,7 @@ interface ContactsRepository {
      *
      * @return A map of contact emails and names.
      */
-    suspend fun getAllContactsName(): Map<String, String>
+    suspend fun getAllContactsName(): Map<String, String?>
 
     /**
      * Gets the updated main data of a contact.
