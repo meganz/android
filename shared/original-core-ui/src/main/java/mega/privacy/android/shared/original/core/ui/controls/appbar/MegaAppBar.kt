@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.appbar
 
-import android.os.Build
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -291,7 +290,7 @@ internal fun BaseMegaAppBar(
         (if (elevation == 0.dp) MegaOriginalTheme.colors.background.pageBackground else MegaOriginalTheme.colors.background.surface1)
             .copy(LocalMegaAppBarColors.current.backgroundAlpha))
     // set the status bar color to match toolbar color, it has no effect on android 15
-    if (!LocalView.current.isInEditMode && Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+    if (!LocalView.current.isInEditMode) {
         val systemUiController = rememberSystemUiController()
         DisposableEffect(systemUiController, backgroundColor) {
             systemUiController.setStatusBarColor(

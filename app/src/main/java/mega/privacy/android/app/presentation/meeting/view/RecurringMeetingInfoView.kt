@@ -10,32 +10,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -50,7 +39,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -68,11 +56,12 @@ import mega.privacy.android.app.presentation.meeting.view.sheet.RecurringMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.legacy.core.ui.controls.dialogs.EditOccurrenceDialog
-import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
@@ -86,7 +75,6 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 fun RecurringMeetingInfoView(
     state: RecurringMeetingInfoState,
     managementState: ScheduledMeetingManagementUiState,
-    onScrollChange: (Boolean) -> Unit,
     onBackPressed: () -> Unit,
     onOccurrenceClicked: (ChatScheduledMeetingOccurr) -> Unit,
     onSeeMoreClicked: () -> Unit,
@@ -104,11 +92,8 @@ fun RecurringMeetingInfoView(
     onEditOccurrence: () -> Unit = {},
     onDismissDialog: () -> Unit = {},
 ) {
-    val isLight = MaterialTheme.colors.isLight
     val listState = rememberLazyListState()
-    val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val scaffoldState = rememberScaffoldState()
-    val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
 
@@ -122,22 +107,16 @@ fun RecurringMeetingInfoView(
         action = { modalSheetState.show() }
     )
 
-    Scaffold(
-        modifier = modifier.systemBarsPadding(),
+    MegaScaffold(
+        modifier = modifier.navigationBarsPadding(),
         scaffoldState = scaffoldState,
-        snackbarHost = {
-            SnackbarHost(hostState = it) { data ->
-                Snackbar(snackbarData = data,
-                    backgroundColor = black.takeIf { isLight } ?: white)
-            }
-        },
         topBar = {
             RecurringMeetingInfoAppBar(
                 state = state,
                 onBackPressed = onBackPressed,
-                elevation = !firstItemVisible
             )
-        }
+        },
+        scrollableContentState = listState
     ) { paddingValues ->
         LazyColumn(
             state = listState,
@@ -169,10 +148,6 @@ fun RecurringMeetingInfoView(
             scaffoldState.snackbarHostState.showAutoDurationSnackbar(it)
         }
     }
-
-    SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
-
-    onScrollChange(!firstItemVisible)
 
     if (managementState.editOccurrenceTapped) {
         managementState.editedOccurrence?.let {
@@ -239,57 +214,26 @@ fun RecurringMeetingInfoView(
  *
  * @param state                     [RecurringMeetingInfoState]
  * @param onBackPressed             When on back pressed option is clicked
- * @param elevation                 True if it has elevation. False, if it does not.
  */
 @Composable
 private fun RecurringMeetingInfoAppBar(
     state: RecurringMeetingInfoState,
     onBackPressed: () -> Unit,
-    elevation: Boolean,
 ) {
-    val isLight = MaterialTheme.colors.isLight
-    val iconColor = black.takeIf { isLight } ?: white
-    TopAppBar(
-        title = {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    state.schedTitle?.let { title ->
-                        Text(text = title,
-                            style = MaterialTheme.typography.subtitle1,
-                            color = black.takeIf { isLight } ?: white,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis)
-                    }
-                }
-                if (state.typeOccurs != OccurrenceFrequencyType.Invalid) {
-                    Text(text = when (state.typeOccurs) {
-                        OccurrenceFrequencyType.Daily -> stringResource(id = R.string.meetings_recurring_meeting_info_occurs_daily_subtitle)
-                        OccurrenceFrequencyType.Weekly -> stringResource(id = R.string.meetings_recurring_meeting_info_occurs_weekly_subtitle)
-                        OccurrenceFrequencyType.Monthly -> stringResource(id = R.string.meetings_recurring_meeting_info_occurs_monthly_subtitle)
-                        else -> ""
-                    },
-                        style = MaterialTheme.typography.subtitle2,
-                        color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Normal,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis)
-                }
-
-            }
-        },
-        navigationIcon = {
-            IconButton(onClick = onBackPressed) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Back button",
-                    tint = iconColor
-                )
-            }
-        },
-        backgroundColor = MaterialTheme.colors.surface,
-        elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp
+    val context = LocalContext.current
+    val subtitle = remember(state.typeOccurs) {
+        when (state.typeOccurs) {
+            OccurrenceFrequencyType.Daily -> context.getString(R.string.meetings_recurring_meeting_info_occurs_daily_subtitle)
+            OccurrenceFrequencyType.Weekly -> context.getString(R.string.meetings_recurring_meeting_info_occurs_weekly_subtitle)
+            OccurrenceFrequencyType.Monthly -> context.getString(R.string.meetings_recurring_meeting_info_occurs_monthly_subtitle)
+            else -> ""
+        }
+    }
+    MegaAppBar(
+        appBarType = AppBarType.BACK_NAVIGATION,
+        onNavigationPressed = onBackPressed,
+        title = state.schedTitle.orEmpty(),
+        subtitle = subtitle,
     )
 }
 

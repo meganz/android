@@ -18,7 +18,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -108,7 +107,6 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
             RecurringMeetingInfoView(
                 state = uiState,
                 managementState = managementState,
-                onScrollChange = { scrolled -> this.changeStatusBarColor(scrolled, isDark) },
                 onBackPressed = { finish() },
                 onOccurrenceClicked = { occurrence ->
                     if (managementState.chatRoom?.ownPrivilege == ChatRoomPermission.Moderator) {

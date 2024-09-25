@@ -9,9 +9,9 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
+import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
-import mega.privacy.android.app.presentation.meeting.view.RecurringMeetingInfoView
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import org.junit.Rule
@@ -19,7 +19,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class RecurringMeetingInfoViewTest {
@@ -164,7 +163,6 @@ class RecurringMeetingInfoViewTest {
             RecurringMeetingInfoView(
                 state = uiState,
                 managementState = managementState,
-                onScrollChange = { },
                 onBackPressed = { },
                 onOccurrenceClicked = { },
                 onSeeMoreClicked = { },
@@ -194,7 +192,6 @@ class RecurringMeetingInfoViewTest {
             RecurringMeetingInfoView(
                 state = uiState,
                 managementState = managementState,
-                onScrollChange = { },
                 onBackPressed = { },
                 onOccurrenceClicked = { },
                 onSeeMoreClicked = onSeeMoreClicked,
