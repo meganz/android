@@ -19,6 +19,7 @@ import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -33,7 +34,10 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -482,6 +486,20 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun setUpViews() {
         activityChatContactBinding = ActivityChatContactPropertiesBinding.inflate(layoutInflater)
         setContentView(activityChatContactBinding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                leftMargin = insets.left
+                bottomMargin = insets.bottom
+                rightMargin = insets.right
+            }
+
+            collapsingAppBar.toolbar.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                topMargin = insets.top
+            }
+
+            WindowInsetsCompat.CONSUMED
+        }
         setSupportActionBar(collapsingAppBar.toolbar)
         title = null
         supportActionBar?.apply {
