@@ -159,7 +159,7 @@ internal fun VideoThumbnailView(
             contentDescription = VIDEO_ITEM_THUMBNAIL_CONTENT_DESCRIPTION,
             placeholder = painterResource(id = icon),
             error = painterResource(id = icon),
-            contentScale = ContentScale.FillBounds,
+            contentScale = ContentScale.Crop,
             modifier = thumbnailModifier.testTag(VIDEO_ITEM_THUMBNAIL_TEST_TAG)
         )
 

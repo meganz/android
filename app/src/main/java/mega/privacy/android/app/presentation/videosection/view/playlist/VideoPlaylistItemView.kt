@@ -204,7 +204,7 @@ internal fun MultipleThumbnailsView(
                                 contentDescription = "Video",
                                 placeholder = painterResource(id = icon),
                                 error = painterResource(id = icon),
-                                contentScale = ContentScale.FillBounds,
+                                contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .fillMaxHeight()
                                     .weight(1f)
