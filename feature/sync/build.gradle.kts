@@ -17,6 +17,9 @@ android {
     lint {
         abortOnError = true
     }
+    defaultConfig {
+        testInstrumentationRunner = "mega.privacy.android.app.HiltTestRunner"
+    }
     namespace = "mega.privacy.android.feature.sync"
 }
 
@@ -62,5 +65,6 @@ dependencies {
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
+    testImplementation(google.hilt.android.test)
     testImplementation(androidx.work.test)
 }
