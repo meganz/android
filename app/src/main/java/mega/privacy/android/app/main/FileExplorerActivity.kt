@@ -11,6 +11,7 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -40,7 +41,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
-import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
+import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.CreateChatListener
@@ -77,8 +78,6 @@ import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
-import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
@@ -138,6 +137,7 @@ import javax.inject.Inject
  *
  * @property getChatChangesUseCase     [GetChatChangesUseCase]
  * @property copyNodeUseCase           [CopyNodeUseCase]
+ * @property checkFileNameCollisionsUseCase [CheckFileNameCollisionsUseCase]
  * @property loginMutex                Mutex.
  * @property isList                    True if the view is in list mode, false if it is in grid mode.
  * @property mode                      Mode for opening the file explorer: [UPLOAD], [MOVE], [COPY], [CAMERA], [IMPORT], [SELECT], [SELECT_CAMERA_FOLDER], [SHARE_LINK] or [SAVE]
@@ -228,13 +228,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private var bottomSheetDialogFragment: BottomSheetDialogFragment? = null
     private var parentHandle: Long = 0
 
-    private val transparentColor by lazy {
-        ContextCompat.getColor(
-            this,
-            android.R.color.transparent
-        )
-    }
-
     private val nameCollisionActivityLauncher = registerForActivityResult(
         NameCollisionActivityContract()
     ) { result ->
@@ -246,7 +239,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
-    private val toolbarElevationColor by lazy { getColorForElevation(this, elevation) }
 
     private lateinit var createChatLauncher: ActivityResultLauncher<Intent>
 
@@ -393,7 +385,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        enableEdgeToEdgeAndConsumeInsets()
         Timber.d("onCreate first")
         super.onCreate(savedInstanceState)
         credentials = runBlocking {
@@ -573,8 +564,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         if (savedInstanceState != null) {
             folderSelected = savedInstanceState.getBoolean("folderSelected", false)
         }
-
+        enableEdgeToEdge()
         binding = ActivityFileExplorerBinding.inflate(layoutInflater)
+        consumeInsetsWithToolbar(customToolbar = binding.appBarLayoutExplorer)
         setContentView(binding.root)
         addStartUploadTransferView()
 
@@ -959,32 +951,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      */
     fun changeActionBarElevation(elevate: Boolean, fragmentIndex: Int) {
         if (!isCurrentFragment(fragmentIndex)) return
-
-        changeStatusBarColorForElevation(this, elevate)
-
-        with(binding) {
-            if (fragmentIndex == CHAT_FRAGMENT) {
-                if (Util.isDarkMode(this@FileExplorerActivity)) {
-                    if (tabShown == NO_TABS) {
-                        if (elevate) {
-                            toolbarExplorer.setBackgroundColor(toolbarElevationColor)
-                        } else {
-                            toolbarExplorer.setBackgroundColor(transparentColor)
-                        }
-                    } else {
-                        if (elevate) {
-                            toolbarExplorer.setBackgroundColor(transparentColor)
-                            appBarLayoutExplorer.elevation = elevation
-                        } else {
-                            toolbarExplorer.setBackgroundColor(transparentColor)
-                            appBarLayoutExplorer.elevation = 0F
-                        }
-                    }
-                }
-            } else {
-                appBarLayoutExplorer.elevation = if (elevate) elevation else 0f
-            }
-        }
+        binding.appBarLayoutExplorer.elevation = if (elevate) elevation else 0f
     }
 
     private fun isCurrentFragment(index: Int): Boolean =

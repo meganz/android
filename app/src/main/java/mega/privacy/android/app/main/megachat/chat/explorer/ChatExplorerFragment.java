@@ -223,23 +223,14 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
 
         if (context instanceof FileExplorerActivity) {
-            if (addLayoutVisible && canScroll) {
-                if (Util.isDarkMode(context)) {
-                    addLayout.setBackgroundColor(ColorUtils.getColorForElevation(context, elevation));
-                } else {
-                    addLayout.setElevation(elevation);
-                }
+            if (canScroll) {
+                addLayout.setBackgroundColor(ColorUtils.getColorForElevation(context, elevation));
             } else {
-                if (Util.isDarkMode(context)) {
-                    addLayout.setBackgroundColor(getResources().getColor(android.R.color.transparent, null));
-                } else {
-                    addLayout.setElevation(0);
-                }
+                addLayout.setBackgroundColor(getResources().getColor(android.R.color.transparent, null));
             }
-
             ((FileExplorerActivity) context).changeActionBarElevation(canScroll, CHAT_FRAGMENT);
         } else if (context instanceof ChatExplorerActivity && addLayoutVisible) {
-            addLayout.setElevation(canScroll ? getResources().getDimension(R.dimen.toolbar_elevation) : 0);
+            addLayout.setElevation(canScroll ? elevation : 0);
 
             Toolbar tB = ((ChatExplorerActivity) context).findViewById(R.id.toolbar_chat_explorer);
             Util.changeToolBarElevationForDarkMode((ChatExplorerActivity) context, tB, canScroll);

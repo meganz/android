@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
@@ -139,8 +140,13 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
 
     private fun setupView() {
         with(binding) {
-            scrollContainerImport.setOnScrollChangeListener { _: View?, _: Int, _: Int, _: Int, _: Int -> changeActionBarElevation() }
             fileListView.layoutManager = LinearLayoutManager(requireContext())
+            fileListView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    changeActionBarElevation()
+                }
+            })
         }
     }
 
@@ -172,9 +178,11 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
                 emptyNames > 0 && wrongNames > 0 -> {
                     getString(R.string.general_incorrect_names)
                 }
+
                 emptyNames > 0 -> {
                     resources.getQuantityString(R.plurals.empty_names, emptyNames)
                 }
+
                 else -> {
                     getString(
                         R.string.invalid_characters_defined,
@@ -194,7 +202,7 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
      */
     fun changeActionBarElevation() {
         (requireActivity() as FileExplorerActivity).changeActionBarElevation(
-            binding.scrollContainerImport.canScrollVertically(Constants.SCROLLING_UP_DIRECTION),
+            binding.fileListView.canScrollVertically(Constants.SCROLLING_UP_DIRECTION),
             FileExplorerActivity.IMPORT_FRAGMENT
         )
     }

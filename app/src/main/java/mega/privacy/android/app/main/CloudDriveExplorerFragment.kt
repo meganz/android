@@ -234,7 +234,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
     override fun checkScroll() {
         if (!isAdded) return
 
-        (recyclerView.canScrollHorizontally(SCROLLING_UP_DIRECTION) || (adapter.multipleSelected))
+        (recyclerView.canScrollVertically(SCROLLING_UP_DIRECTION) || (adapter.multipleSelected))
             .let { elevate ->
                 (requireActivity() as FileExplorerActivity).changeActionBarElevation(
                     elevate,

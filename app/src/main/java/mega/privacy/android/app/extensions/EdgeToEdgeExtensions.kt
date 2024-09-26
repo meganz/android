@@ -1,9 +1,9 @@
 package mega.privacy.android.app.extensions
 
+import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
@@ -38,7 +38,7 @@ fun ComponentActivity.enableEdgeToEdgeAndConsumeInsets(type: Int = WindowInsetsC
 @JvmOverloads
 fun ComponentActivity.consumeInsetsWithToolbar(
     type: Int = WindowInsetsCompat.Type.systemBars(),
-    customToolbar: Toolbar,
+    customToolbar: View,
 ) {
     // we need condition to check if the device running Android 15 when we target sdk to 35
     // because it will enable edge to edge by default
