@@ -13,6 +13,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.RelativeLayout
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
@@ -23,7 +24,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.ViewGifActivityContract
 import mega.privacy.android.app.adapters.GiphyAdapter
 import mega.privacy.android.app.databinding.ActivityGiphyBinding
-import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
+import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.GiphyEndPointsInterface
 import mega.privacy.android.app.interfaces.GiphyInterface
 import mega.privacy.android.app.interfaces.GiphyInterface.Companion.EMPTY_DOWN_SERVER
@@ -102,15 +103,14 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
-        ColorUtils.changeStatusBarColorForElevation(this, true)
-
+        enableEdgeToEdge()
         binding = ActivityGiphyBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        consumeInsetsWithToolbar(customToolbar = binding.giphyToolbar)
 
         setSupportActionBar(binding.giphyToolbar)
 
