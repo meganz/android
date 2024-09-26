@@ -98,7 +98,7 @@ fun ParticipantInCallItem(
                         val avatarModifier = Modifier
                             .padding(
                                 horizontal = 16.dp,
-                                vertical = if (participant.areCredentialsVerified) 16.dp else 8.dp
+                                vertical = 8.dp
                             )
                             .size(40.dp)
 
@@ -370,7 +370,7 @@ fun PreviewParticipantInCallItem() {
                 email = "name3@mega.nz",
                 isMe = false,
                 privilege = ChatRoomPermission.Moderator,
-                defaultAvatarColor = 333,
+                defaultAvatarColor = -30327,
             ),
             onAdmitParticipantClicked = {},
             onDenyParticipantClicked = {},
