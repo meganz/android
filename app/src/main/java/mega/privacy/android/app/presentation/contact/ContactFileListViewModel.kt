@@ -12,8 +12,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
+import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
+import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -44,6 +47,7 @@ class ContactFileListViewModel @Inject constructor(
     private val copyNodesUseCase: CopyNodesUseCase,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
     private val filePrepareUseCase: FilePrepareUseCase,
+    private val scannerHandler: ScannerHandler,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ContactFileListUiState())
 
@@ -240,5 +244,42 @@ class ContactFileListViewModel @Inject constructor(
      */
     fun consumeUploadEvent() {
         _state.update { it.copy(uploadEvent = consumed()) }
+    }
+
+    /**
+     * Checks whether the legacy or modern Document Scanner should be used
+     */
+    fun handleScanDocument() {
+        viewModelScope.launch {
+            runCatching {
+                scannerHandler.handleScanDocument()
+            }.onSuccess { handleScanDocumentResult ->
+                _state.update { it.copy(handleScanDocumentResult = handleScanDocumentResult) }
+            }.onFailure { exception ->
+                _state.update {
+                    it.copy(
+                        documentScanningError = if (exception is InsufficientRAMToLaunchDocumentScanner) {
+                            DocumentScanningError.InsufficientRAM
+                        } else {
+                            DocumentScanningError.GenericError
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Resets the value of [ContactFileListUiState.handleScanDocumentResult]
+     */
+    fun onHandleScanDocumentResultConsumed() {
+        _state.update { it.copy(handleScanDocumentResult = null) }
+    }
+
+    /**
+     * Resets the value of [ContactFileListUiState.documentScanningError]
+     */
+    fun onDocumentScanningErrorConsumed() {
+        _state.update { it.copy(documentScanningError = null) }
     }
 }

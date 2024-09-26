@@ -23,12 +23,18 @@
                 android:minHeight="?attr/actionBarSize" />
         </com.google.android.material.appbar.AppBarLayout>
 
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/contact_properties_error_dialog_compose_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
         <FrameLayout
             android:id="@+id/fragment_container_contact_properties"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/app_bar_layout" />
+            android:layout_below="@id/app_bar_layout">
+
+        </FrameLayout>
 
     </RelativeLayout>
 

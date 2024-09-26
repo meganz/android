@@ -29,7 +29,6 @@ public class Constants {
     public static final int REQUEST_CODE_FILE_INFO = 1027;
     public static final int REQUEST_CODE_REFRESH_API_SERVER = 1028;
     public static final int REQUEST_CODE_DELETE_VERSIONS_HISTORY = 1029;
-    public static final int REQUEST_CODE_SCAN_DOCUMENT = 1036;
     public static final int REQUEST_CODE_GET_FOLDER = 1038;
     public static final int REQUEST_CODE_GET_FOLDER_CONTENT = 1039;
 

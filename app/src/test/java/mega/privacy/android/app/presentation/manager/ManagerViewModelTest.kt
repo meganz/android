@@ -30,7 +30,7 @@ import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningErrorTypeUiItem
+import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -1567,12 +1567,12 @@ class ManagerViewModelTest {
     }
 
     @Test
-    fun `test that the document scanning error type is reset`() = runTest {
+    fun `test that the document scanning error is reset`() = runTest {
         underTest.onDocumentScanningErrorConsumed()
         testScheduler.advanceUntilIdle()
 
         underTest.state.test {
-            assertThat(awaitItem().documentScanningErrorTypeUiItem).isNull()
+            assertThat(awaitItem().documentScanningError).isNull()
         }
     }
 

@@ -8,7 +8,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningErrorTypeUiItem
+import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
@@ -16,18 +16,18 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 /**
  * A Composable Dialog shown when an error occurs during Document Scanning
  *
- * @param documentScanningErrorTypeUiItem The specific Document Scanning Error Type. If it's value
- * is null, the Dialog is not shown
+ * @param documentScanningError The specific Document Scanning Error. If it's value is null, the
+ * Dialog is not shown
  * @param onErrorAcknowledged Lambda to execute upon clicking the Button
  * @param onErrorDismissed Lambda to execute upon clicking outside the Dialog bounds
  */
 @Composable
 internal fun DocumentScanningErrorDialog(
-    documentScanningErrorTypeUiItem: DocumentScanningErrorTypeUiItem?,
+    documentScanningError: DocumentScanningError?,
     onErrorAcknowledged: () -> Unit,
     onErrorDismissed: () -> Unit,
 ) {
-    documentScanningErrorTypeUiItem?.let { errorType ->
+    documentScanningError?.let { errorType ->
         MegaAlertDialog(
             modifier = Modifier.testTag(DOCUMENT_SCANNING_ERROR_DIALOG),
             title = stringResource(SharedR.string.document_scanning_error_dialog_title),
@@ -43,26 +43,26 @@ internal fun DocumentScanningErrorDialog(
 /**
  * A Preview [Composable] for [DocumentScanningErrorDialog]
  *
- * @param documentScanningErrorTypeUiItem The specific Document Scanning Error Type
+ * @param documentScanningError The specific Document Scanning Error
  */
 @CombinedThemePreviews
 @Composable
 private fun DocumentScanningErrorDialogPreview(
-    @PreviewParameter(DocumentScanningErrorTypeUiItemParameterProvider::class) documentScanningErrorTypeUiItem: DocumentScanningErrorTypeUiItem,
+    @PreviewParameter(DocumentScanningErrorParameterProvider::class) documentScanningError: DocumentScanningError,
 ) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         DocumentScanningErrorDialog(
-            documentScanningErrorTypeUiItem = documentScanningErrorTypeUiItem,
+            documentScanningError = documentScanningError,
             onErrorAcknowledged = {},
             onErrorDismissed = {},
         )
     }
 }
 
-private class DocumentScanningErrorTypeUiItemParameterProvider :
-    PreviewParameterProvider<DocumentScanningErrorTypeUiItem> {
-    override val values: Sequence<DocumentScanningErrorTypeUiItem>
-        get() = DocumentScanningErrorTypeUiItem.entries.asSequence()
+private class DocumentScanningErrorParameterProvider :
+    PreviewParameterProvider<DocumentScanningError> {
+    override val values: Sequence<DocumentScanningError>
+        get() = DocumentScanningError.entries.asSequence()
 }
 
 /**

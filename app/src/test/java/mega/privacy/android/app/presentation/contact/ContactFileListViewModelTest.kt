@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.ShareInfo
+import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
+import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.EventType
@@ -58,6 +60,7 @@ internal class ContactFileListViewModelTest {
     private val copyNodesUseCase: CopyNodesUseCase = mock()
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase = mock()
     private val filePrepareUseCase: FilePrepareUseCase = mock()
+    private val scannerHandler: ScannerHandler = mock()
     private val nodeNameCollision = mock<NodeNameCollision.Default> {
         on { nodeHandle }.thenReturn(2L)
         on { collisionHandle }.thenReturn(123L)
@@ -87,7 +90,8 @@ internal class ContactFileListViewModelTest {
             moveNodesUseCase,
             copyNodesUseCase,
             getNodeContentUriByHandleUseCase,
-            filePrepareUseCase
+            filePrepareUseCase,
+            scannerHandler,
         )
     }
 
@@ -100,7 +104,8 @@ internal class ContactFileListViewModelTest {
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
             getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
-            filePrepareUseCase = filePrepareUseCase
+            filePrepareUseCase = filePrepareUseCase,
+            scannerHandler = scannerHandler,
         )
     }
 
@@ -390,5 +395,47 @@ internal class ContactFileListViewModelTest {
             .thenReturn(listOf(entity))
         val actual = underTest.prepareFiles(listOf(uri))
         assertThat(actual).isEqualTo(listOf(entity))
+    }
+
+    @Test
+    fun `test that the old document scanner is used for scanning documents`() = runTest {
+        val handleScanDocumentResult = HandleScanDocumentResult.UseLegacyImplementation
+        whenever(scannerHandler.handleScanDocument()).thenReturn(handleScanDocumentResult)
+
+        underTest.handleScanDocument()
+
+        underTest.state.test {
+            assertThat(awaitItem().handleScanDocumentResult).isEqualTo(handleScanDocumentResult)
+        }
+    }
+
+    @Test
+    fun `test that the new ML Document Kit Scanner is used for scanning documents`() = runTest {
+        val handleScanDocumentResult = HandleScanDocumentResult.UseNewImplementation(mock())
+        whenever(scannerHandler.handleScanDocument()).thenReturn(handleScanDocumentResult)
+
+        underTest.handleScanDocument()
+
+        underTest.state.test {
+            assertThat(awaitItem().handleScanDocumentResult).isEqualTo(handleScanDocumentResult)
+        }
+    }
+
+    @Test
+    fun `test that the handle scan document result is reset`() = runTest {
+        underTest.onHandleScanDocumentResultConsumed()
+
+        underTest.state.test {
+            assertThat(awaitItem().handleScanDocumentResult).isNull()
+        }
+    }
+
+    @Test
+    fun `test that the document scanning error is reset`() = runTest {
+        underTest.onDocumentScanningErrorConsumed()
+
+        underTest.state.test {
+            assertThat(awaitItem().documentScanningError).isNull()
+        }
     }
 }

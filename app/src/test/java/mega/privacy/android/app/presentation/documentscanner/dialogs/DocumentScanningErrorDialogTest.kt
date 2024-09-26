@@ -6,15 +6,13 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.presentation.documentscanner.dialogs.DOCUMENT_SCANNING_ERROR_DIALOG
-import mega.privacy.android.app.presentation.documentscanner.dialogs.DocumentScanningErrorDialog
-import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningErrorTypeUiItem
+import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.app.onNodeWithText
 
 /**
  * Test class for [DocumentScanningErrorDialog]
@@ -26,10 +24,10 @@ internal class DocumentScanningErrorDialogTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `test that the dialog and its static elements are not shown when the error type is null`() {
+    fun `test that the dialog and its static elements are not shown when the error is null`() {
         composeTestRule.setContent {
             DocumentScanningErrorDialog(
-                documentScanningErrorTypeUiItem = null,
+                documentScanningError = null,
                 onErrorAcknowledged = {},
                 onErrorDismissed = {},
             )
@@ -43,10 +41,10 @@ internal class DocumentScanningErrorDialogTest {
     }
 
     @Test
-    fun `test that the dialog and its static elements are shown when an error type is provided`() {
+    fun `test that the dialog and its static elements are shown when an error is provided`() {
         composeTestRule.setContent {
             DocumentScanningErrorDialog(
-                documentScanningErrorTypeUiItem = DocumentScanningErrorTypeUiItem.GenericError,
+                documentScanningError = DocumentScanningError.GenericError,
                 onErrorAcknowledged = {},
                 onErrorDismissed = {},
             )
@@ -63,7 +61,7 @@ internal class DocumentScanningErrorDialogTest {
     fun `test that an insufficient RAM error message is shown`() {
         composeTestRule.setContent {
             DocumentScanningErrorDialog(
-                documentScanningErrorTypeUiItem = DocumentScanningErrorTypeUiItem.InsufficientRAM,
+                documentScanningError = DocumentScanningError.InsufficientRAM,
                 onErrorAcknowledged = {},
                 onErrorDismissed = {},
             )
@@ -77,7 +75,7 @@ internal class DocumentScanningErrorDialogTest {
     fun `test that a generic error message is shown`() {
         composeTestRule.setContent {
             DocumentScanningErrorDialog(
-                documentScanningErrorTypeUiItem = DocumentScanningErrorTypeUiItem.GenericError,
+                documentScanningError = DocumentScanningError.GenericError,
                 onErrorAcknowledged = {},
                 onErrorDismissed = {},
             )
@@ -89,7 +87,7 @@ internal class DocumentScanningErrorDialogTest {
         val onErrorAcknowledged = mock<() -> Unit>()
         composeTestRule.setContent {
             DocumentScanningErrorDialog(
-                documentScanningErrorTypeUiItem = DocumentScanningErrorTypeUiItem.GenericError,
+                documentScanningError = DocumentScanningError.GenericError,
                 onErrorAcknowledged = onErrorAcknowledged,
                 onErrorDismissed = {},
             )

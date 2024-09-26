@@ -29,7 +29,7 @@ import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningErrorTypeUiItem
+import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -1380,10 +1380,10 @@ class ManagerViewModel @Inject constructor(
             }.onFailure { exception ->
                 _state.update {
                     it.copy(
-                        documentScanningErrorTypeUiItem = if (exception is InsufficientRAMToLaunchDocumentScanner) {
-                            DocumentScanningErrorTypeUiItem.InsufficientRAM
+                        documentScanningError = if (exception is InsufficientRAMToLaunchDocumentScanner) {
+                            DocumentScanningError.InsufficientRAM
                         } else {
-                            DocumentScanningErrorTypeUiItem.GenericError
+                            DocumentScanningError.GenericError
                         }
                     )
                 }
@@ -1399,10 +1399,10 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
-     * Resets the value of [ManagerState.documentScanningErrorTypeUiItem]
+     * Resets the value of [ManagerState.documentScanningError]
      */
     fun onDocumentScanningErrorConsumed() {
-        _state.update { it.copy(documentScanningErrorTypeUiItem = null) }
+        _state.update { it.copy(documentScanningError = null) }
     }
 
     /**

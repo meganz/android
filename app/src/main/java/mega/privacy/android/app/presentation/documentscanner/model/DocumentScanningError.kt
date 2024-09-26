@@ -9,7 +9,7 @@ import androidx.annotation.StringRes
  *
  * @property textRes the String Resource ID for the Error Type
  */
-enum class DocumentScanningErrorTypeUiItem(
+enum class DocumentScanningError(
     @StringRes val textRes: Int,
 ) {
     /**

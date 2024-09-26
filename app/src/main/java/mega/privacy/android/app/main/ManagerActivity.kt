@@ -1143,7 +1143,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
                 OriginalTempTheme(isDark = isDark) {
                     DocumentScanningErrorDialog(
-                        documentScanningErrorTypeUiItem = state.documentScanningErrorTypeUiItem,
+                        documentScanningError = state.documentScanningError,
                         onErrorAcknowledged = { viewModel.onDocumentScanningErrorConsumed() },
                         onErrorDismissed = { viewModel.onDocumentScanningErrorConsumed() },
                     )
