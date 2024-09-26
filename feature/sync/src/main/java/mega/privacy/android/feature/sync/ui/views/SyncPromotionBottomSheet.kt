@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.feature.sync.navigation.syncNewFolderRoute
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedWithoutBackgroundMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
@@ -34,6 +33,8 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.layout.size
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.feature.sync.navigation.getSyncNewFolderRoute
 import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetLearnMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetSyncFoldersButtonPressedEvent
 
@@ -140,7 +141,7 @@ private fun UpgradeProPlanBottomSheetPreview(
     }
 }
 
-private const val ADD_NEW_SYNC_URI = "https://mega.nz/$syncNewFolderRoute"
+private val ADD_NEW_SYNC_URI = "https://mega.nz/${getSyncNewFolderRoute(SyncType.TYPE_TWOWAY)}"
 private const val LEARN_MORE_URI = "https://mega.io/syncing"
 
 internal const val SYNC_PROMOTION_BOTTOM_SHEET_IMAGE_TEST_TAG = "sync_promotion_bottom_sheet:image"

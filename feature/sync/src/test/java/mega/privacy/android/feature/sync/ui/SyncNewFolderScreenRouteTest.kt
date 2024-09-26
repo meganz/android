@@ -7,9 +7,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import kotlinx.coroutines.flow.StateFlow
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.core.test.AnalyticsTestRule
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
@@ -46,7 +47,12 @@ class SyncNewFolderScreenRouteTest {
 
     @Test
     fun `test that all sync Sync New Folder components are visible`() {
-        whenever(state.value).thenReturn(SyncNewFolderState())
+        whenever(state.value).thenReturn(
+            SyncNewFolderState(
+                syncType = SyncType.TYPE_TWOWAY,
+                deviceName = "Device Name",
+            )
+        )
         whenever(viewModel.state).thenReturn(state)
         composeTestRule.setContent {
             SyncNewFolderScreenRoute(
@@ -74,7 +80,13 @@ class SyncNewFolderScreenRouteTest {
     @Test
     fun `test that selected local folder name is correctly displayed`() {
         val localFolderName = "local_folder"
-        whenever(state.value).thenReturn(SyncNewFolderState(selectedLocalFolder = localFolderName))
+        whenever(state.value).thenReturn(
+            SyncNewFolderState(
+                syncType = SyncType.TYPE_TWOWAY,
+                deviceName = "Device Name",
+                selectedLocalFolder = localFolderName,
+            )
+        )
         whenever(viewModel.state).thenReturn(state)
         composeTestRule.setContent {
             SyncNewFolderScreenRoute(
@@ -96,10 +108,11 @@ class SyncNewFolderScreenRouteTest {
         val megaFolderName = "mega_folder"
         whenever(state.value).thenReturn(
             SyncNewFolderState(
+                syncType = SyncType.TYPE_TWOWAY,
+                deviceName = "Device Name",
                 selectedMegaFolder = RemoteFolder(
-                    id = 0,
-                    megaFolderName
-                )
+                    id = 0, megaFolderName
+                ),
             )
         )
         whenever(viewModel.state).thenReturn(state)
@@ -120,7 +133,10 @@ class SyncNewFolderScreenRouteTest {
 
     @Test
     fun `test that sync button is not clickable when local folder or mega folder are not filled`() {
-        val emptyState = SyncNewFolderState()
+        val emptyState = SyncNewFolderState(
+            syncType = SyncType.TYPE_TWOWAY,
+            deviceName = "Device Name",
+        )
         val openNextScreenCallback = mock<(SyncNewFolderState) -> Unit>()
         whenever(state.value).thenReturn(emptyState)
         whenever(viewModel.state).thenReturn(state)
@@ -143,7 +159,10 @@ class SyncNewFolderScreenRouteTest {
 
     @Test
     fun `test that click on select mega folder button invokes openSelectMegaFolderScreen lambda`() {
-        val emptyState = SyncNewFolderState()
+        val emptyState = SyncNewFolderState(
+            syncType = SyncType.TYPE_TWOWAY,
+            deviceName = "Device Name",
+        )
         val openSelectMegaFolderScreenLambda = mock<() -> Unit>()
         whenever(state.value).thenReturn(emptyState)
         whenever(viewModel.state).thenReturn(state)
@@ -166,7 +185,11 @@ class SyncNewFolderScreenRouteTest {
 
     @Test
     fun `test that only all files access banner is shown when all files access permission is not granted`() {
-        val emptyState = SyncNewFolderState(selectedMegaFolder = RemoteFolder(0, ""))
+        val emptyState = SyncNewFolderState(
+            syncType = SyncType.TYPE_TWOWAY,
+            deviceName = "Device Name",
+            selectedMegaFolder = RemoteFolder(0, ""),
+        )
         whenever(state.value).thenReturn(emptyState)
         whenever(viewModel.state).thenReturn(state)
         whenever(syncPermissionsManager.isManageExternalStoragePermissionGranted())
@@ -190,7 +213,12 @@ class SyncNewFolderScreenRouteTest {
 
     @Test
     fun `test that click the app bar back button sends the right analytics tracker event`() {
-        whenever(state.value).thenReturn(SyncNewFolderState())
+        whenever(state.value).thenReturn(
+            SyncNewFolderState(
+                syncType = SyncType.TYPE_TWOWAY,
+                deviceName = "Device Name",
+            )
+        )
         whenever(viewModel.state).thenReturn(state)
         composeTestRule.setContent {
             SyncNewFolderScreenRoute(

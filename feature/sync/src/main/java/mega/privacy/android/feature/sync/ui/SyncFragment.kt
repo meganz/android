@@ -26,9 +26,8 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.sync.R
+import mega.privacy.android.feature.sync.navigation.getSyncRoute
 import mega.privacy.android.feature.sync.navigation.syncNavGraph
-import mega.privacy.android.feature.sync.navigation.syncRoute
-import mega.privacy.android.feature.sync.ui.mapper.SyncChipValueMapper
 import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.navigation.MegaNavigator
@@ -44,30 +43,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class SyncFragment : Fragment() {
-
-    companion object {
-        /**
-         * To specify the fragment title value
-         */
-        const val TITLE_KEY = "titleKey"
-
-        /**
-         * To specify if the view to create a new sync should be directly displayed
-         */
-        const val OPEN_NEW_SYNC_KEY = "openNewSyncKey"
-
-        /**
-         * Returns the instance of SyncFragment
-         */
-        @JvmStatic
-        fun newInstance(title: String? = null, openNewSync: Boolean = false): SyncFragment {
-            val args = Bundle().apply {
-                putString(TITLE_KEY, title)
-                putBoolean(OPEN_NEW_SYNC_KEY, openNewSync)
-            }
-            return SyncFragment().apply { arguments = args }
-        }
-    }
 
     /**
      * Allows navigation to specific features in the monolith :app
@@ -88,12 +63,6 @@ class SyncFragment : Fragment() {
     lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     /**
-     * Get [SyncChipValueMapper]
-     */
-    @Inject
-    lateinit var syncChipValueMapper: SyncChipValueMapper
-
-    /**
      * Get [SyncPermissionsManager]
      */
     @Inject
@@ -108,15 +77,13 @@ class SyncFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                val title = arguments?.getString(TITLE_KEY)
-                val openNewSync = arguments?.getBoolean(OPEN_NEW_SYNC_KEY) ?: false
                 val animatedNavController = rememberNavController()
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val state by viewModel.state.collectAsStateWithLifecycle()
 
                 OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                     if (state.isNetworkConnected) {
-                        AndroidSyncFeatureNavigation(animatedNavController, title, openNewSync)
+                        AndroidSyncFeatureNavigation(animatedNavController)
                     } else {
                         SyncNoNetworkState()
                     }
@@ -128,24 +95,19 @@ class SyncFragment : Fragment() {
     @Composable
     private fun AndroidSyncFeatureNavigation(
         animatedNavController: NavHostController,
-        title: String?,
-        openNewSync: Boolean,
     ) {
         val context = LocalContext.current
         NavHost(
             navController = animatedNavController,
-            startDestination = syncRoute,
+            startDestination = getSyncRoute(),
         ) {
             syncNavGraph(
                 navController = animatedNavController,
                 fileTypeIconMapper = fileTypeIconMapper,
-                syncChipValueMapper = syncChipValueMapper,
                 syncPermissionsManager = syncPermissionsManager,
                 openUpgradeAccountPage = {
                     megaNavigator.openUpgradeAccount(context)
                 },
-                title = title,
-                openNewSync = openNewSync,
             )
         }
     }

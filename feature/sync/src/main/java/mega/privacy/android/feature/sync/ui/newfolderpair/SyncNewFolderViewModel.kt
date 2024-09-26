@@ -3,6 +3,9 @@ package mega.privacy.android.feature.sync.ui.newfolderpair
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -19,10 +22,11 @@ import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUs
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
-import javax.inject.Inject
 
-@HiltViewModel
-internal class SyncNewFolderViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = SyncNewFolderViewModel.SyncNewFolderViewModelFactory::class)
+internal class SyncNewFolderViewModel @AssistedInject constructor(
+    @Assisted val syncType: SyncType,
+    @Assisted val deviceName: String,
     private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase,
     private val monitorSelectedMegaFolderUseCase: MonitorSelectedMegaFolderUseCase,
     private val syncFolderPairUseCase: SyncFolderPairUseCase,
@@ -31,7 +35,13 @@ internal class SyncNewFolderViewModel @Inject constructor(
     private val clearSelectedMegaFolderUseCase: ClearSelectedMegaFolderUseCase,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(SyncNewFolderState())
+    @AssistedFactory
+    interface SyncNewFolderViewModelFactory {
+        fun create(syncType: SyncType, deviceName: String): SyncNewFolderViewModel
+    }
+
+    private val _state =
+        MutableStateFlow(SyncNewFolderState(syncType = syncType, deviceName = deviceName))
     val state: StateFlow<SyncNewFolderState> = _state.asStateFlow()
 
     init {
@@ -76,7 +86,7 @@ internal class SyncNewFolderViewModel @Inject constructor(
                         else -> {
                             state.value.selectedMegaFolder?.let { remoteFolder ->
                                 syncFolderPairUseCase(
-                                    syncType = SyncType.TYPE_TWOWAY,
+                                    syncType = state.value.syncType,
                                     name = remoteFolder.name,
                                     localPath = state.value.selectedLocalFolder,
                                     remotePath = remoteFolder,

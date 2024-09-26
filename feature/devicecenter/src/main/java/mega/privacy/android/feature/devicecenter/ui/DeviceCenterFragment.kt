@@ -31,6 +31,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.devicecenter.navigation.deviceCenterInfoNavGraph
 import mega.privacy.android.feature.devicecenter.navigation.deviceCenterRoute
@@ -157,11 +158,11 @@ class DeviceCenterFragment : Fragment() {
                         },
                         onInfoOptionClicked = viewModel::onInfoClicked,
                         onAddNewSyncOptionClicked = { device ->
-                            megaNavigator.openSyncs(
+                            megaNavigator.openNewSync(
                                 context = this@DeviceCenterFragment.activity
                                     ?: return@DeviceCenterScreen,
                                 deviceName = device.name,
-                                openNewSync = true,
+                                syncType = SyncType.TYPE_TWOWAY,
                             )
                         },
                         onRenameDeviceOptionClicked = viewModel::setDeviceToRename,

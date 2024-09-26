@@ -67,7 +67,11 @@ internal class SyncNewFolderViewModelTest {
         val localFolderUri: Uri = mock()
         val localFolderFolderStoragePath = "/storage/emulated/0/Sync/someFolder"
         val localDCIMFolderPath = "/storage/emulated/0/DCIM"
-        val expectedState = SyncNewFolderState(selectedLocalFolder = localFolderFolderStoragePath)
+        val expectedState = SyncNewFolderState(
+            syncType = SyncType.TYPE_TWOWAY,
+            deviceName = "Device Name",
+            selectedLocalFolder = localFolderFolderStoragePath
+        )
         whenever(getExternalPathByContentUriUseCase.invoke(localFolderContentUri)).thenReturn(
             localFolderFolderStoragePath
         )
@@ -122,7 +126,11 @@ internal class SyncNewFolderViewModelTest {
             awaitCancellation()
         })
         initViewModel()
-        val expectedState = SyncNewFolderState(selectedMegaFolder = remoteFolder)
+        val expectedState = SyncNewFolderState(
+            syncType = SyncType.TYPE_TWOWAY,
+            deviceName = "Device Name",
+            selectedMegaFolder = remoteFolder,
+        )
 
         assertThat(expectedState).isEqualTo(underTest.state.value)
     }
@@ -144,7 +152,9 @@ internal class SyncNewFolderViewModelTest {
             )
         ).thenReturn(true)
         val state = SyncNewFolderState(
-            selectedMegaFolder = remoteFolder
+            syncType = SyncType.TYPE_TWOWAY,
+            deviceName = "Device Name",
+            selectedMegaFolder = remoteFolder,
         )
         initViewModel()
 
@@ -209,12 +219,14 @@ internal class SyncNewFolderViewModelTest {
 
     private fun initViewModel() {
         underTest = SyncNewFolderViewModel(
-            getExternalPathByContentUriUseCase,
-            monitorSelectedMegaFolderUseCase,
-            syncFolderPairUseCase,
-            isStorageOverQuotaUseCase,
-            getLocalDCIMFolderPathUseCase,
-            clearSelectedMegaFolderUseCase
+            syncType = SyncType.TYPE_TWOWAY,
+            deviceName = "Device Name",
+            getExternalPathByContentUriUseCase = getExternalPathByContentUriUseCase,
+            monitorSelectedMegaFolderUseCase = monitorSelectedMegaFolderUseCase,
+            syncFolderPairUseCase = syncFolderPairUseCase,
+            isStorageOverQuotaUseCase = isStorageOverQuotaUseCase,
+            getLocalDCIMFolderPathUseCase = getLocalDCIMFolderPathUseCase,
+            clearSelectedMegaFolderUseCase = clearSelectedMegaFolderUseCase,
         )
     }
 }

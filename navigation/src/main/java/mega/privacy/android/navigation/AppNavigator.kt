@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.sync.SyncType
 import java.io.File
 
 /**
@@ -92,9 +93,17 @@ interface AppNavigator {
      *
      * @param context       Context
      * @param deviceName    The device name
-     * @param openNewSync   True to directly open New Sync screen, False otherwise.
      */
-    fun openSyncs(context: Context, deviceName: String? = null, openNewSync: Boolean = false)
+    fun openSyncs(context: Context, deviceName: String? = null)
+
+    /**
+     * Navigates to the Add New Sync page
+     *
+     * @param context       Context
+     * @param syncType      The sync type from [SyncType]
+     * @param deviceName    The device name
+     */
+    fun openNewSync(context: Context, syncType: SyncType, deviceName: String? = null)
 
     /**
      * Open zip browser

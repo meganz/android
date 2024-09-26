@@ -3,6 +3,7 @@ package mega.privacy.android.app.nav
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.core.net.toUri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -49,13 +50,13 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
-import mega.privacy.android.feature.sync.ui.SyncFragment.Companion.OPEN_NEW_SYNC_KEY
-import mega.privacy.android.feature.sync.ui.SyncFragment.Companion.TITLE_KEY
-import mega.privacy.android.feature.sync.ui.SyncHostActivity
+import mega.privacy.android.feature.sync.navigation.getSyncListRoute
+import mega.privacy.android.feature.sync.navigation.getSyncNewFolderRoute
 import mega.privacy.android.navigation.MegaNavigator
 import java.io.File
 import javax.inject.Inject
@@ -398,10 +399,19 @@ internal class MegaNavigatorImpl @Inject constructor(
         )
     }
 
-    override fun openSyncs(context: Context, deviceName: String?, openNewSync: Boolean) {
-        val intent = Intent(context, SyncHostActivity::class.java)
-        intent.putExtra(TITLE_KEY, deviceName)
-        intent.putExtra(OPEN_NEW_SYNC_KEY, openNewSync)
-        context.startActivity(intent)
+    override fun openSyncs(context: Context, deviceName: String?) {
+        context.startActivity(Intent(Intent.ACTION_VIEW).apply {
+            data = "https://mega.nz/${getSyncListRoute(deviceName = deviceName)}".toUri()
+        })
+    }
+
+    override fun openNewSync(context: Context, syncType: SyncType, deviceName: String?) {
+        context.startActivity(Intent(Intent.ACTION_VIEW).apply {
+            data = "https://mega.nz/${
+                getSyncNewFolderRoute(
+                    syncType = syncType, deviceName = deviceName
+                )
+            }".toUri()
+        })
     }
 }

@@ -4,7 +4,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class DeeplinkProcessorTest {
+class SyncDeeplinkProcessorTest {
 
     private lateinit var syncDeeplinkProcessor: SyncDeeplinkProcessor
 
@@ -16,8 +16,8 @@ class DeeplinkProcessorTest {
     @Test
     fun `test that the sync deep link processor matches sync URLs`() = runTest {
         val urls = listOf(
-            "https://mega.nz/$syncRoute",
-            "https://mega.nz/$syncListRoute",
+            "https://mega.nz/${getSyncRoute()}",
+            "https://mega.nz/${getSyncListRoute()}",
         )
         urls.forEach { url ->
             assert(syncDeeplinkProcessor.matches(url))

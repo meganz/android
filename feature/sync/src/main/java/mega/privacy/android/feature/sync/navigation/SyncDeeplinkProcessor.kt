@@ -15,7 +15,7 @@ import javax.inject.Singleton
 class SyncDeeplinkProcessor @Inject constructor() : DeeplinkProcessor {
 
     override fun matches(deeplink: String): Boolean =
-        deeplink.contains("https://mega.nz/$syncRoute")
+        deeplink.contains("https://mega.nz/${getSyncRoute()}")
 
     override fun execute(context: Context, deeplink: String) {
         val intent = Intent(context, SyncHostActivity::class.java)
