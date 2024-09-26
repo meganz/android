@@ -26,6 +26,15 @@ enum class ApiFeatures(
         "Call to stay unlimited when host with pro plan leaves",
         false
     ),
+
+    /**
+     * Enable Google ads with feature flag "ff_adse" or A/B test flag "ab_adse"
+     */
+    GoogleAdsFeatureFlag(
+        "adse",
+        "Enable Google Ads",
+        false
+    ),
     ;
 
     companion object : FeatureFlagValueProvider {

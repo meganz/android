@@ -122,7 +122,7 @@ import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.extensions.isTablet
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -990,8 +990,9 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun checkForInAppAdvertisement() {
         lifecycleScope.launch {
             runCatching {
-                val isAdseFlagEnabled = getFeatureFlagValueUseCase(ABTestFeatures.adse)
-                if (isAdseFlagEnabled) {
+                val isGoogleAdsFlagEnabled =
+                    getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
+                if (isGoogleAdsFlagEnabled) {
                     if (this@ManagerActivity.isPortrait()) {
                         setupAdsView()
                     } else {
@@ -1000,7 +1001,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     adsViewModel.enableAdsFeature()
                 }
             }.onFailure {
-                Timber.e("Failed to fetch ab_adse flag with error: ${it.message}")
+                Timber.e("Failed to fetch ab_adse / ff_adse flag with error: ${it.message}")
             }
         }
     }
