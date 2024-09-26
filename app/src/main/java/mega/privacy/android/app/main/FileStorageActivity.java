@@ -34,12 +34,14 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.core.text.HtmlCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -129,6 +131,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
             }
         }
     }
+
     private Mode mode;
     private File path;
     private File root;
@@ -170,11 +173,14 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
     protected void onCreate(Bundle savedInstanceState) {
         Timber.d("onCreate");
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        EdgeToEdgeExtensionsKt.enableEdgeToEdgeAndConsumeInsets(this);
         super.onCreate(savedInstanceState);
-
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_filestorage);
-
+        EdgeToEdgeExtensionsKt.consumeInsetsWithToolbar(
+                this,
+                WindowInsetsCompat.Type.systemBars(),
+                findViewById(R.id.toolbar_filestorage)
+        );
         viewContainer = findViewById(R.id.file_storage_container);
         contentText = findViewById(R.id.file_storage_content_text);
         listView = findViewById(R.id.file_storage_list_view);
