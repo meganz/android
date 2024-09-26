@@ -28,7 +28,7 @@ import mega.privacy.android.data.wrapper.BitmapFactoryWrapper
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AvatarRepository
-import mega.privacy.android.domain.repository.ContactsRepository
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
@@ -48,7 +48,6 @@ import kotlin.coroutines.resume
  */
 internal class DefaultAvatarRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
-    private val contactsRepository: ContactsRepository,
     private val cacheGateway: CacheGateway,
     private val avatarWrapper: AvatarWrapper,
     private val bitmapFactoryWrapper: BitmapFactoryWrapper,
@@ -131,47 +130,48 @@ internal class DefaultAvatarRepository @Inject constructor(
 
     override suspend fun getAvatarFile(userHandle: Long, skipCache: Boolean): File =
         withContext(ioDispatcher) {
-            val userEmail = getUserEmail(userHandle) ?: error("Could not get user email")
-            getAvatarFile(userEmail, skipCache)
+            val userHandleBase64 =
+                MegaApiJava.userHandleToBase64(userHandle) ?: error("Could not get user email")
+            getAvatarFile(userHandleBase64, skipCache)
         }
 
-    override suspend fun getAvatarFile(userEmail: String, skipCache: Boolean): File =
-        withContext(ioDispatcher) {
-            val file = cacheGateway.buildAvatarFile(userEmail + FileConstant.JPG_EXTENSION)
+    override suspend fun getAvatarFile(
+        userEmailOrUserHandleBase64: String,
+        skipCache: Boolean,
+    ): File = withContext(ioDispatcher) {
+        val file =
+            cacheGateway.buildAvatarFile(userEmailOrUserHandleBase64 + FileConstant.JPG_EXTENSION)
                 ?: error("Could not generate avatar file")
 
-            if (!skipCache && file.exists() && file.canRead() && file.length() > 0) {
-                return@withContext file
-            }
-
-            suspendCancellableCoroutine { continuation ->
-                val listener = OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { _: MegaRequest, error: MegaError ->
-                        if (error.errorCode == MegaError.API_OK) {
-                            continuation.resume(file)
-                        } else {
-                            if (error.errorCode == MegaError.API_ENOENT && file.exists()) {
-                                file.delete()
-                            }
-                            continuation.failWithError(error, "getAvatarFile")
-                        }
-                    }
-                )
-                megaApiGateway.getContactAvatar(
-                    userEmail,
-                    file.absolutePath,
-                    listener,
-                )
-            }
+        if (!skipCache && file.exists() && file.canRead() && file.length() > 0) {
+            return@withContext file
         }
+
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _: MegaRequest, error: MegaError ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        continuation.resume(file)
+                    } else {
+                        if (error.errorCode == MegaError.API_ENOENT && file.exists()) {
+                            file.delete()
+                        }
+                        continuation.failWithError(error, "getAvatarFile")
+                    }
+                }
+            )
+            megaApiGateway.getContactAvatar(
+                userEmailOrUserHandleBase64,
+                file.absolutePath,
+                listener,
+            )
+        }
+    }
 
     override suspend fun getAvatarColor(userHandle: Long): Int =
         withContext(ioDispatcher) {
             getColor(megaApiGateway.getUserAvatarColor(userHandle))
         }
-
-    private suspend fun getUserEmail(userHandle: Long): String? =
-        runCatching { contactsRepository.getUserEmail(userHandle) }.getOrNull()
 
     private fun getColor(color: String?): Int =
         color?.toColorInt() ?: avatarWrapper.getSpecificAvatarColor(AVATAR_PRIMARY_COLOR)

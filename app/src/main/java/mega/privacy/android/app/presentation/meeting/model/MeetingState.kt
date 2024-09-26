@@ -133,6 +133,7 @@ data class MeetingState(
     val startedMeetingChatId: Long? = null,
     val isWaitingForCall: Boolean = false,
     val chatConnectionStatus: ChatConnectionStatus? = null,
+    val userAvatarUpdateId: Long? = null,
 ) {
 
     /**

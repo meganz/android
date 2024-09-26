@@ -11,16 +11,12 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.AddContactListener
-import mega.privacy.android.app.meeting.listeners.MeetingAvatarListener
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -125,10 +121,10 @@ class InMeetingRepository @Inject constructor(
      * @param peerId user Handle of a participant
      * @return the avatar the avatar of a participant
      */
-    fun getAvatarBitmap(peerId: Long): Bitmap? {
+    fun getAvatarBitmap(peerId: Long, getRemoteAvatar: () -> Unit): Bitmap? {
         var avatar = CallUtil.getImageAvatarCall(peerId)
         if (avatar == null) {
-            getRemoteAvatar(peerId)
+            getRemoteAvatar()
 
             avatar = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,
@@ -285,12 +281,17 @@ class InMeetingRepository @Inject constructor(
         return megaChatApi.myEmail
     }
 
-    fun getMyInfo(moderator: Boolean, audio: Boolean, video: Boolean): Participant {
+    fun getMyInfo(
+        moderator: Boolean,
+        audio: Boolean,
+        video: Boolean,
+        getRemoteAvatar: () -> Unit,
+    ): Participant {
         return Participant(
             megaApi.myUserHandleBinary,
             MEGACHAT_INVALID_HANDLE,
             megaChatApi.myFullname ?: "",
-            getAvatarBitmapByPeerId(megaApi.myUserHandleBinary),
+            getAvatarBitmapByPeerId(megaApi.myUserHandleBinary, getRemoteAvatar),
             true,
             moderator,
             audio,
@@ -305,7 +306,7 @@ class InMeetingRepository @Inject constructor(
      *
      * @param peerId user handle of participant
      */
-    fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
+    fun getAvatarBitmapByPeerId(peerId: Long, getRemoteAvatar: () -> Unit): Bitmap? {
         var bitmap: Bitmap?
         val mail = ChatController(context).getParticipantEmail(peerId)
 
@@ -321,12 +322,7 @@ class InMeetingRepository @Inject constructor(
         }
 
         if (bitmap == null) {
-            megaApi.getUserAvatar(
-                mail,
-                CacheFolderManager.buildAvatarFile(
-                    mail + FileUtil.JPG_EXTENSION
-                )?.absolutePath, MeetingAvatarListener(context, peerId)
-            )
+            getRemoteAvatar()
             bitmap = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,
                 peerId
@@ -364,28 +360,6 @@ class InMeetingRepository @Inject constructor(
             null,
             MegaContactRequest.INVITE_ACTION_ADD,
             AddContactListener(callback, context)
-        )
-    }
-
-    /**
-     * Get avatar from sdk
-     *
-     * @param peerId the peerId of participant
-     */
-    fun getRemoteAvatar(peerId: Long) {
-        var email = ChatController(context).getParticipantEmail(peerId)
-
-        if (email == null) {
-            email = MegaApiJava.handleToBase64(peerId)
-        }
-
-        if (email == null) return
-
-        megaApi.getUserAvatar(
-            email,
-            CacheFolderManager.buildAvatarFile(
-                email + FileUtil.JPG_EXTENSION
-            )?.absolutePath, MeetingAvatarListener(context, peerId)
         )
     }
 }

@@ -82,6 +82,7 @@ import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
+import mega.privacy.android.domain.usecase.avatar.GetUserAvatarUseCase
 import mega.privacy.android.domain.usecase.call.BroadcastCallEndedUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
@@ -215,6 +216,7 @@ class InMeetingViewModel @Inject constructor(
     private val monitorLocalVideoChangedDueToProximitySensorUseCase: MonitorLocalVideoChangedDueToProximitySensorUseCase,
     private val monitorUserAvatarUpdatesUseCase: MonitorUserAvatarUpdatesUseCase,
     @ApplicationContext private val context: Context,
+    private val getUserAvatarUseCase: GetUserAvatarUseCase,
 ) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
 
     private val composite = CompositeDisposable()
@@ -413,7 +415,7 @@ class InMeetingViewModel @Inject constructor(
         viewModelScope.launch {
             monitorUserAvatarUpdatesUseCase()
                 .catch { Timber.d(it) }
-                .collect { peerId -> getRemoteAvatar(peerId) }
+                .collect { peerId -> getRemoteUserAvatar(peerId) }
         }
     }
 
@@ -1828,7 +1830,9 @@ class InMeetingViewModel @Inject constructor(
             val isContact = isMyContact(session.peerId)
             val hasHiRes = needHiRes()
 
-            val avatar = inMeetingRepository.getAvatarBitmap(session.peerId)
+            val avatar = inMeetingRepository.getAvatarBitmap(session.peerId) {
+                getRemoteUserAvatar(session.peerId)
+            }
             val email = inMeetingRepository.getEmailParticipant(
                 session.peerId,
                 GetUserEmailListener(
@@ -1867,6 +1871,18 @@ class InMeetingViewModel @Inject constructor(
         }
 
         return null
+    }
+
+    private fun getRemoteUserAvatar(peerId: Long) {
+        viewModelScope.launch {
+            runCatching { getUserAvatarUseCase(peerId) }
+                .onSuccess {
+                    _state.update { state ->
+                        state.copy(userAvatarUpdateId = peerId)
+                    }
+                }
+                .onFailure { Timber.d(it) }
+        }
     }
 
     /**
@@ -2160,7 +2176,11 @@ class InMeetingViewModel @Inject constructor(
      */
     fun getAvatarBitmap(peerId: Long): Bitmap? =
         inMeetingRepository.getChatRoom(_state.value.currentChatId)
-            ?.let { inMeetingRepository.getAvatarBitmap(peerId) }
+            ?.let {
+                inMeetingRepository.getAvatarBitmap(peerId) {
+                    getRemoteUserAvatar(peerId)
+                }
+            }
 
     /**
      * Method to get the first participant in the list, who will be the new speaker
@@ -2859,7 +2879,9 @@ class InMeetingViewModel @Inject constructor(
             getOwnPrivileges() == PRIV_MODERATOR,
             audio,
             video
-        )
+        ) {
+            state.value.myUserHandle?.let { getRemoteUserAvatar(it) }
+        }
         participant.hasOptionsAllowed =
             shouldParticipantsOptionBeVisible(participant.isMe, participant.isGuest)
 
@@ -2994,16 +3016,6 @@ class InMeetingViewModel @Inject constructor(
     fun addContact(context: Context, peerId: Long, callback: (String) -> Unit) {
         inMeetingRepository.addContact(context, peerId, callback)
     }
-
-    /**
-     * Get avatar from sdk
-     *
-     * @param peerId the peerId of participant
-     */
-    fun getRemoteAvatar(peerId: Long) {
-        inMeetingRepository.getRemoteAvatar(peerId)
-    }
-
     /**
      * Method for clearing the list of speakers
      */

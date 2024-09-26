@@ -7,17 +7,16 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
-import mega.privacy.android.app.meeting.listeners.MeetingAvatarListener
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.call.AudioDevice
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -140,7 +139,7 @@ class MeetingActivityRepository @Inject constructor(
      *
      * @param peerId user handle of participant
      */
-    fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
+    fun getAvatarBitmapByPeerId(peerId: Long, getRemoteAvatar: () -> Unit): Bitmap? {
         val mail = ChatController(context).getParticipantEmail(peerId)
         val userHandleString = MegaApiAndroid.userHandleToBase64(peerId)
         val myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaApi.myUserHandleBinary)
@@ -156,12 +155,7 @@ class MeetingActivityRepository @Inject constructor(
         }
 
         if (bitmap == null) {
-            megaApi.getUserAvatar(
-                mail,
-                CacheFolderManager.buildAvatarFile(
-                    mail + JPG_EXTENSION
-                )?.absolutePath, MeetingAvatarListener(context, peerId)
-            )
+            getRemoteAvatar()
             bitmap = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,
                 peerId

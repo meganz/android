@@ -82,6 +82,7 @@ import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInviteWithChatIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.avatar.GetUserAvatarUseCase
 import mega.privacy.android.domain.usecase.call.AllowUsersJoinCallUseCase
 import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.call.BroadcastCallEndedUseCase
@@ -229,6 +230,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
     savedStateHandle: SavedStateHandle,
     @ApplicationContext private val context: Context,
+    private val getUserAvatarUseCase: GetUserAvatarUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         MeetingState(
@@ -1728,7 +1730,21 @@ class MeetingActivityViewModel @Inject constructor(
      * @return The bitmap of a participant's avatar
      */
     fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
-        return meetingActivityRepository.getAvatarBitmapByPeerId(peerId)
+        return meetingActivityRepository.getAvatarBitmapByPeerId(peerId) {
+            getRemoteUserAvatar(peerId)
+        }
+    }
+
+    private fun getRemoteUserAvatar(peerId: Long) {
+        viewModelScope.launch {
+            runCatching { getUserAvatarUseCase(peerId) }
+                .onSuccess {
+                    _state.update { state ->
+                        state.copy(userAvatarUpdateId = peerId)
+                    }
+                }
+                .onFailure { Timber.d(it) }
+        }
     }
 
     /**

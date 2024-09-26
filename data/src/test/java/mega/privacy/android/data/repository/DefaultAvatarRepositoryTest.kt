@@ -23,7 +23,6 @@ import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.BitmapFactoryWrapper
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.repository.ContactsRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaUser
 import org.junit.After
@@ -53,7 +52,6 @@ internal class DefaultAvatarRepositoryTest {
 
     private val megaApiGateway = mock<MegaApiGateway>()
     private val cacheGateway = mock<CacheGateway>()
-    private val contactsRepository = mock<ContactsRepository>()
     private val currentUser = mock<MegaUser> {
         on { it.isOwnChange }.thenReturn(0)
         on { it.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong()) }.thenReturn(true)
@@ -73,7 +71,6 @@ internal class DefaultAvatarRepositoryTest {
             avatarWrapper = avatarWrapper,
             bitmapFactoryWrapper = bitmapFactoryWrapper,
             cacheGateway = cacheGateway,
-            contactsRepository = contactsRepository,
             sharingScope = TestScope(),
             ioDispatcher = UnconfinedTestDispatcher(),
         )

@@ -21,6 +21,7 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.mapper.ChatParticipantMapper
+import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.DeviceGateway
@@ -38,6 +39,7 @@ import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInviteWithChatIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.avatar.GetUserAvatarUseCase
 import mega.privacy.android.domain.usecase.call.AllowUsersJoinCallUseCase
 import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.call.BroadcastCallEndedUseCase
@@ -85,7 +87,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
-import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 
 @ExperimentalCoroutinesApi
 @ExtendWith(value = [CoroutineMainDispatcherExtension::class, InstantTaskExecutorExtension::class])
@@ -152,6 +153,7 @@ class MeetingActivityViewModelTest {
     private val createMeetingUseCase: CreateMeetingUseCase = mock()
     private val startCallUseCase: StartCallUseCase = mock()
     private val passcodeManagement: PasscodeManagement = mock()
+    private val getUserAvatarUseCase: GetUserAvatarUseCase = mock()
 
     private val context: Context = mock()
 
@@ -293,6 +295,7 @@ class MeetingActivityViewModelTest {
             passcodeManagement = passcodeManagement,
             monitorAudioOutputUseCase = monitorAudioOutputUseCase,
             monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
+            getUserAvatarUseCase = getUserAvatarUseCase,
         )
     }
 

@@ -50,7 +50,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -225,14 +224,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (peerId != MegaApiJava.INVALID_HANDLE) {
             Timber.d("Change in name")
             updateParticipantInfo(peerId, NAME_CHANGE)
-        }
-    }
-
-    // Observer for getting avatar
-    private val getAvatarObserver = Observer<Long> { peerId ->
-        if (peerId != MegaApiJava.INVALID_HANDLE) {
-            Timber.d("Change in avatar")
-            updateParticipantInfo(peerId, AVATAR_CHANGE)
         }
     }
 
@@ -685,9 +676,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long::class.java)
             .observe(this, visibilityChangeObserver)
-
-        LiveEventBus.get(EVENT_MEETING_GET_AVATAR, Long::class.java)
-            .observe(this, getAvatarObserver)
     }
 
     private fun initToolbar() {
@@ -1496,6 +1484,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     clearAnimation()
                     inMeetingViewModel.checkBannerInfo()
                 }
+            }
+        }
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.userAvatarUpdateId }
+            .distinctUntilChanged()) { peerId ->
+            peerId?.let {
+                updateParticipantInfo(peerId, AVATAR_CHANGE)
+            }
+        }
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.userAvatarUpdateId }
+            .distinctUntilChanged()) { peerId ->
+            peerId?.let {
+                updateParticipantInfo(peerId, AVATAR_CHANGE)
             }
         }
     }

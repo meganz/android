@@ -25,10 +25,10 @@ interface AvatarRepository {
     /**
      * Get avatar file for an user
      *
-     * @param userEmail  User email
+     * @param userEmailOrUserHandleBase64  User email or user handle in Base64
      * @param skipCache  Skip cached avatar.
      */
-    suspend fun getAvatarFile(userEmail: String, skipCache: Boolean = false): File
+    suspend fun getAvatarFile(userEmailOrUserHandleBase64: String, skipCache: Boolean = false): File
 
     /**
      * Get avatar file for an user
