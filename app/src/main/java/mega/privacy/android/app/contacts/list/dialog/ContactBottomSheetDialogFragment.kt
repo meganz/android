@@ -220,6 +220,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         contact.statusColor?.let { color ->
             binding.header.imgState.setColorFilter(ContextCompat.getColor(requireContext(), color))
         }
+        binding.header.verifiedIcon.isVisible = contact.isVerified
     }
 
     /**
