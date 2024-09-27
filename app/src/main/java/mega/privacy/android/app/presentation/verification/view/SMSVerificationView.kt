@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -49,17 +50,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.verification.model.SMSVerificationUIState
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.legacy.core.ui.controls.textfields.MegaTextField
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.blue_400_blue_200
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_alpha_087_grey_alpha_087
-import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
-import mega.privacy.android.legacy.core.ui.controls.textfields.MegaTextField
 
 /**
  * Test tag not now button
@@ -90,10 +90,6 @@ fun SMSVerificationView(
     onSMSCodeSent: () -> Unit,
     onConsumeSMSCodeSentFinishedEvent: () -> Unit,
 ) {
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setStatusBarColor(
-        color = MaterialTheme.colors.blue_400_blue_200,
-    )
     LaunchedEffect(
         state.isVerificationCodeSent
     ) {
@@ -112,6 +108,7 @@ fun SMSVerificationView(
             .verticalScroll(rememberScrollState())
             .fillMaxHeight()
             .background(color = MaterialTheme.colors.primary)
+            .navigationBarsPadding()
     ) {
         ConfirmLogoutDialog(
             shouldShowLogoutDialog,

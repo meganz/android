@@ -4,15 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.verification.view.SMSVerificationView
@@ -89,8 +88,8 @@ class SMSVerificationActivity : PasscodeActivity() {
      * onCreate
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdgeAndConsumeInsets(WindowInsetsCompat.Type.navigationBars())
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         lifecycle.addObserver(viewModel)
         if (intent != null) {
             val isUserLocked = intent.getBooleanExtra(NAME_USER_LOCKED, false)
