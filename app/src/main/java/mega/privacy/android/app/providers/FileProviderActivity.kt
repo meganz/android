@@ -54,6 +54,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.CustomViewPager
 import mega.privacy.android.app.components.EditTextPIN
+import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.main.providers.CloudDriveProviderFragment
 import mega.privacy.android.app.main.providers.IncomingSharesProviderFragment
 import mega.privacy.android.app.main.providers.ProviderPageAdapter
@@ -154,7 +155,6 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
     private var timer: CountDownTimer? = null
     private var tB: MaterialToolbar? = null
     private var aB: ActionBar? = null
-    private var aBL: AppBarLayout? = null
     private var scrollView: ScrollView? = null
     private var loginLayout: LinearLayout? = null
     private var loginCreateAccount: LinearLayout? = null
@@ -329,9 +329,9 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
                 }
             } else {
                 setContentView(R.layout.activity_file_provider)
+                consumeInsetsWithToolbar(customToolbar = requireViewById(R.id.app_bar_layout_provider))
                 addStartTransfersView(findViewById(R.id.provider_container))
                 Timber.d("megaApi.getRootNode() NOT null")
-                aBL = findViewById(R.id.app_bar_layout_provider)
 
                 //Set toolbar
                 tB = findViewById(R.id.toolbar_provider)
@@ -1419,8 +1419,6 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
         Timber.d("afterFetchNodes")
         //Set toolbar
         tB = findViewById(R.id.toolbar_provider)
-        //Set app bar layout
-        aBL = findViewById(R.id.app_bar_layout_provider)
         val params = tB?.layoutParams as AppBarLayout.LayoutParams
         params.setMargins(0, 0, 0, 0)
         showAB(tB)
@@ -1778,7 +1776,8 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
         }
         changeStatusBarColorForElevation(this@FileProviderActivity, withElevation)
         val elevation = resources.getDimension(R.dimen.toolbar_elevation)
-        aBL?.elevation = if (withElevation) elevation else 0F
+        findViewById<AppBarLayout>(R.id.app_bar_layout_provider)?.elevation =
+            if (withElevation) elevation else 0F
     }
 
     override fun onGlobalSyncStateChanged(api: MegaApiJava) {}
