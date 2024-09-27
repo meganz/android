@@ -13,7 +13,6 @@ import androidx.activity.viewModels
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -31,7 +30,6 @@ import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityCo
 import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
-import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
@@ -65,8 +63,6 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.PhotoPreviewSaveToDeviceMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.PhotoPreviewScreenEvent
 import mega.privacy.mobile.analytics.event.PlaySlideshowMenuToolbarEvent
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -75,9 +71,15 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class ImagePreviewActivity : BaseActivity() {
+    /**
+     * Get theme mode
+     */
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
+    /**
+     * Passcode crypt object factory
+     */
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
@@ -109,7 +111,7 @@ class ImagePreviewActivity : BaseActivity() {
         NameCollisionActivityContract()
     ) { result ->
         result?.let {
-            showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
+            showSnackbar(SNACKBAR_TYPE, it, invalidHandle)
         }
     }
 
@@ -117,17 +119,17 @@ class ImagePreviewActivity : BaseActivity() {
     private val nodeAttachmentViewModel: NodeAttachmentViewModel by viewModels()
 
     private var tempNodeId: NodeId? = null
+    private val invalidHandle = -1L
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         Analytics.tracker.trackEvent(PhotoPreviewScreenEvent)
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val snackbarHostState: SnackbarHostState = remember {
                 SnackbarHostState()
             }
-            val coroutineScope = rememberCoroutineScope()
             OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 PasscodeContainer(
                     passcodeCryptObjectFactory = passcodeCryptObjectFactory,
@@ -152,7 +154,7 @@ class ImagePreviewActivity : BaseActivity() {
                             onClickRename = ::renameNode,
                             onClickHide = ::hideNode,
                             onClickHideHelp = ::showHiddenNodesOnboarding,
-                            onClickUnhide = ::unhideNode,
+                            onClickUnHide = ::unHideNode,
                             onClickMove = ::moveNode,
                             onClickCopy = ::copyNode,
                             onClickRestore = ::restoreNode,
@@ -194,7 +196,7 @@ class ImagePreviewActivity : BaseActivity() {
         val (handles, toHandle) = result
 
         val targetHandle = handles.firstOrNull()
-        if (targetHandle == null || targetHandle == MegaApiJava.INVALID_HANDLE || toHandle == MegaApiJava.INVALID_HANDLE) return
+        if (targetHandle == null || targetHandle == invalidHandle || toHandle == invalidHandle) return
 
         viewModel.moveNode(
             context = this,
@@ -208,7 +210,7 @@ class ImagePreviewActivity : BaseActivity() {
         val (handles, toHandle) = result
 
         val targetHandle = handles.firstOrNull()
-        if (targetHandle == null || targetHandle == MegaApiJava.INVALID_HANDLE || toHandle == MegaApiJava.INVALID_HANDLE) return
+        if (targetHandle == null || targetHandle == invalidHandle || toHandle == invalidHandle) return
 
         viewModel.copyNode(
             context = this,
@@ -222,7 +224,7 @@ class ImagePreviewActivity : BaseActivity() {
         val (handles, toHandle) = result
 
         val targetHandle = handles.firstOrNull()
-        if (targetHandle != null && targetHandle != MegaApiJava.INVALID_HANDLE && toHandle != MegaApiJava.INVALID_HANDLE) {
+        if (targetHandle != null && targetHandle != invalidHandle && toHandle != invalidHandle) {
             viewModel.importNode(
                 context = this,
                 importHandle = targetHandle,
@@ -294,7 +296,6 @@ class ImagePreviewActivity : BaseActivity() {
         isHiddenNodesOnboarded: Boolean?,
     ) {
         val isPaid = accountDetail?.levelDetail?.accountType?.isPaid ?: false
-        val isHiddenNodesOnboarded = isHiddenNodesOnboarded ?: false
 
         if (!isPaid) {
             val intent = HiddenNodesOnboardingActivity.createScreen(
@@ -303,7 +304,7 @@ class ImagePreviewActivity : BaseActivity() {
             )
             hiddenNodesOnboardingLauncher.launch(intent)
             overridePendingTransition(0, 0)
-        } else if (isHiddenNodesOnboarded) {
+        } else if (isHiddenNodesOnboarded == true) {
             viewModel.hideNode(nodeId = imageNode.id)
         } else {
             tempNodeId = imageNode.id
@@ -322,7 +323,7 @@ class ImagePreviewActivity : BaseActivity() {
         overridePendingTransition(0, 0)
     }
 
-    private fun unhideNode(imageNode: ImageNode) {
+    private fun unHideNode(imageNode: ImageNode) {
         viewModel.unhideNode(nodeId = imageNode.id)
     }
 
@@ -391,6 +392,16 @@ class ImagePreviewActivity : BaseActivity() {
     companion object {
         private const val TAG = "ImagePreviewActivity"
 
+        /**
+         * Create intent
+         *
+         * @param context
+         * @param imageSource
+         * @param menuOptionsSource
+         * @param anchorImageNodeId
+         * @param params
+         * @param isForeign
+         */
         fun createIntent(
             context: Context,
             imageSource: ImagePreviewFetcherSource,
@@ -408,6 +419,16 @@ class ImagePreviewActivity : BaseActivity() {
             }
         }
 
+        /**
+         * Create secondary intent
+         *
+         * @param context
+         * @param imageSource
+         * @param menuOptionsSource
+         * @param anchorImageNodeId
+         * @param params
+         * @param isForeign
+         */
         fun createSecondaryIntent(
             context: Context,
             imageSource: ImagePreviewFetcherSource,
