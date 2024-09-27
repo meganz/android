@@ -2,10 +2,10 @@ package mega.privacy.android.app.presentation.contactinfo
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalDensity
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
@@ -39,7 +39,7 @@ class ComposeContactInfoActivity : BaseActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        enableEdgeToEdge()
         intent.extras?.let { getContactData(extras = it) }
         setContent {
             val themeMode by getThemeMode()

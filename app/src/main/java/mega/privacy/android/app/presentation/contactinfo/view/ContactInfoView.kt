@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -25,7 +26,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
 import mega.privacy.android.domain.entity.contacts.ContactData
@@ -44,11 +44,6 @@ internal fun ContactInfoView(
     updateNickNameDialogVisibility: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setStatusBarColor(
-        color = Color.Transparent,
-        darkIcons = systemUiController.statusBarDarkContentEnabled
-    )
     val scrollState = rememberScrollState()
     val snackBarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
@@ -66,7 +61,7 @@ internal fun ContactInfoView(
     )
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.navigationBarsPadding(),
         backgroundColor = Color.Transparent,
         scaffoldState = scaffoldState,
     ) { padding ->
