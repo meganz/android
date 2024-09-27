@@ -13,7 +13,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.Window
 import android.widget.FrameLayout
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
@@ -44,6 +43,7 @@ import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityCo
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE
+import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
@@ -388,9 +388,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
-        Timber.d("onCreate first")
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return
@@ -410,10 +407,9 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         if (extras != null) {
             userEmail = extras.getString(Constants.NAME)
             val currNodePosition = extras.getInt("node_position", -1)
+            enableEdgeToEdge()
             setContentView(R.layout.activity_main_contact_properties)
-            val coordinatorLayout =
-                findViewById<View>(R.id.contact_properties_main_activity_layout) as CoordinatorLayout
-            coordinatorLayout.fitsSystemWindows = false
+            consumeInsetsWithToolbar(customToolbar = findViewById(R.id.app_bar_layout))
 
             //Set toolbar
             tB =
@@ -435,7 +431,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             fragmentContainer =
                 findViewById<View>(R.id.fragment_container_contact_properties) as FrameLayout
             Timber.d("Shared Folders are:")
-            coordinatorLayout.fitsSystemWindows = true
             contactFileListFragment =
                 supportFragmentManager.findFragmentByTag("cflF") as ContactFileListFragment?
             if (contactFileListFragment == null) {
@@ -451,7 +446,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                     "cflF"
                 ).commitNow()
             }
-            coordinatorLayout.invalidate()
             if (savedInstanceState != null && savedInstanceState.getBoolean(
                     IS_NEW_TEXT_FILE_SHOWN,
                     false

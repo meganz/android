@@ -472,7 +472,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
         val withElevation =
             (listView != null && listView!!.canScrollVertically(-1) && listView!!.visibility == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect)
         val abL = requireActivity().findViewById<AppBarLayout>(R.id.app_bar_layout)
-        Util.changeActionBarElevation(requireActivity(), abL, withElevation)
+        abL.elevation = if (withElevation) resources.getDimension(R.dimen.toolbar_elevation) else 0f
     }
 
     fun showOptionsPanel(sNode: MegaNode) {

@@ -363,7 +363,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * onCreate life cycle callback of Contact info activity
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return
@@ -485,6 +484,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private fun setUpViews() {
         activityChatContactBinding = ActivityChatContactPropertiesBinding.inflate(layoutInflater)
+        enableEdgeToEdge()
         setContentView(activityChatContactBinding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { v, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
