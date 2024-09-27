@@ -121,8 +121,8 @@ internal fun VideoSectionComposeView(
                                         .map { it.id },
                                     hide = false,
                                 )
+                                videoSectionViewModel.clearAllSelectedVideos()
                             }
-                            videoSectionViewModel.clearAllSelectedVideos()
                         }
 
                         is VideoSectionMenuAction.VideoSectionSelectAllAction ->
