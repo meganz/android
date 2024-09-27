@@ -42,7 +42,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
-import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
@@ -61,7 +60,6 @@ internal fun FolderLinkBottomSheetView(
     val fileIcon = MimeTypeList.typeForName(nodeUIItem?.node?.name).iconResourceId
     BottomSheet(
         modalSheetState = modalSheetState,
-        scrimColor = black.copy(alpha = 0.32f),
         sheetBody = {
             BottomSheetContent(
                 modalSheetState = modalSheetState,
