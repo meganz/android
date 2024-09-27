@@ -490,9 +490,6 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun getChatInvalidHandle(): Long = MegaChatApiAndroid.MEGACHAT_INVALID_HANDLE
 
-    override fun removeRequestListener(listener: MegaChatRequestListenerInterface) =
-        chatApi.removeChatRequestListener(listener)
-
     override fun signalPresenceActivity(listener: MegaChatRequestListenerInterface) =
         chatApi.signalPresenceActivity(listener)
 

@@ -87,8 +87,6 @@ internal class DefaultPushesRepository @Inject constructor(
                     }
                 )
                 megaChatApi.pushReceived(beep, listener)
-
-                continuation.invokeOnCancellation { megaChatApi.removeRequestListener(listener) }
             }
         }
 

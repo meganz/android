@@ -18,7 +18,6 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
 import mega.privacy.android.domain.exception.NullMegaHandleListException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -37,7 +36,6 @@ import mega.privacy.android.domain.usecase.contact.GetContactEmail
 import mega.privacy.android.domain.usecase.contact.GetContactFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaUser
 import java.io.File
 import javax.inject.Inject
 
@@ -289,12 +287,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             suspendCancellableCoroutine { continuation ->
                 megaHandleListMapper(usersHandles)?.let { megaHandleList ->
                     val listener = continuation.getChatRequestListener("loadUserAttributes") {}
-
                     megaChatApiGateway.loadUserAttributes(chatId, megaHandleList, listener)
-
-                    continuation.invokeOnCancellation {
-                        megaChatApiGateway.removeRequestListener(listener)
-                    }
                 } ?: continuation.resumeWith(Result.failure(NullMegaHandleListException()))
             }
         }
@@ -343,10 +336,6 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             )
 
             megaChatApiGateway.setOnlineStatus(userStatusToIntMapper(status), listener)
-
-            continuation.invokeOnCancellation {
-                megaChatApiGateway.removeRequestListener(listener)
-            }
         }
     }
 }

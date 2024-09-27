@@ -120,8 +120,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 enabledAudio,
                 callback
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -144,8 +142,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 enabledAudio,
                 callback
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -168,8 +164,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 enabledAudio,
                 callback
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -190,8 +184,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 ringTimeout,
                 callback
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -212,8 +204,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 enabledAudio,
                 callback
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -229,8 +219,6 @@ internal class CallRepositoryImpl @Inject constructor(
             megaChatApiGateway.hangChatCall(
                 callId, callback
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -249,8 +237,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 setOnHold,
                 callback
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -302,10 +288,6 @@ internal class CallRepositoryImpl @Inject constructor(
                     since,
                     callback
                 )
-
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(callback)
-                }
             }
         }
 
@@ -374,8 +356,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 attributes,
                 callback
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -412,8 +392,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 updateChatTitle,
                 listener
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -440,8 +418,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 cancelled = cancelled,
                 listener = listener
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -496,8 +472,6 @@ internal class CallRepositoryImpl @Inject constructor(
             val listener = continuation.getChatRequestListener("setChatVideoInDevice") {}
 
             megaChatApiGateway.setChatVideoInDevice(device, listener)
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -521,8 +495,6 @@ internal class CallRepositoryImpl @Inject constructor(
             megaChatApiGateway.openVideoDevice(
                 listener
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -536,8 +508,6 @@ internal class CallRepositoryImpl @Inject constructor(
             megaChatApiGateway.releaseVideoDevice(
                 listener
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -554,8 +524,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 chatId,
                 listener
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -572,8 +540,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 chatId,
                 listener
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -591,8 +557,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 chatId,
                 listener
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -610,8 +574,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 chatId,
                 listener
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -632,8 +594,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 all,
                 callback
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -650,8 +610,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 megaHandleListMapper(userList),
                 callback
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -672,8 +630,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 all,
                 callback
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -689,12 +645,6 @@ internal class CallRepositoryImpl @Inject constructor(
                     chatId,
                     listener
                 )
-
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(
-                        listener
-                    )
-                }
             }
         }
 
@@ -710,12 +660,6 @@ internal class CallRepositoryImpl @Inject constructor(
                     chatId,
                     listener
                 )
-
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(
-                        listener
-                    )
-                }
             }
         }
 
@@ -732,12 +676,6 @@ internal class CallRepositoryImpl @Inject constructor(
                     clientId,
                     callback
                 )
-
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(
-                        callback
-                    )
-                }
             }
         }
 
@@ -754,12 +692,6 @@ internal class CallRepositoryImpl @Inject constructor(
                     megaHandleListMapper(clientIds),
                     callback
                 )
-
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(
-                        callback
-                    )
-                }
             }
         }
 
@@ -776,12 +708,6 @@ internal class CallRepositoryImpl @Inject constructor(
                     megaHandleListMapper(clientIds),
                     callback
                 )
-
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(
-                        callback
-                    )
-                }
             }
         }
 
@@ -798,12 +724,6 @@ internal class CallRepositoryImpl @Inject constructor(
                     megaHandleListMapper(clientIds),
                     callback
                 )
-
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(
-                        callback
-                    )
-                }
             }
         }
 
@@ -862,8 +782,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 clientId,
                 callback
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -881,8 +799,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 megaChatApiGateway.getChatInvalidHandle(),
                 callback
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -918,8 +834,6 @@ internal class CallRepositoryImpl @Inject constructor(
                 openInvite,
                 callback
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 }

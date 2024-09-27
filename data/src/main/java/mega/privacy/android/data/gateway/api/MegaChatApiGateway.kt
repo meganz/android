@@ -777,11 +777,6 @@ interface MegaChatApiGateway {
     fun getMessageFromNodeHistory(chatId: Long, messageId: Long): MegaChatMessage?
 
     /**
-     * Removes chat request listener.
-     */
-    fun removeRequestListener(listener: MegaChatRequestListenerInterface)
-
-    /**
      * Signal there is some user activity
      *
      * When the presence configuration is set to autoaway (and persist is false), this

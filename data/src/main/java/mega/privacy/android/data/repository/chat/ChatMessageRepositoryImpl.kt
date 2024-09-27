@@ -71,9 +71,6 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getChatRequestListener("addReaction") {}
                 megaChatApiGateway.addReaction(chatId, msgId, reaction, listener)
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -82,9 +79,6 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getChatRequestListener("deleteReaction") {}
                 megaChatApiGateway.delReaction(chatId, msgId, reaction, listener)
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -202,9 +196,6 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
                     it.megaChatMessage.tempId
                 }
                 megaChatApiGateway.attachNode(chatId, nodeId.longValue, listener)
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -220,10 +211,6 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
                     nodeHandle = nodeHandle,
                     listener = listener,
                 )
-
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(listener)
-                }
             }
         }
 

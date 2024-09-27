@@ -310,9 +310,6 @@ internal class DefaultAccountRepository @Inject constructor(
                     disconnect = disconnect,
                     listener = listener
                 )
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(listener)
-                }
             }
         }
 

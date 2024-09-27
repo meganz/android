@@ -173,10 +173,6 @@ internal class DefaultLoginRepository @Inject constructor(
             val listener = continuation.getChatRequestListener("chatLogout") { }
 
             megaChatApiGateway.logout(listener)
-
-            continuation.invokeOnCancellation {
-                megaChatApiGateway.removeRequestListener(listener)
-            }
         }
     }
 

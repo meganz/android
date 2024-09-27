@@ -95,18 +95,20 @@ fun <T> CancellableContinuation<T>.getRequestListener(
 /**
  * Gets a chat request Listener.
  */
-fun <T> Continuation<T>.getChatRequestListener(
+fun <T> CancellableContinuation<T>.getChatRequestListener(
     methodName: String,
     block: (request: MegaChatRequest) -> T,
 ): MegaChatRequestListenerInterface {
     val listener = OptionalMegaChatRequestListenerInterface(
         onRequestFinish = { request, error ->
-            if (error.errorCode == MegaChatError.ERROR_OK) {
-                this.resumeWith(Result.success(block(request)))
-            } else {
-                // log the error code when calling SDK api, it helps us easy to find the cause
-                Timber.e("Calling $methodName failed with error code ${error.errorCode}")
-                this.failWithError(error, methodName)
+            if (isActive) {
+                if (error.errorCode == MegaChatError.ERROR_OK) {
+                    this.resumeWith(Result.success(block(request)))
+                } else {
+                    // log the error code when calling SDK api, it helps us easy to find the cause
+                    Timber.e("Calling $methodName failed with error code ${error.errorCode}")
+                    this.failWithError(error, methodName)
+                }
             }
         }
     )

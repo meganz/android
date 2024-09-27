@@ -278,8 +278,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                 isOpenInvite,
                 listener
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -297,8 +295,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                 enabled,
                 listener
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -316,14 +312,11 @@ internal class ChatRepositoryImpl @Inject constructor(
             val listener = OptionalMegaChatRequestListenerInterface(
                 onRequestFinish = onRequestCompleted(continuation)
             )
-
             megaChatApiGateway.setChatTitle(
                 chatId,
                 title,
                 listener
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -422,18 +415,11 @@ internal class ChatRepositoryImpl @Inject constructor(
                         }
                     }
                 )
-
                 megaChatApiGateway.inviteToChat(
                     chatId,
                     handle,
                     listener
                 )
-
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(
-                        listener
-                    )
-                }
             }
         }
 
@@ -491,12 +477,7 @@ internal class ChatRepositoryImpl @Inject constructor(
                     }
                 }
             )
-
             megaChatApiGateway.openChatPreview(link, listener)
-
-            continuation.invokeOnCancellation {
-                megaChatApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -505,12 +486,7 @@ internal class ChatRepositoryImpl @Inject constructor(
             val listener = continuation.getChatRequestListener("checkChatLink") {
                 chatRequestMapper(it)
             }
-
             megaChatApiGateway.checkChatLink(link, listener)
-
-            continuation.invokeOnCancellation {
-                megaChatApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -519,12 +495,7 @@ internal class ChatRepositoryImpl @Inject constructor(
             val listener = continuation.getChatRequestListener("queryChatLink") {
                 chatRequestMapper(it)
             }
-
             megaChatApiGateway.queryChatLink(chatId, listener)
-
-            continuation.invokeOnCancellation {
-                megaChatApiGateway.removeRequestListener(listener)
-            }
         }
 
     override suspend fun autojoinPublicChat(chatId: Long) = withContext(NonCancellable) {
@@ -534,12 +505,7 @@ internal class ChatRepositoryImpl @Inject constructor(
         runCatching {
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getChatRequestListener("autojoinPublicChat") {}
-
                 megaChatApiGateway.autojoinPublicChat(chatId, listener)
-
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(listener)
-                }
             }
         }.also {
             joiningIds.remove(chatId)
@@ -558,12 +524,7 @@ internal class ChatRepositoryImpl @Inject constructor(
         runCatching {
             suspendCancellableCoroutine { continuation ->
                 val listener = continuation.getChatRequestListener("autorejoinPublicChat") {}
-
                 megaChatApiGateway.autorejoinPublicChat(chatId, publicHandle, listener)
-
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(listener)
-                }
             }
         }.also {
             joiningIds.remove(chatId)
@@ -645,8 +606,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                 handle,
                 callback
             )
-
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -664,10 +623,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                     chatId,
                     callback
                 )
-
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(callback)
-                }
             }
         }.also {
             leavingIds.remove(chatId)
@@ -790,9 +745,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                     }
                 )
                 megaChatApiGateway.clearChatHistory(chatId = chatId, listener = listener)
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(listener)
-                }
             }
         }
 
@@ -827,19 +779,12 @@ internal class ChatRepositoryImpl @Inject constructor(
                 val listener = continuation.getChatRequestListener("onRequestCreateChatCompleted") {
                     it.chatHandle
                 }
-
                 megaChatApiGateway.createChat(
                     isGroup = isGroup,
                     peers = megaChatPeerListMapper(userHandles),
                     listener = listener
                 )
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeChatRequestListener(
-                        listener
-                    )
-                }
             }
-
         }
 
     override suspend fun createGroupChat(
@@ -853,7 +798,6 @@ internal class ChatRepositoryImpl @Inject constructor(
             val listener = continuation.getChatRequestListener("createGroupChat") {
                 it.chatHandle
             }
-
             megaChatApiGateway.createGroupChat(
                 title = title,
                 peers = megaChatPeerListMapper(userHandles),
@@ -862,10 +806,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                 openInvite = openInvite,
                 listener = listener
             )
-
-            continuation.invokeOnCancellation {
-                megaChatApiGateway.removeChatRequestListener(listener)
-            }
         }
     }
 
@@ -880,7 +820,6 @@ internal class ChatRepositoryImpl @Inject constructor(
             val listener = continuation.getChatRequestListener("createPublicChat") {
                 it.chatHandle
             }
-
             megaChatApiGateway.createPublicChat(
                 title = title,
                 peers = megaChatPeerListMapper(userHandles),
@@ -889,10 +828,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                 openInvite = openInvite,
                 listener = listener
             )
-
-            continuation.invokeOnCancellation {
-                megaChatApiGateway.removeChatRequestListener(listener)
-            }
         }
     }
 
@@ -968,45 +903,6 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
     }
 
-    @Deprecated("Deprecated. Replace with the same fun in ChatMessageRepository")
-    override suspend fun attachNode(chatId: Long, nodeHandle: Long) = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getChatRequestListener("attachNode") {
-                it.megaChatMessage.tempId
-            }
-
-            megaChatApiGateway.attachNode(
-                chatId = chatId,
-                nodeHandle = nodeHandle,
-                listener = listener,
-            )
-
-            continuation.invokeOnCancellation {
-                megaChatApiGateway.removeRequestListener(listener)
-            }
-        }
-    }
-
-    @Deprecated("Deprecated. Replace with the same fun in ChatMessageRepository")
-    override suspend fun attachVoiceMessage(chatId: Long, nodeHandle: Long) =
-        withContext(ioDispatcher) {
-            suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getChatRequestListener("attachVoiceMessage") {
-                    it.megaChatMessage.tempId
-                }
-
-                megaChatApiGateway.attachVoiceMessage(
-                    chatId = chatId,
-                    nodeHandle = nodeHandle,
-                    listener = listener,
-                )
-
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(listener)
-                }
-            }
-        }
-
     override suspend fun getOwnPrivilege(chatId: Long): ChatRoomPermission =
         withContext(ioDispatcher) {
             getChatRoom(chatId)?.ownPrivilege ?: ChatRoomPermission.Unknown
@@ -1069,10 +965,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                 it.flag
             }
             megaChatApiGateway.endChatCall(chatCall.callId, listener)
-
-            continuation.invokeOnCancellation {
-                megaChatApiGateway.removeRequestListener(listener)
-            }
         }
     }
 
@@ -1326,7 +1218,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                 divider,
                 listener
             )
-            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 
@@ -1341,11 +1232,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                     period = period,
                     listener = listener
                 )
-                continuation.invokeOnCancellation {
-                    megaChatApiGateway.removeRequestListener(
-                        listener
-                    )
-                }
             }
         }
 
