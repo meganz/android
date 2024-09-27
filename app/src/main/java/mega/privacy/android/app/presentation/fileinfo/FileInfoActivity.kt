@@ -134,8 +134,8 @@ class FileInfoActivity : BaseActivity() {
      */
     @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         viewModel.setNode(readExtrasAndGetHandle() ?: run {
             finish()
             return

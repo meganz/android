@@ -12,10 +12,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -27,7 +27,6 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -38,7 +37,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -46,7 +44,6 @@ import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
 import androidx.constraintlayout.compose.Dimension
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
@@ -58,8 +55,8 @@ import mega.privacy.android.shared.original.core.ui.model.MenuActionString
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * ScaffoldWithCollapsibleHeader
@@ -179,21 +176,6 @@ fun ScaffoldWithCollapsibleHeader(
             }
         }
 
-        //set the status bar color to match toolbar color
-        if (!LocalView.current.isInEditMode) {
-            val statusColor =
-                MegaOriginalTheme.colors.background.pageBackground.copy(LocalMegaAppBarColors.current.backgroundAlpha)
-                    .surfaceColorAtElevation(absoluteElevation = appBarElevation)
-                    .copy(alpha = topBarBackgroundAlpha)
-            val systemUiController = rememberSystemUiController()
-            DisposableEffect(systemUiController, statusColor) {
-                systemUiController.setStatusBarColor(
-                    color = statusColor, darkIcons = systemUiController.statusBarDarkContentEnabled
-                )
-                onDispose { }
-            }
-        }
-
         //draw the composables
         val (headerRef, headerBelowRef) = createRefs()
         if (headerIncludingSystemBar != null && headerAlpha > 0) {
@@ -234,7 +216,7 @@ fun ScaffoldWithCollapsibleHeader(
             )
         }
         Scaffold(
-            modifier = Modifier.systemBarsPadding(),
+            modifier = Modifier.navigationBarsPadding(),
             backgroundColor = Color.Transparent,
             topBar = {
                 CompositionLocalProvider(
@@ -247,7 +229,12 @@ fun ScaffoldWithCollapsibleHeader(
                     LocalMegaAppBarElevation provides appBarElevation,
                     LocalCollapsibleHeaderTitleTransition provides collapsibleHeaderTitleTransition,
                 ) {
-                    topBar()
+                    Box(
+                        modifier = Modifier
+                            .statusBarsPadding()
+                    ) {
+                        topBar()
+                    }
                 }
             },
             bottomBar = bottomBar,
@@ -410,7 +397,10 @@ private fun ScaffoldWithCollapsibleHeaderWithSubtitlePreview() {
                 modifier = Modifier
                     .size(24.dp)
                     .padding(6.dp)
-                    .background(MegaOriginalTheme.colors.components.selectionControl, shape = CircleShape)
+                    .background(
+                        MegaOriginalTheme.colors.components.selectionControl,
+                        shape = CircleShape
+                    )
             )
         }
         ScaffoldWithCollapsibleHeader(

@@ -118,8 +118,8 @@ class FileLinkComposeActivity : PasscodeActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate()")
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         viewModel.handleIntent(intent)
         viewModel.checkLoginRequired()
