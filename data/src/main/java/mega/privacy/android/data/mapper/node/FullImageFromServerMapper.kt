@@ -83,9 +83,7 @@ internal class FullImageFromServerMapper @Inject constructor(
                 highPriority, listener
             )
 
-            awaitClose {
-                megaApiGateway.removeTransferListener(listener)
-            }
+            awaitClose()
         }.flowOn(ioDispatcher)
     }
 }

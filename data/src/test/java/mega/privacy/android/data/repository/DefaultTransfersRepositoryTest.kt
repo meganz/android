@@ -284,7 +284,6 @@ class DefaultTransfersRepositoryTest {
                 assertThat(awaitItem()).isEqualTo(expected)
                 awaitComplete()
             }
-            verify(megaApiGateway).removeTransferListener(any())
         }
 
         @ParameterizedTest
@@ -310,7 +309,6 @@ class DefaultTransfersRepositoryTest {
                 assertThat(awaitItem()).isEqualTo(expected)
                 awaitComplete()
             }
-            verify(megaApiGateway).removeTransferListener(any())
         }
 
         @ParameterizedTest

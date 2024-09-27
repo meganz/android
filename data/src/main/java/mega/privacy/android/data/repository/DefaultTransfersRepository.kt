@@ -160,10 +160,7 @@ internal class DefaultTransfersRepository @Inject constructor(
             cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
             listener = listener,
         )
-
-        awaitClose {
-            megaApiGateway.removeTransferListener(listener)
-        }
+        awaitClose()
     }
         .flowOn(ioDispatcher)
         .cancellable()
@@ -189,9 +186,7 @@ internal class DefaultTransfersRepository @Inject constructor(
             listener = listener,
         )
 
-        awaitClose {
-            megaApiGateway.removeTransferListener(listener)
-        }
+        awaitClose()
     }
         .flowOn(ioDispatcher)
         .cancellable()
@@ -255,6 +250,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         val megaNode = runCatching { megaNodeMapper(node) }.getOrNull()
             ?: throw NodeDoesNotExistsException()
         val listener = transferListener(channel)
+
         megaApiGateway.startDownload(
             node = megaNode,
             localPath = localPath,
@@ -266,9 +262,7 @@ internal class DefaultTransfersRepository @Inject constructor(
             collisionResolution = COLLISION_RESOLUTION_NEW_WITH_N,
             listener = listener,
         )
-        awaitClose {
-            megaApiGateway.removeTransferListener(listener)
-        }
+        awaitClose()
     }
         .flowOn(ioDispatcher)
         .cancellable()

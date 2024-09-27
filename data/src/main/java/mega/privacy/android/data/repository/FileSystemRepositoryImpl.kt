@@ -161,12 +161,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                         collisionResolution = COLLISION_RESOLUTION_NEW_WITH_N,
                         listener = listener
                     )
-
-                    continuation.invokeOnCancellation {
-                        megaApiGateway.removeTransferListener(
-                            listener
-                        )
-                    }
                 }
             } ?: throw NullPointerException()
         }

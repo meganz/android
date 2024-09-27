@@ -321,10 +321,10 @@ internal class MegaApiFacade @Inject constructor(
             },
         )
 
-        megaApi.addTransferListener(listener)
+        addTransferListener(listener)
 
         awaitClose {
-            megaApi.removeTransferListener(listener)
+            removeTransferListener(listener)
         }
     }.buffer(Channel.Factory.UNLIMITED).shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
@@ -1218,7 +1218,7 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.setUserAlias(userHandle, name, listener)
 
-    override suspend fun getTransferData(): MegaTransferData? = megaApi.getTransferData(null)
+    override suspend fun getTransferData(): MegaTransferData? = megaApi.transferData
 
     override fun removeContact(user: MegaUser, listener: MegaRequestListenerInterface?) =
         listener?.let {
