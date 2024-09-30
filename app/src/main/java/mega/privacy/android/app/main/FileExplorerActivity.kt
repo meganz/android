@@ -64,16 +64,17 @@ import mega.privacy.android.app.main.FileExplorerActivity.Companion.SELECT_CAMER
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.SHARE_LINK
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.UPLOAD
 import mega.privacy.android.app.main.adapters.FileExplorerPagerAdapter
-import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
+import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
+import mega.privacy.android.app.presentation.upload.UploadDestinationActivity
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -170,6 +171,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private val viewModel by viewModels<FileExplorerViewModel>()
 
     private lateinit var binding: ActivityFileExplorerBinding
+    private val isFromUploadDestinationActivity by lazy {
+        intent.hasExtra(UploadDestinationActivity.EXTRA_NAVIGATION)
+    }
 
     var isList = true
         private set
@@ -360,6 +364,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
         if (action != null && intent != null) {
             intent.action = action
+        }
+        if(isFromUploadDestinationActivity) {
+            intent.serializable<HashMap<String,String>>(UploadDestinationActivity.EXTRA_NAME_MAP)?.let { nameMap ->
+                viewModel.setFileNames(nameMap)
+            }
         }
 
         if (chatListItems.isNotEmpty()) {
@@ -609,6 +618,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             afterLoginAndFetch()
         }
 
+        handleImportFromUploadDestination()
         window.setFlags(
             WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
             WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
@@ -617,6 +627,15 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
         )
+    }
+
+    private fun handleImportFromUploadDestination() {
+        if (isFromUploadDestinationActivity) {
+            val fragment = intent.getIntExtra(UploadDestinationActivity.EXTRA_NAVIGATION, CLOUD_FRAGMENT)
+            importFileF = true
+            importFragmentSelected = fragment
+            chooseFragment(fragment)
+        }
     }
 
     private fun setupObservers() {
@@ -771,7 +790,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
             }
 
-            title?.let { supportActionBar?.title = it }
+            title.let { supportActionBar?.title = it }
         } else {
             Timber.e("intent error")
         }
@@ -1356,16 +1375,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         invalidateOptionsMenu()
     }
 
-    /**
-     * Gets a fragment tag.
-     *
-     * @param viewPagerId      The pager it.
-     * @param fragmentPosition The fragment position.
-     * @return The fragment tag.
-     */
-    fun getFragmentTag(viewPagerId: Int, fragmentPosition: Int): String =
-        "android:switcher:$viewPagerId:$fragmentPosition"
-
     override fun onSaveInstanceState(outState: Bundle) {
         Timber.d("onSaveInstanceState")
         super.onSaveInstanceState(outState)
@@ -1400,7 +1409,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun performImportFileBack() {
         if (importFileF) {
-            chooseFragment(IMPORT_FRAGMENT)
+            if (isFromUploadDestinationActivity) {
+                finishAndRemoveTask()
+            } else {
+                chooseFragment(IMPORT_FRAGMENT)
+            }
         } else {
             finishAndRemoveTask()
         }
@@ -1599,7 +1612,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     checkFileNameCollisionsUseCase(
                         files = infos.map {
                             DocumentEntity(
-                                name = it.originalFileName,
+                                name = viewModel.uiState.value.fileNames[it.originalFileName] ?: it.originalFileName,
                                 size = it.size,
                                 lastModified = it.lastModified,
                                 uri = UriPath(it.fileAbsolutePath),
@@ -2424,7 +2437,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     /**
-     * Gets the paret node to copy.
+     * Gets the parent node to copy.
      *
      * @return The node.
      */
@@ -2468,17 +2481,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
 
     /**
-     * View type.
-     */
-    val itemType: Int
-        get() = if (isList) {
-            MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
-        } else {
-            MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
-        }
-
-    /**
-     * Sets a node as "My chat files" foler.
+     * Sets a node as "My chat files" folder.
      *
      * @param myChatFilesNode The node to set.
      */

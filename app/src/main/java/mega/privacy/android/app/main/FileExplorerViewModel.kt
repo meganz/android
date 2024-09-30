@@ -56,7 +56,6 @@ import javax.inject.Inject
  *
  * @property storageState    [StorageState]
  * @property isImportingText True if it is importing text, false if it is importing files.
- * @property fileNames       File names.
  * @property uiState     [FileExplorerUiState]
  */
 @HiltViewModel

@@ -74,10 +74,12 @@ class UploadDestinationActivity : AppCompatActivity() {
                                 content = {
                                     UploadDestinationView(
                                         uiState = uploadActivityUiState,
-                                        confirmImport = uploadDestinationViewModel::confirmImport,
+                                        isValidNameForUpload = uploadDestinationViewModel::isValidNameForUpload,
                                         consumeNameValidationError = uploadDestinationViewModel::consumeNameValidationError,
                                         editFileName = uploadDestinationViewModel::editFileName,
-                                        updateFileName = uploadDestinationViewModel::updateFileName
+                                        updateFileName = uploadDestinationViewModel::updateFileName,
+                                        navigateToCloudDrive = this::navigateToCloudDrive,
+                                        navigateToChats = this::navigateToChats
                                     )
                                 }
                             )
@@ -127,5 +129,36 @@ class UploadDestinationActivity : AppCompatActivity() {
         intent.parcelableArrayList<Parcelable>(Intent.EXTRA_STREAM)?.let {
             uploadDestinationViewModel.updateUri(it.mapNotNull { item -> item as? Uri })
         }
+    }
+
+    private fun navigateToChats() {
+        startActivity(
+            intent.setClass(this, FileExplorerActivity::class.java).apply {
+                putExtra(EXTRA_NAME_MAP, uploadDestinationViewModel.uiState.value.nameMap)
+                putExtra(EXTRA_NAVIGATION, FileExplorerActivity.CHAT_FRAGMENT)
+            }
+        )
+    }
+
+    private fun navigateToCloudDrive() {
+        startActivity(
+            intent.setClass(this, FileExplorerActivity::class.java).apply {
+                putExtra(EXTRA_NAME_MAP, uploadDestinationViewModel.uiState.value.nameMap)
+                putExtra(EXTRA_NAVIGATION, FileExplorerActivity.CLOUD_FRAGMENT)
+            }
+        )
+    }
+
+    companion object {
+        /**
+         * Extra name map
+         */
+        const val EXTRA_NAME_MAP = "intent_name_map_extra"
+
+        /**
+         * Extra direction
+         */
+        const val EXTRA_NAVIGATION = "intent_extra_navigation"
+
     }
 }

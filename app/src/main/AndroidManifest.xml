@@ -121,7 +121,7 @@
             android:name=".presentation.upload.UploadDestinationActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true"
-            android:launchMode="singleTop">
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 

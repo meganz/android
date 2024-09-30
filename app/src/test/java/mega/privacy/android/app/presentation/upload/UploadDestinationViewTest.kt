@@ -18,10 +18,12 @@ class UploadDestinationViewTest {
         composeTestRule.setContent {
             UploadDestinationView(
                 editFileName = {},
-                confirmImport = {},
+                isValidNameForUpload = {true},
                 consumeNameValidationError = {},
                 updateFileName = {},
                 uiState = UploadDestinationUiState(),
+                navigateToChats = {},
+                navigateToCloudDrive = {},
             )
         }
         composeTestRule.onNodeWithText("Upload to MEGA", useUnmergedTree = true).assertExists()
@@ -44,15 +46,17 @@ class UploadDestinationViewTest {
         composeTestRule.setContent {
             UploadDestinationView(
                 editFileName = {},
-                confirmImport = {},
+                isValidNameForUpload = {true},
                 consumeNameValidationError = {},
                 updateFileName = {},
+                navigateToChats = {},
+                navigateToCloudDrive = {},
                 uiState = UploadDestinationUiState(
                     importUiItems = listOf(
-                        ImportUiItem("file1", "path1"),
-                        ImportUiItem("file2", "path2"),
-                        ImportUiItem("file3", "path3"),
-                    )
+                        ImportUiItem("file1", "path1", fileName = "file1"),
+                        ImportUiItem("file2", "path2", fileName = "file2"),
+                        ImportUiItem("file3", "path3", fileName = "file3"),
+                    ),
                 ),
             )
         }
@@ -76,20 +80,22 @@ class UploadDestinationViewTest {
         composeTestRule.setContent {
             UploadDestinationView(
                 editFileName = {},
-                confirmImport = {},
+                isValidNameForUpload = {true},
                 consumeNameValidationError = {},
                 updateFileName = {},
+                navigateToChats = {},
+                navigateToCloudDrive = {},
                 uiState = UploadDestinationUiState(
                     importUiItems = listOf(
-                        ImportUiItem(fileName = "file1", filePath = "path1"),
-                        ImportUiItem(fileName = "file2", filePath = "path2"),
-                        ImportUiItem(fileName = "file3", filePath = "path3"),
-                        ImportUiItem(fileName = "file4", filePath = "path4"),
-                        ImportUiItem(fileName = "file5", filePath = "path5"),
-                        ImportUiItem(fileName = "file6", filePath = "path6"),
-                        ImportUiItem(fileName = "file7", filePath = "path7"),
-                        ImportUiItem(fileName = "file8", filePath = "path8"),
-                        ImportUiItem(fileName = "file9", filePath = "path9"),
+                        ImportUiItem(originalFileName = "file1", filePath = "path1", fileName = "file1"),
+                        ImportUiItem(originalFileName = "file2", filePath = "path2", fileName = "file2"),
+                        ImportUiItem(originalFileName = "file3", filePath = "path3", fileName = "file3"),
+                        ImportUiItem(originalFileName = "file4", filePath = "path4", fileName = "file4"),
+                        ImportUiItem(originalFileName = "file5", filePath = "path5", fileName = "file5"),
+                        ImportUiItem(originalFileName = "file6", filePath = "path6", fileName = "file6"),
+                        ImportUiItem(originalFileName = "file7", filePath = "path7", fileName = "file7"),
+                        ImportUiItem(originalFileName = "file8", filePath = "path8", fileName = "file8"),
+                        ImportUiItem(originalFileName = "file9", filePath = "path9", fileName = "file9"),
                     ),
                 ),
             )
@@ -114,12 +120,14 @@ class UploadDestinationViewTest {
         composeTestRule.setContent {
             UploadDestinationView(
                 editFileName = {},
-                confirmImport = {},
+                isValidNameForUpload = {true},
                 consumeNameValidationError = {},
                 updateFileName = {},
+                navigateToChats = {},
+                navigateToCloudDrive = {},
                 uiState = UploadDestinationUiState(
                     importUiItems = listOf(
-                        ImportUiItem("file1", "path1", isUrl = true),
+                        ImportUiItem("file1", "path1", isUrl = true, fileName = "file1"),
                     ),
                 ),
             )

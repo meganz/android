@@ -105,8 +105,9 @@ private fun UploadRowItemPreview() {
         Column {
             UploadDestinationRowItem(
                 importUiItem = ImportUiItem(
+                    originalFileName = "IMG_20171123_17220.jpg",
+                    filePath = "file_path",
                     fileName = "IMG_20171123_17220.jpg",
-                    filePath = "file_path"
                 ),
                 isEditMode = false,
                 editFileName = {},
@@ -115,7 +116,8 @@ private fun UploadRowItemPreview() {
             UploadDestinationRowItem(
                 importUiItem = ImportUiItem(
                     filePath = "file_path",
-                    fileName = "IMG_20171123_17220.jpg"
+                    originalFileName = "IMG_20171123_17220.jpg",
+                    fileName = "IMG_20171123_17220.jpg",
                 ),
                 isEditMode = true,
                 editFileName = { },

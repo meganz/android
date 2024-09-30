@@ -42,11 +42,13 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
  */
 @Composable
 fun UploadDestinationView(
-    confirmImport: () -> Unit,
+    isValidNameForUpload: () -> Boolean,
     consumeNameValidationError: () -> Unit,
     editFileName: (ImportUiItem?) -> Unit,
     updateFileName: (String) -> Unit,
     uiState: UploadDestinationUiState,
+    navigateToChats: () -> Unit,
+    navigateToCloudDrive: () -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
     MegaScaffold(
@@ -67,13 +69,6 @@ fun UploadDestinationView(
         }
         val itemsToShow =
             if (showMore.value) uiState.importUiItems else uiState.importUiItems.take(4)
-
-        EventEffect(
-            event = uiState.navigateToUpload,
-            onConsumed = { },
-        ) { items ->
-            scaffoldState.snackbarHostState.showSnackbar("Navigate to upload screen with ${items.size} items")
-        }
 
         EventEffect(
             event = uiState.nameValidationError,
@@ -116,7 +111,9 @@ fun UploadDestinationView(
                 UploadDestinationFooterView(
                     fileList = uiState.importUiItems,
                     showMore = showMore,
-                    confirmImport = confirmImport
+                    isValidNameForUpload = isValidNameForUpload,
+                    navigateToChats = navigateToChats,
+                    navigateToCloudDrive = navigateToCloudDrive,
                 )
             }
         }
@@ -127,7 +124,9 @@ fun UploadDestinationView(
 private fun UploadDestinationFooterView(
     fileList: List<ImportUiItem>,
     showMore: MutableState<Boolean>,
-    confirmImport: () -> Unit,
+    isValidNameForUpload: () -> Boolean,
+    navigateToChats: () -> Unit = {},
+    navigateToCloudDrive: () -> Unit = {},
 ) {
     if (fileList.size > 4) {
         Row(
@@ -185,8 +184,9 @@ private fun UploadDestinationFooterView(
         modifier = Modifier.testTag(UPLOAD_DESTINATION_VIEW_CLOUD_DRIVE),
         text = stringResource(id = R.string.section_cloud_drive),
         onClick = {
-            confirmImport()
-            //navigate to cloud drive
+            if(isValidNameForUpload()) {
+                navigateToCloudDrive()
+            }
         },
         textAlign = TextAlign.Start,
         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp)
@@ -196,8 +196,9 @@ private fun UploadDestinationFooterView(
         modifier = Modifier.testTag(UPLOAD_DESTINATION_VIEW_CHAT),
         text = stringResource(id = R.string.section_chat),
         onClick = {
-            confirmImport()
-            //navigate to chat
+            if (isValidNameForUpload()) {
+                navigateToChats()
+            }
         },
         textAlign = TextAlign.Start,
         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp)
@@ -211,16 +212,18 @@ private fun UploadViewPreview() {
         UploadDestinationView(
             uiState = UploadDestinationUiState(
                 importUiItems = listOf(
-                    ImportUiItem(fileName = "file1", filePath = "path1"),
-                    ImportUiItem(fileName = "file2", filePath = "path2"),
-                    ImportUiItem(fileName = "file3", filePath = "path3"),
-                    ImportUiItem(fileName = "file4", filePath = "path4"),
+                    ImportUiItem(originalFileName = "file1", filePath = "path1",fileName = "file1"),
+                    ImportUiItem(originalFileName = "file2", filePath = "path2", fileName = "file2"),
+                    ImportUiItem(originalFileName = "file3", filePath = "path3", fileName = "file3"),
+                    ImportUiItem(originalFileName = "file4", filePath = "path4", fileName = "file4"),
                 ),
             ),
-            confirmImport = {},
+            isValidNameForUpload = {true},
             consumeNameValidationError = {},
             editFileName = {},
             updateFileName = {},
+            navigateToChats = {},
+            navigateToCloudDrive = {},
         )
     }
 }
@@ -232,22 +235,24 @@ private fun UploadViewInEditModePreview() {
         UploadDestinationView(
             uiState = UploadDestinationUiState(
                 importUiItems = listOf(
-                    ImportUiItem(fileName = "file1", filePath = "path1"),
-                    ImportUiItem(fileName = "file2", filePath = "path2"),
-                    ImportUiItem(fileName = "file3", filePath = "path3"),
-                    ImportUiItem(fileName = "file4", filePath = "path4"),
-                    ImportUiItem(fileName = "file5", filePath = "path5"),
-                    ImportUiItem(fileName = "file6", filePath = "path6"),
-                    ImportUiItem(fileName = "file7", filePath = "path7"),
-                    ImportUiItem(fileName = "file8", filePath = "path8"),
-                    ImportUiItem(fileName = "file9", filePath = "path9"),
+                    ImportUiItem(originalFileName = "file1", filePath = "path1", fileName = "file1"),
+                    ImportUiItem(originalFileName = "file2", filePath = "path2", fileName = "file2"),
+                    ImportUiItem(originalFileName = "file3", filePath = "path3", fileName = "file3"),
+                    ImportUiItem(originalFileName = "file4", filePath = "path4", fileName = "file4"),
+                    ImportUiItem(originalFileName = "file5", filePath = "path5", fileName = "file5"),
+                    ImportUiItem(originalFileName = "file6", filePath = "path6", fileName = "file6"),
+                    ImportUiItem(originalFileName = "file7", filePath = "path7", fileName = "file7"),
+                    ImportUiItem(originalFileName = "file8", filePath = "path8", fileName = "file8"),
+                    ImportUiItem(originalFileName = "file9", filePath = "path9", fileName = "file9"),
                 ),
-                editableFile = ImportUiItem(fileName = "file5", filePath = "path5"),
+                editableFile = ImportUiItem(originalFileName = "file5", filePath = "path5", fileName = "file5"),
             ),
-            confirmImport = {},
+            isValidNameForUpload = {true},
             consumeNameValidationError = {},
             editFileName = {},
             updateFileName = {},
+            navigateToChats = {},
+            navigateToCloudDrive = {},
         )
     }
 }

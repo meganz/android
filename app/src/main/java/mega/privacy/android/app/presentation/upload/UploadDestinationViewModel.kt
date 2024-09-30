@@ -15,7 +15,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.transfers.GetFileForUploadUseCase
+import mega.privacy.android.domain.usecase.transfers.GetFileNameFromContentUri
 import mega.privacy.android.icon.pack.R
 import timber.log.Timber
 import javax.inject.Inject
@@ -26,7 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UploadDestinationViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val getFileForUploadUseCase: GetFileForUploadUseCase,
+    private val getFileNameFromContentUri: GetFileNameFromContentUri,
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val importFilesErrorMessageMapper: ImportFilesErrorMessageMapper,
     private val importFileErrorMessageMapper: ImportFileErrorMessageMapper,
@@ -56,19 +56,17 @@ class UploadDestinationViewModel @Inject constructor(
      * Update the list of [Uri] of the files to upload
      */
     fun updateUri(fileUriList: List<Uri>) = viewModelScope.launch {
-        val importableItems = fileUriList.mapNotNull {
-            runCatching { getFileForUploadUseCase(it.toString(), false) }
-                .onFailure { error -> Timber.e(error) }
-                .getOrNull()?.let { file ->
-                    ImportUiItem(
-                        filePath = file.path,
-                        fileName = file.name,
-                        fileIcon = fileTypeIconMapper(file.name.substringAfterLast('.')),
-                        error = importFileErrorMessageMapper(file.name)
-                    )
-                }
+        val importableItems = fileUriList.map { uri ->
+            val fileName = runCatching { getFileNameFromContentUri(uri.toString()) }.getOrNull().orEmpty()
+            ImportUiItem(
+                filePath = uri.toString(),
+                originalFileName = fileName,
+                fileName = fileName,
+                fileIcon = fileTypeIconMapper(fileName.substringAfterLast('.')),
+                error = importFileErrorMessageMapper(fileName)
+            )
         }
-        _uiState.update { it.copy(fileUriList = fileUriList, importUiItems = importableItems) }
+        _uiState.update { it.copy(importUiItems = importableItems) }
     }
 
     /**
@@ -81,6 +79,7 @@ class UploadDestinationViewModel @Inject constructor(
         val isUrl = URLUtil.isHttpUrl(text) || URLUtil.isHttpsUrl(text)
         val importTextItem = ImportUiItem(
             filePath = null,
+            originalFileName = subject,
             fileName = subject,
             fileIcon = if (isUrl) R.drawable.ic_url_medium_solid else R.drawable.ic_generic_medium_solid,
         )
@@ -90,20 +89,19 @@ class UploadDestinationViewModel @Inject constructor(
     /**
      * Confirm the import
      */
-    fun confirmImport() {
+    fun isValidNameForUpload() : Boolean {
         Timber.d("Import confirmed")
         val emptyNames = uiState.value.importUiItems.count { it.fileName.isBlank() }
         val hasWrongNames = uiState.value.importUiItems.any {
             Constants.NODE_NAME_REGEX.matcher(it.fileName).find()
         }
 
-        if (hasWrongNames || emptyNames > 0) {
+        val hasError = hasWrongNames || emptyNames > 0
+        if (hasError) {
             val message = importFilesErrorMessageMapper(hasWrongNames, emptyNames)
             _uiState.update { it.copy(nameValidationError = triggered(message)) }
-        } else {
-            Timber.d("Import confirmed")
-            _uiState.update { it.copy(navigateToUpload = triggered(uiState.value.fileUriList)) }
         }
+        return !hasError
     }
 
     /**
