@@ -168,15 +168,17 @@ class SearchActivityViewModel @Inject constructor(
                     parentHandle = NodeId(getCurrentParentHandle()),
                     nodeSourceType = nodeSourceType,
                     searchParameters = SearchParameters(
-                        query = getCurrentSearchQuery(),
+                        query = getCurrentQueryWithSearchByTags(),
                         searchTarget = nodeSourceTypeToSearchTargetMapper(nodeSourceType),
                         searchCategory = state.value.typeSelectedFilterOption?.let {
                             typeFilterToSearchMapper(it.type)
                         } ?: SearchCategory.ALL,
                         modificationDate = state.value.dateModifiedSelectedFilterOption?.date,
                         creationDate = state.value.dateAddedSelectedFilterOption?.date,
-                        description = if (state.value.searchDescriptionEnabled == true) getCurrentSearchQuery() else null,
-                        tag = if (state.value.searchTagsEnabled == true) getCurrentSearchQuery() else null,
+                        description = if (state.value.searchDescriptionEnabled == true) getCurrentQueryWithSearchByTags() else null,
+                        tag = if (state.value.searchTagsEnabled == true) getCurrentSearchQuery().removePrefix(
+                            "#"
+                        ) else null,
                     )
                 )
             }.onSuccess {
@@ -187,7 +189,15 @@ class SearchActivityViewModel @Inject constructor(
         }
     }
 
-    //If folder is opened from search screen we are setting query as empty
+    // Get current query adjusted by search by tags
+    private fun getCurrentQueryWithSearchByTags() =
+        getCurrentSearchQuery().takeUnless {
+            state.value.searchTagsEnabled == true && getCurrentSearchQuery().startsWith(
+                "#"
+            )
+        }.orEmpty()
+
+    // If folder is opened from search screen we are setting query as empty
     private fun getCurrentSearchQuery() =
         state.value.searchQuery.takeIf { state.value.navigationLevel.isEmpty() }.orEmpty()
 

@@ -31,6 +31,7 @@ class MegaSearchFilterMapper @Inject constructor(
      * @param creationDate [DateFilterOption]
      * @param description [String]
      * @param tag [String]
+     * @param useAndForTextQuery [Boolean]
      */
     operator fun invoke(
         parentHandle: NodeId? = null,
@@ -41,6 +42,7 @@ class MegaSearchFilterMapper @Inject constructor(
         creationDate: DateFilterOption? = null,
         description: String? = null,
         tag: String? = null,
+        useAndForTextQuery: Boolean = true,
         sensitivityFilter: SensitivityFilterOption? = null,
     ): MegaSearchFilter = MegaSearchFilter.createInstance().apply {
 
@@ -48,6 +50,9 @@ class MegaSearchFilterMapper @Inject constructor(
         if (searchQuery.isNotEmpty()) {
             byName(searchQuery)
         }
+
+        // Set the logical operator to search name, description, tags (AND, OR)
+        useAndForTextQuery(useAndForTextQuery)
 
         // Set the parent node to search, if parentHandle is null, search in all nodes
         if (parentHandle == null || parentHandle.longValue == -1L) {

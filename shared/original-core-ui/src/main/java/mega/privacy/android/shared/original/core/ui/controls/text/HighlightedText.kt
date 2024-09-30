@@ -45,6 +45,20 @@ fun HighlightedText(
     style: TextStyle = LocalTextStyle.current,
     overflow: TextOverflow = TextOverflow.Ellipsis,
 ) {
+    if (text.isEmpty()) return
+
+    if (highlightText.isEmpty()) {
+        Text(
+            text = text,
+            modifier = modifier.basicMarquee(),
+            maxLines = maxLines,
+            overflow = overflow,
+            style = style,
+            color = MegaOriginalTheme.textColor(textColor = textColor),
+        )
+        return
+    }
+
     val annotatedText: AnnotatedString = buildAnnotatedString {
         append(text)
         var startIndex = text.indexOf(string = highlightText, ignoreCase = true)
@@ -69,8 +83,8 @@ fun HighlightedText(
     Text(
         text = annotatedText,
         modifier = modifier.basicMarquee(),
-        overflow = overflow,
         maxLines = maxLines,
+        overflow = overflow,
         style = style,
         color = MegaOriginalTheme.textColor(textColor = textColor),
     )

@@ -239,6 +239,7 @@ fun NodeListViewItem(
         customRow = {
             tags?.let {
                 if (highlightText.isNotBlank()) {
+                    val tagHighlightText = highlightText.removePrefix("#")
                     Row(
                         modifier = Modifier.horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -246,7 +247,7 @@ fun NodeListViewItem(
                         tags.forEach { tag ->
                             HighlightChip(
                                 text = "#$tag",
-                                highlightText = highlightText,
+                                highlightText = tagHighlightText,
                             )
                         }
                     }

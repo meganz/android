@@ -1,7 +1,6 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
@@ -49,35 +48,11 @@ internal class SearchRepositoryImpl @Inject constructor(
             searchCategory = searchCategory,
             modificationDate = modificationDate,
             creationDate = creationDate,
+            description = description,
+            tag = tag,
+            useAndForTextQuery = description == null && tag == null,
         )
-        val queryListDeferred = async { searchAndMap(queryFilter, order, megaCancelToken) }
-        val descriptionListDeferred = async {
-            description?.let {
-                val descriptionFilter = megaSearchFilterMapper(
-                    parentHandle = nodeId ?: NodeId(-1L),
-                    searchTarget = searchTarget,
-                    searchCategory = searchCategory,
-                    modificationDate = modificationDate,
-                    creationDate = creationDate,
-                    description = description,
-                )
-                searchAndMap(descriptionFilter, order, megaCancelToken)
-            } ?: emptyList()
-        }
-        val tagListDeferred = async {
-            tag?.let {
-                val tagFilter = megaSearchFilterMapper(
-                    parentHandle = nodeId ?: NodeId(-1L),
-                    searchTarget = searchTarget,
-                    searchCategory = searchCategory,
-                    modificationDate = modificationDate,
-                    creationDate = creationDate,
-                    tag = tag,
-                )
-                searchAndMap(tagFilter, order, megaCancelToken)
-            } ?: emptyList()
-        }
-        queryListDeferred.await() + descriptionListDeferred.await() + tagListDeferred.await()
+        searchAndMap(queryFilter, order, megaCancelToken)
     }
 
     private suspend fun searchAndMap(
