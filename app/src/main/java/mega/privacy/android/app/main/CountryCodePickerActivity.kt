@@ -7,6 +7,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,10 +16,9 @@ import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityCountryCodePickerBinding
-import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
+import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.main.adapters.CountryListAdapter
 import mega.privacy.android.app.utils.ColorUtils.tintIcon
-import mega.privacy.android.app.utils.Util
 import timber.log.Timber
 import java.util.Locale
 
@@ -30,7 +31,7 @@ class CountryCodePickerActivity : PasscodeActivity() {
     private var countries: List<Country>? = null
     private val selectedCountries = mutableListOf<Country>()
     private var searchInput: String? = null
-    private var searchAutoComplete: SearchView.SearchAutoComplete? = null
+    private var searchAutoComplete: AppCompatAutoCompleteTextView? = null
     private val receivedCountryCodes by lazy(LazyThreadSafetyMode.NONE) {
         intent.extras?.getStringArrayList("country_code")
     }
@@ -45,9 +46,10 @@ class CountryCodePickerActivity : PasscodeActivity() {
      * OnCreate
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         binding = ActivityCountryCodePickerBinding.inflate(layoutInflater)
+        consumeInsetsWithToolbar(customToolbar = binding.appBarLayout)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
@@ -77,11 +79,9 @@ class CountryCodePickerActivity : PasscodeActivity() {
             countryList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
-                    Util.changeActionBarElevation(
-                        this@CountryCodePickerActivity,
-                        binding.appBarLayout,
-                        recyclerView.canScrollVertically(-1)
-                    )
+                    val canScroll = recyclerView.canScrollVertically(-1)
+                    binding.appBarLayout.elevation =
+                        if (canScroll) getResources().getDimension(R.dimen.toolbar_elevation) else 0f
                 }
             })
         }
