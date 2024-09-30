@@ -8,6 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.BOTTOM_SHEET_TILE_CAMERA_UPLOADS
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.BOTTOM_SHEET_TILE_INFO
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.BOTTOM_SHEET_TILE_RENAME_DEVICE
+import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.TEST_TAG_BOTTOM_SHEET_TILE_ADD_BACKUP
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.tiles.TEST_TAG_BOTTOM_SHEET_TILE_ADD_NEW_SYNC
 import org.junit.Rule
 import org.junit.Test
@@ -31,12 +32,15 @@ internal class OwnDeviceBottomSheetBodyTest {
                 onRenameDeviceClicked = {},
                 onInfoClicked = {},
                 onAddNewSyncClicked = {},
+                onAddBackupClicked = {},
                 isFreeAccount = false,
+                isBackupForAndroidEnabled = true
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_BODY_OWN_DEVICE).assertIsDisplayed()
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_CAMERA_UPLOADS).assertIsNotDisplayed()
         composeTestRule.onNodeWithTag(TEST_TAG_BOTTOM_SHEET_TILE_ADD_NEW_SYNC).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_BOTTOM_SHEET_TILE_ADD_BACKUP).assertIsDisplayed()
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_RENAME_DEVICE).assertIsDisplayed()
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_INFO).assertIsDisplayed()
     }

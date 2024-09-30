@@ -18,21 +18,21 @@ import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
- * A [Composable] Bottom Sheet Tile that displays "Add new sync"
+ * A [Composable] Bottom Sheet Tile that displays "Add backup"
  *
  * @param onActionClicked Lambda that is executed when the Tile is selected
  * @param dividerType type for the divider at the bottom. Hidden if NULL
  */
 @Composable
-internal fun AddNewSyncBottomSheetTile(
+internal fun AddBackupBottomSheetTile(
     isFreeAccount: Boolean,
     onActionClicked: () -> Unit,
     dividerType: DividerType? = DividerType.BigStartPadding,
 ) {
     MenuActionListTile(
-        text = stringResource(id = sharedResR.string.device_center_add_sync_button_option),
-        modifier = Modifier.testTag(TEST_TAG_BOTTOM_SHEET_TILE_ADD_NEW_SYNC),
-        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+        text = stringResource(id = sharedResR.string.device_center_add_backup_button_option),
+        modifier = Modifier.testTag(TEST_TAG_BOTTOM_SHEET_TILE_ADD_BACKUP),
+        icon = painterResource(id = iconPackR.drawable.ic_database),
         dividerType = dividerType,
         onActionClicked = onActionClicked,
         trailingItem = {
@@ -41,7 +41,7 @@ internal fun AddNewSyncBottomSheetTile(
                     text = stringResource(id = sharedResR.string.general_pro_only_label),
                     textColor = TextColor.Primary,
                     modifier = Modifier.testTag(
-                        TEST_TAG_BOTTOM_SHEET_TILE_ADD_NEW_SYNC_PRO_ONLY_LABEL
+                        TEST_TAG_BOTTOM_SHEET_TILE_ADD_BACKUP_PRO_ONLY_LABEL
                     )
                 )
             }
@@ -54,22 +54,22 @@ internal fun AddNewSyncBottomSheetTile(
  */
 @CombinedThemePreviews
 @Composable
-private fun AddNewSyncBottomSheetTilePreview(
+private fun AddBackupBottomSheetTilePreview(
     @PreviewParameter(BooleanProvider::class) isFreeAccount: Boolean,
 ) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
-        AddNewSyncBottomSheetTile(isFreeAccount = isFreeAccount, onActionClicked = {})
+        AddBackupBottomSheetTile(isFreeAccount = isFreeAccount, onActionClicked = {})
     }
 }
 
 /**
- * Test Tag for the Add New Sync Bottom Sheet Tile
+ * Test Tag for the "Add backup" Bottom Sheet Tile
  */
-internal const val TEST_TAG_BOTTOM_SHEET_TILE_ADD_NEW_SYNC =
-    "device_bottom_sheet_tile:add_new_sync"
+internal const val TEST_TAG_BOTTOM_SHEET_TILE_ADD_BACKUP =
+    "device_bottom_sheet_tile:add_backup"
 
 /**
- * Test Tag for the Add New Sync Bottom Sheet Tile "Pro only" label
+ * Test Tag for the "Add backup" Bottom Sheet Tile "Pro only" label
  */
-internal const val TEST_TAG_BOTTOM_SHEET_TILE_ADD_NEW_SYNC_PRO_ONLY_LABEL =
-    "device_bottom_sheet_tile:add_new_sync_pro_only_label"
+internal const val TEST_TAG_BOTTOM_SHEET_TILE_ADD_BACKUP_PRO_ONLY_LABEL =
+    "device_bottom_sheet_tile:add_backup_pro_only_label"

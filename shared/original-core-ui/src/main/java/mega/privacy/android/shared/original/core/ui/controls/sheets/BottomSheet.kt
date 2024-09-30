@@ -48,7 +48,6 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
  * @param sheetHeader header composable for the bottom sheet
  * @param content scaffold/layout in which bottom sheet is shown
  * @param sheetBody list of composable which will be included in sheet content below sheet header
- * @param scrimColor when bottom sheet displayed this color will overlay on background content
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -78,7 +77,6 @@ fun BottomSheet(
  * @param modalSheetState state of [ModalBottomSheetLayout]
  * @param content scaffold/layout in which bottom sheet is shown
  * @param sheetBody list of composable which will be included in sheet content below sheet header
- * @param scrimColor when bottom sheet displayed this color will overlay on background content
  * @param expandedRoundedCorners rounded corners even when the state is expanded
  */
 @OptIn(ExperimentalMaterialApi::class)

@@ -28,6 +28,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -64,6 +65,7 @@ internal class DeviceCenterViewModel @Inject constructor(
     init {
         monitorNetworkConnectivity()
         monitorAccountDetail()
+        checkFeatureFlags()
     }
 
     private fun monitorNetworkConnectivity() {
@@ -85,6 +87,20 @@ internal class DeviceCenterViewModel @Inject constructor(
                     it.copy(isFreeAccount = accountDetail.levelDetail?.accountType == AccountType.FREE)
                 }
             }
+        }
+    }
+
+    private fun checkFeatureFlags() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(SyncFeatures.BackupForAndroid)
+            }.onSuccess { isBackupForAndroidEnabled ->
+                if (isBackupForAndroidEnabled) {
+                    _state.update {
+                        it.copy(enabledFlags = state.value.enabledFlags.plus(SyncFeatures.BackupForAndroid))
+                    }
+                }
+            }.onFailure(Timber::e)
         }
     }
 

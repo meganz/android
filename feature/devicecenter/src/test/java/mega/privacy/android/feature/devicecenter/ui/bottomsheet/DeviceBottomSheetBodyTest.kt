@@ -39,8 +39,10 @@ internal class DeviceBottomSheetBodyTest {
                 onRenameDeviceClicked = {},
                 onInfoClicked = {},
                 onAddNewSyncClicked = {},
+                onAddBackupClicked = {},
                 onBottomSheetDismissed = {},
                 isFreeAccount = false,
+                isBackupForAndroidEnabled = true,
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER)
@@ -64,8 +66,10 @@ internal class DeviceBottomSheetBodyTest {
                 onRenameDeviceClicked = {},
                 onInfoClicked = {},
                 onAddNewSyncClicked = {},
+                onAddBackupClicked = {},
                 onBottomSheetDismissed = {},
                 isFreeAccount = false,
+                isBackupForAndroidEnabled = true,
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER)

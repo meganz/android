@@ -45,6 +45,7 @@ internal const val BOTTOM_SHEET_HEADER =
  * @param onRenameDeviceClicked Lambda that is executed when the "Rename" Tile is selected
  * @param onInfoClicked Lambda that is executed when the "Info" Tile is selected
  * @param onAddNewSyncClicked Lambda that is executed when the "Add new sync" Tile is selected
+ * @param onAddBackupClicked Lambda that is executed when the "Add backup" Tile is selected
  * @param onBottomSheetDismissed Lambda that is executed when the bottom sheet is dismissed
  * @param isFreeAccount True if is a Free account or False otherwise
  */
@@ -55,8 +56,10 @@ internal fun DeviceBottomSheetBody(
     onRenameDeviceClicked: (DeviceUINode) -> Unit,
     onInfoClicked: (DeviceUINode) -> Unit,
     onAddNewSyncClicked: (DeviceUINode) -> Unit,
+    onAddBackupClicked: (DeviceUINode) -> Unit,
     onBottomSheetDismissed: () -> Unit,
     isFreeAccount: Boolean,
+    isBackupForAndroidEnabled: Boolean,
 ) {
     Column(Modifier.testTag(BOTTOM_SHEET_CONTAINER)) {
         MenuActionNodeHeaderWithBody(
@@ -88,7 +91,12 @@ internal fun DeviceBottomSheetBody(
                         onBottomSheetDismissed()
                         onAddNewSyncClicked(device)
                     },
+                    onAddBackupClicked = {
+                        onBottomSheetDismissed()
+                        onAddBackupClicked(device)
+                    },
                     isFreeAccount = isFreeAccount,
+                    isBackupForAndroidEnabled = isBackupForAndroidEnabled,
                 )
             }
 
@@ -163,8 +171,10 @@ private fun DeviceBottomSheetBodyPreview(
             onRenameDeviceClicked = {},
             onInfoClicked = {},
             onAddNewSyncClicked = {},
+            onAddBackupClicked = {},
             onBottomSheetDismissed = {},
             isFreeAccount = true,
+            isBackupForAndroidEnabled = true,
         )
     }
 }

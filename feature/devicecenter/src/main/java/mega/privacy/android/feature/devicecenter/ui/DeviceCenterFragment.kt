@@ -165,6 +165,14 @@ class DeviceCenterFragment : Fragment() {
                                 syncType = SyncType.TYPE_TWOWAY,
                             )
                         },
+                        onAddBackupOptionClicked = { device ->
+                            megaNavigator.openNewSync(
+                                context = this@DeviceCenterFragment.activity
+                                    ?: return@DeviceCenterScreen,
+                                deviceName = device.name,
+                                syncType = SyncType.TYPE_BACKUP,
+                            )
+                        },
                         onRenameDeviceOptionClicked = viewModel::setDeviceToRename,
                         onRenameDeviceCancelled = viewModel::resetDeviceToRename,
                         onRenameDeviceSuccessful = {

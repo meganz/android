@@ -61,6 +61,7 @@ import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.android.shared.sync.ui.SyncEmptyState
 import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogCancelButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogDisplayedEvent
@@ -110,6 +111,7 @@ internal fun DeviceCenterScreen(
     onNonBackupFolderClicked: (NonBackupDeviceFolderUINode) -> Unit,
     onInfoOptionClicked: (DeviceCenterUINode) -> Unit,
     onAddNewSyncOptionClicked: (DeviceUINode) -> Unit,
+    onAddBackupOptionClicked: (DeviceUINode) -> Unit,
     onRenameDeviceOptionClicked: (DeviceUINode) -> Unit,
     onRenameDeviceCancelled: () -> Unit,
     onRenameDeviceSuccessful: () -> Unit,
@@ -165,6 +167,7 @@ internal fun DeviceCenterScreen(
     }
     BottomSheet(
         modalSheetState = modalSheetState,
+        expandedRoundedCorners = true,
         sheetBody = {
             DeviceBottomSheetBody(
                 device = uiState.menuClickedDevice ?: return@BottomSheet,
@@ -178,10 +181,18 @@ internal fun DeviceCenterScreen(
                         onAddNewSyncOptionClicked(uiState.menuClickedDevice)
                     }
                 },
+                onAddBackupClicked = {
+                    if (uiState.isFreeAccount) {
+                        showUpgradeDialog = true
+                    } else {
+                        onAddBackupOptionClicked(uiState.menuClickedDevice)
+                    }
+                },
                 onBottomSheetDismissed = {
                     coroutineScope.launch { modalSheetState.hide() }
                 },
                 isFreeAccount = uiState.isFreeAccount,
+                isBackupForAndroidEnabled = uiState.enabledFlags.contains(SyncFeatures.BackupForAndroid),
             )
         },
         content = {
@@ -255,9 +266,18 @@ internal fun DeviceCenterScreen(
 
     if (showUpgradeDialog) {
         Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogDisplayedEvent)
+        val isBackupForAndroidEnabled = uiState.enabledFlags.contains(SyncFeatures.BackupForAndroid)
         MegaAlertDialog(
-            title = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_title),
-            body = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_message),
+            title = if (isBackupForAndroidEnabled) {
+                stringResource(id = sharedR.string.device_center_sync_backup_upgrade_dialog_title)
+            } else {
+                stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_title)
+            },
+            body = if (isBackupForAndroidEnabled) {
+                stringResource(id = sharedR.string.device_center_sync_backup_upgrade_dialog_message)
+            } else {
+                stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_message)
+            },
             confirmButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_confirm_button),
             cancelButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_cancel_button),
             onConfirm = {
@@ -490,6 +510,7 @@ private fun DeviceCenterNoNetworkStatePreview() {
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
+            onAddBackupOptionClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},
@@ -523,6 +544,7 @@ private fun DeviceCenterNoItemsFoundPreview() {
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
+            onAddBackupOptionClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},
@@ -553,6 +575,7 @@ private fun DeviceCenterInInitialLoadingPreview() {
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
+            onAddBackupOptionClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},
@@ -593,6 +616,7 @@ private fun DeviceCenterInDeviceViewPreview() {
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
+            onAddBackupOptionClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},
@@ -630,6 +654,7 @@ private fun DeviceCenterInFolderViewEmptyStatePreview() {
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
+            onAddBackupOptionClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},
@@ -666,6 +691,7 @@ private fun DeviceCenterInFolderViewPreview() {
             onNonBackupFolderClicked = {},
             onInfoOptionClicked = {},
             onAddNewSyncOptionClicked = {},
+            onAddBackupOptionClicked = {},
             onRenameDeviceOptionClicked = {},
             onRenameDeviceCancelled = {},
             onRenameDeviceSuccessful = {},

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
@@ -702,4 +702,12 @@
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
     <string name="document_scanning_confirmation_destination_chat">Chat</string>
+    <!-- Label for the button or menu option to add a sync -->
+    <string name="device_center_add_sync_button_option">Add sync</string>
+    <!-- Label for the button or menu option to add a backup -->
+    <string name="device_center_add_backup_button_option">Add backup</string>
+    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_title">Upgrade your account</string>
+    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_message">Unlock the power to sync and backup your mobile to cloud storage with one of our premium plans</string>
 </resources>
