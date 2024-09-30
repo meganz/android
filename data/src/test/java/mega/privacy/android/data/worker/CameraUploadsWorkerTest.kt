@@ -115,6 +115,8 @@ import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
+import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
@@ -224,6 +226,8 @@ internal class CameraUploadsWorkerTest {
     private val crashReporter: CrashReporter = mock()
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
     private val handleTransferEventUseCase: HandleTransferEventUseCase = mock()
+    private val correctActiveTransfersUseCase = mock<CorrectActiveTransfersUseCase>()
+    private val clearActiveTransfersIfFinishedUseCase = mock<ClearActiveTransfersIfFinishedUseCase>()
 
     private val foregroundInfo = ForegroundInfo(1, mock())
     private val primaryNodeHandle = 1111L
@@ -317,6 +321,8 @@ internal class CameraUploadsWorkerTest {
                 crashReporter = crashReporter,
                 monitorTransferEventsUseCase = monitorTransferEventsUseCase,
                 handleTransferEventUseCase = handleTransferEventUseCase,
+                correctActiveTransfersUseCase = correctActiveTransfersUseCase,
+                clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
             )
         )
     }
@@ -1692,5 +1698,71 @@ internal class CameraUploadsWorkerTest {
             verify(updateCameraUploadsBackupHeartbeatStatusUseCase, never())
                 .invoke(eq(HeartbeatStatus.UP_TO_DATE), any())
             assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        }
+
+    @Test
+    fun `test that correctActiveTransfersUseCase is invoked when worker starts work`() = runTest {
+        setupDefaultCheckConditionMocks()
+
+        underTest.doWork()
+
+        verify(correctActiveTransfersUseCase).invoke(TransferType.CU_UPLOAD)
+    }
+
+    @Test
+    fun `test that clearActiveTransfersIfFinishedUseCase is invoked when the worker complete with success`() =
+        runTest {
+            setupDefaultCheckConditionMocks()
+
+            val result = underTest.doWork()
+
+            verify(resetTotalUploadsUseCase).invoke()
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        }
+
+    @Test
+    fun `test that clearActiveTransfersIfFinishedUseCase is invoked when the worker complete with failure`() =
+        runTest {
+            setupDefaultCheckConditionMocks()
+            val fakeFlow = MutableStateFlow(true)
+            val record = mock<CameraUploadsRecord> {
+                on { folderType }.thenReturn(CameraUploadFolderType.Primary)
+            }
+            val list = listOf(record)
+            val size = 2L // in MB
+            val file = mock<File> {
+                on { length() }.thenReturn(size * 1024 * 1024)
+            }
+            setupDefaultProcessingFilesConditionMocks(list)
+            whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
+            whenever(getFileByPathUseCase(record.filePath)).thenReturn(file)
+
+            val uploadTag = 100
+            val transfer = mock<Transfer> {
+                on { tag }.thenReturn(uploadTag)
+                on { isFinished }.thenReturn(false)
+            }
+            val toUploadEvent = CameraUploadsTransferProgress.ToUpload(
+                record = record,
+                transferEvent = TransferEvent.TransferStartEvent(transfer = transfer),
+            )
+            val flow = channelFlow {
+                send(toUploadEvent)
+                fakeFlow.emit(false)
+            }
+            whenever(monitorConnectivityUseCase()).thenReturn(fakeFlow)
+            whenever(getTransferByTagUseCase(uploadTag)).thenReturn(transfer)
+            whenever(
+                uploadCameraUploadsRecordsUseCase(
+                    list,
+                    NodeId(primaryNodeHandle),
+                    NodeId(secondaryNodeHandle),
+                    tempPath
+                )
+            ).thenReturn(flow)
+
+            underTest.doWork()
+
+            verify(clearActiveTransfersIfFinishedUseCase).invoke()
         }
 }

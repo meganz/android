@@ -122,6 +122,8 @@ import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
+import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
@@ -195,6 +197,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val crashReporter: CrashReporter,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val handleTransferEventUseCase: HandleTransferEventUseCase,
+    private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
+    private val correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
 
@@ -512,6 +516,8 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Monitors and processes only the Camera Uploads Transfers
      */
     private fun CoroutineScope.monitorCameraUploadsTransfers() = launch {
+        runCatching { correctActiveTransfersUseCase(TransferType.CU_UPLOAD) }
+            .onFailure { Timber.e(it) }
         monitorTransferEventsUseCase()
             .filter { it.transfer.transferType == TransferType.CU_UPLOAD }
             .collectChunked(
@@ -581,6 +587,8 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun resetTotalUploads() {
         runCatching { resetTotalUploadsUseCase() }
+            .onFailure { Timber.e(it) }
+        runCatching { clearActiveTransfersIfFinishedUseCase() }
             .onFailure { Timber.e(it) }
     }
 
