@@ -528,19 +528,17 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun checkNodeCanBeMovedToTargetNode(
         nodeId: NodeId,
         targetNodeId: NodeId,
-    ): Boolean {
+    ): Boolean = withContext(ioDispatcher) {
         val node = megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
         val targetNode = megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
 
-        return withContext(ioDispatcher) {
-            if (node != null && targetNode != null) {
-                megaApiGateway.checkMoveErrorExtended(
-                    node,
-                    targetNode
-                ).errorCode != MegaError.API_OK
-            } else {
-                false
-            }
+        if (node != null && targetNode != null) {
+            megaApiGateway.checkMoveErrorExtended(
+                node,
+                targetNode
+            ).errorCode != MegaError.API_OK
+        } else {
+            false
         }
     }
 
@@ -898,13 +896,17 @@ internal class NodeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getAllOfflineNodes(): List<OfflineNodeInformation> =
-        megaLocalRoomGateway.getAllOfflineInfo().map {
-            offlineNodeInformationMapper(it)
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.getAllOfflineInfo().map {
+                offlineNodeInformationMapper(it)
+            }
         }
 
     override suspend fun getOfflineNodesByParentId(parentId: Int): List<OfflineNodeInformation> =
-        megaLocalRoomGateway.getOfflineInfoByParentId(parentId).map {
-            offlineNodeInformationMapper(it)
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.getOfflineInfoByParentId(parentId).map {
+                offlineNodeInformationMapper(it)
+            }
         }
 
     override suspend fun getOfflineFolderInfo(parentId: Int): OfflineFolderInfo =
@@ -916,14 +918,18 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
 
     override suspend fun getOfflineNodeById(id: Int) =
-        megaLocalRoomGateway.getOfflineLineById(id)?.let { offlineNodeInformationMapper(it) }
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.getOfflineLineById(id)?.let { offlineNodeInformationMapper(it) }
+        }
 
     override suspend fun removeOfflineNodeById(id: Int) {
-        megaLocalRoomGateway.removeOfflineInformationById(id)
+        withContext(ioDispatcher) { megaLocalRoomGateway.removeOfflineInformationById(id) }
     }
 
     override suspend fun removeOfflineNodeByIds(ids: List<Int>) {
-        megaLocalRoomGateway.removeOfflineInformationByIds(ids)
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.removeOfflineInformationByIds(ids)
+        }
     }
 
     override suspend fun setNodeLabel(nodeId: NodeId, label: NodeLabel): Unit =
@@ -960,11 +966,13 @@ internal class NodeRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) { megaLocalRoomGateway.clearOffline() }
 
     override suspend fun moveNodeToRubbishBinByHandle(nodeId: NodeId) {
-        val rubbish = megaApiGateway.getRubbishBinNode()
-        val node = getMegaNodeByHandle(nodeId, true)
-        requireNotNull(node) { "Node to move with handle $node not found" }
-        requireNotNull(rubbish) { "Rubbish bin node not found" }
-        moveNode(node, rubbish, null)
+        withContext(ioDispatcher) {
+            val rubbish = megaApiGateway.getRubbishBinNode()
+            val node = getMegaNodeByHandle(nodeId, true)
+            requireNotNull(node) { "Node to move with handle $node not found" }
+            requireNotNull(rubbish) { "Rubbish bin node not found" }
+            moveNode(node, rubbish, null)
+        }
     }
 
     override fun getNodeLabelList(): List<NodeLabel> =
@@ -1068,14 +1076,14 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun isEmptyFolder(node: TypedNode): Boolean {
-        if (node is FileNode) return false
-        if (node is FolderNode) {
-            megaApiGateway.getMegaNodeByHandle(node.id.longValue)?.let { parent ->
-                isChildrenEmpty(parent)
-            }
+    override suspend fun isEmptyFolder(node: TypedNode): Boolean = withContext(ioDispatcher) {
+        when (node) {
+            is FileNode -> false
+            is FolderNode -> megaApiGateway.getMegaNodeByHandle(node.id.longValue)
+                ?.let { isChildrenEmpty(it) } ?: true
+
+            else -> true
         }
-        return true
     }
 
     private suspend fun isChildrenEmpty(parent: MegaNode): Boolean {
@@ -1121,7 +1129,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun addNodeTag(nodeHandle: NodeId, tag: String) {
+    override suspend fun addNodeTag(nodeHandle: NodeId, tag: String) = withContext(ioDispatcher) {
         val node = megaApiGateway.getMegaNodeByHandle(nodeHandle.longValue)
         requireNotNull(node) { "Node not found" }
         suspendCancellableCoroutine { continuation ->
@@ -1130,23 +1138,25 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun removeNodeTag(nodeHandle: NodeId, tag: String) {
-        val node = megaApiGateway.getMegaNodeByHandle(nodeHandle.longValue)
-        requireNotNull(node) { "Node not found" }
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("removeNodeTag") {}
-            megaApiGateway.removeNodeTag(node, tag, listener)
+    override suspend fun removeNodeTag(nodeHandle: NodeId, tag: String) =
+        withContext(ioDispatcher) {
+            val node = megaApiGateway.getMegaNodeByHandle(nodeHandle.longValue)
+            requireNotNull(node) { "Node not found" }
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("removeNodeTag") {}
+                megaApiGateway.removeNodeTag(node, tag, listener)
+            }
         }
-    }
 
-    override suspend fun updateNodeTag(nodeHandle: NodeId, oldTag: String, newTag: String) {
-        val node = megaApiGateway.getMegaNodeByHandle(nodeHandle.longValue)
-        requireNotNull(node) { "Node not found" }
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("updateNodeTag") {}
-            megaApiGateway.updateNodeTag(node, oldTag, newTag, listener)
+    override suspend fun updateNodeTag(nodeHandle: NodeId, oldTag: String, newTag: String) =
+        withContext(ioDispatcher) {
+            val node = megaApiGateway.getMegaNodeByHandle(nodeHandle.longValue)
+            requireNotNull(node) { "Node not found" }
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("updateNodeTag") {}
+                megaApiGateway.updateNodeTag(node, oldTag, newTag, listener)
+            }
         }
-    }
 
     override suspend fun hasSensitiveDescendant(nodeId: NodeId): Boolean =
         withContext(ioDispatcher) {
