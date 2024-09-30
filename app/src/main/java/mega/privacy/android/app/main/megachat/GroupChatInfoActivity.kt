@@ -48,6 +48,7 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityGroupChatPropertiesBinding
+import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.listeners.GetPeerAttributesListener
@@ -71,7 +72,6 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT
@@ -196,8 +196,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         Timber.d("onCreate")
 
         groupChatInfoActivity = this
@@ -228,6 +228,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             setContentView(binding.root)
 
             setSupportActionBar(binding.toolbarGroupChatProperties)
+            consumeInsetsWithToolbar(customToolbar = binding.toolbarGroupChatProperties)
             supportActionBar?.apply {
                 setHomeButtonEnabled(true)
                 setDisplayHomeAsUpEnabled(true)
@@ -253,11 +254,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                         super.onScrolled(recyclerView, dx, dy)
                         val withElevation =
                             recyclerView.canScrollVertically(Constants.SCROLLING_UP_DIRECTION)
-                        Util.changeViewElevation(supportActionBar, withElevation, outMetrics)
-
-                        groupChatInfoActivity?.let { activity ->
-                            changeStatusBarColorForElevation(activity, withElevation)
-                        }
+                        binding.toolbarGroupChatProperties.elevation =
+                            if (withElevation) resources.getDimension(R.dimen.toolbar_elevation) else 0f
 
                         if (recyclerView.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
                             checkIfShouldAskForUsersAttributes(RecyclerView.SCROLL_STATE_IDLE)
