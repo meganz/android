@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingViewModel
 import mega.privacy.android.app.presentation.meeting.mapper.RecurrenceDialogOptionMapper
 import mega.privacy.android.app.presentation.meeting.mapper.WeekDayMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension

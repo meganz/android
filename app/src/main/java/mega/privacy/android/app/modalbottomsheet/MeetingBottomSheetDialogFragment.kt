@@ -35,6 +35,11 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
     private val showSimpleList by lazy { arguments?.getBoolean(SHOW_SIMPLE_LIST) ?: false }
     private var listener: MeetingBottomSheetDialogActionListener? = null
 
+    /**
+     * onScheduleMeeting callback
+     */
+    var onScheduleMeeting: (() -> Unit)? = null
+
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
@@ -79,7 +84,7 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
 
             R.id.btn_schedule_meeting -> {
                 Analytics.tracker.trackEvent(ScheduleMeetingMenuItemEvent)
-                listener?.onScheduleMeeting()
+                onScheduleMeeting?.invoke()
                 dismiss()
             }
         }

@@ -26,6 +26,7 @@ import java.time.ZonedDateTime
  * @property displayDialog                      Indicates if display confirm dialog or not
  * @property enabledMeetingLinkOption           True if is enabled the meeting link option, false otherwise.
  * @property meetingLink                        Meeting link.
+ * @property title                              Meeting Title
  * @property cancelOccurrenceTapped             Indicates if cancel occurrence option was tapped
  * @property editOccurrenceTapped               Indicates if edit occurrence option was tapped
  * @property chatRoomItem                       Selected [ChatRoomItem]
@@ -37,7 +38,10 @@ import java.time.ZonedDateTime
  * @property showForceUpdateDialog              True, if the force update dialog should be shown. False, if not.
  * @property subscriptionPlan                           [AccountType]
  * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
+ * @property meetingLinkCreated
+ * @property myFullName
  * @constructor Create empty Scheduled meeting management state
+ *
  */
 data class ScheduledMeetingManagementUiState(
     val finish: Boolean = false,
@@ -50,6 +54,7 @@ data class ScheduledMeetingManagementUiState(
     val displayDialog: Boolean = false,
     val enabledMeetingLinkOption: Boolean = false,
     val meetingLink: String? = null,
+    val title: String? = null,
     val cancelOccurrenceTapped: Boolean = false,
     val editOccurrenceTapped: Boolean = false,
     val chatRoomItem: ChatRoomItem? = null,
@@ -60,6 +65,8 @@ data class ScheduledMeetingManagementUiState(
     val showForceUpdateDialog: Boolean = false,
     val subscriptionPlan: AccountType = AccountType.UNKNOWN,
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
+    val meetingLinkCreated: StateEvent = consumed,
+    val myFullName: String = "",
 ) {
 
     /**

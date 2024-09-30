@@ -71,7 +71,37 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     private lateinit var permissionsRequest: ActivityResultLauncher<Array<String>>
-    private lateinit var editSchedMeetLauncher: ActivityResultLauncher<Intent?>
+    private val editSchedMeetLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == AppCompatActivity.RESULT_OK) {
+                val isLinkCreated = result.data?.getBooleanExtra(
+                    CreateScheduledMeetingActivity.MEETING_LINK_CREATED_TAG,
+                    false
+                ) ?: false
+                if (isLinkCreated) {
+                    // show bottom sheet dialog
+                    val chatId = result.data?.getLongExtra(
+                        Constants.CHAT_ID,
+                        -1L
+                    ) ?: -1L
+                    if (chatId != -1L) {
+                        val link = result.data?.getStringExtra(
+                            CreateScheduledMeetingActivity.MEETING_LINK_TAG
+                        )
+                        val title = result.data?.getStringExtra(
+                            CreateScheduledMeetingActivity.MEETING_TITLE_TAG
+                        ) ?: ""
+                        scheduledMeetingManagementViewModel.setMeetingLink(
+                            chatId,
+                            link,
+                            title
+                        )
+                    }
+                }
+                scheduledMeetingManagementViewModel.scheduledMeetingUpdated()
+            }
+            dismissAllowingStateLoss()
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -103,14 +133,6 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         permissionsRequest = getCallPermissionsRequest()
-        editSchedMeetLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == AppCompatActivity.RESULT_OK) {
-                    scheduledMeetingManagementViewModel.scheduledMeetingUpdated()
-                }
-                dismissAllowingStateLoss()
-            }
-
         scheduledMeetingManagementViewModel.monitorLoadedMessages(chatId)
     }
 

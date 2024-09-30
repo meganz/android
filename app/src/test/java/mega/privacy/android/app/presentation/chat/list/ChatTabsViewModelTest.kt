@@ -9,7 +9,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.chat.list.ChatTabsViewModel
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
 import mega.privacy.android.app.usecase.chat.GetLastMessageUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -108,7 +107,7 @@ internal class ChatTabsViewModelTest {
             setNextMeetingTooltipUseCase,
             getChatsUnreadStatusUseCase,
             startMeetingInWaitingRoomChatUseCase,
-            monitorChatCallUpdatesUseCase
+            monitorChatCallUpdatesUseCase,
         )
     }
 
@@ -138,7 +137,7 @@ internal class ChatTabsViewModelTest {
             monitorLeaveChatUseCase,
             monitorChatCallUpdatesUseCase,
             hasArchivedChatsUseCase,
-            monitorHasAnyContactUseCase
+            monitorHasAnyContactUseCase,
         )
     }
 

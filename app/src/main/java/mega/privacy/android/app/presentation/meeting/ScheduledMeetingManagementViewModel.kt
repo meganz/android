@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.meeting
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
@@ -12,11 +11,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.getLink.BaseLinkViewModel
 import mega.privacy.android.app.presentation.extensions.getDayAndMonth
 import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
@@ -29,21 +31,29 @@ import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
+import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
+import mega.privacy.android.domain.usecase.IsDevice24HourFormatUseCase
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
+import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.QueryChatLinkUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatLinkUseCase
+import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.link.RemoveChatLinkUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
+import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingOccurrenceUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.GetWaitingRoomRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatHistoryEmptyUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
@@ -108,11 +118,22 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
     private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-) : ViewModel() {
+    private val getMyFullNameUseCase: GetMyFullNameUseCase,
+    private val monitorUserUpdates: MonitorUserUpdates,
+    private val getScheduledMeetingByChatUseCase: GetScheduledMeetingByChatUseCase,
+    private val isDevice24HourFormatUseCase: IsDevice24HourFormatUseCase,
+    get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
+    sendTextMessageUseCase: SendTextMessageUseCase,
+) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
     private val _state = MutableStateFlow(ScheduledMeetingManagementUiState())
     val state: StateFlow<ScheduledMeetingManagementUiState> = _state
 
     private var isChatHistoryEmptyJob: Job? = null
+
+    internal var chatScheduledMeeting: ChatScheduledMeeting? = null
+
+    internal val is24HourFormat: Boolean
+        get() = isDevice24HourFormatUseCase()
 
     /**
      * Is network connected
@@ -121,6 +142,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
         get() = isConnectedToInternetUseCase()
 
     init {
+        getMyFullName()
         checkWaitingRoomWarning()
         getApiFeatureFlag()
 
@@ -130,6 +152,38 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             }
         }
         getAccountDetailUpdates()
+
+        viewModelScope.launch {
+            flow {
+                emitAll(monitorUserUpdates()
+                    .catch { Timber.w("Exception monitoring user updates: $it") }
+                    .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email })
+            }.collect {
+                when (it) {
+                    UserChanges.Firstname, UserChanges.Lastname -> getMyFullName()
+                    else -> Unit
+                }
+            }
+        }
+    }
+
+    /**
+     * Get my full name
+     */
+    private fun getMyFullName() = viewModelScope.launch {
+        runCatching {
+            getMyFullNameUseCase()
+        }.onSuccess {
+            it?.apply {
+                _state.update { state ->
+                    state.copy(
+                        myFullName = this,
+                    )
+                }
+            }
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }
     }
 
     /**
@@ -769,4 +823,75 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Trigger event to show meeting link share bottom sheet
+     */
+    private fun onMeetingLinkCreated() {
+        _state.update { it.copy(meetingLinkCreated = triggered) }
+    }
+
+    /**
+     * Reset and notify that meeting link share is consumed
+     */
+    fun onMeetingLinkShareShown() {
+        _state.update { it.copy(meetingLinkCreated = consumed) }
+    }
+
+
+    /**
+     * Set meeting link and start/end time
+     */
+    fun setMeetingLink(
+        chatId: Long,
+        link: String?,
+        title: String,
+    ) {
+        _state.update { it.copy(meetingLink = link, chatId = chatId, title = title) }
+        getScheduledMeeting()
+    }
+
+    /**
+     * Get scheduled meeting
+     */
+    private fun getScheduledMeeting() {
+        _state.value.chatId?.let {
+            viewModelScope.launch {
+                runCatching {
+                    getScheduledMeetingByChatUseCase(it)
+                }.onFailure { exception ->
+                    Timber.e("Scheduled meeting does not exist, finish $exception")
+                }.onSuccess { scheduledMeetingList ->
+                    scheduledMeetingList?.let { list ->
+                        list.forEach { scheduledMeetReceived ->
+                            if (isMainScheduledMeeting(scheduledMeet = scheduledMeetReceived)) {
+                                updateScheduledMeeting(scheduledMeetReceived = scheduledMeetReceived)
+                                return@forEach
+                            }
+                        }
+                    }
+                }
+                onMeetingLinkCreated()
+            }
+        }
+    }
+
+    /**
+     * Check if is main scheduled meeting
+     *
+     * @param scheduledMeet [ChatScheduledMeeting]
+     * @ return True, if it's the main scheduled meeting. False if not.
+     */
+    private fun isMainScheduledMeeting(scheduledMeet: ChatScheduledMeeting): Boolean =
+        scheduledMeet.parentSchedId == megaChatApiGateway.getChatInvalidHandle()
+
+    /**
+     * Update scheduled meeting
+     *
+     * @param scheduledMeetReceived [ChatScheduledMeeting]
+     */
+    private fun updateScheduledMeeting(scheduledMeetReceived: ChatScheduledMeeting) {
+        chatScheduledMeeting = scheduledMeetReceived
+    }
+
 }

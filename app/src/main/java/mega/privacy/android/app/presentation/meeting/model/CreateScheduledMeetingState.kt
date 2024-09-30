@@ -7,7 +7,6 @@ import mega.privacy.android.app.presentation.extensions.getZoneStartTime
 import mega.privacy.android.app.presentation.extensions.meeting.DialogOption
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingViewModel
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -18,7 +17,6 @@ import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
 import mega.privacy.android.domain.entity.meeting.WeekOfMonth
 import mega.privacy.android.domain.entity.meeting.Weekday
 import java.time.DayOfWeek
-import java.time.Duration
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
@@ -64,6 +62,7 @@ import java.time.temporal.WeekFields
  * @property initialParticipantsList                    List of participants handles.
  * @property participantsRemoved                        List of participants removed.
  * @property weekList                                   List of [Weekday] in the week.
+ * @property meetingLink                                Meeting Link
  */
 data class CreateScheduledMeetingState(
     val scheduledMeeting: ChatScheduledMeeting? = null,
@@ -100,6 +99,7 @@ data class CreateScheduledMeetingState(
     val initialWaitingRoomOption: Boolean = false,
     val initialParticipantsList: List<ContactItem> = emptyList(),
     val participantsRemoved: List<ContactItem> = emptyList(),
+    val meetingLink: String? = null,
     val weekList: List<Weekday> =
         listOf(
             Weekday.Monday,

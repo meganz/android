@@ -710,4 +710,10 @@
     <string name="device_center_sync_backup_upgrade_dialog_title">Upgrade your account</string>
     <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
     <string name="device_center_sync_backup_upgrade_dialog_message">Unlock the power to sync and backup your mobile to cloud storage with one of our premium plans</string>
+    <!-- Title of the share meeting link bottom panel -->
+    <string name="meetings_share_link_bottom_sheet_title">Meeting confirmed: Invite others to join</string>
+    <!-- Button text of the send meeting link to chat -->
+    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Send link to chat</string>
+    <!-- Button text of the share meeting link -->
+    <string name="meetings_share_link_bottom_sheet_button_share_link">Share link</string>
 </resources>

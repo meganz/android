@@ -12,11 +12,17 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.BackHandler
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
@@ -29,10 +35,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.NavigationDrawerManager
@@ -42,8 +51,10 @@ import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragmen
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.view.ChatTabsView
+import mega.privacy.android.app.presentation.chat.list.view.MeetingLinkBottomSheet
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
@@ -52,6 +63,7 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
+import mega.privacy.android.app.utils.ScheduledMeetingDateUtil
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
@@ -64,6 +76,10 @@ import mega.privacy.mobile.analytics.event.ChatTabFABPressedEvent
 import mega.privacy.mobile.analytics.event.ChatsTabEvent
 import mega.privacy.mobile.analytics.event.InviteFriendsPressedEvent
 import mega.privacy.mobile.analytics.event.MeetingsTabEvent
+import mega.privacy.mobile.analytics.event.ScheduleMeetingPressedEvent
+import mega.privacy.mobile.analytics.event.ScheduledMeetingShareMeetingLinkButtonEvent
+import mega.privacy.mobile.analytics.event.SendMeetingLinkToChatScheduledMeetingEvent
+import mega.privacy.mobile.analytics.event.ShareLinkDialogEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
@@ -136,6 +152,46 @@ class ChatTabsFragment : Fragment() {
             }
         }
 
+    private val sendToChatLauncher = registerForActivityResult(SendToChatActivityContract()) {
+        if (it != null) {
+            scheduledMeetingManagementViewModel.sendToChat(
+                data = it,
+                link = scheduledMeetingManagementViewModel.state.value.meetingLink
+            )
+        }
+    }
+
+    private val scheduleResultContract =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            Timber.d("Schedule meeting result: ${result.resultCode}")
+            if (result.resultCode == Activity.RESULT_OK) {
+                val isLinkCreated = result.data?.getBooleanExtra(
+                    CreateScheduledMeetingActivity.MEETING_LINK_CREATED_TAG,
+                    false
+                ) ?: false
+                if (isLinkCreated) {
+                    // show bottom sheet dialog
+                    val chatId = result.data?.getLongExtra(
+                        Constants.CHAT_ID,
+                        -1L
+                    ) ?: -1L
+                    if (chatId != -1L) {
+                        val link = result.data?.getStringExtra(
+                            CreateScheduledMeetingActivity.MEETING_LINK_TAG
+                        )
+                        val title = result.data?.getStringExtra(
+                            CreateScheduledMeetingActivity.MEETING_TITLE_TAG
+                        ) ?: ""
+                        scheduledMeetingManagementViewModel.setMeetingLink(
+                            chatId,
+                            link,
+                            title
+                        )
+                    }
+                }
+            }
+        }
+
     private val drawerListener = object : DrawerLayout.DrawerListener {
         override fun onDrawerOpened(drawerView: View) {
             viewModel.showTooltips(false)
@@ -149,6 +205,7 @@ class ChatTabsFragment : Fragment() {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -159,6 +216,25 @@ class ChatTabsFragment : Fragment() {
                 val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val chatsTabState by viewModel.getState().collectAsStateWithLifecycle()
                 val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
+                val coroutineScope = rememberCoroutineScope()
+                val modalSheetState = rememberModalBottomSheetState(
+                    initialValue = ModalBottomSheetValue.Hidden,
+                    skipHalfExpanded = true,
+                )
+                BackHandler(enabled = modalSheetState.isVisible) {
+                    coroutineScope.launch { modalSheetState.hide() }
+                }
+
+                LaunchedEffect(Unit) {
+                    Analytics.tracker.trackEvent(ShareLinkDialogEvent)
+                }
+
+                EventEffect(
+                    managementState.meetingLinkCreated,
+                    scheduledMeetingManagementViewModel::onMeetingLinkShareShown
+                ) {
+                    modalSheetState.show()
+                }
                 OriginalTempTheme(isDark = mode.isDarkMode()) {
                     ChatTabsView(
                         state = chatsTabState,
@@ -180,6 +256,17 @@ class ChatTabsFragment : Fragment() {
                         onDismissForceAppUpdateDialog = viewModel::onForceUpdateDialogDismissed,
                         onScheduleMeeting = ::onScheduleMeeting
                     )
+                    MeetingLinkBottomSheet(
+                        modalSheetState = modalSheetState,
+                        coroutineScope = coroutineScope,
+                        onShareLink = {
+                            Analytics.tracker.trackEvent(ScheduledMeetingShareMeetingLinkButtonEvent)
+                            showMeetingShareOptions()
+                        },
+                        onSendLinkToChat = {
+                            Analytics.tracker.trackEvent(SendMeetingLinkToChatScheduledMeetingEvent)
+                            sendToChatLauncher.launch(longArrayOf())
+                        })
                 }
             }
         }
@@ -405,15 +492,21 @@ class ChatTabsFragment : Fragment() {
         )
     }
 
+    /**
+     * On schedule meeting
+     */
     private fun onScheduleMeeting() {
-        (activity as? ManagerActivity?)?.onScheduleMeeting()
+        Analytics.tracker.trackEvent(ScheduleMeetingPressedEvent)
+        scheduleResultContract.launch(Intent(context, CreateScheduledMeetingActivity::class.java))
     }
 
     private fun startChatAction(isFabClicked: Boolean) {
         if (isMeetingTabShown()) {
             if (isFabClicked) {
                 Analytics.tracker.trackEvent(ChatTabFABPressedEvent)
-                MeetingBottomSheetDialogFragment.newInstance(true).show(
+                MeetingBottomSheetDialogFragment.newInstance(true).apply {
+                    onScheduleMeeting = ::onScheduleMeeting
+                }.show(
                     childFragmentManager,
                     MeetingBottomSheetDialogFragment.TAG
                 )
@@ -554,5 +647,52 @@ class ChatTabsFragment : Fragment() {
             it.setOnChatIdConsumed()
             it.setOnChatRoomItemConsumed()
         }
+    }
+
+    private fun showMeetingShareOptions() {
+        val subject = getString(R.string.meetings_sharing_meeting_link_meeting_invite_subject)
+        val message = getString(
+            R.string.meetings_sharing_meeting_link_title,
+            scheduledMeetingManagementViewModel.state.value.myFullName
+        )
+        val meetingName =
+            getString(
+                R.string.meetings_sharing_meeting_link_meeting_name,
+                scheduledMeetingManagementViewModel.state.value.title
+            )
+        val meetingLink =
+            getString(
+                R.string.meetings_sharing_meeting_link_meeting_link,
+                scheduledMeetingManagementViewModel.state.value.meetingLink
+            )
+
+        val body = StringBuilder()
+        body.append("\n")
+            .append(message)
+            .append("\n\n")
+            .append(meetingName)
+
+        scheduledMeetingManagementViewModel.chatScheduledMeeting?.let {
+            val meetingDateAndTime = getString(
+                R.string.meetings_sharing_meeting_link_meeting_date_and_time,
+                ScheduledMeetingDateUtil.getAppropriateStringForScheduledMeetingDate(
+                    requireContext(),
+                    scheduledMeetingManagementViewModel.is24HourFormat,
+                    it
+                )
+            )
+            body.append(meetingDateAndTime)
+        }
+
+        body.append("\n")
+            .append(meetingLink)
+
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = Constants.TYPE_TEXT_PLAIN
+            putExtra(Intent.EXTRA_SUBJECT, "\n${subject}")
+            putExtra(Intent.EXTRA_TEXT, body.toString())
+        }
+
+        startActivity(Intent.createChooser(intent, " "))
     }
 }

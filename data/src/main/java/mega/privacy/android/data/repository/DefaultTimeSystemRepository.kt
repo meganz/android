@@ -16,4 +16,7 @@ internal class DefaultTimeSystemRepository @Inject constructor(
     override fun getCurrentHourOfDay(): Int = deviceGateway.getCurrentHourOfDay()
 
     override fun getCurrentMinute(): Int = deviceGateway.getCurrentMinute()
+
+    override fun is24HourFormat(): Boolean = deviceGateway.is24HourFormat()
+
 }

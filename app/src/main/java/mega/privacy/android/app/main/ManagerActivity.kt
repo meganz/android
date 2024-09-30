@@ -194,7 +194,6 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
-import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.UpgradeProPlanBottomSheet
@@ -340,7 +339,6 @@ import mega.privacy.mobile.analytics.event.IncomingSharesTabEvent
 import mega.privacy.mobile.analytics.event.JoinMeetingPressedEvent
 import mega.privacy.mobile.analytics.event.LinkSharesTabEvent
 import mega.privacy.mobile.analytics.event.OutgoingSharesTabEvent
-import mega.privacy.mobile.analytics.event.ScheduleMeetingPressedEvent
 import mega.privacy.mobile.analytics.event.SharedItemsScreenEvent
 import mega.privacy.mobile.analytics.event.StartMeetingNowPressedEvent
 import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetDismissedEvent
@@ -5687,11 +5685,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     override fun onCreateMeeting() {
         Analytics.tracker.trackEvent(StartMeetingNowPressedEvent)
         chatsFragment?.onCreateMeeting()
-    }
-
-    override fun onScheduleMeeting() {
-        Analytics.tracker.trackEvent(ScheduleMeetingPressedEvent)
-        startActivity(Intent(this, CreateScheduledMeetingActivity::class.java))
     }
 
     /**

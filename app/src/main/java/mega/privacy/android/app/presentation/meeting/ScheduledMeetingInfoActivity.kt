@@ -41,6 +41,9 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.Participan
 import mega.privacy.android.app.presentation.chat.dialog.ManageMeetingLinkBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_LINK_CREATED_TAG
+import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_LINK_TAG
+import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_TITLE_TAG
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
@@ -502,7 +505,31 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                 onLeaveGroupClicked = { viewModel.onLeaveGroupTap() },
                 onParticipantClicked = { showParticipantOptionsPanel(it) },
                 onScrollChange = { scrolled -> this.changeStatusBarColor(scrolled, isDark) },
-                onBackPressed = { finish() },
+                onBackPressed = {
+                    Timber.d(
+                        "onBackPressed schedule meeting created ${
+                            intent.getBooleanExtra(
+                                SCHEDULED_MEETING_CREATED,
+                                false
+                            )
+                        }"
+                    )
+                    if (intent.getBooleanExtra(SCHEDULED_MEETING_CREATED, false)) {
+                        setResult(
+                            RESULT_OK,
+                            Intent().apply {
+                                putExtra(CHAT_ID, uiState.scheduledMeeting?.chatId)
+                                putExtra(MEETING_TITLE_TAG, uiState.scheduledMeeting?.title)
+                                putExtra(
+                                    MEETING_LINK_CREATED_TAG,
+                                    managementState.meetingLink?.isNotBlank() ?: false
+                                )
+                                putExtra(MEETING_LINK_TAG, managementState.meetingLink)
+                            }
+                        )
+                    }
+                    finish()
+                },
                 onDismiss = { viewModel.dismissDialog() },
                 onLeaveGroupDialog = { viewModel.leaveChat() },
                 onInviteParticipantsDialog = {

@@ -957,28 +957,30 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      *
      * @param chatId    Chat Id.
      */
-    private fun createMeetingLink(chatId: Long) =
-        viewModelScope.launch {
-            runCatching {
-                createChatLinkUseCase(chatId)
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }
+    private suspend fun createMeetingLink(chatId: Long) {
+        runCatching {
+            val chatRequest = createChatLinkUseCase(chatId)
+            Timber.d("Meeting link created successfully ${chatRequest.text}")
+            _state.update { it.copy(meetingLink = chatRequest.text) }
+        }.onFailure { exception ->
+            Timber.e(exception)
         }
+    }
 
     /**
      * Remove chat link
      *
      * @param chatId    Chat Id.
      */
-    private fun removeMeetingLink(chatId: Long) =
-        viewModelScope.launch {
-            runCatching {
-                removeChatLinkUseCase(chatId)
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }
+    private suspend fun removeMeetingLink(chatId: Long) {
+        runCatching {
+            removeChatLinkUseCase(chatId)
+            Timber.d("Meeting link removed successfully")
+            _state.update { it.copy(meetingLink = null) }
+        }.onFailure { exception ->
+            Timber.e(exception)
         }
+    }
 
     /**
      * Check if there is an existing chat-link for an public chat
@@ -991,11 +993,11 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 Timber.e(exception)
             }.onSuccess { request ->
                 Timber.d("Query chat link successfully")
-                val hastMeetingLink = request.text != null
+                val hasMeetingLink = request.text != null
                 _state.update {
                     it.copy(
-                        enabledMeetingLinkOption = hastMeetingLink,
-                        initialMeetingLinkOption = hastMeetingLink
+                        enabledMeetingLinkOption = hasMeetingLink,
+                        initialMeetingLinkOption = hasMeetingLink
                     )
                 }
             }

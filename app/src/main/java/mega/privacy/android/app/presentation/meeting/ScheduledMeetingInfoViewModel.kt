@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
@@ -68,6 +69,7 @@ import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
+import mega.privacy.mobile.analytics.event.SendMeetingLinkToChatScheduledMeetingEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -361,9 +363,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             return@forEach
                         }
                     }
-                    getScheduledMeetingUpdates()
                 }
-
                 getScheduledMeetingUpdates()
             }
         }
@@ -610,7 +610,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param id    Chat id.
      */
     private fun updateDndSeconds(id: Long) {
-        getPushNotificationSettingManagement().pushNotificationSetting?.let { push ->
+        getPushNotificationSettingManagement().pushNotificationSetting.let { push ->
             if (push.isChatDndEnabled(id)) {
                 _uiState.update {
                     it.copy(dndSeconds = push.getChatDnd(id))
@@ -1136,6 +1136,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Open send to screen
      */
     fun openSendToChat(shouldOpen: Boolean) {
+        Analytics.tracker.trackEvent(SendMeetingLinkToChatScheduledMeetingEvent)
         _uiState.update { it.copy(openSendToChat = shouldOpen) }
     }
 

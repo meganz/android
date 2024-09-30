@@ -7,5 +7,4 @@ package mega.privacy.android.app.interfaces
 interface MeetingBottomSheetDialogActionListener {
     fun onJoinMeeting()
     fun onCreateMeeting()
-    fun onScheduleMeeting()
 }
