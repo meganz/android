@@ -497,7 +497,7 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
         Contact c = (Contact) getItem(currentPosition);
 
         int id = v.getId();
-        if (id == R.id.contact_list_three_dots || id == R.id.contact_grid_three_dots) {
+        if (id == R.id.contact_list_three_dots) {
             Timber.d("Click contact three dots!");
             if (!multipleSelect) {
                 if ((c.getEmail().equals(megaChatApi.getMyEmail()))) {
@@ -506,7 +506,7 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
                     ((ContactAttachmentActivity) context).showOptionsPanel(c.getEmail());
                 }
             }
-        } else if (id == R.id.contact_list_item_layout || id == R.id.contact_grid_item_layout) {
+        } else if (id == R.id.contact_list_item_layout) {
             Timber.d("contact_item_layout");
             ((ContactAttachmentActivity) context).itemClick(currentPosition);
         }
