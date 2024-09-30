@@ -763,7 +763,7 @@ internal class MegaLocalRoomFacadeTest {
         whenever(videoRecentlyWatchedEntityMapper(testItem)).thenReturn(testEntity)
 
         underTest.saveRecentlyWatchedVideo(testItem)
-        verify(videoRecentlyWatchedDao).insertOrUpdateRecentlyWatchedVideo(testEntity)
+        verify(videoRecentlyWatchedDao).insertVideo(testEntity)
     }
 
     @Test

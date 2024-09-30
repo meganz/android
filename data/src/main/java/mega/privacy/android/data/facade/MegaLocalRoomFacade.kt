@@ -474,12 +474,14 @@ internal class MegaLocalRoomFacade @Inject constructor(
         )
     }
 
-    override suspend fun getAllRecentlyWatchedVideos() =
-        videoRecentlyWatchedDao.get().getAllRecentlyWatchedVideos().map { entities ->
+    override suspend fun getAllRecentlyWatchedVideos(): Flow<List<VideoRecentlyWatchedItem>> {
+        videoRecentlyWatchedDao.get().deleteExcessVideos()
+        return videoRecentlyWatchedDao.get().getAllRecentlyWatchedVideos().map { entities ->
             entities.map { entity ->
                 videoRecentlyWatchedItemMapper(entity.videoHandle, entity.watchedTimestamp)
             }
         }
+    }
 
     override suspend fun removeRecentlyWatchedVideo(handle: Long) =
         videoRecentlyWatchedDao.get().removeRecentlyWatchedVideo(handle)
@@ -489,7 +491,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun saveRecentlyWatchedVideo(item: VideoRecentlyWatchedItem) {
         val entity = videoRecentlyWatchedEntityMapper(item)
-        videoRecentlyWatchedDao.get().insertOrUpdateRecentlyWatchedVideo(entity)
+        videoRecentlyWatchedDao.get().insertVideo(entity)
     }
 
     override suspend fun saveRecentlyWatchedVideos(items: List<VideoRecentlyWatchedItem>) {

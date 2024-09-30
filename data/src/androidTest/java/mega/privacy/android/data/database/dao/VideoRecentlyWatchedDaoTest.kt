@@ -8,6 +8,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.MegaDatabase
+import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao.Companion.MAX_RECENTLY_WATCHED_VIDEOS
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
 import org.junit.After
 import org.junit.Before
@@ -19,6 +20,7 @@ import java.io.IOException
 class VideoRecentlyWatchedDaoTest {
     private lateinit var videoRecentlyWatchedDao: VideoRecentlyWatchedDao
     private lateinit var db: MegaDatabase
+    private val maxVideosCount = MAX_RECENTLY_WATCHED_VIDEOS
 
     @Before
     fun createDb() {
@@ -194,4 +196,79 @@ class VideoRecentlyWatchedDaoTest {
                 )
             }
         }
+
+    @Test
+    fun `test_that_getVideoCount_returns_as_expected`() = runTest {
+        val testEntities = (1..100L).map {
+            VideoRecentlyWatchedEntity(
+                videoHandle = it,
+                watchedTimestamp = it
+            )
+        }
+        videoRecentlyWatchedDao.insertOrUpdateRecentlyWatchedVideos(testEntities)
+        assertThat(videoRecentlyWatchedDao.getVideoCount()).isEqualTo(testEntities.size)
+    }
+
+    @Test
+    fun `test_that_deleteOldestVideo_deletes_oldest_video_as_expected`() = runTest {
+        val testEntities = (1..100L).map {
+            VideoRecentlyWatchedEntity(
+                videoHandle = it,
+                watchedTimestamp = it
+            )
+        }
+        videoRecentlyWatchedDao.insertOrUpdateRecentlyWatchedVideos(testEntities)
+        videoRecentlyWatchedDao.deleteOldestVideo()
+        val entities = videoRecentlyWatchedDao.getAllRecentlyWatchedVideos().first()
+        assertThat(entities).isNotEmpty()
+        assertThat(entities.size).isEqualTo(testEntities.size - 1)
+        assertThat(entities.find { it.videoHandle == 1L }).isNull()
+    }
+
+    @Test
+    fun `test_that_deleteExcessVideos_deletes_excess_videos_as_expected`() = runTest {
+        val testEntities = (1..100L).map {
+            VideoRecentlyWatchedEntity(
+                videoHandle = it,
+                watchedTimestamp = it
+            )
+        }
+        videoRecentlyWatchedDao.insertOrUpdateRecentlyWatchedVideos(testEntities)
+        videoRecentlyWatchedDao.deleteExcessVideos()
+        val entities = videoRecentlyWatchedDao.getAllRecentlyWatchedVideos().first()
+        assertThat(entities).isNotEmpty()
+        assertThat(entities.size).isEqualTo(maxVideosCount)
+        val start = testEntities.size - maxVideosCount
+        (start + 1..testEntities.size.toLong()).forEach {
+            assertThat(entities.find { entity -> entity.videoHandle == it }).isNotNull()
+        }
+    }
+
+    @Test
+    fun `test_that_insertVideo_inserts_video_as_expected`() = runTest {
+        val testEntities = (1..maxVideosCount.toLong()).map {
+            VideoRecentlyWatchedEntity(
+                videoHandle = it,
+                watchedTimestamp = it
+            )
+        }
+        videoRecentlyWatchedDao.insertOrUpdateRecentlyWatchedVideos(testEntities)
+        videoRecentlyWatchedDao.getAllRecentlyWatchedVideos().first().let { entities ->
+            assertThat(entities).isNotEmpty()
+            assertThat(entities.size).isEqualTo(maxVideosCount)
+        }
+
+        videoRecentlyWatchedDao.insertVideo(
+            VideoRecentlyWatchedEntity(
+                videoHandle = maxVideosCount + 1L,
+                watchedTimestamp = maxVideosCount + 1L
+            )
+        )
+        videoRecentlyWatchedDao.getAllRecentlyWatchedVideos().first().let { entities ->
+            assertThat(entities).isNotEmpty()
+            assertThat(entities.size).isEqualTo(maxVideosCount)
+            assertThat(entities.find { it.videoHandle == 1L }).isNull()
+            assertThat(entities.find { it.videoHandle == maxVideosCount + 1L }).isNotNull()
+        }
+    }
 }
