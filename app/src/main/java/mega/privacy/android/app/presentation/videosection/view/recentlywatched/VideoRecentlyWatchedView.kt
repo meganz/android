@@ -23,6 +23,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
@@ -39,6 +40,7 @@ import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VideoItemView
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
@@ -56,6 +58,7 @@ import nz.mega.sdk.MegaNode
 @Composable
 fun VideoRecentlyWatchedView(
     group: Map<String, List<VideoUIEntity>>,
+    accountType: AccountType?,
     clearRecentlyWatchedVideosSuccess: StateEvent,
     removeRecentlyWatchedItemSuccess: StateEvent,
     modifier: Modifier,
@@ -171,7 +174,12 @@ fun VideoRecentlyWatchedView(
                                     thumbnailData = ThumbnailRequest(videoItem.id),
                                     nodeAvailableOffline = videoItem.nodeAvailableOffline,
                                     onClick = { onClick(videoItem, it) },
-                                    onMenuClick = { onMenuClick(videoItem) }
+                                    onMenuClick = { onMenuClick(videoItem) },
+                                    modifier = Modifier
+                                        .alpha(0.5f.takeIf {
+                                            accountType?.isPaid == true && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited)
+                                        } ?: 1f),
+                                    isSensitive = accountType?.isPaid == true && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited),
                                 )
                             }
                         }

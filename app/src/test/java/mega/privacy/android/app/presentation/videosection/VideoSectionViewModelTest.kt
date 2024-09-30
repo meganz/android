@@ -20,6 +20,7 @@ import mega.privacy.android.app.presentation.videosection.model.LocationFilterOp
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
+import mega.privacy.android.app.presentation.videosection.view.videoSectionRoute
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Offline
@@ -1359,9 +1360,11 @@ class VideoSectionViewModelTest {
                 on { exportedData }.thenReturn(ExportedData("", 0))
             }
             initVideosReturned()
+
             whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
             whenever(getNodeByIdUseCase(expectedId)).thenReturn(mockTypedNode)
             initUnderTest()
+            underTest.setCurrentDestinationRoute(videoSectionRoute)
 
             underTest.state.drop(1).test {
                 underTest.refreshNodes()

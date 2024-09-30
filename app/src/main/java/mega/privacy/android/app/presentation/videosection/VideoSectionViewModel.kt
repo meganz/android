@@ -38,6 +38,8 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionStat
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTabState
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
+import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
+import mega.privacy.android.app.presentation.videosection.view.videoSectionRoute
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -160,6 +162,14 @@ class VideoSectionViewModel @Inject constructor(
             _state.map { it.selectedVideoHandles }.distinctUntilChanged().collectLatest {
                 if (it.isNotEmpty()) {
                     checkActionsVisible()
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            _state.map { it.selectedVideoElementIDs }.distinctUntilChanged().collectLatest {
+                if (it.isNotEmpty()) {
+                    checkPlaylistDetailActionsVisible()
                 }
             }
         }
@@ -633,12 +643,36 @@ class VideoSectionViewModel @Inject constructor(
             }
         }
 
-    internal suspend fun getSelectedNodes(): List<TypedNode> =
-        _state.value.selectedVideoHandles.mapNotNull {
-            runCatching {
-                getNodeByIdUseCase(NodeId(it))
-            }.getOrNull()
-        }
+    internal suspend fun getSelectedNodes(): List<TypedNode> {
+        return _state.value.currentDestinationRoute?.let { route ->
+            when (route) {
+                videoSectionRoute -> {
+                    _state.value.selectedVideoHandles.mapNotNull {
+                        runCatching {
+                            getNodeByIdUseCase(NodeId(it))
+                        }.getOrNull()
+                    }
+                }
+
+                videoPlaylistDetailRoute -> {
+                    _state.value.currentVideoPlaylist?.let { playlist ->
+                        val selectedVideoElementIDs = _state.value.selectedVideoElementIDs
+                        val videos = playlist.videos ?: emptyList()
+                        val selectedVideos = selectedVideoElementIDs.mapNotNull { elementId ->
+                            videos.find { video -> video.elementID == elementId }
+                        }
+                        selectedVideos.mapNotNull { video ->
+                            runCatching {
+                                getNodeByIdUseCase(video.id)
+                            }.getOrNull()
+                        }
+                    }
+                }
+
+                else -> emptyList()
+            }
+        } ?: emptyList()
+    }
 
     internal suspend fun getSelectedMegaNode(): List<MegaNode> =
         _state.value.selectedVideoHandles.mapNotNull {
@@ -910,6 +944,14 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
+    internal suspend fun unhideNodes() {
+        hideOrUnhideNodes(
+            nodeIds = getSelectedNodes()
+                .map { it.id },
+            hide = false,
+        )
+    }
+
     private fun monitorAccountDetail() {
         monitorAccountDetailUseCase()
             .onEach { accountDetail ->
@@ -1011,6 +1053,37 @@ class VideoSectionViewModel @Inject constructor(
                 isHideMenuActionVisible = isHideMenuActionVisible,
                 isUnhideMenuActionVisible = isUnhideMenuActionVisible,
                 isRemoveLinkMenuActionVisible = isRemoveLinkMenuActionVisible
+            )
+        }
+    }
+
+    private suspend fun checkPlaylistDetailActionsVisible() {
+        var isHideMenuActionVisible = false
+        var isUnhideMenuActionVisible = false
+        _state.value.currentVideoPlaylist?.let { playlist ->
+            val selectedVideoElementIDs = _state.value.selectedVideoElementIDs
+            val videos = playlist.videos ?: return
+            val selectedVideos = selectedVideoElementIDs.mapNotNull { elementId ->
+                videos.find { video -> video.elementID == elementId }
+            }
+            val isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+            val includeSensitiveInheritedNode = selectedVideos.any { it.isSensitiveInherited }
+
+            if (isHiddenNodesEnabled) {
+                val hasNonSensitiveNode =
+                    selectedVideos.any { !it.isMarkedSensitive }
+                val isPaid =
+                    _state.value.accountDetail?.levelDetail?.accountType?.isPaid ?: false
+                isHideMenuActionVisible =
+                    !isPaid || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
+                isUnhideMenuActionVisible =
+                    isPaid && !hasNonSensitiveNode && !includeSensitiveInheritedNode
+            }
+        }
+        _state.update {
+            it.copy(
+                isHideMenuActionVisible = isHideMenuActionVisible,
+                isUnhideMenuActionVisible = isUnhideMenuActionVisible,
             )
         }
     }

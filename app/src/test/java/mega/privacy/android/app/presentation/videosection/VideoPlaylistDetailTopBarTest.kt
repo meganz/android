@@ -37,6 +37,8 @@ class VideoPlaylistDetailTopBarTest {
                 title = title,
                 isActionMode = isActionMode,
                 selectedSize = selectedSize,
+                isUnhideMenuActionVisible = false,
+                isHideMenuActionVisible = false,
                 onMenuActionClick = onMenuActionClick,
                 onBackPressed = onBackPressed
             )

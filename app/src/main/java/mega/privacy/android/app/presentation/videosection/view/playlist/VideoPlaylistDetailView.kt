@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -58,6 +59,7 @@ import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VideoItemView
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
@@ -82,6 +84,9 @@ import nz.mega.sdk.MegaNode
 fun VideoPlaylistDetailView(
     playlist: VideoPlaylistUIEntity?,
     selectedSize: Int,
+    accountType: AccountType?,
+    isHideMenuActionVisible: Boolean,
+    isUnhideMenuActionVisible: Boolean,
     isInputTitleValid: Boolean,
     numberOfAddedVideos: Int,
     numberOfRemovedItems: Int,
@@ -191,6 +196,8 @@ fun VideoPlaylistDetailView(
                 title = playlistTitle,
                 isActionMode = selectedSize > 0,
                 selectedSize = selectedSize,
+                isHideMenuActionVisible = isHideMenuActionVisible,
+                isUnhideMenuActionVisible = isUnhideMenuActionVisible,
                 onMenuActionClick = { action ->
                     when (action) {
                         is VideoSectionMenuAction.VideoSectionMoreAction -> {
@@ -338,7 +345,12 @@ fun VideoPlaylistDetailView(
                                     nodeAvailableOffline = videoItem.nodeAvailableOffline,
                                     onClick = { onClick(videoItem, it) },
                                     onMenuClick = { onMenuClick(videoItem) },
-                                    onLongClick = { onLongClick(videoItem, it) }
+                                    onLongClick = { onLongClick(videoItem, it) },
+                                    modifier = Modifier
+                                        .alpha(0.5f.takeIf {
+                                            accountType?.isPaid == true && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited)
+                                        } ?: 1f),
+                                    isSensitive = accountType?.isPaid == true && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited),
                                 )
                             }
                         }
@@ -528,6 +540,9 @@ private fun VideoPlaylistDetailViewPreview() {
         VideoPlaylistDetailView(
             playlist = null,
             selectedSize = 0,
+            accountType = AccountType.FREE,
+            isHideMenuActionVisible = true,
+            isUnhideMenuActionVisible = true,
             isInputTitleValid = true,
             inputPlaceHolderText = "",
             setInputValidity = {},
@@ -556,6 +571,9 @@ private fun VideoPlaylistDetailViewUnderActionModePreview() {
         VideoPlaylistDetailView(
             playlist = null,
             selectedSize = 2,
+            accountType = AccountType.FREE,
+            isHideMenuActionVisible = true,
+            isUnhideMenuActionVisible = true,
             isInputTitleValid = true,
             inputPlaceHolderText = "",
             setInputValidity = {},

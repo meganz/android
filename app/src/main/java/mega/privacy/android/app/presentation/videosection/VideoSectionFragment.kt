@@ -214,6 +214,8 @@ class VideoSectionFragment : Fragment() {
 
                     is VideoSectionMenuAction.VideoSectionHideAction -> handleHideNodeClick()
 
+                    is VideoSectionMenuAction.VideoSectionUnhideAction -> videoSectionViewModel.unhideNodes()
+
                     is VideoSectionMenuAction.VideoSectionCopyAction ->
                         NodeController(managerActivity).chooseLocationToCopyNodes(selectedVideos)
 
@@ -224,6 +226,7 @@ class VideoSectionFragment : Fragment() {
                 }
                 videoSectionViewModel.clearAllSelectedVideos()
                 videoSectionViewModel.clearAllSelectedVideoPlaylists()
+                videoSectionViewModel.clearAllSelectedVideosOfPlaylist()
             }
         }
 

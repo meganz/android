@@ -127,6 +127,9 @@ internal fun VideoSectionNavHost(
             VideoPlaylistDetailView(
                 playlist = state.currentVideoPlaylist,
                 selectedSize = state.selectedVideoElementIDs.size,
+                accountType = state.accountDetail?.levelDetail?.accountType,
+                isHideMenuActionVisible = state.isHideMenuActionVisible,
+                isUnhideMenuActionVisible = state.isUnhideMenuActionVisible,
                 isInputTitleValid = state.isInputTitleValid,
                 numberOfAddedVideos = state.numberOfAddedVideos,
                 addedMessageShown = viewModel::clearNumberOfAddedVideos,
@@ -162,7 +165,9 @@ internal fun VideoSectionNavHost(
                         is VideoSectionMenuAction.VideoSectionClearSelectionAction ->
                             viewModel.clearAllSelectedVideosOfPlaylist()
 
-                        else -> {}
+                        else -> {
+                            onMenuAction(action)
+                        }
                     }
                 }
             )
@@ -171,6 +176,7 @@ internal fun VideoSectionNavHost(
         composable(route = videoRecentlyWatchedRoute) {
             VideoRecentlyWatchedView(
                 group = state.groupedVideoRecentlyWatchedItems,
+                accountType = state.accountDetail?.levelDetail?.accountType,
                 clearRecentlyWatchedVideosSuccess = state.clearRecentlyWatchedVideosSuccess,
                 removeRecentlyWatchedItemSuccess = state.removeRecentlyWatchedItemSuccess,
                 modifier = Modifier,

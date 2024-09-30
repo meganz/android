@@ -114,17 +114,6 @@ internal fun VideoSectionComposeView(
                 query = uiState.query,
                 onMenuActionClicked = { action ->
                     when (action) {
-                        is VideoSectionMenuAction.VideoSectionUnhideAction -> {
-                            coroutineScope.launch {
-                                videoSectionViewModel.hideOrUnhideNodes(
-                                    nodeIds = videoSectionViewModel.getSelectedNodes()
-                                        .map { it.id },
-                                    hide = false,
-                                )
-                                videoSectionViewModel.clearAllSelectedVideos()
-                            }
-                        }
-
                         is VideoSectionMenuAction.VideoSectionSelectAllAction ->
                             if (tabState.selectedTab == VideoSectionTab.All) {
                                 videoSectionViewModel.selectAllNodes()

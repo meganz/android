@@ -15,6 +15,8 @@ internal fun VideoPlaylistDetailTopBar(
     title: String,
     isActionMode: Boolean,
     selectedSize: Int,
+    isHideMenuActionVisible: Boolean,
+    isUnhideMenuActionVisible: Boolean,
     onMenuActionClick: (VideoSectionMenuAction?) -> Unit,
     onBackPressed: () -> Unit,
 ) {
@@ -24,11 +26,17 @@ internal fun VideoPlaylistDetailTopBar(
             actions = if (selectedSize == 0) {
                 emptyList()
             } else {
-                listOf(
-                    VideoSectionMenuAction.VideoSectionRemoveAction,
-                    VideoSectionMenuAction.VideoSectionSelectAllAction,
-                    VideoSectionMenuAction.VideoSectionClearSelectionAction
-                )
+                mutableListOf<VideoSectionMenuAction>().apply {
+                    add(VideoSectionMenuAction.VideoSectionRemoveAction)
+                    add(VideoSectionMenuAction.VideoSectionSelectAllAction)
+                    add(VideoSectionMenuAction.VideoSectionClearSelectionAction)
+                    if (isHideMenuActionVisible) {
+                        add(VideoSectionMenuAction.VideoSectionHideAction)
+                    }
+                    if (isUnhideMenuActionVisible) {
+                        add(VideoSectionMenuAction.VideoSectionUnhideAction)
+                    }
+                }
             },
             onActionPressed = {
                 onMenuActionClick(it as? VideoSectionMenuAction)
