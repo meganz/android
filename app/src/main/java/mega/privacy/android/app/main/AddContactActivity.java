@@ -2409,7 +2409,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     int userStatus = megaChatApi.getUserOnlineStatus(handle);
                     if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
                         Timber.d("Request last green for user");
-                        megaChatApi.requestLastGreen(handle, null);
+                        megaChatApi.requestLastGreen(handle);
                     }
                 }
             }

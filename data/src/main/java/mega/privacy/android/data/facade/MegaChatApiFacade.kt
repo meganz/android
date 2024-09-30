@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.listener.IgnoredChatRequestListener
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
@@ -77,7 +78,9 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun retryPendingConnections(
         disconnect: Boolean,
         listener: MegaChatRequestListenerInterface?,
-    ) = chatApi.retryPendingConnections(disconnect, listener)
+    ) = listener?.let {
+        chatApi.retryPendingConnections(disconnect, it)
+    } ?: chatApi.retryPendingConnections(disconnect)
 
     override val chatUpdates: Flow<ChatUpdate>
         get() = callbackFlow {
@@ -202,7 +205,7 @@ internal class MegaChatApiFacade @Inject constructor(
     }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
     override suspend fun requestLastGreen(userHandle: Long) =
-        chatApi.requestLastGreen(userHandle, null)
+        chatApi.requestLastGreen(userHandle)
 
     override fun createChat(
         isGroup: Boolean,
@@ -417,7 +420,9 @@ internal class MegaChatApiFacade @Inject constructor(
         chatId: Long,
         userHandle: Long,
         listener: MegaChatRequestListenerInterface?,
-    ) = chatApi.inviteToChat(chatId, userHandle, MegaChatPeerList.PRIV_STANDARD, listener)
+    ) = listener?.let {
+        chatApi.inviteToChat(chatId, userHandle, MegaChatPeerList.PRIV_STANDARD, it)
+    } ?: chatApi.inviteToChat(chatId, userHandle, MegaChatPeerList.PRIV_STANDARD)
 
     override fun openChatPreview(
         link: String,
@@ -723,7 +728,7 @@ internal class MegaChatApiFacade @Inject constructor(
         chatApi.isAudioLevelMonitorEnabled(chatId)
 
     override suspend fun enableAudioLevelMonitor(enable: Boolean, chatId: Long) {
-        chatApi.enableAudioLevelMonitor(enable, chatId, null)
+        chatApi.enableAudioLevelMonitor(enable, chatId, IgnoredChatRequestListener)
     }
 
     override fun raiseHandToSpeak(

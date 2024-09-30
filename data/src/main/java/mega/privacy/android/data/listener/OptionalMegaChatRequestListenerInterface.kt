@@ -12,19 +12,19 @@ class OptionalMegaChatRequestListenerInterface(
     private val onRequestStart: ((MegaChatRequest) -> Unit)? = null,
     private val onRequestUpdate: ((MegaChatRequest) -> Unit)? = null,
     private val onRequestTemporaryError: ((MegaChatRequest, MegaChatError) -> Unit)? = null,
-    private val onRequestFinish: ((MegaChatRequest, MegaChatError) -> Unit)? = null
+    private val onRequestFinish: ((MegaChatRequest, MegaChatError) -> Unit)? = null,
 ) : MegaChatRequestListenerInterface {
 
     override fun onRequestStart(
         api: MegaChatApiJava,
-        request: MegaChatRequest
+        request: MegaChatRequest,
     ) {
         onRequestStart?.invoke(request)
     }
 
     override fun onRequestUpdate(
         api: MegaChatApiJava,
-        request: MegaChatRequest
+        request: MegaChatRequest,
     ) {
         onRequestUpdate?.invoke(request)
     }
@@ -32,7 +32,7 @@ class OptionalMegaChatRequestListenerInterface(
     override fun onRequestTemporaryError(
         api: MegaChatApiJava,
         request: MegaChatRequest,
-        error: MegaChatError
+        error: MegaChatError,
     ) {
         onRequestTemporaryError?.invoke(request, error)
     }
@@ -40,8 +40,16 @@ class OptionalMegaChatRequestListenerInterface(
     override fun onRequestFinish(
         api: MegaChatApiJava,
         request: MegaChatRequest,
-        error: MegaChatError
+        error: MegaChatError,
     ) {
         onRequestFinish?.invoke(request, error)
     }
 }
+
+/**
+ * Returns a dummy instance of OptionalMegaChatRequestListenerInterface.
+ *
+ * Can be used where a listener instance is required but there is no need to listen to any events.
+ * Use this instead of setting the listener to null if a non-listener based SDK API doesn't exist.
+ */
+val IgnoredChatRequestListener get() = OptionalMegaChatRequestListenerInterface()

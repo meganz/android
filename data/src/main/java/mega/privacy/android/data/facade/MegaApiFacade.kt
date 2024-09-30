@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.IgnoredRequestListener
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
@@ -1349,7 +1350,7 @@ internal class MegaApiFacade @Inject constructor(
         get() = megaApi.currentUploadSpeed
 
     override suspend fun setNodeCoordinates(node: MegaNode, latitude: Double, longitude: Double) =
-        megaApi.setNodeCoordinates(node, latitude, longitude, null)
+        megaApi.setNodeCoordinates(node, latitude, longitude, IgnoredRequestListener)
 
     override suspend fun createThumbnail(imagePath: String, destinationPath: String) =
         megaApi.createThumbnail(imagePath, destinationPath)

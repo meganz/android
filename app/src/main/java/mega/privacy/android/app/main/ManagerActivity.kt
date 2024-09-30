@@ -909,7 +909,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         CacheFolderManager.createCacheFolders()
         checkChatChanges()
         Timber.d("retryChatPendingConnections()")
-        megaChatApi.retryPendingConnections(false, null)
+        megaChatApi.retryPendingConnections(false)
 
         val display: Display = windowManager.defaultDisplay
         display.getMetrics(outMetrics)
@@ -4717,7 +4717,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         typesCameraPermission = Constants.INVALID_TYPE_PERMISSIONS
         megaApi.retryPendingConnections()
-        megaChatApi.retryPendingConnections(false, null)
+        megaChatApi.retryPendingConnections(false)
         return when (item.itemId) {
             android.R.id.home -> {
                 if (isFirstNavigationLevel) {

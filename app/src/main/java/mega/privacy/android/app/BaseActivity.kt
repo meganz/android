@@ -673,7 +673,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         Timber.d("retryConnectionsAndSignalPresence")
         try {
             megaApi.retryPendingConnections()
-            megaChatApi.retryPendingConnections(false, null)
+            megaChatApi.retryPendingConnections(false)
 
             if (megaChatApi.presenceConfig != null && !megaChatApi.presenceConfig.isPending) {
                 delaySignalPresence = false

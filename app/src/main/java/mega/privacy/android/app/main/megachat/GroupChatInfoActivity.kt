@@ -402,7 +402,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 participants.add(participant)
                 val userStatus = ChatUtil.getUserStatus(peerHandle)
                 if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
-                    megaChatApi.requestLastGreen(participant.handle, null)
+                    megaChatApi.requestLastGreen(participant.handle)
                 }
             }
 

@@ -82,9 +82,6 @@ internal class SyncGatewayImpl @Inject constructor(
                 null,
                 requestListener
             )
-            continuation.invokeOnCancellation {
-                megaApi.removeRequestListener(requestListener)
-            }
         }
 
     override suspend fun getFolderPairs(): MegaSyncList =

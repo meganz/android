@@ -17,19 +17,19 @@ class OptionalMegaRequestListenerInterface(
     private val onRequestStart: ((MegaRequest) -> Unit)? = null,
     private val onRequestUpdate: ((MegaRequest) -> Unit)? = null,
     private val onRequestTemporaryError: ((MegaRequest, MegaError) -> Unit)? = null,
-    private val onRequestFinish: ((MegaRequest, MegaError) -> Unit)? = null
+    private val onRequestFinish: ((MegaRequest, MegaError) -> Unit)? = null,
 ) : MegaRequestListenerInterface {
 
     override fun onRequestStart(
         api: MegaApiJava,
-        request: MegaRequest
+        request: MegaRequest,
     ) {
         onRequestStart?.invoke(request)
     }
 
     override fun onRequestUpdate(
         api: MegaApiJava,
-        request: MegaRequest
+        request: MegaRequest,
     ) {
         onRequestUpdate?.invoke(request)
     }
@@ -37,7 +37,7 @@ class OptionalMegaRequestListenerInterface(
     override fun onRequestTemporaryError(
         api: MegaApiJava,
         request: MegaRequest,
-        error: MegaError
+        error: MegaError,
     ) {
         onRequestTemporaryError?.invoke(request, error)
     }
@@ -45,8 +45,17 @@ class OptionalMegaRequestListenerInterface(
     override fun onRequestFinish(
         api: MegaApiJava,
         request: MegaRequest,
-        error: MegaError
+        error: MegaError,
     ) {
         onRequestFinish?.invoke(request, error)
     }
 }
+
+
+/**
+ * Returns a dummy instance of OptionalMegaRequestListenerInterface.
+ *
+ * Can be used where a listener instance is required but there is no need to listen to any events.
+ * Use this instead of setting the listener to null if a non-listener based SDK API doesn't exist.
+ */
+val IgnoredRequestListener get() = OptionalMegaRequestListenerInterface()

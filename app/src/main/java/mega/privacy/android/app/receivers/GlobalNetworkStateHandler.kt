@@ -40,11 +40,11 @@ class GlobalNetworkStateHandler @Inject constructor(
                         if (previousIP == null || currentIP.compareTo(previousIP) != 0) {
                             Timber.d("Reconnecting...")
                             megaApi.reconnect()
-                            megaChatApi.retryPendingConnections(true, null)
+                            megaChatApi.retryPendingConnections(true)
                         } else {
                             Timber.d("Retrying pending connections...")
                             megaApi.retryPendingConnections()
-                            megaChatApi.retryPendingConnections(false, null)
+                            megaChatApi.retryPendingConnections(false)
                         }
                     }
                     runCatching {
