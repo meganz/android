@@ -281,9 +281,19 @@ def setFeatureFlag(String featureFlagFile, String flagName, boolean flagValue) {
  * Compose the failure message of "deliver_appStore" command, which might be used for Slack or GitLab MR.
  * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
  * while GitLab MR uses "<br/>".
- * @return The success message to be sent
+ * @return The failure message to be sent
  */
 String releaseFailureMessage(String lineBreak) {
+    return releaseFailureMessage(lineBreak, "")
+}
+
+/**
+ * A variant of releaseFailureMessage method
+ * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
+ * @param postfix additional message to be appended to the end of the message
+ * @return The failure message to be sent
+ */
+String releaseFailureMessage(String lineBreak, String postfix) {
     String message = ":x: Android Release Failed!" +
             "${lineBreak}Branch:\t${gitlabSourceBranch}" +
             "${lineBreak}Author:\t${gitlabUserName}" +
@@ -292,6 +302,9 @@ String releaseFailureMessage(String lineBreak) {
         message += "${lineBreak}Trigger Reason: git PUSH"
     } else if (env.gitlabActionType == "NOTE") {
         message += "${lineBreak}Trigger Reason: MR comment (${gitlabTriggerPhrase})"
+    }
+    if (!postfix.isEmpty()) {
+        message += "${lineBreak}${postfix}"
     }
     return message
 }
