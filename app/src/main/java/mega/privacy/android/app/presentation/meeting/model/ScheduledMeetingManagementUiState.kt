@@ -40,6 +40,7 @@ import java.time.ZonedDateTime
  * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
  * @property meetingLinkCreated
  * @property myFullName
+ * @property meetingLinkAction
  * @constructor Create empty Scheduled meeting management state
  *
  */
@@ -67,6 +68,7 @@ data class ScheduledMeetingManagementUiState(
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
     val meetingLinkCreated: StateEvent = consumed,
     val myFullName: String = "",
+    val meetingLinkAction: StateEventWithContent<ShareLinkOption> = consumed(),
 ) {
 
     /**
@@ -148,4 +150,19 @@ data class ScheduledMeetingManagementUiState(
          */
         const val FREE_PLAN_DURATION_LIMIT_IN_MINUTES = 60
     }
+}
+
+/**
+ * Share link option
+ */
+enum class ShareLinkOption {
+    /**
+     * Send link to chat
+     */
+    SendLinkToChat,
+
+    /**
+     * Share link
+     */
+    ShareLink
 }

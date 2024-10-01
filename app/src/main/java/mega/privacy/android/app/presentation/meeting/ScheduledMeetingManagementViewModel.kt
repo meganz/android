@@ -24,6 +24,7 @@ import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
+import mega.privacy.android.app.presentation.meeting.model.ShareLinkOption
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
@@ -838,7 +839,6 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
         _state.update { it.copy(meetingLinkCreated = consumed) }
     }
 
-
     /**
      * Set meeting link and start/end time
      */
@@ -849,6 +849,20 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     ) {
         _state.update { it.copy(meetingLink = link, chatId = chatId, title = title) }
         getScheduledMeeting()
+    }
+
+    /**
+     * Share meeting link
+     */
+    fun onMeetingLinkShare(option: ShareLinkOption) {
+        _state.update { it.copy(meetingLinkAction = triggered(option)) }
+    }
+
+    /**
+     * Reset and notify that meeting link share is consumed
+     */
+    fun onMeetingLinkShareConsumed() {
+        _state.update { it.copy(meetingLinkAction = consumed()) }
     }
 
     /**

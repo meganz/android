@@ -10,12 +10,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -26,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedWithoutBackgroundMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -34,6 +34,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.mobile.analytics.event.ShareLinkDialogEvent
 
 /**
  * Contact info bottom sheet
@@ -71,15 +72,18 @@ internal fun MeetingLinkBottomSheet(
 }
 
 @Composable
-private fun MeetingLinkView(
+internal fun MeetingLinkView(
     onSendLinkToChat: () -> Unit,
     onShareLink: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    LaunchedEffect(Unit) {
+        Analytics.tracker.trackEvent(ShareLinkDialogEvent)
+    }
     Column(
-        modifier = modifier.padding(vertical = 20.dp)
-            .testTag("meeting_list:share_link")
-            .verticalScroll(rememberScrollState()),
+        modifier = modifier
+            .padding(vertical = 20.dp)
+            .testTag("meeting_list:share_link"),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -98,7 +102,7 @@ private fun MeetingLinkView(
 
         MegaText(
             text = stringResource(R.string.scheduled_meetings_share_meeting_link_panel_title),
-            style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.W500),
+            style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.W500),
             textColor = TextColor.Secondary,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 10.dp, start = 50.dp, end = 50.dp)
