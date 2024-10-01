@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.settingsFragments.cookie
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.text.method.LinkMovementMethod
@@ -14,7 +15,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.app.utils.ContextUtils.isValid
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
@@ -47,6 +48,7 @@ class CookieDialogHandler @Inject constructor(
     private val broadcastCookieSettingsSavedUseCase: BroadcastCookieSettingsSavedUseCase,
     private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
     private val getCookieDialogUseCase: GetCookieDialogUseCase,
+    private val googleAdsManager: GoogleAdsManager,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
@@ -105,7 +107,7 @@ class CookieDialogHandler @Inject constructor(
             .setCancelable(false)
             .setView(R.layout.dialog_cookie_alert)
             .setPositiveButton(context.getString(R.string.preference_cookies_accept)) { _, _ ->
-                acceptAllCookies()
+                acceptAllCookies(context)
             }
             .setNegativeButton(context.getString(R.string.settings_about_cookie_settings)) { _, _ ->
                 context.startActivity(Intent(context, CookiePreferencesActivity::class.java))
@@ -139,7 +141,7 @@ class CookieDialogHandler @Inject constructor(
             .setCancelable(false)
             .setView(R.layout.dialog_cookie_alert)
             .setPositiveButton(context.getString(R.string.preference_cookies_accept)) { _, _ ->
-                acceptAllCookies()
+                acceptAllCookies(context)
             }
             .setNegativeButton(context.getString(R.string.settings_about_cookie_settings)) { _, _ ->
                 context.startActivity(Intent(context, CookiePreferencesActivity::class.java))
@@ -167,7 +169,7 @@ class CookieDialogHandler @Inject constructor(
             }.also { it.show() }
     }
 
-    private fun acceptAllCookies() {
+    private fun acceptAllCookies(context: Context) {
         applicationScope.launch {
             runCatching {
                 // If the user accepts all cookies, we will enable all the cookies,
@@ -180,6 +182,10 @@ class CookieDialogHandler @Inject constructor(
                 updateCookieSettingsUseCase(enabledCookies)
                 broadcastCookieSettingsSavedUseCase(enabledCookies)
                 updateCrashAndPerformanceReportersUseCase()
+                googleAdsManager.checkForAdsAvailability()
+                if (googleAdsManager.isAdsEnabled() && context is Activity) {
+                    googleAdsManager.checkLatestConsentInformation(activity = context)
+                }
             }.onFailure { Timber.e("failed to accept all cookies: $it") }
         }
     }

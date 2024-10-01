@@ -54,7 +54,8 @@ class CookieSettingsFragment : SettingsBaseFragment(),
 
     private fun setupObservers() {
         collectFlow(viewModel.uiState) { uiState ->
-            showAdsCookiePreference = uiState.showAdsCookiePreference
+            //Ads cookie preference is temporarily disabled & hidden during Google Ads implementation
+            showAdsCookiePreference = false //uiState.showAdsCookiePreference
             adsCookiesPreference?.isVisible = showAdsCookiePreference
             updateAcceptCookiesPreference(showAdsCookiePreference)
             cookiePolicyLink =

@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase.setting
 
-import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.featureflag.ABTestFeature
 import mega.privacy.android.domain.entity.settings.cookie.CookieDialog
 import mega.privacy.android.domain.entity.settings.cookie.CookieDialogType

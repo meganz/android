@@ -82,9 +82,7 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.work.WorkManager
 import com.anggrayudi.storage.file.getAbsolutePath
 import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import com.google.android.gms.ads.admanager.AdManagerAdView
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
@@ -122,7 +120,6 @@ import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.extensions.isTablet
-import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -164,6 +161,7 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountActivity
+import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_CLOUD_SLOT_ID
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_HOME_SLOT_ID
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
@@ -490,6 +488,9 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     lateinit var crashReporter: CrashReporter
 
     @Inject
+    lateinit var googleAdsManager: GoogleAdsManager
+
+    @Inject
     @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
@@ -670,7 +671,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private val adView: AdManagerAdView by lazy {
         AdManagerAdView(this).apply {
             adUnitId = BuildConfig.AD_UNIT_ID
-            setAdSize(AD_SIZE)
+            setAdSize(googleAdsManager.AD_SIZE)
             adListener = object : AdListener() {
                 override fun onAdClicked() {
                     Timber.d("Ad clicked")
@@ -892,7 +893,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         Timber.d("onCreate")
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
-
         Timber.d("onCreate after call super")
         registerViewModelObservers()
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
@@ -988,18 +988,16 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun checkForInAppAdvertisement() {
         lifecycleScope.launch {
             runCatching {
-                val isGoogleAdsFlagEnabled =
-                    getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
-                if (isGoogleAdsFlagEnabled) {
-                    if (this@ManagerActivity.isPortrait()) {
-                        setupAdsView()
-                    } else {
-                        hideAdsView()
-                    }
-                    adsViewModel.enableAdsFeature()
+                googleAdsManager.checkForAdsAvailability()
+                if (googleAdsManager.isAdsEnabled()) {
+                    setupAdsView()
+                    googleAdsManager.checkLatestConsentInformation(
+                        activity = this@ManagerActivity,
+                        onConsentInformationUpdated = { handleShowingAds("") }
+                    )
                 }
             }.onFailure {
-                Timber.e("Failed to fetch ab_adse / ff_adse flag with error: ${it.message}")
+                Timber.e("Failed to fetch latest consent information : ${it.message}")
             }
         }
     }
@@ -2447,7 +2445,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      */
     fun handleShowingAds(slotId: String) {
         //slotId is not used for now during the implementation of the new Ads SDK
-        if (this.isPortrait() && adsViewModel.isAdsFeatureEnabled()) {
+        if (this.isPortrait()) {
             fetchNewAd()
         } else {
             hideAdsView()
@@ -2463,8 +2461,9 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * Fetch a new Ad by creating new request
      */
     private fun fetchNewAd() {
-        val adRequest = AdManagerAdRequest.Builder().build()
-        adView.loadAd(adRequest)
+        googleAdsManager.fetchAdRequest()?.let {
+            adView.loadAd(it)
+        }
     }
 
     private fun showAdsView() {
@@ -2905,7 +2904,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     override fun onPause() {
         Timber.d("onPause")
         transfersManagement.isOnTransfersSection = false
-        adView?.pause()
+        adView.pause()
         super.onPause()
     }
 
@@ -2917,7 +2916,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         reconnectDialog?.cancel()
         dismissAlertDialogIfExists(processFileDialog)
         cookieDialogHandler.onDestroy()
-        adView?.destroy()
+        adView.destroy()
         super.onDestroy()
     }
 
@@ -7932,7 +7931,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     companion object {
-        val AD_SIZE = AdSize(320, 50)
         const val TRANSFERS_TAB = "TRANSFERS_TAB"
         private const val BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE =
             "BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE"

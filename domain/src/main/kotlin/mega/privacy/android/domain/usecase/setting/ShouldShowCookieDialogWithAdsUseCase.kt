@@ -18,7 +18,6 @@ class ShouldShowCookieDialogWithAdsUseCase @Inject constructor(
      *  Check if the cookie dialog should be shown with ads.
      *
      * @param cookieSettings Cookie settings.
-     * @param inAppAdvertisementFeature Feature flag to check if in-app ads are enabled.
      * @param isAdsEnabledFeature Feature flag to check if ads are enabled.
      * @param isExternalAdsEnabledFeature Feature flag to check if external ads are enabled.
      * @return True if cookie dialog should be shown with ads, false otherwise.
