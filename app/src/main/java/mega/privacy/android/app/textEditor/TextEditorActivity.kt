@@ -21,6 +21,7 @@ import android.view.MotionEvent
 import android.view.ViewPropertyAnimator
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -42,7 +43,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
-import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
+import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.Scrollable
@@ -60,7 +61,6 @@ import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MO
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
-import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.ANIMATION_DURATION
 import mega.privacy.android.app.utils.Constants.CHAT_ID
@@ -94,7 +94,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
@@ -185,10 +184,11 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdgeAndConsumeInsets()
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityTextFileEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        consumeInsetsWithToolbar(customToolbar = binding.fileEditorToolbar)
 
         lifecycleScope.launch {
             runCatching {
@@ -1098,24 +1098,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         }
 
         val scrolling = binding.fileEditorScrollView.canScrollVertically(SCROLLING_UP_DIRECTION)
-
-        when {
-            !scrolling -> {
-                binding.fileEditorToolbar.setBackgroundColor(transparentColor)
-                binding.appBar.elevation = 0f
-            }
-
-            isDarkMode(this) -> {
-                binding.fileEditorToolbar.setBackgroundColor(toolbarElevationColor)
-            }
-
-            else -> {
-                binding.fileEditorToolbar.setBackgroundColor(transparentColor)
-                binding.appBar.elevation = elevation
-            }
-        }
-
-        changeStatusBarColorForElevation(this, scrolling)
+        binding.fileEditorToolbar.elevation = if (scrolling) elevation else 0f
     }
 
     /**
