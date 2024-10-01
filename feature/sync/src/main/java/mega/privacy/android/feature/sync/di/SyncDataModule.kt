@@ -26,18 +26,22 @@ import mega.privacy.android.feature.sync.data.gateway.SyncWorkManagerGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncWorkManagerGatewayImpl
 import mega.privacy.android.feature.sync.data.gateway.UserPausedSyncGateway
 import mega.privacy.android.feature.sync.data.gateway.UserPausedSyncGatewayImpl
+import mega.privacy.android.feature.sync.data.gateway.notification.SyncNotificationGateway
+import mega.privacy.android.feature.sync.data.gateway.notification.SyncNotificationGatewayImpl
 import mega.privacy.android.feature.sync.data.gateway.syncPrefsDataStore
 import mega.privacy.android.feature.sync.data.gateway.syncPrefsDataStoreName
 import mega.privacy.android.feature.sync.data.gateway.syncPromotionDataStore
 import mega.privacy.android.feature.sync.data.gateway.syncPromotionDataStoreName
 import mega.privacy.android.feature.sync.data.repository.SyncDebrisRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncNewFolderParamsRepositoryImpl
+import mega.privacy.android.feature.sync.data.repository.SyncNotificationRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncPreferencesRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncPromotionPreferencesRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncSolvedIssuesRepositoryImpl
 import mega.privacy.android.feature.sync.domain.repository.SyncDebrisRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncNewFolderParamsRepository
+import mega.privacy.android.feature.sync.domain.repository.SyncNotificationRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncPreferencesRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncPromotionPreferencesRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
@@ -48,6 +52,14 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal interface SyncDataModule {
+
+    @Binds
+    @Singleton
+    fun bindSyncNotificationRepository(implementation: SyncNotificationRepositoryImpl): SyncNotificationRepository
+
+    @Binds
+    @Singleton
+    fun bindSyncNotificationGateway(implementation: SyncNotificationGatewayImpl): SyncNotificationGateway
 
     @Binds
     @Singleton
