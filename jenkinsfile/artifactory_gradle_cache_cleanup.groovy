@@ -60,7 +60,7 @@ pipeline {
                                 "ARTIFACTORY_USER=${ARTIFACTORY_USER}",
                                 "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}"
                         ]) {
-                            String daysToKeep = "3"
+                            String daysToKeep = "2"
                             sh """
                                 echo #### querying old cache files....
                                 curl -u ${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -X POST -k -H 'Content-Type:text/plain' ${ARTIFACTORY_BASE_URL}/artifactory/api/search/aql --data 'items.find({\"repo\": \"android-mega\",\"path\": {\"\$match\": \"*gradle-cache*\"},\"created\": {\"\$before\": \"${daysToKeep}d\"}})' > aql_results.json
