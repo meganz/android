@@ -40,7 +40,7 @@ internal class CacheRepositoryImpl @Inject constructor(
     override fun isFileInCacheDirectory(file: File) =
         cacheFolderGateway.isFileInCacheDirectory(file)
 
-    override fun getCacheFolderNameForUpload(isForChat: Boolean) =
+    override fun getCacheFolderNameForTransfer(isForChat: Boolean) =
         if (isForChat) {
             CacheFolderConstant.CHAT_TEMPORARY_FOLDER
         } else {

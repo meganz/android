@@ -133,6 +133,6 @@ class GetCacheFileForUploadUseCaseTest {
 
     private fun getCacheFolder(isChatUpload: Boolean) =
         (if (isChatUpload) "chatFolder" else "noChatFolder").also {
-            whenever(cacheRepository.getCacheFolderNameForUpload(isChatUpload)) doReturn it
+            whenever(cacheRepository.getCacheFolderNameForTransfer(isChatUpload)) doReturn it
         }
 }

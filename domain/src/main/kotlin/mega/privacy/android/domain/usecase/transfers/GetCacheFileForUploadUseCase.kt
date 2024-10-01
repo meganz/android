@@ -18,7 +18,7 @@ class GetCacheFileForUploadUseCase @Inject constructor(
      * @return a file in cache temporary folder that does not exist yet or null if not possible
      */
     operator fun invoke(file: File, isChatUpload: Boolean): File? =
-        (cacheRepository.getCacheFolderNameForUpload(isChatUpload)).let { folderName ->
+        (cacheRepository.getCacheFolderNameForTransfer(isChatUpload)).let { folderName ->
             getCacheFileUseCase(folderName, file.name)?.takeIf { !it.exists() }
                 ?: run {
                     (1..99).firstNotNullOfOrNull { suffix ->

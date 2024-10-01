@@ -99,13 +99,13 @@ class CacheRepositoryImplTest {
 
     @Test
     fun `test that correct name is returned for cache folder for uploads`() = runTest {
-        val actual = underTest.getCacheFolderNameForUpload(false)
+        val actual = underTest.getCacheFolderNameForTransfer(false)
         assertThat(actual).isEqualTo(CacheFolderConstant.TEMPORARY_FOLDER)
     }
 
     @Test
     fun `test that correct name is returned for cache folder for chat uploads`() = runTest {
-        val actual = underTest.getCacheFolderNameForUpload(true)
+        val actual = underTest.getCacheFolderNameForTransfer(true)
         assertThat(actual).isEqualTo(CacheFolderConstant.CHAT_TEMPORARY_FOLDER)
     }
 }
