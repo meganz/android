@@ -149,14 +149,30 @@ class AddContactViewModel @Inject constructor(
 
     fun checkSensitiveItems(handles: List<Long>) = viewModelScope.launch {
         if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
-            val hasSensitiveItems = handles.any { handle ->
+            var sensitiveType = 0
+
+            for (handle in handles) {
                 val nodeId = NodeId(handle)
                 val node = getNodeByIdUseCase(nodeId)
-                node != null && node is FolderNode && !node.isOutShare() && (node.isMarkedSensitive || node.isSensitiveInherited || hasSensitiveDescendantUseCase(nodeId))
+
+                if (node == null || node.isOutShare() || node !is FolderNode) continue
+
+                if (node.isMarkedSensitive || node.isSensitiveInherited) {
+                    sensitiveType = 1
+                    break
+                }
+
+                if (hasSensitiveDescendantUseCase(nodeId)) {
+                    sensitiveType = 2
+                }
             }
 
-            val count = 1.takeIf { hasSensitiveItems } ?: 0
-            _sensitiveItemsCount.value = if (handles.size > 1 && count > 0) count + 1 else count
+            if (sensitiveType == 1 && handles.size == 1) sensitiveType = 1
+            else if (sensitiveType == 1 && handles.size > 1) sensitiveType = 2
+            else if (sensitiveType == 2 && handles.size == 1) sensitiveType = 3
+            else if (sensitiveType == 2 && handles.size > 1) sensitiveType = 4
+
+            _sensitiveItemsCount.value = sensitiveType
         } else {
             _sensitiveItemsCount.value = 0
         }

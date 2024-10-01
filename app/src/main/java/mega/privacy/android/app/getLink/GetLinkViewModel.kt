@@ -63,7 +63,7 @@ class GetLinkViewModel @Inject constructor(
     private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
     private val _linkCopied: MutableStateFlow<Pair<String, String>?> = MutableStateFlow(null)
     private val _copyrightAgreed: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    private val _hasSensitiveItems: MutableStateFlow<Boolean?> = MutableStateFlow(null)
+    private val _hasSensitiveItems: MutableStateFlow<Int?> = MutableStateFlow(null)
     val linkCopied = _linkCopied.asStateFlow()
     val copyrightAgreed = _copyrightAgreed.asStateFlow()
     val hasSensitiveItemsFlow = _hasSensitiveItems.asStateFlow()
@@ -420,10 +420,15 @@ class GetLinkViewModel @Inject constructor(
         val node = megaApi.getNodeByHandle(handle)
         val nodeId = node?.let { NodeId(it.handle) }
 
-        _hasSensitiveItems.value =
-            node != null && nodeId != null && !node.isExported && (node.isMarkedSensitive
-                    || hasSensitiveInheritedUseCase(nodeId)
-                    || (node.isFolder && hasSensitiveDescendantUseCase(nodeId)))
+        if (node == null || nodeId == null || node.isExported) {
+            _hasSensitiveItems.value = 0
+        } else if (node.isMarkedSensitive || hasSensitiveInheritedUseCase(nodeId)) {
+            _hasSensitiveItems.value = 1
+        } else if (node.isFolder && hasSensitiveDescendantUseCase(nodeId)) {
+            _hasSensitiveItems.value = 2
+        } else {
+            _hasSensitiveItems.value = 0
+        }
     }
 
     fun clearSensitiveItemCheck() {

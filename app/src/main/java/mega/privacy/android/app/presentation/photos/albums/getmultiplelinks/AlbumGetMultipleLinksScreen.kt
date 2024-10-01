@@ -175,7 +175,7 @@ fun AlbumGetMultipleLinksScreen(
     if (!state.showCopyright && state.showSharingSensitiveWarning) {
         ConfirmationDialog(
             title = stringResource(id = sharedR.string.hidden_items),
-            text = stringResource(id = R.string.hidden_nodes_sharing_album),
+            text = stringResource(id = sharedR.string.hidden_nodes_sharing_albums),
             confirmButtonText = stringResource(id = R.string.button_continue),
             cancelButtonText = stringResource(id = R.string.button_cancel),
             dismissOnClickOutside = false,

@@ -672,6 +672,8 @@
     <string name="account_cancel_subscription_survey_minimum_character_limit">Message must be at least 10 characters</string>
     <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
     <string name="account_cancel_subscription_survey_enter_details">Enter details</string>
+    <!-- Hidden nodes sharing albums -->
+    <string name="hidden_nodes_sharing_albums">There are hidden items in one or more of these albums. Sharing the albums will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
     <!-- the bonus title of join without account on left meeting page-->
     <string name="meeting_guest_left_meeting_bonus_title">Get free cloud storage</string>
     <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->

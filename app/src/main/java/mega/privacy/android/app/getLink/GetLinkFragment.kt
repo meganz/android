@@ -278,9 +278,9 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
 
         viewModel.hasSensitiveItemsFlow
             .filterNotNull()
-            .onEach { hasSensitiveItems ->
-                if (hasSensitiveItems) {
-                    showSharingSensitiveItemsWarningDialog()
+            .onEach { sensitiveType ->
+                if (sensitiveType > 0) {
+                    showSharingSensitiveItemsWarningDialog(sensitiveType)
                 } else {
                     initNode()
 
@@ -675,11 +675,15 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         viewModel.setElevation(withElevation)
     }
 
-    private fun showSharingSensitiveItemsWarningDialog() {
+    private fun showSharingSensitiveItemsWarningDialog(type: Int) {
         val context = context ?: return
         MaterialAlertDialogBuilder(context)
             .setTitle(getString(sharedR.string.hidden_item))
-            .setMessage(getString(sharedR.string.share_hidden_item_link_description))
+            .setMessage(
+                getString(sharedR.string.share_hidden_item_link_description).takeIf {
+                    type == 1
+                } ?: getString(sharedR.string.share_hidden_folder_description)
+            )
             .setCancelable(false)
             .setPositiveButton(R.string.button_continue) { _, _ ->
                 initNode()

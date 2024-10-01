@@ -111,9 +111,9 @@ class GetSeveralLinksFragment : Fragment() {
 
         viewModel.hasSensitiveItemsFlow
             .filterNotNull()
-            .onEach { hasSensitiveItems ->
-                if (hasSensitiveItems) {
-                    showSharingSensitiveItemsWarningDialog()
+            .onEach { sensitiveType ->
+                if (sensitiveType > 0) {
+                    showSharingSensitiveItemsWarningDialog(sensitiveType)
                 } else {
                     initNodes()
 
@@ -127,11 +127,15 @@ class GetSeveralLinksFragment : Fragment() {
         viewModel.checkSensitiveItems(handles.toList())
     }
 
-    private fun showSharingSensitiveItemsWarningDialog() {
+    private fun showSharingSensitiveItemsWarningDialog(sensitiveType: Int) {
         val context = context ?: return
         MaterialAlertDialogBuilder(context)
             .setTitle(getString(sharedR.string.hidden_items))
-            .setMessage(getString(sharedR.string.share_hidden_item_links_description))
+            .setMessage(
+                getString(sharedR.string.share_hidden_item_links_description).takeIf {
+                    sensitiveType == 1
+                } ?: getString(sharedR.string.share_hidden_folders_description)
+            )
             .setCancelable(false)
             .setPositiveButton(R.string.button_continue) { _, _ ->
                 initNodes()

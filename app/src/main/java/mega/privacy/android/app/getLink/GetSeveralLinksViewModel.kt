@@ -62,7 +62,7 @@ class GetSeveralLinksViewModel @Inject constructor(
 
     private val thumbFolder by lazy { getThumbFolder(MegaApplication.getInstance()) }
 
-    private val _hasSensitiveItems: MutableStateFlow<Boolean?> = MutableStateFlow(null)
+    private val _hasSensitiveItems: MutableStateFlow<Int?> = MutableStateFlow(null)
     val hasSensitiveItemsFlow = _hasSensitiveItems.asStateFlow()
 
     private var isInitialized = false
@@ -250,14 +250,25 @@ class GetSeveralLinksViewModel @Inject constructor(
         ?.joinToString(separator = "\n", postfix = "\n") ?: ""
 
     fun checkSensitiveItems(handles: List<Long>) = viewModelScope.launch {
-        _hasSensitiveItems.value = handles.any { handle ->
+        var sensitiveType = 0
+
+        for (handle in handles) {
             val node = megaApi.getNodeByHandle(handle)
             val nodeId = node?.let { NodeId(it.handle) }
 
-            node != null && nodeId != null && !node.isExported && (node.isMarkedSensitive
-                    || hasSensitiveInheritedUseCase(nodeId)
-                    || (node.isFolder && hasSensitiveDescendantUseCase(nodeId)))
+            if (node == null || nodeId == null || node.isExported) continue
+
+            if (node.isMarkedSensitive || hasSensitiveInheritedUseCase(nodeId)) {
+                sensitiveType = 1
+                break
+            }
+
+            if (node.isFolder && hasSensitiveDescendantUseCase(nodeId)) {
+                sensitiveType = 2
+            }
         }
+
+        _hasSensitiveItems.value = sensitiveType
     }
 
     fun clearSensitiveItemCheck() {

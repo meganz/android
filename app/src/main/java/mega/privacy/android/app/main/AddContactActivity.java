@@ -1471,12 +1471,12 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             }
         }
 
-        ViewExtensionsKt.collectFlow(this, viewModel.getSensitiveItemsCountFlow(), Lifecycle.State.STARTED, count -> {
-            if (count != null) {
-                if (count == 0) {
+        ViewExtensionsKt.collectFlow(this, viewModel.getSensitiveItemsCountFlow(), Lifecycle.State.STARTED, type -> {
+            if (type != null) {
+                if (type == 0) {
                     initialize(savedInstanceState);
                 } else {
-                    showSharingSensitiveItemsWarningDialog(savedInstanceState, count);
+                    showSharingSensitiveItemsWarningDialog(savedInstanceState, type);
                 }
                 viewModel.clearSensitiveItemsCheck();
             }
@@ -1772,17 +1772,24 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         observeFlow();
     }
 
-    private void showSharingSensitiveItemsWarningDialog(Bundle bundle, int count) {
+    private void showSharingSensitiveItemsWarningDialog(Bundle bundle, int type) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(AddContactActivity.this);
 
-        String title = count == 1 ?
+        String title = type % 2 == 1 ?
                 getString(mega.privacy.android.shared.resources.R.string.hidden_item) :
                 getString(mega.privacy.android.shared.resources.R.string.hidden_items);
         builder.setTitle(title);
 
-        String message = count == 1 ?
-                getString(mega.privacy.android.shared.resources.R.string.share_hidden_folder_description) :
-                getString(mega.privacy.android.shared.resources.R.string.share_hidden_folders_description);
+        String message = "";
+        if (type == 1) {
+            message = getString(mega.privacy.android.shared.resources.R.string.share_hidden_item_link_description);
+        } else if (type == 2) {
+            message = getString(mega.privacy.android.shared.resources.R.string.share_hidden_item_links_description);
+        } else if (type == 3) {
+            message = getString(mega.privacy.android.shared.resources.R.string.share_hidden_folder_description);
+        } else if (type == 4) {
+            message = getString(mega.privacy.android.shared.resources.R.string.share_hidden_folders_description);
+        }
         builder.setMessage(message);
 
         builder.setCancelable(false);
