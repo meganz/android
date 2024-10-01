@@ -3,9 +3,7 @@ package mega.privacy.android.feature.sync.ui.notification
 import android.app.Notification
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
@@ -18,12 +16,11 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-@HiltAndroidTest
 internal class SyncNotificationManagerTest {
 
     private lateinit var underTest: SyncNotificationManager
 
-    private lateinit var context: Context
+    private val context: Context = mock()
     private val notificationManagerCompat: NotificationManagerCompat = mock()
     private val createSyncNotificationIdUseCase: CreateSyncNotificationIdUseCase = mock()
     private val syncNotificationMapper: SyncNotificationMapper = mock()
@@ -31,7 +28,6 @@ internal class SyncNotificationManagerTest {
 
     @Before
     fun setUp() {
-        context = ApplicationProvider.getApplicationContext()
         underTest = SyncNotificationManager(
             notificationManagerCompat,
             syncNotificationMapper,
