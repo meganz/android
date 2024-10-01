@@ -64,5 +64,7 @@ class AlbumContentImageNodeFetcher @Inject constructor(
         const val CUSTOM_ALBUM_ID: String = "customAlbumId"
 
         const val ALBUM_SORT_TYPE: String = "albumSortType"
+
+        const val ALBUM_TITLE: String = "albumTitle"
     }
 }

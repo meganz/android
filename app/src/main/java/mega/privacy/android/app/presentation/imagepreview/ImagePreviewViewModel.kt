@@ -26,6 +26,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
+import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -796,7 +797,8 @@ class ImagePreviewViewModel @Inject constructor(
         imagePreviewVideoLauncher.launchVideoScreen(
             context = context,
             imageNode = imageNode,
-            source = imagePreviewFetcherSource
+            source = imagePreviewFetcherSource,
+            albumTitle = params.getString(AlbumContentImageNodeFetcher.ALBUM_TITLE),
         )
     }
 

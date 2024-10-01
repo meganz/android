@@ -39,6 +39,7 @@ class ImagePreviewVideoLauncher @Inject constructor(
         imageNode: ImageNode,
         source: ImagePreviewFetcherSource = ImagePreviewFetcherSource.DEFAULT,
         adapterType: Int = Constants.FROM_IMAGE_VIEWER,
+        albumTitle: String? = null,
     ) {
         runCatching {
             val viewType = if (source == ImagePreviewFetcherSource.ZIP) { //handle zip file
@@ -56,6 +57,7 @@ class ImagePreviewVideoLauncher @Inject constructor(
                     viewType = viewType,
                     handle = imageNode.id.longValue,
                     parentId = imageNode.parentId.longValue,
+                    collectionTitle = albumTitle
                 )
             } ?: run {
                 val typedFileNode = addImageTypeUseCase(imageNode)
@@ -68,7 +70,8 @@ class ImagePreviewVideoLauncher @Inject constructor(
                         context = context,
                         contentUri = contentUri,
                         fileNode = typedFileNode,
-                        viewType = viewType
+                        viewType = viewType,
+                        collectionTitle = albumTitle
                     )
                 }
             }

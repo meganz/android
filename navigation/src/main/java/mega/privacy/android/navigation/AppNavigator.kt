@@ -145,6 +145,7 @@ interface AppNavigator {
      * @param isMediaQueueAvailable whether the media queue is available
      * @param searchedItems the list of searched items, this is only used under the search mode
      * @param mediaQueueTitle the title of the media queue
+     * @param collectionTitle the title of the video collection
      */
     suspend fun openMediaPlayerActivityByFileNode(
         context: Context,
@@ -156,6 +157,7 @@ interface AppNavigator {
         isMediaQueueAvailable: Boolean = true,
         searchedItems: List<Long>? = null,
         mediaQueueTitle: String? = null,
+        collectionTitle: String? = null,
     )
 
     /**
@@ -172,6 +174,7 @@ interface AppNavigator {
      * @param isFolderLink whether the file is a folder link
      * @param isMediaQueueAvailable whether the media queue is available
      * @param searchedItems the list of searched items, this is only used under the search mode
+     * @param collectionTitle the title of the video collection
      */
     suspend fun openMediaPlayerActivityByLocalFile(
         context: Context,
@@ -185,6 +188,7 @@ interface AppNavigator {
         isFolderLink: Boolean = false,
         isMediaQueueAvailable: Boolean = true,
         searchedItems: List<Long>? = null,
+        collectionTitle: String? = null,
     )
 
     /**

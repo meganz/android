@@ -206,6 +206,12 @@ class AlbumContentFragment : Fragment() {
 
                     this[AlbumContentImageNodeFetcher.ALBUM_SORT_TYPE] =
                         albumContentViewModel.state.value.currentSort
+
+                    context?.let { ctx ->
+                        albumContentViewModel.state.value.uiAlbum?.title?.getTitleString(ctx)
+                    }?.also { albumTitle ->
+                        this[AlbumContentImageNodeFetcher.ALBUM_TITLE] = albumTitle
+                    }
                 }
                 val intent = ImagePreviewActivity.createIntent(
                     context = requireContext(),
