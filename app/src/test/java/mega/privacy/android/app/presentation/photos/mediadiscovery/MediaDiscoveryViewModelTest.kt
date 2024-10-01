@@ -8,19 +8,25 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeContentUri
@@ -38,6 +44,7 @@ import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
@@ -57,6 +64,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -66,6 +76,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
+import java.util.stream.Stream
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -100,6 +111,7 @@ class MediaDiscoveryViewModelTest {
     private val getPublicChildNodeFromIdUseCase = mock<GetPublicChildNodeFromIdUseCase>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
+    private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -150,7 +162,8 @@ class MediaDiscoveryViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
-            getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase
+            getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
+            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase
         )
     }
 
@@ -163,6 +176,7 @@ class MediaDiscoveryViewModelTest {
         whenever(savedStateHandle.get<Long>(any())) doReturn (null)
         whenever(savedStateHandle.get<Boolean>(any())) doReturn (null)
         whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)).thenReturn(true)
     }
 
     @BeforeEach
@@ -193,8 +207,61 @@ class MediaDiscoveryViewModelTest {
         getPublicChildNodeFromIdUseCase,
         monitorAccountDetailUseCase,
         monitorShowHiddenItemsUseCase,
-        getNodeContentUriByHandleUseCase
+        getNodeContentUriByHandleUseCase,
+        monitorStorageStateEventUseCase
     )
+
+    private fun provideStorageStateParameters(): Stream<Arguments> = Stream.of(
+        Arguments.of(
+            StorageState.Red,
+            StorageOverQuotaCapacity.FULL
+        ),
+        Arguments.of(
+            StorageState.Green,
+            null
+        ), Arguments.of(
+            StorageState.Orange,
+            null
+        ),
+        Arguments.of(
+            StorageState.Change,
+            null
+        ), Arguments.of(
+            StorageState.Change,
+            null
+        ), Arguments.of(
+            StorageState.Unknown,
+            null
+        ), Arguments.of(
+            StorageState.PayWall,
+            null
+        )
+    )
+
+
+    @ParameterizedTest(name = "when storage state is: {0} then storageCapacity is: {1}")
+    @MethodSource("provideStorageStateParameters")
+    fun `test that storageCapacity is updated correctly when monitorStorageStateEventUseCase is invoked`(
+        storageState: StorageState,
+        storageOverQuotaCapacity: StorageOverQuotaCapacity?,
+    ) = runTest {
+        val storageStateEvent = StorageStateEvent(
+            handle = 1L,
+            eventString = "",
+            number = 1L,
+            text = "",
+            type = EventType.Storage,
+            storageState = storageState
+        )
+        whenever(monitorStorageStateEventUseCase()).thenReturn(MutableStateFlow(storageStateEvent))
+        commonStub()
+        initViewModel()
+        advanceUntilIdle()
+        underTest.state.test {
+            assertThat(awaitItem().storageCapacity).isEqualTo(storageOverQuotaCapacity)
+        }
+    }
+
 
     @Test
     fun `test that start download node event is launched with correct value when on save to device is invoked with download worker feature flag is enabled`() =

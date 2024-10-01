@@ -7,6 +7,7 @@ import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -14,7 +15,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
@@ -25,7 +28,10 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.Node
@@ -43,6 +49,8 @@ import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -61,6 +69,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -68,6 +79,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.util.stream.Stream
 import kotlin.time.Duration.Companion.seconds
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -112,6 +124,8 @@ class FileBrowserViewModelTest {
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val accountDetailFakeFlow = MutableSharedFlow<AccountDetail>()
     private val shouldEnterMediaDiscoveryModeUseCase = mock<ShouldEnterMediaDiscoveryModeUseCase>()
+    private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -146,8 +160,67 @@ class FileBrowserViewModelTest {
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-            shouldEnterMediaDiscoveryModeUseCase = shouldEnterMediaDiscoveryModeUseCase
+            shouldEnterMediaDiscoveryModeUseCase = shouldEnterMediaDiscoveryModeUseCase,
+            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
+    }
+
+    private fun provideStorageStateParameters(): Stream<Arguments> = Stream.of(
+        Arguments.of(
+            StorageState.Red,
+            StorageOverQuotaCapacity.FULL
+        ),
+        Arguments.of(
+            StorageState.Green,
+            null
+        ), Arguments.of(
+            StorageState.Orange,
+            null
+        ),
+        Arguments.of(
+            StorageState.Change,
+            null
+        ), Arguments.of(
+            StorageState.Change,
+            null
+        ), Arguments.of(
+            StorageState.Unknown,
+            null
+        ), Arguments.of(
+            StorageState.PayWall,
+            null
+        )
+    )
+
+
+    @ParameterizedTest(name = "when storage state is: {0} then storageCapacity is: {1}")
+    @MethodSource("provideStorageStateParameters")
+    fun `test that storageCapacity is updated correctly when monitorStorageStateEventUseCase is invoked`(
+        storageState: StorageState,
+        storageOverQuotaCapacity: StorageOverQuotaCapacity?,
+    ) = runTest {
+        val storageStateEvent = StorageStateEvent(
+            handle = 1L,
+            eventString = "",
+            number = 1L,
+            text = "",
+            type = EventType.Storage,
+            storageState = storageState
+        )
+        runBlocking {
+            stubCommon()
+            whenever(monitorStorageStateEventUseCase()).thenReturn(
+                MutableStateFlow(
+                    storageStateEvent
+                )
+            )
+        }
+        initViewModel()
+        advanceUntilIdle()
+        underTest.state.test {
+            assertThat(awaitItem().storageCapacity).isEqualTo(storageOverQuotaCapacity)
+        }
     }
 
     @Test
@@ -622,6 +695,7 @@ class FileBrowserViewModelTest {
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
         whenever(shouldEnterMediaDiscoveryModeUseCase(any())).thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)).thenReturn(true)
     }
 
     @AfterEach
@@ -641,6 +715,8 @@ class FileBrowserViewModelTest {
             fileDurationMapper,
             monitorOfflineNodeUpdatesUseCase,
             monitorConnectivityUseCase,
+            monitorStorageStateEventUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 }

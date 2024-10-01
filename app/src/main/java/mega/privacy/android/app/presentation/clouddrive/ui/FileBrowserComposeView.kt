@@ -66,6 +66,7 @@ fun FileBrowserComposeView(
     onDismissClicked: () -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
+    onStorageFullWarningDismiss: () -> Unit,
 ) {
 
     var listStateMap by rememberSaveable(saver = ListGridStateMap.Saver) {
@@ -90,6 +91,14 @@ fun FileBrowserComposeView(
     ) {
         uiState.errorMessage?.let { errorMessage ->
             WarningBanner(textString = stringResource(id = errorMessage), onCloseClick = null)
+        }
+
+        uiState.storageCapacity?.let {
+            StorageOverQuotaBanner(
+                storageCapacity = it,
+                onStorageFullWarningDismiss = onStorageFullWarningDismiss,
+                onUpgradeClicked = onUpgradeClicked
+            )
         }
 
         val currentListState = listStateMap.getState(uiState.fileBrowserHandle)

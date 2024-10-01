@@ -64,6 +64,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.clouddrive.ui.StorageOverQuotaBanner
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryGlobalStateViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryViewModel
@@ -102,6 +103,8 @@ fun MediaDiscoveryView(
     mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = viewModel(),
     mediaDiscoveryViewModel: MediaDiscoveryViewModel = viewModel(),
     showSettingDialog: Boolean = false,
+    onStorageFullWarningDismiss: () -> Unit,
+    onUpgradeClicked: () -> Unit,
 ) {
     val mediaDiscoveryViewState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
     val hasUIPhoto = mediaDiscoveryViewState.uiPhotoList.isNotEmpty()
@@ -190,7 +193,9 @@ fun MediaDiscoveryView(
                             }
                         )
                     }
-                }
+                },
+                onStorageFullWarningDismiss = onStorageFullWarningDismiss,
+                onUpgradeClicked = onUpgradeClicked
             )
         } else {
             Box(modifier = Modifier.fillMaxSize()) {
@@ -424,6 +429,8 @@ private fun MDView(
     addFabButton: @Composable () -> Unit,
     photoDownloaderViewModel: PhotoDownloaderViewModel = viewModel(),
     showSettingDialog: Boolean = false,
+    onStorageFullWarningDismiss: () -> Unit,
+    onUpgradeClicked: () -> Unit,
 ) {
     val lazyGridState = rememberSaveable(
         mediaDiscoveryViewState.scrollStartIndex,
@@ -446,6 +453,13 @@ private fun MDView(
         Column(modifier = Modifier.fillMaxWidth()) {
             mediaDiscoveryViewState.errorMessage?.let { errorMessage ->
                 WarningBanner(textString = stringResource(id = errorMessage), onCloseClick = null)
+            }
+            mediaDiscoveryViewState.storageCapacity?.let {
+                StorageOverQuotaBanner(
+                    storageCapacity = it,
+                    onStorageFullWarningDismiss = onStorageFullWarningDismiss,
+                    onUpgradeClicked = onUpgradeClicked
+                )
             }
             if (showSettingDialog) {
                 MediaDiscoveryDialog(

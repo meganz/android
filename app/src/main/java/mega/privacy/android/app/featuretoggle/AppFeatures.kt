@@ -172,6 +172,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
+     * Enables full storage over quota banner
+     */
+    FullStorageOverQuotaBanner(
+        "Enable full storage over quota banner",
+        false
+    ),
+
+    /**
      * New import section
      */
     NewUploadDestinationActivity(

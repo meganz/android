@@ -123,6 +123,10 @@ class MediaDiscoveryFragment : Fragment() {
                             onStartModalSheetShow = this@MediaDiscoveryFragment::onStartModalSheetShow,
                             onEndModalSheetHide = this@MediaDiscoveryFragment::onEndModalSheetHide,
                             onModalSheetVisibilityChange = this@MediaDiscoveryFragment::onModalSheetVisibilityChange,
+                            onStorageFullWarningDismiss = {},
+                            onUpgradeClicked = {
+                                (activity as? ManagerActivity)?.navigateToUpgradeAccount()
+                            },
                         )
                     }
                 }

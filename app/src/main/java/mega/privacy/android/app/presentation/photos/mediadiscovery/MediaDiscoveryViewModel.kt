@@ -25,8 +25,10 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.FULL
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.PARAM_ERROR_MESSAGE
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
@@ -45,6 +47,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -62,6 +65,7 @@ import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
@@ -114,6 +118,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -137,6 +142,32 @@ class MediaDiscoveryViewModel @Inject constructor(
         loadSortRule()
         monitorPhotos()
         handleHiddenNodes()
+        monitorStorageOverQuotaCapacity()
+    }
+
+    private fun monitorStorageOverQuotaCapacity() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner).let { isFullStorageOverQuotaBannerEnabled ->
+                    if (isFullStorageOverQuotaBannerEnabled) {
+                        val storageCapacity =
+                            if (monitorStorageStateEventUseCase.getState() == StorageState.Red) {
+                                FULL
+                            } else {
+                                null
+                            }
+                        _state.update {
+                            it.copy(storageCapacity = storageCapacity)
+                        }
+                    }
+                }
+            }.onFailure { throwable ->
+                Timber.e(throwable.message)
+                _state.update {
+                    it.copy(storageCapacity = null)
+                }
+            }
+        }
     }
 
     private fun handleHiddenNodes() = viewModelScope.launch {

@@ -716,4 +716,14 @@
     <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Send link to chat</string>
     <!-- Button text of the share meeting link -->
     <string name="meetings_share_link_bottom_sheet_button_share_link">Share link</string>
+    <!-- Title for the inline warning banner when storage is almost full -->
+    <string name="account_storage_over_quota_inline_warning_banner_title">Your storage is almost full</string>
+    <!-- Title for the inline error banner when storage is full -->
+    <string name="account_storage_over_quota_inline_error_banner_title">Your storage is full</string>
+    <!-- Error Message indicating the user needs to upgrade now to get more storage -->
+    <string name="account_storage_over_quota_inline_error_banner_message">To keep uploading data, upgrade now to get more storage.</string>
+    <!-- Warning Message indicating the user needs to upgrade to get more storage -->
+    <string name="account_storage_over_quota_inline_warning_banner_message">To keep uploading data, upgrade to get more storage.</string>
+    <!-- Label for the upgrade action link -->
+    <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Upgrade now</string>
 </resources>

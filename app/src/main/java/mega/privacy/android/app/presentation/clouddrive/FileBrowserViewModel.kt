@@ -21,14 +21,18 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.extensions.updateItemAt
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
+import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.FULL
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.data.mapper.FileDurationMapper
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
@@ -44,6 +48,8 @@ import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -106,6 +112,8 @@ class FileBrowserViewModel @Inject constructor(
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val shouldEnterMediaDiscoveryModeUseCase: ShouldEnterMediaDiscoveryModeUseCase,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -132,6 +140,32 @@ class FileBrowserViewModel @Inject constructor(
         monitorAccountDetail()
         monitorIsHiddenNodesOnboarded()
         monitorShowHiddenItems()
+        monitorStorageOverQuotaCapacity()
+    }
+
+    private fun monitorStorageOverQuotaCapacity() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner).let { isFullStorageOverQuotaBannerEnabled ->
+                    if (isFullStorageOverQuotaBannerEnabled) {
+                        val storageCapacity =
+                            if (monitorStorageStateEventUseCase.getState() == StorageState.Red) {
+                                FULL
+                            } else {
+                                null
+                            }
+                        _state.update {
+                            it.copy(storageCapacity = storageCapacity)
+                        }
+                    }
+                }
+            }.onFailure { throwable ->
+                Timber.e(throwable.message)
+                _state.update {
+                    it.copy(storageCapacity = null)
+                }
+            }
+        }
     }
 
     private fun monitorConnectivity() {

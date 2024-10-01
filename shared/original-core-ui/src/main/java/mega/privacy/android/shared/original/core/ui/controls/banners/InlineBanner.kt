@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
@@ -48,7 +49,7 @@ private fun InlineBaseBanner(
         modifier = modifier
             .fillMaxWidth()
             .background(color = backgroundColor)
-            .padding(24.dp),
+            .padding(top = 24.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
     ) {
         Row {
             Icon(
@@ -67,7 +68,8 @@ private fun InlineBaseBanner(
                         end = 16.dp
                     )
                     .weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+
             ) {
                 MegaText(
                     text = title,
@@ -90,10 +92,11 @@ private fun InlineBaseBanner(
                         disabledBackgroundColor = Color.Transparent,
                         disabledContentColor = MegaOriginalTheme.colors.text.disabled,
                     ),
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp)
+                    contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp)
                 ) {
                     Text(
                         text = actionButtonText,
+                        textDecoration = TextDecoration.Underline,
                         color = MegaOriginalTheme.colors.support.info,
                         style = MaterialTheme.typography.button.copy(
                             fontWeight = FontWeight.Medium
@@ -122,7 +125,7 @@ private fun InlineBaseBanner(
  * Inline banner with warning style
  */
 @Composable
-internal fun InlineWarningBanner(
+fun InlineWarningBanner(
     title: String,
     message: String,
     actionButtonText: String,
@@ -147,7 +150,7 @@ internal fun InlineWarningBanner(
  * Inline banner with error style
  */
 @Composable
-internal fun InlineErrorBanner(
+fun InlineErrorBanner(
     title: String,
     message: String,
     actionButtonText: String,

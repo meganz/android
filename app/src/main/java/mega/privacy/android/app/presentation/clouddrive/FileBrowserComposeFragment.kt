@@ -236,6 +236,7 @@ class FileBrowserComposeFragment : Fragment() {
                             onLinkClicked = ::navigateToLink,
                             onDisputeTakeDownClicked = ::navigateToLink,
                             onDismissClicked = fileBrowserViewModel::onBannerDismissClicked,
+                            onStorageFullWarningDismiss = {},
                             onUpgradeClicked = {
                                 fileBrowserViewModel::onBannerDismissClicked
                                 (activity as? ManagerActivity)?.navigateToUpgradeAccount()
