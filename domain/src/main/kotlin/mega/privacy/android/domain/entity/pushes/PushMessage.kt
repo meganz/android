@@ -10,9 +10,10 @@ sealed class PushMessage {
     /**
      * Call push message
      *
+     * @property chatId
      * @constructor Create empty Call push message
      */
-    object CallPushMessage : PushMessage()
+    data class CallPushMessage(val chatId: Long) : PushMessage()
 
     /**
      * Chat push message

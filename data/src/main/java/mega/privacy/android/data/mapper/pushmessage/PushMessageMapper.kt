@@ -19,7 +19,11 @@ class PushMessageMapper @Inject constructor() {
      */
     operator fun invoke(data: Data): PushMessage? =
         when (data.getString(KEY_TYPE)) {
-            PUSH_TYPE_CALL -> PushMessage.CallPushMessage
+            PUSH_TYPE_CALL -> PushMessage.CallPushMessage(
+                chatId = data.getString(KEY_CHAT_ROOM_HANDLE)
+                    ?.base64ToUserHandle() ?: MegaChatApiJava.MEGACHAT_INVALID_HANDLE,
+            )
+
             PUSH_TYPE_CHAT -> {
                 PushMessage.ChatPushMessage(
                     shouldBeep = data.getString(KEY_CHAT_SILENT) != VALUE_NO_BEEP,

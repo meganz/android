@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationDataUseCase
 import mega.privacy.android.domain.usecase.notifications.PushReceivedUseCase
 import org.junit.Before
@@ -63,6 +64,7 @@ class PushMessageWorkerTest {
     private val backgroundFastLoginUseCase = mock<BackgroundFastLoginUseCase>()
     private val pushReceivedUseCase = mock<PushReceivedUseCase>()
     private val retryPendingConnectionsUseCase = mock<RetryPendingConnectionsUseCase>()
+    private val monitorChatCallUpdatesUseCase = mock<MonitorChatCallUpdatesUseCase>()
     private val pushMessageMapper = mock<PushMessageMapper>()
     private val initialiseMegaChatUseCase = mock<InitialiseMegaChatUseCase>()
     private val scheduledMeetingPushMessageNotificationManager =
@@ -107,6 +109,7 @@ class PushMessageWorkerTest {
             ),
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
             pushReceivedUseCase = pushReceivedUseCase,
+            monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             retryPendingConnectionsUseCase = retryPendingConnectionsUseCase,
             pushMessageMapper = pushMessageMapper,
             initialiseMegaChatUseCase = initialiseMegaChatUseCase,
@@ -124,7 +127,7 @@ class PushMessageWorkerTest {
         )
 
         whenever(notificationManager.notify(any(), any())).then(mock())
-        whenever(pushMessageMapper(any())).thenReturn(PushMessage.CallPushMessage)
+        whenever(pushMessageMapper(any())).thenReturn(PushMessage.CallPushMessage(chatId = 123L))
         whenever(notificationManager.areNotificationsEnabled()).thenReturn(false)
         whenever(callsPreferencesGateway.getCallsMeetingRemindersPreference())
             .thenReturn(flowOf(CallsMeetingReminders.Disabled))

@@ -21,7 +21,14 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
@@ -45,6 +52,7 @@ import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationDataUseCase
 import mega.privacy.android.domain.usecase.notifications.PushReceivedUseCase
 import timber.log.Timber
@@ -63,6 +71,7 @@ import timber.log.Timber
  *  @property notificationManager      Notification manager
  *  @property isChatNotifiableUseCase  Use case to check if a chat is notifiable
  *  @property getChatRoomUseCase       Use case to get a chat room
+ *  @property monitorChatCallUpdatesUseCase   Use case to monitor call updates
  *  @property fileDurationMapper      Mapper to convert file duration
  *  @property getChatMessageNotificationDataUseCase Use case to get chat message notification data
  *  @property chatMessageNotificationManager Use case to show a device Notification given a [ChatMessageNotificationData]
@@ -78,6 +87,7 @@ class PushMessageWorker @AssistedInject constructor(
     private val retryPendingConnectionsUseCase: RetryPendingConnectionsUseCase,
     private val pushMessageMapper: PushMessageMapper,
     private val initialiseMegaChatUseCase: InitialiseMegaChatUseCase,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val scheduledMeetingPushMessageNotificationManager: ScheduledMeetingPushMessageNotificationManager,
     private val promoPushNotificationManager: PromoPushNotificationManager,
     private val callsPreferencesGateway: CallsPreferencesGateway,
@@ -91,6 +101,11 @@ class PushMessageWorker @AssistedInject constructor(
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
 
+    /**
+     * Job to monitor chat call updates flow
+     */
+    private var monitorChatCallUpdatesJob: Job? = null
+
     @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
         // legacy support, other places need to know logging in happen
@@ -99,7 +114,17 @@ class PushMessageWorker @AssistedInject constructor(
             return@withContext Result.failure()
         }
 
-        val loginResult = runCatching { backgroundFastLoginUseCase() }
+        getPushMessageFromWorkerData(inputData)?.let {
+            if (it is CallPushMessage) {
+                runCatching {
+                    monitorChatCallUpdatesJob = monitorChatCallUpdates(it.chatId)
+                }
+            }
+        }
+
+        val loginResult = runCatching {
+            backgroundFastLoginUseCase()
+        }
 
         if (loginResult.isSuccess) {
             Timber.d("Fast login success.")
@@ -113,10 +138,12 @@ class PushMessageWorker @AssistedInject constructor(
                     }
                 }.onFailure { error ->
                     Timber.e("Initialise MEGAChat failed: $error")
+                    cancelJobs()
                     return@withContext Result.failure()
                 }
         } else {
             Timber.e("Fast login error: ${loginResult.exceptionOrNull()}")
+            cancelJobs()
             return@withContext Result.failure()
         }
 
@@ -127,6 +154,7 @@ class PushMessageWorker @AssistedInject constructor(
 
                     if (chatId == -1L || msgId == -1L) {
                         Timber.d("Message should be managed in onChatNotification")
+                        cancelJobs()
                         return@withContext Result.success()
                     }
 
@@ -134,8 +162,11 @@ class PushMessageWorker @AssistedInject constructor(
                         pushReceivedUseCase(shouldBeep)
                     }.onSuccess {
                         Timber.d("Push received success chatID: $chatId msgId:$msgId")
-                        if (!isChatNotifiableUseCase(chatId) || !areNotificationsEnabled())
+                        if (!isChatNotifiableUseCase(chatId) || !areNotificationsEnabled()) {
+                            cancelJobs()
                             return@with
+
+                        }
 
                         val data = getChatMessageNotificationDataUseCase(
                             shouldBeep,
@@ -144,6 +175,7 @@ class PushMessageWorker @AssistedInject constructor(
                             runCatching { DEFAULT_NOTIFICATION_URI.toString() }.getOrNull()
                         ) ?: return@withContext Result.failure()
 
+
                         chatMessageNotificationManager.show(
                             applicationContext,
                             data,
@@ -151,6 +183,7 @@ class PushMessageWorker @AssistedInject constructor(
                         )
                     }.onFailure { error ->
                         Timber.e(error)
+                        cancelJobs()
                         return@withContext Result.failure()
                     }
                 }
@@ -165,6 +198,7 @@ class PushMessageWorker @AssistedInject constructor(
                         )
                     }.onFailure { error ->
                         Timber.e(error)
+                        cancelJobs()
                         return@withContext Result.failure()
                     }
                 }
@@ -174,6 +208,7 @@ class PushMessageWorker @AssistedInject constructor(
                 runCatching { promoPushNotificationManager.show(applicationContext, pushMessage) }
                     .onFailure { error ->
                         Timber.e(error)
+                        cancelJobs()
                         return@withContext Result.failure()
                     }
             }
@@ -183,7 +218,8 @@ class PushMessageWorker @AssistedInject constructor(
             }
         }
 
-        Result.success()
+        cancelJobs()
+        return@withContext Result.success()
     }
 
     /**
@@ -259,6 +295,21 @@ class PushMessageWorker @AssistedInject constructor(
             ?.let { chatRoomTitle ->
                 copy(title = chatRoomTitle)
             } ?: this
+
+    /**
+     * Monitors and processes only the Camera Uploads Transfers
+     */
+    private fun CoroutineScope.monitorChatCallUpdates(chatIdPushMessage: Long) = launch {
+        monitorChatCallUpdatesUseCase()
+            .filter { it.chatId == chatIdPushMessage }
+            .distinctUntilChanged().collectLatest {
+                Timber.d("Call updated")
+            }
+    }
+
+    private suspend fun cancelJobs() {
+        monitorChatCallUpdatesJob?.cancelAndJoin()
+    }
 
     companion object {
         const val NOTIFICATION_CHANNEL_ID = 1086
