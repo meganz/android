@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -22,10 +22,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
@@ -47,15 +44,15 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.model.AuthenticityCredentialsState
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.original.core.ui.theme.grey_020
-import mega.privacy.android.shared.original.core.ui.theme.grey_800
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.yellow_100
 
@@ -65,7 +62,6 @@ import mega.privacy.android.shared.original.core.ui.theme.yellow_100
  * @param state           [AuthenticityCredentialsState]
  * @param onButtonClicked Action for button pressed.
  * @param onBackPressed   Action for on back pressed.
- * @param onScrollChange  Action for on scroll change.
  * @param onErrorShown    Action for doing after error was shown.
  */
 @Composable
@@ -73,25 +69,22 @@ fun AuthenticityCredentialsView(
     state: AuthenticityCredentialsState,
     onButtonClicked: () -> Unit,
     onBackPressed: () -> Unit,
-    onScrollChange: (Boolean) -> Unit,
     onErrorShown: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
-    val isScrolled = scrollState.value > 0
-    val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
 
-    Scaffold(
-        modifier = Modifier.systemBarsPadding(),
+    MegaScaffold(
+        modifier = Modifier.navigationBarsPadding(),
         scaffoldState = scaffoldState,
         topBar = {
-            SimpleTopAppBar(
-                titleId = R.string.contact_approve_credentials_toolbar_title,
-                elevation = isScrolled,
-                onBackPressed = onBackPressed
+            MegaAppBar(
+                appBarType = AppBarType.BACK_NAVIGATION,
+                title = stringResource(R.string.contact_approve_credentials_toolbar_title),
+                onNavigationPressed = onBackPressed
             )
         },
-        backgroundColor = if (MaterialTheme.colors.isLight) grey_020 else grey_800
+        scrollableContentState = scrollState
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -116,10 +109,6 @@ fun AuthenticityCredentialsView(
             }
         }
     }
-
-    SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
-
-    onScrollChange(isScrolled)
 }
 
 /**
@@ -363,7 +352,6 @@ fun PreviewAuthenticityCredentialsView(
         ),
             onButtonClicked = { },
             onBackPressed = { },
-            onScrollChange = { },
             onErrorShown = {})
     }
 }

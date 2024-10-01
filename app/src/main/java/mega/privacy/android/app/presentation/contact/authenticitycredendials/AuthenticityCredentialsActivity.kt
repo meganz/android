@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
@@ -70,7 +69,6 @@ class AuthenticityCredentialsActivity : ComponentActivity() {
     @Composable
     private fun AuthenticityCredentialsView() {
         val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
-        val isDark = themeMode.isDarkMode()
         val uiState by viewModel.state.collectAsState()
 
         OriginalTempTheme(isDark = themeMode.isDarkMode()) {
@@ -78,12 +76,8 @@ class AuthenticityCredentialsActivity : ComponentActivity() {
                 state = uiState,
                 onButtonClicked = viewModel::actionClicked,
                 onBackPressed = { finish() },
-                onScrollChange = { scrolled -> onScrollChange(scrolled, isDark) },
                 onErrorShown = viewModel::errorShown
             )
         }
     }
-
-    private fun onScrollChange(scrolled: Boolean, isDark: Boolean) =
-        changeStatusBarColor(scrolled = scrolled, isDark = isDark)
 }

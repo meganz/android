@@ -178,7 +178,6 @@ class AuthenticityCredentialsViewTest {
             AuthenticityCredentialsView(state = state,
                 onButtonClicked = onButtonClicked,
                 onBackPressed = {},
-                onScrollChange = {},
                 onErrorShown = {})
         }
     }
