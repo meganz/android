@@ -222,8 +222,8 @@ pipeline {
                                 common.downloadDependencyLibForSdk()
 
                                 util.useArtifactory() {
-                                    sh "./gradlew app:assembleGmsDebug 2>&1  | tee ${GMS_APK_BUILD_LOG}"
-                                    sh "./gradlew app:assembleGmsQa 2>&1  | tee ${QA_APK_BUILD_LOG}"
+                                    sh "./gradlew app:assembleGmsDebug --no-daemon 2>&1  | tee ${GMS_APK_BUILD_LOG}"
+                                    sh "./gradlew app:assembleGmsQa --no-daemon 2>&1  | tee ${QA_APK_BUILD_LOG}"
                                 }
 
                                 sh """
@@ -240,7 +240,7 @@ pipeline {
                                 util.useGitLab() {
                                     String htmlOutput = "mr-file-changes.html"
                                     try {
-                                        sh "./gradlew checkMergeRequestFileChanges --html-output $htmlOutput"
+                                        sh "./gradlew --no-daemon checkMergeRequestFileChanges --html-output $htmlOutput"
                                     } finally {
                                         MERGE_REQUEST_FILE_CHANGES_MESSAGE = getHtmlReport(htmlOutput, "")
                                     }
