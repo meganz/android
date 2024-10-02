@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.backup.BackupRemovalStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
@@ -428,7 +429,7 @@ interface CameraUploadsRepository {
      *
      * @param backupId id of the folder to be removed
      */
-    suspend fun removeBackupFolder(backupId: Long): Pair<Long, Int>
+    suspend fun removeBackupFolder(backupId: Long): BackupRemovalStatus
 
 
     /**

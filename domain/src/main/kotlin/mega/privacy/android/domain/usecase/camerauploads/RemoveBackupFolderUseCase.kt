@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
+import mega.privacy.android.domain.entity.backup.BackupRemovalStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.repository.CameraUploadsRepository
 import javax.inject.Inject
@@ -17,18 +18,9 @@ class RemoveBackupFolderUseCase @Inject constructor(private val cameraUploadsRep
      *
      * @param cameraUploadFolderType selects primary or secondary folder type
      */
-    suspend operator fun invoke(cameraUploadFolderType: CameraUploadFolderType) {
+    suspend operator fun invoke(cameraUploadFolderType: CameraUploadFolderType): BackupRemovalStatus? =
         cameraUploadsRepository.getBackupFolderId(cameraUploadFolderType)?.let {
-            val (backupId, code) = cameraUploadsRepository.removeBackupFolder(backupId = it)
-            if (code == OK_CODE) {
-                cameraUploadsRepository.deleteBackupById(backupId = backupId)
-            } else {
-                cameraUploadsRepository.setBackupAsOutdated(backupId = backupId)
-            }
+            cameraUploadsRepository.removeBackupFolder(backupId = it)
         }
-    }
 
-    companion object {
-        private const val OK_CODE = 0
-    }
 }

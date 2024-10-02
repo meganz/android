@@ -39,6 +39,7 @@ import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.backup.BackupRemovalStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
@@ -489,7 +490,14 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request: MegaRequest, error: MegaError ->
-                    continuation.resumeWith(Result.success(request.parentHandle to error.errorCode))
+                    continuation.resumeWith(
+                        Result.success(
+                            BackupRemovalStatus(
+                                backupId = request.parentHandle,
+                                isOutdated = error.errorCode != SUCCESS_RESPONSE
+                            ),
+                        ),
+                    )
                 },
             )
             megaApiGateway.removeBackup(backupId, listener)
@@ -602,5 +610,6 @@ internal class CameraUploadsRepositoryImpl @Inject constructor(
     private companion object {
         private const val SUB_STATE_NO_CHANGE = -1
         private const val TARGET_NODE_NO_CHANGE = -1L
+        private const val SUCCESS_RESPONSE = 0
     }
 }

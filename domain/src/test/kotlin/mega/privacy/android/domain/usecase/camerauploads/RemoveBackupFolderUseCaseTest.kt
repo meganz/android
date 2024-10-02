@@ -45,26 +45,6 @@ class RemoveBackupFolderUseCaseTest {
         verify(cameraUploadsRepository, never()).removeBackupFolder(any())
     }
 
-    @Test
-    fun `test that the backup folder is deleted from the database when removeBackupFolder return success response`() =
-        runTest {
-            whenever(cameraUploadsRepository.getBackupFolderId(any())).thenReturn(backupId)
-            whenever(cameraUploadsRepository.removeBackupFolder(backupId))
-                .thenReturn(Pair(backupId, 0))
-            underTest(cameraUploadFolderType = CameraUploadFolderType.Primary)
-            verify(cameraUploadsRepository).deleteBackupById(backupId)
-        }
-
-    @Test
-    fun `test that the backup folder is set as outdated when removeBackupFolder did not return success response`() {
-        runTest {
-            whenever(cameraUploadsRepository.getBackupFolderId(any())).thenReturn(backupId)
-            whenever(cameraUploadsRepository.removeBackupFolder(backupId))
-                .thenReturn(Pair(backupId, 120))
-            underTest(cameraUploadFolderType = CameraUploadFolderType.Primary)
-            verify(cameraUploadsRepository).setBackupAsOutdated(backupId)
-        }
-    }
 
     @Test
     fun `test that error is thrown when removeBackUpFolder throws some error`() = runTest {
