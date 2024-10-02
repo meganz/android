@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
@@ -672,8 +672,6 @@
     <string name="account_cancel_subscription_survey_minimum_character_limit">Message must be at least 10 characters</string>
     <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
     <string name="account_cancel_subscription_survey_enter_details">Enter details</string>
-    <!-- Hidden nodes sharing albums -->
-    <string name="hidden_nodes_sharing_albums">There are hidden items in one or more of these albums. Sharing the albums will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
     <!-- the bonus title of join without account on left meeting page-->
     <string name="meeting_guest_left_meeting_bonus_title">Get free cloud storage</string>
     <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
@@ -711,7 +709,7 @@
     <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
     <string name="device_center_sync_backup_upgrade_dialog_title">Upgrade your account</string>
     <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_message">Unlock the power to sync and backup your mobile to cloud storage with one of our premium plans</string>
+    <string name="device_center_sync_backup_upgrade_dialog_message">Unlock the power to sync and backup your mobile device to cloud storage with one of our premium plans</string>
     <!-- Title of the share meeting link bottom panel -->
     <string name="meetings_share_link_bottom_sheet_title">Meeting confirmed: Invite others to join</string>
     <!-- Button text of the send meeting link to chat -->
@@ -728,4 +726,6 @@
     <string name="account_storage_over_quota_inline_warning_banner_message">To keep uploading data, upgrade to get more storage.</string>
     <!-- Label for the upgrade action link -->
     <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Upgrade now</string>
+    <!-- Hidden nodes sharing albums -->
+    <string name="hidden_nodes_sharing_albums">There are hidden items in one or more of these albums. Sharing the albums will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
 </resources>

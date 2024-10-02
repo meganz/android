@@ -714,4 +714,30 @@
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
     <string name="document_scanning_confirmation_destination_chat">Dialogue en ligne</string>
+    <!-- Label for the button or menu option to add a sync -->
+    <string name="device_center_add_sync_button_option">Ajouter une synchronisation</string>
+    <!-- Label for the button or menu option to add a backup -->
+    <string name="device_center_add_backup_button_option">Ajouter une sauvegarde</string>
+    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_title">Surclassez votre compte</string>
+    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_message">Libérez la puissance de la synchronisation et de la sauvegarde de votre appareil mobile sur le stockage cloud avec l\’un de nos forfaits premium</string>
+    <!-- Title of the share meeting link bottom panel -->
+    <string name="meetings_share_link_bottom_sheet_title">Réunion confirmée&#160;: invitez d\’autres personnes à y participer</string>
+    <!-- Button text of the send meeting link to chat -->
+    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Envoyez un lien pour dialoguer en ligne</string>
+    <!-- Button text of the share meeting link -->
+    <string name="meetings_share_link_bottom_sheet_button_share_link">Partager le lien</string>
+    <!-- Title for the inline warning banner when storage is almost full -->
+    <string name="account_storage_over_quota_inline_warning_banner_title">Votre espace de stockage est presque saturé</string>
+    <!-- Title for the inline error banner when storage is full -->
+    <string name="account_storage_over_quota_inline_error_banner_title">Votre espace de stockage est saturé</string>
+    <!-- Error Message indicating the user needs to upgrade now to get more storage -->
+    <string name="account_storage_over_quota_inline_error_banner_message">Pour continuer à téléverser des données, surclassez votre compte maintenant pour obtenir plus d’espace de stockage.</string>
+    <!-- Warning Message indicating the user needs to upgrade to get more storage -->
+    <string name="account_storage_over_quota_inline_warning_banner_message">Pour continuer à téléverser des données, surclassez votre compte pour obtenir plus d’espace de stockage.</string>
+    <!-- Label for the upgrade action link -->
+    <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Surclasser le compte maintenant</string>
+    <!-- Hidden nodes sharing albums -->
+    <string name="hidden_nodes_sharing_albums">Des éléments cachés sont présents dans un ou plusieurs de ces albums. Partager les albums implique que les éléments cachés seront visibles par les personnes avec qui vous les partagez. Les éléments resteront cachés dans votre Disque nuagique.</string>
 </resources>

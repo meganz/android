@@ -533,7 +533,7 @@
     <!-- Label for cancellation instructions on a mobile device -->
     <string name="account_cancellation_instructions_on_mobile_device">Usando um dispositivo móvel</string>
     <!-- Step 1: instruction step no.1 to visit the MEGA website on the mobile device-->
-    <string name="account_cancellation_instructions_mobile_visit_website">1. Acesse [A]www.mega.nz[/A] no navegador.</string>
+    <string name="account_cancellation_instructions_mobile_visit_website">1. Acesse [A]www.mega.nz[/A] usando um navegador.</string>
     <!-- Step 2: instruction step no.2 to Log in to MEGA account on the mobile device from the browser-->
     <string name="account_cancellation_instructions_mobile_login_account">2. Faça login na sua conta do MEGA.</string>
     <!-- Step 3: instruction step no.3 Tap on the user avatar on the MEGA website from the mobile device-->
@@ -714,4 +714,30 @@
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
     <string name="document_scanning_confirmation_destination_chat">Chat</string>
+    <!-- Label for the button or menu option to add a sync -->
+    <string name="device_center_add_sync_button_option">Adicionar sincronização</string>
+    <!-- Label for the button or menu option to add a backup -->
+    <string name="device_center_add_backup_button_option">Adicionar backup</string>
+    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_title">Faça o upgrade da sua conta</string>
+    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_message">Libere o poder de sincronização e backup do seu dispositivo móvel na nuvem com um dos nossos planos pagos.</string>
+    <!-- Title of the share meeting link bottom panel -->
+    <string name="meetings_share_link_bottom_sheet_title">Reunião confirmada: convide outras pessoas para entrar</string>
+    <!-- Button text of the send meeting link to chat -->
+    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Enviar link ao chat</string>
+    <!-- Button text of the share meeting link -->
+    <string name="meetings_share_link_bottom_sheet_button_share_link">Obter link</string>
+    <!-- Title for the inline warning banner when storage is almost full -->
+    <string name="account_storage_over_quota_inline_warning_banner_title">O armazenamento da sua conta está quase cheio</string>
+    <!-- Title for the inline error banner when storage is full -->
+    <string name="account_storage_over_quota_inline_error_banner_title">O armazenamento da sua conta está cheio</string>
+    <!-- Error Message indicating the user needs to upgrade now to get more storage -->
+    <string name="account_storage_over_quota_inline_error_banner_message">Para continuar fazendo o upload de dados, faça um upgrade para obter mais armazenamento.</string>
+    <!-- Warning Message indicating the user needs to upgrade to get more storage -->
+    <string name="account_storage_over_quota_inline_warning_banner_message">Para continuar fazendo o upload de dados, faça um upgrade para obter mais armazenamento.</string>
+    <!-- Label for the upgrade action link -->
+    <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Fazer upgrade</string>
+    <!-- Hidden nodes sharing albums -->
+    <string name="hidden_nodes_sharing_albums">Há itens ocultos em um ou mais destes álbuns. Ao compartilhar os álbuns, os itens ocultos ficarão visíveis para as pessoas com as quais você o compartilhar, mas vão permanecer ocultos na sua Nuvem de arquivos.</string>
 </resources>

@@ -696,4 +696,30 @@
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
     <string name="document_scanning_confirmation_destination_chat">Obrolan</string>
+    <!-- Label for the button or menu option to add a sync -->
+    <string name="device_center_add_sync_button_option">Tambah sync</string>
+    <!-- Label for the button or menu option to add a backup -->
+    <string name="device_center_add_backup_button_option">Tambahkan cadangan</string>
+    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_title">Upgrade your account</string>
+    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_message">Unlock the power to sync and backup your mobile device to cloud storage with one of our premium plans</string>
+    <!-- Title of the share meeting link bottom panel -->
+    <string name="meetings_share_link_bottom_sheet_title">Meeting confirmed: Invite others to join</string>
+    <!-- Button text of the send meeting link to chat -->
+    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Send link to chat</string>
+    <!-- Button text of the share meeting link -->
+    <string name="meetings_share_link_bottom_sheet_button_share_link">Dapatkan tautan</string>
+    <!-- Title for the inline warning banner when storage is almost full -->
+    <string name="account_storage_over_quota_inline_warning_banner_title">Penyimpanan anda hampir penuh</string>
+    <!-- Title for the inline error banner when storage is full -->
+    <string name="account_storage_over_quota_inline_error_banner_title">Penyimpanan anda penuh</string>
+    <!-- Error Message indicating the user needs to upgrade now to get more storage -->
+    <string name="account_storage_over_quota_inline_error_banner_message">Untuk terus mengupload data, tingkatkan versi sekarang untuk mendapatkan lebih banyak penyimpanan.</string>
+    <!-- Warning Message indicating the user needs to upgrade to get more storage -->
+    <string name="account_storage_over_quota_inline_warning_banner_message">Untuk terus mengupload data, tingkatkan versi untuk mendapatkan lebih banyak penyimpanan.</string>
+    <!-- Label for the upgrade action link -->
+    <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Tingkatkan sekarang</string>
+    <!-- Hidden nodes sharing albums -->
+    <string name="hidden_nodes_sharing_albums">Ada item tersembunyi di satu atau lebih album ini. Berbagi album berarti bahwa item tersembunyi terlihat oleh orang-orang yang anda bagikan. Item masih akan disembunyikan di drive Cloud anda.</string>
 </resources>

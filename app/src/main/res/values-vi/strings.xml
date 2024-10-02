@@ -1783,7 +1783,7 @@
     <!-- Text button -->
     <string name="general_close">Đóng</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-factor authenticator app</string>
+    <string name="no_authentication_apps_title">App xác&#160;thực 2&#160;yếu&#160;tố</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Bạn có muốn tới CH Google Play để tải về một app lập xác thực hay không?</string>
     <!-- Label Play Store -->

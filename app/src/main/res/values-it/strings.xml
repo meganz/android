@@ -163,7 +163,7 @@
     <!-- when the user tries to share something to MEGA without being logged -->
     <string name="login_before_share">Accedi per condividere con MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
-    <string name="reg_link_expired">Your confirmation link is no longer valid. Your account may already be activated or you may have cancelled your signup.</string>
+    <string name="reg_link_expired">Il tuo link di conferma non è più valido. Il tuo account potrebbe essere stato già attivato o potresti aver annullato la tua registrazione.</string>
     <!-- First Name of the user -->
     <string name="first_name_text">Nome</string>
     <!-- Last name of the user -->
@@ -183,7 +183,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Le password non combaciano</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">This email address has already signed up for an account with MEGA</string>
+    <string name="error_email_registered">Questo indirizzo e-mail è già utilizzato da un altro account MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">Connessione al server: registrazione conto</string>
     <!--  -->
@@ -1386,7 +1386,7 @@
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">Installa la nostra app</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
-    <string name="title_regitration">Signup bonus</string>
+    <string name="title_regitration">Bonus di registrazione</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Installa un’app per desktop di MEGA</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -1400,7 +1400,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Come funziona</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invite your friends to sign up for a free MEGA account and to install a MEGA Mobile App. You will receive free storage as a bonus for every signup and app installation.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invita i tuoi amici a registrare un account gratuito su MEGA e ad installare una delle app per mobile di MEGA. Riceverai spazio di archiviazione gratuito come bonus per ogni registrazione e installazione dell\’app.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Bonus dello spazio di archiviazione applicabile ai nuovi inviti solo quando l\’app per mobile o per desktop di MEGA è installata.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -1416,7 +1416,7 @@
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">Hai ricevuto %1$s di spazio di archiviazione per aver installato l\’app per mobile di MEGA.</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="result_paragraph_info_achievement_registration">You have received %1$s storage space as your free signup bonus.</string>
+    <string name="result_paragraph_info_achievement_registration">Hai ricevuto %1$s di spazio di archiviazione gratuito come bonus per la tua registrazione.</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Condividi cartella</item>
@@ -1867,7 +1867,7 @@
     <!-- Text button -->
     <string name="general_close">Chiudi</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-factor authenticator app</string>
+    <string name="no_authentication_apps_title">App di autenticazione a due fattori</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Vuoi aprire il Google Play Store in modo da installare un\’app di autenticazione?</string>
     <!-- Label Play Store -->
@@ -1983,7 +1983,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Attiva o disattiva le versioni dei file per il tuo account.\nDisabilitare le versioni dei file non esclude che i tuoi contatti creino nuove versioni nelle cartelle condivise.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Search contacts or type email address</string>
+    <string name="type_mail">Cerca i contatti o digita l\’indirizzo email</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">Aggiungere %s ai tuoi contatti?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
@@ -2463,7 +2463,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Le tue foto nel cloud</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Camera uploads is an essential feature for any mobile device and we have got you covered. Sign up for an account now.</string>
+    <string name="content_tour_four">I Caricamenti da fotocamera sono una feature essenziale per qualsiasi dispositivo mobile e possiamo farlo per te. Registra un account adesso.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Inserisci la tua password</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -2557,7 +2557,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">Effettua il login in MEGA</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">Sign up for a MEGA account</string>
+    <string name="create_account_title">Registra un account MEGA</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Recenti</string>
     <!-- Label to reference a chats section -->
@@ -3761,7 +3761,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Il tuo account MEGA è stato sospeso a causa di ripetute accuse di violazione di copyright. Questo significa che non puoi accedere al tuo account o ai dati al suo interno.\nControlla la tua casella di posta elettronica per maggiori informazioni su come puoi inviare una contro-notifica.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Your account was terminated due to a breach of MEGA’s Terms of Service.\nYou will not be able to regain access to your stored data or be authorised to sign up for a new MEGA account.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Il tuo account è stato chiuso a causa di una violazione dei Termini di servizio di MEGA.\nNon potrai riottenere accesso ai tuoi dati archiviati o registrare un nuovo account MEGA.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Meeting</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -5409,13 +5409,13 @@
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
     <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]Il tuo piano gratuito prevede un limite di 60 minuti per i meeting. Gli utenti Pro hanno chiamate illimitate e fino a 1000 partecipanti.[/A] [B]Effettua l\’upgrade adesso.[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 1 month for %2$s per month. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Ti verrà addebitato %1$s immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 1 mese al costo di %2$s al mese. Il rinnovo verrà addebitato sul tuo account Google&#160;Play entro 24 ore dalla fine di ogni periodo di fatturazione. Per annullare l\’abbonamento, devi disattivare il rinnovo automatico dell\’abbonamento MEGA&#160;Pro almeno 24 ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di servizio[/B] e la [C]Politica sulla privacy e sui dati[/C] di MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 12 months for %2$s per year. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">Ti verrà addebitato %1$s immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 12 mesi al costo di %2$s all\’anno. Il rinnovo verrà addebitato sul tuo account Google&#160;Play entro 24 ore dalla fine di ogni periodo di fatturazione. Per annullare l\’abbonamento, devi disattivare il rinnovo automatico dell\’abbonamento MEGA&#160;Pro almeno 24 ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di servizio[/B] e la [C]Politica sulla privacy e sui dati[/C] di MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">You will be charged immediately and your subscription will automatically renew after 1 month. Your Google&#160;Play account will be charged for renewal within 24 hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24 hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">L\’addebito avverrà immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 1 mese. Il tuo account Google&#160;Play riceverà un addebito per il rinnovo entro le 24 ore precedenti la fine del periodo di fatturazione. Per annullare il tuo abbonamento, devi disattivare il rinnovo automatico del tuo abbonamento MEGA&#160;Pro almeno 24 ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di servizio[/B] e la [C]Politica sulla privacy e sui dati[/C] di MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">You will be charged immediately and your subscription will automatically renew after 12&#160;months. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy and Data Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">L\’addebito avverrà immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 12&#160;mesi. Il tuo account Google&#160;Play riceverà un addebito per il rinnovo entro le 24&#160;ore precedenti la fine del periodo di fatturazione. Per annullare il tuo abbonamento, devi disattivare il rinnovo automatico del tuo abbonamento MEGA&#160;Pro almeno 24&#160;ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di servizio[/B] e la [C]Politica sulla privacy e sui dati[/C] di MEGA.</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">Account Business disattivato</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->

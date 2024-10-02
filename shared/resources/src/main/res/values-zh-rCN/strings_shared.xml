@@ -677,7 +677,7 @@
     <!-- Sync option dialog cancel button -->
     <string name="settings_sync_option_cancel">取消</string>
     <!-- Snackbar message displayed when sync option is selected -->
-    <string name="settings_sync_option_updated_message">Sync options updated</string>
+    <string name="settings_sync_option_updated_message">同步选项已更新</string>
     <!-- Title of the Contact Permission Explanation -->
     <string name="title_enable_access_contact">启用访问以邀请好友的权限</string>
     <!-- Sub title of the Contact Permission Explanation -->
@@ -690,4 +690,30 @@
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
     <string name="document_scanning_confirmation_destination_chat">聊天</string>
+    <!-- Label for the button or menu option to add a sync -->
+    <string name="device_center_add_sync_button_option">添加同步</string>
+    <!-- Label for the button or menu option to add a backup -->
+    <string name="device_center_add_backup_button_option">添加备份</string>
+    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_title">Upgrade your account</string>
+    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_message">Unlock the power to sync and backup your mobile device to cloud storage with one of our premium plans</string>
+    <!-- Title of the share meeting link bottom panel -->
+    <string name="meetings_share_link_bottom_sheet_title">Meeting confirmed: Invite others to join</string>
+    <!-- Button text of the send meeting link to chat -->
+    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Send link to chat</string>
+    <!-- Button text of the share meeting link -->
+    <string name="meetings_share_link_bottom_sheet_button_share_link">共享链接</string>
+    <!-- Title for the inline warning banner when storage is almost full -->
+    <string name="account_storage_over_quota_inline_warning_banner_title">您的存储空间几乎已满</string>
+    <!-- Title for the inline error banner when storage is full -->
+    <string name="account_storage_over_quota_inline_error_banner_title">您的存储空间已满</string>
+    <!-- Error Message indicating the user needs to upgrade now to get more storage -->
+    <string name="account_storage_over_quota_inline_error_banner_message">为了保持数据上传，请立即升级以获得更多存储空间。</string>
+    <!-- Warning Message indicating the user needs to upgrade to get more storage -->
+    <string name="account_storage_over_quota_inline_warning_banner_message">为了继续上传数据，请升级以获得更多存储空间。</string>
+    <!-- Label for the upgrade action link -->
+    <string name="account_storage_over_quota_inline_error_banner_upgrade_link">立即升级</string>
+    <!-- Hidden nodes sharing albums -->
+    <string name="hidden_nodes_sharing_albums">其中一个或多个相册包含隐藏的项目。共享相册意味着与您共享的人可以看到隐藏的项目。这些项目仍将隐藏在您的云盘中。</string>
 </resources>
