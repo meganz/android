@@ -148,10 +148,7 @@ internal fun CancelAccountPlanView(
                 cellAlignment = TableCell.CellAlignment.Start,
             ),
             TableCell.TextCell(
-                text = context.getString(
-                    SharedR.string.account_cancel_account_screen_plan_free_storage,
-                    accountUiState.baseStorageFormatted,
-                ),
+                text = accountUiState.baseStorageFormatted,
                 style = TableCell.TextCellStyle.Normal,
                 cellAlignment = TableCell.CellAlignment.Center,
             ),
