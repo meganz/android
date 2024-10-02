@@ -12,8 +12,32 @@ import mega.privacy.android.shared.original.core.ui.model.MenuActionString
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithoutIcon
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+
+@Composable
+fun SelectModeAppBar(
+    title: String,
+    modifier: Modifier = Modifier,
+    actions: List<MenuActionWithClick>? = emptyList(),
+    onNavigationPressed: (() -> Unit)? = null,
+    elevation: Dp = LocalMegaAppBarElevation.current,
+) = CompositionLocalProvider(
+    LocalMegaAppBarColors provides
+            MegaAppBarColors(
+                MegaOriginalTheme.colors.icon.accent,
+                MegaOriginalTheme.colors.text.accent
+            )
+) {
+    BaseMegaAppBar(
+        appBarType = AppBarType.BACK_NAVIGATION,
+        title = { MegaAppBarTitle(title) },
+        modifier = modifier,
+        onNavigationPressed = onNavigationPressed,
+        actions = actions,
+        elevation = elevation
+    )
+}
 
 /**
  * Select mode app bar
@@ -33,50 +57,13 @@ fun SelectModeAppBar(
     onNavigationPressed: (() -> Unit)? = null,
     onActionPressed: ((MenuAction) -> Unit)? = null,
     elevation: Dp = LocalMegaAppBarElevation.current,
-) = CompositionLocalProvider(
-    LocalMegaAppBarColors provides
-            MegaAppBarColors(MegaOriginalTheme.colors.icon.accent, MegaOriginalTheme.colors.text.accent)
-) {
-    BaseMegaAppBar(
-        appBarType = AppBarType.BACK_NAVIGATION,
-        title = { MegaAppBarTitle(title) },
-        modifier = modifier,
-        onNavigationPressed = onNavigationPressed,
-        actions = actions,
-        onActionPressed = onActionPressed,
-        elevation = elevation
+) = SelectModeAppBar(
+    title = title,
+    modifier = modifier,
+    actions = actions.addClick(onActionPressed),
+    onNavigationPressed = onNavigationPressed,
+    elevation = elevation
     )
-}
-
-/**
- * Select mode app bar
- *
- * @param title
- * @param modifier [Modifier]
- * @param onNavigationPressed Action for navigation button.
- * @param actions Available options.
- * @param elevation Elevation.
- */
-@Composable
-fun SelectModeAppBar(
-    title: String,
-    modifier: Modifier = Modifier,
-    actions: List<MenuActionWithClick>? = null,
-    onNavigationPressed: (() -> Unit)? = null,
-    elevation: Dp = LocalMegaAppBarElevation.current,
-) = CompositionLocalProvider(
-    LocalMegaAppBarColors provides
-            MegaAppBarColors(MegaOriginalTheme.colors.icon.accent, MegaOriginalTheme.colors.text.accent)
-) {
-    BaseMegaAppBar(
-        appBarType = AppBarType.BACK_NAVIGATION,
-        title = { MegaAppBarTitle(title) },
-        modifier = modifier,
-        onNavigationPressed = onNavigationPressed,
-        actions = actions,
-        elevation = elevation
-    )
-}
 
 @CombinedThemePreviews
 @Composable
@@ -95,7 +82,11 @@ private fun getSampleToolbarActions(): List<MenuAction> {
     val item3 =
         object : MenuActionString(R.drawable.ic_chevron_up, R.string.password_text, "chevron up") {}
     val item4 =
-        object : MenuActionString(iconPackR.drawable.ic_alert_circle_regular_medium_outline, R.string.password_text, "circle") {}
+        object : MenuActionString(
+            iconPackR.drawable.ic_alert_circle_regular_medium_outline,
+            R.string.password_text,
+            "circle"
+        ) {}
     val item5 = object : MenuActionWithoutIcon(R.string.password_text, "password") {}
     return listOf(item1, item2, item3, item4, item5)
 }
