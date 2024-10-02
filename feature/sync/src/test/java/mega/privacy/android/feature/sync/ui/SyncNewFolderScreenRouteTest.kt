@@ -20,6 +20,7 @@ import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SC
 import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.shared.original.core.ui.controls.appbar.APP_BAR_BACK_BUTTON_TAG
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.SyncNewFolderScreenBackNavigationEvent
 import org.junit.Rule
 import org.junit.Test
@@ -46,7 +47,7 @@ class SyncNewFolderScreenRouteTest {
     private val syncPermissionsManager: SyncPermissionsManager = mock()
 
     @Test
-    fun `test that all sync Sync New Folder components are visible`() {
+    fun `test that all sync Sync New Folder components are visible (Sync Type = TYPE_TWOWAY)`() {
         whenever(state.value).thenReturn(
             SyncNewFolderState(
                 syncType = SyncType.TYPE_TWOWAY,
@@ -67,6 +68,8 @@ class SyncNewFolderScreenRouteTest {
 
         composeTestRule.onNodeWithTag(TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR)
             .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_add_new_sync_folder_header_text))
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_two_way))
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folder_choose_device_folder_title))
@@ -78,11 +81,69 @@ class SyncNewFolderScreenRouteTest {
     }
 
     @Test
-    fun `test that selected local folder name is correctly displayed`() {
+    fun `test that all sync Sync New Folder components are visible (Sync Type = TYPE_BACKUP)`() {
+        whenever(state.value).thenReturn(
+            SyncNewFolderState(
+                syncType = SyncType.TYPE_BACKUP,
+                deviceName = "Device Name",
+            )
+        )
+        whenever(viewModel.state).thenReturn(state)
+        composeTestRule.setContent {
+            SyncNewFolderScreenRoute(
+                viewModel,
+                syncPermissionsManager = syncPermissionsManager,
+                openNextScreen = {},
+                openSelectMegaFolderScreen = {},
+                openUpgradeAccount = {},
+                onBackClicked = {}
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_add_new_backup_header_text))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_add_new_backup_choose_device_folder_title))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_add_new_backup_choose_mega_folder_title))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that selected local folder name is correctly displayed (Sync Type = TYPE_TWOWAY)`() {
         val localFolderName = "local_folder"
         whenever(state.value).thenReturn(
             SyncNewFolderState(
                 syncType = SyncType.TYPE_TWOWAY,
+                deviceName = "Device Name",
+                selectedLocalFolder = localFolderName,
+            )
+        )
+        whenever(viewModel.state).thenReturn(state)
+        composeTestRule.setContent {
+            SyncNewFolderScreenRoute(
+                viewModel,
+                syncPermissionsManager = syncPermissionsManager,
+                openNextScreen = {},
+                openSelectMegaFolderScreen = {},
+                openUpgradeAccount = {},
+                onBackClicked = {}
+            )
+        }
+
+        composeTestRule.onNodeWithText(localFolderName)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that selected local folder name is correctly displayed (Sync Type = TYPE_BACKUP)`() {
+        val localFolderName = "local_folder"
+        whenever(state.value).thenReturn(
+            SyncNewFolderState(
+                syncType = SyncType.TYPE_BACKUP,
                 deviceName = "Device Name",
                 selectedLocalFolder = localFolderName,
             )
@@ -132,9 +193,35 @@ class SyncNewFolderScreenRouteTest {
     }
 
     @Test
-    fun `test that sync button is not clickable when local folder or mega folder are not filled`() {
+    fun `test that sync button is not clickable when local folder or mega folder are not filled (Sync Type = TYPE_TWOWAY)`() {
         val emptyState = SyncNewFolderState(
             syncType = SyncType.TYPE_TWOWAY,
+            deviceName = "Device Name",
+        )
+        val openNextScreenCallback = mock<(SyncNewFolderState) -> Unit>()
+        whenever(state.value).thenReturn(emptyState)
+        whenever(viewModel.state).thenReturn(state)
+        composeTestRule.setContent {
+            SyncNewFolderScreenRoute(
+                viewModel,
+                syncPermissionsManager = syncPermissionsManager,
+                openNextScreen = openNextScreenCallback,
+                openSelectMegaFolderScreen = {},
+                openUpgradeAccount = {},
+                onBackClicked = {}
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON)
+            .performClick()
+
+        verifyNoInteractions(openNextScreenCallback)
+    }
+
+    @Test
+    fun `test that sync button is not clickable when local folder or mega folder are not filled (Sync Type = TYPE_BACKUP)`() {
+        val emptyState = SyncNewFolderState(
+            syncType = SyncType.TYPE_BACKUP,
             deviceName = "Device Name",
         )
         val openNextScreenCallback = mock<(SyncNewFolderState) -> Unit>()
@@ -184,38 +271,35 @@ class SyncNewFolderScreenRouteTest {
     }
 
     @Test
-    fun `test that only all files access banner is shown when all files access permission is not granted`() {
-        val emptyState = SyncNewFolderState(
-            syncType = SyncType.TYPE_TWOWAY,
-            deviceName = "Device Name",
-            selectedMegaFolder = RemoteFolder(0, ""),
+    fun `test that click the app bar back button sends the right analytics tracker event (Sync Type = TYPE_TWOWAY)`() {
+        whenever(state.value).thenReturn(
+            SyncNewFolderState(
+                syncType = SyncType.TYPE_TWOWAY,
+                deviceName = "Device Name",
+            )
         )
-        whenever(state.value).thenReturn(emptyState)
         whenever(viewModel.state).thenReturn(state)
-        whenever(syncPermissionsManager.isManageExternalStoragePermissionGranted())
-            .thenReturn(false)
-        whenever(syncPermissionsManager.isDisableBatteryOptimizationGranted())
-            .thenReturn(false)
         composeTestRule.setContent {
             SyncNewFolderScreenRoute(
                 viewModel,
-                openNextScreen = {},
                 syncPermissionsManager = syncPermissionsManager,
-                openSelectMegaFolderScreen = { },
+                openNextScreen = {},
+                openSelectMegaFolderScreen = {},
                 openUpgradeAccount = {},
                 onBackClicked = {}
             )
         }
 
-        composeTestRule.onNodeWithText("We need to access your device storage in order to sync your local folder. Click here to grant access.")
-            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(APP_BAR_BACK_BUTTON_TAG).assertExists().assertIsDisplayed()
+            .performClick()
+        assertThat(analyticsTestRule.events).contains(SyncNewFolderScreenBackNavigationEvent)
     }
 
     @Test
-    fun `test that click the app bar back button sends the right analytics tracker event`() {
+    fun `test that click the app bar back button sends the right analytics tracker event (Sync Type = TYPE_BACKUP)`() {
         whenever(state.value).thenReturn(
             SyncNewFolderState(
-                syncType = SyncType.TYPE_TWOWAY,
+                syncType = SyncType.TYPE_BACKUP,
                 deviceName = "Device Name",
             )
         )

@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
@@ -84,13 +85,26 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                         }
 
                         else -> {
-                            state.value.selectedMegaFolder?.let { remoteFolder ->
-                                syncFolderPairUseCase(
-                                    syncType = state.value.syncType,
-                                    name = remoteFolder.name,
-                                    localPath = state.value.selectedLocalFolder,
-                                    remotePath = remoteFolder,
-                                )
+                            when (state.value.syncType) {
+                                SyncType.TYPE_BACKUP -> {
+                                    syncFolderPairUseCase(
+                                        syncType = state.value.syncType,
+                                        name = null,
+                                        localPath = state.value.selectedLocalFolder,
+                                        remotePath = RemoteFolder(-1L, ""),
+                                    )
+                                }
+
+                                else -> {
+                                    state.value.selectedMegaFolder?.let { remoteFolder ->
+                                        syncFolderPairUseCase(
+                                            syncType = state.value.syncType,
+                                            name = remoteFolder.name,
+                                            localPath = state.value.selectedLocalFolder,
+                                            remotePath = remoteFolder,
+                                        )
+                                    }
+                                }
                             }
                             _state.update { state ->
                                 state.copy(openSyncListScreen = triggered)

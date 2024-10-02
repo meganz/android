@@ -12,28 +12,34 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.sync.R
+import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreen
 import mega.privacy.android.shared.original.core.ui.controls.cards.MegaCardWithHeader
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.resources.R as sharedResR
 
 @Composable
 internal fun InputSyncInformationView(
+    syncType: SyncType,
+    deviceName: String,
     selectDeviceFolderClicked: () -> Unit,
     selectMegaFolderClicked: () -> Unit,
     selectedDeviceFolder: String = "",
@@ -43,30 +49,51 @@ internal fun InputSyncInformationView(
         MegaCardWithHeader(
             header = {
                 Header(
-                    imageResource = CoreUiR.drawable.ic_sync,
-                    text = stringResource(id = R.string.sync_two_way),
+                    imageResource = when (syncType) {
+                        SyncType.TYPE_BACKUP -> iconPackR.drawable.ic_database
+                        else -> CoreUiR.drawable.ic_sync
+                    },
+                    text = when (syncType) {
+                        SyncType.TYPE_BACKUP -> stringResource(id = sharedResR.string.sync_add_new_backup_card_sync_type_text)
+                        else -> stringResource(id = R.string.sync_two_way)
+                    },
                 )
             },
             body = {
                 TwoLinesItem(
-                    CoreUiR.drawable.ic_smartphone,
-                    stringResource(id = R.string.sync_folder_choose_device_folder_title),
-                    selectedDeviceFolder,
-                    stringResource(R.string.sync_general_select),
-                    Modifier.clickable { selectDeviceFolderClicked() }
+                    imageResource = CoreUiR.drawable.ic_smartphone,
+                    topText = when (syncType) {
+                        SyncType.TYPE_BACKUP -> stringResource(id = sharedResR.string.sync_add_new_backup_choose_device_folder_title)
+                        else -> stringResource(id = R.string.sync_folder_choose_device_folder_title)
+                    },
+                    bottomText = selectedDeviceFolder.substring(selectedDeviceFolder.lastIndexOf('/') + 1),
+                    bottomDefaultText = stringResource(R.string.sync_general_select),
+                    modifier = Modifier.clickable { selectDeviceFolderClicked() }
                 )
 
                 MegaDivider(dividerType = DividerType.Centered)
 
-                TwoLinesItem(
-                    CoreUiR.drawable.ic_mega,
-                    stringResource(id = R.string.sync_folders_choose_mega_folder_title),
-                    selectedMegaFolder,
-                    stringResource(R.string.sync_general_select),
-                    Modifier.clickable {
-                        selectMegaFolderClicked()
+                when (syncType) {
+                    SyncType.TYPE_BACKUP -> {
+                        TwoLinesItem(
+                            imageResource = CoreUiR.drawable.ic_mega,
+                            topText = stringResource(id = sharedResR.string.sync_add_new_backup_choose_mega_folder_title),
+                            bottomText = "/Backups/$deviceName",
+                            bottomDefaultText = "",
+                            isBottomTextClickable = false,
+                        )
                     }
-                )
+
+                    else -> {
+                        TwoLinesItem(
+                            imageResource = CoreUiR.drawable.ic_mega,
+                            topText = stringResource(id = R.string.sync_folders_choose_mega_folder_title),
+                            bottomText = selectedMegaFolder,
+                            bottomDefaultText = stringResource(R.string.sync_general_select),
+                            modifier = Modifier.clickable { selectMegaFolderClicked() }
+                        )
+                    }
+                }
             },
         )
     }
@@ -88,7 +115,9 @@ private fun Header(
         Image(
             painter = painterResource(imageResource),
             contentDescription = null,
-            modifier = modifier.size(20.dp).padding(end = 8.dp),
+            modifier = modifier
+                .size(20.dp)
+                .padding(end = 8.dp),
             colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorSecondary)
         )
         MegaText(
@@ -106,6 +135,7 @@ private fun TwoLinesItem(
     bottomText: String,
     bottomDefaultText: String,
     modifier: Modifier = Modifier,
+    isBottomTextClickable: Boolean = true,
 ) {
     Row(
         modifier
@@ -119,24 +149,25 @@ private fun TwoLinesItem(
             colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorSecondary)
         )
         Column {
-            Text(
+            MegaText(
                 text = topText,
-                style = if (bottomText.isEmpty()) {
-                    MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.textColorSecondary)
-                } else {
-                    MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.grey_alpha_087_white_alpha_087)
-                },
+                textColor = TextColor.Secondary
             )
-            Text(
+            MegaText(
                 text = bottomText.ifEmpty {
                     bottomDefaultText
                 },
-                style = if (bottomText.isEmpty()) {
-                    MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.teal_300_teal_200)
+                textColor = if (isBottomTextClickable) {
+                    TextColor.Accent
                 } else {
-                    MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorSecondary)
+                    TextColor.Secondary
                 },
-                modifier = Modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(top = 4.dp),
+                style = if (isBottomTextClickable) {
+                    MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Medium)
+                } else {
+                    MaterialTheme.typography.body2
+                },
             )
         }
     }
@@ -144,11 +175,39 @@ private fun TwoLinesItem(
 
 @CombinedThemePreviews
 @Composable
-private fun SyncEmptyScreenPreview() {
+private fun EmptyInputSyncInformationViewPreview(
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         InputSyncInformationView(
+            syncType = syncType,
+            deviceName = "Device Name",
             selectDeviceFolderClicked = {},
             selectMegaFolderClicked = {},
         )
     }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun InputSyncInformationViewPreview(
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        InputSyncInformationView(
+            syncType = syncType,
+            deviceName = "Device Name",
+            selectDeviceFolderClicked = {},
+            selectMegaFolderClicked = {},
+            selectedDeviceFolder = "Device folder name",
+            selectedMegaFolder = "MEGA folder name"
+        )
+    }
+}
+
+/**
+ * A class that provides Preview Parameters for the [SyncNewFolderScreen]
+ */
+internal class SyncTypePreviewProvider : PreviewParameterProvider<SyncType> {
+    override val values = sequenceOf(SyncType.TYPE_TWOWAY, SyncType.TYPE_BACKUP)
 }

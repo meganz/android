@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.ui
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.commit
@@ -21,6 +22,8 @@ class SyncHostActivity : AppCompatActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        enableEdgeToEdge()
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 

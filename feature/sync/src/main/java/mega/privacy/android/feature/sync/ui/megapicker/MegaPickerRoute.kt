@@ -13,6 +13,10 @@ import mega.privacy.android.feature.sync.R
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction.FolderClicked
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.shared.resources.R as sharedResR
+import androidx.compose.foundation.isSystemInDarkTheme
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaApiJava
 
 @Composable
@@ -121,12 +125,12 @@ fun AllFilesAccessDialog(
     onDismiss: () -> Unit,
 ) {
     ConfirmationDialog(
-        text = stringResource(id = R.string.sync_access_storage_permission_message),
+        title = stringResource(id = sharedResR.string.sync_backup_access_storage_permission_dialog_title),
+        text = stringResource(id = sharedResR.string.sync_backup_access_storage_permission_dialog_message),
         confirmButtonText = stringResource(id = R.string.sync_dialog_file_permission_positive_button),
         cancelButtonText = stringResource(id = R.string.sync_dialog_file_permission_negative_button),
         onConfirm = onConfirm,
         onDismiss = onDismiss,
-        title = stringResource(id = R.string.sync_dialog_storage_access_title),
     )
 }
 
@@ -143,4 +147,26 @@ private fun DisableBatteryOptimizationDialog(
         onDismiss = onDismiss,
         title = stringResource(id = R.string.sync_dialog_battery_optimization_title),
     )
+}
+
+@CombinedThemePreviews
+@Composable
+private fun AllFilesAccessDialogPreview() {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        AllFilesAccessDialog(
+            onConfirm = {},
+            onDismiss = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun DisableBatteryOptimizationDialogPreview() {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        DisableBatteryOptimizationDialog(
+            onConfirm = {},
+            onDismiss = {},
+        )
+    }
 }

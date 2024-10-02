@@ -39,7 +39,7 @@ internal fun AddNewSyncBottomSheetTile(
             if (isFreeAccount) {
                 MegaText(
                     text = stringResource(id = sharedResR.string.general_pro_only_label),
-                    textColor = TextColor.Primary,
+                    textColor = TextColor.Accent,
                     modifier = Modifier.testTag(
                         TEST_TAG_BOTTOM_SHEET_TILE_ADD_NEW_SYNC_PRO_ONLY_LABEL
                     )
