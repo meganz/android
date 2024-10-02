@@ -3,7 +3,7 @@ package mega.privacy.android.app.modalbottomsheet
 /**
  * Listener to receive events from [FileContactsListBottomSheetDialogFragment]
  */
-internal interface FileContactsListBottomSheetDialogListener {
+interface FileContactsListBottomSheetDialogListener {
     /**
      * change permission option has been selected
      */
