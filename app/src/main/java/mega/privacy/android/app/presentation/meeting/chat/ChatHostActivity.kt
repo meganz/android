@@ -2,8 +2,8 @@ package mega.privacy.android.app.presentation.meeting.chat
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
 import androidx.fragment.app.commit
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
@@ -18,9 +18,7 @@ class ChatHostActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-
+        enableEdgeToEdge()
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 replace(android.R.id.content, ChatFragment().apply {

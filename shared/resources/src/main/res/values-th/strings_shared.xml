@@ -425,7 +425,7 @@
     <!-- Row label for storage feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_storage">พื้นที่เก็บข้อมูล</string>
     <!-- Storage amount available in the free plan. %1s represents the amount of storage and the unit -->
-    <string name="account_cancel_account_screen_plan_free_storage">%1 วิ</string>
+    <string name="account_cancel_account_screen_plan_free_storage">%1s</string>
     <!-- Row label for transfer feature in the comparison table -->
     <string name="account_cancel_account_screen_plan_transfer">ถ่ายโอน</string>
     <!-- Transfer limit in the free plan -->
@@ -655,9 +655,9 @@
     <!--Title text to start a meeting from Meeting screen empty view-->
     <string name="meeting_recent_list_empty_title">ปกป้องการโทรของคุณ</string>
     <!--Subtitle text from Meeting screen empty view-->
-    <string name="meeting_recent_list_empty_subtitle">Your meetings, family calls, and private conversations are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <string name="meeting_recent_list_empty_subtitle">การประชุม การโทรหาครอบครัว และการสนทนาส่วนตัวของคุณได้รับการปกป้องด้วยการเข้ารหัสแบบวิธีซีโร่-นอว์เลจ [A]เรียนรู้เพิ่มเติม[/A]</string>
     <!--Warning message to inform the user the minimum number of characters to enter into the edit text field for the survey-->
-    <string name="account_cancel_subscription_survey_minimum_character_limit">Message must be at least 10 characters</string>
+    <string name="account_cancel_subscription_survey_minimum_character_limit">ข้อความต้องมีความยาวอย่างน้อย 10 ตัวอักษร</string>
     <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
     <string name="account_cancel_subscription_survey_enter_details">กรอกรายละเอียด</string>
     <!-- the bonus title of join without account on left meeting page-->
@@ -665,23 +665,23 @@
     <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_whats_new_label">มีอะไรใหม่ ๆ บ้าง</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_title">Easy, automated sync</string>
+    <string name="sync_promotion_bottom_sheet_title">ซิงค์ข้อมูลได้ง่ายและอัตโนมัติ</string>
     <!-- Body message of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_body_message">Sync a folder on your device with MEGA to access the latest version of your files anywhere</string>
+    <string name="sync_promotion_bottom_sheet_body_message">ซิงค์โฟลเดอร์ในอุปกรณ์ของคุณกับ MEGA เพื่อเข้าถึงไฟล์ล่าสุดได้จากทุกที่</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sync folders</string>
+    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">ซิงค์โฟลเดอร์</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_free">Upgrade to use sync</string>
+    <string name="sync_promotion_bottom_sheet_primary_button_text_free">อัปเกรดเพื่อใช้การซิงค์</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
     <string name="sync_promotion_bottom_sheet_secondary_button_text">เรียนรู้เพิ่มเติม</string>
     <!-- Sync option dialog cancel button -->
     <string name="settings_sync_option_cancel">ยกเลิก</string>
     <!-- Snackbar message displayed when sync option is selected -->
-    <string name="settings_sync_option_updated_message">Sync options updated</string>
+    <string name="settings_sync_option_updated_message">อัปเดตตัวเลือกการซิงค์แล้ว</string>
     <!-- Title of the Contact Permission Explanation -->
-    <string name="title_enable_access_contact">Enable access to invite friends</string>
+    <string name="title_enable_access_contact">อนุญาตให้เข้าถึงรายชื่อติดต่อเพื่อเชิญเพื่อน</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">In order to invite friends, you must allow MEGA to access your contact list</string>
+    <string name="subtitle_enable_access_contact">เพื่อที่จะเชิญเพื่อน คุณต้องอนุญาตให้แอปพลิเคชัน MEGA เข้าถึงรายชื่อติดต่อของคุณ</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">อนุญาตให้เข้าถึง</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -690,4 +690,30 @@
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
     <string name="document_scanning_confirmation_destination_chat">แชท</string>
+    <!-- Label for the button or menu option to add a sync -->
+    <string name="device_center_add_sync_button_option">เพิ่มการซิงค์</string>
+    <!-- Label for the button or menu option to add a backup -->
+    <string name="device_center_add_backup_button_option">เพิ่มการสำรองข้อมูล</string>
+    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_title">อัปเกรดบัญชีของคุณ</string>
+    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_message">ปลดล็อกฟังก์ชันการซิงค์และสำรองข้อมูลอุปกรณ์มือถือของคุณกับที่เก็บข้อมูลบนคลาวด์ ด้วยแผนพรีเมียมของเรา</string>
+    <!-- Title of the share meeting link bottom panel -->
+    <string name="meetings_share_link_bottom_sheet_title">ยืนยันการประชุมแล้ว: เชิญคนอื่นเข้าร่วม</string>
+    <!-- Button text of the send meeting link to chat -->
+    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">ส่งลิงก์ไปที่แชท</string>
+    <!-- Button text of the share meeting link -->
+    <string name="meetings_share_link_bottom_sheet_button_share_link">แชร์ลิงก์</string>
+    <!-- Title for the inline warning banner when storage is almost full -->
+    <string name="account_storage_over_quota_inline_warning_banner_title">พื้นที่เก็บข้อมูลของคุณใกล้เต็มแล้ว</string>
+    <!-- Title for the inline error banner when storage is full -->
+    <string name="account_storage_over_quota_inline_error_banner_title">พื้นที่เก็บข้อมูลของคุณเต็มแล้ว</string>
+    <!-- Error Message indicating the user needs to upgrade now to get more storage -->
+    <string name="account_storage_over_quota_inline_error_banner_message">หากต้องการอัปโหลดข้อมูลต่อ กรุณาอัปเกรดทันทีเพื่อเพิ่มพื้นที่เก็บข้อมูล</string>
+    <!-- Warning Message indicating the user needs to upgrade to get more storage -->
+    <string name="account_storage_over_quota_inline_warning_banner_message">หากต้องการอัปโหลดข้อมูลต่อ กรุณาอัปเกรดเพื่อเพิ่มพื้นที่เก็บข้อมูล</string>
+    <!-- Label for the upgrade action link -->
+    <string name="account_storage_over_quota_inline_error_banner_upgrade_link">อัปเกรดตอนนี้เลย</string>
+    <!-- Hidden nodes sharing albums -->
+    <string name="hidden_nodes_sharing_albums">อัลบั้มเหล่านี้มีรายการบางอย่างที่ซ่อนอยู่ หากคุณแชร์อัลบั้ม ผู้ที่ได้รับลิงก์จะสามารถเห็นสิ่งที่ซ่อนไว้ได้ อย่างไรก็ตาม สิ่งเหล่านี้จะยังคงถูกซ่อนอยู่ในคลาวด์ไดร์ฟของคุณ</string>
 </resources>

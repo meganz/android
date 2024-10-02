@@ -714,4 +714,30 @@
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
     <string name="document_scanning_confirmation_destination_chat">Chat</string>
+    <!-- Label for the button or menu option to add a sync -->
+    <string name="device_center_add_sync_button_option">Adăugați o sincronizare</string>
+    <!-- Label for the button or menu option to add a backup -->
+    <string name="device_center_add_backup_button_option">Adăugați un backup</string>
+    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_title">Upgradează-ți contul</string>
+    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_message">Deblocați puterea de a sincroniza și de a face backup pentru dispozitivul mobil în spațiu de stocare în cloud cu unul dintre abonamentele noastre premium</string>
+    <!-- Title of the share meeting link bottom panel -->
+    <string name="meetings_share_link_bottom_sheet_title">Întâlnire confirmată: Invitați alții să se alăture</string>
+    <!-- Button text of the send meeting link to chat -->
+    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Trimite link către chat</string>
+    <!-- Button text of the share meeting link -->
+    <string name="meetings_share_link_bottom_sheet_button_share_link">Partajați un link</string>
+    <!-- Title for the inline warning banner when storage is almost full -->
+    <string name="account_storage_over_quota_inline_warning_banner_title">Spațiul dvs. de stocare este aproape plin</string>
+    <!-- Title for the inline error banner when storage is full -->
+    <string name="account_storage_over_quota_inline_error_banner_title">Spațiul dvs. de stocare este plin</string>
+    <!-- Error Message indicating the user needs to upgrade now to get more storage -->
+    <string name="account_storage_over_quota_inline_error_banner_message">Pentru a continua să încărcați date, upgradați acum pentru a obține mai mult spațiu de stocare.</string>
+    <!-- Warning Message indicating the user needs to upgrade to get more storage -->
+    <string name="account_storage_over_quota_inline_warning_banner_message">Pentru a continua să încărcați date, upgradați pentru a obține mai mult spațiu de stocare.</string>
+    <!-- Label for the upgrade action link -->
+    <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Upgradați acum</string>
+    <!-- Hidden nodes sharing albums -->
+    <string name="hidden_nodes_sharing_albums">Există elemente ascunse într-unul sau mai multe dintre aceste albume. Partajarea albumelor va însemna că elementele ascunse sunt vizibile pentru cei cu care partajați. Elementele vor fi în continuare ascunse în Unitatea cloud.</string>
 </resources>

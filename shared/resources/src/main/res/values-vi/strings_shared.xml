@@ -677,7 +677,7 @@
     <!-- Sync option dialog cancel button -->
     <string name="settings_sync_option_cancel">Hủy</string>
     <!-- Snackbar message displayed when sync option is selected -->
-    <string name="settings_sync_option_updated_message">Sync options updated</string>
+    <string name="settings_sync_option_updated_message">Tùy chọn đồng&#160;bộ hóa đã được cập nhật</string>
     <!-- Title of the Contact Permission Explanation -->
     <string name="title_enable_access_contact">Bật quyền truy&#160;cập để mời bạn&#160;bè</string>
     <!-- Sub title of the Contact Permission Explanation -->
@@ -690,4 +690,30 @@
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
     <string name="document_scanning_confirmation_destination_chat">Chat</string>
+    <!-- Label for the button or menu option to add a sync -->
+    <string name="device_center_add_sync_button_option">Thêm đồng bộ</string>
+    <!-- Label for the button or menu option to add a backup -->
+    <string name="device_center_add_backup_button_option">Thêm sao lưu</string>
+    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_title">Nâng&#160;cấp tài&#160;khoản của bạn</string>
+    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_message">Mở khóa sức&#160;mạnh để đồng&#160;bộ và sao lưu thiết&#160;bị di&#160;động của bạn lên không&#160;gian lưu&#160;trữ đám&#160;mây với một trong các gói Pro của chúng&#160;tôi</string>
+    <!-- Title of the share meeting link bottom panel -->
+    <string name="meetings_share_link_bottom_sheet_title">Cuộc họp được xác&#160;nhận: Mời thêm người khác tham&#160;gia</string>
+    <!-- Button text of the send meeting link to chat -->
+    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Gửi đường liên&#160;kết tới chat</string>
+    <!-- Button text of the share meeting link -->
+    <string name="meetings_share_link_bottom_sheet_button_share_link">Chia&#160;sẻ đường liên&#160;kết</string>
+    <!-- Title for the inline warning banner when storage is almost full -->
+    <string name="account_storage_over_quota_inline_warning_banner_title">Không&#160;gian lưu&#160;trữ sắp đầy</string>
+    <!-- Title for the inline error banner when storage is full -->
+    <string name="account_storage_over_quota_inline_error_banner_title">Không&#160;gian lưu&#160;trữ đã đầy</string>
+    <!-- Error Message indicating the user needs to upgrade now to get more storage -->
+    <string name="account_storage_over_quota_inline_error_banner_message">Để tiếp&#160;tục tải thêm dữ&#160;liệu lên, hãy nâng&#160;cấp ngay để có thêm không&#160;gian lưu&#160;trữ.</string>
+    <!-- Warning Message indicating the user needs to upgrade to get more storage -->
+    <string name="account_storage_over_quota_inline_warning_banner_message">Để tiếp&#160;tục tải thêm dữ&#160;liệu lên, hãy nâng&#160;cấp để có thêm không&#160;gian lưu&#160;trữ.</string>
+    <!-- Label for the upgrade action link -->
+    <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Nâng&#160;cấp ngay</string>
+    <!-- Hidden nodes sharing albums -->
+    <string name="hidden_nodes_sharing_albums">Có các mục ẩn nằm trong một hoặc nhiều album này. Việc thực&#160;hiện chia&#160;sẻ album sẽ làm các mục ẩn hiển&#160;thị cho những người bạn chia&#160;sẻ. Các mục vẫn sẽ được ẩn đi trong Ổ&#160;Mây của bạn.</string>
 </resources>

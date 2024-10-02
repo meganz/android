@@ -103,8 +103,58 @@ fun MegaAppBar(
         onNavigationPressed = onNavigationPressed,
         badgeCount = badgeCount,
         titleIcons = titleIcons,
+        actions = actions.addClick(onActionPressed),
+        maxActionsToShow = maxActionsToShow,
+        enabled = enabled,
+        elevation = elevation
+    )
+}
+
+/**
+ * Mega app bar.
+ *
+ * This component has been implemented following the latest rules for the new design system.
+ * If this component does not serve your purpose, discuss this with the team in charge of
+ * developing the new design system. It will be updated or override depending on the needs.
+ *
+ * @param appBarType [AppBarType]
+ * @param title Title.
+ * @param modifier [Modifier]
+ * @param onNavigationPressed Action for navigation button.
+ * @param badgeCount Count if should show a badge, null otherwise.
+ * @param titleIcons Icons to show at the end of the title if any, null otherwise.
+ * @param actions Available options.
+ * @param maxActionsToShow The Max [actions] to be shown, if there are more they will be under three dots menu
+ * @param enabled if false, the navigation icon and actions will be disabled
+ * @param elevation Elevation.
+ */
+@Composable
+fun MegaAppBar(
+    appBarType: AppBarType,
+    title: String,
+    modifier: Modifier = Modifier,
+    onNavigationPressed: (() -> Unit)? = null,
+    badgeCount: Int? = null,
+    titleIcons: @Composable (RowScope.() -> Unit)? = null,
+    actions: List<MenuActionWithClick>? = null,
+    maxActionsToShow: Int = 4,
+    enabled: Boolean = true,
+    elevation: Dp = LocalMegaAppBarElevation.current,
+) = CompositionLocalProvider(
+    LocalMegaAppBarColors provides MegaAppBarColors(
+        iconsTintColor = MegaOriginalTheme.colors.icon.primary,
+        titleColor = MegaOriginalTheme.colors.text.primary,
+        subtitleColor = MegaOriginalTheme.colors.text.secondary,
+    )
+) {
+    BaseMegaAppBar(
+        appBarType = appBarType,
+        title = { MegaAppBarTitle(title) },
+        modifier = modifier,
+        onNavigationPressed = onNavigationPressed,
+        badgeCount = badgeCount,
+        titleIcons = titleIcons,
         actions = actions,
-        onActionPressed = onActionPressed,
         maxActionsToShow = maxActionsToShow,
         enabled = enabled,
         elevation = elevation
@@ -170,13 +220,15 @@ fun MegaAppBar(
                 }
             }
         },
-        actions = actions,
-        onActionPressed = onActionPressed,
+        actions = actions.addClick(onActionPressed),
         maxActionsToShow = maxActionsToShow,
         enabled = enabled,
         elevation = elevation
     )
 }
+
+internal fun List<MenuAction>?.addClick(onActionPressed: ((MenuAction) -> Unit)?): List<MenuActionWithClick>? =
+    this?.map { MenuActionWithClick(it) { onActionPressed?.invoke(it) } }
 
 /**
  * Method to provide default mega app bar colors.
@@ -216,40 +268,6 @@ internal fun BaseMegaAppBar(
     badgeCount: Int? = null,
     titleIcons: @Composable (RowScope.() -> Unit)? = null,
     subtitle: @Composable (() -> Unit)? = null,
-    actions: List<MenuAction>? = null,
-    onActionPressed: ((MenuAction) -> Unit)? = null,
-    maxActionsToShow: Int = 4,
-    enabled: Boolean = true,
-    elevation: Dp = LocalMegaAppBarElevation.current,
-) = BaseMegaAppBar(
-    appBarType = appBarType,
-    titleAndSubtitle = {
-        MegaAppBarTitleAndSubtitle(
-            title = title,
-            titleIcons = titleIcons,
-            subtitle = subtitle,
-            modifier = Modifier.then(Modifier.padding(end = if (actions.isNullOrEmpty()) 12.dp else 0.dp))
-        )
-    },
-    actions = actions,
-    modifier = modifier,
-    onNavigationPressed = onNavigationPressed,
-    badgeCount = badgeCount,
-    onActionPressed = onActionPressed,
-    maxActionsToShow = maxActionsToShow,
-    enabled = enabled,
-    elevation = elevation
-)
-
-@Composable
-internal fun BaseMegaAppBar(
-    appBarType: AppBarType,
-    title: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    onNavigationPressed: (() -> Unit)? = null,
-    badgeCount: Int? = null,
-    titleIcons: @Composable (RowScope.() -> Unit)? = null,
-    subtitle: @Composable (() -> Unit)? = null,
     actions: List<MenuActionWithClick>? = null,
     maxActionsToShow: Int = 4,
     enabled: Boolean = true,
@@ -278,17 +296,18 @@ internal fun BaseMegaAppBar(
     appBarType: AppBarType,
     titleAndSubtitle: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    actions: List<MenuAction>? = null,
+    actions: List<MenuActionWithClick>? = null,
     onNavigationPressed: (() -> Unit)? = null,
     badgeCount: Int? = null,
-    onActionPressed: ((MenuAction) -> Unit)? = null,
     maxActionsToShow: Int = 4,
     enabled: Boolean = true,
     elevation: Dp = LocalMegaAppBarElevation.current,
 ) {
-    val backgroundColor by animateColorAsState(targetValue =
-        (if (elevation == 0.dp) MegaOriginalTheme.colors.background.pageBackground else MegaOriginalTheme.colors.background.surface1)
-            .copy(LocalMegaAppBarColors.current.backgroundAlpha))
+    val backgroundColor by animateColorAsState(
+        targetValue = (if (elevation == 0.dp) MegaOriginalTheme.colors.background.pageBackground else MegaOriginalTheme.colors.background.surface1)
+            .copy(LocalMegaAppBarColors.current.backgroundAlpha),
+        label = "elevation animation",
+    )
     // set the status bar color to match toolbar color, it has no effect on android 15
     if (!LocalView.current.isInEditMode) {
         val systemUiController = rememberSystemUiController()
@@ -303,80 +322,6 @@ internal fun BaseMegaAppBar(
         title = titleAndSubtitle,
         windowInsets = WindowInsets.systemBars,
         backgroundColor = backgroundColor,
-        modifier = modifier.testTag(TEST_TAG_APP_BAR),
-        navigationIcon = appBarType.takeIf { it != AppBarType.NONE }?.composeLet {
-            Box {
-                NavigationIcon(
-                    onNavigationPressed = onNavigationPressed ?: {},
-                    enabled = enabled,
-                    iconId = when (appBarType) {
-                        AppBarType.BACK_NAVIGATION -> R.drawable.ic_back
-                        AppBarType.MENU -> R.drawable.ic_menu
-                        AppBarType.CLOSE -> R.drawable.ic_universal_close
-                        else -> return@Box
-                    },
-                    modifier = Modifier.testTag(APP_BAR_BACK_BUTTON_TAG),
-                )
-                badgeCount?.let {
-                    Box(
-                        modifier = Modifier
-                            .padding(3.dp)
-                            .size(24.dp)
-                            .padding(3.dp)
-                            .background(
-                                color = MegaOriginalTheme.colors.indicator.pink,
-                                shape = CircleShape
-                            )
-                            .border(
-                                2.dp,
-                                MegaOriginalTheme.colors.background.pageBackground,
-                                shape = CircleShape
-                            )
-                            .testTag(APP_BAR_BADGE)
-                            .align(Alignment.TopEnd),
-                    ) {
-                        Text(
-                            text = it.toString(),
-                            modifier = Modifier.align(Alignment.Center),
-                            color = MegaOriginalTheme.colors.text.inverse,
-                            style = MaterialTheme.typography.badge,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                }
-            }
-        },
-        actions = {
-            actions?.let {
-                MenuActions(
-                    actions = actions,
-                    maxActionsToShow = maxActionsToShow,
-                    enabled = enabled,
-                    onActionClick = { action -> onActionPressed?.invoke(action) }
-                )
-            }
-        },
-        elevation = elevation
-    )
-}
-
-@Composable
-internal fun BaseMegaAppBar(
-    appBarType: AppBarType,
-    titleAndSubtitle: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    onNavigationPressed: (() -> Unit)? = null,
-    badgeCount: Int? = null,
-    actions: List<MenuActionWithClick>? = null,
-    maxActionsToShow: Int = 4,
-    enabled: Boolean = true,
-    elevation: Dp = LocalMegaAppBarElevation.current,
-) {
-    TopAppBar(
-        title = titleAndSubtitle,
-        backgroundColor = MegaOriginalTheme.colors.background.pageBackground.copy(
-            LocalMegaAppBarColors.current.backgroundAlpha
-        ),
         modifier = modifier.testTag(TEST_TAG_APP_BAR),
         navigationIcon = appBarType.takeIf { it != AppBarType.NONE }?.composeLet {
             Box {

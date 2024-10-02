@@ -13,8 +13,8 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalCollap
 import mega.privacy.android.shared.original.core.ui.controls.layouts.ScaffoldWithCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
 
 /**
@@ -65,8 +65,7 @@ fun AppBarForCollapsibleHeader(
     modifier = modifier,
     onNavigationPressed = onNavigationPressed,
     badgeCount = badgeCount,
-    actions = actions,
-    onActionPressed = onActionPressed,
+    actions = actions.addClick(onActionPressed),
     maxActionsToShow = maxActionsToShow,
     enabled = enabled,
     elevation = elevation

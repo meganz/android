@@ -309,7 +309,7 @@
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_list_empty_state_title">Nessuna sincronizzazione configurata</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_list_empty_state_message">Sync a folder on your device with a folder on MEGA.</string>
+    <string name="device_center_sync_list_empty_state_message">Sincronizza una cartella sul tuo dispositivo con una cartella su MEGA.</string>
     <!-- Label for the button or menu option to add a new sync -->
     <string name="device_center_sync_add_new_syn_button_option">Aggiungi una nuova sincronizzazione</string>
     <!-- Text for the Sync solved issues chip -->
@@ -349,7 +349,7 @@
     <!-- Third subtitle of the tour screen -->
     <string name="cloud_drive_tour_third_subtitle">Aggiungi contatti, crea un network, collabora, ed effettua chiamate audio e video senza lasciare mai MEGA.</string>
     <!-- Fourth subtitle of the tour screen -->
-    <string name="cloud_drive_tour_fourth_subtitle">Camera uploads is an essential feature for any mobile device and we have got you covered. Sign up for an account now.</string>
+    <string name="cloud_drive_tour_fourth_subtitle">I Caricamenti da fotocamera sono una feature essenziale per qualsiasi dispositivo mobile e possiamo farlo per te. Registra un account adesso.</string>
     <!-- Fifth subtitle of the tour screen -->
     <string name="cloud_drive_tour_fifth_subtitle">Meeting video criptati con conoscenza zero.</string>
     <!-- Titles of the tour screen to onboard users with the MEGA application -->
@@ -563,13 +563,14 @@
     <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
     <string name="transfers_scanning_folders_dialog_creating_folders_title">Sto creando le cartelle&#8230;</string>
     <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
-    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Starting transfers&#8230;</string>
+    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Avvio dei trasferimenti&#8230;</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Non chiudere l\’app. Se la chiudi, i trasferimenti non ancora completati saranno persi.</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning a single folder-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folder_subtitle">
-        <item quantity="one">Found 1 folder and %1$d file.</item>
-        <item quantity="other">Found 1 folder and %1$d files.</item>
+        <item quantity="one">Trovata 1 cartella e %1$d file.</item>
+        <item quantity="many">Trovata 1 cartella e %1$d di file.</item>
+        <item quantity="other">Trovata 1 cartella e %1$d file.</item>
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
@@ -579,44 +580,45 @@
     </plurals>
     <!-- Transfers scanning folders dialog sub-title when the app is creating the folders. This message will inform how many folders are already created together with the total amount of folders that will be created. Example: "1/134 folder" or "48/134 folders" -->
     <plurals name="transfers_scanning_folders_dialog_creating_folders_subtitle">
-        <item quantity="one">%1$d/%2$d folder</item>
-        <item quantity="other">%1$d/%2$d folders</item>
+        <item quantity="one">%1$d/%2$d cartella</item>
+        <item quantity="many">%1$d/%2$d di cartelle</item>
+        <item quantity="other">%1$d/%2$d cartelle</item>
     </plurals>
     <!-- Title of the clear debris item displayed in the sync settings menu -->
-    <string name="settings_sync_clear_debris_item_title">Clear .debris (local cache)</string>
+    <string name="settings_sync_clear_debris_item_title">Pulisci .debris (cache locale)</string>
     <!-- Title of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_title">Clear debris?</string>
+    <string name="settings_sync_clear_debris_dialog_title">Pulire la cache?</string>
     <!-- Body of the dialog shown when user clicks to clear debris from settings menu -->
-    <string name="settings_sync_clear_debris_dialog_body">Backups of the previous versions of your synced files will be permanently deleted from your device. \n\nCheck the .debris folder in your local device to see if you need to restore anything.</string>
+    <string name="settings_sync_clear_debris_dialog_body">I backup delle versioni precedenti dei file sincronizzati verranno eliminati definitivamente dal dispositivo. \n\nControlla la cartella .debris nel tuo dispositivo locale per vedere se devi ripristinare qualcosa.</string>
     <!-- Cancel button of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_cancel">Annulla</string>
     <!-- Continue button of the dialog shown when user clicks to clear debris from settings menu -->
     <string name="settings_sync_clear_debris_dialog_continue">Continua</string>
     <!-- Snackbar message shown when user clears debris from settings menu -->
-    <string name="settings_sync_debris_cleared_message">.debris folder successfully cleared</string>
+    <string name="settings_sync_debris_cleared_message">Cartella .debris svuotata con successo</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
         <item quantity="one">Found %1$s and %2$d file.</item>
         <item quantity="other">Found %1$s and %2$d files.</item>
     </plurals>
     <!-- Label for the file info information screen no tags label -->
-    <string name="file_info_information_no_tags_label">No tags</string>
+    <string name="file_info_information_no_tags_label">Nessun tag</string>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Sto annullando i trasferimenti&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Enquiries must be at least 10 characters</string>
+    <string name="report_issue_error_minimum_characters">Le richieste devono contenere almeno 10 caratteri</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Describe the issue with at least 10 characters</string>
+    <string name="report_issue_description_placeholder_message">Descrivi il problema con almeno 10 caratteri</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_title">Keep conversations private</string>
+    <string name="chat_recent_list_empty_title">Mantieni private le conversazioni</string>
     <!--Subtitle text from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_subtitle">All your messages, group chats, and calls are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <string name="chat_recent_list_empty_subtitle">Tutti i tuoi messaggi, le chat di gruppo e le chiamate sono protetti dalla nostra criptazione a conoscenza zero. [A]Scopri di più[/A]</string>
     <!-- Label of the action button of inviting a friend from contact screen -->
     <string name="chat_recent_invite_friend">Invita un amico</string>
     <!-- Title Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
-    <string name="invite_contacts_to_start_chat_title">Invite friends with confidence</string>
+    <string name="invite_contacts_to_start_chat_title">Invita gli amici con fiducia</string>
     <!-- Subtitle Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
-    <string name="invite_contacts_to_start_chat_subtitle">With top-notch security and verification codes, reach out without fear of scams, data mining, or information theft</string>
+    <string name="invite_contacts_to_start_chat_subtitle">Con codici di sicurezza e verifica di prim\’ordine, contattaci senza timore di truffe, data mining o furto di informazioni</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
     <string name="invite_contacts_action_label">Invita</string>
     <!-- Share hidden folder description -->
@@ -624,9 +626,9 @@
     <!-- Share hidden folders description -->
     <string name="share_hidden_folders_description">Ci sono oggetti nascosti in una o più di queste cartelle. La condivisione delle cartelle significa che gli oggetti nascosti saranno visibili alle persone con cui condividi. Gli oggetti saranno comunque nascosti nel tuo Cloud drive.</string>
     <!-- Title shown at the top of the survey screen when cancelling the subscription -->
-    <string name="account_cancel_subscription_survey_title">We’re sorry to see you leave! Can you tell us why you’re cancelling your subscription?</string>
+    <string name="account_cancel_subscription_survey_title">Ci dispiace che tu te ne vada! Puoi dirci perché stai annullando l\’abbonamento?</string>
     <!-- Message explaining the immediate effect of subscription cancellation -->
-    <string name="account_cancel_subscription_survey_cancellation_message">Your subscription will be cancelled immediately and you will be moved to a free MEGA account when your current plan expires. Note: Cancelling your subscription won’t delete your account.</string>
+    <string name="account_cancel_subscription_survey_cancellation_message">L\’abbonamento verrà annullato immediatamente e alla scadenza del piano attuale il tuo account diventerà un account MEGA gratuito. Nota: l\’annullamento dell\’abbonamento non comporta l\’eliminazione dell\’account.</string>
     <!-- Warning message shown in a red box when no reason is selected -->
     <string name="account_cancel_subscription_survey_no_reason_selected">Seleziona un motivo per annullare il tuo abbonamento</string>
     <!-- Option in the survey indicating that the plan is too expensive -->
@@ -650,35 +652,35 @@
     <!-- Option in the survey for other reasons, with a prompt to provide details -->
     <string name="account_cancel_subscription_survey_option_other">Altro (per favore, fornire dettagli)</string>
     <!-- Checkbox allowing MEGA to contact the user for further discussion -->
-    <string name="account_cancel_subscription_survey_allow_contact">I allow MEGA to contact me to talk about this topic further</string>
+    <string name="account_cancel_subscription_survey_allow_contact">Permetto a MEGA di contattarmi per parlare ulteriormente di questo argomento</string>
     <!-- Button label to cancel the subscription -->
     <string name="account_cancel_subscription_survey_cancel_button">Annulla Iscrizione</string>
     <!-- Button label to not cancel the subscription -->
     <string name="account_cancel_subscription_survey_do_not_cancel_button">Non annullare</string>
     <!-- Video recently watched title of the video section  -->
-    <string name="video_section_title_video_recently_watched">Recently watched</string>
+    <string name="video_section_title_video_recently_watched">Guardati di recente</string>
     <!-- Text that there is no recent activity of the video recently watched page  -->
     <string name="video_section_empty_hint_no_recently_activity">Nessuna attività recente</string>
     <!-- Bottom sheet option that remove recently watched item from the video recently watched page  -->
-    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Remove from recently watched</string>
+    <string name="video_section_bottom_sheet_option_remove_recently_watched_item">Rimuovi dai guardati di recente</string>
     <!-- Message that remove recently watched item from the video recently watched page  -->
-    <string name="video_section_message_remove_recently_watched_item">Removed from recently watched</string>
+    <string name="video_section_message_remove_recently_watched_item">Rimosso dai guardati di recente</string>
     <!-- Message that clear recently watched in the video recently watched page  -->
-    <string name="video_section_message_clear_recently_watched">Recently watched has been cleared</string>
+    <string name="video_section_message_clear_recently_watched">Guardati di recente è stato svuotato</string>
     <!-- Title of the Document Scanning Error Dialog -->
-    <string name="document_scanning_error_dialog_title">Scan incomplete</string>
+    <string name="document_scanning_error_dialog_title">Scansione incompleta</string>
     <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
-    <string name="document_scanning_error_type_insufficient_ram">Your phone doesn’t meet the minimum memory requirements to complete the scan</string>
+    <string name="document_scanning_error_type_insufficient_ram">Il telefono non soddisfa i requisiti minimi di memoria per completare la scansione</string>
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
-    <string name="document_scanning_error_type_generic_error">We’re having trouble scanning this document. Please try again.</string>
+    <string name="document_scanning_error_type_generic_error">Stiamo riscontrando problemi con la scansione di questo documento. Per favore riprova.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">Chiudi</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
-    <string name="meeting_recent_list_empty_title">Protect your calls</string>
+    <string name="meeting_recent_list_empty_title">Proteggi le tue chiamate</string>
     <!--Subtitle text from Meeting screen empty view-->
-    <string name="meeting_recent_list_empty_subtitle">Your meetings, family calls, and private conversations are protected by our zero-knowledge encryption. [A]Learn more[/A]</string>
+    <string name="meeting_recent_list_empty_subtitle">Le riunioni, le chiamate familiari e le conversazioni private sono protette dalla nostra criptazione a conoscenza zero. [A]Scopri di più[/A]</string>
     <!--Warning message to inform the user the minimum number of characters to enter into the edit text field for the survey-->
-    <string name="account_cancel_subscription_survey_minimum_character_limit">Message must be at least 10 characters</string>
+    <string name="account_cancel_subscription_survey_minimum_character_limit">Il messaggio deve contenere almeno 10 caratteri</string>
     <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
     <string name="account_cancel_subscription_survey_enter_details">Inserisci dettagli</string>
     <!-- the bonus title of join without account on left meeting page-->
@@ -686,23 +688,23 @@
     <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_whats_new_label">Cosa c\’è di nuovo</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_title">Easy, automated sync</string>
+    <string name="sync_promotion_bottom_sheet_title">Sincronizzazione semplice e automatica</string>
     <!-- Body message of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_body_message">Sync a folder on your device with MEGA to access the latest version of your files anywhere</string>
+    <string name="sync_promotion_bottom_sheet_body_message">Sincronizza una cartella sul tuo dispositivo con MEGA per accedere all\’ultima versione dei tuoi file ovunque</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sync folders</string>
+    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sincronizza cartelle</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_free">Upgrade to use sync</string>
+    <string name="sync_promotion_bottom_sheet_primary_button_text_free">Esegui l\’upgrade per utilizzare la sincronizzazione</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
     <string name="sync_promotion_bottom_sheet_secondary_button_text">Scopri di più</string>
     <!-- Sync option dialog cancel button -->
     <string name="settings_sync_option_cancel">Annulla</string>
     <!-- Snackbar message displayed when sync option is selected -->
-    <string name="settings_sync_option_updated_message">Sync options updated</string>
+    <string name="settings_sync_option_updated_message">Opzioni di sincronizzazione aggiornate</string>
     <!-- Title of the Contact Permission Explanation -->
-    <string name="title_enable_access_contact">Enable access to invite friends</string>
+    <string name="title_enable_access_contact">Attiva l\’accesso per invitare amici</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">In order to invite friends, you must allow MEGA to access your contact list</string>
+    <string name="subtitle_enable_access_contact">Per invitare amici, devi consentire a MEGA di accedere alla tua lista di contatti</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">Permetti l\’accesso</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -711,4 +713,30 @@
     <string name="document_scanning_confirmation_file_type_jpg">JPG</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are saved to Chat -->
     <string name="document_scanning_confirmation_destination_chat">Chat</string>
+    <!-- Label for the button or menu option to add a sync -->
+    <string name="device_center_add_sync_button_option">Aggiungi sincronizzazione</string>
+    <!-- Label for the button or menu option to add a backup -->
+    <string name="device_center_add_backup_button_option">Aggiungi backup</string>
+    <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_title">Upgrade your account</string>
+    <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
+    <string name="device_center_sync_backup_upgrade_dialog_message">Unlock the power to sync and backup your mobile device to cloud storage with one of our premium plans</string>
+    <!-- Title of the share meeting link bottom panel -->
+    <string name="meetings_share_link_bottom_sheet_title">Meeting confirmed: Invite others to join</string>
+    <!-- Button text of the send meeting link to chat -->
+    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Send link to chat</string>
+    <!-- Button text of the share meeting link -->
+    <string name="meetings_share_link_bottom_sheet_button_share_link">Ottieni link</string>
+    <!-- Title for the inline warning banner when storage is almost full -->
+    <string name="account_storage_over_quota_inline_warning_banner_title">Il tuo spazio di archiviazione è quasi pieno</string>
+    <!-- Title for the inline error banner when storage is full -->
+    <string name="account_storage_over_quota_inline_error_banner_title">Il tuo spazio di archiviazione è pieno</string>
+    <!-- Error Message indicating the user needs to upgrade now to get more storage -->
+    <string name="account_storage_over_quota_inline_error_banner_message">Per continuare a caricare dati, effettua l\’upgrade ora per ottenere più spazio di archiviazione.</string>
+    <!-- Warning Message indicating the user needs to upgrade to get more storage -->
+    <string name="account_storage_over_quota_inline_warning_banner_message">Per continuare a caricare dati, effettua l\’upgrade ora per ottenere più spazio di archiviazione.</string>
+    <!-- Label for the upgrade action link -->
+    <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Effettua l\’upgrade ora</string>
+    <!-- Hidden nodes sharing albums -->
+    <string name="hidden_nodes_sharing_albums">Ci sono oggetti nascosti in uno o più di questi album. Condividere gli album significa che gli oggetti nascosti saranno visibili alle persone con cui condividi. Gli oggetti saranno comunque nascosti nel tuo Cloud drive.</string>
 </resources>
