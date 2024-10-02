@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -16,17 +17,17 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.SetOpenInviteWithChatIdUseCase
-import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -39,7 +40,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 
@@ -64,10 +64,10 @@ class GroupChatInfoViewModelTest {
     private val broadcastChatArchivedUseCase: BroadcastChatArchivedUseCase = mock()
     private val broadcastLeaveChatUseCase: BroadcastLeaveChatUseCase = mock()
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase = mock()
-    private val getChatCallUseCase: GetChatCallUseCase = mock()
-    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val monitorChatRoomUpdatesUseCase = mock<MonitorChatRoomUpdatesUseCase>()
+    private val monitorCallInChatUseCase = mock<MonitorCallInChatUseCase>()
+    private val getChatRoomUseCase = mock<GetChatRoomUseCase>()
 
     private val connectivityFlow = MutableSharedFlow<Boolean>()
     private val updatePushNotificationSettings = MutableSharedFlow<Boolean>()
@@ -92,8 +92,8 @@ class GroupChatInfoViewModelTest {
             monitorUpdatePushNotificationSettingsUseCase,
             broadcastChatArchivedUseCase,
             broadcastLeaveChatUseCase,
-            getChatCallUseCase,
-            monitorChatCallUpdatesUseCase,
+            monitorCallInChatUseCase,
+            getChatRoomUseCase
         )
         initializeStubbing()
     }
@@ -104,7 +104,7 @@ class GroupChatInfoViewModelTest {
         wheneverBlocking { monitorSFUServerUpgradeUseCase() } doReturn emptyFlow()
         wheneverBlocking { getFeatureFlagValueUseCase.invoke(any()) } doReturn false
         wheneverBlocking { monitorChatRoomUpdatesUseCase(chatId) } doReturn chatRoomUpdates
-        wheneverBlocking { monitorChatCallUpdatesUseCase() } doReturn chatCallUpdates
+        whenever(monitorCallInChatUseCase(any())) doReturn chatCallUpdates
     }
 
     private fun initializeViewModel() {
@@ -123,10 +123,10 @@ class GroupChatInfoViewModelTest {
             broadcastChatArchivedUseCase = broadcastChatArchivedUseCase,
             broadcastLeaveChatUseCase = broadcastLeaveChatUseCase,
             monitorSFUServerUpgradeUseCase = monitorSFUServerUpgradeUseCase,
-            getChatCallUseCase = getChatCallUseCase,
-            monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorChatRoomUpdatesUseCase = monitorChatRoomUpdatesUseCase,
+            monitorCallInChatUseCase = monitorCallInChatUseCase,
+            getChatRoomUseCase = getChatRoomUseCase
         )
     }
 
@@ -164,22 +164,20 @@ class GroupChatInfoViewModelTest {
                 on { callId } doReturn 456L
             }
 
-            whenever(getChatCallUseCase.invoke(chatId)).thenReturn(call)
-
             initializeViewModel()
             underTest.setChatId(chatId)
 
             underTest.state.test {
                 val item = awaitItem()
                 assertThat(item.chatId).isEqualTo(chatId)
-                verify(monitorChatCallUpdatesUseCase).invoke()
+                verify(monitorCallInChatUseCase).invoke(chatId)
             }
         }
 
     @Test
     fun `test that call is not set if there is no existing call when setChatId is invoked`() =
         runTest {
-            whenever(getChatCallUseCase.invoke(chatId)).thenReturn(null)
+            whenever(monitorCallInChatUseCase(chatId)).thenReturn(flowOf(null))
 
             initializeViewModel()
             underTest.setChatId(chatId)
@@ -187,7 +185,7 @@ class GroupChatInfoViewModelTest {
             underTest.state.test {
                 val item = awaitItem()
                 assertThat(item.chatId).isEqualTo(chatId)
-                verifyNoInteractions(monitorChatCallUpdatesUseCase)
+                assertThat(item.call).isNull()
             }
         }
 
@@ -231,6 +229,53 @@ class GroupChatInfoViewModelTest {
 
         underTest.state.map { it.retentionTime }.test {
             assertThat(awaitItem()).isEqualTo(retentionTime)
+        }
+    }
+
+    @Test
+    fun `test that chat call updates state correctly`() = runTest {
+        val call = mock<ChatCall> {
+            on { callId } doReturn 456L
+        }
+
+        initializeViewModel()
+        whenever(monitorCallInChatUseCase(chatId)).thenReturn(flowOf(call))
+        underTest.setChatId(chatId)
+
+        underTest.state.map { it.call }.test {
+            assertThat(awaitItem()).isEqualTo(call)
+        }
+    }
+
+    @Test
+    fun `test that chat room updates state correctly`() = runTest {
+        val chat = mock<ChatRoom> {
+            on { chatId } doReturn chatId
+        }
+
+        initializeViewModel()
+        whenever(monitorChatRoomUpdatesUseCase(chatId)).thenReturn(flowOf(chat))
+        underTest.setChatId(chatId)
+
+        underTest.state.map { it.chatRoom }.test {
+            assertThat(awaitItem()).isEqualTo(chat)
+        }
+    }
+
+    @Test
+    fun `test that get chat room use case is invoked when setChatId is invoked`() = runTest {
+        val chat = mock<ChatRoom> {
+            on { chatId } doReturn chatId
+        }
+
+        initializeViewModel()
+        whenever(getChatRoomUseCase(chatId)).thenReturn(chat)
+        underTest.setChatId(chatId)
+
+        verify(getChatRoomUseCase).invoke(chatId)
+        underTest.state.test {
+            val item = awaitItem()
+            assertThat(item.chatRoom).isEqualTo(chat)
         }
     }
 

@@ -63,7 +63,6 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.Participan
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
 import mega.privacy.android.app.presentation.chat.groupInfo.GroupChatInfoViewModel
-import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.createForceAppUpdateDialog
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -83,6 +82,8 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -108,9 +109,7 @@ import javax.inject.Inject
  * Activity which shows group chat room information.
  *
  * @property getChatChangesUseCase [GetChatChangesUseCase]
- * @property getCallUseCase [GetCallUseCase]
  * @property binding [ActivityGroupChatPropertiesBinding]
- * @property isChatOpen True when the megaChatApi.openChatRoom() method has already been called from ChatActivity. False, otherwise
  * @property chatLink The chat link
  * @property chat [MegaChatRoom]
  * @property chatC [ChatController]
@@ -125,9 +124,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
     @Inject
     lateinit var getChatChangesUseCase: GetChatChangesUseCase
-
-    @Inject
-    lateinit var getCallUseCase: GetCallUseCase
 
     @Inject
     lateinit var chatManagement: ChatManagement
@@ -283,28 +279,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
             adapter?.checkNotifications(chatHandle)
 
-            chat?.let { chatRoom ->
-                if (chatRoom.isPreview || !chatRoom.isActive) {
-                    endCallForAllShouldBeVisible = false
-                } else {
-                    getCallUseCase.isThereACallAndIAmModerator(
-                        chatRoom.chatId
-                    )
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({ shouldBeVisible: Boolean ->
-                            endCallForAllShouldBeVisible = shouldBeVisible
-                            adapter?.updateEndCallOption(endCallForAllShouldBeVisible)
-
-                            if (!endCallForAllShouldBeVisible) {
-                                endCallForAllDialog?.dismiss()
-                            }
-
-                        }) { error: Throwable -> Timber.e("Error $error") }
-                        .addTo(composite)
-                }
-            }
-
             savedInstanceState?.let {
                 val isEndCallForAllDialogShown = it.getBoolean(
                     END_CALL_FOR_ALL_DIALOG, false
@@ -336,6 +310,19 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 invalidateOptionsMenu()
             }
             updateParticipantsWarning()
+            val call = state.call
+            val chatRoom = state.chatRoom
+            val endCallVisible = call != null && call.status != ChatCallStatus.Initial
+                    && call.status != ChatCallStatus.TerminatingUserParticipation
+                    && call.status != ChatCallStatus.Destroyed
+                    && chatRoom != null && chatRoom.ownPrivilege == ChatRoomPermission.Moderator
+            if (endCallVisible != endCallForAllShouldBeVisible) {
+                endCallForAllShouldBeVisible = endCallVisible
+                adapter?.updateEndCallOption(endCallForAllShouldBeVisible)
+                if (!endCallVisible) {
+                    endCallForAllDialog?.dismiss()
+                }
+            }
         }
 
         collectFlow(viewModel.state.map { it.retentionTime }.distinctUntilChanged()) {

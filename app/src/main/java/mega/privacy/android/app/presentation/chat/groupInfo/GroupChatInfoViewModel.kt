@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -29,17 +28,17 @@ import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
+import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.SetOpenInviteWithChatIdUseCase
-import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -79,10 +78,10 @@ class GroupChatInfoViewModel @Inject constructor(
     private val broadcastLeaveChatUseCase: BroadcastLeaveChatUseCase,
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
-    private val getChatCallUseCase: GetChatCallUseCase,
-    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    private val monitorCallInChatUseCase: MonitorCallInChatUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase,
+    private val getChatRoomUseCase: GetChatRoomUseCase,
 ) : ViewModel() {
 
     /**
@@ -114,19 +113,33 @@ class GroupChatInfoViewModel @Inject constructor(
     }
 
     private fun monitorChatUpdates(chatId: Long) {
+        viewModelScope.launch {
+            runCatching {
+                getChatRoomUseCase(chatId)
+            }.onSuccess { chat ->
+                _state.update { state -> state.copy(chatRoom = chat) }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
         monitorChatRoomUpdatesJob?.cancel()
         monitorChatRoomUpdatesJob = viewModelScope.launch {
-            monitorChatRoomUpdatesUseCase(chatId).collectLatest { chat ->
-                when {
-                    chat.hasChanged(ChatRoomChange.OpenInvite) -> {
-                        _state.update { state -> state.copy(resultSetOpenInvite = chat.isOpenInvite) }
-                    }
+            monitorChatRoomUpdatesUseCase(chatId)
+                .catch {
+                    Timber.e(it)
+                }
+                .collectLatest { chat ->
+                    _state.update { state -> state.copy(chatRoom = chat) }
+                    when {
+                        chat.hasChanged(ChatRoomChange.OpenInvite) -> {
+                            _state.update { state -> state.copy(resultSetOpenInvite = chat.isOpenInvite) }
+                        }
 
-                    chat.hasChanged(ChatRoomChange.RetentionTime) -> {
-                        _state.update { state -> state.copy(retentionTime = chat.retentionTime) }
+                        chat.hasChanged(ChatRoomChange.RetentionTime) -> {
+                            _state.update { state -> state.copy(retentionTime = chat.retentionTime) }
+                        }
                     }
                 }
-            }
         }
     }
 
@@ -161,7 +174,7 @@ class GroupChatInfoViewModel @Inject constructor(
                     chatId = newChatId
                 )
             }
-            getChatCall()
+            monitorCallInChat()
             monitorChatUpdates(newChatId)
         }
     }
@@ -320,30 +333,17 @@ class GroupChatInfoViewModel @Inject constructor(
     /**
      * Get chat call updates
      */
-    private fun getChatCall() {
-        viewModelScope.launch {
-            runCatching {
-                getChatCallUseCase(_state.value.chatId)?.let { call ->
-                    setShouldShowUserLimitsWarning(call)
-                    monitorChatCall(call.callId)
-                }
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
-    }
-
-    private fun monitorChatCall(callId: Long) {
+    private fun monitorCallInChat() {
         monitorChatCallJob?.cancel()
         monitorChatCallJob = viewModelScope.launch {
-            monitorChatCallUpdatesUseCase()
-                .filter { it.callId == callId }
+            monitorCallInChatUseCase(_state.value.chatId)
                 .catch {
                     Timber.e(it)
                 }
-                .collect { call ->
-                    setShouldShowUserLimitsWarning(call)
-                    call.changes?.apply {
+                .collectLatest { call ->
+                    _state.update { it.copy(call = call) }
+                    call?.let { setShouldShowUserLimitsWarning(it) }
+                    call?.changes?.apply {
                         if (contains(ChatCallChanges.Status)) {
                             Timber.d("Chat call status: ${call.status}")
                             when (call.status) {
