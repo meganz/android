@@ -88,7 +88,7 @@ class DefaultLoginRepositoryTest {
             fetchNodesUpdateMapper = fetchNodesUpdateMapper,
             applicationScope = testScope,
             setLogoutFlagWrapper = setLogoutFlagWrapper,
-            credentialsPreferencesGateway = credentialsPreferencesGateway
+            credentialsPreferencesGateway = { credentialsPreferencesGateway }
         )
     }
 

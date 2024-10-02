@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -70,7 +71,7 @@ internal class DefaultLoginRepository @Inject constructor(
     private val fetchNodesUpdateMapper: FetchNodesUpdateMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val setLogoutFlagWrapper: SetLogoutFlagWrapper,
-    private val credentialsPreferencesGateway: CredentialsPreferencesGateway
+    private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>
 ) : LoginRepository {
 
     override suspend fun initMegaChat(session: String) =
@@ -165,7 +166,7 @@ internal class DefaultLoginRepository @Inject constructor(
             megaApiGateway.logout(listener)
 
         }
-        credentialsPreferencesGateway.clear()
+        credentialsPreferencesGateway.get().clear()
     }
 
     override suspend fun chatLogout() = withContext(ioDispatcher) {

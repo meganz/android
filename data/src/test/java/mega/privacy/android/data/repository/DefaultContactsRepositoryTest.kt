@@ -144,7 +144,7 @@ class DefaultContactsRepositoryTest {
             contactDataMapper = contactDataMapper,
             contactCredentialsMapper = contactCredentialsMapper,
             inviteContactRequestMapper = inviteContactRequestMapper,
-            credentialsPreferencesGateway = credentialsPreferencesGateway,
+            credentialsPreferencesGateway = { credentialsPreferencesGateway },
             contactRequestActionMapper = contactRequestActionMapper,
             contactWrapper = contactWrapper,
             databaseHandler = { databaseHandler },

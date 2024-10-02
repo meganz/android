@@ -240,7 +240,7 @@ class DefaultAccountRepositoryTest {
             cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
             cookieSettingsMapper = cookieSettingsMapper,
             cookieSettingsIntMapper = cookieSettingsIntMapper,
-            credentialsPreferencesGateway = credentialsPreferencesGateway,
+            credentialsPreferencesGateway = { credentialsPreferencesGateway },
             userMapper = userMapper
         )
 

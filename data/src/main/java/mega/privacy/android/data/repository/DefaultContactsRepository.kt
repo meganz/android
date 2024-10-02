@@ -109,7 +109,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val contactDataMapper: ContactDataMapper,
     private val contactCredentialsMapper: ContactCredentialsMapper,
     private val inviteContactRequestMapper: InviteContactRequestMapper,
-    private val credentialsPreferencesGateway: CredentialsPreferencesGateway,
+    private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>,
     private val contactWrapper: ContactWrapper,
     private val contactRequestActionMapper: ContactRequestActionMapper,
     private val databaseHandler: Lazy<DatabaseHandler>,
@@ -595,11 +595,11 @@ internal class DefaultContactsRepository @Inject constructor(
         withContext(ioDispatcher) {
             if (forceRefresh) {
                 getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)
-                    .also { credentialsPreferencesGateway.saveFirstName(it) }
+                    .also { credentialsPreferencesGateway.get().saveFirstName(it) }
             } else {
-                credentialsPreferencesGateway.monitorCredentials().firstOrNull()?.firstName
+                credentialsPreferencesGateway.get().monitorCredentials().firstOrNull()?.firstName
                     ?: getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)
-                        .also { credentialsPreferencesGateway.saveFirstName(it) }
+                        .also { credentialsPreferencesGateway.get().saveFirstName(it) }
             }
         }
 
@@ -607,11 +607,11 @@ internal class DefaultContactsRepository @Inject constructor(
         withContext(ioDispatcher) {
             if (forceRefresh) {
                 getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_LASTNAME)
-                    .also { credentialsPreferencesGateway.saveLastName(it) }
+                    .also { credentialsPreferencesGateway.get().saveLastName(it) }
             } else {
-                credentialsPreferencesGateway.monitorCredentials().firstOrNull()?.lastName
+                credentialsPreferencesGateway.get().monitorCredentials().firstOrNull()?.lastName
                     ?: getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_LASTNAME)
-                        .also { credentialsPreferencesGateway.saveLastName(it) }
+                        .also { credentialsPreferencesGateway.get().saveLastName(it) }
             }
         }
 
@@ -656,13 +656,13 @@ internal class DefaultContactsRepository @Inject constructor(
         MegaApiJava.USER_ATTR_FIRSTNAME,
         "setUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)",
         value
-    ) { credentialsPreferencesGateway.saveFirstName(it) }
+    ) { credentialsPreferencesGateway.get().saveFirstName(it) }
 
     override suspend fun updateCurrentUserLastName(value: String): String = executeNameUpdate(
         MegaApiJava.USER_ATTR_LASTNAME,
         "setUserAttribute(MegaApiJava.USER_ATTR_LASTNAME)",
         value
-    ) { credentialsPreferencesGateway.saveLastName(it) }
+    ) { credentialsPreferencesGateway.get().saveLastName(it) }
 
     private suspend inline fun executeNameUpdate(
         type: Int,

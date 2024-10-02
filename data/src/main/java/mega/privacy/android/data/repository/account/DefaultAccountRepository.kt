@@ -168,7 +168,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
     private val cookieSettingsMapper: CookieSettingsMapper,
     private val cookieSettingsIntMapper: CookieSettingsIntMapper,
-    private val credentialsPreferencesGateway: CredentialsPreferencesGateway,
+    private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>,
     private val userMapper: UserMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
@@ -511,7 +511,7 @@ internal class DefaultAccountRepository @Inject constructor(
                 return@withContext megaApiGateway.accountEmail
                     .also {
                         if (!it.isNullOrBlank()) {
-                            credentialsPreferencesGateway.saveEmail(it)
+                            credentialsPreferencesGateway.get().saveEmail(it)
                         }
                     }
             }
@@ -563,14 +563,14 @@ internal class DefaultAccountRepository @Inject constructor(
 
         val session = megaApiGateway.dumpSession
         val credentials = userCredentialsMapper(email, session, null, null, myUserHandle.toString())
-        credentialsPreferencesGateway.save(credentials)
+        credentialsPreferencesGateway.get().save(credentials)
         ephemeralCredentialsGateway.get().clear()
 
         accountSessionMapper(email, session, myUserHandle)
     }
 
     override suspend fun getAccountCredentials() = withContext(ioDispatcher) {
-        credentialsPreferencesGateway.monitorCredentials().firstOrNull()
+        credentialsPreferencesGateway.get().monitorCredentials().firstOrNull()
     }
 
     override suspend fun changeEmail(email: String): String = withContext(ioDispatcher) {
@@ -644,7 +644,7 @@ internal class DefaultAccountRepository @Inject constructor(
             clearAttributes()
             clearChatSettings()
         }
-        credentialsPreferencesGateway.clear()
+        credentialsPreferencesGateway.get().clear()
         megaLocalRoomGateway.deleteAllBackups()
         megaLocalRoomGateway.deleteAllCompletedTransfers()
         megaLocalRoomGateway.clearOffline()
@@ -1306,15 +1306,15 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     override suspend fun setCredentials(credentials: UserCredentials) = withContext(ioDispatcher) {
-        credentialsPreferencesGateway.save(credentials)
+        credentialsPreferencesGateway.get().save(credentials)
     }
 
     override fun monitorCredentials(): Flow<UserCredentials?> =
-        credentialsPreferencesGateway.monitorCredentials()
+        credentialsPreferencesGateway.get().monitorCredentials()
             .flowOn(ioDispatcher)
 
     override suspend fun clearCredentials() = withContext(ioDispatcher) {
-        credentialsPreferencesGateway.clear()
+        credentialsPreferencesGateway.get().clear()
     }
 
     override suspend fun getCurrentUser(): User? = withContext(ioDispatcher) {
