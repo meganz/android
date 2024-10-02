@@ -1002,7 +1002,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     }
 
     override suspend fun sendMessage(chatId: Long, message: String) = withContext(ioDispatcher) {
-        chatMessageMapper(megaChatApiGateway.sendMessage(chatId, message))
+        megaChatApiGateway.sendMessage(chatId, message)?.let { chatMessageMapper(it) }
     }
 
     override suspend fun setLastPublicHandle(handle: Long) {

@@ -1511,7 +1511,7 @@ interface MegaChatApiGateway {
      *
      * @return MegaChatMessage that will be sent. The message id is not definitive, but temporal.
      */
-    fun sendMessage(chatId: Long, message: String): MegaChatMessage
+    fun sendMessage(chatId: Long, message: String): MegaChatMessage?
 
     /**
      * This method should be called when we want to close a public chat preview

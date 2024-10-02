@@ -18,8 +18,9 @@ class SendTextMessageUseCase @Inject constructor(
      * @param message Message to send.
      */
     suspend operator fun invoke(chatId: Long, message: String) {
-        val sentMessage = chatRepository.sendMessage(chatId, message)
-        val request = createSaveSentMessageRequestUseCase(sentMessage, chatId)
-        chatRepository.storeMessages(listOf(request))
+        chatRepository.sendMessage(chatId, message)?.let { sentMessage ->
+            val request = createSaveSentMessageRequestUseCase(sentMessage, chatId)
+            chatRepository.storeMessages(listOf(request))
+        }
     }
 }

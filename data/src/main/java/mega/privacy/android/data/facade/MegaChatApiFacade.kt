@@ -781,7 +781,7 @@ internal class MegaChatApiFacade @Inject constructor(
         chatApi.endChatCall(callId, listener)
     }
 
-    override fun sendMessage(chatId: Long, message: String): MegaChatMessage =
+    override fun sendMessage(chatId: Long, message: String): MegaChatMessage? =
         chatApi.sendMessage(chatId, message)
 
     override suspend fun closeChatPreview(chatId: Long) {

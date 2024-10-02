@@ -1142,7 +1142,11 @@ class ChatViewModel @Inject constructor(
                 if (editedMessage == null) {
                     messageCannotBeEdited()
                 }
-            } ?: sendTextMessageUseCase(chatId, message)
+            } ?: runCatching {
+                sendTextMessageUseCase(chatId, message)
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 
