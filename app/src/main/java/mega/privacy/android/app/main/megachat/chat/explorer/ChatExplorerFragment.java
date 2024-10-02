@@ -25,7 +25,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
@@ -53,7 +52,6 @@ import mega.privacy.android.app.main.megachat.chatAdapters.MegaChipChatExplorerA
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatExplorerAdapter;
 import mega.privacy.android.app.main.model.chat.explorer.ChatExplorerUiState;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import timber.log.Timber;
@@ -232,8 +230,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         } else if (context instanceof ChatExplorerActivity && addLayoutVisible) {
             addLayout.setElevation(canScroll ? elevation : 0);
 
-            Toolbar tB = ((ChatExplorerActivity) context).findViewById(R.id.toolbar_chat_explorer);
-            Util.changeToolBarElevationForDarkMode((ChatExplorerActivity) context, tB, canScroll);
+            AppBarLayout aB = ((ChatExplorerActivity) context).findViewById(R.id.app_bar_layout_chat_explorer);
+            aB.setElevation(canScroll ? elevation : 0);
         }
     }
 

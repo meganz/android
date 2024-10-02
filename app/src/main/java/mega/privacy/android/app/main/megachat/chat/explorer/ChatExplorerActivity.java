@@ -1,7 +1,6 @@
 package mega.privacy.android.app.main.megachat.chat.explorer;
 
 
-import static mega.privacy.android.app.extensions.EdgeToEdgeExtensionsKt.enableEdgeToEdgeAndConsumeInsets;
 import static mega.privacy.android.app.main.AddContactActivity.ALLOW_ADD_PARTICIPANTS;
 import static mega.privacy.android.app.utils.Constants.ACTION_FORWARD_MESSAGES;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA;
@@ -28,6 +27,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.FrameLayout;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -46,6 +46,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.extensions.EdgeToEdgeExtensionsKt;
 import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
@@ -96,7 +97,6 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         Timber.d("onCreate first");
-        enableEdgeToEdgeAndConsumeInsets(this);
         super.onCreate(savedInstanceState);
 
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
@@ -108,8 +108,9 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_chat_explorer);
+        EdgeToEdgeExtensionsKt.consumeInsetsWithToolbar(this, findViewById(R.id.app_bar_layout_chat_explorer));
 
         fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_chat_explorer);
         fab = (FloatingActionButton) findViewById(R.id.fab_chat_explorer);
