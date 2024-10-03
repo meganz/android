@@ -64,7 +64,6 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhoto
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CAMERA_UPLOAD
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CLOUD_DRIVE
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -215,7 +214,8 @@ fun AlbumPhotosSelectionScreen(
                     lazyGridState = lazyGridState,
                     uiPhotos = state.uiPhotos,
                     selectedPhotoIds = state.selectedPhotoIds,
-                    accountType = state.accountType,
+                    shouldApplySensitiveMode = state.accountType?.isPaid == true
+                            && !state.isBusinessAccountExpired,
                     onPhotoDownload = viewModel::downloadPhoto,
                     onPhotoSelection = { photo ->
                         if (photo.id in state.selectedPhotoIds) {
@@ -337,7 +337,7 @@ private fun AlbumPhotosSelectionHeader(
 private fun AlbumPhotosSelectionContent(
     lazyGridState: LazyGridState,
     uiPhotos: List<UIPhoto>,
-    accountType: AccountType?,
+    shouldApplySensitiveMode: Boolean,
     selectedPhotoIds: Set<Long>,
     onPhotoDownload: PhotoDownload,
     onPhotoSelection: (Photo) -> Unit,
@@ -353,7 +353,7 @@ private fun AlbumPhotosSelectionContent(
         selectedPhotoIds = selectedPhotoIds,
         uiPhotoList = uiPhotos,
         isBlurUnselectItem = selectedPhotoIds.size >= MAX_SELECTION_NUM,
-        accountType = accountType,
+        shouldApplySensitiveMode = shouldApplySensitiveMode,
     )
 }
 

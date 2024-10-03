@@ -42,20 +42,19 @@ import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.isDownloadPreview
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Photo
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PhotoView(
+    modifier: Modifier = Modifier,
     photo: Photo,
     isSelected: Boolean,
     currentZoomLevel: ZoomLevel,
-    accountType: AccountType?,
+    shouldApplySensitiveMode: Boolean,
     onClick: (Photo) -> Unit,
     onLongPress: (Photo) -> Unit,
     downloadPhoto: PhotoDownload,
-    modifier: Modifier = Modifier,
 ) {
     var photoBoxModifier = remember {
         when (currentZoomLevel) {
@@ -88,7 +87,7 @@ fun PhotoView(
     Box(modifier = photoBoxModifier) {
         PhotoCoverView(
             photo = photo,
-            accountType = accountType,
+            shouldApplySensitiveMode = shouldApplySensitiveMode,
             currentZoomLevel = currentZoomLevel,
             downloadPhoto = downloadPhoto,
             modifier = Modifier
@@ -123,7 +122,7 @@ fun PhotoView(
 }
 
 @Composable
-fun SelectedIconView(
+private fun SelectedIconView(
     modifier: Modifier,
 ) {
     Icon(
@@ -135,9 +134,9 @@ fun SelectedIconView(
 }
 
 @Composable
-fun PhotoCoverView(
+private fun PhotoCoverView(
     photo: Photo,
-    accountType: AccountType?,
+    shouldApplySensitiveMode: Boolean,
     currentZoomLevel: ZoomLevel,
     modifier: Modifier,
     downloadPhoto: PhotoDownload,
@@ -152,9 +151,9 @@ fun PhotoCoverView(
             is Photo.Image -> {
                 PhotoImageView(
                     photo = photo,
-                    accountType = accountType,
                     isPreview = isDownloadPreview,
-                    downloadPhoto = downloadPhoto
+                    downloadPhoto = downloadPhoto,
+                    shouldApplySensitiveMode = shouldApplySensitiveMode,
                 )
                 if (photo.isFavourite) {
                     Image(
@@ -170,7 +169,7 @@ fun PhotoCoverView(
             is Photo.Video -> {
                 PhotoImageView(
                     photo = photo,
-                    accountType = accountType,
+                    shouldApplySensitiveMode = shouldApplySensitiveMode,
                     isPreview = isDownloadPreview,
                     downloadPhoto = downloadPhoto
                 )
@@ -206,9 +205,9 @@ fun PhotoCoverView(
 
 
 @Composable
-fun PhotoImageView(
+private fun PhotoImageView(
     photo: Photo,
-    accountType: AccountType?,
+    shouldApplySensitiveMode: Boolean,
     isPreview: Boolean,
     downloadPhoto: PhotoDownload,
 ) {
@@ -237,10 +236,10 @@ fun PhotoImageView(
             .fillMaxWidth()
             .aspectRatio(1f)
             .alpha(0.5f.takeIf {
-                accountType?.isPaid == true && (photo.isSensitive || photo.isSensitiveInherited)
+                shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
             } ?: 1f)
             .blur(16.dp.takeIf {
-                accountType?.isPaid == true && (photo.isSensitive || photo.isSensitiveInherited)
+                shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
             } ?: 0.dp)
     )
 }

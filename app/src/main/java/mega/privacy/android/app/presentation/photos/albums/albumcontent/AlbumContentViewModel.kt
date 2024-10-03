@@ -21,6 +21,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Album.FavouriteAlbum
@@ -33,6 +34,7 @@ import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
 import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -79,6 +81,7 @@ internal class AlbumContentViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumContentState())
     val state = _state.asStateFlow()
@@ -142,8 +145,17 @@ internal class AlbumContentViewModel @Inject constructor(
 
     private fun monitorAccountDetail() = monitorAccountDetailUseCase()
         .onEach { accountDetail ->
+            val accountType = accountDetail.levelDetail?.accountType
+            val businessStatus =
+                if (accountType?.isBusinessAccount == true) {
+                    getBusinessStatusUseCase()
+                } else null
+
             _state.update {
-                it.copy(accountType = accountDetail.levelDetail?.accountType)
+                it.copy(
+                    accountType = accountType,
+                    isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+                )
             }
             if (_state.value.isLoading) return@onEach
 
@@ -259,7 +271,7 @@ internal class AlbumContentViewModel @Inject constructor(
         val showHiddenItems = showHiddenItems ?: return photos
         val isPaid = _state.value.accountType?.isPaid ?: return photos
 
-        return if (showHiddenItems || !isPaid) {
+        return if (showHiddenItems || !isPaid || _state.value.isBusinessAccountExpired) {
             photos
         } else {
             photos.filter { !it.isSensitive && !it.isSensitiveInherited }

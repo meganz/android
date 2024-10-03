@@ -64,4 +64,9 @@ enum class AccountType {
      * Convenient method to check paid account type
      */
     val isPaid: Boolean get() = this != FREE && this != UNKNOWN
+
+    /**
+     * Convenient method to check business account type
+     */
+    val isBusinessAccount: Boolean get() = this == PRO_FLEXI || this == BUSINESS
 }

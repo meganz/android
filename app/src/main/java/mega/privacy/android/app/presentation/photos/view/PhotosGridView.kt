@@ -78,8 +78,8 @@ internal fun PhotosGridView(
     photoDownland: PhotoDownload,
     selectedPhotoIds: Set<Long>,
     uiPhotoList: List<UIPhoto>,
+    shouldApplySensitiveMode: Boolean,
     modifier: Modifier = Modifier,
-    accountType: AccountType? = null,
     currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     endSpacing: Dp = 56.dp,
     lazyGridState: LazyGridState = rememberLazyGridState(),
@@ -160,7 +160,7 @@ internal fun PhotosGridView(
                                 isPreview = isDownloadPreview(configuration, currentZoomLevel),
                                 downloadPhoto = photoDownland,
                                 alpha = if (isBlurUnselectItem && !isSelected) 0.4f else 1.0f,
-                                accountType = accountType,
+                                shouldApplySensitiveMode = shouldApplySensitiveMode,
                             )
                         }
                     )
@@ -256,7 +256,7 @@ internal fun PhotoViewContainer(
 internal fun PhotoView(
     photo: Photo,
     isPreview: Boolean,
-    accountType: AccountType?,
+    shouldApplySensitiveMode: Boolean,
     downloadPhoto: PhotoDownload,
     alpha: Float = DefaultAlpha,
 ) {
@@ -286,10 +286,10 @@ internal fun PhotoView(
             .fillMaxWidth()
             .aspectRatio(1f)
             .alpha(0.5f.takeIf {
-                accountType?.isPaid == true && (photo.isSensitive || photo.isSensitiveInherited)
+                shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
             } ?: 1f)
             .blur(16.dp.takeIf {
-                accountType?.isPaid == true && (photo.isSensitive || photo.isSensitiveInherited)
+                shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
             } ?: 0.dp)
     )
 }

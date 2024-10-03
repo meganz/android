@@ -37,7 +37,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
@@ -77,7 +76,8 @@ fun AlbumCoverSelectionScreen(
                     lazyGridState = lazyGridState,
                     uiPhotos = state.uiPhotos,
                     selectedPhoto = state.selectedPhoto,
-                    accountType = state.accountType,
+                    shouldApplySensitiveMode = state.accountType?.isPaid == true
+                            && !state.isBusinessAccountExpired,
                     onPhotoDownload = viewModel::downloadPhoto,
                     onPhotoSelection = viewModel::selectPhoto,
                 )
@@ -133,7 +133,7 @@ private fun AlbumCoverSelectionContent(
     lazyGridState: LazyGridState,
     uiPhotos: List<UIPhoto>,
     selectedPhoto: Photo?,
-    accountType: AccountType?,
+    shouldApplySensitiveMode: Boolean,
     onPhotoDownload: PhotoDownload,
     onPhotoSelection: (Photo) -> Unit,
 ) {
@@ -148,7 +148,7 @@ private fun AlbumCoverSelectionContent(
         onLongPress = onPhotoSelection,
         selectedPhotoIds = setOfNotNull(selectedPhoto?.id),
         uiPhotoList = uiPhotos,
-        accountType = accountType,
+        shouldApplySensitiveMode = shouldApplySensitiveMode,
     )
 }
 

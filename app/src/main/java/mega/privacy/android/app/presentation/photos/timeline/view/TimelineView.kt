@@ -317,7 +317,8 @@ private fun HandlePhotosGridView(
                 CardListView(
                     state = lazyGridState,
                     dateCards = dateCards,
-                    accountType = timelineViewState.accountType,
+                    shouldApplySensitiveMode = timelineViewState.accountType?.isPaid == true
+                            && !timelineViewState.isBusinessAccountExpired,
                     photoDownload = photoDownload,
                     onCardClick = onCardClick,
                     cardListViewHeaderView = {

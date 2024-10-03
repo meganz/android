@@ -26,6 +26,7 @@ import mega.privacy.android.domain.usecase.AddPhotosToAlbum
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
@@ -49,6 +50,7 @@ class AlbumPhotosSelectionViewModelTest {
     private val filterCloudDrivePhotos = mock<FilterCloudDrivePhotos>()
     private val filterCameraUploadPhotos = mock<FilterCameraUploadPhotos>()
     private val addPhotosToAlbum = mock<AddPhotosToAlbum>()
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -193,6 +195,7 @@ class AlbumPhotosSelectionViewModelTest {
         },
         monitorShowHiddenItemsUseCase = mock(),
         monitorAccountDetailUseCase = mock(),
+        getBusinessStatusUseCase = getBusinessStatusUseCase,
     )
 
     private fun createUserAlbum(

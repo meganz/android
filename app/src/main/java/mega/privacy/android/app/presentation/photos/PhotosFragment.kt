@@ -205,7 +205,6 @@ class PhotosFragment : Fragment() {
                 OriginalTempTheme(isDark = mode.isDarkMode()) {
                     PhotosScreen(
                         viewComposeCoordinator = viewComposeCoordinator,
-                        getFeatureFlagUseCase = getFeatureFlagUseCase,
                         photosViewModel = photosViewModel,
                         timelineViewModel = timelineViewModel,
                         albumsViewModel = albumsViewModel,

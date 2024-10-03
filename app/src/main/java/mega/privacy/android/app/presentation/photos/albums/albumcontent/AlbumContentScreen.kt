@@ -51,16 +51,16 @@ import mega.privacy.android.app.presentation.photos.view.RemovePhotosFromAlbumDi
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaLinearProgressIndicator
-import mega.privacy.android.shared.original.core.ui.theme.black
-import mega.privacy.android.shared.original.core.ui.theme.dark_grey
-import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.domain.entity.photos.Album.FavouriteAlbum
 import mega.privacy.android.domain.entity.photos.Album.GifAlbum
 import mega.privacy.android.domain.entity.photos.Album.RawAlbum
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
+import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaLinearProgressIndicator
+import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.theme.dark_grey
+import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.mobile.analytics.event.AlbumAddPhotosFABEvent
 import mega.privacy.mobile.analytics.event.RemoveItemsFromAlbumDialogButtonEvent
 
@@ -163,7 +163,8 @@ internal fun AlbumContentScreen(
                     albumContentViewModel.togglePhotoSelection(photo)
                 },
                 selectedPhotos = albumContentState.selectedPhotos,
-                accountType = albumContentState.accountType,
+                shouldApplySensitiveMode = albumContentState.accountType?.isPaid == true
+                        && !albumContentState.isBusinessAccountExpired,
             )
 
             if (albumContentState.isAddingPhotos || albumContentState.isRemovingPhotos) {

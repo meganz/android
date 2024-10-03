@@ -48,12 +48,14 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
@@ -119,6 +121,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -196,9 +199,19 @@ class MediaDiscoveryViewModel @Inject constructor(
     internal fun monitorAccountDetail(loadPhotosDone: Boolean, sourcePhotos: List<Photo>) =
         monitorAccountDetailUseCase()
             .onEach { accountDetail ->
+                val accountType = accountDetail.levelDetail?.accountType
+                val businessStatus =
+                    if (accountType?.isBusinessAccount == true) {
+                        getBusinessStatusUseCase()
+                    } else null
+
                 _state.update {
-                    it.copy(accountType = accountDetail.levelDetail?.accountType)
+                    it.copy(
+                        accountType = accountType,
+                        isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+                    )
                 }
+
                 if (!loadPhotosDone) return@onEach
 
                 handleFolderPhotosAndLogic(sourcePhotos)
@@ -326,7 +339,7 @@ class MediaDiscoveryViewModel @Inject constructor(
         val showHiddenItems = showHiddenItems ?: return photos
         isPaid ?: return photos
 
-        return if (showHiddenItems || !isPaid) {
+        return if (showHiddenItems || !isPaid || _state.value.isBusinessAccountExpired) {
             photos
         } else {
             photos.filter { !it.isSensitive && !it.isSensitiveInherited }

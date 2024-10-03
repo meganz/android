@@ -23,18 +23,21 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.UIPhoto.PhotoItem
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
-import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumCoverUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -51,6 +54,7 @@ class AlbumCoverSelectionViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumCoverSelectionState())
     val state: StateFlow<AlbumCoverSelectionState> = _state
@@ -86,8 +90,17 @@ class AlbumCoverSelectionViewModel @Inject constructor(
 
     private suspend fun fetchAccountDetail() {
         val accountDetail = monitorAccountDetailUseCase().firstOrNull()
+        val accountType = accountDetail?.levelDetail?.accountType
+        val businessStatus =
+            if (accountType?.isBusinessAccount == true) {
+                getBusinessStatusUseCase()
+            } else null
+
         _state.update {
-            it.copy(accountType = accountDetail?.levelDetail?.accountType)
+            it.copy(
+                accountType = accountType,
+                isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+            )
         }
     }
 
@@ -141,7 +154,7 @@ class AlbumCoverSelectionViewModel @Inject constructor(
         val showHiddenItems = showHiddenItems ?: return photos
         val isPaid = _state.value.accountType?.isPaid ?: return photos
 
-        return if (showHiddenItems || !isPaid) {
+        return if (showHiddenItems || !isPaid || _state.value.isBusinessAccountExpired) {
             photos
         } else {
             photos.filter { !it.isSensitive && !it.isSensitiveInherited }

@@ -40,6 +40,7 @@ import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
@@ -136,6 +137,8 @@ internal class TimelineViewModelTest {
 
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
 
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+
     @BeforeEach
     fun setUp() {
         getTimelinePhotosUseCase.stub {
@@ -185,6 +188,7 @@ internal class TimelineViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 

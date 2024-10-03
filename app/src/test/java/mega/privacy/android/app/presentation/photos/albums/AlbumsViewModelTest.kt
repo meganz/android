@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -89,6 +90,7 @@ class AlbumsViewModelTest {
         )
     }
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
 
     @BeforeEach
     fun setUp() {
@@ -113,6 +115,7 @@ class AlbumsViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 

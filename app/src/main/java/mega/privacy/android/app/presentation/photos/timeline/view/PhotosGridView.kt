@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -132,7 +131,8 @@ fun PhotosGridView(
                     photo = item.photo,
                     isSelected = item.isSelected,
                     currentZoomLevel = timelineViewState.currentZoomLevel,
-                    accountType = timelineViewState.accountType,
+                    shouldApplySensitiveMode = timelineViewState.accountType?.isPaid == true
+                            && !timelineViewState.isBusinessAccountExpired,
                     onClick = onClick,
                     onLongPress = onLongPress,
                     downloadPhoto = downloadPhoto,

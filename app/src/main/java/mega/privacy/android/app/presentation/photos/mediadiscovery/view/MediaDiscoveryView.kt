@@ -487,7 +487,8 @@ private fun MDView(
                             onSwitchListView = onSwitchListView
                         )
                     },
-                    accountType = mediaDiscoveryViewState.accountType,
+                    shouldApplySensitiveMode = mediaDiscoveryViewState.accountType?.isPaid == true
+                            && !mediaDiscoveryViewState.isBusinessAccountExpired,
                 )
             } else {
                 val dateCards = when (mediaDiscoveryViewState.selectedTimeBarTab) {
@@ -515,7 +516,8 @@ private fun MDView(
                                 )
                             }
                         },
-                        accountType = mediaDiscoveryViewState.accountType,
+                        shouldApplySensitiveMode = mediaDiscoveryViewState.accountType?.isPaid == true
+                                && !mediaDiscoveryViewState.isBusinessAccountExpired,
                     )
                 }
             }

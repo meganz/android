@@ -40,10 +40,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.view.isSelected
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_032
 import mega.privacy.android.shared.original.core.ui.theme.white
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.photos.Photo
 
 private val gap = 1.dp
 
@@ -54,7 +53,7 @@ internal fun PhotosBig2SmallItems(
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
     selectedPhotos: Set<Photo>,
-    accountType: AccountType? = null,
+    shouldApplySensitiveMode: Boolean,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -70,7 +69,7 @@ internal fun PhotosBig2SmallItems(
                     photo = photos[0],
                     photoDownload = photoDownload,
                     isPreview = true,
-                    isSensitive = accountType?.isPaid == true && (photos[0].isSensitive || photos[0].isSensitiveInherited),
+                    isSensitive = shouldApplySensitiveMode && (photos[0].isSensitive || photos[0].isSensitiveInherited),
                 )
             },
             photo = photos[0],
@@ -89,7 +88,7 @@ internal fun PhotosBig2SmallItems(
                             height = size,
                             photo = photos[1],
                             photoDownload = photoDownload,
-                            isSensitive = accountType?.isPaid == true && (photos[1].isSensitive || photos[1].isSensitiveInherited),
+                            isSensitive = shouldApplySensitiveMode && (photos[1].isSensitive || photos[1].isSensitiveInherited),
                         )
                     },
                     photo = photos[1],
@@ -108,7 +107,7 @@ internal fun PhotosBig2SmallItems(
                                 height = size,
                                 photo = photos[2],
                                 photoDownload = photoDownload,
-                                isSensitive = accountType?.isPaid == true && (photos[2].isSensitive || photos[2].isSensitiveInherited),
+                                isSensitive = shouldApplySensitiveMode && (photos[2].isSensitive || photos[2].isSensitiveInherited),
                             )
                         },
                         photo = photos[2],
@@ -128,7 +127,7 @@ internal fun Photos3SmallItems(
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
     selectedPhotos: Set<Photo>,
-    accountType: AccountType? = null,
+    shouldApplySensitiveMode: Boolean,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -143,7 +142,7 @@ internal fun Photos3SmallItems(
                     height = size,
                     photo = photos[0],
                     photoDownload = downloadPhoto,
-                    isSensitive = accountType?.isPaid == true && (photos[0].isSensitive || photos[0].isSensitiveInherited),
+                    isSensitive = shouldApplySensitiveMode && (photos[0].isSensitive || photos[0].isSensitiveInherited),
                 )
             },
             photo = photos[0],
@@ -159,7 +158,7 @@ internal fun Photos3SmallItems(
                         height = size,
                         photo = photos[1],
                         photoDownload = downloadPhoto,
-                        isSensitive = accountType?.isPaid == true && (photos[1].isSensitive || photos[1].isSensitiveInherited),
+                        isSensitive = shouldApplySensitiveMode && (photos[1].isSensitive || photos[1].isSensitiveInherited),
                     )
                 },
                 photo = photos[1],
@@ -179,7 +178,7 @@ internal fun Photos3SmallItems(
                         height = size,
                         photo = photos[2],
                         photoDownload = downloadPhoto,
-                        isSensitive = accountType?.isPaid == true && (photos[2].isSensitive || photos[2].isSensitiveInherited),
+                        isSensitive = shouldApplySensitiveMode && (photos[2].isSensitive || photos[2].isSensitiveInherited),
                     )
                 },
                 photo = photos[2],
@@ -196,7 +195,7 @@ internal fun Photos2SmallBigItems(
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
     selectedPhotos: Set<Photo>,
-    accountType: AccountType? = null,
+    shouldApplySensitiveMode: Boolean,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -214,7 +213,7 @@ internal fun Photos2SmallBigItems(
                         height = size,
                         photo = photos[0],
                         photoDownload = downloadPhoto,
-                        isSensitive = accountType?.isPaid == true && (photos[0].isSensitive || photos[0].isSensitiveInherited),
+                        isSensitive = shouldApplySensitiveMode && (photos[0].isSensitive || photos[0].isSensitiveInherited),
                     )
                 },
                 photo = photos[0],
@@ -234,7 +233,7 @@ internal fun Photos2SmallBigItems(
                             height = size,
                             photo = photos[2],
                             photoDownload = downloadPhoto,
-                            isSensitive = accountType?.isPaid == true && (photos[2].isSensitive || photos[2].isSensitiveInherited),
+                            isSensitive = shouldApplySensitiveMode && (photos[2].isSensitive || photos[2].isSensitiveInherited),
                         )
                     },
                     photo = photos[2],
@@ -253,7 +252,7 @@ internal fun Photos2SmallBigItems(
                         photo = photos[1],
                         photoDownload = downloadPhoto,
                         isPreview = true,
-                        isSensitive = accountType?.isPaid == true && (photos[1].isSensitive || photos[1].isSensitiveInherited),
+                        isSensitive = shouldApplySensitiveMode && (photos[1].isSensitive || photos[1].isSensitiveInherited),
                     )
                 },
                 photo = photos[1],

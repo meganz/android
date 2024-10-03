@@ -167,6 +167,8 @@ fun MediaDiscoveryScreen(
                         yearsCardList = uiState.yearsCardList,
                         monthsCardList = uiState.monthsCardList,
                         daysCardList = uiState.daysCardList,
+                        shouldApplySensitiveMode = uiState.accountType?.isPaid == true
+                                && !uiState.isBusinessAccountExpired,
                         currentZoomLevel = uiState.currentZoomLevel,
                         selectedPhotoIds = uiState.selectedPhotoIds,
                         onPhotoDownload = photoDownloaderViewModel::downloadPublicNodePhoto,
@@ -387,6 +389,7 @@ private fun MediaDiscoveryContent(
     currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     lazyGridState: LazyGridState,
     uiPhotos: List<UIPhoto>,
+    shouldApplySensitiveMode: Boolean,
     selectedTimeBarTab: TimeBarTab = TimeBarTab.All,
     yearsCardList: List<DateCard> = emptyList(),
     monthsCardList: List<DateCard> = emptyList(),
@@ -419,6 +422,7 @@ private fun MediaDiscoveryContent(
                     onLongPress = onPhotoLongPressed,
                     selectedPhotoIds = selectedPhotoIds,
                     uiPhotoList = uiPhotos,
+                    shouldApplySensitiveMode = shouldApplySensitiveMode,
                 )
             } else {
                 val dateCards = when (selectedTimeBarTab) {

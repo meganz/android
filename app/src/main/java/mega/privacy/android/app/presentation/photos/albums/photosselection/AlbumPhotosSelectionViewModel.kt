@@ -28,21 +28,23 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhoto
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.ALL_PHOTOS
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CAMERA_UPLOAD
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CLOUD_DRIVE
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.AddPhotosToAlbum
-import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
-import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -62,6 +64,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumPhotosSelectionState())
     val state: StateFlow<AlbumPhotosSelectionState> = _state
@@ -150,7 +153,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
             val showHiddenItems = showHiddenItems ?: true
             val isPaid = _state.value.accountType?.isPaid ?: false
 
-            if (showHiddenItems || !isPaid) {
+            if (showHiddenItems || !isPaid || _state.value.isBusinessAccountExpired) {
                 photos
             } else {
                 photos.filter { !it.isSensitive && !it.isSensitiveInherited }
@@ -215,8 +218,17 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
 
     private fun monitorAccountDetail() = monitorAccountDetailUseCase()
         .onEach { accountDetail ->
+            val accountType = accountDetail.levelDetail?.accountType
+            val businessStatus =
+                if (accountType?.isBusinessAccount == true) {
+                    getBusinessStatusUseCase()
+                } else null
+
             _state.update {
-                it.copy(accountType = accountDetail.levelDetail?.accountType)
+                it.copy(
+                    accountType = accountType,
+                    isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+                )
             }
             if (_state.value.sourcePhotos.isEmpty()) return@onEach
 

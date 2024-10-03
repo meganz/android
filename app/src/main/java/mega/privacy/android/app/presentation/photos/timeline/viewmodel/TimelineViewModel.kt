@@ -39,6 +39,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.CAN_
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
@@ -51,6 +52,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
@@ -120,6 +122,7 @@ class TimelineViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
 
     internal val _state = MutableStateFlow(TimelineViewState(loadPhotosDone = false))
@@ -189,9 +192,19 @@ class TimelineViewModel @Inject constructor(
 
     private fun monitorAccountDetail() = monitorAccountDetailUseCase()
         .onEach { accountDetail ->
+            val accountType = accountDetail.levelDetail?.accountType
+            val businessStatus =
+                if (accountType?.isBusinessAccount == true) {
+                    getBusinessStatusUseCase()
+                } else null
+
             _state.update {
-                it.copy(accountType = accountDetail.levelDetail?.accountType)
+                it.copy(
+                    accountType = accountType,
+                    isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+                )
             }
+
             if (!_state.value.loadPhotosDone) return@onEach
 
             handleAndUpdatePhotosUIState(
@@ -500,7 +513,7 @@ class TimelineViewModel @Inject constructor(
         val showHiddenItems = showHiddenItems ?: return photos
         val isPaid = _state.value.accountType?.isPaid ?: return photos
 
-        return if (showHiddenItems || !isPaid) {
+        return if (showHiddenItems || !isPaid || _state.value.isBusinessAccountExpired) {
             photos
         } else {
             photos.filter { !it.isSensitive && !it.isSensitiveInherited }

@@ -23,6 +23,7 @@ data class AlbumPhotosSelectionState(
     val numCommittedPhotos: Int = 0,
     val accountType: AccountType? = null,
     val isLoading: Boolean = true,
+    val isBusinessAccountExpired: Boolean = false,
 )
 
 enum class AlbumFlow {

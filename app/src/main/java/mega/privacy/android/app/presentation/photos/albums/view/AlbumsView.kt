@@ -127,7 +127,8 @@ fun AlbumsView(
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
     val grids = 3.takeIf { isPortrait } ?: 4
 
-    val isPaid = albumsViewState.accountType?.isPaid
+    val shouldApplySensitiveMode = albumsViewState.accountType?.isPaid == true
+            && !albumsViewState.isBusinessAccountExpired
 
     val scaffoldState = rememberScaffoldState()
 
@@ -292,10 +293,10 @@ fun AlbumsView(
                                     .clip(RoundedCornerShape(10.dp))
                                     .aspectRatio(1f)
                                     .alpha(0.5f.takeIf {
-                                        isPaid == true && (cover?.isSensitive == true || cover?.isSensitiveInherited == true)
+                                        shouldApplySensitiveMode && (cover?.isSensitive == true || cover?.isSensitiveInherited == true)
                                     } ?: 1f)
                                     .blur(16.dp.takeIf {
-                                        isPaid == true && (cover?.isSensitive == true || cover?.isSensitiveInherited == true)
+                                        shouldApplySensitiveMode && (cover?.isSensitive == true || cover?.isSensitiveInherited == true)
                                     } ?: 0.dp)
                                     .then(
                                         if (isAlbumSelected(

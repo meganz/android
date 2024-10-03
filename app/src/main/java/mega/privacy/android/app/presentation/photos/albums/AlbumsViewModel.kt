@@ -24,11 +24,13 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -64,6 +66,7 @@ class AlbumsViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumsViewState())
     val state = _state.asStateFlow()
@@ -163,8 +166,17 @@ class AlbumsViewModel @Inject constructor(
 
     private fun monitorAccountDetail() = monitorAccountDetailUseCase()
         .onEach { accountDetail ->
+            val accountType = accountDetail.levelDetail?.accountType
+            val businessStatus =
+                if (accountType?.isBusinessAccount == true) {
+                    getBusinessStatusUseCase()
+                } else null
+
             _state.update {
-                it.copy(accountType = accountDetail.levelDetail?.accountType)
+                it.copy(
+                    accountType = accountType,
+                    isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+                )
             }
             if (!_state.value.showAlbums) return@onEach
 
@@ -177,11 +189,12 @@ class AlbumsViewModel @Inject constructor(
         val isPaid = _state.value.accountType?.isPaid ?: false
 
         val systemAlbums = systemAlbumPhotos.mapNotNull { (album, photos) ->
-            val filteredPhotos = if (showHiddenItems || !isPaid) {
-                photos
-            } else {
-                photos.filter { !it.isSensitive && !it.isSensitiveInherited }
-            }
+            val filteredPhotos =
+                if (showHiddenItems || !isPaid || _state.value.isBusinessAccountExpired) {
+                    photos
+                } else {
+                    photos.filter { !it.isSensitive && !it.isSensitiveInherited }
+                }
             if (album !is Album.FavouriteAlbum && filteredPhotos.isEmpty()) return@mapNotNull null
 
             val cover = filteredPhotos.firstOrNull()

@@ -47,6 +47,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property accountType the account detail
  * @property isHiddenNodesOnboarded if is hidden nodes onboarded
  * @property storageCapacity the storage capacity
+ * @property isBusinessAccountExpired if the business or pro flexi is expired
  */
 data class MediaDiscoveryViewState(
     val currentFolderId: Long? = null,
@@ -78,4 +79,5 @@ data class MediaDiscoveryViewState(
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean = false,
     val storageCapacity: StorageOverQuotaCapacity? = null,
+    val isBusinessAccountExpired: Boolean = false,
 )

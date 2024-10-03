@@ -59,6 +59,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property showCameraUploadsCompletedMessage          True if the message that Camera Uploads has been completed should be shown
  * @property accountType                                Indicates the User's Account Type
  * @property isHiddenNodesOnboarded                     True if the Hidden Nodes have been onboarded
+ * @property isBusinessAccountExpired                   True if the Business or Pro Flexi plan has expired
  */
 data class TimelineViewState(
     val photos: List<Photo> = emptyList(),
@@ -108,4 +109,5 @@ data class TimelineViewState(
     val showCameraUploadsCompletedMessage: Boolean = false,
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean = false,
+    val isBusinessAccountExpired: Boolean = false,
 )

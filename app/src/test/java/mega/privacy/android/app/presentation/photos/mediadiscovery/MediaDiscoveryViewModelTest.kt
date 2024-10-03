@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
@@ -123,6 +124,7 @@ class MediaDiscoveryViewModelTest {
         }.thenReturn(false)
     }
     private val getNodeContentUriByHandleUseCase = mock<GetNodeContentUriByHandleUseCase>()
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -163,7 +165,8 @@ class MediaDiscoveryViewModelTest {
             defaultDispatcher = UnconfinedTestDispatcher(),
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
-            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase
+            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 

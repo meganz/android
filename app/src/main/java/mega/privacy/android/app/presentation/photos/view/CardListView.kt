@@ -40,7 +40,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.DateCardCount
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
 
 @Composable
@@ -49,7 +48,7 @@ fun CardListView(
     photoDownload: PhotoDownload,
     onCardClick: (DateCard) -> Unit,
     state: LazyGridState = rememberLazyGridState(),
-    accountType: AccountType? = null,
+    shouldApplySensitiveMode: Boolean = false,
     cardListViewHeaderView: @Composable () -> Unit = {},
 ) {
     val spanCount =
@@ -118,10 +117,10 @@ fun CardListView(
                             .fillMaxWidth()
                             .aspectRatio(1f)
                             .alpha(0.5f.takeIf {
-                                accountType?.isPaid == true && (photo.isSensitive || photo.isSensitiveInherited)
+                                shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
                             } ?: 1f)
                             .blur(16.dp.takeIf {
-                                accountType?.isPaid == true && (photo.isSensitive || photo.isSensitiveInherited)
+                                shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
                             } ?: 0.dp)
                     )
                     Box(

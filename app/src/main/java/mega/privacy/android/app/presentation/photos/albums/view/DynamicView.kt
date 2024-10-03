@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumPhotoItem
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Photo
 
 @Composable
@@ -22,11 +21,11 @@ internal fun DynamicView(
     photos: List<Photo>,
     smallWidth: Dp,
     photoDownload: PhotoDownload,
+    shouldApplySensitiveMode: Boolean = false,
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
     selectedPhotos: Set<Photo>,
     endSpacing: Dp = 0.dp,
-    accountType: AccountType? = null,
 ) {
     val dynamicList = remember(photos) {
         photos.chunked(3).mapIndexed { i, list ->
@@ -63,7 +62,7 @@ internal fun DynamicView(
                         onClick = onClick,
                         onLongPress = onLongPress,
                         selectedPhotos = selectedPhotos,
-                        accountType = accountType,
+                        shouldApplySensitiveMode = shouldApplySensitiveMode,
                     )
                 }
 
@@ -75,7 +74,7 @@ internal fun DynamicView(
                         onClick = onClick,
                         onLongPress = onLongPress,
                         selectedPhotos = selectedPhotos,
-                        accountType = accountType,
+                        shouldApplySensitiveMode = shouldApplySensitiveMode,
                     )
                 }
 
@@ -87,7 +86,7 @@ internal fun DynamicView(
                         onClick = onClick,
                         onLongPress = onLongPress,
                         selectedPhotos = selectedPhotos,
-                        accountType = accountType,
+                        shouldApplySensitiveMode = shouldApplySensitiveMode,
                     )
                 }
             }

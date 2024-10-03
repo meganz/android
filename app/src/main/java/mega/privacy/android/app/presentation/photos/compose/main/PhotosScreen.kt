@@ -14,7 +14,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.PhotosViewComposeCoordinator
 import mega.privacy.android.app.presentation.photos.PhotosViewModel
@@ -33,7 +32,6 @@ import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetect
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.CameraUploadsBusinessAccountDialog
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.AlbumSelected
 import mega.privacy.mobile.analytics.event.AlbumSelectedEvent
 
@@ -42,7 +40,6 @@ import mega.privacy.mobile.analytics.event.AlbumSelectedEvent
 fun PhotosScreen(
     /** A temporary field to support compatibility between view and compose architecture. */
     viewComposeCoordinator: PhotosViewComposeCoordinator,
-    getFeatureFlagUseCase: GetFeatureFlagValueUseCase,
     photosViewModel: PhotosViewModel,
     timelineViewModel: TimelineViewModel,
     albumsViewModel: AlbumsViewModel,
@@ -76,7 +73,7 @@ fun PhotosScreen(
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
             photosViewModel.onTabSelected(selectedTab = photosViewState.tabs[page])
-            val photosTab = PhotosTab.values()[page]
+            val photosTab = PhotosTab.entries[page]
             pagerState.scrollToPage(photosTab.ordinal)
             Analytics.tracker.trackEvent(photosTab.analyticsInfo)
         }

@@ -20,6 +20,8 @@ import mega.privacy.android.domain.entity.photos.AlbumId
  * @property removedLinksCount
  * @property selectedAlbumIds
  * @property showAlbums
+ * @property accountType
+ * @property isBusinessAccountExpired
  */
 data class AlbumsViewState(
     val albums: List<UIAlbum> = emptyList(),
@@ -38,6 +40,7 @@ data class AlbumsViewState(
     val selectedAlbumIds: Set<AlbumId> = setOf(),
     val showAlbums: Boolean = false,
     val accountType: AccountType? = null,
+    val isBusinessAccountExpired: Boolean = false,
 ) {
     val currentUIAlbum: UIAlbum?
         get() {
