@@ -59,12 +59,10 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.ColorRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -870,21 +868,6 @@ public class Util {
         icon.setColorFilter(ContextCompat.getColor(context, idColor), PorterDuff.Mode.SRC_ATOP);
 
         return icon;
-    }
-
-    /**
-     * Set status bar color.
-     *
-     * @param activity the activity
-     * @param color    color of the status bar
-     */
-    public static void setStatusBarColor(Activity activity, @ColorRes int color) {
-        Window window = activity.getWindow();
-        if (window == null) {
-            return;
-        }
-
-        window.setStatusBarColor(ContextCompat.getColor(activity, color));
     }
 
     /**

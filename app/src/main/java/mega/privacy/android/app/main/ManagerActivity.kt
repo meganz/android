@@ -2538,6 +2538,11 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     fun deleteTurnOnNotificationsFragment() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return
+        }
+        //This restriction is already enforced indirectly,
+        // but stated here explicitly as statusBarColor should not be set from Android 15
         Timber.d("deleteTurnOnNotificationsFragment")
         turnOnNotifications = false
         appBarLayout.visibility = View.VISIBLE
@@ -2545,7 +2550,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         supportInvalidateOptionsMenu()
         selectDrawerItem(drawerItem)
-        Util.setStatusBarColor(this, android.R.color.transparent)
+        window?.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
     }
 
     private fun deleteCurrentFragment() {
@@ -2556,7 +2561,13 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
+
     private fun setTurnOnNotificationsFragment() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return
+        }
+        //This restriction is already enforced in the calling function,
+        // but stated here explicitly as statusBarColor should not be set from Android 15
         Timber.d("setTurnOnNotificationsFragment")
         supportActionBar?.subtitle = null
         appBarLayout.visibility = View.GONE
@@ -2577,7 +2588,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         supportInvalidateOptionsMenu()
         hideFabButton()
         showHideBottomNavigationView(true)
-        Util.setStatusBarColor(this, R.color.teal_500_teal_400)
+        window?.statusBarColor = ContextCompat.getColor(this, R.color.teal_500_teal_400)
     }
 
     private fun actionOpenFolder(handleIntent: Long) {
