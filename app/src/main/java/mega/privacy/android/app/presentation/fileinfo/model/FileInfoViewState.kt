@@ -12,7 +12,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.shared.original.core.ui.utils.textcomparator.AlphanumericComparator
-import nz.mega.sdk.MegaShare
 
 /**
  * Represents the view state of the File info screen
@@ -28,7 +27,6 @@ import nz.mega.sdk.MegaShare
  * @param previewUriString the uri of the file containing the preview
  * @param thumbnailUriString the uri of the file containing the thumbnail, just as a fallback in case there's no [previewUriString]
  * @param folderTreeInfo the folder info if the node is a folder
- * @param outSharesDeprecated shares in case of a node shared with others as outgoing share (To be removed when the compose view is used)
  * @param outShares shares in case of a node shared with others as outgoing share (To be used when the compose view is used)
  * @param nodeLocationInfo the location info of the node
  * @param isAvailableOffline true if the file is available offline
@@ -75,8 +73,6 @@ internal data class FileInfoViewState(
     val previewUriString: String? = null,
     val thumbnailUriString: String? = null,
     val folderTreeInfo: FolderTreeInfo? = null,
-    @Deprecated("to be removed once FileContactsListBottomSheetDialogFragment migrated to compose")
-    val outSharesDeprecated: List<MegaShare> = emptyList(),
     val outShares: List<ContactPermission> = emptyList(),
     val nodeLocationInfo: LocationInfo? = null,
     val isAvailableOffline: Boolean = false,
@@ -84,7 +80,7 @@ internal data class FileInfoViewState(
     val isAvailableOfflineAvailable: Boolean = false,
     val inShareOwnerContactItem: ContactItem? = null,
     val accessPermission: AccessPermission = AccessPermission.UNKNOWN,
-    val contactToShowOptions: String? = null,
+    val contactToShowOptions: ContactPermission? = null,
     val outShareContactsSelected: List<String> = emptyList(),
     val iconResource: Int? = null,
     val sizeInBytes: Long = 0,

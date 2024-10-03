@@ -15,8 +15,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
-import mega.privacy.android.app.domain.usecase.shares.GetOutShares
-import mega.privacy.android.app.presentation.fileinfo.FileInfoViewModel
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
@@ -87,7 +85,6 @@ import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaShare
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -132,7 +129,6 @@ internal class FileInfoViewModelTest {
     private val megaNodeRepository: MegaNodeRepository = mock()
     private val getNodeVersionsByHandleUseCase: GetNodeVersionsByHandleUseCase = mock()
     private val getNodeLocationInfo: GetNodeLocationInfo = mock()
-    private val getOutShares: GetOutShares = mock()
     private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase = mock()
     private val setNodeDescriptionUseCase: SetNodeDescriptionUseCase = mock()
     private val isAvailableOffline: IsAvailableOfflineUseCase = mock()
@@ -192,7 +188,6 @@ internal class FileInfoViewModelTest {
             megaNodeRepository,
             getNodeVersionsByHandleUseCase,
             getNodeLocationInfo,
-            getOutShares,
             getNodeOutSharesUseCase,
             setNodeDescriptionUseCase,
             isAvailableOffline,
@@ -239,7 +234,6 @@ internal class FileInfoViewModelTest {
             monitorContactUpdates = monitorContactUpdates,
             getNodeVersionsByHandleUseCase = getNodeVersionsByHandleUseCase,
             getNodeLocationInfo = getNodeLocationInfo,
-            getOutShares = getOutShares,
             getNodeOutSharesUseCase = getNodeOutSharesUseCase,
             setNodeDescriptionUseCase = setNodeDescriptionUseCase,
             isAvailableOfflineUseCase = isAvailableOffline,
@@ -293,7 +287,6 @@ internal class FileInfoViewModelTest {
         whenever(isAvailableOffline.invoke(any())).thenReturn(true)
         whenever(getAvailableNodeActionsUseCase(any())).thenReturn(emptyList())
         whenever(getNodeOutSharesUseCase(nodeId)).thenReturn(emptyList())
-        whenever(getOutShares(nodeId)).thenReturn(emptyList())
         whenever(getContactVerificationWarningUseCase()).thenReturn(false)
         whenever(monitorOfflineFileAvailabilityUseCase()).thenReturn(emptyFlow())
         whenever(typedFileNode.type).thenReturn(
@@ -778,37 +771,17 @@ internal class FileInfoViewModelTest {
     }
 
     @Test
-    fun `test getOutShares is fetched when node is set`() = runTest {
-        underTest.setNode(node.handle, true)
-        verify(getOutShares, times(1)).invoke(nodeId)
-    }
-
-    @Test
     fun `test getOutShares result is set on uiState`() = runTest {
-        val expectedDeprecated = mock<List<MegaShare>>()
         val expected = mock<List<ContactPermission>>()
-        whenever(getOutShares.invoke(nodeId)).thenReturn(expectedDeprecated)
         whenever(getNodeOutSharesUseCase.invoke(nodeId)).thenReturn(expected)
         underTest.setNode(node.handle, true)
-        Truth.assertThat(underTest.uiState.value.outSharesDeprecated).isEqualTo(expectedDeprecated)
         Truth.assertThat(underTest.uiState.value.outShares).isEqualTo(expected)
-    }
-
-    @Test
-    fun `test getOutShares is fetched when out shares update is received`() = runTest {
-        whenever(monitorNodeUpdatesById.invoke(nodeId)).thenReturn(
-            flowOf(listOf(NodeChanges.Outshare))
-        )
-        underTest.setNode(node.handle, true)
-        verify(getOutShares, times(2)).invoke(nodeId)
     }
 
     @Test
     fun `test getOutShares is fetched when contacts update is received and there are out shares`() =
         runTest {
-            val expectedDeprecated = mock<List<MegaShare>>()
             val expected = mock<List<ContactPermission>>()
-            whenever(getOutShares.invoke(nodeId)).thenReturn(expectedDeprecated)
             whenever(getNodeOutSharesUseCase.invoke(nodeId)).thenReturn(expected)
             val updateChanges = mapOf(Pair(UserId(1L), listOf(UserChanges.Alias)))
             val update = mock<UserUpdate> {
@@ -816,7 +789,6 @@ internal class FileInfoViewModelTest {
             }
             whenever(monitorContactUpdates.invoke()).thenReturn(flowOf(update))
             underTest.setNode(node.handle, true)
-            verify(getOutShares, times(2)).invoke(nodeId)
             verify(getNodeOutSharesUseCase, times(2)).invoke(nodeId)
         }
 

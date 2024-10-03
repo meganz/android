@@ -35,9 +35,6 @@ import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment
-import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogListener
-import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
@@ -107,8 +104,6 @@ class FileInfoActivity : BaseActivity() {
     private var fileBackupManager: FileBackupManager? = null
     private val nodeController: NodeController by lazy { NodeController(this) }
 
-    private var bottomSheetDialogFragment: FileContactsListBottomSheetDialogFragment? = null
-
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             retryConnectionsAndSignalPresence()
@@ -171,9 +166,7 @@ class FileInfoActivity : BaseActivity() {
                     onSharedWithContactClick = { this.navigateToUserDetails(it.contactItem) },
                     onSharedWithContactSelected = { viewModel.contactSelectedInSharedList(it.contactItem.email) },
                     onSharedWithContactUnselected = { viewModel.contactUnselectedInSharedList(it.contactItem.email) },
-                    onSharedWithContactMoreOptionsClick = {
-                        viewModel.contactToShowOptions(it.contactItem.email)
-                    },
+                    onSharedWithContactMoreOptionsClick = { viewModel.contactToShowOptions(it) },
                     onShowMoreSharedWithContactsClick = this::navigateToSharedContacts,
                     onPublicLinkCopyClick = viewModel::copyPublicLink,
                     onMenuActionClick = { handleAction(it, uiState) },
@@ -184,6 +177,14 @@ class FileInfoActivity : BaseActivity() {
                         testTagsAsResourceId = true
                     },
                     getAddress = viewModel::getAddress,
+                    onShareContactOptionsDismissed = { viewModel.contactToShowOptions(null) },
+                    onSharedWithContactRemoveClicked = { viewModel.initiateRemoveContacts(listOf(it.contactItem.email)) },
+                    onSharedWithContactChangePermissionClicked = {
+                        viewModel.initiateChangePermission(listOf(it.contactItem.email))
+                    },
+                    onSharedWithContactMoreInfoClick = {
+                        ContactUtil.openContactInfoActivity(this, it.contactItem.email)
+                    }
                 )
                 uiState.requiredExtraAction?.let { action ->
                     ExtraActionDialog(
@@ -219,7 +220,6 @@ class FileInfoActivity : BaseActivity() {
                         }
                     }
                 }
-                updateContactShareBottomSheet(uiState)
             }
         }
     }
@@ -528,36 +528,6 @@ class FileInfoActivity : BaseActivity() {
             is FileInfoOneOffViewEvent.OverDiskQuota -> AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
         }
     }
-
-    private fun updateContactShareBottomSheet(viewState: FileInfoViewState) =
-        viewState.contactToShowOptions?.takeIf {
-            !bottomSheetDialogFragment.isBottomSheetDialogShown() //this is not compose yet, so we need to check if it's already shown
-        }?.let { email ->
-            Timber.d("showNodeOptionsPanel")
-            bottomSheetDialogFragment =
-                FileContactsListBottomSheetDialogFragment(
-                    viewModel.getShareFromEmail(email),
-                    viewModel.node,
-                    object : FileContactsListBottomSheetDialogListener {
-                        override fun changePermissions(userEmail: String) {
-                            viewModel.initiateChangePermission(listOf(userEmail))
-                        }
-
-                        override fun removeFileContactShare(userEmail: String) {
-                            viewModel.initiateRemoveContacts(listOf(userEmail))
-                        }
-
-                        override fun fileContactsDialogDismissed() {
-                            viewModel.contactToShowOptions(null)
-                        }
-
-                    }
-                )
-            bottomSheetDialogFragment?.show(
-                supportFragmentManager,
-                bottomSheetDialogFragment?.tag
-            )
-        }
 
     companion object {
         /**

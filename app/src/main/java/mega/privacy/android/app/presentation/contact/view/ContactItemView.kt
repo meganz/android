@@ -10,6 +10,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -37,9 +37,11 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.MarqueeText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import timber.log.Timber
@@ -53,7 +55,7 @@ import java.util.Locale
  * @param onClick is invoked when the view is clicked
  * @param modifier
  * @param statusOverride to allow change the status text, if null connection status description will be shown
- * @param includeDivider to show or not a divider at the bottom of the view, default is true
+ * @param dividerType divider type to be shown at the bottom of the view, null for no divider
  */
 @Composable
 internal fun ContactItemView(
@@ -62,7 +64,7 @@ internal fun ContactItemView(
     modifier: Modifier = Modifier,
     statusOverride: String? = null,
     selected: Boolean = false,
-    includeDivider: Boolean = true,
+    dividerType: DividerType? = DividerType.BigStartPadding,
 ) {
     Column(modifier = modifier) {
         Row(
@@ -115,12 +117,8 @@ internal fun ContactItemView(
                 }
             }
         }
-        if (includeDivider) {
-            Divider(
-                modifier = Modifier.padding(start = 72.dp),
-                color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
-                thickness = 1.dp
-            )
+        dividerType?.let {
+            MegaDivider(it)
         }
     }
 }
@@ -249,10 +247,12 @@ internal fun ContactAvatarVerified(
 @CombinedTextAndThemePreviews
 @Composable
 private fun PreviewContactItem() {
-    ContactItemView(
-        contactItem = contactItemForPreviews,
-        onClick = {}
-    )
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        ContactItemView(
+            contactItem = contactItemForPreviews,
+            onClick = {}
+        )
+    }
 }
 
 internal val contactItemForPreviews get() = contactItemForPreviews(-1)

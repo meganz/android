@@ -6,9 +6,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
-import mega.privacy.android.app.presentation.fileinfo.view.FileInfoScreen
-import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_ICON
-import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_PREVIEW
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -44,6 +41,10 @@ class FileInfoScreenTest {
                 onAddTagClick = {},
                 onUpgradeAccountClick = {},
                 getAddress = { _, _, _ -> null },
+                onShareContactOptionsDismissed = {},
+                onSharedWithContactRemoveClicked = {},
+                onSharedWithContactMoreInfoClick = {},
+                onSharedWithContactChangePermissionClicked = {},
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_PREVIEW, true).assertExists()
@@ -78,6 +79,10 @@ class FileInfoScreenTest {
                 onAddTagClick = {},
                 onUpgradeAccountClick = {},
                 getAddress = { _, _, _ -> null },
+                onShareContactOptionsDismissed = {},
+                onSharedWithContactRemoveClicked = {},
+                onSharedWithContactMoreInfoClick = {},
+                onSharedWithContactChangePermissionClicked = {},
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_ICON, true).assertDoesNotExist()

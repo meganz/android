@@ -21,7 +21,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
-import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
@@ -41,6 +40,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges.Description
@@ -97,7 +97,6 @@ import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
 import java.util.Locale
@@ -128,7 +127,6 @@ class FileInfoViewModel @Inject constructor(
     private val monitorContactUpdates: MonitorContactUpdates,
     private val monitorChatOnlineStatusUseCase: MonitorChatOnlineStatusUseCase,
     private val getNodeVersionsByHandleUseCase: GetNodeVersionsByHandleUseCase,
-    private val getOutShares: GetOutShares,
     private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase,
     private val getNodeLocationInfo: GetNodeLocationInfo,
     private val setNodeDescriptionUseCase: SetNodeDescriptionUseCase,
@@ -478,21 +476,14 @@ class FileInfoViewModel @Inject constructor(
     /**
      * A contact is selected to show Sharing info
      */
-    fun contactToShowOptions(email: String?) {
+    fun contactToShowOptions(contactPermission: ContactPermission?) {
         updateState {
             it.copy(
-                contactToShowOptions = email,
+                contactToShowOptions = contactPermission,
                 outShareContactsSelected = emptyList(),
             )
         }
     }
-
-    /**
-     * gets the [MegaShare] of the given email if it exists
-     */
-    @Deprecated("this should be avoided, need while using FileContactsListBottomSheetDialogFragment. To be removed once migrated to compose")
-    fun getShareFromEmail(email: String?): MegaShare? =
-        _uiState.value.outSharesDeprecated.firstOrNull { it.user == email }
 
     /**
      * A new contact of the shared list are selected
@@ -986,7 +977,6 @@ class FileInfoViewModel @Inject constructor(
 
     private fun updateOutShares() = updateState {
         it.copy(
-            outSharesDeprecated = getOutShares(typedNode.id) ?: emptyList(),
             outShares = getNodeOutSharesUseCase(typedNode.id),
         )
     }
