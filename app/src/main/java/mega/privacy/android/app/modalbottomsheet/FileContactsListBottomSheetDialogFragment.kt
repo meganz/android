@@ -5,29 +5,60 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import mega.privacy.android.app.R
-import mega.privacy.android.app.components.RoundedImageView
-import mega.privacy.android.app.components.twemoji.EmojiTextView
-import mega.privacy.android.app.utils.AvatarUtil
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.fileinfo.view.ShareContactOptionsContent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.contacts.ContactPermission
+import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
-import nz.mega.sdk.MegaShare.ACCESS_UNKNOWN
 import nz.mega.sdk.MegaUser
+import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * FileContactsListBottomSheetDialogFragment
  */
-class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment,
-    View.OnClickListener {
+@AndroidEntryPoint
+@Deprecated(message = "This bottom sheet should be replaced by direct use [ShareContactOptionsContent] in a compose bottom sheet in a compose screen, is left here until [FileContactListActivity] is migrated to compose.")
+class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment {
     private var contact: MegaUser? = null
     private var share: MegaShare? = null
     private var nonContactEmail: String? = null
     private var node: MegaNode? = null
     private var listener: FileContactsListBottomSheetDialogListener? = null
+
+    /**
+     * Get theme mode
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * Contacts repository
+     */
+    @Inject
+    lateinit var contactsRepository: ContactsRepository
 
     /**
      * This constructor shouldn't be used, is just here to avoid crashes on recreation. Fragment will be automatically dismissed.
@@ -52,16 +83,6 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment,
         }
     }
 
-    constructor(
-        share: MegaShare?,
-        node: MegaNode?,
-        listener: FileContactsListBottomSheetDialogListener?,
-    ) {
-        this.share = share
-        this.node = node
-        this.listener = listener
-    }
-
     /**
      * On create
      */
@@ -80,8 +101,6 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        contentView = View.inflate(context, R.layout.bottom_sheet_file_contact_list, null)
-        itemsLayout = contentView.findViewById(R.id.items_layout)
         if (contact == null) {
             contact = megaApi.getContact(share?.user ?: "")
         }
@@ -98,6 +117,55 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment,
                 }
             }
         }
+
+        contentView = ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                var contactPermission by remember {
+                    mutableStateOf<ContactPermission?>(null)
+                }
+                LaunchedEffect(share?.user) {
+                    contactsRepository.getContactItem(UserId(contact?.handle ?: -1L), false)?.let {
+                        contactPermission = ContactPermission(
+                            contactItem = it,
+                            accessPermission = getAccessPermission(share?.access),
+                        )
+                    } ?: run {
+                        Timber.e("Contact item not found ${contact?.handle}")
+                        dismissAllowingStateLoss()
+                    }
+                }
+                val themeMode by getThemeMode()
+                    .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 260.dp)
+                    ) {
+                        contactPermission?.let { contactPermission ->
+                            ShareContactOptionsContent(
+                                contactPermission = contactPermission,
+                                allowChangePermission = node == null || !megaApi.isInInbox(node),
+                                onInfoClicked = {
+                                    email()?.let {
+                                        ContactUtil.openContactInfoActivity(requireActivity(), it)
+                                    }
+                                    dismissAllowingStateLoss()
+                                },
+                                onChangePermissionClicked = {
+                                    email()?.let { listener?.changePermissions(it) }
+                                    dismissAllowingStateLoss()
+                                },
+                                onRemoveClicked = {
+                                    email()?.let { listener?.removeFileContactShare(it) }
+                                    dismissAllowingStateLoss()
+                                })
+                        }
+                    }
+                }
+            }
+        }
         return contentView
     }
 
@@ -109,107 +177,14 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment,
         listener?.fileContactsDialogDismissed()
     }
 
-    /**
-     * On View created
-     */
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val titleNameContactPanel =
-            contentView.findViewById<EmojiTextView>(R.id.file_contact_list_contact_name_text)
-        val titleMailContactPanel =
-            contentView.findViewById<TextView>(R.id.file_contact_list_contact_mail_text)
-        val contactImageView =
-            contentView.findViewById<RoundedImageView>(R.id.sliding_file_contact_list_thumbnail)
+    private fun email() = contact?.email ?: nonContactEmail
 
-        val optionChangePermissions =
-            contentView.findViewById<TextView>(R.id.file_contact_list_option_permissions)
-        val optionDelete = contentView.findViewById<TextView>(R.id.file_contact_list_option_delete)
-        val optionInfo = contentView.findViewById<TextView>(R.id.file_contact_list_option_info)
-
-        optionChangePermissions.setOnClickListener(this)
-        optionDelete.setOnClickListener(this)
-        optionInfo.setOnClickListener(this)
-
-        titleNameContactPanel.setMaxWidthEmojis(Util.scaleWidthPx(200, resources.displayMetrics))
-        titleMailContactPanel.maxWidth =
-            Util.scaleWidthPx(200, resources.displayMetrics)
-
-        val separatorInfo = contentView.findViewById<View>(R.id.separator_info)
-        val separatorChangePermissions =
-            contentView.findViewById<View>(R.id.separator_change_permissions)
-
-        val fullName =
-            if (contact != null) ContactUtil.getMegaUserNameDB(contact) else nonContactEmail ?: ""
-
-        if (contact?.visibility == MegaUser.VISIBILITY_VISIBLE) {
-            optionInfo.visibility = View.VISIBLE
-            separatorInfo.visibility = View.VISIBLE
-        } else {
-            optionInfo.visibility = View.GONE
-            separatorInfo.visibility = View.GONE
-        }
-
-        titleNameContactPanel.text = fullName
-        AvatarUtil.setImageAvatar(
-            contact?.handle ?: Constants.INVALID_ID.toLong(),
-            contact?.email ?: nonContactEmail,
-            fullName,
-            contactImageView
-        )
-
-        if (share != null) {
-            val accessLevel = share?.access ?: ACCESS_UNKNOWN
-            when (accessLevel) {
-                MegaShare.ACCESS_OWNER, MegaShare.ACCESS_FULL -> titleMailContactPanel.text =
-                    getString(R.string.file_properties_shared_folder_full_access)
-
-                MegaShare.ACCESS_READ -> titleMailContactPanel.text =
-                    getString(R.string.file_properties_shared_folder_read_only)
-
-                MegaShare.ACCESS_READWRITE -> titleMailContactPanel.text =
-                    getString(R.string.file_properties_shared_folder_read_write)
-            }
-            if (share?.isPending == true) {
-                titleMailContactPanel.append(" " + getString(R.string.pending_outshare_indicator))
-            }
-        } else {
-            titleMailContactPanel.text = contact?.email ?: nonContactEmail
-        }
-
-        // Disable changing permissions if the node came from Backups
-        if (node != null && megaApi.isInInbox(node)) {
-            optionChangePermissions.visibility = View.GONE
-            separatorChangePermissions.visibility = View.GONE
-        }
-
-        super.onViewCreated(view, savedInstanceState)
-    }
-
-    /**
-     * On click
-     */
-    override fun onClick(v: View) {
-        val id = v.id
-        when (id) {
-            R.id.file_contact_list_option_permissions -> {
-                (contact?.email ?: nonContactEmail)?.let {
-                    listener?.changePermissions(it)
-                }
-            }
-
-            R.id.file_contact_list_option_delete -> {
-                (contact?.email ?: nonContactEmail)?.let {
-                    listener?.removeFileContactShare(it)
-                }
-            }
-
-            R.id.file_contact_list_option_info -> {
-                share?.user?.let {
-                    ContactUtil.openContactInfoActivity(requireActivity(), it)
-                }
-            }
-        }
-
-        setStateBottomSheetBehaviorHidden()
+    private fun getAccessPermission(intRawValue: Int?) = when (intRawValue) {
+        MegaShare.ACCESS_READ -> AccessPermission.READ
+        MegaShare.ACCESS_READWRITE -> AccessPermission.READWRITE
+        MegaShare.ACCESS_FULL -> AccessPermission.FULL
+        MegaShare.ACCESS_OWNER -> AccessPermission.OWNER
+        else -> AccessPermission.UNKNOWN
     }
 
     /**
