@@ -169,7 +169,7 @@ fun String.toFormattedText(
             }
         }
         addAll(getFormatsFromLinks(links))
-    }.compactInnerFormats()
+    }.filterInvalidFormats().compactInnerFormats()
 
     return buildAnnotatedString {
         if (formatList.isEmpty()) {
@@ -189,7 +189,7 @@ fun String.toFormattedText(
             val isEndOfText = format.formatEnd == text.length - (when {
                 isMultiQuote -> 3
                 isOnlyLink -> 0
-                else -> 1
+                else -> format.type.size - (if (format.type.contains(FormatType.Link)) 1 else 0)
             })
             val isStartOfNextFormat = index < formatList.size - 1
                     && format.formatEnd == formatList[index + 1].formatStart
@@ -208,6 +208,21 @@ fun String.toFormattedText(
             }
         }
     }
+}
+
+private fun List<Format>.filterInvalidFormats(): List<Format> {
+    if (size <= 1) return this
+
+    for (i in 0 until size - 2) {
+        val currentFormat = this[i]
+        val nextFormat = this[i + 1]
+
+        if (currentFormat.sentenceStart == nextFormat.formatStart) {
+            return filter { it != currentFormat && it != nextFormat }
+        }
+    }
+
+    return this
 }
 
 private fun List<Format>.compactInnerFormats(): List<Format> {
@@ -248,6 +263,7 @@ private fun compactFormats(
     if (innerFormat == parentFormat) return initialList
 
     val isOnlyLink = innerFormat.type.size == 1 && innerFormat.type.first() == FormatType.Link
+    val isParentMultiQuote = parentFormat.type.first() == FormatType.MultiQuote
 
     with(initialList.toMutableList()) {
         remove(innerFormat)
@@ -269,7 +285,7 @@ private fun compactFormats(
                 formatEnd = innerFormat.formatEnd,
                 type = parentFormat.type.toMutableList().apply { addAll(innerFormat.type) },
                 sentenceStart =
-                if (isOnlyLink) parentFormat.formatStart + parentFormat.type.size
+                if (isOnlyLink) parentFormat.formatStart + if (isParentMultiQuote) 3 else parentFormat.type.size
                 else innerFormat.formatStart + innerFormat.type.size,
                 sentenceEnd =
                 if (isOnlyLink) parentFormat.formatEnd - (parentFormat.type.size - 1)
@@ -301,9 +317,7 @@ private fun String.getFormat(formatList: List<Format>, index: Int, formatType: F
         FormatType.MultiQuote -> FormatTag.Quote.tag.toString().repeat(3)
         FormatType.Link -> null
     }?.let { tag ->
-        if (formatList.isAlreadyPartOfAFormat(index)
-            || (index > 0 && this[index - 1] != ' ' && this[index - 1] != '\n')
-        ) {
+        if (formatList.isAlreadyPartOfAFormat(index)) {
             return@let null
         }
 
@@ -330,9 +344,7 @@ private fun String.getFormat(formatList: List<Format>, index: Int, formatType: F
         val indexAfterFormat = index + formatTypeList.size + if (isMultiQuote) 2 else 0
         val indexBeforeFormat = endIndex - formatTypeList.size
 
-        if (this[indexAfterFormat] != ' ' && this[indexAfterFormat] != '\n'
-            && this[indexBeforeFormat] != ' ' && this[indexBeforeFormat] != '\n'
-        ) {
+        if (this[indexAfterFormat] != '\n' && this[indexBeforeFormat] != '\n') {
             Format(
                 formatStart = index,
                 formatEnd = endIndex,
@@ -347,33 +359,15 @@ private fun String.getFormat(formatList: List<Format>, index: Int, formatType: F
 
 private fun String.getEndFormatIndex(tag: String, isMultiQuote: Boolean, startIndex: Int): Int? {
     val formatCharsSize = if (isMultiQuote) 3 else 1
-    var endIndex = indexOf(tag, startIndex + formatCharsSize)
-    var newStartIndex = -1
+    val endIndex = indexOf(tag, startIndex + formatCharsSize)
+    val existsStringInFormat = startIndex != endIndex - 1
 
-    while (endIndex != -1) {
+    while (endIndex != -1 && existsStringInFormat) {
         val breaksSimpleFormat = !isMultiQuote && substring(startIndex, endIndex).contains('\n')
-        val isEndOfText = endIndex == this.length - formatCharsSize
-        val indexBeforeFormat = endIndex - 1
-        val indexAfterFormat = endIndex + formatCharsSize
-        if (newStartIndex == -1 && this[indexBeforeFormat] == ' ' || this[indexBeforeFormat] == '\n') {
-            newStartIndex = endIndex
-        }
 
-        if (!breaksSimpleFormat
-            && this[indexBeforeFormat] != ' '
-            && this[indexBeforeFormat] != '\n'
-            && (isEndOfText
-                    || this[indexAfterFormat] == ' '
-                    || this[indexAfterFormat] == '\n')
-        ) {
-            if (newStartIndex == -1) {
-                return endIndex
-            } else {
-                newStartIndex = -1
-            }
+        if (!breaksSimpleFormat) {
+            return endIndex
         }
-
-        endIndex = indexOf(tag, endIndex + formatCharsSize)
     }
 
     // No final format char found
@@ -402,7 +396,7 @@ private fun List<Format>.isAlreadyPartOfAFormat(index: Int) =
     find { format ->
         with(format) {
             when {
-                type.first() == FormatType.MultiQuote -> index in formatStart + 1 until formatEnd + 1
+                type.first() == FormatType.MultiQuote -> index in formatStart + 1 until formatEnd + 3
                 type.size > 1 -> index in formatStart + 1 until formatStart + type.size
                         || index in formatEnd - (type.size - 1) until formatEnd + 1
 
