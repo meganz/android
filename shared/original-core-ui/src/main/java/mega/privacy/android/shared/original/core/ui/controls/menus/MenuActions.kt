@@ -180,6 +180,7 @@ private fun DropDown(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun DropDown(
     actions: List<MenuActionWithClick>,
@@ -198,6 +199,9 @@ private fun DropDown(
         )
 
         DropdownMenu(
+            modifier = Modifier.semantics {
+                testTagsAsResourceId = true
+            },
             expanded = showMoreMenu,
             onDismissRequest = {
                 showMoreMenu = false
