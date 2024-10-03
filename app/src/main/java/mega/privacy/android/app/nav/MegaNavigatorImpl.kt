@@ -41,6 +41,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
@@ -199,6 +200,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         searchedItems: List<Long>?,
         mediaQueueTitle: String?,
         collectionTitle: String?,
+        collectionId: Long?,
     ) {
         manageMediaIntent(
             context = context,
@@ -213,7 +215,8 @@ internal class MegaNavigatorImpl @Inject constructor(
             isMediaQueueAvailable = isMediaQueueAvailable,
             searchedItems = searchedItems,
             mediaQueueTitle = mediaQueueTitle,
-            collectionTitle = collectionTitle
+            collectionTitle = collectionTitle,
+            collectionId = collectionId
         )
     }
 
@@ -235,6 +238,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         mediaQueueTitle: String? = null,
         nodeHandles: List<Long>? = null,
         collectionTitle: String? = null,
+        collectionId: Long? = null,
     ) {
         val intent = getIntent(context, fileTypeInfo).apply {
             putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder)
@@ -269,6 +273,9 @@ internal class MegaNavigatorImpl @Inject constructor(
             }
             collectionTitle?.let {
                 putExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE, it)
+            }
+            collectionId?.let {
+                putExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID, it)
             }
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
@@ -307,6 +314,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         isMediaQueueAvailable: Boolean,
         searchedItems: List<Long>?,
         collectionTitle: String?,
+        collectionId: Long?,
     ) {
         val contentUri = NodeContentUri.LocalContentUri(localFile)
         val info = fileTypeInfo ?: getFileTypeInfoUseCase(localFile)
@@ -325,7 +333,8 @@ internal class MegaNavigatorImpl @Inject constructor(
             offlineParentId = offlineParentId,
             offlineParent = localFile.parent,
             searchedItems = searchedItems,
-            collectionTitle = collectionTitle
+            collectionTitle = collectionTitle,
+            collectionId = collectionId
         )
 
     }

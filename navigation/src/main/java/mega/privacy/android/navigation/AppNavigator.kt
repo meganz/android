@@ -158,6 +158,7 @@ interface AppNavigator {
         searchedItems: List<Long>? = null,
         mediaQueueTitle: String? = null,
         collectionTitle: String? = null,
+        collectionId: Long? = null,
     )
 
     /**
@@ -189,6 +190,7 @@ interface AppNavigator {
         isMediaQueueAvailable: Boolean = true,
         searchedItems: List<Long>? = null,
         collectionTitle: String? = null,
+        collectionId: Long? = null,
     )
 
     /**

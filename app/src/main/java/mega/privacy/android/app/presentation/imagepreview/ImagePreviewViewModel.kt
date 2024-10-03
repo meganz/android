@@ -799,6 +799,7 @@ class ImagePreviewViewModel @Inject constructor(
             imageNode = imageNode,
             source = imagePreviewFetcherSource,
             albumTitle = params.getString(AlbumContentImageNodeFetcher.ALBUM_TITLE),
+            albumId = params.getLong(AlbumContentImageNodeFetcher.CUSTOM_ALBUM_ID)
         )
     }
 
