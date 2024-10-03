@@ -14,8 +14,12 @@ class VideoRecentlyWatchedItemMapper @Inject constructor() {
     operator fun invoke(
         videoHandle: Long,
         watchedTimestamp: Long,
+        collectionId: Long = 0,
+        collectionTitle: String? = null,
     ) = VideoRecentlyWatchedItem(
         videoHandle = videoHandle,
-        watchedTimestamp = watchedTimestamp
+        watchedTimestamp = watchedTimestamp,
+        collectionId = collectionId,
+        collectionTitle = collectionTitle
     )
 }

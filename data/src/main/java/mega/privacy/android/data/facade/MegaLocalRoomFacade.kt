@@ -478,7 +478,12 @@ internal class MegaLocalRoomFacade @Inject constructor(
         videoRecentlyWatchedDao.get().deleteExcessVideos()
         return videoRecentlyWatchedDao.get().getAllRecentlyWatchedVideos().map { entities ->
             entities.map { entity ->
-                videoRecentlyWatchedItemMapper(entity.videoHandle, entity.watchedTimestamp)
+                videoRecentlyWatchedItemMapper(
+                    entity.videoHandle,
+                    entity.watchedTimestamp,
+                    entity.collectionId,
+                    entity.collectionTitle
+                )
             }
         }
     }

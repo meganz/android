@@ -42,7 +42,9 @@ class VideoRecentlyWatchedDaoTest {
         val entities = (1..100L).map {
             val entity = VideoRecentlyWatchedEntity(
                 videoHandle = it,
-                watchedTimestamp = it
+                watchedTimestamp = it,
+                collectionId = 0,
+                collectionTitle = "collection title"
             )
             videoRecentlyWatchedDao.insertOrUpdateRecentlyWatchedVideo(entity)
             entity
@@ -52,6 +54,8 @@ class VideoRecentlyWatchedDaoTest {
             .forEachIndexed { index, entity ->
                 assertThat(entity.videoHandle).isEqualTo(entities[index].videoHandle)
                 assertThat(entity.watchedTimestamp).isEqualTo(entities[index].watchedTimestamp)
+                assertThat(entity.collectionId).isEqualTo(entities[index].collectionId)
+                assertThat(entity.collectionTitle).isEqualTo(entities[index].collectionTitle)
             }
     }
 
@@ -60,7 +64,9 @@ class VideoRecentlyWatchedDaoTest {
         (1..100L).map {
             val entity = VideoRecentlyWatchedEntity(
                 videoHandle = it,
-                watchedTimestamp = it
+                watchedTimestamp = it,
+                collectionId = 123456L,
+                collectionTitle = "collection title"
             )
             videoRecentlyWatchedDao.insertOrUpdateRecentlyWatchedVideo(entity)
         }
@@ -75,7 +81,9 @@ class VideoRecentlyWatchedDaoTest {
             val testEntities = (1..10L).map {
                 VideoRecentlyWatchedEntity(
                     videoHandle = it,
-                    watchedTimestamp = it
+                    watchedTimestamp = it,
+                    collectionId = 123456L,
+                    collectionTitle = "collection title"
                 )
             }
             val removedHandle = 5L
@@ -114,9 +122,23 @@ class VideoRecentlyWatchedDaoTest {
         runTest {
             val expectedVideoHandle = 123456L
             val expectedTimestamp = 1000000L
+            val expectedCollectionTitle = "collection title"
+            val expectedCollectionId = 234567L
             val newTimestamp = 200000L
-            val testEntity = VideoRecentlyWatchedEntity(expectedVideoHandle, expectedTimestamp)
-            val newEntity = VideoRecentlyWatchedEntity(expectedVideoHandle, newTimestamp)
+            val newCollectionTitle = "new title"
+            val newCollectionId = 345678L
+            val testEntity = VideoRecentlyWatchedEntity(
+                expectedVideoHandle,
+                expectedTimestamp,
+                expectedCollectionId,
+                expectedCollectionTitle
+            )
+            val newEntity = VideoRecentlyWatchedEntity(
+                expectedVideoHandle,
+                newTimestamp,
+                newCollectionId,
+                newCollectionTitle
+            )
             videoRecentlyWatchedDao.insertOrUpdateRecentlyWatchedVideo(testEntity)
             videoRecentlyWatchedDao.getAllRecentlyWatchedVideos().first().let { entities ->
                 assertThat(entities).isNotEmpty()
@@ -124,6 +146,8 @@ class VideoRecentlyWatchedDaoTest {
                 entities.forEach {
                     assertThat(it.videoHandle).isEqualTo(expectedVideoHandle)
                     assertThat(it.watchedTimestamp).isEqualTo(expectedTimestamp)
+                    assertThat(it.collectionId).isEqualTo(expectedCollectionId)
+                    assertThat(it.collectionTitle).isEqualTo(expectedCollectionTitle)
                 }
             }
 
@@ -134,6 +158,8 @@ class VideoRecentlyWatchedDaoTest {
                 entities.forEach {
                     assertThat(it.videoHandle).isEqualTo(expectedVideoHandle)
                     assertThat(it.watchedTimestamp).isEqualTo(newTimestamp)
+                    assertThat(it.collectionId).isEqualTo(newCollectionId)
+                    assertThat(it.collectionTitle).isEqualTo(newCollectionTitle)
                 }
             }
         }
@@ -144,7 +170,9 @@ class VideoRecentlyWatchedDaoTest {
             val testEntities = (1..100L).map {
                 VideoRecentlyWatchedEntity(
                     videoHandle = it,
-                    watchedTimestamp = it
+                    watchedTimestamp = it,
+                    collectionId = 123456L,
+                    collectionTitle = "collection title"
                 )
             }
             videoRecentlyWatchedDao.insertOrUpdateRecentlyWatchedVideos(testEntities)
@@ -154,6 +182,8 @@ class VideoRecentlyWatchedDaoTest {
             entities.forEachIndexed { index, entity ->
                 assertThat(entity.videoHandle).isEqualTo(testEntities[index].videoHandle)
                 assertThat(entity.watchedTimestamp).isEqualTo(testEntities[index].watchedTimestamp)
+                assertThat(entity.collectionId).isEqualTo(testEntities[index].collectionId)
+                assertThat(entity.collectionTitle).isEqualTo(testEntities[index].collectionTitle)
             }
         }
 
@@ -163,13 +193,18 @@ class VideoRecentlyWatchedDaoTest {
             val testEntities = (1..100L).map {
                 VideoRecentlyWatchedEntity(
                     videoHandle = it,
-                    watchedTimestamp = it
+                    watchedTimestamp = it,
+                    collectionId = 0,
+                    collectionTitle = null
                 )
             }
+            val expectedTitle = "collection title"
             val newEntities = (10L downTo 1).mapIndexed { index, it ->
                 VideoRecentlyWatchedEntity(
                     videoHandle = it,
-                    watchedTimestamp = index.toLong()
+                    watchedTimestamp = index.toLong(),
+                    collectionId = index.toLong(),
+                    collectionTitle = expectedTitle + index
                 )
             }
             videoRecentlyWatchedDao.insertOrUpdateRecentlyWatchedVideos(testEntities)
@@ -179,6 +214,8 @@ class VideoRecentlyWatchedDaoTest {
                 entities.forEachIndexed { index, entity ->
                     assertThat(entity.videoHandle).isEqualTo(testEntities[index].videoHandle)
                     assertThat(entity.watchedTimestamp).isEqualTo(testEntities[index].watchedTimestamp)
+                    assertThat(entity.collectionId).isEqualTo(0)
+                    assertThat(entity.collectionTitle).isNull()
                 }
             }
 
@@ -194,6 +231,20 @@ class VideoRecentlyWatchedDaoTest {
                 ).isEqualTo(
                     entity.watchedTimestamp
                 )
+                assertThat(
+                    entities.first {
+                        it.videoHandle == entity.videoHandle
+                    }.collectionId
+                ).isEqualTo(
+                    entity.collectionId
+                )
+                assertThat(
+                    entities.first {
+                        it.videoHandle == entity.videoHandle
+                    }.collectionTitle
+                ).isEqualTo(
+                    entity.collectionTitle
+                )
             }
         }
 
@@ -202,7 +253,9 @@ class VideoRecentlyWatchedDaoTest {
         val testEntities = (1..100L).map {
             VideoRecentlyWatchedEntity(
                 videoHandle = it,
-                watchedTimestamp = it
+                watchedTimestamp = it,
+                collectionId = 123456L,
+                collectionTitle = "collection title"
             )
         }
         videoRecentlyWatchedDao.insertOrUpdateRecentlyWatchedVideos(testEntities)
@@ -214,7 +267,9 @@ class VideoRecentlyWatchedDaoTest {
         val testEntities = (1..100L).map {
             VideoRecentlyWatchedEntity(
                 videoHandle = it,
-                watchedTimestamp = it
+                watchedTimestamp = it,
+                collectionId = 123456L,
+                collectionTitle = "collection title"
             )
         }
         videoRecentlyWatchedDao.insertOrUpdateRecentlyWatchedVideos(testEntities)
@@ -230,7 +285,9 @@ class VideoRecentlyWatchedDaoTest {
         val testEntities = (1..100L).map {
             VideoRecentlyWatchedEntity(
                 videoHandle = it,
-                watchedTimestamp = it
+                watchedTimestamp = it,
+                collectionId = 123456L,
+                collectionTitle = "collection title"
             )
         }
         videoRecentlyWatchedDao.insertOrUpdateRecentlyWatchedVideos(testEntities)
@@ -249,7 +306,9 @@ class VideoRecentlyWatchedDaoTest {
         val testEntities = (1..maxVideosCount.toLong()).map {
             VideoRecentlyWatchedEntity(
                 videoHandle = it,
-                watchedTimestamp = it
+                watchedTimestamp = it,
+                collectionId = 123456L,
+                collectionTitle = "collection title"
             )
         }
         videoRecentlyWatchedDao.insertOrUpdateRecentlyWatchedVideos(testEntities)

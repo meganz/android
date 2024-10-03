@@ -7,5 +7,10 @@ import javax.inject.Inject
 internal class VideoRecentlyWatchedEntityMapper @Inject constructor() {
 
     operator fun invoke(item: VideoRecentlyWatchedItem) =
-        VideoRecentlyWatchedEntity(item.videoHandle, item.watchedTimestamp)
+        VideoRecentlyWatchedEntity(
+            item.videoHandle,
+            item.watchedTimestamp,
+            item.collectionId,
+            item.collectionTitle
+        )
 }

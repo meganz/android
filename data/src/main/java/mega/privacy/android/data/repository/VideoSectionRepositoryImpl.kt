@@ -304,13 +304,20 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
 
     override suspend fun getVideoPlaylistSets(): List<UserSet> = getAllUserSets()
 
-    override suspend fun saveVideoRecentlyWatched(handle: Long, timestamp: Long) =
+    override suspend fun saveVideoRecentlyWatched(
+        handle: Long,
+        timestamp: Long,
+        collectionId: Long,
+        collectionTitle: String?,
+    ) =
         withContext(ioDispatcher) {
             migrateOldDataToDatabase()
             megaLocalRoomGateway.saveRecentlyWatchedVideo(
                 videoRecentlyWatchedItemMapper(
                     handle,
-                    timestamp
+                    timestamp,
+                    collectionId,
+                    collectionTitle
                 )
             )
         }
@@ -338,10 +345,12 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
             val offlineItems = getAllOfflineNodeHandle()
             getRecentlyWatchedData()?.mapNotNull { item ->
                 megaApiGateway.getMegaNodeByHandle(item.videoHandle)?.let { megaNode ->
+                    val title = megaNode.getCollectionTitle(item.collectionId, item.collectionTitle)
                     typedVideoNodeMapper(
                         fileNode = megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()]),
                         duration = megaNode.duration,
-                        watchedTimestamp = item.watchedTimestamp
+                        watchedTimestamp = item.watchedTimestamp,
+                        collectionTitle = title
                     )
                 }
             }?.sortedByDescending { it.watchedTimestamp } ?: emptyList()
@@ -351,6 +360,26 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
         migrateOldDataToDatabase()
         return megaLocalRoomGateway.getAllRecentlyWatchedVideos().firstOrNull()
     }
+
+    private suspend fun MegaNode.getCollectionTitle(
+        collectionId: Long,
+        collectionTitle: String?,
+    ): String? =
+        when {
+            collectionId != 0L -> {
+                val elementList = megaApiGateway.getSetElements(collectionId)
+                val isInCollection = (0 until elementList.size()).mapNotNull { index ->
+                    elementList[index].node()
+                }.any { it == handle }
+                if (isInCollection) {
+                    megaApiGateway.getSet(collectionId)?.name()
+                } else null
+            }
+
+            collectionTitle != null && isFavourite -> collectionTitle
+
+            else -> null
+        }
 
     override suspend fun clearRecentlyWatchedVideos() = withContext(ioDispatcher) {
         megaLocalRoomGateway.clearRecentlyWatchedVideos()
@@ -364,4 +393,5 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
             "PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS"
     }
 }
+
 

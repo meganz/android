@@ -264,7 +264,14 @@ class VideoSectionRepositoryImplTest {
             }
 
             whenever(
-                typedVideoNodeMapper(anyOrNull(), any(), any(), anyOrNull(), anyOrNull())
+                typedVideoNodeMapper(
+                    anyOrNull(),
+                    any(),
+                    any(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    anyOrNull()
+                )
             ).thenReturn(
                 typedVideoNode
             )
@@ -650,12 +657,26 @@ class VideoSectionRepositoryImplTest {
             }
             val addedHandle = 54321L
             val addedTimestamp = 200000L
-            val addedRecentlyWatchedItem = VideoRecentlyWatchedItem(addedHandle, addedTimestamp)
+            val addedCollectionId = 654321L
+            val addedCollectionTitle = "collection title"
+            val addedRecentlyWatchedItem = VideoRecentlyWatchedItem(
+                addedHandle,
+                addedTimestamp,
+                addedCollectionId,
+                addedCollectionTitle
+            )
             val jsonString = Json.encodeToString(testVideoRecentlyWatchedData)
             whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull())).thenReturn(
                 flowOf(jsonString)
             )
-            whenever(videoRecentlyWatchedItemMapper(anyOrNull(), anyOrNull())).thenReturn(
+            whenever(
+                videoRecentlyWatchedItemMapper(
+                    anyOrNull(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    anyOrNull()
+                )
+            ).thenReturn(
                 addedRecentlyWatchedItem
             )
             initUnderTest()
@@ -673,6 +694,9 @@ class VideoSectionRepositoryImplTest {
         runTest {
             val testHandle = 12345L
             val testTimestamp = 100000L
+
+            val collectionIdIndex = 1
+
             val testVideoRecentlyWatchedData = mutableListOf<VideoRecentlyWatchedItem>().apply {
                 add(VideoRecentlyWatchedItem(testHandle, testTimestamp))
             }
@@ -683,9 +707,20 @@ class VideoSectionRepositoryImplTest {
             val testHandles = listOf(12345L, 23456L, 34567L)
             val testTimestamps = listOf(100000L, 200000L, 300000L)
 
+            val testCollectionId = 654321L
+
+            val testCollectionTitles = listOf(null, "set name", "collection title")
+
             val testItems = testHandles.mapIndexed { index, handle ->
                 VideoRecentlyWatchedItem(
-                    handle, testTimestamps[index]
+                    handle,
+                    testTimestamps[index],
+                    if (index == collectionIdIndex) {
+                        testCollectionId
+                    } else {
+                        0
+                    },
+                    testCollectionTitles[index]
                 )
             }
 
@@ -696,7 +731,11 @@ class VideoSectionRepositoryImplTest {
                 mock<TypedFileNode>()
             }
             val testTypedVideoNodes = testHandles.mapIndexed { index, handle ->
-                initTypedVideoNode(handle, testTimestamps[index])
+                initTypedVideoNode(
+                    handle,
+                    testTimestamps[index],
+                    testCollectionTitles[index]
+                )
             }
             testMegaNodes.mapIndexed { index, node ->
                 whenever(megaApiGateway.getMegaNodeByHandle(node.handle)).thenReturn(node)
@@ -705,7 +744,8 @@ class VideoSectionRepositoryImplTest {
                     typedVideoNodeMapper(
                         fileNode = testFileNodes[index],
                         duration = 100,
-                        watchedTimestamp = testTimestamps[index]
+                        watchedTimestamp = testTimestamps[index],
+                        collectionTitle = testCollectionTitles[index]
                     )
                 )
                     .thenReturn(testTypedVideoNodes[index])
@@ -717,6 +757,18 @@ class VideoSectionRepositoryImplTest {
             )
             whenever(megaLocalRoomGateway.getAllRecentlyWatchedVideos()).thenReturn(flowOf(testItems))
             whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(emptyList())
+            val megaSetElement = mock<MegaSetElement> {
+                on { node() }.thenReturn(testHandles[collectionIdIndex])
+            }
+            val megaSetElementList = mock<MegaSetElementList> {
+                on { size() }.thenReturn(1L)
+                on { get(0) }.thenReturn(megaSetElement)
+            }
+            val megaSet = mock<MegaSet> {
+                on { name() }.thenReturn(testCollectionTitles[collectionIdIndex])
+            }
+            whenever(megaApiGateway.getSetElements(anyOrNull())).thenReturn(megaSetElementList)
+            whenever(megaApiGateway.getSet(anyOrNull())).thenReturn(megaSet)
 
             val actual = underTest.getRecentlyWatchedVideoNodes()
             verify(megaLocalRoomGateway).saveRecentlyWatchedVideos(testVideoRecentlyWatchedData)
@@ -728,19 +780,25 @@ class VideoSectionRepositoryImplTest {
             assertThat(actual.size).isEqualTo(3)
             testTimestamps.sortedByDescending { it }.mapIndexed { index, expectedTimestamp ->
                 assertThat(actual[index].watchedTimestamp).isEqualTo(expectedTimestamp)
+                assertThat(actual[index].collectionTitle).isEqualTo(
+                    testCollectionTitles.reversed()[index]
+                )
             }
         }
 
     private fun initMegaNode(nodeHandle: Long) = mock<MegaNode> {
         on { handle }.thenReturn(nodeHandle)
         on { duration }.thenReturn(100)
+        on { isFavourite }.thenReturn(true)
     }
 
-    private fun initTypedVideoNode(nodeHandle: Long, timestamp: Long) = mock<TypedVideoNode> {
-        on { id }.thenReturn(NodeId(nodeHandle))
-        on { duration }.thenReturn(100.seconds)
-        on { watchedTimestamp }.thenReturn(timestamp)
-    }
+    private fun initTypedVideoNode(nodeHandle: Long, timestamp: Long, title: String?) =
+        mock<TypedVideoNode> {
+            on { id }.thenReturn(NodeId(nodeHandle))
+            on { duration }.thenReturn(100.seconds)
+            on { watchedTimestamp }.thenReturn(timestamp)
+            on { collectionTitle }.thenReturn(title)
+        }
 
     @Test
     fun `test that clearRecentlyWatchedVideos function is invoked as expected`() = runTest {

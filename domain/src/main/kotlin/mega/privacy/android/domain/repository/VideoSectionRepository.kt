@@ -112,8 +112,15 @@ interface VideoSectionRepository {
      *
      * @param handle the handle of the video node
      * @param timestamp saved timestamp
+     * @param collectionId the collection id of the video
+     * @param collectionTitle the collection title of the video
      */
-    suspend fun saveVideoRecentlyWatched(handle: Long, timestamp: Long)
+    suspend fun saveVideoRecentlyWatched(
+        handle: Long,
+        timestamp: Long,
+        collectionId: Long = 0,
+        collectionTitle: String? = null
+    )
 
     /**
      * Get the data of video recently watched

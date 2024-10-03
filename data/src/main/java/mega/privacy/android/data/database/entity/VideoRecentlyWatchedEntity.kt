@@ -11,4 +11,8 @@ internal data class VideoRecentlyWatchedEntity(
     val videoHandle: Long = 0L,
     @ColumnInfo(name = "watched_timestamp")
     val watchedTimestamp: Long = 0L,
+    @ColumnInfo(name = "collection_id", defaultValue = "0")
+    val collectionId: Long = 0L,
+    @ColumnInfo(name = "collection_title")
+    val collectionTitle: String? = null
 )

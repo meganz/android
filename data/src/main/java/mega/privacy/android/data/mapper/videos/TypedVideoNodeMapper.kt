@@ -12,11 +12,13 @@ internal class TypedVideoNodeMapper @Inject constructor() {
         elementID: Long? = null,
         isOutShared: Boolean = false,
         watchedTimestamp: Long = 0,
+        collectionTitle: String? = null,
     ) = TypedVideoNode(
         fileNode = fileNode,
         duration = duration.seconds,
         elementID = elementID,
         isOutShared = isOutShared,
-        watchedTimestamp = watchedTimestamp
+        watchedTimestamp = watchedTimestamp,
+        collectionTitle = collectionTitle
     )
 }
