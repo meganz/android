@@ -9,7 +9,6 @@ import mega.privacy.android.domain.exception.NullFileException
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetFileDestinationAndAppDataForDownloadUseCase
-import mega.privacy.android.domain.usecase.transfers.mapper.GetPendingTransferNodeIdentifierUseCase
 import java.io.File
 import javax.inject.Inject
 

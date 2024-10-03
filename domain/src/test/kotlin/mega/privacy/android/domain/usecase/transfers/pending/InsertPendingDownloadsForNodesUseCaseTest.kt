@@ -13,7 +13,6 @@ import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DestinationAndAppDataForDownloadResult
 import mega.privacy.android.domain.usecase.transfers.downloads.GetFileDestinationAndAppDataForDownloadUseCase
-import mega.privacy.android.domain.usecase.transfers.mapper.GetPendingTransferNodeIdentifierUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

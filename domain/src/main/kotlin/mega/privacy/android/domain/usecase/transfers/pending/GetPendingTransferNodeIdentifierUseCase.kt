@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.transfers.mapper
+package mega.privacy.android.domain.usecase.transfers.pending
 
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode

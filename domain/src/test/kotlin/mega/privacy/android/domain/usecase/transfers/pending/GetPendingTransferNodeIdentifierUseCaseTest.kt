@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.transfers.mapper
+package mega.privacy.android.domain.usecase.transfers.pending
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
