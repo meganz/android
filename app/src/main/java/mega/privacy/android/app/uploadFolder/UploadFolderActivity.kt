@@ -104,7 +104,6 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
      * onCreate
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         onBackPressedDispatcher.addCallback(onBackPressedCallback)
@@ -138,10 +137,10 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
                     }
                 }
             }
-
+        enableEdgeToEdge()
         binding = ActivityUploadFolderBinding.inflate(layoutInflater)
-        consumeInsetsWithToolbar(customToolbar = binding.toolbar)
         setContentView(binding.root)
+        consumeInsetsWithToolbar(customToolbar = binding.toolbar)
         setupView()
         setupObservers()
 
