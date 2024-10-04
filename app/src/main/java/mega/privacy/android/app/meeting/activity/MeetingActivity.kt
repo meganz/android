@@ -34,6 +34,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
+import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.meeting.CallNotificationIntentService
 import mega.privacy.android.app.meeting.fragments.CreateMeetingFragment
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment
@@ -44,7 +45,6 @@ import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
-import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
@@ -264,8 +264,8 @@ class MeetingActivity : PasscodeActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         initializePictureInPictureParams()
 
         // Setup the Back Press dispatcher to receive Back Press events
@@ -274,11 +274,11 @@ class MeetingActivity : PasscodeActivity() {
         initIntent()
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)
+        consumeInsetsWithToolbar(customToolbar = binding.toolbar)
         setContentView(binding.root)
 
         initActionBar()
         initNavigation()
-        setStatusBarTranslucent()
         binding.waitingRoomDialogComposeView.apply {
             isVisible = true
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -297,10 +297,7 @@ class MeetingActivity : PasscodeActivity() {
                 OriginalTempTheme(isDark = true) {
                     ParticipantsFullListView(
                         onScrollChange = { scrolled ->
-                            this@MeetingActivity.changeStatusBarColor(
-                                scrolled,
-                                true
-                            )
+                            binding.toolbar.elevation = if (scrolled) 4f else 0f
                         },
                         onEditProfileClicked = { editProfile() },
                         onContactInfoClicked = { email -> openContactInfo(email) },
@@ -486,24 +483,6 @@ class MeetingActivity : PasscodeActivity() {
 
             meetingAction = it.action
             meetingViewModel.setAction(meetingAction)
-        }
-    }
-
-    private fun setStatusBarTranslucent() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { v, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = insets.top
-            }
-
-            binding.navHostFragment.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                topMargin = insets.top
-                leftMargin = insets.left
-                rightMargin = insets.right
-                bottomMargin = insets.bottom
-            }
-
-            WindowInsetsCompat.CONSUMED
         }
     }
 

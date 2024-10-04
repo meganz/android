@@ -39,7 +39,6 @@ import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.ManageMeetingLinkBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_LINK_CREATED_TAG
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_LINK_TAG
@@ -119,8 +118,8 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      * Perform Activity initialization
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         collectFlows()
 
@@ -504,7 +503,6 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                 onSeeMoreOrLessClicked = { viewModel.onSeeMoreOrLessTap() },
                 onLeaveGroupClicked = { viewModel.onLeaveGroupTap() },
                 onParticipantClicked = { showParticipantOptionsPanel(it) },
-                onScrollChange = { scrolled -> this.changeStatusBarColor(scrolled, isDark) },
                 onBackPressed = {
                     Timber.d(
                         "onBackPressed schedule meeting created ${

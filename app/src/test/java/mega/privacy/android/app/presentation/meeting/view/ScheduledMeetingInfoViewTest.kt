@@ -12,14 +12,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.R
+import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.getRetentionTimeString
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoUiState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
-import mega.privacy.android.app.presentation.meeting.view.SCHEDULE_MEETING_INFO_PARTICIPANTS_WARNING_TAG
-import mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -31,7 +30,6 @@ import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class ScheduledMeetingInfoViewTest {
@@ -432,7 +430,6 @@ class ScheduledMeetingInfoViewTest {
                     onSeeMoreOrLessClicked = {},
                     onLeaveGroupClicked = {},
                     onParticipantClicked = {},
-                    onScrollChange = {},
                     onBackPressed = {},
                     onDismiss = {},
                     onLeaveGroupDialog = {},
@@ -462,7 +459,6 @@ class ScheduledMeetingInfoViewTest {
                     onSeeMoreOrLessClicked = {},
                     onLeaveGroupClicked = {},
                     onParticipantClicked = {},
-                    onScrollChange = {},
                     onBackPressed = {},
                     onDismiss = {},
                     onLeaveGroupDialog = {},

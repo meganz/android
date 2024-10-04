@@ -11,12 +11,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -34,7 +35,7 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -120,7 +121,6 @@ fun ScheduledMeetingInfoView(
     onResetStateSnackbarMessage: () -> Unit = {},
     onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
     onParticipantClicked: (ChatParticipant) -> Unit = {},
-    onScrollChange: (Boolean) -> Unit,
 ) {
     val shouldShowParticipantsLimitWarning =
         managementState.isCallUnlimitedProPlanFeatureFlagEnabled &&
@@ -135,7 +135,7 @@ fun ScheduledMeetingInfoView(
                 && managementState.waitingRoomReminder == WaitingRoomReminders.Enabled
 
     Scaffold(
-        modifier = Modifier.systemBarsPadding(),
+        modifier = Modifier,
         scaffoldState = scaffoldState,
         snackbarHost = {
             SnackbarHost(hostState = it) { data ->
@@ -152,7 +152,7 @@ fun ScheduledMeetingInfoView(
                 onAddParticipantsClicked = onAddParticipantsClicked,
                 onBackPressed = onBackPressed,
                 titleId = R.string.general_info,
-                elevation = shouldShowWarningDialog || !firstItemVisible,
+                elevation = shouldShowWarningDialog || listState.canScrollBackward,
             )
         }
     ) { paddingValues ->
@@ -254,8 +254,6 @@ fun ScheduledMeetingInfoView(
     }
 
     SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
-
-    onScrollChange(!firstItemVisible)
 }
 
 /**
@@ -351,7 +349,7 @@ private fun ScheduledMeetingInfoAppBar(
         navigationIcon = {
             IconButton(onClick = onBackPressed) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back button",
                     tint = iconColor
                 )
@@ -380,7 +378,8 @@ private fun ScheduledMeetingInfoAppBar(
             }
         },
         backgroundColor = MaterialTheme.colors.surface,
-        elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp
+        elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp,
+        windowInsets = WindowInsets.systemBars,
     )
 }
 
@@ -1303,7 +1302,6 @@ fun PreviewScheduledMeetingInfoView() {
             onSeeMoreOrLessClicked = {},
             onLeaveGroupClicked = {},
             onParticipantClicked = {},
-            onScrollChange = {},
             onBackPressed = {},
             onDismiss = {},
             onLeaveGroupDialog = {},
