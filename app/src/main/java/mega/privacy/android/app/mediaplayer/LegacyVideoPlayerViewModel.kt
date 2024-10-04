@@ -169,6 +169,7 @@ import timber.log.Timber
 import java.io.File
 import java.net.URI
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.util.Collections
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -1214,7 +1215,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     internal fun saveVideoWatchedTime() = viewModelScope.launch {
         if (getFeatureFlagValueUseCase(AppFeatures.VideoRecentlyWatched)) {
             mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong()?.let {
-                saveVideoRecentlyWatchedUseCase(it, System.currentTimeMillis() / 1000)
+                saveVideoRecentlyWatchedUseCase(it, Instant.now().toEpochMilli() / 1000)
             }
         }
     }

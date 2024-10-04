@@ -41,6 +41,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -49,6 +50,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import java.io.File
+import java.time.Instant
 
 @ExtendWith(
     value = [
@@ -355,29 +357,36 @@ internal class LegacyVideoPlayerViewModelTest {
     @Test
     fun `test that the saveVideoRecentlyWatchedUseCase is invoked as expected when initVideoSources is called`() =
         runTest {
-            val testMediaItem = MediaItem.Builder()
-                .setMediaId(expectedId.toString())
-                .build()
-            whenever(getFeatureFlagValueUseCase(anyOrNull())).thenReturn(true)
-            whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
-            val timestamp = System.currentTimeMillis() / 1000
-            underTest.initVideoSources(null)
+            val instant = Instant.ofEpochMilli(2000L)
+            mockStatic(Instant::class.java).use {
+                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
+                val testMediaItem = MediaItem.Builder()
+                    .setMediaId(expectedId.toString())
+                    .build()
+                whenever(getFeatureFlagValueUseCase(anyOrNull())).thenReturn(true)
+                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+                underTest.initVideoSources(null)
 
-            verify(saveVideoRecentlyWatchedUseCase).invoke(expectedId, timestamp)
+                verify(saveVideoRecentlyWatchedUseCase).invoke(expectedId, 2)
+            }
+
         }
 
     @Test
     fun `test that the saveVideoRecentlyWatchedUseCase is invoked as expected when saveVideoWatchedTime is called`() =
         runTest {
-            val testMediaItem = MediaItem.Builder()
-                .setMediaId(expectedId.toString())
-                .build()
-            whenever(getFeatureFlagValueUseCase(anyOrNull())).thenReturn(true)
-            whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
-            val timestamp = System.currentTimeMillis() / 1000
-            underTest.saveVideoWatchedTime()
+            val instant = Instant.ofEpochMilli(2000L)
+            mockStatic(Instant::class.java).use {
+                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
+                val testMediaItem = MediaItem.Builder()
+                    .setMediaId(expectedId.toString())
+                    .build()
+                whenever(getFeatureFlagValueUseCase(anyOrNull())).thenReturn(true)
+                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+                underTest.saveVideoWatchedTime()
 
-            verify(saveVideoRecentlyWatchedUseCase).invoke(expectedId, timestamp)
+                verify(saveVideoRecentlyWatchedUseCase).invoke(expectedId, 2)
+            }
         }
 
     @Test
