@@ -53,11 +53,11 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = GetLinkActivityLayoutBinding.inflate(layoutInflater)
-        consumeInsetsWithToolbar(customToolbar = binding.toolbarGetLink)
+        enableEdgeToEdge()
         setContentView(binding.root)
+        consumeInsetsWithToolbar(customToolbar = binding.toolbarGetLink)
 
         if (intent == null || shouldRefreshSessionDueToSDK()) {
             return
@@ -174,7 +174,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
      *
      * @param withElevation True if should set elevation, false otherwise.
      */
-    private fun changeElevation(withElevation: Boolean) {
+    fun changeElevation(withElevation: Boolean) {
         binding.toolbarGetLink.elevation = if (withElevation) elevation else 0f
     }
 
