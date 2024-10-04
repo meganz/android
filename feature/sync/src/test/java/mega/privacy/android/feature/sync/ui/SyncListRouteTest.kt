@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.core.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.feature.sync.R
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
@@ -64,13 +64,13 @@ class SyncListRouteTest {
     private val synUiItems = listOf(
         SyncUiItem(
             id = 1L,
+            syncType = SyncType.TYPE_TWOWAY,
             folderPairName = "Folder Name",
             status = SyncStatus.SYNCING,
             hasStalledIssues = false,
             deviceStoragePath = "Folder Path",
             megaStoragePath = "MEGA Patch",
             megaStorageNodeId = NodeId(1234L),
-            method = R.string.sync_two_way,
             expanded = false
         )
     )

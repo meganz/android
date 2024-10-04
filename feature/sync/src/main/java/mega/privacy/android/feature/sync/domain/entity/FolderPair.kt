@@ -1,10 +1,12 @@
 package mega.privacy.android.feature.sync.domain.entity
 
 import mega.privacy.android.domain.entity.sync.SyncError
+import mega.privacy.android.domain.entity.sync.SyncType
 
 /**
  * Entity representing a folder pair
  * @property id - id of the folder pair
+ * @property syncType - the sync type of the folder pair
  * @property pairName - name of the pair
  * @property localFolderPath - path to the local folder
  * @property remoteFolder - remote folder location
@@ -13,6 +15,7 @@ import mega.privacy.android.domain.entity.sync.SyncError
  */
 data class FolderPair(
     val id: Long,
+    val syncType: SyncType,
     val pairName: String,
     val localFolderPath: String,
     val remoteFolder: RemoteFolder,
@@ -21,13 +24,17 @@ data class FolderPair(
 ) {
 
     companion object {
+        /**
+         * Reset the folder pair
+         */
         fun empty(): FolderPair =
             FolderPair(
                 id = -1,
+                syncType = SyncType.TYPE_UNKNOWN,
                 pairName = "",
                 localFolderPath = "",
                 remoteFolder = RemoteFolder(-1, ""),
-                syncStatus = SyncStatus.SYNCED
+                syncStatus = SyncStatus.SYNCED,
             )
     }
 }

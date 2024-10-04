@@ -15,7 +15,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.core.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.feature.sync.R
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
@@ -57,13 +57,13 @@ class SyncFoldersScreenTest {
             listOf(
                 SyncUiItem(
                     id = 1L,
+                    syncType = SyncType.TYPE_TWOWAY,
                     folderPairName = folderName,
                     status = SyncStatus.SYNCING,
                     hasStalledIssues = false,
                     deviceStoragePath = folderName,
                     megaStoragePath = folderName,
                     megaStorageNodeId = NodeId(1234L),
-                    method = R.string.sync_two_way,
                     expanded = false
                 )
             )

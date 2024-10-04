@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -30,11 +31,12 @@ class MonitorSyncsUseCaseTest {
 
     private val folderPairs = listOf(
         FolderPair(
-            3L,
-            "folderPair",
-            "DCIM",
-            RemoteFolder(233L, "photos"),
-            SyncStatus.SYNCING
+            id = 3L,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "folderPair",
+            localFolderPath = "DCIM",
+            remoteFolder = RemoteFolder(id = 233L, name = "photos"),
+            syncStatus = SyncStatus.SYNCING
         )
     )
 

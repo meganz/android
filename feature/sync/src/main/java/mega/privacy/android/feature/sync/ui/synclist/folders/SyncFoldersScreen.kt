@@ -33,11 +33,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.CardExpanded
 import mega.privacy.android.feature.sync.ui.views.SyncItemView
+import mega.privacy.android.feature.sync.ui.views.SyncTypePreviewProvider
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
@@ -273,19 +275,21 @@ private fun SyncFoldersScreenLoadingStatePreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun SyncFoldersScreenSyncingPreview() {
+private fun SyncFoldersScreenSyncingPreview(
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
             listOf(
                 SyncUiItem(
                     id = 1,
+                    syncType = syncType,
                     folderPairName = "Folder pair name",
                     status = SyncStatus.SYNCING,
                     hasStalledIssues = false,
                     deviceStoragePath = "/path/to/local/folder",
                     megaStoragePath = "/path/to/mega/folder",
                     megaStorageNodeId = NodeId(1234L),
-                    method = R.string.sync_two_way,
                     expanded = false,
                 )
             ),
@@ -306,19 +310,21 @@ private fun SyncFoldersScreenSyncingPreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun SyncFoldersScreenSyncingWithStalledIssuesPreview() {
+private fun SyncFoldersScreenSyncingWithStalledIssuesPreview(
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
             listOf(
                 SyncUiItem(
                     id = 1,
+                    syncType = syncType,
                     folderPairName = "Folder pair name",
                     status = SyncStatus.SYNCING,
                     hasStalledIssues = true,
                     deviceStoragePath = "/path/to/local/folder",
                     megaStoragePath = "/path/to/mega/folder",
                     megaStorageNodeId = NodeId(1234L),
-                    method = R.string.sync_two_way,
                     expanded = false
                 )
             ),

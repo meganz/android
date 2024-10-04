@@ -159,6 +159,7 @@ import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.domain.usecase.FakeMonitorBackupFolder
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import java.io.File
 import java.util.stream.Stream
@@ -1346,11 +1347,12 @@ class ManagerViewModelTest {
     fun `test that if Android Sync feature is on and syncs are not empty Sync service is enabled`() =
         runTest {
             val mockFolderPair = FolderPair(
-                1L,
-                "folder name",
-                "folder name",
-                RemoteFolder(1L, "folder name"),
-                SyncStatus.SYNCING
+                id = 1L,
+                syncType = SyncType.TYPE_TWOWAY,
+                pairName = "folder name",
+                localFolderPath = "folder name",
+                remoteFolder = RemoteFolder(id = 1L, name = "folder name"),
+                syncStatus = SyncStatus.SYNCING,
             )
             testScheduler.advanceUntilIdle()
             monitorSyncsUseCaseFakeFlow.emit(listOf(mockFolderPair))

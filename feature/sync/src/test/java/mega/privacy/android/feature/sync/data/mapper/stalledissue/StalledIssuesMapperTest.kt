@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.data.mapper.stalledissue
 
 import com.google.common.truth.Truth
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
@@ -29,11 +30,12 @@ internal class StalledIssuesMapperTest {
         val syncs =
             listOf(
                 FolderPair(
-                    syncId,
-                    "",
-                    syncLocalFolderPath,
-                    RemoteFolder(1L, stalledIssueNodeName),
-                    SyncStatus.SYNCED
+                    id = syncId,
+                    syncType = SyncType.TYPE_TWOWAY,
+                    pairName = "",
+                    localFolderPath = syncLocalFolderPath,
+                    remoteFolder = RemoteFolder(id = 1L, name = stalledIssueNodeName),
+                    syncStatus = SyncStatus.SYNCED
                 )
             )
         val stalledIssuesSDKList: MegaSyncStallList = mock()

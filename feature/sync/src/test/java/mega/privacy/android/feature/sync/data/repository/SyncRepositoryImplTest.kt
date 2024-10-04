@@ -53,7 +53,7 @@ class SyncRepositoryImplTest {
     private val syncStatsCacheGateway: SyncStatsCacheGateway = mock()
     private val syncWorkManagerGateway: SyncWorkManagerGateway = mock()
     private val megaApiGateway: MegaApiGateway = mock()
-    private val folderPairMapper: FolderPairMapper = FolderPairMapper(mock(), mock())
+    private val folderPairMapper: FolderPairMapper = FolderPairMapper(mock(), mock(), mock())
     private val stalledIssuesMapper: StalledIssuesMapper = StalledIssuesMapper(
         StalledIssueTypeMapper()
     )

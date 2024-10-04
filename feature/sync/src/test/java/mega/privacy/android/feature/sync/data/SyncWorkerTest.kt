@@ -21,6 +21,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.feature.sync.data.SyncWorker.Companion.SYNC_WORKER_RECHECK_DELAY
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
@@ -89,13 +90,28 @@ class SyncWorkerTest {
     @Test
     fun `test that sync worker finishes immediately if all folders have been synced`() = runTest {
         val firstSync = FolderPair(
-            1, "first", "first", RemoteFolder(1232L, "first"), SyncStatus.SYNCED
+            id = 1,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "first",
+            localFolderPath = "first",
+            remoteFolder = RemoteFolder(id = 1232L, name = "first"),
+            syncStatus = SyncStatus.SYNCED
         )
         val secondSync = FolderPair(
-            2, "second", "second", RemoteFolder(2222L, "second"), SyncStatus.SYNCED
+            id = 2,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "second",
+            localFolderPath = "second",
+            remoteFolder = RemoteFolder(id = 2222L, name = "second"),
+            syncStatus = SyncStatus.SYNCED
         )
         val thirdSync = FolderPair(
-            3, "third", "third", RemoteFolder(3333L, "third"), SyncStatus.PAUSED
+            id = 3,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "third",
+            localFolderPath = "third",
+            remoteFolder = RemoteFolder(id = 3333L, name = "third"),
+            syncStatus = SyncStatus.PAUSED
         )
         whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(firstSync, secondSync, thirdSync)))
 
@@ -109,10 +125,20 @@ class SyncWorkerTest {
         val testDispatcher = StandardTestDispatcher()
         val testScope = TestScope(testDispatcher)
         val firstSync = FolderPair(
-            1, "first", "first", RemoteFolder(1232L, "first"), SyncStatus.SYNCING
+            id = 1,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "first",
+            localFolderPath = "first",
+            remoteFolder = RemoteFolder(id = 1232L, name = "first"),
+            syncStatus = SyncStatus.SYNCING
         )
         val secondSync = FolderPair(
-            2, "second", "second", RemoteFolder(1232L, "second"), SyncStatus.SYNCED
+            id = 2,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "second",
+            localFolderPath = "second",
+            remoteFolder = RemoteFolder(id = 1232L, name = "second"),
+            syncStatus = SyncStatus.SYNCED
         )
         whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(firstSync, secondSync)))
 

@@ -13,13 +13,13 @@ import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.IsProAccountUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
-import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
@@ -70,20 +70,25 @@ class SyncFoldersViewModelTest {
 
     private val folderPairs = listOf(
         FolderPair(
-            3L, "folderPair", "DCIM", RemoteFolder(233L, "photos"), SyncStatus.SYNCING
+            id = 3L,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "folderPair",
+            localFolderPath = "DCIM",
+            remoteFolder = RemoteFolder(id = 233L, name = "photos"),
+            syncStatus = SyncStatus.SYNCING
         )
     )
 
     private val syncUiItems = listOf(
         SyncUiItem(
             id = 3L,
+            syncType = SyncType.TYPE_TWOWAY,
             folderPairName = "folderPair",
             status = SyncStatus.SYNCING,
             deviceStoragePath = "DCIM",
             hasStalledIssues = false,
             megaStoragePath = "photos",
             megaStorageNodeId = NodeId(1234L),
-            method = R.string.sync_two_way,
             expanded = false
         )
     )
@@ -253,13 +258,13 @@ class SyncFoldersViewModelTest {
 
     private fun getSyncUiItem(status: SyncStatus): SyncUiItem = SyncUiItem(
         id = 3L,
+        syncType = SyncType.TYPE_TWOWAY,
         folderPairName = "folderPair",
         status = status,
         deviceStoragePath = "DCIM",
         megaStoragePath = "photos",
         megaStorageNodeId = NodeId(1234L),
         hasStalledIssues = false,
-        method = R.string.sync_two_way,
         expanded = false
     )
 

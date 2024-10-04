@@ -3,7 +3,7 @@ package mega.privacy.android.feature.sync.presentation.mapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.feature.sync.R
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -23,11 +23,12 @@ class SyncUiItemMapperTest {
     private val underTest = SyncUiItemMapper(deviceFolderUINodeErrorMessageMapper)
 
     private val folderPair = FolderPair(
-        3L,
-        "folderPair",
-        "DCIM",
-        RemoteFolder(233L, "photos"),
-        SyncStatus.SYNCING,
+        id = 3L,
+        syncType = SyncType.TYPE_TWOWAY,
+        pairName = "folderPair",
+        localFolderPath = "DCIM",
+        remoteFolder = RemoteFolder(id = 233L, name = "photos"),
+        syncStatus = SyncStatus.SYNCING,
         syncError = null
     )
     private val folderPairsList = listOf(
@@ -40,13 +41,13 @@ class SyncUiItemMapperTest {
         val syncUiItems = listOf(
             SyncUiItem(
                 id = 3L,
+                syncType = SyncType.TYPE_TWOWAY,
                 folderPairName = "folderPair",
                 status = SyncStatus.SYNCING,
                 hasStalledIssues = false,
                 deviceStoragePath = "DCIM",
                 megaStoragePath = "photos",
                 megaStorageNodeId = NodeId(233L),
-                method = R.string.sync_two_way,
                 expanded = false
             )
         )
@@ -60,13 +61,13 @@ class SyncUiItemMapperTest {
         val syncUiItems = listOf(
             SyncUiItem(
                 id = 4L,
+                syncType = SyncType.TYPE_TWOWAY,
                 folderPairName = "folderPair",
                 status = SyncStatus.SYNCING,
                 hasStalledIssues = false,
                 deviceStoragePath = "DCIM",
                 megaStoragePath = "photos",
                 megaStorageNodeId = NodeId(1234L),
-                method = R.string.sync_two_way,
                 expanded = false
             )
         )

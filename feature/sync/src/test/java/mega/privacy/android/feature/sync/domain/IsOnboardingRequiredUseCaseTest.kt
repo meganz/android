@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.domain
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -47,11 +48,12 @@ class IsOnboardingRequiredUseCaseTest {
     @Test
     fun `test that if user has established syncs then onboarding is not required`() = runTest {
         val fakeFolderPair = FolderPair(
-            1,
-            "",
-            "",
-            RemoteFolder(1, ""),
-            SyncStatus.SYNCING
+            id = 1,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "",
+            localFolderPath = "",
+            remoteFolder = RemoteFolder(id = 1, name = ""),
+            syncStatus = SyncStatus.SYNCING
         )
         whenever(syncPreferencesRepository.getOnboardingShown()).thenReturn(false)
         whenever(syncRepository.getFolderPairs()).thenReturn(listOf(fakeFolderPair))

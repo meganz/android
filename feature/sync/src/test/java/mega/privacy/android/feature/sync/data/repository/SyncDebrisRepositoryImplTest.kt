@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.data.gateway.SyncDebrisGateway
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -69,18 +70,20 @@ class SyncDebrisRepositoryImplTest {
     fun `test that repository extracts debris folder for each sync`() = runTest {
         val syncs = listOf(
             FolderPair(
-                123L,
-                "",
-                "storage/emulated/0/sync",
-                RemoteFolder(12L, "some folder"),
-                SyncStatus.SYNCED
+                id = 123L,
+                syncType = SyncType.TYPE_TWOWAY,
+                pairName = "",
+                localFolderPath = "storage/emulated/0/sync",
+                remoteFolder = RemoteFolder(id = 12L, name = "some folder"),
+                syncStatus = SyncStatus.SYNCED
             ),
             FolderPair(
-                345L,
-                "",
-                "storage/emulated/0/anothersync",
-                RemoteFolder(434L, "some other folder"),
-                SyncStatus.SYNCED
+                id = 345L,
+                syncType = SyncType.TYPE_TWOWAY,
+                pairName = "",
+                localFolderPath = "storage/emulated/0/anothersync",
+                remoteFolder = RemoteFolder(id = 434L, name = "some other folder"),
+                syncStatus = SyncStatus.SYNCED
             ),
         )
         whenever(

@@ -23,10 +23,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
@@ -316,18 +318,20 @@ private fun SyncCardFooter(
 
 @CombinedThemePreviews
 @Composable
-private fun SyncCardExpandedPreview() {
+private fun SyncCardExpandedPreview(
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
             SyncUiItem(
                 id = 1234L,
+                syncType = syncType,
                 folderPairName = "Competitors documentation",
                 status = SyncStatus.SYNCING,
                 hasStalledIssues = false,
                 deviceStoragePath = "/storage/emulated/0/Download",
-                megaStoragePath = "/Root/Competitors documentation",
+                megaStoragePath = "Competitors documentation",
                 megaStorageNodeId = NodeId(1234L),
-                method = R.string.sync_two_way,
                 expanded = true,
                 numberOfFolders = 5,
                 totalSizeInBytes = 23552L,
@@ -346,18 +350,20 @@ private fun SyncCardExpandedPreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun SyncCardExpandedWithBannerPreview() {
+private fun SyncCardExpandedWithBannerPreview(
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
             SyncUiItem(
                 id = 1234L,
+                syncType = syncType,
                 folderPairName = "Competitors documentation",
                 status = SyncStatus.SYNCING,
                 hasStalledIssues = false,
                 deviceStoragePath = "/storage/emulated/0/Download",
-                megaStoragePath = "/Root/Competitors documentation",
+                megaStoragePath = "Competitors documentation",
                 megaStorageNodeId = NodeId(1234L),
-                method = R.string.sync_two_way,
                 expanded = true,
                 numberOfFolders = 5,
                 totalSizeInBytes = 23552L,
@@ -376,18 +382,20 @@ private fun SyncCardExpandedWithBannerPreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun SyncCardCollapsedPreview() {
+private fun SyncCardCollapsedPreview(
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
             SyncUiItem(
                 id = 1234L,
+                syncType = syncType,
                 folderPairName = "Competitors documentation",
                 status = SyncStatus.SYNCING,
                 hasStalledIssues = false,
                 deviceStoragePath = "/storage/emulated/0/Download",
-                megaStoragePath = "/Root/Competitors documentation",
+                megaStoragePath = "Competitors documentation",
                 megaStorageNodeId = NodeId(1234L),
-                method = R.string.sync_two_way,
                 expanded = false,
                 numberOfFolders = 5,
                 totalSizeInBytes = 23552L,
@@ -406,18 +414,20 @@ private fun SyncCardCollapsedPreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun SyncCardCollapsedWithBannerPreview() {
+private fun SyncCardCollapsedWithBannerPreview(
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
             SyncUiItem(
                 id = 1234L,
+                syncType = syncType,
                 folderPairName = "Competitors documentation",
                 status = SyncStatus.SYNCING,
                 hasStalledIssues = false,
                 deviceStoragePath = "/storage/emulated/0/Download",
-                megaStoragePath = "/Root/Competitors documentation",
+                megaStoragePath = "Competitors documentation",
                 megaStorageNodeId = NodeId(1234L),
-                method = R.string.sync_two_way,
                 expanded = false,
                 numberOfFolders = 5,
                 totalSizeInBytes = 23552L,
