@@ -340,7 +340,7 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/zip_browser_activity" />
         <activity
-            android:name=".main.AddContactActivity"
+            android:name=".main.legacycontact.AddContactActivity"
             android:windowSoftInputMode="adjustNothing" />
         <activity
             android:name=".presentation.contact.invite.InviteContactActivity"

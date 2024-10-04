@@ -61,7 +61,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
-import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.meeting.chat.extension.getOpenChatId
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined

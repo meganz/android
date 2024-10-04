@@ -48,7 +48,7 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiUtils;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
-import mega.privacy.android.app.main.AddContactActivity;
+import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.main.ShareContactInfo;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;

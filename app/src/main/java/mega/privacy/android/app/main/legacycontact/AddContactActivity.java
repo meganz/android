@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main;
+package mega.privacy.android.app.main.legacycontact;
 
 import static mega.privacy.android.app.presentation.meeting.model.MeetingState.FREE_PLAN_PARTICIPANTS_LIMIT;
 import static mega.privacy.android.app.utils.CallUtil.isNecessaryDisableLocalCamera;
@@ -111,6 +111,8 @@ import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.extensions.EdgeToEdgeExtensionsKt;
+import mega.privacy.android.app.main.PhoneContactInfo;
+import mega.privacy.android.app.main.ShareContactInfo;
 import mega.privacy.android.app.main.adapters.AddContactsAdapter;
 import mega.privacy.android.app.main.adapters.MegaAddContactsAdapter;
 import mega.privacy.android.app.main.adapters.MegaContactsAdapter;
@@ -118,7 +120,6 @@ import mega.privacy.android.app.main.adapters.PhoneContactsAdapter;
 import mega.privacy.android.app.main.adapters.ShareContactsAdapter;
 import mega.privacy.android.app.main.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.main.controllers.ContactController;
-import mega.privacy.android.app.main.tasks.AddContactViewModel;
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsLimitWarningView;
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity;
 import mega.privacy.android.app.psa.PsaWebBrowser;

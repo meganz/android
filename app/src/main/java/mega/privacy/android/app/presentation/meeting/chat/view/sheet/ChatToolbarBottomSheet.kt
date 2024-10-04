@@ -35,7 +35,7 @@ import mega.privacy.android.app.activities.GiphyPickerActivity
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
 import mega.privacy.android.app.camera.CameraArg
 import mega.privacy.android.app.camera.InAppCameraLauncher
-import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAttachContactActivity

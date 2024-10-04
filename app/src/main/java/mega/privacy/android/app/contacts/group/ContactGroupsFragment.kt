@@ -24,7 +24,7 @@ import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.databinding.FragmentContactGroupsBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView

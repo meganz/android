@@ -22,7 +22,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.main.AddContactActivity;
+import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.main.ShareContactInfo;
 import nz.mega.sdk.MegaApiAndroid;
 import timber.log.Timber;

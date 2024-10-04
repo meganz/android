@@ -49,7 +49,7 @@ import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.main.AddContactActivity;
+import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.main.listeners.UserAvatarListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;

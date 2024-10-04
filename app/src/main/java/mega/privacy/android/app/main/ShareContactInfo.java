@@ -9,7 +9,7 @@ import mega.privacy.android.app.MegaContactAdapter;
 public class ShareContactInfo{
 
     PhoneContactInfo phoneContactInfo;
-    MegaContactAdapter megaContactAdapter;
+    public MegaContactAdapter megaContactAdapter;
     String mail;
     boolean isPhoneContact;
     boolean isMegaContact;

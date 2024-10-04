@@ -76,6 +76,7 @@ import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.main.adapters.MegaSharedFolderAdapter;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.controllers.NodeController;
+import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogListener;
 import mega.privacy.android.app.presentation.contact.FileContactListActivityExtensionKt;

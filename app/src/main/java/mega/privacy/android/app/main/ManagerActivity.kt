@@ -144,6 +144,7 @@ import mega.privacy.android.app.main.dialog.connect.ConfirmConnectDialogFragment
 import mega.privacy.android.app.main.dialog.contactlink.ContactLinkDialogFragment
 import mega.privacy.android.app.main.dialog.link.OpenLinkDialogFragment
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogFragment
+import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.main.listeners.FabButtonListener
 import mega.privacy.android.app.main.managerSections.ManagerUploadBottomSheetDialogActionHandler
 import mega.privacy.android.app.main.managerSections.TransfersViewModel

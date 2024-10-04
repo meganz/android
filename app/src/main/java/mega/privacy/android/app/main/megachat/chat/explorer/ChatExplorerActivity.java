@@ -1,7 +1,7 @@
 package mega.privacy.android.app.main.megachat.chat.explorer;
 
 
-import static mega.privacy.android.app.main.AddContactActivity.ALLOW_ADD_PARTICIPANTS;
+import static mega.privacy.android.app.main.legacycontact.AddContactActivity.ALLOW_ADD_PARTICIPANTS;
 import static mega.privacy.android.app.utils.Constants.ACTION_FORWARD_MESSAGES;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA;
 import static mega.privacy.android.app.utils.Constants.ID_CHAT_FROM;
@@ -47,7 +47,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.extensions.EdgeToEdgeExtensionsKt;
-import mega.privacy.android.app.main.AddContactActivity;
+import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.domain.entity.chat.ChatListItem;

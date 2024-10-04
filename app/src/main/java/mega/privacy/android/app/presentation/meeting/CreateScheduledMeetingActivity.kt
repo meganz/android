@@ -25,7 +25,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.DatePickerType.END_DATE
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.DatePickerType.START_DATE

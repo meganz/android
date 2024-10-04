@@ -53,7 +53,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.listeners.GetPeerAttributesListener
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
-import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaParticipantsChatAdapter

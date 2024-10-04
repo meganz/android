@@ -23,7 +23,7 @@ import java.util.Objects;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
-import mega.privacy.android.app.main.AddContactActivity;
+import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.utils.TextUtil;
 
