@@ -111,33 +111,9 @@ pipeline {
                                 "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${link})"
                         common.sendToMR(message)
 
-                        // send to android slack channel
-                        // the version name can be a <major>.<minor>.<point> (for hotfix) or <major>.<minor> format it to <major>.<minor>
-                        // we are using the same channel if the version has hotfix
-                        def formattedVersionName = common.readAppVersion()[0].split("\\.")[0..1].join(".")
+                        // Send to android slack channel
                         def slackVersionInfo = getSlackBuildVersionInfo(common)
-                        def slackInfoFileName = "slack_info.txt"
-
-                        // fetch slack channel id from Artifactory if exists
-                        String slackInfoPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/v${formattedVersionName}/${slackInfoFileName}"
-                        try {
-                            common.downloadFromArtifactory(slackInfoPath, slackInfoFileName)
-                        } catch (Exception ignored) {
-                            println("slack_info.txt not found in Artifactory.")
-                        }
-
-                        def slackChannelId = ""
-                        def qaSlackChannelId = ""
-                        if (fileExists(WORKSPACE + "/" + slackInfoFileName)) {
-                            def content = readFile(WORKSPACE + "/" + slackInfoFileName).trim()
-                            def slackInfo = content.split(",")
-                            if (slackInfo.size() > 0) {
-                                slackChannelId = slackInfo[0]
-                            }
-                            if (slackInfo.size() > 1) {
-                                qaSlackChannelId = slackInfo[1]
-                            }
-                        }
+                        def (slackChannelId, qaSlackChannelId) = common.fetchSlackChannelIdsByReleaseVersion(common.readAppVersion()[0])
 
                         if (slackChannelId == "") {
                             def slackResponse = slackSend(channel: "android", message: slackVersionInfo)

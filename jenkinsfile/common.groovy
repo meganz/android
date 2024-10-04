@@ -682,4 +682,41 @@ String uploadFileToArtifactory(String fileName) {
     return "${env.ARTIFACTORY_BASE_URL}:443/${targetFolder}/${targetFile}"
 }
 
+/**
+ * Fetch slack channel->thread IDs by release version from Artifactory
+ * @param version the release version
+ * @return a list of slack channel IDs. The first element is the Slack #android channel->release thread ID for release version, the second element is the #qa > release thread ID.
+ */
+def fetchSlackChannelIdsByReleaseVersion(String version) {
+    // Ignore hotfix version so that the same channel/thread is used if the version has hotfix
+    def formattedVersionName = version.split("\\.")[0..1].join(".")
+    def slackInfoFileName = "slack_info.txt"
+
+    // Fetch slack channel->thread id from Artifactory if exists
+    String slackInfoPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/v${formattedVersionName}/${slackInfoFileName}"
+    try {
+        downloadFromArtifactory(slackInfoPath, slackInfoFileName)
+    } catch (Exception ignored) {
+        println("slack_info.txt not found in Artifactory.")
+    }
+
+    def androidChannelThreadId = ""
+    def qaChannelThreadId = ""
+    if (fileExists(WORKSPACE + "/" + slackInfoFileName)) {
+        def content = readFile(WORKSPACE + "/" + slackInfoFileName).trim()
+        def slackInfo = content.split(",")
+        if (slackInfo.size() > 0) {
+            androidChannelThreadId = slackInfo[0]
+        }
+        if (slackInfo.size() > 1) {
+            qaChannelThreadId = slackInfo[1]
+        }
+    }
+
+    return [androidChannelThreadId, qaChannelThreadId]
+}
+
+
 return this
+
+
