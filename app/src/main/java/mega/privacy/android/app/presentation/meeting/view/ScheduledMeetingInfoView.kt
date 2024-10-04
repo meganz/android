@@ -11,36 +11,23 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -77,6 +64,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManag
 import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.WaitingRoomWarningDialog
+import mega.privacy.android.app.presentation.meeting.view.menuaction.ScheduledMeetingInfoMenuAction
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -84,8 +72,13 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.legacy.core.ui.controls.text.MarqueeText
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
@@ -93,6 +86,7 @@ import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.red_300
 import mega.privacy.android.shared.original.core.ui.theme.red_600
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_038
@@ -126,25 +120,15 @@ fun ScheduledMeetingInfoView(
         managementState.isCallUnlimitedProPlanFeatureFlagEnabled &&
                 state.shouldShowParticipantsLimitWarning && state.isModerator
     val listState = rememberLazyListState()
-    val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
-    val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
 
     val shouldShowWarningDialog =
         state.enabledAllowNonHostAddParticipantsOption && state.enabledWaitingRoomOption && state.isHost
                 && managementState.waitingRoomReminder == WaitingRoomReminders.Enabled
 
-    Scaffold(
-        modifier = Modifier,
+    MegaScaffold(
+        modifier = Modifier.navigationBarsPadding(),
         scaffoldState = scaffoldState,
-        snackbarHost = {
-            SnackbarHost(hostState = it) { data ->
-                Snackbar(
-                    snackbarData = data,
-                    backgroundColor = MaterialTheme.colors.onPrimary
-                )
-            }
-        },
         topBar = {
             ScheduledMeetingInfoAppBar(
                 state = state,
@@ -152,9 +136,9 @@ fun ScheduledMeetingInfoView(
                 onAddParticipantsClicked = onAddParticipantsClicked,
                 onBackPressed = onBackPressed,
                 titleId = R.string.general_info,
-                elevation = shouldShowWarningDialog || listState.canScrollBackward,
             )
-        }
+        },
+        scrollableContentState = listState
     ) { paddingValues ->
         LeaveGroupAlertDialog(
             state = state,
@@ -252,8 +236,6 @@ fun ScheduledMeetingInfoView(
             scaffoldState.snackbarHostState.showAutoDurationSnackbar(it)
         }
     }
-
-    SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
 }
 
 /**
@@ -325,7 +307,6 @@ private fun AddParticipantsAlertDialog(
  * @param onAddParticipantsClicked  When add participants option is clicked
  * @param onBackPressed             When on back pressed option is clicked
  * @param titleId                   Title id
- * @param elevation                 True if it has elevation. False, if it does not.
  */
 @Composable
 private fun ScheduledMeetingInfoAppBar(
@@ -334,52 +315,27 @@ private fun ScheduledMeetingInfoAppBar(
     onAddParticipantsClicked: () -> Unit,
     onBackPressed: () -> Unit,
     titleId: Int,
-    elevation: Boolean,
 ) {
-    val iconColor = black.takeIf { isLight() } ?: white
-
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(id = titleId),
-                style = MaterialTheme.typography.subtitle1,
-                fontWeight = FontWeight.Medium
-            )
-        },
-        navigationIcon = {
-            IconButton(onClick = onBackPressed) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back button",
-                    tint = iconColor
-                )
-            }
-        },
-        actions = {
+    MegaAppBar(
+        appBarType = AppBarType.BACK_NAVIGATION,
+        title = stringResource(id = titleId),
+        onNavigationPressed = onBackPressed,
+        actions = buildList {
             if (state.isHost || state.isOpenInvite) {
-                IconButton(onClick = { onAddParticipantsClicked() }) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.add_participants),
-                        contentDescription = "Add participants Icon",
-                        tint = iconColor
-                    )
-                }
+                add(ScheduledMeetingInfoMenuAction.AddParticipants)
             }
             state.scheduledMeeting?.let { schedMeet ->
                 if (state.isHost && !schedMeet.isPast()) {
-                    IconButton(onClick = { onEditClicked() }) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_scheduled_meeting_edit),
-                            contentDescription = "Edit Icon",
-                            tint = iconColor
-                        )
-                    }
+                    add(ScheduledMeetingInfoMenuAction.EditMeeting)
                 }
             }
         },
-        backgroundColor = MaterialTheme.colors.surface,
-        elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp,
-        windowInsets = WindowInsets.systemBars,
+        onActionPressed = { action ->
+            when (action) {
+                ScheduledMeetingInfoMenuAction.AddParticipants -> onAddParticipantsClicked()
+                ScheduledMeetingInfoMenuAction.EditMeeting -> onEditClicked()
+            }
+        },
     )
 }
 
@@ -1050,14 +1006,14 @@ private fun ParticipantItemView(
                             participant.data.alias ?: participant.data.fullName
                             ?: participant.email ?: ""
 
-                        Text(
+                        MegaText(
                             text = if (participant.isMe) stringResource(
                                 R.string.chat_me_text_bracket,
                                 contactName
                             ) else contactName,
+                            overflow = LongTextBehaviour.Ellipsis(1),
                             style = MaterialTheme.typography.subtitle1,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            textColor = TextColor.Primary,
                         )
 
                         if (participant.status != UserChatStatus.Invalid) {

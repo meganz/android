@@ -512,6 +512,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                             )
                         }"
                     )
+
                     if (intent.getBooleanExtra(SCHEDULED_MEETING_CREATED, false)) {
                         setResult(
                             RESULT_OK,
