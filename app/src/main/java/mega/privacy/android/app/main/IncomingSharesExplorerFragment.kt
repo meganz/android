@@ -203,7 +203,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
     override fun checkScroll() {
         if (!isAdded) return
 
-        (recyclerView.canScrollHorizontally(SCROLLING_UP_DIRECTION) || adapter.multipleSelected)
+        (recyclerView.canScrollVertically(SCROLLING_UP_DIRECTION) || adapter.multipleSelected)
             .let { elevate ->
                 fileExplorerActivity.changeActionBarElevation(elevate, INCOMING_FRAGMENT)
             }
