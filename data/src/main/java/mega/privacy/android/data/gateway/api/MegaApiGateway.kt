@@ -3522,14 +3522,12 @@ interface MegaApiGateway {
      *
      * @param flagName Name or key of the value to be retrieved (and possibly be sent to API as active).
      * @param commit Determine whether an A/B Test flag will be sent to API as active.
-     * @param listener MegaRequestListener to track this request, ignored if commit was false
      *
      * @return A MegaFlag instance with the type and value of the flag.
      */
     fun getFlag(
         flagName: String,
         commit: Boolean,
-        listener: MegaRequestListenerInterface?,
     ): MegaFlag?
 
     /**

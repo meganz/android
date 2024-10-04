@@ -1,19 +1,20 @@
 package mega.privacy.android.data.featuretoggle.remote
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.featureflag.FlagMapper
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.featureflag.ApiFeature
 import mega.privacy.android.domain.entity.featureflag.Flag
 import mega.privacy.android.domain.entity.featureflag.GroupFlagTypes
-import mega.privacy.android.domain.usecase.featureflag.GetFlagUseCase
-import org.junit.jupiter.api.AfterEach
+import nz.mega.sdk.MegaFlag
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -21,18 +22,16 @@ class ApiFeatureFlagProviderTest {
 
     private lateinit var underTest: ApiFeatureFlagProvider
 
-    private val getFlagUseCase = mock<GetFlagUseCase>()
+    private val megaApiGateway = mock<MegaApiGateway>()
+    private val flagMapper = mock<FlagMapper>()
 
     @BeforeEach
     internal fun setUp() {
         underTest = ApiFeatureFlagProvider(
-            getFlagUseCase = getFlagUseCase,
+            ioDispatcher = UnconfinedTestDispatcher(),
+            megaApiGateway = megaApiGateway,
+            flagMapper = flagMapper
         )
-    }
-
-    @AfterEach
-    fun tearDown() {
-        reset(getFlagUseCase)
     }
 
     @Test
@@ -40,7 +39,7 @@ class ApiFeatureFlagProviderTest {
         val feature = mock<Feature> {
             on { name } doReturn "feature"
         }
-        Truth.assertThat(underTest.isEnabled(feature)).isNull()
+        assertThat(underTest.isEnabled(feature)).isNull()
     }
 
     @Test
@@ -48,7 +47,7 @@ class ApiFeatureFlagProviderTest {
         val feature = mock<ApiFeature> {
             on { checkRemote } doReturn false
         }
-        Truth.assertThat(underTest.isEnabled(feature)).isNull()
+        assertThat(underTest.isEnabled(feature)).isNull()
     }
 
     @Test
@@ -56,14 +55,20 @@ class ApiFeatureFlagProviderTest {
         val feature = mock<ApiFeature> {
             on { experimentName } doReturn "chmon"
             on { checkRemote } doReturn true
+            on { mapValue(GroupFlagTypes.Enabled) } doReturn true
+        }
+        val megaFlag = mock<MegaFlag> {
+            on { group } doReturn 1L
         }
         val flag = mock<Flag> {
             on { group } doReturn GroupFlagTypes.Enabled
         }
-        whenever(getFlagUseCase(feature.experimentName)).thenReturn(flag)
+        whenever(megaApiGateway.getFlag(feature.experimentName, true)).thenReturn(megaFlag)
+        whenever(flagMapper(megaFlag)).thenReturn(flag)
+
 
         val expected = underTest.isEnabled(feature)
-        Truth.assertThat(expected).isTrue()
+        assertThat(expected).isTrue()
     }
 
     @Test
@@ -71,13 +76,19 @@ class ApiFeatureFlagProviderTest {
         val feature = mock<ApiFeature> {
             on { experimentName } doReturn "chmon"
             on { checkRemote } doReturn true
+            on { mapValue(GroupFlagTypes.Disabled) } doReturn false
+        }
+        val megaFlag = mock<MegaFlag> {
+            on { group } doReturn 0L
         }
         val flag = mock<Flag> {
             on { group } doReturn GroupFlagTypes.Disabled
         }
-        whenever(getFlagUseCase(feature.experimentName)).thenReturn(flag)
+
+        whenever(megaApiGateway.getFlag(feature.experimentName, true)).thenReturn(megaFlag)
+        whenever(flagMapper(megaFlag)).thenReturn(flag)
 
         val expected = underTest.isEnabled(feature)
-        Truth.assertThat(expected).isFalse()
+        assertThat(expected).isFalse()
     }
 }

@@ -9,12 +9,10 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
-import mega.privacy.android.data.mapper.featureflag.FlagMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
@@ -61,8 +59,6 @@ class CallRepositoryImplTest {
     private lateinit var underTest: CallRepository
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val chatCallMapper = mock<ChatCallMapper>()
-    private val megaApiGateway = mock<MegaApiGateway>()
-    private val flagMapper = mock<FlagMapper>()
     private val megaChatRequest = mock<MegaChatRequest>()
     private val chatRequestMapper = mock<ChatRequestMapper>()
     private val megaChatCallStatusMapper = MegaChatCallStatusMapper()
@@ -139,8 +135,6 @@ class CallRepositoryImplTest {
             megaChatPeerListMapper = megaChatPeerListMapper,
             megaHandleListMapper = megaHandleListMapper,
             appEventGateway = appEventGateway,
-            flagMapper = flagMapper,
-            megaApiGateway = megaApiGateway
         )
 
         whenever(megaChatRoom.chatId).thenReturn(chatId)

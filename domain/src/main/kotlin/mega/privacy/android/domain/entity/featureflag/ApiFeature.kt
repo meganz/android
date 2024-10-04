@@ -19,8 +19,8 @@ interface ApiFeature : Feature {
     /**
      * map value to boolean
      */
-    fun mapValue(input: Long): Boolean = when (input) {
-        0L -> false
-        else -> true
+    fun mapValue(input: GroupFlagTypes): Boolean = when (input) {
+        GroupFlagTypes.Enabled -> true
+        else -> false
     }
 }
