@@ -442,7 +442,7 @@ pipeline {
                     androidApkUpload googleCredentialsId: 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL',
                             filesPattern: 'archive/*-gms-release.aab',
                             trackName: 'alpha',
-                            rolloutPercentage: '0',
+                            rolloutPercentage: '100',
                             additionalVersionCodes: '233140859',
                             nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOLS_FILE}",
                             recentChangeList: common.getRecentChangeList(RELEASE_NOTES_CONTENT),
