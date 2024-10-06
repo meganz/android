@@ -177,7 +177,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     private DisplayMetrics outMetrics;
 
-    private int contactType = 0;
+    int contactType = 0;
 
     private ArrayList<String> emailsContactsSelected = new ArrayList<>();
 
@@ -203,26 +203,26 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     private TextView emptyTextView;
     private TextView emptySubTextView;
     private Button emptyInviteButton;
-    private ProgressBar progressBar;
+    ProgressBar progressBar;
     private RecyclerView addedContactsRecyclerView;
     private RelativeLayout containerAddedContactsRecyclerView;
     private LinearLayoutManager mLayoutManager;
 
     private TextView mWarningMessage;
 
-    private String inputString = "";
+    String inputString = "";
     private String savedInputString = "";
 
     //    Adapter list MEGA contacts
     private MegaContactsAdapter adapterMEGA;
     //    Adapter list chips MEGA contacts
-    private MegaAddContactsAdapter adapterMEGAContacts;
+    MegaAddContactsAdapter adapterMEGAContacts;
 
     private ArrayList<MegaUser> contactsMEGA;
-    private ArrayList<MegaContactAdapter> visibleContactsMEGA = new ArrayList<>();
-    private ArrayList<MegaContactAdapter> filteredContactMEGA = new ArrayList<>();
-    private ArrayList<MegaContactAdapter> addedContactsMEGA = new ArrayList<>();
-    private ArrayList<MegaContactAdapter> queryContactMEGA = new ArrayList<>();
+    ArrayList<MegaContactAdapter> visibleContactsMEGA = new ArrayList<>();
+    ArrayList<MegaContactAdapter> filteredContactMEGA = new ArrayList<>();
+    ArrayList<MegaContactAdapter> addedContactsMEGA = new ArrayList<>();
+    ArrayList<MegaContactAdapter> queryContactMEGA = new ArrayList<>();
 
 
     //    Adapter list Phone contacts
@@ -231,25 +231,25 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     private AddContactsAdapter adapterContacts;
 
     private ArrayList<PhoneContactInfo> phoneContacts = new ArrayList<>();
-    private ArrayList<PhoneContactInfo> addedContactsPhone = new ArrayList<>();
-    private ArrayList<PhoneContactInfo> filteredContactsPhone = new ArrayList<>();
-    private ArrayList<PhoneContactInfo> queryContactsPhone = new ArrayList<>();
+    ArrayList<PhoneContactInfo> addedContactsPhone = new ArrayList<>();
+    ArrayList<PhoneContactInfo> filteredContactsPhone = new ArrayList<>();
+    ArrayList<PhoneContactInfo> queryContactsPhone = new ArrayList<>();
 
     //    Adapter list Share contacts
     private ShareContactsHeaderAdapter adapterShareHeader;
     //    Adapter list chips MEGA/Phone contacts
     private ShareContactsAdapter adapterShare;
 
-    private ArrayList<ShareContactInfo> addedContactsShare = new ArrayList<>();
-    private ArrayList<ShareContactInfo> shareContacts = new ArrayList<>();
-    private ArrayList<ShareContactInfo> filteredContactsShare = new ArrayList<>();
-    private ArrayList<ShareContactInfo> queryContactsShare = new ArrayList<>();
+    ArrayList<ShareContactInfo> addedContactsShare = new ArrayList<>();
+    ArrayList<ShareContactInfo> shareContacts = new ArrayList<>();
+    ArrayList<ShareContactInfo> filteredContactsShare = new ArrayList<>();
+
 
     private RelativeLayout relativeLayout;
 
     private ParticipantsLimitWarningView participantsLimitWarningView;
 
-    private ArrayList<String> savedaddedContacts = new ArrayList<>();
+    ArrayList<String> savedaddedContacts = new ArrayList<>();
 
     private MenuItem sendInvitationMenuItem;
     private MenuItem scanQrMenuItem;
@@ -267,34 +267,34 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     private ArrayList<String> mailsFromAchievements;
 
     private MenuItem searchMenuItem;
-    private SearchView.SearchAutoComplete searchAutoComplete;
-    private boolean searchExpand = false;
+    SearchView.SearchAutoComplete searchAutoComplete;
+    boolean searchExpand = false;
 
-    private FilterContactsTask filterContactsTask;
+    FilterContactsTask filterContactsTask;
     private GetContactsTask getContactsTask;
-    private GetPhoneContactsTask getPhoneContactsTask;
+    GetPhoneContactsTask getPhoneContactsTask;
     private RecoverContactsTask recoverContactsTask;
-    private QueryIfContactSouldBeAddedTask queryIfContactSouldBeAddedTask;
+    QueryIfContactSouldBeAddedTask queryIfContactSouldBeAddedTask;
 
     private FastScroller fastScroller;
 
     private FloatingActionButton fabImageGroup;
     private FloatingActionButton fabButton;
     private EmojiEditText nameGroup;
-    private boolean onNewGroup = false;
+    boolean onNewGroup = false;
     private boolean isConfirmDeleteShown = false;
     private String confirmDeleteMail;
 
     private RelativeLayout mailError;
     private RelativeLayout typeContactLayout;
-    private EditText typeContactEditText;
+    EditText typeContactEditText;
     private RelativeLayout scanQRButton;
-    private boolean isConfirmAddShown = false;
-    private String confirmAddMail;
+    boolean isConfirmAddShown = false;
+    String confirmAddMail;
     private boolean createNewGroup = false;
     private String title = "";
 
-    private boolean queryPermissions = true;
+    boolean queryPermissions = true;
 
     private LinearLayout addContactsLayout;
     private NestedScrollView newGroupLayout;
@@ -307,13 +307,13 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     private LinearLayoutManager newGrouplinearLayoutManager;
     private RecyclerView newGroupRecyclerView;
     private TextView newGroupHeaderList;
-    private boolean newGroup = false;
-    private ArrayList<String> contactsNewGroup;
+    boolean newGroup = false;
+    ArrayList<String> contactsNewGroup;
 
     MegaContactAdapter myContact;
 
     private boolean onlyCreateGroup;
-    private boolean waitingForPhoneContacts;
+    boolean waitingForPhoneContacts;
 
     private boolean isContactVerificationOn;
 
@@ -340,65 +340,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     public void onGlobalSyncStateChanged(@NonNull MegaApiJava api) {
     }
 
-    private class GetPhoneContactsTask extends AsyncTask<Void, Void, Void> {
-
-        int inProgressPosition = INVALID_POSITION;
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            getDeviceContacts();
-            MegaContactAdapter contactMEGA;
-            PhoneContactInfo contactPhone;
-            boolean found;
-            shareContacts.clear();
-
-            if (!filteredContactsShare.isEmpty()) {
-                int pos = filteredContactsShare.size() - 1;
-                ShareContactInfo lastItem = filteredContactsShare.get(pos);
-
-                if (lastItem.isProgress()) {
-                    inProgressPosition = pos;
-                }
-            }
-
-            if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
-                shareContacts.add(new ShareContactInfo(true, false, true));
-                for (int i = 0; i < filteredContactsPhone.size(); i++) {
-                    found = false;
-                    contactPhone = filteredContactsPhone.get(i);
-                    for (int j = 0; j < filteredContactMEGA.size(); j++) {
-                        contactMEGA = filteredContactMEGA.get(j);
-                        if (contactPhone.getEmail().equals(getMegaContactMail(contactMEGA))) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        shareContacts.add(new ShareContactInfo(contactPhone, null, null));
-                    } else {
-                        filteredContactsPhone.remove(contactPhone);
-                        i--;
-                    }
-                }
-
-                filteredContactsShare.addAll(shareContacts);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            Timber.d("onPostExecute: GetPhoneContactsTask");
-            if (inProgressPosition != INVALID_POSITION) {
-                filteredContactsShare.remove(inProgressPosition);
-            }
-
-            waitingForPhoneContacts = false;
-            setShareAdapterContacts(filteredContactsShare);
-        }
-    }
-
     public String getShareContactMail(ShareContactInfo contact) {
         String mail = null;
 
@@ -417,269 +358,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         return mail;
     }
 
-    private class FilterContactsTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            if (searchExpand) {
-                if (searchAutoComplete != null) {
-                    inputString = searchAutoComplete.getText().toString();
-                }
-            } else {
-                inputString = typeContactEditText.getText().toString();
-            }
-            if (inputString != null && !inputString.equals("")) {
-                MegaContactAdapter contactMega;
-                PhoneContactInfo contactPhone;
-                ShareContactInfo contactShare;
-
-                if (contactType == CONTACT_TYPE_MEGA) {
-                    queryContactMEGA.clear();
-                    for (int i = 0; i < filteredContactMEGA.size(); i++) {
-                        contactMega = filteredContactMEGA.get(i);
-                        if (getMegaContactMail(contactMega).toLowerCase().contains(inputString.toLowerCase())
-                                || contactMega.getFullName().toLowerCase().contains(inputString.toLowerCase())) {
-                            queryContactMEGA.add(contactMega);
-                        }
-                    }
-                } else if (contactType == CONTACT_TYPE_DEVICE) {
-                    queryContactsPhone.clear();
-                    for (int i = 0; i < filteredContactsPhone.size(); i++) {
-                        contactPhone = filteredContactsPhone.get(i);
-                        if (contactPhone.getEmail().toLowerCase().contains(inputString.toLowerCase())
-                                || contactPhone.getName().toLowerCase().contains(inputString.toLowerCase())) {
-                            queryContactsPhone.add(contactPhone);
-                        }
-                    }
-                } else {
-                    queryContactsShare.clear();
-                    int numMega = 0;
-                    int numPhone = 0;
-                    for (int i = 0; i < filteredContactsShare.size(); i++) {
-                        contactShare = filteredContactsShare.get(i);
-                        if (contactShare.isHeader()) {
-                            queryContactsShare.add(contactShare);
-                        } else {
-                            if (contactShare.isMegaContact()) {
-                                if (getMegaContactMail(contactShare.getMegaContactAdapter()).toLowerCase().contains(inputString.toLowerCase())
-                                        || contactShare.getMegaContactAdapter().getFullName().toLowerCase().contains(inputString.toLowerCase())) {
-                                    queryContactsShare.add(contactShare);
-                                    numMega++;
-                                }
-                            } else if (contactShare.getPhoneContactInfo() != null
-                                    && ((contactShare.getPhoneContactInfo().getEmail() != null && contactShare.getPhoneContactInfo().getEmail().toLowerCase().contains(inputString.toLowerCase()))
-                                    || (contactShare.getPhoneContactInfo().getName() != null && contactShare.getPhoneContactInfo().getName().toLowerCase().contains(inputString.toLowerCase())))) {
-
-                                queryContactsShare.add(contactShare);
-                                numPhone++;
-                            }
-                        }
-                    }
-                    if (numMega == 0 && queryContactsShare.size() > 0) {
-                        ShareContactInfo first = queryContactsShare.get(0);
-                        if (first.isHeader() && first.isMegaContact()) {
-                            queryContactsShare.remove(0);
-                        }
-                    }
-                    if (numPhone == 0 && (queryContactsShare.size() - 1 >= 0)) {
-                        ShareContactInfo last = queryContactsShare.get(queryContactsShare.size() - 1);
-                        if (last.isHeader() && last.isPhoneContact()) {
-                            queryContactsShare.remove(queryContactsShare.size() - 1);
-                        }
-                    }
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void voids) {
-            Timber.d("onPostExecute FilterContactsTask");
-            if (contactType == CONTACT_TYPE_MEGA) {
-                if (inputString != null && !inputString.equals("")) {
-                    setMegaAdapterContacts(queryContactMEGA, MegaContactsAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
-                } else {
-                    setMegaAdapterContacts(filteredContactMEGA, MegaContactsAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
-                }
-            } else if (contactType == CONTACT_TYPE_DEVICE) {
-                if (inputString != null && !inputString.equals("")) {
-                    setPhoneAdapterContacts(queryContactsPhone);
-                } else {
-                    setPhoneAdapterContacts(filteredContactsPhone);
-                }
-            } else {
-                if (inputString != null && !inputString.equals("")) {
-                    setShareAdapterContacts(queryContactsShare);
-                } else {
-                    setShareAdapterContacts(filteredContactsShare);
-                }
-            }
-            visibilityFastScroller();
-
-            if (isConfirmAddShown) {
-                if (isAsyncTaskRunning(queryIfContactSouldBeAddedTask)) {
-                    queryIfContactSouldBeAddedTask.cancel(true);
-                }
-                hideKeyboard(addContactActivity, 0);
-                queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
-                queryIfContactSouldBeAddedTask.execute(true);
-            }
-        }
-    }
-
-    private class RecoverContactsTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            if (contactType == CONTACT_TYPE_MEGA) {
-                getVisibleMEGAContacts();
-                String contactToAddMail = null;
-                MegaContactAdapter contactToAdd, contact;
-                for (int i = 0; i < savedaddedContacts.size(); i++) {
-                    String mail = savedaddedContacts.get(i);
-                    for (int j = 0; j < filteredContactMEGA.size(); j++) {
-                        contact = filteredContactMEGA.get(j);
-                        contactToAddMail = getMegaContactMail(contact);
-                        if (contactToAddMail != null && contactToAddMail.equals(mail)) {
-                            if (!addedContactsMEGA.contains(contact)) {
-                                addedContactsMEGA.add(contact);
-                                int filteredPosition = filteredContactMEGA.indexOf(contact);
-                                if (filteredPosition != INVALID_POSITION) {
-                                    filteredContactMEGA.get(filteredPosition).setSelected(true);
-                                }
-                            }
-                            break;
-                        }
-                    }
-                    if (contactToAddMail != null && !contactToAddMail.equals(mail)) {
-                        contactToAdd = new MegaContactAdapter(null, null, mail);
-                        if (!addedContactsMEGA.contains(contactToAdd)) {
-                            addedContactsMEGA.add(contactToAdd);
-                        }
-                    }
-                }
-            } else {
-                getBothContacts();
-                MegaContactAdapter contactMEGA;
-                PhoneContactInfo contactPhone;
-                ShareContactInfo contact = null;
-                boolean found;
-                shareContacts.clear();
-
-                if (filteredContactMEGA != null && !filteredContactMEGA.isEmpty()) {
-                    shareContacts.add(new ShareContactInfo(true, true, false));
-                    for (int i = 0; i < filteredContactMEGA.size(); i++) {
-                        contactMEGA = filteredContactMEGA.get(i);
-                        contact = new ShareContactInfo(null, contactMEGA, null);
-                        shareContacts.add(contact);
-                    }
-                }
-                if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
-                    shareContacts.add(new ShareContactInfo(true, false, true));
-                    for (int i = 0; i < filteredContactsPhone.size(); i++) {
-                        found = false;
-                        contactPhone = filteredContactsPhone.get(i);
-                        for (int j = 0; j < filteredContactMEGA.size(); j++) {
-                            contactMEGA = filteredContactMEGA.get(j);
-                            if (contactPhone.getEmail().equals(getMegaContactMail(contactMEGA))) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            shareContacts.add(new ShareContactInfo(contactPhone, null, null));
-                        } else {
-                            filteredContactsPhone.remove(contactPhone);
-                            i--;
-                        }
-                    }
-                }
-                filteredContactsShare.clear();
-                filteredContactsShare.addAll(shareContacts);
-                addedContactsShare.clear();
-                String contactToAddMail = null;
-
-                for (int i = 0; i < savedaddedContacts.size(); i++) {
-                    String mail = savedaddedContacts.get(i);
-                    Timber.d("mail[%d]: %s", i, mail);
-                    for (int j = 0; j < filteredContactsShare.size(); j++) {
-                        contact = filteredContactsShare.get(j);
-                        if (contact.isMegaContact() && !contact.isHeader()) {
-                            contactToAddMail = getMegaContactMail(contact.getMegaContactAdapter());
-                        } else if (!contact.isHeader()) {
-                            contactToAddMail = contact.getPhoneContactInfo().getEmail();
-                        } else {
-                            contactToAddMail = null;
-                        }
-                        if (contactToAddMail != null && contactToAddMail.equals(mail)) {
-                            if (!addedContactsShare.contains(contact)) {
-                                addedContactsShare.add(contact);
-                                if (contact.isMegaContact()) {
-                                    int megaPosition = filteredContactMEGA.indexOf(contact.getMegaContactAdapter());
-                                    if (megaPosition != INVALID_POSITION) {
-                                        filteredContactMEGA.get(megaPosition).setSelected(true);
-                                    }
-
-                                    int sharePosition = filteredContactsShare.indexOf(contact);
-                                    if (sharePosition != INVALID_POSITION) {
-                                        filteredContactsShare.get(sharePosition).megaContactAdapter.setSelected(true);
-                                    }
-                                } else {
-                                    filteredContactsPhone.remove(contact.getPhoneContactInfo());
-                                    filteredContactsShare.remove(contact);
-                                }
-                            }
-                            break;
-                        }
-                    }
-                    if (contactToAddMail != null && !contactToAddMail.equals(mail)) {
-                        contact = new ShareContactInfo(null, null, mail);
-                        if (!addedContactsShare.contains(contact)) {
-                            addedContactsShare.add(contact);
-                        }
-                    }
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            Timber.d("onPostExecute RecoverContactsTask");
-            setAddedAdapterContacts();
-            if (searchExpand) {
-                if (isAsyncTaskRunning(filterContactsTask)) {
-                    filterContactsTask.cancel(true);
-                }
-                filterContactsTask = new FilterContactsTask();
-                filterContactsTask.execute();
-            } else {
-                if (contactType == CONTACT_TYPE_MEGA) {
-                    if (onNewGroup) {
-                        newGroup();
-                    } else {
-                        setMegaAdapterContacts(filteredContactMEGA, MegaContactsAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
-                    }
-                } else {
-                    setShareAdapterContacts(filteredContactsShare);
-                }
-                setTitleAB();
-                setRecyclersVisibility();
-                visibilityFastScroller();
-
-                if (isConfirmAddShown) {
-                    if (isAsyncTaskRunning(queryIfContactSouldBeAddedTask)) {
-                        queryIfContactSouldBeAddedTask.cancel(true);
-                    }
-                    hideKeyboard(addContactActivity, 0);
-                    queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
-                    queryIfContactSouldBeAddedTask.execute(true);
-                }
-            }
-        }
-    }
-
-    private void getDeviceContacts() {
+    void getDeviceContacts() {
         if (queryPermissions) {
             if (phoneContacts != null) {
                 phoneContacts.clear();
@@ -694,211 +373,12 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         }
     }
 
-    private void getBothContacts() {
+    void getBothContacts() {
         getDeviceContacts();
         getVisibleMEGAContacts();
     }
 
-    private class QueryIfContactSouldBeAddedTask extends AsyncTask<Boolean, Void, Integer> {
-
-        ShareContactInfo shareContactInfo;
-        PhoneContactInfo phoneContactInfo;
-        boolean showDialog;
-        final int isShareContact = 1;
-        final int addContactShare = 2;
-        final int isPhoneContact = 3;
-        final int addContactPhone = 4;
-        final int isAddedContact = 5;
-        final int isMegaContact = 6;
-
-        @Override
-        protected Integer doInBackground(Boolean... booleans) {
-            showDialog = booleans[0];
-
-            if (contactType == CONTACT_TYPE_DEVICE) {
-                for (int i = 0; i < addedContactsPhone.size(); i++) {
-                    if (addedContactsPhone.get(i).getEmail().equals(confirmAddMail)) {
-                        return isAddedContact;
-                    }
-                }
-                for (int i = 0; i < filteredContactsPhone.size(); i++) {
-                    if (filteredContactsPhone.get(i).getEmail().equals(confirmAddMail)) {
-                        phoneContactInfo = filteredContactsPhone.get(i);
-                        return isPhoneContact;
-                    }
-                }
-                for (int i = 0; i < visibleContactsMEGA.size(); i++) {
-                    if (getMegaContactMail(visibleContactsMEGA.get(i)).equals(confirmAddMail)) {
-                        return isMegaContact;
-                    }
-                }
-                return addContactPhone;
-            } else if (contactType == CONTACT_TYPE_BOTH) {
-                for (int i = 0; i < addedContactsShare.size(); i++) {
-                    if (addedContactsShare.get(i).isMegaContact() && !addedContactsShare.get(i).isHeader()) {
-                        if (getMegaContactMail(addedContactsShare.get(i).getMegaContactAdapter()).equals(confirmAddMail)) {
-                            return isAddedContact;
-                        }
-                    } else if (addedContactsShare.get(i).isPhoneContact() && !addedContactsShare.get(i).isHeader()) {
-                        if (addedContactsShare.get(i).getPhoneContactInfo().getEmail().equals(confirmAddMail)) {
-                            return isAddedContact;
-                        }
-                    } else {
-                        if (addedContactsShare.get(i).getMail().equals(confirmAddMail)) {
-                            return isAddedContact;
-                        }
-                    }
-                }
-
-                for (int i = 0; i < filteredContactsShare.size(); i++) {
-                    if (filteredContactsShare.get(i).isMegaContact() && !filteredContactsShare.get(i).isHeader()) {
-                        if (getMegaContactMail(filteredContactsShare.get(i).getMegaContactAdapter()).equals(confirmAddMail)) {
-                            shareContactInfo = filteredContactsShare.get(i);
-                            return isShareContact;
-                        }
-                    } else if (filteredContactsShare.get(i).isPhoneContact() && !filteredContactsShare.get(i).isHeader()) {
-                        if (filteredContactsShare.get(i).getPhoneContactInfo().getEmail().equals(confirmAddMail)) {
-                            shareContactInfo = filteredContactsShare.get(i);
-                            return isShareContact;
-                        }
-                    }
-                }
-                return addContactShare;
-            }
-            return 0;
-        }
-
-        void shareContact() {
-            addShareContact(shareContactInfo);
-            int position = filteredContactsShare.indexOf(shareContactInfo);
-            if (shareContactInfo.isMegaContact()) {
-                if (filteredContactMEGA.size() == 1) {
-                    filteredContactsShare.remove(0);
-                }
-                filteredContactMEGA.remove(shareContactInfo.getMegaContactAdapter());
-            } else if (shareContactInfo.isPhoneContact()) {
-                filteredContactsPhone.remove(shareContactInfo.getPhoneContactInfo());
-                if (filteredContactsPhone.size() == 0) {
-                    filteredContactsShare.remove(filteredContactsShare.size() - 2);
-                }
-            }
-            filteredContactsShare.remove(shareContactInfo);
-            setShareAdapterContacts(filteredContactsShare);
-        }
-
-        void phoneContact() {
-            addContact(phoneContactInfo);
-            filteredContactsPhone.remove(phoneContactInfo);
-            setPhoneAdapterContacts(filteredContactsPhone);
-        }
-
-        @Override
-        protected void onPostExecute(final Integer type) {
-            Timber.d("onPostExecute QueryIfContactSouldBeAddedTask");
-            if (showDialog) {
-                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(addContactActivity, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-                builder.setCancelable(false);
-
-                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case DialogInterface.BUTTON_POSITIVE: {
-                                if (contactType == CONTACT_TYPE_DEVICE) {
-                                    if (type == isPhoneContact) {
-                                        phoneContact();
-                                    } else {
-                                        addContact(new PhoneContactInfo(0, null, confirmAddMail, null));
-                                    }
-                                } else if (contactType == CONTACT_TYPE_BOTH) {
-                                    if (type == isShareContact) {
-                                        shareContact();
-                                    } else {
-                                        addShareContact(new ShareContactInfo(null, null, confirmAddMail));
-                                    }
-                                }
-                                isConfirmAddShown = false;
-                                break;
-                            }
-
-                            case DialogInterface.BUTTON_NEGATIVE: {
-                                //No button clicked
-                                isConfirmAddShown = false;
-                                break;
-                            }
-                        }
-                    }
-                };
-
-                switch (type) {
-                    case isShareContact:
-                    case addContactShare: {
-                        builder.setMessage(getString(R.string.confirmation_share_contact, confirmAddMail));
-
-                        builder.setPositiveButton(R.string.menu_add_contact, dialogClickListener)
-                                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-                        break;
-                    }
-                    case isPhoneContact:
-                    case addContactPhone: {
-                        builder.setMessage(getString(R.string.confirmation_invite_contact, confirmAddMail));
-
-                        builder.setPositiveButton(R.string.menu_add_contact, dialogClickListener)
-                                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-                        break;
-                    }
-                    case isAddedContact: {
-                        builder.setMessage(getString(R.string.confirmation_invite_contact_already_added, confirmAddMail));
-
-                        builder.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-                        break;
-                    }
-                    case isMegaContact: {
-                        builder.setMessage(getString(R.string.confirmation_not_invite_contact, confirmAddMail));
-
-                        builder.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-                    }
-                }
-
-                isConfirmAddShown = true;
-                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        isConfirmAddShown = false;
-                    }
-                });
-            } else {
-                switch (type) {
-                    case isShareContact: {
-                        shareContact();
-                        break;
-                    }
-                    case addContactShare: {
-                        addShareContact(new ShareContactInfo(null, null, confirmAddMail));
-                        break;
-                    }
-                    case isPhoneContact: {
-                        phoneContact();
-                        break;
-                    }
-                    case addContactPhone: {
-                        addContact(new PhoneContactInfo(0, null, confirmAddMail, null));
-                        break;
-                    }
-                    case isAddedContact: {
-                        showSnackbar(getString(R.string.contact_not_added));
-                        break;
-                    }
-                    case isMegaContact: {
-                        showSnackbar(getString(R.string.context_contact_already_exists, confirmAddMail));
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    private void setAddedAdapterContacts() {
+    void setAddedAdapterContacts() {
         if (contactType == CONTACT_TYPE_MEGA) {
             if (adapterMEGAContacts == null) {
                 adapterMEGAContacts = new MegaAddContactsAdapter(addContactActivity, addedContactsMEGA);
@@ -946,7 +426,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         setSendInvitationVisibility();
     }
 
-    private void setPhoneAdapterContacts(ArrayList<PhoneContactInfo> contacts) {
+    void setPhoneAdapterContacts(ArrayList<PhoneContactInfo> contacts) {
         if (queryPermissions && filteredContactsPhone != null) {
             if (filteredContactsPhone.size() == 0) {
                 showHeader(false);
@@ -1015,7 +495,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         }
     }
 
-    private void setMegaAdapterContacts(ArrayList<MegaContactAdapter> contacts, int adapter) {
+    void setMegaAdapterContacts(ArrayList<MegaContactAdapter> contacts, int adapter) {
         if (onNewGroup) {
             adapterMEGA = new MegaContactsAdapter(addContactActivity, contacts, newGroupRecyclerView, adapter);
 
@@ -1060,7 +540,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         }
     }
 
-    private void setShareAdapterContacts(ArrayList<ShareContactInfo> contacts) {
+    void setShareAdapterContacts(ArrayList<ShareContactInfo> contacts) {
         if (adapterShareHeader == null) {
             adapterShareHeader = new ShareContactsHeaderAdapter(addContactActivity, contacts);
             recyclerViewList.setAdapter(adapterShareHeader);
@@ -1104,7 +584,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         }
     }
 
-    private void setSendInvitationVisibility() {
+    void setSendInvitationVisibility() {
         if (fabButton != null) {
             if (contactType == CONTACT_TYPE_MEGA && !onNewGroup &&
                     (createNewGroup || (comesFromChat &&
@@ -1166,7 +646,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 if (isAsyncTaskRunning(filterContactsTask)) {
                     filterContactsTask.cancel(true);
                 }
-                filterContactsTask = new FilterContactsTask();
+                filterContactsTask = new FilterContactsTask(AddContactActivity.this);
                 filterContactsTask.execute();
                 setSendInvitationVisibility();
                 return true;
@@ -1198,7 +678,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 if (isAsyncTaskRunning(filterContactsTask)) {
                     filterContactsTask.cancel(true);
                 }
-                filterContactsTask = new FilterContactsTask();
+                filterContactsTask = new FilterContactsTask(AddContactActivity.this);
                 filterContactsTask.execute();
                 return true;
             }
@@ -1222,7 +702,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 Timber.d("searchView != null inputString: %s", savedInputString);
                 searchView.setQuery(savedInputString, false);
                 if (recoverContactsTask != null && recoverContactsTask.getStatus() == AsyncTask.Status.FINISHED) {
-                    filterContactsTask = new FilterContactsTask();
+                    filterContactsTask = new FilterContactsTask(this);
                     filterContactsTask.execute();
                 }
             }
@@ -1236,7 +716,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void setSearchVisibility() {
+    void setSearchVisibility() {
         if (searchMenuItem == null) {
             return;
         }
@@ -1348,7 +828,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         saveContactsAdded(outState);
     }
 
-    private boolean isAsyncTaskRunning(AsyncTask asyncTask) {
+    boolean isAsyncTaskRunning(AsyncTask asyncTask) {
         return asyncTask != null && asyncTask.getStatus() == AsyncTask.Status.RUNNING;
     }
 
@@ -1558,7 +1038,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                         if (isAsyncTaskRunning(filterContactsTask)) {
                             filterContactsTask.cancel(true);
                         }
-                        filterContactsTask = new FilterContactsTask();
+                        filterContactsTask = new FilterContactsTask(AddContactActivity.this);
                         filterContactsTask.execute();
                     }
                 }
@@ -1698,10 +1178,10 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
                 if (savedaddedContacts == null && (contactType == CONTACT_TYPE_MEGA || contactType == CONTACT_TYPE_BOTH)) {
                     setAddedAdapterContacts();
-                    getContactsTask = new GetContactsTask();
+                    getContactsTask = new GetContactsTask(this);
                     getContactsTask.execute();
                 } else {
-                    recoverContactsTask = new RecoverContactsTask();
+                    recoverContactsTask = new RecoverContactsTask(this);
                     recoverContactsTask.execute();
                 }
             } else if (contactType == CONTACT_TYPE_DEVICE) {
@@ -1734,7 +1214,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                         setEmptyStateVisibility(true);
 
                         progressBar.setVisibility(View.VISIBLE);
-                        getContactsTask = new GetContactsTask();
+                        getContactsTask = new GetContactsTask(this);
                         getContactsTask.execute();
                     }
                 }
@@ -1749,7 +1229,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
             if (contactType == CONTACT_TYPE_MEGA) {
                 progressBar.setVisibility(View.VISIBLE);
-                getContactsTask = new GetContactsTask();
+                getContactsTask = new GetContactsTask(this);
                 getContactsTask.execute();
             } else {
                 queryIfHasReadContactsPermissions();
@@ -1839,19 +1319,19 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
         if (waitingForPhoneContacts) {
             filteredContactsShare.add(new ShareContactInfo());
-            getPhoneContactsTask = new GetPhoneContactsTask();
+            getPhoneContactsTask = new GetPhoneContactsTask(this);
             getPhoneContactsTask.execute();
             return;
         }
 
         setEmptyStateVisibility(true);
         progressBar.setVisibility(View.VISIBLE);
-        getContactsTask = new GetContactsTask();
+        getContactsTask = new GetContactsTask(this);
         getContactsTask.execute();
 
     }
 
-    private void setTitleAB() {
+    void setTitleAB() {
         Timber.d("setTitleAB");
         if (aB != null) {
             if (contactType == CONTACT_TYPE_MEGA) {
@@ -1916,7 +1396,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         ColorUtils.setErrorAwareInputAppearance(typeContactEditText, false);
     }
 
-    private void addShareContact(ShareContactInfo contact) {
+    void addShareContact(ShareContactInfo contact) {
         Timber.d("addShareContact");
 
         if (searchExpand && searchMenuItem != null) {
@@ -2046,7 +1526,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         refreshKeyboard();
     }
 
-    private void addContact(PhoneContactInfo contact) {
+    void addContact(PhoneContactInfo contact) {
         Timber.d("Contact: %s, Mail: %s", contact.getName(), contact.getEmail());
 
         if (searchExpand && searchMenuItem != null) {
@@ -2212,7 +1692,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 filteredContactsShare.add(i + 1, contactToAdd);
             }
             if (inputString != null && !inputString.equals("")) {
-                filterContactsTask = new FilterContactsTask();
+                filterContactsTask = new FilterContactsTask(this);
                 filterContactsTask.execute();
             } else {
                 adapterShareHeader.setContacts(filteredContactsShare);
@@ -2226,7 +1706,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         } else {
             if (!onNewGroup) {
                 if (inputString != null && !inputString.equals("")) {
-                    filterContactsTask = new FilterContactsTask();
+                    filterContactsTask = new FilterContactsTask(this);
                     filterContactsTask.execute();
                 } else {
                     adapterMEGA.setContacts(filteredContactMEGA);
@@ -2273,7 +1753,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 }
             }
             if (inputString != null && !inputString.equals("")) {
-                filterContactsTask = new FilterContactsTask();
+                filterContactsTask = new FilterContactsTask(this);
                 filterContactsTask.execute();
             } else {
                 adapterShareHeader.setContacts(filteredContactsShare);
@@ -2286,7 +1766,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             }
         } else {
             if (inputString != null && !inputString.equals("")) {
-                filterContactsTask = new FilterContactsTask();
+                filterContactsTask = new FilterContactsTask(this);
                 filterContactsTask.execute();
             } else {
                 adapterPhone.setContacts(filteredContactsPhone);
@@ -2313,7 +1793,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         return new MegaContactAdapter(contactDB, contact, fullName);
     }
 
-    private void getVisibleMEGAContacts() {
+    void getVisibleMEGAContacts() {
         contactsMEGA = megaApi.getContacts();
         visibleContactsMEGA.clear();
         filteredContactMEGA.clear();
@@ -2491,7 +1971,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                         boolean isValid = isValidEmail(temp.trim());
                         if (isValid) {
                             confirmAddMail = temp.trim();
-                            queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
+                            queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask(this);
                             queryIfContactSouldBeAddedTask.execute(false);
                             typeContactEditText.getText().clear();
                         } else {
@@ -2514,7 +1994,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                         boolean isValid = isValidEmail(temp.trim());
                         if (isValid) {
                             confirmAddMail = temp.trim();
-                            queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
+                            queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask(this);
                             queryIfContactSouldBeAddedTask.execute(false);
                             typeContactEditText.getText().clear();
                         } else {
@@ -2533,7 +2013,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         if (isAsyncTaskRunning(filterContactsTask)) {
             filterContactsTask.cancel(true);
         }
-        filterContactsTask = new FilterContactsTask();
+        filterContactsTask = new FilterContactsTask(this);
         filterContactsTask.execute();
         refreshKeyboard();
     }
@@ -2556,7 +2036,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     boolean isValid = isValidEmail(s.trim());
                     if (isValid) {
                         confirmAddMail = s.trim();
-                        queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
+                        queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask(this);
                         queryIfContactSouldBeAddedTask.execute(false);
                         typeContactEditText.getText().clear();
                         hideKeyboard(addContactActivity, 0);
@@ -2570,7 +2050,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     boolean isValid = isValidEmail(s.trim());
                     if (isValid) {
                         confirmAddMail = s.trim();
-                        queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
+                        queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask(this);
                         queryIfContactSouldBeAddedTask.execute(false);
                         typeContactEditText.getText().clear();
                         hideKeyboard(addContactActivity, 0);
@@ -2584,7 +2064,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 if (isAsyncTaskRunning(filterContactsTask)) {
                     filterContactsTask.cancel(true);
                 }
-                filterContactsTask = new FilterContactsTask();
+                filterContactsTask = new FilterContactsTask(this);
                 filterContactsTask.execute();
             }
             return true;
@@ -2773,7 +2253,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             }
 
             if (inputString != null && !inputString.equals("")) {
-                filterContactsTask = new FilterContactsTask();
+                filterContactsTask = new FilterContactsTask(this);
                 filterContactsTask.execute();
             } else {
                 adapterShareHeader.setContacts(filteredContactsShare);
@@ -2784,7 +2264,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         setSearchVisibility();
     }
 
-    private String getMegaContactMail(MegaContactAdapter contact) {
+    String getMegaContactMail(MegaContactAdapter contact) {
         String mail = null;
         if (contact != null) {
             if (contact.getMegaUser() != null && contact.getMegaUser().getEmail() != null) {
@@ -2898,7 +2378,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
             if (mail != null && !mail.equals("")) {
                 confirmAddMail = mail;
-                queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
+                queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask(this);
                 queryIfContactSouldBeAddedTask.execute(true);
             }
         } else if (requestCode == REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == RESULT_OK) {
@@ -2938,128 +2418,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             finish();
         } else {
             super.onBackPressed();
-        }
-    }
-
-    private class GetContactsTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            if (contactType == CONTACT_TYPE_MEGA) {
-                getVisibleMEGAContacts();
-                if (newGroup) {
-                    String mail;
-                    MegaContactAdapter contact;
-                    for (int i = 0; i < contactsNewGroup.size(); i++) {
-                        mail = contactsNewGroup.get(i);
-                        for (int j = 0; j < filteredContactMEGA.size(); j++) {
-                            contact = filteredContactMEGA.get(j);
-                            if ((contact.getMegaUser() != null && contact.getMegaUser().getEmail().equals(mail))
-                                    || (contact.getContact() != null
-                                    && contact.getContact().getEmail() != null
-                                    && contact.getContact().getEmail().equals(mail))
-                            ) {
-                                addedContactsMEGA.add(contact);
-                                filteredContactMEGA.remove(contact);
-                                break;
-                            }
-                        }
-                    }
-                    adapterMEGAContacts.setContacts(addedContactsMEGA);
-                }
-            } else if (contactType == CONTACT_TYPE_DEVICE) {
-                if (queryPermissions) {
-                    getBothContacts();
-                    addedContactsPhone.clear();
-                    boolean found;
-                    PhoneContactInfo contactPhone;
-                    MegaContactAdapter contactMEGA;
-
-                    if (filteredContactsPhone != null && !filteredContactsPhone.isEmpty()) {
-                        for (int i = 0; i < filteredContactsPhone.size(); i++) {
-                            found = false;
-                            contactPhone = filteredContactsPhone.get(i);
-                            for (int j = 0; j < visibleContactsMEGA.size(); j++) {
-                                contactMEGA = visibleContactsMEGA.get(j);
-                                if (contactPhone.getEmail().equals(getMegaContactMail(contactMEGA))) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if (found) {
-                                filteredContactsPhone.remove(contactPhone);
-                                i--;
-                            }
-                        }
-                    }
-                }
-            } else {
-                getVisibleMEGAContacts();
-                addedContactsPhone.clear();
-                MegaContactAdapter contactMEGA;
-                ShareContactInfo contact;
-                shareContacts.clear();
-                filteredContactsShare.clear();
-
-                if (filteredContactMEGA != null && !filteredContactMEGA.isEmpty()) {
-                    shareContacts.add(new ShareContactInfo(true, true, false));
-                    for (int i = 0; i < filteredContactMEGA.size(); i++) {
-                        contactMEGA = filteredContactMEGA.get(i);
-                        contact = new ShareContactInfo(null, contactMEGA, null);
-                        shareContacts.add(contact);
-                    }
-
-                    filteredContactsShare.addAll(shareContacts);
-
-                    if (queryPermissions) {
-                        filteredContactsShare.add(new ShareContactInfo());
-                    }
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void avoid) {
-            Timber.d("onPostExecute GetContactsTask");
-            progressBar.setVisibility(View.GONE);
-            if (searchExpand) {
-                if (isAsyncTaskRunning(filterContactsTask)) {
-                    filterContactsTask.cancel(true);
-                }
-                filterContactsTask = new FilterContactsTask();
-                filterContactsTask.execute();
-            } else {
-                if (contactType == CONTACT_TYPE_MEGA) {
-                    if (newGroup) {
-                        setAddedAdapterContacts();
-                    }
-                    setMegaAdapterContacts(filteredContactMEGA, MegaContactsAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT);
-                } else if (contactType == CONTACT_TYPE_DEVICE) {
-                    setPhoneAdapterContacts(filteredContactsPhone);
-                } else {
-                    setShareAdapterContacts(filteredContactsShare);
-                    if (queryPermissions) {
-                        waitingForPhoneContacts = true;
-                        getPhoneContactsTask = new GetPhoneContactsTask();
-                        getPhoneContactsTask.execute();
-                    }
-                }
-                setTitleAB();
-                setRecyclersVisibility();
-                setSendInvitationVisibility();
-                visibilityFastScroller();
-                setSearchVisibility();
-
-                if (isConfirmAddShown) {
-                    if (isAsyncTaskRunning(queryIfContactSouldBeAddedTask)) {
-                        queryIfContactSouldBeAddedTask.cancel(true);
-                    }
-                    hideKeyboard(addContactActivity, 0);
-                    queryIfContactSouldBeAddedTask = new QueryIfContactSouldBeAddedTask();
-                    queryIfContactSouldBeAddedTask.execute(true);
-                }
-            }
         }
     }
 
@@ -3107,7 +2465,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         }
     }
 
-    private void newGroup() {
+    void newGroup() {
         Timber.d("newGroup");
 
         if (isAsyncTaskRunning(filterContactsTask)) {
@@ -3250,12 +2608,12 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                         setEmptyStateVisibility(true);
 
                         progressBar.setVisibility(View.VISIBLE);
-                        new GetContactsTask().execute();
+                        new GetContactsTask(this).execute();
                     } else if (hasReadContactsPermissions && contactType == CONTACT_TYPE_BOTH) {
                         progressBar.setVisibility(View.VISIBLE);
                         emptyTextView.setText(R.string.contacts_list_empty_text_loading_share);
 
-                        getContactsTask = new GetContactsTask();
+                        getContactsTask = new GetContactsTask(this);
                         getContactsTask.execute();
                     }
                 } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
@@ -3277,7 +2635,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         }
     }
 
-    private void setRecyclersVisibility() {
+    void setRecyclersVisibility() {
         if (contactType == CONTACT_TYPE_MEGA) {
             if (filteredContactMEGA.size() > 0) {
                 containerContacts.setVisibility(View.VISIBLE);
@@ -3303,7 +2661,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         }
     }
 
-    private void visibilityFastScroller() {
+    void visibilityFastScroller() {
         fastScroller.setRecyclerView(recyclerViewList);
         if (contactType == CONTACT_TYPE_MEGA) {
             if (adapterMEGA == null) {
@@ -3386,7 +2744,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 if (cr != null) {
                     if ((cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED) && (cr.isOutgoing())) {
                         Timber.d("ACCEPT OPR: %s cr.isOutgoing: %s cr.getStatus: %d", cr.getSourceEmail(), cr.isOutgoing(), cr.getStatus());
-                        getContactsTask = new GetContactsTask();
+                        getContactsTask = new GetContactsTask(this);
                         getContactsTask.execute();
                     }
                 }
