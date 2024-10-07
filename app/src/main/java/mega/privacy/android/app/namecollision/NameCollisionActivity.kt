@@ -63,7 +63,6 @@ class NameCollisionActivity : PasscodeActivity() {
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         Timber.e("hmt new NameCollisionActivity")
         if (savedInstanceState == null) {
@@ -111,6 +110,7 @@ class NameCollisionActivity : PasscodeActivity() {
 
         if (!viewModel.isCopyToOrigin) {
             setTheme(R.style.Theme_Mega)
+            enableEdgeToEdge()
             binding = ActivityNameCollisionBinding.inflate(layoutInflater)
             consumeInsetsWithToolbar(customToolbar = binding.toolbar)
             setContentView(binding.root)

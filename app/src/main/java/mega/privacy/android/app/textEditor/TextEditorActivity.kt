@@ -27,7 +27,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
@@ -61,7 +60,6 @@ import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MO
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
-import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.ANIMATION_DURATION
 import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
@@ -147,10 +145,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     private var originalContentTextSize: Float = 0f
     private var originalNameTextSize: Float = 0f
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
-    private val toolbarElevationColor by lazy { getColorForElevation(this, elevation) }
-    private val transparentColor by lazy {
-        ContextCompat.getColor(this, android.R.color.transparent)
-    }
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             if (!viewModel.isViewMode() && viewModel.isFileEdited()) {
@@ -184,8 +178,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         binding = ActivityTextFileEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
         consumeInsetsWithToolbar(customToolbar = binding.fileEditorToolbar)
