@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -80,7 +81,11 @@ internal fun ContactItemView(
                 .padding(end = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ContactAvatarVerified(contactItem, selected = selected)
+            ContactAvatarVerified(
+                contactItem,
+                selected = selected,
+                modifier = Modifier.testTag(CONTACT_ITEM_CONTACT_AVATAR_IMAGE),
+            )
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     val contactName = with(contactItem) {
@@ -91,7 +96,8 @@ internal fun ContactItemView(
                         text = contactName,
                         style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.textColorPrimary),
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.testTag(CONTACT_ITEM_CONTACT_NAME_TEXT),
                     )
 
                     if (contactItem.status != UserChatStatus.Invalid) {
@@ -113,6 +119,7 @@ internal fun ContactItemView(
                         text = secondLineText,
                         style = MaterialTheme.typography.subtitle2,
                         color = TextColor.Secondary,
+                        modifier = Modifier.testTag(CONTACT_ITEM_STATUS_TEXT),
                     )
                 }
             }
@@ -254,6 +261,10 @@ private fun PreviewContactItem() {
         )
     }
 }
+
+internal const val CONTACT_ITEM_CONTACT_NAME_TEXT = "contact_item:contact_name_text"
+internal const val CONTACT_ITEM_STATUS_TEXT = "contact_item:status_text"
+internal const val CONTACT_ITEM_CONTACT_AVATAR_IMAGE = "contact_item:contact_avatar_image"
 
 internal val contactItemForPreviews get() = contactItemForPreviews(-1)
 internal fun contactItemForPreviews(id: Int) = ContactItem(
