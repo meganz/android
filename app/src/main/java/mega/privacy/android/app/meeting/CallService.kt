@@ -1,11 +1,15 @@
 package mega.privacy.android.app.meeting
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -15,6 +19,7 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
 import android.graphics.RectF
+import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -38,13 +43,13 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.call.CallCompositionChanges
-import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.call.HangChatCallByChatIdUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorCallScreenOpenedUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorCallScreenOpenedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -200,11 +205,11 @@ class CallService : LifecycleService() {
                                 when (call.status) {
                                     ChatCallStatus.UserNoPresent,
                                     ChatCallStatus.InProgress,
-                                    -> updateNotificationContent()
+                                        -> updateNotificationContent()
 
                                     ChatCallStatus.TerminatingUserParticipation,
                                     ChatCallStatus.Destroyed,
-                                    -> removeNotification(call.chatId)
+                                        -> removeNotification(call.chatId)
 
                                     else -> Unit
                                 }
@@ -315,9 +320,21 @@ class CallService : LifecycleService() {
         return intentCall
     }
 
+    private fun PackageManager.hasPermission(
+        permission: String,
+        pn: String = packageName,
+    ): Boolean =
+        checkPermission(permission, pn) == PackageManager.PERMISSION_GRANTED
+
+    private fun PackageManager.hasPermissions(vararg permissions: String): Boolean {
+        val pn = packageName
+        return permissions.all { checkPermission(it, pn) == PackageManager.PERMISSION_GRANTED }
+    }
+
     /**
      * Update the content of the notification
      */
+    @SuppressLint("ForegroundServiceType")
     private fun updateNotificationContent() {
         Timber.d("Updating notification")
         megaChatApi.getChatRoom(currentChatId)?.let { chat ->
@@ -370,8 +387,49 @@ class CallService : LifecycleService() {
                         setContentText(contentText)
                 }
                 val newNotification: Notification? = mBuilderCompatO?.build()
-
-                startForeground(notificationId, newNotification)
+                newNotification?.let {
+                    try {
+                        // Since API 34, foreground services
+                        // should not be specified before user grants permission.
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                            val pm = packageManager
+                            val microphoneServiceType = if (pm.hasPermissions(
+                                    Manifest.permission.FOREGROUND_SERVICE_MICROPHONE,
+                                    Manifest.permission.RECORD_AUDIO
+                                )
+                            )
+                                ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE else 0
+                            val callServiceType =
+                                if (pm.hasPermission(Manifest.permission.FOREGROUND_SERVICE_PHONE_CALL))
+                                    ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL else 0
+                            startForeground(
+                                notificationId,
+                                newNotification,
+                                callServiceType
+                                        or microphoneServiceType
+                            )
+                            // Since API 30, microphone and camera should be specified for app to use them.
+                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+                            startForeground(
+                                notificationId,
+                                newNotification,
+                                ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+                                        or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                            )
+                        // Since API 29, should specify foreground service type.
+                        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                            startForeground(
+                                notificationId,
+                                newNotification,
+                                ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+                                        or ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
+                            )
+                        else // Before API 29, just start foreground service.
+                            startForeground(notificationId, newNotification)
+                    } catch (e: Exception) {
+                        Timber.e(e)
+                    }
+                }
             }
         }
     }
@@ -472,7 +530,7 @@ class CallService : LifecycleService() {
      */
     private fun removeNotification(chatId: Long) {
         val listCalls = CallUtil.getCallsParticipating()
-        if (listCalls == null || listCalls.size == 0) {
+        if (listCalls == null || listCalls.isEmpty()) {
             stopNotification(chatId)
             return
         }

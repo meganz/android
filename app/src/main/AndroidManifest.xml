@@ -57,6 +57,7 @@
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" /> <!-- For apps targeting Android 13 (API level 33) -->
@@ -169,7 +170,7 @@
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Mega.Starting"
-            android:windowSoftInputMode="stateAlwaysHidden" >
+            android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -261,8 +262,7 @@
             android:configChanges="orientation|screenSize"
             android:exported="false"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustNothing">
-        </activity>
+            android:windowSoftInputMode="adjustNothing"></activity>
         <activity android:name=".main.megachat.chat.explorer.ChatExplorerActivity" />
         <activity android:name=".main.megachat.NodeAttachmentHistoryActivity" />
         <activity android:name=".main.CountryCodePickerActivity" />
@@ -517,7 +517,8 @@
         <service
             android:name=".meeting.CallService"
             android:exported="false"
-            android:foregroundServiceType="phoneCall" />
+            android:foregroundServiceType="phoneCall|microphone"
+            android:permission="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
         <service
             android:name=".meeting.CallNotificationIntentService"
             android:exported="false" />
@@ -727,9 +728,10 @@
             android:name=".presentation.tags.TagsActivity"
             android:launchMode="singleTop" />
         <activity android:name=".presentation.settings.passcode.PasscodeSettingsActivity" />
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-2135147798858967~2157690671"/>
+            android:value="ca-app-pub-2135147798858967~2157690671" />
         <property
             android:name="android.adservices.AD_SERVICES_CONFIG"
             android:resource="@xml/gma_ad_services_config"
