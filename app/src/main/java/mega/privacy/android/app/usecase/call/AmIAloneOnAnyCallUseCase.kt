@@ -11,24 +11,24 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ParticipantsCountChange
+import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
-import nz.mega.sdk.MegaChatCall
 import javax.inject.Inject
 
 /**
  * Am i alone on any call use case - to check if I am alone on any call and whether it is because I am waiting for others or because everyone has dropped out of the call.
  *
- * @property getCallUseCase
  * @property monitorChatCallUpdatesUseCase
  * @property chatManagement
  * @property ChatRepository
+ * @property CallRepository
  */
 class AmIAloneOnAnyCallUseCase @Inject constructor(
-    private val getCallUseCase: GetCallUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val chatManagement: ChatManagement,
     private val chatRepository: ChatRepository,
+    private val callRepository: CallRepository,
 ) {
     /**
      * Method to check if I am alone on any call and whether it is because I am waiting for others or because everyone has dropped out of the call.
@@ -36,13 +36,17 @@ class AmIAloneOnAnyCallUseCase @Inject constructor(
     operator fun invoke(): Flow<ParticipantsCountChange> =
         flow {
             emitAll(
-                getCallUseCase.getCallsInProgressAndOnHold()
-                    .asFlow()
-                    .map {
-                        checkIfIAmAloneOnSpecificCall(it).apply {
-                            isReceivedChange = false
-                        }
+                listOf(
+                    callRepository.getCallHandleList(ChatCallStatus.Connecting),
+                    callRepository.getCallHandleList(ChatCallStatus.Joining),
+                    callRepository.getCallHandleList(ChatCallStatus.InProgress)
+                ).flatten().mapNotNull {
+                    callRepository.getChatCall(it)
+                }.asFlow().map {
+                    checkIfIAmAloneOnSpecificCall(it).apply {
+                        isReceivedChange = false
                     }
+                }
             )
 
             emitAll(
@@ -96,30 +100,6 @@ class AmIAloneOnAnyCallUseCase @Inject constructor(
 
         return ParticipantsCountChange(
             call.chatId,
-            onlyMeInTheCall,
-            waitingForOthers,
-            isReceivedChange = true
-        )
-    }
-
-    private suspend fun checkIfIAmAloneOnSpecificCall(call: MegaChatCall): ParticipantsCountChange {
-        var waitingForOthers = false
-        var onlyMeInTheCall = false
-        chatRepository.getChatRoom(call.chatid)?.let { chat ->
-            val isOneToOneCall = !chat.isGroup && !chat.isMeeting
-            if (!isOneToOneCall) {
-                call.peeridParticipants?.let { list ->
-                    onlyMeInTheCall =
-                        list.size().toInt() == 1 && list.get(0) == chatRepository.getMyUserHandle()
-
-                    waitingForOthers = onlyMeInTheCall &&
-                            chatManagement.isRequestSent(call.callId)
-                }
-            }
-        }
-
-        return ParticipantsCountChange(
-            call.chatid,
             onlyMeInTheCall,
             waitingForOthers,
             isReceivedChange = true

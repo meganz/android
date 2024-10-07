@@ -34,20 +34,21 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 import mega.privacy.android.app.extensions.asHotFlow
+import mega.privacy.android.domain.repository.CallRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AmIAloneOnAnyCallUseCaseTest {
     private lateinit var underTest: AmIAloneOnAnyCallUseCase
 
-    private val getCallUseCase = mock<GetCallUseCase>()
     private val monitorChatCallUpdatesUseCase = mock<MonitorChatCallUpdatesUseCase>()
     private val chatManagement = mock<ChatManagement>()
     private val chatRepository = mock<ChatRepository>()
+    private val callRepository = mock<CallRepository>()
 
     @BeforeEach
     fun setUp() {
         underTest = AmIAloneOnAnyCallUseCase(
-            getCallUseCase = getCallUseCase,
+            callRepository = callRepository,
             monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             chatManagement = chatManagement,
             chatRepository = chatRepository,
@@ -57,7 +58,6 @@ class AmIAloneOnAnyCallUseCaseTest {
     @AfterEach
     fun tearDown() {
         reset(
-            getCallUseCase,
             chatRepository,
             monitorChatCallUpdatesUseCase,
             chatManagement,
@@ -175,13 +175,14 @@ class AmIAloneOnAnyCallUseCaseTest {
         mode = EnumSource.Mode.INCLUDE
     )
     fun `test statuses with no result`(currentStatus: ChatCallStatus) = runTest {
-        val call = mock<ChatCall>{
-            on {changes} doReturn listOf()
+        whenever(callRepository.getCallHandleList(any())).thenReturn(emptyList())
+        val call = mock<ChatCall> {
+            on { changes } doReturn listOf()
             on { status } doReturn currentStatus
         }
 
         monitorChatCallUpdatesUseCase.stub {
-            on{ invoke() } doReturn call.asHotFlow()
+            on { invoke() } doReturn call.asHotFlow()
         }
 
         underTest().test {
@@ -197,18 +198,16 @@ class AmIAloneOnAnyCallUseCaseTest {
     )
     fun `test statuses with default result`(currentStatus: ChatCallStatus) = runTest {
         val thisChatId = 12L
-        getCallUseCase.stub {
-            on { getCallsInProgressAndOnHold() } doReturn arrayListOf()
-        }
+        whenever(callRepository.getCallHandleList(any())).thenReturn(emptyList())
 
-        val call = mock<ChatCall>{
+        val call = mock<ChatCall> {
             on { chatId } doReturn thisChatId
-            on {changes} doReturn listOf()
+            on { changes } doReturn listOf()
             on { status } doReturn currentStatus
         }
 
         monitorChatCallUpdatesUseCase.stub {
-            on{ invoke() } doReturn call.asHotFlow()
+            on { invoke() } doReturn call.asHotFlow()
         }
 
         underTest().test {
@@ -327,7 +326,7 @@ class AmIAloneOnAnyCallUseCaseTest {
         }
     }
 
-    private fun stubOngoingCall(
+    private suspend fun stubOngoingCall(
         isAlone: Boolean,
         isMeetingCall: Boolean,
         requestSent: Boolean,
@@ -335,17 +334,19 @@ class AmIAloneOnAnyCallUseCaseTest {
         val thisChatId = 321L
         val myHandle = 42L
         val thisCallId = 123L
-        val userCount = if (isAlone) 1L else 2L
-        val peerList = mock<MegaHandleList> {
-            on { size() } doReturn userCount
-            on { get(any()) } doReturn myHandle
-        }
-        val call = mock<MegaChatCall> {
-            on { chatid } doReturn thisChatId
-            on { peeridParticipants } doReturn peerList
+        val call = mock<ChatCall> {
+            on { chatId } doReturn thisChatId
+            on { peerIdParticipants } doReturn if (isAlone) listOf(myHandle) else listOf(myHandle, 43L)
             on { callId } doReturn thisCallId
         }
-        whenever(getCallUseCase.getCallsInProgressAndOnHold()).thenReturn(arrayListOf(call))
+        whenever(callRepository.getCallHandleList(ChatCallStatus.Connecting)).thenReturn(emptyList())
+        whenever(callRepository.getCallHandleList(ChatCallStatus.Joining)).thenReturn(emptyList())
+        whenever(callRepository.getCallHandleList(ChatCallStatus.InProgress)).thenReturn(
+            listOf(
+                thisCallId
+            )
+        )
+        whenever(callRepository.getChatCall(thisCallId)).thenReturn(call)
         val chatRoom = mock<ChatRoom> {
             on { isGroup } doReturn false
             on { isMeeting } doReturn isMeetingCall
@@ -362,7 +363,7 @@ class AmIAloneOnAnyCallUseCaseTest {
         }
     }
 
-    private fun stubUpdatedCall(
+    private suspend fun stubUpdatedCall(
         isAlone: Boolean,
         isMeetingCall: Boolean,
         requestSent: Boolean,
@@ -372,22 +373,20 @@ class AmIAloneOnAnyCallUseCaseTest {
         val myHandle = 42L
         val thisCallId = 123L
 
-        getCallUseCase.stub {
-            on { getCallsInProgressAndOnHold() } doReturn arrayListOf()
-        }
+        whenever(callRepository.getCallHandleList(any())).thenReturn(emptyList())
 
-        val peerList =  if (isAlone) listOf(myHandle) else listOf(myHandle, 1L)
+        val peerList = if (isAlone) listOf(myHandle) else listOf(myHandle, 1L)
 
-        val call = mock<ChatCall>{
+        val call = mock<ChatCall> {
             on { chatId } doReturn thisChatId
-            on {changes} doReturn listOf()
+            on { changes } doReturn listOf()
             on { status } doReturn currentStatus
             on { peerIdParticipants } doReturn peerList
             on { callId } doReturn thisCallId
         }
 
         monitorChatCallUpdatesUseCase.stub {
-            on{ invoke() } doReturn call.asHotFlow()
+            on { invoke() } doReturn call.asHotFlow()
         }
 
 
