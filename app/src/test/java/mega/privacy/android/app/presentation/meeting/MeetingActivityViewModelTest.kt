@@ -252,7 +252,6 @@ class MeetingActivityViewModelTest {
             getChatParticipants = getChatParticipants,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             logoutUseCase = logoutUseCase,
-            monitorFinishActivityUseCase = monitorFinishActivityUseCase,
             monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
             getChatRoomUseCase = getChatRoomUseCase,
@@ -296,6 +295,7 @@ class MeetingActivityViewModelTest {
             monitorAudioOutputUseCase = monitorAudioOutputUseCase,
             monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
             getUserAvatarUseCase = getUserAvatarUseCase,
+            megaChatRequestHandler = mock(),
         )
     }
 
