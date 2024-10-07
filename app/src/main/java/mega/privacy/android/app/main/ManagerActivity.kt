@@ -5978,7 +5978,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
             return
         } else if (Constants.ACTION_SHOW_UPGRADE_ACCOUNT == intent.action) {
-            setIntent(intent)
             navigateToUpgradeAccount()
             return
         } else if (Constants.ACTION_SHOW_TRANSFERS == intent.action) {
