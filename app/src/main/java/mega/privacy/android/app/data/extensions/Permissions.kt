@@ -1,7 +1,7 @@
 package mega.privacy.android.app.data.extensions
 
-import mega.privacy.android.app.presentation.permissions.model.PermissionScreen
 import mega.privacy.android.app.presentation.permissions.model.Permission
+import mega.privacy.android.app.presentation.permissions.model.PermissionScreen
 
 /**
  * Removes the permissions already granted.
@@ -25,11 +25,11 @@ fun List<Permission>.toPermissionScreen(): MutableList<PermissionScreen> =
                 Permission.Read -> add(PermissionScreen.Media)
                 Permission.Write -> if (!contains(PermissionScreen.Media))
                     add(PermissionScreen.Media)
+
                 Permission.Camera -> add(PermissionScreen.Camera)
                 Permission.Microphone -> add(PermissionScreen.Calls)
                 Permission.Bluetooth -> if (!contains(PermissionScreen.Calls))
                     add(PermissionScreen.Calls)
-                Permission.Contacts -> add(PermissionScreen.Contacts)
             }
         }
     }

@@ -49,19 +49,6 @@
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant" />
 
-        <TextView
-            android:id="@+id/subtitle_explanation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/subtitle_permissions"
-            android:layout_marginLeft="24dp"
-            android:layout_marginRight="24dp"
-            android:fontFamily="sans-serif"
-            android:gravity="center"
-            android:text="@string/allow_access_contact_explanation"
-            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant"
-            android:visibility="gone" />
-
     </RelativeLayout>
 
 </LinearLayout>

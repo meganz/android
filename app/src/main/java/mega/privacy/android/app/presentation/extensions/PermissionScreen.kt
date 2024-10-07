@@ -15,7 +15,6 @@ internal val PermissionScreen.title: Int
 
         PermissionScreen.Camera -> R.string.allow_acces_camera_title
         PermissionScreen.Calls -> R.string.allow_acces_calls_title
-        PermissionScreen.Contacts -> R.string.allow_acces_contact_title
     }
 
 internal val PermissionScreen.description: Int
@@ -24,7 +23,6 @@ internal val PermissionScreen.description: Int
         PermissionScreen.Media -> R.string.allow_acces_media_subtitle
         PermissionScreen.Camera -> R.string.allow_acces_camera_subtitle
         PermissionScreen.Calls -> R.string.allow_acces_calls_subtitle_microphone
-        PermissionScreen.Contacts -> R.string.allow_acces_contact_subtitle
     }
 
 internal val PermissionScreen.image: Int
@@ -33,5 +31,4 @@ internal val PermissionScreen.image: Int
         PermissionScreen.Media -> R.drawable.photos
         PermissionScreen.Camera -> R.drawable.enable_camera
         PermissionScreen.Calls -> R.drawable.calls
-        PermissionScreen.Contacts -> R.drawable.contacts
     }

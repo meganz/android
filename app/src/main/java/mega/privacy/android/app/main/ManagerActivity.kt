@@ -2394,9 +2394,8 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         val microphoneGranted: Boolean = hasPermissions(this, Manifest.permission.RECORD_AUDIO)
         val bluetoothGranted = (Build.VERSION.SDK_INT < Build.VERSION_CODES.S
                 || hasPermissions(this, Manifest.permission.BLUETOOTH_CONNECT))
-        val contactsGranted: Boolean = hasPermissions(this, Manifest.permission.READ_CONTACTS)
         if (!notificationsGranted || !writeStorageGranted || !readStorageGranted || !cameraGranted
-            || !microphoneGranted || !bluetoothGranted || !contactsGranted
+            || !microphoneGranted || !bluetoothGranted
         ) {
             val currentFragment =
                 supportFragmentManager.findFragmentById(R.id.fragment_container)

@@ -44,9 +44,4 @@ enum class PermissionType {
      * Bluetooth permission.
      */
     Bluetooth,
-
-    /**
-     * Contacts permission.
-     */
-    Contacts
 }

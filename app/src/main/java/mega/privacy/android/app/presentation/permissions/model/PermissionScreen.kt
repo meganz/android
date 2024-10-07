@@ -22,12 +22,7 @@ enum class PermissionScreen {
     /**
      * Calls permission.
      */
-    Calls,
-
-    /**
-     * Contacts permission.
-     */
-    Contacts;
+    Calls;
 
     companion object {
         /**

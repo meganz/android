@@ -131,13 +131,6 @@ class PermissionsFragment : Fragment() {
                     )
                 )
             }
-
-            add(
-                Pair(
-                    Permission.Contacts,
-                    hasPermissions(requireActivity(), Manifest.permission.READ_CONTACTS)
-                )
-            )
         }
         viewModel.updateFirstTimeLoginStatus()
         viewModel.setData(missingPermission)
@@ -171,8 +164,6 @@ class PermissionsFragment : Fragment() {
             getString(currentPermission.title)
         permissionBinding.subtitlePermissions.text =
             getString(currentPermission.description)
-        permissionBinding.subtitleExplanation.isVisible =
-            currentPermission == PermissionScreen.Contacts
     }
 
     /**
@@ -190,7 +181,6 @@ class PermissionsFragment : Fragment() {
             PermissionType.MicrophoneAndBluetooth -> askForMicrophoneAndBluetoothPermissions()
             PermissionType.Microphone -> askForMicrophonePermission()
             PermissionType.Bluetooth -> askForBluetoothPermission()
-            PermissionType.Contacts -> askForContactsPermissions()
         }
     }
 
@@ -281,18 +271,6 @@ class PermissionsFragment : Fragment() {
             requireActivity(),
             PERMISSIONS_FRAGMENT,
             Manifest.permission.BLUETOOTH_CONNECT
-        )
-    }
-
-    /**
-     * Asks for contacts permission.
-     */
-    private fun askForContactsPermissions() {
-        Timber.d("Ask for CONTACT permission")
-        requestPermission(
-            requireActivity(),
-            PERMISSIONS_FRAGMENT,
-            Manifest.permission.READ_CONTACTS
         )
     }
 
