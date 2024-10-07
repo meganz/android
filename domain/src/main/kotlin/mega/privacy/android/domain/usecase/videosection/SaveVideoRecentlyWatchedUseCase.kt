@@ -15,7 +15,18 @@ class SaveVideoRecentlyWatchedUseCase @Inject constructor(
      *
      * @param handle the video handle
      * @param timestamp saved timestamp
+     * @param collectionId collection id of the video
      */
-    suspend operator fun invoke(handle: Long, timestamp: Long) =
-        videoSectionRepository.saveVideoRecentlyWatched(handle, timestamp)
+    suspend operator fun invoke(
+        handle: Long,
+        timestamp: Long,
+        collectionId: Long = 0,
+        collectionTitle: String? = null,
+    ) =
+        videoSectionRepository.saveVideoRecentlyWatched(
+            handle,
+            timestamp,
+            collectionId,
+            collectionTitle
+        )
 }

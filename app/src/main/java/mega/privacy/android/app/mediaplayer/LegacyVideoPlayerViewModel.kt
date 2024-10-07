@@ -87,6 +87,8 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILD
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.INVALID_SIZE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
@@ -352,6 +354,14 @@ class LegacyVideoPlayerViewModel @Inject constructor(
         SharingStarted.Eagerly,
         RepeatToggleMode.REPEAT_NONE
     )
+
+    private val collectionTitle: String? by lazy {
+        savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE]
+    }
+
+    private val collectionId: Long? by lazy {
+        savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID]
+    }
 
     init {
         viewModelScope.launch {
@@ -1215,7 +1225,12 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     internal fun saveVideoWatchedTime() = viewModelScope.launch {
         if (getFeatureFlagValueUseCase(AppFeatures.VideoRecentlyWatched)) {
             mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong()?.let {
-                saveVideoRecentlyWatchedUseCase(it, Instant.now().toEpochMilli() / 1000)
+                saveVideoRecentlyWatchedUseCase(
+                    it,
+                    Instant.now().toEpochMilli() / 1000,
+                    collectionId ?: 0L,
+                    collectionTitle
+                )
             }
         }
     }

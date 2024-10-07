@@ -42,6 +42,7 @@ class VideoUIEntityMapperTest {
     private val expectedType = mock<VideoFileTypeInfo>()
     private val expectedWatchedTimestamp = 100L
     private val expectedWatchedDate = "12 April 2024"
+    private val expectedCollectionTitle = "collection title"
 
     @BeforeAll
     fun setUp() {
@@ -113,6 +114,7 @@ class VideoUIEntityMapperTest {
         on { type }.thenReturn(expectedType)
         on { isOutShared }.thenReturn(expectedIsOutShared)
         on { watchedTimestamp }.thenReturn(expectedWatchedTimestamp)
+        on { collectionTitle }.thenReturn(expectedCollectionTitle)
     }
 
     private fun assertMappedVideoUIEntity(
@@ -135,7 +137,8 @@ class VideoUIEntityMapperTest {
                 { assertThat(it.elementID).isEqualTo(expectedElementID) },
                 { assertThat(it.label).isEqualTo(expectedLabel) },
                 { assertThat(it.fileTypeInfo).isEqualTo(expectedType) },
-                { assertThat(it.watchedDate).isEqualTo(expectedWatchedDate) }
+                { assertThat(it.watchedDate).isEqualTo(expectedWatchedDate) },
+                { assertThat(it.collectionTitle).isEqualTo(expectedCollectionTitle) }
             )
         }
     }

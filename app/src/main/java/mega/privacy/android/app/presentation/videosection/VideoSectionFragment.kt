@@ -333,7 +333,8 @@ class VideoSectionFragment : Fragment() {
                     viewType = SEARCH_BY_ADAPTER,
                     isFolderLink = false,
                     searchedItems = uiState.currentVideoPlaylist?.videos?.map { it.id.longValue },
-                    mediaQueueTitle = uiState.currentVideoPlaylist?.title
+                    mediaQueueTitle = uiState.currentVideoPlaylist?.title,
+                    collectionId = uiState.currentVideoPlaylist?.id?.longValue
                 )
                 videoSectionViewModel.updateClickedPlaylistDetailItem(null)
             }.onFailure {

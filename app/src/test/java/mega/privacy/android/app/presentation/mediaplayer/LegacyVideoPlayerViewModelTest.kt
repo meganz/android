@@ -19,6 +19,8 @@ import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
@@ -87,6 +89,8 @@ internal class LegacyVideoPlayerViewModelTest {
     private val expectedId = 123456L
     private val expectedName = "testName"
     private val expectedUrl = "test url"
+    private val expectedCollectionId = 123456L
+    private val expectedCollectionTitle = "collection title"
 
     @BeforeEach
     fun setUp() {
@@ -159,6 +163,8 @@ internal class LegacyVideoPlayerViewModelTest {
         savedStateHandle[underTest.subtitleShowKey] = false
         savedStateHandle[underTest.videoPlayerPausedForPlaylistKey] = false
         savedStateHandle[underTest.currentSubtitleFileInfoKey] = null
+        savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID] = expectedCollectionId
+        savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE] = expectedCollectionTitle
     }
 
     @Test
@@ -367,7 +373,12 @@ internal class LegacyVideoPlayerViewModelTest {
                 whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
                 underTest.initVideoSources(null)
 
-                verify(saveVideoRecentlyWatchedUseCase).invoke(expectedId, 2)
+                verify(saveVideoRecentlyWatchedUseCase).invoke(
+                    expectedId,
+                    2,
+                    expectedCollectionId,
+                    expectedCollectionTitle
+                )
             }
 
         }
@@ -385,7 +396,12 @@ internal class LegacyVideoPlayerViewModelTest {
                 whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
                 underTest.saveVideoWatchedTime()
 
-                verify(saveVideoRecentlyWatchedUseCase).invoke(expectedId, 2)
+                verify(saveVideoRecentlyWatchedUseCase).invoke(
+                    expectedId,
+                    2,
+                    expectedCollectionId,
+                    expectedCollectionTitle
+                )
             }
         }
 

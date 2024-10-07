@@ -37,6 +37,7 @@ class VideoUIEntityMapper @Inject constructor(
         elementID = typedVideoNode.elementID,
         isMarkedSensitive = typedVideoNode.isMarkedSensitive,
         isSensitiveInherited = typedVideoNode.isSensitiveInherited,
-        watchedDate = TimeUtils.formatRecentlyWatchedDate(typedVideoNode.watchedTimestamp, context)
+        watchedDate = TimeUtils.formatRecentlyWatchedDate(typedVideoNode.watchedTimestamp, context),
+        collectionTitle = typedVideoNode.collectionTitle
     )
 }
