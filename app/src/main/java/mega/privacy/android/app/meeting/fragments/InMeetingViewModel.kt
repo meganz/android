@@ -571,7 +571,7 @@ class InMeetingViewModel @Inject constructor(
                 _state.update { it.copy(chat = chat) }
 
                 when {
-                    chat.hasChanged(ChatRoomChange.OwnPrivilege) -> {
+                    chat.hasChanged(ChatRoomChange.OwnPrivilege) && isOneToOneCall().not() -> {
                         if (chat.ownPrivilege == ChatRoomPermission.Moderator) {
                             _state.update { state ->
                                 state.copy(
