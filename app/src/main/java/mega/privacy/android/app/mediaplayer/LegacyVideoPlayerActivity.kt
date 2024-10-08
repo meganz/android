@@ -1184,10 +1184,13 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                             val isRootParentInShare = megaApi.getRootParentNode(node).isInShare
                             val accountType = viewModel.state.value.accountType
                             val isPaidAccount = accountType?.isPaid == true
+                            val isBusinessAccountExpired =
+                                viewModel.state.value.isBusinessAccountExpired
                             val isNodeInBackup = megaApi.isInInbox(node)
 
                             val shouldShowHideNode = isHiddenNodesEnabled
                                     && (!isPaidAccount
+                                    || isBusinessAccountExpired
                                     || (!isInSharedItems
                                     && !isRootParentInShare
                                     && !isNodeInBackup
@@ -1199,6 +1202,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                                     && !isRootParentInShare
                                     && node.isMarkedSensitive
                                     && isPaidAccount
+                                    && !isBusinessAccountExpired
                                     && !isSensitiveInherited
                                     && !isNodeInBackup
 
@@ -1240,11 +1244,14 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                             val isRootParentInShare = megaApi.getRootParentNode(node).isInShare
                             val accountType = viewModel.state.value.accountType
                             val isPaidAccount = accountType?.isPaid == true
+                            val isBusinessAccountExpired =
+                                viewModel.state.value.isBusinessAccountExpired
                             val isNodeInBackup = megaApi.isInInbox(node)
 
 
                             val shouldShowHideNode = isHiddenNodesEnabled
                                     && (!isPaidAccount
+                                    || isBusinessAccountExpired
                                     || (!isInSharedItems
                                     && !isRootParentInShare
                                     && !isNodeInBackup
@@ -1256,6 +1263,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                                     && !isRootParentInShare
                                     && node.isMarkedSensitive
                                     && isPaidAccount
+                                    && !isBusinessAccountExpired
                                     && !isSensitiveInherited
                                     && !isNodeInBackup
 
@@ -1681,11 +1689,16 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
     }
 
     private fun handleHideNodeClick(playingHandle: Long) {
-        val (isPaid, isHiddenNodesOnboarded) = with(viewModel.state.value) {
-            (this.accountType?.isPaid ?: false) to this.isHiddenNodesOnboarded
+        var isPaid: Boolean
+        var isHiddenNodesOnboarded: Boolean
+        var isBusinessAccountExpired: Boolean
+        with(viewModel.state.value) {
+            isPaid = this.accountType?.isPaid ?: false
+            isHiddenNodesOnboarded = this.isHiddenNodesOnboarded
+            isBusinessAccountExpired = this.isBusinessAccountExpired
         }
 
-        if (!isPaid) {
+        if (!isPaid || isBusinessAccountExpired) {
             val intent = HiddenNodesOnboardingActivity.createScreen(
                 context = this,
                 isOnboarding = false,

@@ -21,9 +21,11 @@ sealed class SubtitleLoadState {
      *
      * @property items subtitle file list
      * @property accountType
+     * @property isBusinessAccountExpired
      */
     data class Success(
         val items: List<SubtitleFileInfoItem>,
         val accountType: AccountType?,
+        val isBusinessAccountExpired: Boolean,
     ) : SubtitleLoadState()
 }

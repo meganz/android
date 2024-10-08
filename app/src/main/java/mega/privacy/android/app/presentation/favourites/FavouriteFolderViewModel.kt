@@ -32,10 +32,12 @@ import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMa
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteFolderInfoUseCase
@@ -70,6 +72,7 @@ class FavouriteFolderViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     savedStateHandle: SavedStateHandle,
 ) :
     ViewModel() {
@@ -110,10 +113,18 @@ class FavouriteFolderViewModel @Inject constructor(
             Triple(folderInfo, accountDetail.levelDetail?.accountType, showHiddenItems)
         }.catch { Timber.e(it) }
             .collectLatest { (folderInfo, accountType, showHiddenItems) ->
+                val businessStatus =
+                    if (accountType?.isBusinessAccount == true) {
+                        getBusinessStatusUseCase()
+                    } else null
+
+                val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+
                 val filteredChildren = filterNonSensitiveItems(
-                    folderInfo.children,
-                    showHiddenItems,
-                    accountType?.isPaid
+                    items = folderInfo.children,
+                    showHiddenItems = showHiddenItems,
+                    isPaid = accountType?.isPaid,
+                    isBusinessAccountExpired = isBusinessAccountExpired,
                 )
                 _childrenNodesState.update {
                     folderInfo.run {
@@ -127,6 +138,7 @@ class FavouriteFolderViewModel @Inject constructor(
                                 children = filteredChildren,
                                 currentHandle = folderInfo.currentHandle,
                                 accountType = accountType,
+                                isBusinessAccountExpired = isBusinessAccountExpired,
                             )
                         }
                     }
@@ -175,6 +187,7 @@ class FavouriteFolderViewModel @Inject constructor(
         children: List<TypedNode>,
         currentHandle: Long,
         accountType: AccountType? = null,
+        isBusinessAccountExpired: Boolean = false,
     ): ChildrenNodesLoadState {
         return withContext(ioDispatcher) {
             ChildrenNodesLoadState.Success(
@@ -201,6 +214,7 @@ class FavouriteFolderViewModel @Inject constructor(
                 // If current handle is not current root handle, enable onBackPressedCallback
                 isBackPressedEnable = currentHandle != currentRootHandle,
                 accountType = accountType,
+                isBusinessAccountExpired = isBusinessAccountExpired,
             )
         }
     }
@@ -209,11 +223,12 @@ class FavouriteFolderViewModel @Inject constructor(
         items: List<TypedNode>,
         showHiddenItems: Boolean?,
         isPaid: Boolean?,
+        isBusinessAccountExpired: Boolean,
     ) = withContext(defaultDispatcher) {
         showHiddenItems ?: return@withContext items
         isPaid ?: return@withContext items
 
-        return@withContext if (showHiddenItems || !isPaid) {
+        return@withContext if (showHiddenItems || !isPaid || isBusinessAccountExpired) {
             items
         } else {
             items.filter {

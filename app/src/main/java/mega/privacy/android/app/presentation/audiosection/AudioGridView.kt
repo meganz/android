@@ -20,7 +20,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewI
 @Composable
 internal fun AudioGridView(
     items: List<AudioUiEntity>,
-    accountType: AccountType?,
+    shouldApplySensitiveMode: Boolean,
     lazyGridState: LazyGridState,
     sortOrder: String,
     modifier: Modifier,
@@ -76,9 +76,9 @@ internal fun AudioGridView(
                 iconRes = R.drawable.ic_audio_medium_solid,
                 modifier = Modifier
                     .alpha(0.5f.takeIf {
-                        accountType?.isPaid == true && (audioItem.isMarkedSensitive || audioItem.isSensitiveInherited)
+                        shouldApplySensitiveMode && (audioItem.isMarkedSensitive || audioItem.isSensitiveInherited)
                     } ?: 1f),
-                isSensitive = accountType?.isPaid == true && (audioItem.isMarkedSensitive || audioItem.isSensitiveInherited),
+                isSensitive = shouldApplySensitiveMode && (audioItem.isMarkedSensitive || audioItem.isSensitiveInherited),
                 showBlurEffect = true,
             )
         }

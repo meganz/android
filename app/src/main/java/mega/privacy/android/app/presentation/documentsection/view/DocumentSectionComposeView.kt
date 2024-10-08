@@ -63,7 +63,6 @@ internal fun DocumentSectionComposeView(
     val gridState = rememberLazyGridState()
     val progressBarShowing = uiState.isLoading
     val items = uiState.allDocuments
-    val accountType = uiState.accountDetail?.levelDetail?.accountType
     val scrollToTop = uiState.scrollToTop
 
     LaunchedEffect(items) {
@@ -127,7 +126,8 @@ internal fun DocumentSectionComposeView(
                     if (uiState.currentViewType == ViewType.LIST) {
                         DocumentListView(
                             items = items,
-                            accountType = accountType,
+                            shouldApplySensitiveMode = uiState.accountType?.isPaid == true
+                                    && !uiState.isBusinessAccountExpired,
                             lazyListState = listState,
                             sortOrder = sortOrder,
                             modifier = modifier.testTag(DOCUMENT_SECTION_LIST_VIEW_TEST_TAG),
@@ -141,7 +141,8 @@ internal fun DocumentSectionComposeView(
                     } else {
                         DocumentGridView(
                             items = items,
-                            accountType = accountType,
+                            shouldApplySensitiveMode = uiState.accountType?.isPaid == true
+                                    && !uiState.isBusinessAccountExpired,
                             lazyGridState = gridState,
                             sortOrder = sortOrder,
                             modifier = modifier.testTag(DOCUMENT_SECTION_GRID_VIEW_TEST_TAG),

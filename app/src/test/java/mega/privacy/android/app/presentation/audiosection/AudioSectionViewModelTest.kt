@@ -49,6 +49,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import mega.privacy.android.app.TimberJUnit5Extension
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -90,6 +91,7 @@ class AudioSectionViewModelTest {
         on { id }.thenReturn(expectedId)
         on { name }.thenReturn("audio name")
     }
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -117,7 +119,8 @@ class AudioSectionViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            getNodeContentUriUseCase = getNodeContentUriUseCase
+            getNodeContentUriUseCase = getNodeContentUriUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 
@@ -149,7 +152,7 @@ class AudioSectionViewModelTest {
             assertThat(initial.scrollToTop).isFalse()
             assertThat(initial.selectedAudioHandles).isEmpty()
             assertThat(initial.isInSelection).isFalse()
-            assertThat(initial.accountDetail).isNull()
+            assertThat(initial.accountType).isNull()
             assertThat(initial.isHiddenNodesOnboarded).isFalse()
             assertThat(initial.clickedItem).isNull()
             cancelAndIgnoreRemainingEvents()

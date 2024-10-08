@@ -1,6 +1,5 @@
 package mega.privacy.android.app.mediaplayer.model
 
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 
 /**
@@ -12,8 +11,6 @@ import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
  * @property currentSpeedPlayback current SpeedPlaybackItem
  * @property isVideoOptionPopupShown video option popup whether is shown, true is shown, otherwise is false
  * @property videoRepeatToggleMode videoRepeatToggleMode
- * @property accountType the account type
- * @property isHiddenNodesOnboarded if the user has been onboarded with hidden nodes
  */
 data class VideoPlayerUiState(
     val subtitleDisplayState: SubtitleDisplayState = SubtitleDisplayState(),
@@ -22,6 +19,4 @@ data class VideoPlayerUiState(
     val currentSpeedPlayback: SpeedPlaybackItem = SpeedPlaybackItem.PLAYBACK_SPEED_1_X,
     val isVideoOptionPopupShown: Boolean = false,
     val videoRepeatToggleMode: RepeatToggleMode = RepeatToggleMode.REPEAT_NONE,
-    val accountType: AccountType? = null,
-    val isHiddenNodesOnboarded: Boolean = false,
 )

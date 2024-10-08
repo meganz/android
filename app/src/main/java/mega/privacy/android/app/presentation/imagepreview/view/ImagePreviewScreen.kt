@@ -46,7 +46,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.imagepreview.slideshow.view.rememberPhotoState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
@@ -76,7 +76,7 @@ internal fun ImagePreviewScreen(
     onClickSendTo: (ImageNode) -> Unit = {},
     onClickShare: (ImageNode) -> Unit = {},
     onClickRename: (ImageNode) -> Unit = {},
-    onClickHide: (ImageNode, AccountDetail?, Boolean?) -> Unit = { _, _, _ -> },
+    onClickHide: (ImageNode, AccountType?, Boolean, Boolean?) -> Unit = { _, _, _, _ -> },
     onClickHideHelp: () -> Unit = {},
     onClickUnHide: (ImageNode) -> Unit = {},
     onClickMove: (ImageNode) -> Unit = {},
@@ -99,7 +99,8 @@ internal fun ImagePreviewScreen(
     }
 
     val currentImageNodeIndex = viewState.currentImageNodeIndex
-    val accountDetail = viewState.accountDetail
+    val accountType = viewState.accountType
+    val isBusinessAccountExpired = viewState.isBusinessAccountExpired
     val isHiddenNodesOnboarded = viewState.isHiddenNodesOnboarded
     viewState.currentImageNode?.let { currentImageNode ->
         val isCurrentImageNodeAvailableOffline = viewState.isCurrentImageNodeAvailableOffline
@@ -325,7 +326,8 @@ internal fun ImagePreviewScreen(
                         modalSheetState = modalSheetState,
                         imageNode = currentImageNode,
                         isAvailableOffline = isCurrentImageNodeAvailableOffline,
-                        accountDetail = accountDetail,
+                        accountType = accountType,
+                        isBusinessAccountExpired = isBusinessAccountExpired,
                         isHiddenNodesEnabled = isHiddenNodesEnabled,
                         isHiddenNodesOnboarded = isHiddenNodesOnboarded,
                         showInfoMenu = viewModel::isInfoMenuVisible,
@@ -396,7 +398,12 @@ internal fun ImagePreviewScreen(
                         },
                         onClickHide = hideSheet {
                             Analytics.tracker.trackEvent(ImagePreviewHideNodeMenuToolBarEvent)
-                            onClickHide(currentImageNode, accountDetail, isHiddenNodesOnboarded)
+                            onClickHide(
+                                currentImageNode,
+                                accountType,
+                                isBusinessAccountExpired,
+                                isHiddenNodesOnboarded
+                            )
                         },
                         onClickHideHelp = hideSheet {
                             onClickHideHelp()

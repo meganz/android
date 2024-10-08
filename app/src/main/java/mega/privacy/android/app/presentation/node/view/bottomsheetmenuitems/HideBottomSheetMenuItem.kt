@@ -15,8 +15,10 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.node.model.menuaction.HideMenuAction
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -43,8 +45,10 @@ class HideBottomSheetMenuItem @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     private var isPaid: Boolean = false
+    private var isBusinessAccountExpired: Boolean = false
 
     override fun buildComposeControl(selectedNode: TypedNode): BottomSheetClickHandler =
         { onDismiss, handler, navController, coroutineScope ->
@@ -61,7 +65,7 @@ class HideBottomSheetMenuItem @Inject constructor(
                 ),
                 dividerType = null,
                 trailingItem = {
-                    if (!isPaid) {
+                    if (!isPaid || isBusinessAccountExpired) {
                         MegaText(
                             text = stringResource(id = R.string.general_pro_only),
                             textColor = TextColor.Accent,
@@ -98,7 +102,8 @@ class HideBottomSheetMenuItem @Inject constructor(
             return false
         this.isPaid =
             monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
-        if (!isPaid)
+        this.isBusinessAccountExpired = getBusinessStatusUseCase() == BusinessAccountStatus.Expired
+        if (!isPaid || isBusinessAccountExpired)
             return true
 
         return isHidingActionAllowedUseCase(node.id) && !node.isMarkedSensitive && !node.isSensitiveInherited
@@ -113,7 +118,7 @@ class HideBottomSheetMenuItem @Inject constructor(
     ): () -> Unit = {
         parentCoroutineScope.launch {
             val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
-            if (!this@HideBottomSheetMenuItem.isPaid) {
+            if (!this@HideBottomSheetMenuItem.isPaid || isBusinessAccountExpired) {
                 actionHandler(menuAction, node)
             } else if (node.isMarkedSensitive || isHiddenNodesOnboarded) {
                 updateNodeSensitiveUseCase(node.id, true)

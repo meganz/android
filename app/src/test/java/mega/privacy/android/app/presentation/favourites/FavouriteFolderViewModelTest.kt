@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteFolderInfoUseCase
@@ -70,6 +71,7 @@ class FavouriteFolderViewModelTest {
     }
     private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()
     private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
     private val megaNode: MegaNode = mock {
         on { handle }.thenReturn(123)
@@ -125,6 +127,7 @@ class FavouriteFolderViewModelTest {
             defaultDispatcher = UnconfinedTestDispatcher(),
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 

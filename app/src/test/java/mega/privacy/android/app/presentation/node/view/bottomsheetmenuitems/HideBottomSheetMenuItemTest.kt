@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -35,6 +36,7 @@ class HideBottomSheetMenuItemTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val accountType = mock<AccountType> {
         on { isPaid } doReturn true
     }
@@ -53,7 +55,8 @@ class HideBottomSheetMenuItemTest {
             isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
-            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 

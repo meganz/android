@@ -55,7 +55,7 @@ class DocumentListViewTest {
         composeTestRule.setContent {
             DocumentListView(
                 items = items,
-                accountType = null,
+                shouldApplySensitiveMode = false,
                 lazyListState = lazyListState,
                 sortOrder = sortOrder,
                 modifier = modifier,
@@ -86,7 +86,7 @@ class DocumentListViewTest {
     }
 
     private fun getDocumentItem(
-        documentId: NodeId
+        documentId: NodeId,
     ) = mock<DocumentUiEntity> {
         on { id }.thenReturn(documentId)
         on { name }.thenReturn("document.txt")

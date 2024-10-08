@@ -68,10 +68,7 @@ internal fun VideoSectionComposeView(
         isRecentlyWatchedEnabled = videoSectionViewModel.isRecentlyWatchedEnabled()
     }
 
-    val accountType = uiState.accountDetail?.levelDetail?.accountType
-
     var showDeleteVideoPlaylist by rememberSaveable { mutableStateOf(false) }
-
 
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -166,7 +163,8 @@ internal fun VideoSectionComposeView(
             allVideoView = {
                 AllVideosView(
                     items = uiState.allVideos,
-                    accountType = accountType,
+                    shouldApplySensitiveMode = uiState.accountType?.isPaid == true
+                            && !uiState.isBusinessAccountExpired,
                     progressBarShowing = uiState.progressBarShowing,
                     searchMode = uiState.searchState == SearchWidgetState.EXPANDED,
                     scrollToTop = uiState.scrollToTop,

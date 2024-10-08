@@ -29,7 +29,6 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PL
 import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_DETAIL_EMPTY_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistDetailView
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.Before
 import org.junit.Rule
@@ -62,7 +61,7 @@ class VideoPlaylistDetailViewTest {
     private fun setComposeContent(
         playlist: VideoPlaylistUIEntity? = null,
         selectedSize: Int = 0,
-        accountType: AccountType? = AccountType.FREE,
+        shouldApplySensitiveMode: Boolean = false,
         isHideMenuActionVisible: Boolean = false,
         isUnhideMenuActionVisible: Boolean = false,
         modifier: Modifier = Modifier,
@@ -89,7 +88,7 @@ class VideoPlaylistDetailViewTest {
             VideoPlaylistDetailView(
                 playlist = playlist,
                 selectedSize = selectedSize,
-                accountType = accountType,
+                shouldApplySensitiveMode = shouldApplySensitiveMode,
                 isHideMenuActionVisible = isHideMenuActionVisible,
                 isUnhideMenuActionVisible = isUnhideMenuActionVisible,
                 modifier = modifier,

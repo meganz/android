@@ -20,7 +20,6 @@ import mega.privacy.android.app.presentation.view.extension.getNodeTitle
 import mega.privacy.android.app.presentation.view.extension.getSharesIcon
 import mega.privacy.android.app.presentation.view.previewdataprovider.SampleFolderNodeDataProvider
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
@@ -72,6 +71,7 @@ fun <T : TypedNode> NodeListView(
     showSortOrder: Boolean,
     listState: LazyListState,
     showMediaDiscoveryButton: Boolean,
+    shouldApplySensitiveMode: Boolean,
     fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
     highlightText: String = "",
@@ -81,7 +81,6 @@ fun <T : TypedNode> NodeListView(
     showPublicLinkCreationTime: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     inSelectionMode: Boolean = false,
-    accountType: AccountType? = null,
     nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) {
     LazyColumn(
@@ -140,7 +139,7 @@ fun <T : TypedNode> NodeListView(
                 isSensitive = nodeSourceType != NodeSourceType.INCOMING_SHARES
                         && nodeSourceType != NodeSourceType.OUTGOING_SHARES
                         && nodeSourceType != NodeSourceType.LINKS
-                        && accountType?.isPaid == true && (nodeUiItem.isMarkedSensitive || nodeUiItem.isSensitiveInherited),
+                        && shouldApplySensitiveMode && (nodeUiItem.isMarkedSensitive || nodeUiItem.isSensitiveInherited),
                 showBlurEffect = (nodeUiItem.node as? FileNode)?.type?.let { fileTypeInfo ->
                     fileTypeInfo is ImageFileTypeInfo || fileTypeInfo is VideoFileTypeInfo || fileTypeInfo is PdfFileTypeInfo || fileTypeInfo is AudioFileTypeInfo
                 } ?: false,
@@ -169,6 +168,7 @@ private fun NodeListViewPreview(
             showSortOrder = true,
             listState = LazyListState(),
             showMediaDiscoveryButton = false,
+            shouldApplySensitiveMode = false,
             modifier = Modifier,
             showChangeViewType = true,
             fileTypeIconMapper = FileTypeIconMapper()

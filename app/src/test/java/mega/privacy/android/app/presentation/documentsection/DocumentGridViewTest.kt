@@ -56,7 +56,7 @@ class DocumentGridViewTest {
         composeTestRule.setContent {
             DocumentGridView(
                 items = items,
-                accountType = null,
+                shouldApplySensitiveMode = false,
                 lazyGridState = lazyGridState,
                 sortOrder = sortOrder,
                 modifier = modifier,
@@ -87,7 +87,7 @@ class DocumentGridViewTest {
     }
 
     private fun getDocumentItem(
-        documentId: NodeId
+        documentId: NodeId,
     ) = mock<DocumentUiEntity> {
         on { id }.thenReturn(documentId)
         on { name }.thenReturn("document.txt")

@@ -20,6 +20,7 @@ import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.data.mapper.FileDurationMapper
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -67,6 +69,7 @@ class RubbishBinViewModel @Inject constructor(
     private val fileDurationMapper: FileDurationMapper,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
 
     /**
@@ -119,7 +122,18 @@ class RubbishBinViewModel @Inject constructor(
     private fun monitorAccountDetail() {
         monitorAccountDetailUseCase()
             .onEach { accountDetail ->
-                _state.update { it.copy(accountType = accountDetail.levelDetail?.accountType) }
+                val accountType = accountDetail.levelDetail?.accountType
+                val businessStatus =
+                    if (accountType?.isBusinessAccount == true) {
+                        getBusinessStatusUseCase()
+                    } else null
+
+                _state.update {
+                    it.copy(
+                        accountType = accountType,
+                        isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+                    )
+                }
                 setPendingRefreshNodes()
             }.catch { Timber.e(it) }
             .launchIn(viewModelScope)

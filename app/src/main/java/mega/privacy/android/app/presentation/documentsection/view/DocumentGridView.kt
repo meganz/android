@@ -12,7 +12,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewItem
@@ -20,7 +19,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewI
 @Composable
 internal fun DocumentGridView(
     items: List<DocumentUiEntity>,
-    accountType: AccountType?,
+    shouldApplySensitiveMode: Boolean,
     lazyGridState: LazyGridState,
     sortOrder: String,
     modifier: Modifier,
@@ -64,9 +63,9 @@ internal fun DocumentGridView(
                 modifier = Modifier
                     .testTag("$DOCUMENT_SECTION_GRID_ITEM_VIEW_TEST_TAG$it")
                     .alpha(0.5f.takeIf {
-                        accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited)
+                        shouldApplySensitiveMode && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited)
                     } ?: 1f),
-                isSensitive = accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited),
+                isSensitive = shouldApplySensitiveMode && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited),
                 showBlurEffect = true,
                 isSelected = documentItem.isSelected,
                 name = documentItem.name,

@@ -19,7 +19,9 @@ import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
 import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -36,6 +38,7 @@ class SelectSubtitleFileViewModel @Inject constructor(
     private val subtitleFileInfoItemMapper: SubtitleFileInfoItemMapper,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow<SubtitleLoadState>(SubtitleLoadState.Loading)
@@ -70,25 +73,36 @@ class SelectSubtitleFileViewModel @Inject constructor(
                 monitorShowHiddenItemsUseCase()
             ) { search, selected, subtitleFileInfoList, accountDetail, showHiddenItems ->
                 val accountType = accountDetail.levelDetail?.accountType
+                val businessStatus =
+                    if (accountType?.isBusinessAccount == true) {
+                        getBusinessStatusUseCase()
+                    } else null
+
+                val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+
                 val filteredItems =
                     filterNonSensitiveItems(
                         items = subtitleFileInfoList,
                         accountType = accountType,
-                        showHiddenItems = showHiddenItems
+                        showHiddenItems = showHiddenItems,
+                        isBusinessAccountExpired = isBusinessAccountExpired,
                     )
-                mapToSubtitleFileInfoItem(
-                    search,
-                    selected,
-                    filteredItems,
-                ) to accountType
-            }.collect { (list, accountType) ->
+                Triple(
+                    mapToSubtitleFileInfoItem(
+                        search,
+                        selected,
+                        filteredItems,
+                    ), accountType, isBusinessAccountExpired
+                )
+            }.collect { (list, accountType, isBusinessAccountExpired) ->
                 _state.update {
                     if (list.isEmpty()) {
                         SubtitleLoadState.Empty
                     } else {
                         SubtitleLoadState.Success(
                             items = list,
-                            accountType = accountType
+                            accountType = accountType,
+                            isBusinessAccountExpired = isBusinessAccountExpired,
                         )
                     }
                 }
@@ -182,9 +196,10 @@ class SelectSubtitleFileViewModel @Inject constructor(
         items: List<SubtitleFileInfo>,
         accountType: AccountType?,
         showHiddenItems: Boolean,
+        isBusinessAccountExpired: Boolean,
     ): List<SubtitleFileInfo> {
         accountType ?: return items
-        return if (showHiddenItems || !accountType.isPaid) {
+        return if (showHiddenItems || !accountType.isPaid || isBusinessAccountExpired) {
             items
         } else {
             items.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }

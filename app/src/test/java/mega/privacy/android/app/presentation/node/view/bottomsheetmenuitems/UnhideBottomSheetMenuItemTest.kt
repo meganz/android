@@ -11,10 +11,11 @@ import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -33,6 +34,7 @@ class UnhideBottomSheetMenuItemTest {
     private val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val accountType = mock<AccountType> {
         on { isPaid } doReturn true
     }
@@ -50,7 +52,8 @@ class UnhideBottomSheetMenuItemTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 

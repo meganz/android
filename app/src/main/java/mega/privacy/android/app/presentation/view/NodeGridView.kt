@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.getIcon
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
@@ -67,8 +66,8 @@ fun <T : TypedNode> NodeGridView(
     showChangeViewType: Boolean = true,
     isPublicNode: Boolean = false,
     inSelectionMode: Boolean = false,
+    shouldApplySensitiveMode: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
-    accountType: AccountType? = null,
     nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) {
     LazyVerticalGrid(
@@ -128,7 +127,7 @@ fun <T : TypedNode> NodeGridView(
                 isSensitive = nodeSourceType != NodeSourceType.INCOMING_SHARES
                         && nodeSourceType != NodeSourceType.OUTGOING_SHARES
                         && nodeSourceType != NodeSourceType.LINKS
-                        && accountType?.isPaid == true && (node.isMarkedSensitive || node.isSensitiveInherited),
+                        && shouldApplySensitiveMode && (node.isMarkedSensitive || node.isSensitiveInherited),
                 showBlurEffect = (nodeUIItems[it].node as? FileNode)?.type?.let { fileTypeInfo ->
                     fileTypeInfo is ImageFileTypeInfo || fileTypeInfo is VideoFileTypeInfo || fileTypeInfo is PdfFileTypeInfo || fileTypeInfo is AudioFileTypeInfo
                 } ?: false,

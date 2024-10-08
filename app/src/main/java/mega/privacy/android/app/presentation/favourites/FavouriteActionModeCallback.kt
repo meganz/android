@@ -69,15 +69,15 @@ class FavouriteActionModeCallback(
                 if (isHiddenNodesEnabled && isHidingActionAllowed) {
                     val includeSensitiveInheritedNode =
                         selectedNodes.any { it.isSensitiveInherited }
-                    val isPaid =
-                        viewModel.getIsPaidAccount()
+                    val isPaid = viewModel.getIsPaidAccount()
+                    val isBusinessAccountExpired = viewModel.getIsBusinessAccountExpired()
 
                     val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
                     menu.findItem(R.id.cab_menu_hide)?.isVisible =
-                        !isPaid || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
+                        !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
 
                     menu.findItem(R.id.cab_menu_unhide)?.isVisible =
-                        isPaid && !hasNonSensitiveNode && !includeSensitiveInheritedNode
+                        isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
                 } else {
                     menu.findItem(R.id.cab_menu_hide)?.isVisible = false
                     menu.findItem(R.id.cab_menu_unhide)?.isVisible = false

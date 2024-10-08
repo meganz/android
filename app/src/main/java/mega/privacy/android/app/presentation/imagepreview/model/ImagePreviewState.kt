@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.imagepreview.model
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NameCollision
 
@@ -20,7 +20,8 @@ data class ImagePreviewState(
     val nameCollision: NameCollision? = null,
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val showDeletedMessage: Boolean = false,
-    val accountDetail: AccountDetail? = null,
+    val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean? = null,
     val isMagnifierMode: Boolean = false,
+    val isBusinessAccountExpired: Boolean = false,
 )

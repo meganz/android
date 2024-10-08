@@ -267,11 +267,17 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                         if (favouritesState is FavouriteLoadState.Success) {
                             if (isList) {
                                 listAdapter.updateSelectionMode(favouritesState.selectedItems.isNotEmpty())
-                                listAdapter.updateAccountType(favouritesState.accountType)
+                                listAdapter.updateAccountType(
+                                    favouritesState.accountType,
+                                    favouritesState.isBusinessAccountExpired
+                                )
                                 listAdapter.submitList(favouritesState.favourites)
                             } else {
                                 gridAdapter.updateSelectionMode(favouritesState.selectedItems.isNotEmpty())
-                                gridAdapter.updateAccountType(favouritesState.accountType)
+                                gridAdapter.updateAccountType(
+                                    favouritesState.accountType,
+                                    favouritesState.isBusinessAccountExpired
+                                )
                                 gridAdapter.submitList(formatGridList(favouritesState))
                             }
                             handleSelectedItems(favouritesState.selectedItems)
@@ -648,8 +654,9 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     ) {
         val isHiddenNodesOnboarded = viewModel.isHiddenNodesOnboarded()
         val isPaid = viewModel.getIsPaidAccount()
+        val isBusinessAccountExpired = viewModel.getIsBusinessAccountExpired()
 
-        if (!isPaid) {
+        if (!isPaid || isBusinessAccountExpired) {
             val intent = HiddenNodesOnboardingActivity.createScreen(
                 context = requireContext(),
                 isOnboarding = false,

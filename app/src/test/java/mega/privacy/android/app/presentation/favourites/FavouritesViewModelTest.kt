@@ -27,6 +27,7 @@ import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
@@ -145,6 +146,7 @@ class FavouritesViewModelTest {
 
     private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()
     private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -182,7 +184,8 @@ class FavouritesViewModelTest {
             defaultDispatcher = UnconfinedTestDispatcher(),
             isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
             getNodeContentUriUseCase = getNodeContentUriUseCase,
-            getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase
+            getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 

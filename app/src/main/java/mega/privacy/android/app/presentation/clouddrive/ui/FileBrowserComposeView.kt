@@ -131,7 +131,8 @@ fun FileBrowserComposeView(
                         listContentPadding = PaddingValues(top = 18.dp, bottom = 86.dp),
                         fileTypeIconMapper = fileTypeIconMapper,
                         inSelectionMode = uiState.isInSelection,
-                        accountType = uiState.accountType,
+                        shouldApplySensitiveMode = uiState.accountType?.isPaid == true
+                                && !uiState.isBusinessAccountExpired,
                     )
                 }
             } else {

@@ -35,8 +35,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -131,9 +129,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
-import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
@@ -226,8 +222,6 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
     monitorVideoRepeatModeUseCase: MonitorVideoRepeatModeUseCase,
     savedStateHandle: SavedStateHandle,
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getOfflineNodesByParentIdUseCase: GetOfflineNodesByParentIdUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
@@ -379,8 +373,6 @@ class LegacyVideoPlayerViewModel @Inject constructor(
             }
         }
         setupTransferListener()
-        monitorAccountDetail()
-        monitorIsHiddenNodesOnboarded()
     }
 
     internal fun setPlayingReverted(value: Boolean) {
@@ -1957,32 +1949,6 @@ class LegacyVideoPlayerViewModel @Inject constructor(
         cancelSearch()
         clear()
     }
-
-    private fun monitorAccountDetail() {
-        monitorAccountDetailUseCase()
-            .onEach { accountDetail ->
-                _state.update {
-                    it.copy(accountType = accountDetail.levelDetail?.accountType)
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-
-    private fun monitorIsHiddenNodesOnboarded() {
-        viewModelScope.launch {
-            val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
-            _state.update {
-                it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
-            }
-        }
-    }
-
-    fun setHiddenNodesOnboarded() {
-        _state.update {
-            it.copy(isHiddenNodesOnboarded = true)
-        }
-    }
-
 
     companion object {
         private const val MEGA_SCREENSHOTS_FOLDER_NAME = "MEGA Screenshots/"

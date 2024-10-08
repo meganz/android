@@ -22,7 +22,9 @@ import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionBucketUIState
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetRootParentNodeUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
@@ -51,6 +53,7 @@ class RecentActionBucketViewModel @Inject constructor(
     private val getRootParentNodeUseCase: GetRootParentNodeUseCase,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
     private val _actionMode = MutableLiveData<Boolean>()
 
@@ -119,8 +122,18 @@ class RecentActionBucketViewModel @Inject constructor(
         viewModelScope.launch {
             monitorAccountDetailUseCase()
                 .collect { accountDetail ->
+                    val accountType = accountDetail.levelDetail?.accountType
+                    val businessStatus =
+                        if (accountType?.isBusinessAccount == true) {
+                            getBusinessStatusUseCase()
+                        } else null
+
+                    val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
                     _state.update {
-                        it.copy(accountDetail = accountDetail)
+                        it.copy(
+                            accountType = accountDetail.levelDetail?.accountType,
+                            isBusinessAccountExpired = isBusinessAccountExpired,
+                        )
                     }
                 }
         }

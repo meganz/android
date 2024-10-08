@@ -33,7 +33,6 @@ import mega.privacy.android.app.presentation.videosection.model.VideosFilterOpti
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionLoadingView
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
@@ -45,7 +44,7 @@ import nz.mega.sdk.MegaNode
 @Composable
 internal fun AllVideosView(
     items: List<VideoUIEntity>,
-    accountType: AccountType?,
+    shouldApplySensitiveMode: Boolean,
     progressBarShowing: Boolean,
     searchMode: Boolean,
     scrollToTop: Boolean,
@@ -190,9 +189,9 @@ internal fun AllVideosView(
                                 onLongClick = { onLongClick(videoItem, it) },
                                 modifier = Modifier
                                     .alpha(0.5f.takeIf {
-                                        accountType?.isPaid == true && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited)
+                                        shouldApplySensitiveMode && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited)
                                     } ?: 1f),
-                                isSensitive = accountType?.isPaid == true && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited),
+                                isSensitive = shouldApplySensitiveMode && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited),
                             )
                         }
                     }
@@ -261,7 +260,7 @@ private fun AllVideosViewPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         AllVideosView(
             items = emptyList(),
-            accountType = null,
+            shouldApplySensitiveMode = false,
             progressBarShowing = false,
             searchMode = false,
             scrollToTop = false,

@@ -14,6 +14,8 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.recentactions.mapper.RecentActionBucketUiEntityMapper
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsUiState
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -39,6 +41,7 @@ class RecentActionsComposeViewModel @Inject constructor(
     getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
 
     /** private mutable UI state */
@@ -93,9 +96,20 @@ class RecentActionsComposeViewModel @Inject constructor(
         viewModelScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
                 monitorAccountDetailUseCase()
-                    .collectLatest {
-                        _uiState.update { state ->
-                            state.copy(accountType = it.levelDetail?.accountType)
+                    .collectLatest { accountDetail ->
+                        val accountType = accountDetail.levelDetail?.accountType
+                        val businessStatus =
+                            if (accountType?.isBusinessAccount == true) {
+                                getBusinessStatusUseCase()
+                            } else null
+
+                        val isBusinessAccountExpired =
+                            businessStatus == BusinessAccountStatus.Expired
+                        _uiState.update {
+                            it.copy(
+                                accountType = accountDetail.levelDetail?.accountType,
+                                isBusinessAccountExpired = isBusinessAccountExpired,
+                            )
                         }
                     }
             }

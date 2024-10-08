@@ -56,14 +56,16 @@ internal class DocumentSectionActionModeCallback(
             if (isHiddenNodesEnabled) {
                 val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
                 val isPaid =
-                    documentSectionViewModel.uiState.value.accountDetail?.levelDetail?.accountType?.isPaid
+                    documentSectionViewModel.uiState.value.accountType?.isPaid
                         ?: false
+                val isBusinessAccountExpired =
+                    documentSectionViewModel.uiState.value.isBusinessAccountExpired
 
                 menu?.findItem(R.id.cab_menu_hide)?.isVisible =
-                    !isPaid || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
+                    !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
 
                 menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
-                    isPaid && !hasNonSensitiveNode && !includeSensitiveInheritedNode
+                    isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
             } else {
                 menu?.findItem(R.id.cab_menu_hide)?.isVisible = false
                 menu?.findItem(R.id.cab_menu_unhide)?.isVisible = false

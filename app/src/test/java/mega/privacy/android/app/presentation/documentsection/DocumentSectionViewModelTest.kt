@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.presentation.documentsection.DocumentSectionViewModel
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntityMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -50,7 +51,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
-import mega.privacy.android.app.TimberJUnit5Extension
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExtendWith(TimberJUnit5Extension::class)
@@ -94,9 +94,9 @@ class DocumentSectionViewModelTest {
         }.thenReturn(false)
     }
 
-
     private val expectedDocument =
         mock<DocumentUiEntity> { on { name }.thenReturn("document name") }
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -132,6 +132,7 @@ class DocumentSectionViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 

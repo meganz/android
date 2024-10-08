@@ -51,6 +51,8 @@ class FavouritesGridAdapter(
 
     private var selectionMode = false
     private var accountType: AccountType? = null
+    private var isBusinessAccountExpired: Boolean = false
+
     override fun getItemViewType(position: Int): Int = getItem(position).type
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavouritesGridViewHolder {
@@ -86,6 +88,7 @@ class FavouritesGridAdapter(
             onLongClicked = onLongClicked,
             selectionMode = selectionMode,
             accountType = accountType,
+            isBusinessAccountExpired = isBusinessAccountExpired,
         )
     }
 
@@ -106,8 +109,9 @@ class FavouritesGridAdapter(
         selectionMode = isSelectionMode
     }
 
-    fun updateAccountType(accountType: AccountType?) {
+    fun updateAccountType(accountType: AccountType?, isBusinessAccountExpired: Boolean) {
         this.accountType = accountType
+        this.isBusinessAccountExpired = isBusinessAccountExpired
     }
 
 }
@@ -135,6 +139,7 @@ class FavouritesGridViewHolder(
         onLongClicked: (info: Favourite) -> Boolean,
         selectionMode: Boolean,
         accountType: AccountType?,
+        isBusinessAccountExpired: Boolean,
     ) {
         with(binding) {
             when (this) {
@@ -155,7 +160,8 @@ class FavouritesGridViewHolder(
                             folderGridTakenDown.isVisible = info.typedNode.isTakenDown
                             textViewSettings(folderGridFilename, info)
                             if (selectionMode) {
-                                folderGridCheckIcon.visibility = if(info.isSelected)View.VISIBLE else View.INVISIBLE
+                                folderGridCheckIcon.visibility =
+                                    if (info.isSelected) View.VISIBLE else View.INVISIBLE
                                 folderGridThreeDots.visibility = View.GONE
                             } else {
                                 folderGridThreeDots.visibility = View.VISIBLE
@@ -176,7 +182,8 @@ class FavouritesGridViewHolder(
                             }
 
                             if (selectionMode) {
-                                fileGridCheckIcon.visibility = if(info.isSelected)View.VISIBLE else View.INVISIBLE
+                                fileGridCheckIcon.visibility =
+                                    if (info.isSelected) View.VISIBLE else View.INVISIBLE
                                 fileGridThreeDots.visibility = View.GONE
                             } else {
                                 fileGridThreeDots.visibility = View.VISIBLE
@@ -205,8 +212,8 @@ class FavouritesGridViewHolder(
                         itemGirdFavourite.apply {
                             handleSensitiveEffect(
                                 view = itemGirdFavourite,
-                                accountType = accountType,
-                                favouriteNode = info.typedNode
+                                shouldApplySensitiveMode = accountType?.isPaid == true && !isBusinessAccountExpired,
+                                favouriteNode = info.typedNode,
                             )
                             setOnLongClickListener {
                                 onLongClicked(info)
@@ -234,11 +241,11 @@ class FavouritesGridViewHolder(
 
     private fun handleSensitiveEffect(
         view: View,
-        accountType: AccountType?,
+        shouldApplySensitiveMode: Boolean,
         favouriteNode: TypedNode,
     ) {
         val isSensitive =
-            accountType?.isPaid == true && (favouriteNode.isMarkedSensitive || favouriteNode.isSensitiveInherited)
+            shouldApplySensitiveMode && (favouriteNode.isMarkedSensitive || favouriteNode.isSensitiveInherited)
         view.setAlpha(if (isSensitive) 0.5f else 1f)
     }
 

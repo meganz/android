@@ -100,12 +100,13 @@ fun MediaDiscoveryView(
     onStartModalSheetShow: () -> Unit,
     onEndModalSheetHide: () -> Unit,
     onModalSheetVisibilityChange: (Boolean) -> Unit,
+    onStorageFullWarningDismiss: () -> Unit,
+    onUpgradeClicked: () -> Unit,
     mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = viewModel(),
     mediaDiscoveryViewModel: MediaDiscoveryViewModel = viewModel(),
     showSettingDialog: Boolean = false,
-    onStorageFullWarningDismiss: () -> Unit,
-    onUpgradeClicked: () -> Unit,
-) {
+
+    ) {
     val mediaDiscoveryViewState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
     val hasUIPhoto = mediaDiscoveryViewState.uiPhotoList.isNotEmpty()
     val shouldShowFabButton = mediaDiscoveryViewState.selectedTimeBarTab == TimeBarTab.All
@@ -427,10 +428,10 @@ private fun MDView(
     onTimeBarTabSelected: (TimeBarTab) -> Unit,
     onSwitchListView: () -> Unit,
     addFabButton: @Composable () -> Unit,
-    photoDownloaderViewModel: PhotoDownloaderViewModel = viewModel(),
-    showSettingDialog: Boolean = false,
     onStorageFullWarningDismiss: () -> Unit,
     onUpgradeClicked: () -> Unit,
+    photoDownloaderViewModel: PhotoDownloaderViewModel = viewModel(),
+    showSettingDialog: Boolean = false,
 ) {
     val lazyGridState = rememberSaveable(
         mediaDiscoveryViewState.scrollStartIndex,

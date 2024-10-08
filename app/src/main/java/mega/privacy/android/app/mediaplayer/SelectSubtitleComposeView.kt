@@ -167,10 +167,14 @@ internal fun SelectSubtitleView(
     var accountType: AccountType? by remember {
         mutableStateOf(null)
     }
+    var isBusinessAccountExpired by remember {
+        mutableStateOf(false)
+    }
 
     if (uiState is SubtitleLoadState.Success) {
         items = uiState.items
         accountType = uiState.accountType
+        isBusinessAccountExpired = uiState.isBusinessAccountExpired
     }
     Scaffold(
         modifier = Modifier.systemBarsPadding(),
@@ -234,6 +238,7 @@ internal fun SelectSubtitleView(
                         else -> SubtitleFileInfoListView(
                             subtitleInfoList = items,
                             accountType = accountType,
+                            isBusinessAccountExpired = isBusinessAccountExpired,
                         ) { index ->
                             itemClicked(index)
                         }
@@ -290,6 +295,7 @@ internal fun SelectSubtitleView(
 internal fun SubtitleFileInfoListItem(
     subtitleFileInfoItem: SubtitleFileInfoItem,
     accountType: AccountType?,
+    isBusinessAccountExpired: Boolean,
     onSubtitleFileInfoClicked: (SubtitleFileInfo) -> Unit,
 ) {
     val rotation = remember { Animatable(0f) }
@@ -309,7 +315,7 @@ internal fun SubtitleFileInfoListItem(
                 onSubtitleFileInfoClicked(subtitleFileInfoItem.subtitleFileInfo)
             }
             .alpha(1f.takeIf {
-                !isSensitive(accountType, subtitleFileInfoItem)
+                !isSensitive(accountType, isBusinessAccountExpired, subtitleFileInfoItem)
             } ?: 0.5f)
     ) {
         Row {
@@ -330,7 +336,13 @@ internal fun SubtitleFileInfoListItem(
                     .graphicsLayer {
                         rotationY = rotation.value
                     }
-                    .blur(16.dp.takeIf { isSensitive(accountType, subtitleFileInfoItem) } ?: 0.dp)
+                    .blur(16.dp.takeIf {
+                        isSensitive(
+                            accountType,
+                            isBusinessAccountExpired,
+                            subtitleFileInfoItem
+                        )
+                    } ?: 0.dp)
             )
             Column(
                 modifier = Modifier
@@ -363,8 +375,9 @@ internal fun SubtitleFileInfoListItem(
 @Composable
 private fun isSensitive(
     accountType: AccountType?,
+    isBusinessAccountExpired: Boolean,
     subtitleFileInfoItem: SubtitleFileInfoItem,
-) = (accountType?.isPaid == true
+) = (accountType?.isPaid == true && !isBusinessAccountExpired
         && (subtitleFileInfoItem.subtitleFileInfo.isMarkedSensitive
         || subtitleFileInfoItem.subtitleFileInfo.isSensitiveInherited))
 
@@ -412,6 +425,7 @@ internal fun SubtitleEmptyView(
 internal fun SubtitleFileInfoListView(
     subtitleInfoList: List<SubtitleFileInfoItem>,
     accountType: AccountType?,
+    isBusinessAccountExpired: Boolean,
     onClicked: (SubtitleFileInfo) -> Unit,
 ) {
     Timber.d("render SubtitleFileInfoListView")
@@ -426,6 +440,7 @@ internal fun SubtitleFileInfoListView(
                 SubtitleFileInfoListItem(
                     subtitleFileInfoItem = item,
                     accountType = accountType,
+                    isBusinessAccountExpired = isBusinessAccountExpired,
                     onSubtitleFileInfoClicked = onClicked
                 )
             })
@@ -541,6 +556,7 @@ private fun PreviewSubtitleFileInfoListItem() {
                 )
             ),
             accountType = AccountType.FREE,
+            isBusinessAccountExpired = false,
             onSubtitleFileInfoClicked = { }
         )
     }
@@ -553,6 +569,7 @@ private fun PreviewSubtitleFileInfoListView() {
         SubtitleFileInfoListView(
             getTestSubtitleFileInfoList(),
             accountType = AccountType.FREE,
+            isBusinessAccountExpired = false,
         ) { }
     }
 }

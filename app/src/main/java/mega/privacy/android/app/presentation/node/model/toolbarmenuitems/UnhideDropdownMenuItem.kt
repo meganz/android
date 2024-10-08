@@ -7,7 +7,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.node.model.menuaction.UnhideDropdownMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.UnhideMenuAction
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -26,6 +28,7 @@ class UnhideDropdownMenuItem @Inject constructor(
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : NodeToolbarMenuItem<MenuAction> {
 
     override suspend fun shouldDisplay(
@@ -43,7 +46,8 @@ class UnhideDropdownMenuItem @Inject constructor(
         if (!isHiddenNodesEnabled) return false
 
         val isPaid = monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
-        if (!isPaid) return false
+        val isBusinessAccountExpired = getBusinessStatusUseCase() == BusinessAccountStatus.Expired
+        if (!isPaid || isBusinessAccountExpired) return false
 
         if (selectedNodes.any { !isHidingActionAllowedUseCase(it.id) }) return false
 

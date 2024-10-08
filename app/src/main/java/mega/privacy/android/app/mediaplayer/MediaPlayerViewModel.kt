@@ -19,11 +19,13 @@ import mega.privacy.android.app.mediaplayer.model.MediaPlayerState
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
@@ -46,6 +48,7 @@ class MediaPlayerViewModel @Inject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val getChatFileUseCase: GetChatFileUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
@@ -72,7 +75,7 @@ class MediaPlayerViewModel @Inject constructor(
      */
     val renameUpdate: LiveData<MegaNode?> = _renameUpdate
 
-    private val _state = MutableStateFlow(MediaPlayerState(null, false))
+    private val _state = MutableStateFlow(MediaPlayerState())
     internal val state: StateFlow<MediaPlayerState> = _state
 
     private val _metadataState = MutableStateFlow(Metadata(null, null, null, ""))
@@ -249,8 +252,18 @@ class MediaPlayerViewModel @Inject constructor(
     private fun monitorAccountDetail() {
         monitorAccountDetailUseCase()
             .onEach { accountDetail ->
+                val accountType = accountDetail.levelDetail?.accountType
+                val businessStatus =
+                    if (accountType?.isBusinessAccount == true) {
+                        getBusinessStatusUseCase()
+                    } else null
+
+                val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
                 _state.update {
-                    it.copy(accountType = accountDetail.levelDetail?.accountType)
+                    it.copy(
+                        accountType = accountDetail.levelDetail?.accountType,
+                        isBusinessAccountExpired = isBusinessAccountExpired,
+                    )
                 }
             }
             .launchIn(viewModelScope)

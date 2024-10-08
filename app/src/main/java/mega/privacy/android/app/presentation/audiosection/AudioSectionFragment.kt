@@ -268,12 +268,14 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
     suspend fun handleHideNodeClick() {
         var isPaid: Boolean
         var isHiddenNodesOnboarded: Boolean
+        var isBusinessAccountExpired: Boolean
         with(audioSectionViewModel.state.value) {
-            isPaid = this.accountDetail?.levelDetail?.accountType?.isPaid ?: false
+            isPaid = this.accountType?.isPaid ?: false
             isHiddenNodesOnboarded = this.isHiddenNodesOnboarded
+            isBusinessAccountExpired = this.isBusinessAccountExpired
         }
 
-        if (!isPaid) {
+        if (!isPaid || isBusinessAccountExpired) {
             val intent = HiddenNodesOnboardingActivity.createScreen(
                 context = requireContext(),
                 isOnboarding = false,

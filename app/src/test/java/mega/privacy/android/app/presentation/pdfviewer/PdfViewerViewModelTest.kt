@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -68,6 +69,7 @@ internal class PdfViewerViewModelTest {
         }.thenReturn(false)
     }
     private val savedStateHandle = mock<SavedStateHandle>()
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -81,6 +83,7 @@ internal class PdfViewerViewModelTest {
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             getChatFileUseCase = getChatFileUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
             savedStateHandle = savedStateHandle,
         )
     }

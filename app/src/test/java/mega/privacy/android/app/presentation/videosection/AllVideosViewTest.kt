@@ -20,7 +20,6 @@ import mega.privacy.android.app.presentation.videosection.view.allvideos.AllVide
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEOS_EMPTY_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEOS_FILTER_BUTTON_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEOS_LIST_TEST_TAG
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.Before
 import org.junit.Rule
@@ -46,7 +45,7 @@ class AllVideosViewTest {
 
     private fun setComposeContent(
         items: List<VideoUIEntity> = emptyList(),
-        accountType: AccountType? = null,
+        shouldApplySensitiveMode: Boolean = false,
         progressBarShowing: Boolean = false,
         searchMode: Boolean = false,
         scrollToTop: Boolean = false,
@@ -65,7 +64,7 @@ class AllVideosViewTest {
         composeTestRule.setContent {
             AllVideosView(
                 items = items,
-                accountType = accountType,
+                shouldApplySensitiveMode = shouldApplySensitiveMode,
                 progressBarShowing = progressBarShowing,
                 searchMode = searchMode,
                 scrollToTop = scrollToTop,

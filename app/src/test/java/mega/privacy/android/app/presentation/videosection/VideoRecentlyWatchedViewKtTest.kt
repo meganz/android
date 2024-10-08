@@ -22,7 +22,6 @@ import mega.privacy.android.app.presentation.videosection.view.recentlywatched.V
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.VIDEO_RECENTLY_WATCHED_HEADER_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.VIDEO_RECENTLY_WATCHED_TOP_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.VideoRecentlyWatchedView
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.Rule
 import org.junit.Test
@@ -57,7 +56,7 @@ class VideoRecentlyWatchedViewKtTest {
 
     private fun setComposeContent(
         group: Map<Long, List<VideoUIEntity>> = emptyMap(),
-        accountType: AccountType? = AccountType.FREE,
+        shouldApplySensitiveMode: Boolean = false,
         clearRecentlyWatchedVideosSuccess: StateEvent = consumed,
         removeRecentlyWatchedItemSuccess: StateEvent = consumed,
         modifier: Modifier = Modifier,
@@ -70,7 +69,7 @@ class VideoRecentlyWatchedViewKtTest {
     ) {
         composeTestRule.setContent {
             VideoRecentlyWatchedView(
-                accountType = accountType,
+                shouldApplySensitiveMode = shouldApplySensitiveMode,
                 group = group,
                 clearRecentlyWatchedVideosSuccess = clearRecentlyWatchedVideosSuccess,
                 removeRecentlyWatchedItemSuccess = removeRecentlyWatchedItemSuccess,

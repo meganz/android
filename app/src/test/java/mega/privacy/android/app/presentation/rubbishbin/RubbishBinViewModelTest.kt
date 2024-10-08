@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -69,6 +70,7 @@ class RubbishBinViewModelTest {
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val accountDetailFakeFlow = MutableSharedFlow<AccountDetail>()
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -92,6 +94,7 @@ class RubbishBinViewModelTest {
             fileDurationMapper = fileDurationMapper,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 

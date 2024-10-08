@@ -347,11 +347,12 @@ class MediaDiscoveryFragment : Fragment() {
     }
 
     fun handleHideNodeClick() {
-        val (isPaid, isHiddenNodesOnboarded) = with(mediaDiscoveryViewModel.state.value) {
-            (this.accountType?.isPaid ?: false) to this.isHiddenNodesOnboarded
-        }
+        val state = mediaDiscoveryViewModel.state.value
+        val isPaid = state.accountType?.isPaid ?: false
+        val isHiddenNodesOnboarded = state.isHiddenNodesOnboarded
+        val isBusinessAccountExpired = state.isBusinessAccountExpired
 
-        if (!isPaid) {
+        if (!isPaid || isBusinessAccountExpired) {
             val intent = HiddenNodesOnboardingActivity.createScreen(
                 context = requireContext(),
                 isOnboarding = false,

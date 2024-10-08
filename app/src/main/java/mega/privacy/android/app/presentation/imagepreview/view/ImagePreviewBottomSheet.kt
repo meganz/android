@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
-import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
@@ -86,7 +86,8 @@ internal fun ImagePreviewBottomSheet(
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
     getImageThumbnailPath: suspend (ImageResult?) -> String?,
     isAvailableOffline: Boolean = false,
-    accountDetail: AccountDetail? = null,
+    accountType: AccountType? = null,
+    isBusinessAccountExpired: Boolean = false,
     isHiddenNodesEnabled: Boolean = false,
     isHiddenNodesOnboarded: Boolean? = null,
     onClickInfo: () -> Unit = {},
@@ -132,8 +133,6 @@ internal fun ImagePreviewBottomSheet(
             val labelColorText = remember(imageNode) {
                 MegaNodeUtil.getNodeLabelText(imageNode.label, context)
             }
-
-            val accountType = accountDetail?.levelDetail?.accountType
 
             val isInfoMenuVisible by produceState(false, imageNode) {
                 value = showInfoMenu(imageNode)
@@ -412,7 +411,7 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (isHiddenNodesEnabled && !forceHideHiddenMenus() && accountType != null && (!accountType.isPaid || (isHideMenuVisible && isHiddenNodesOnboarded != null))) {
+                if (isHiddenNodesEnabled && !forceHideHiddenMenus() && accountType != null && (!accountType.isPaid || isBusinessAccountExpired || (isHideMenuVisible && isHiddenNodesOnboarded != null))) {
                     MenuActionListTile(
                         icon = painterResource(id = IconPack.drawable.ic_eye_off_medium_regular_outline),
                         text = stringResource(id = R.string.general_hide_node),
@@ -420,7 +419,7 @@ internal fun ImagePreviewBottomSheet(
                         dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_HIDE),
                         trailingItem = {
-                            if (!accountType.isPaid) {
+                            if (!accountType.isPaid || isBusinessAccountExpired) {
                                 Text(
                                     text = stringResource(id = R.string.general_pro_only),
                                     color = teal_300.takeIf { isLight } ?: teal_200,
@@ -442,7 +441,7 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (isHiddenNodesEnabled && !forceHideHiddenMenus() && accountType?.isPaid == true && isUnHideMenuVisible) {
+                if (isHiddenNodesEnabled && !forceHideHiddenMenus() && accountType?.isPaid == true && !isBusinessAccountExpired && isUnHideMenuVisible) {
                     MenuActionListTile(
                         icon = painterResource(id = IconPack.drawable.ic_eye_medium_regular_outline),
                         text = stringResource(id = R.string.general_unhide_node),

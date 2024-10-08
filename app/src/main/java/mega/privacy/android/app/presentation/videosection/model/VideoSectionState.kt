@@ -2,8 +2,8 @@ package mega.privacy.android.app.presentation.videosection.model
 
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 
@@ -34,7 +34,8 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property areVideoPlaylistsRemovedSuccessfully true if the video playlists are removed successfully
  * @property currentDestinationRoute the current destination route
  * @property updateToolbarTitle true is to update toolbar title
- * @property accountDetail the account detail
+ * @property accountType the account type
+ * @property isBusinessAccountExpired if the business account is expired
  * @property isHiddenNodesOnboarded if is hidden nodes onboarded
  * @property clickedItem the clicked item
  * @property clickedPlaylistDetailItem the clicked playlist detail item
@@ -72,7 +73,8 @@ data class VideoSectionState(
     val areVideoPlaylistsRemovedSuccessfully: Boolean = false,
     val currentDestinationRoute: String? = null,
     val updateToolbarTitle: String? = null,
-    val accountDetail: AccountDetail? = null,
+    val accountType: AccountType? = null,
+    val isBusinessAccountExpired: Boolean = false,
     val isHiddenNodesOnboarded: Boolean = false,
     val clickedItem: TypedVideoNode? = null,
     val clickedPlaylistDetailItem: TypedVideoNode? = null,

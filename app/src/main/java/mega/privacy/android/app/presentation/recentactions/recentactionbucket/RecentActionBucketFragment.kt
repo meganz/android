@@ -538,8 +538,9 @@ class RecentActionBucketFragment : Fragment() {
 
     fun onHideClicked(nodeIds: List<NodeId>) {
         val isHiddenNodesOnboarded = viewModel.state.value.isHiddenNodesOnboarded ?: false
-        val isPaid = viewModel.state.value.accountDetail?.levelDetail?.accountType?.isPaid ?: false
-        if (!isPaid) {
+        val isPaid = viewModel.state.value.accountType?.isPaid ?: false
+        val isBusinessAccountExpired = viewModel.state.value.isBusinessAccountExpired
+        if (!isPaid || isBusinessAccountExpired) {
             val intent = HiddenNodesOnboardingActivity.createScreen(
                 context = requireContext(),
                 isOnboarding = false,

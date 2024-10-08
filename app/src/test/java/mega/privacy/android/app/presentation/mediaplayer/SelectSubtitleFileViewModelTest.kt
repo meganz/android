@@ -30,6 +30,7 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import mega.privacy.android.app.TimberJUnit5Extension
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -42,6 +43,7 @@ internal class SelectSubtitleFileViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val accountDetailFakeFlow = MutableSharedFlow<AccountDetail>()
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -60,6 +62,7 @@ internal class SelectSubtitleFileViewModelTest {
             savedStateHandle = SavedStateHandle(),
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 

@@ -26,12 +26,14 @@ import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMa
 import mega.privacy.android.app.presentation.favourites.model.mapper.HeaderMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
@@ -84,6 +86,7 @@ class FavouritesViewModel @Inject constructor(
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
 
     private val query = MutableStateFlow<String?>(null)
@@ -135,15 +138,25 @@ class FavouritesViewModel @Inject constructor(
                 query,
             ) { accountDetail, isHiddenNodesOnboarded, favouritesState, showHiddenItems, search ->
                 if (favouritesState is FavouriteLoadState.Success) {
+                    val accountType = accountDetail.levelDetail?.accountType
+                    val businessStatus =
+                        if (accountType?.isBusinessAccount == true) {
+                            getBusinessStatusUseCase()
+                        } else null
+
+                    val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+
                     val filteredItems = filterNonSensitiveItems(
                         items = favouritesState.favourites,
                         showHiddenItems = showHiddenItems,
-                        isPaid = accountDetail.levelDetail?.accountType?.isPaid,
+                        isPaid = accountType?.isPaid,
+                        isBusinessAccountExpired = isBusinessAccountExpired,
                     )
                     if (filteredItems.any { it is FavouriteListItem }) {
                         favouritesState.copy(
                             favourites = filteredItems,
-                            accountType = accountDetail.levelDetail?.accountType,
+                            accountType = accountType,
+                            isBusinessAccountExpired = isBusinessAccountExpired,
                             isHiddenNodesOnboarded = isHiddenNodesOnboarded
                         )
                     } else {
@@ -162,11 +175,12 @@ class FavouritesViewModel @Inject constructor(
         items: List<FavouriteItem>,
         showHiddenItems: Boolean?,
         isPaid: Boolean?,
+        isBusinessAccountExpired: Boolean,
     ) = withContext(defaultDispatcher) {
         showHiddenItems ?: return@withContext items
         isPaid ?: return@withContext items
 
-        return@withContext if (showHiddenItems || !isPaid) {
+        return@withContext if (showHiddenItems || !isPaid || isBusinessAccountExpired) {
             items
         } else {
             items.filter {
@@ -381,6 +395,12 @@ class FavouritesViewModel @Inject constructor(
         return (state as? FavouriteLoadState.Success)
             ?.accountType
             ?.isPaid ?: false
+    }
+
+    fun getIsBusinessAccountExpired(): Boolean {
+        val state = _state.value
+        return (state as? FavouriteLoadState.Success)
+            ?.isBusinessAccountExpired ?: false
     }
 
     fun isHiddenNodesOnboarded(): Boolean {

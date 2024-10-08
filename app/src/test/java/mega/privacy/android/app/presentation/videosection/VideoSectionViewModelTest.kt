@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -145,6 +146,8 @@ class VideoSectionViewModelTest {
         }
     }
 
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+
     @BeforeEach
     fun setUp() {
         wheneverBlocking { monitorNodeUpdatesUseCase() }.thenReturn(fakeMonitorNodeUpdatesFlow)
@@ -190,7 +193,8 @@ class VideoSectionViewModelTest {
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             getVideoRecentlyWatchedUseCase = getVideoRecentlyWatchedUseCase,
             clearRecentlyWatchedVideosUseCase = clearRecentlyWatchedVideosUseCase,
-            removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase
+            removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 

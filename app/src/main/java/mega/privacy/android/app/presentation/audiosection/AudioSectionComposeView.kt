@@ -41,7 +41,6 @@ fun AudioSectionComposeView(
     val progressBarShowing = uiState.progressBarShowing
     val items = uiState.allAudios
     val scrollToTop = uiState.scrollToTop
-    val accountType = uiState.accountDetail?.levelDetail?.accountType
 
     LaunchedEffect(items) {
         if (scrollToTop) {
@@ -78,7 +77,8 @@ fun AudioSectionComposeView(
             else -> {
                 AudiosView(
                     items = items,
-                    accountType = accountType,
+                    shouldApplySensitiveMode = uiState.accountType?.isPaid == true
+                            && !uiState.isBusinessAccountExpired,
                     isListView = uiState.currentViewType == ViewType.LIST,
                     listState = listState,
                     gridState = gridState,

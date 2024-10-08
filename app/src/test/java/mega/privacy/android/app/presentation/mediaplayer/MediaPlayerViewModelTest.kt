@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
@@ -58,6 +59,7 @@ internal class MediaPlayerViewModelTest {
             invoke()
         }.thenReturn(false)
     }
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -69,6 +71,7 @@ internal class MediaPlayerViewModelTest {
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             getChatFileUseCase = getChatFileUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 

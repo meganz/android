@@ -24,10 +24,12 @@ import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEnt
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntityMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -75,6 +77,7 @@ class DocumentSectionViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DocumentSectionUiState())
     internal val uiState = _uiState.asStateFlow()
@@ -119,9 +122,16 @@ class DocumentSectionViewModel @Inject constructor(
             monitorShowHiddenItemsUseCase(),
         ) { _, accountDetail, showHiddenItems ->
             this@DocumentSectionViewModel.showHiddenItems = showHiddenItems
+            val accountType = accountDetail.levelDetail?.accountType
+            val businessStatus =
+                if (accountType?.isBusinessAccount == true) {
+                    getBusinessStatusUseCase()
+                } else null
+
             _uiState.update {
                 it.copy(
-                    accountDetail = accountDetail,
+                    accountType = accountType,
+                    isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
                 )
             }
             refreshDocumentNodes()
@@ -134,11 +144,12 @@ class DocumentSectionViewModel @Inject constructor(
         items: List<DocumentUiEntity>,
         showHiddenItems: Boolean?,
         isPaid: Boolean?,
+        isBusinessAccountExpired: Boolean,
     ) = withContext(defaultDispatcher) {
         showHiddenItems ?: return@withContext items
         isPaid ?: return@withContext items
 
-        return@withContext if (showHiddenItems || !isPaid) {
+        return@withContext if (showHiddenItems || !isPaid || isBusinessAccountExpired) {
             items
         } else {
             items.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
@@ -150,7 +161,8 @@ class DocumentSectionViewModel @Inject constructor(
             filterNonSensitiveItems(
                 items = getDocumentUIEntityList(),
                 showHiddenItems = showHiddenItems,
-                isPaid = _uiState.value.accountDetail?.levelDetail?.accountType?.isPaid,
+                isPaid = _uiState.value.accountType?.isPaid,
+                isBusinessAccountExpired = _uiState.value.isBusinessAccountExpired,
             ).updateOriginalData().filterDocumentsBySearchQuery()
         }.onSuccess { documentList ->
             val sortOrder = getCloudSortOrder()

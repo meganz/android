@@ -127,7 +127,8 @@ internal fun VideoSectionNavHost(
             VideoPlaylistDetailView(
                 playlist = state.currentVideoPlaylist,
                 selectedSize = state.selectedVideoElementIDs.size,
-                accountType = state.accountDetail?.levelDetail?.accountType,
+                shouldApplySensitiveMode = state.accountType?.isPaid == true
+                        && !state.isBusinessAccountExpired,
                 isHideMenuActionVisible = state.isHideMenuActionVisible,
                 isUnhideMenuActionVisible = state.isUnhideMenuActionVisible,
                 isInputTitleValid = state.isInputTitleValid,
@@ -176,7 +177,8 @@ internal fun VideoSectionNavHost(
         composable(route = videoRecentlyWatchedRoute) {
             VideoRecentlyWatchedView(
                 group = state.groupedVideoRecentlyWatchedItems,
-                accountType = state.accountDetail?.levelDetail?.accountType,
+                shouldApplySensitiveMode = state.accountType?.isPaid == true
+                        && !state.isBusinessAccountExpired,
                 clearRecentlyWatchedVideosSuccess = state.clearRecentlyWatchedVideosSuccess,
                 removeRecentlyWatchedItemSuccess = state.removeRecentlyWatchedItemSuccess,
                 modifier = Modifier,

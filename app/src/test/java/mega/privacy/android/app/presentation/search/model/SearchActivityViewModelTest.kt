@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.search.TypeFilterOption
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
@@ -80,6 +81,7 @@ class SearchActivityViewModelTest {
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
     private val accountDetailFakeFlow = MutableSharedFlow<AccountDetail>()
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
 
 
     private val nodeList = mutableListOf<TypedNode>()
@@ -114,6 +116,7 @@ class SearchActivityViewModelTest {
             searchUseCase = searchUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 

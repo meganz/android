@@ -22,6 +22,7 @@ import nz.mega.sdk.MegaNode
  *  @property isRubbishBinEmpty If parent rubbish is empty or not
  *  @property restoreType Determines the specific "Restore" behavior
  *  @property accountType
+ *  @property isBusinessAccountExpired
  */
 data class RubbishBinState(
     val rubbishBinHandle: Long = -1L,
@@ -38,4 +39,5 @@ data class RubbishBinState(
     val isRubbishBinEmpty: Boolean = false,
     val restoreType: RestoreType? = null,
     val accountType: AccountType? = null,
+    val isBusinessAccountExpired: Boolean = false,
 )

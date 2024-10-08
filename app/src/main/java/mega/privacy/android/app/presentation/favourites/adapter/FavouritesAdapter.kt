@@ -49,6 +49,8 @@ class FavouritesAdapter(
 
     private var selectionMode = false
     private var accountType: AccountType? = null
+    private var isBusinessAccountExpired = false
+
     override fun getItemViewType(position: Int): Int = getItem(position).type
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavouritesViewHolder {
@@ -79,6 +81,7 @@ class FavouritesAdapter(
             onLongClicked = onLongClicked,
             selectionMode = selectionMode,
             accountType = accountType,
+            isBusinessAccountExpired = isBusinessAccountExpired,
         )
     }
 
@@ -89,8 +92,9 @@ class FavouritesAdapter(
         selectionMode = isSelectionMode
     }
 
-    fun updateAccountType(accountType: AccountType?) {
+    fun updateAccountType(accountType: AccountType?, isBusinessAccountExpired: Boolean) {
         this.accountType = accountType
+        this.isBusinessAccountExpired = isBusinessAccountExpired
     }
 
     companion object {
@@ -126,6 +130,7 @@ class FavouritesViewHolder(
         onLongClicked: (info: Favourite) -> Boolean,
         selectionMode: Boolean,
         accountType: AccountType?,
+        isBusinessAccountExpired: Boolean,
     ) {
         with(binding) {
             when (this) {
@@ -133,6 +138,7 @@ class FavouritesViewHolder(
                     item.favourite?.let { favourite: Favourite ->
                         val isSensitive =
                             accountType?.isPaid == true
+                                    && !isBusinessAccountExpired
                                     && (favourite.typedNode.isMarkedSensitive
                                     || favourite.typedNode.isSensitiveInherited)
                         itemThumbnail.load(ThumbnailRequest(NodeId(favourite.node.handle))) {

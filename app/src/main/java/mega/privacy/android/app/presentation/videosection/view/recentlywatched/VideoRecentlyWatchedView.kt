@@ -41,7 +41,6 @@ import mega.privacy.android.app.presentation.videosection.view.allvideos.VideoIt
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
@@ -59,7 +58,7 @@ import nz.mega.sdk.MegaNode
 @Composable
 fun VideoRecentlyWatchedView(
     group: Map<Long, List<VideoUIEntity>>,
-    accountType: AccountType?,
+    shouldApplySensitiveMode: Boolean,
     clearRecentlyWatchedVideosSuccess: StateEvent,
     removeRecentlyWatchedItemSuccess: StateEvent,
     modifier: Modifier,
@@ -178,9 +177,9 @@ fun VideoRecentlyWatchedView(
                                     onMenuClick = { onMenuClick(videoItem) },
                                     modifier = Modifier
                                         .alpha(0.5f.takeIf {
-                                            accountType?.isPaid == true && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited)
+                                            shouldApplySensitiveMode && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited)
                                         } ?: 1f),
-                                    isSensitive = accountType?.isPaid == true && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited),
+                                    isSensitive = shouldApplySensitiveMode && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited),
                                 )
                             }
                         }

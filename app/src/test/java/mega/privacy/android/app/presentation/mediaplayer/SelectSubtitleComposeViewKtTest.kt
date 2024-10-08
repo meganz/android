@@ -75,6 +75,7 @@ internal class SelectSubtitleComposeViewKtTest {
                     )
                 ),
                 accountType = null,
+                isBusinessAccountExpired = false,
             ),
             mock()
         )

@@ -1207,13 +1207,14 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             currentParentNode?.let { megaApi.isSensitiveInherited(it) } == true
         val isInShare = rootParentNode?.isInShare == true
         val isPaidAccount = viewModel.uiState.value.accountType?.isPaid == true
+        val isBusinessAccountExpired = viewModel.uiState.value.isBusinessAccountExpired
         val isNotInShare =
             !isInSharedItems && !isInShare
         val isNodeInBackups = viewModel.uiState.value.isNodeInBackups
 
         val shouldShowHideNode =
             isHiddenNodesEnabled
-                    && (!isPaidAccount || (node != null
+                    && (!isPaidAccount || isBusinessAccountExpired || (node != null
                     && isNotInShare
                     && !node.isMarkedSensitive
                     && !isSensitiveInherited
@@ -1226,6 +1227,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 && node.isMarkedSensitive
                 && !isSensitiveInherited
                 && isPaidAccount
+                && !isBusinessAccountExpired
                 && !isNodeInBackups
 
         hideMenuItem.isVisible = shouldShowHideNode
@@ -1765,11 +1767,16 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     }
 
     private fun handleHideNodeClick(playingHandle: Long) {
-        val (isPaid, isHiddenNodesOnboarded) = with(viewModel.uiState.value) {
-            (this.accountType?.isPaid ?: false) to this.isHiddenNodesOnboarded
+        var isPaid: Boolean
+        var isHiddenNodesOnboarded: Boolean
+        var isBusinessAccountExpired: Boolean
+        with(viewModel.uiState.value) {
+            isPaid = this.accountType?.isPaid ?: false
+            isHiddenNodesOnboarded = this.isHiddenNodesOnboarded
+            isBusinessAccountExpired = this.isBusinessAccountExpired
         }
 
-        if (!isPaid) {
+        if (!isPaid || isBusinessAccountExpired) {
             val intent = HiddenNodesOnboardingActivity.createScreen(
                 context = this,
                 isOnboarding = false,

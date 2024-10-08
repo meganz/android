@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.AccountType
  * @param isLoading true if loading
  * @param isConnected true if connected to internet
  * @param accountType
+ * @param isBusinessAccountExpired true if business account is expired
  * @param showHiddenItems
  */
 data class RecentActionsUiState(
@@ -18,5 +19,6 @@ data class RecentActionsUiState(
     val isLoading: Boolean = true,
     val isConnected: Boolean = false,
     val accountType: AccountType? = null,
+    val isBusinessAccountExpired: Boolean = false,
     val showHiddenItems: Boolean = false,
 )

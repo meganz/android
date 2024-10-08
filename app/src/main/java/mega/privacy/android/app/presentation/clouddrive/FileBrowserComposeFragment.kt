@@ -536,11 +536,13 @@ class FileBrowserComposeFragment : Fragment() {
 
             val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
             val isPaid = fileBrowserViewModel.state.value.accountType?.isPaid ?: false
+            val isBusinessAccountExpired =
+                fileBrowserViewModel.state.value.isBusinessAccountExpired
 
             menu.findItem(R.id.cab_menu_hide)?.isVisible =
-                !isPaid || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
+                !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
             menu.findItem(R.id.cab_menu_unhide)?.isVisible =
-                isPaid && !hasNonSensitiveNode && !includeSensitiveInheritedNode
+                isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
         }
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
@@ -713,12 +715,13 @@ class FileBrowserComposeFragment : Fragment() {
     }
 
     fun handleHideNodeClick(nodeIds: List<NodeId>) {
-        val (isPaid, isHiddenNodesOnboarded) = with(fileBrowserViewModel.state.value) {
-            (this.accountType?.isPaid ?: false) to this.isHiddenNodesOnboarded
-        }
+        val state = fileBrowserViewModel.state.value
+        val isPaid = state.accountType?.isPaid ?: false
+        val isHiddenNodesOnboarded = state.isHiddenNodesOnboarded
+        val isBusinessAccountExpired = state.isBusinessAccountExpired
 
 
-        if (!isPaid) {
+        if (!isPaid || isBusinessAccountExpired) {
             val intent = HiddenNodesOnboardingActivity.createScreen(
                 context = requireContext(),
                 isOnboarding = false,

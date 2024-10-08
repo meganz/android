@@ -14,11 +14,10 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
-import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedNode
 
 
 /**
@@ -65,6 +64,7 @@ fun <T : TypedNode> NodesView(
     spanCount: Int = 2,
     showLinkIcon: Boolean = true,
     showChangeViewType: Boolean = true,
+    shouldApplySensitiveMode: Boolean = false,
     showSortOrder: Boolean = true,
     showMediaDiscoveryButton: Boolean = false,
     showPublicLinkCreationTime: Boolean = false,
@@ -72,7 +72,6 @@ fun <T : TypedNode> NodesView(
     inSelectionMode: Boolean = false,
     onEnterMediaDiscoveryClick: () -> Unit = {},
     listContentPadding: PaddingValues = PaddingValues(0.dp),
-    accountType: AccountType? = null,
     nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) {
     val takenDownDialog = remember { mutableStateOf(Pair(false, false)) }
@@ -106,7 +105,7 @@ fun <T : TypedNode> NodesView(
             showPublicLinkCreationTime = showPublicLinkCreationTime,
             fileTypeIconMapper = fileTypeIconMapper,
             inSelectionMode = inSelectionMode,
-            accountType = accountType,
+            shouldApplySensitiveMode = shouldApplySensitiveMode,
             nodeSourceType = nodeSourceType,
         )
     } else {
@@ -136,7 +135,7 @@ fun <T : TypedNode> NodesView(
             isPublicNode = isPublicNode,
             fileTypeIconMapper = fileTypeIconMapper,
             inSelectionMode = inSelectionMode,
-            accountType = accountType,
+            shouldApplySensitiveMode = shouldApplySensitiveMode,
             nodeSourceType = nodeSourceType,
         )
     }

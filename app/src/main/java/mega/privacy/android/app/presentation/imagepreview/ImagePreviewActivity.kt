@@ -53,8 +53,8 @@ import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
@@ -292,12 +292,13 @@ class ImagePreviewActivity : BaseActivity() {
 
     private fun hideNode(
         imageNode: ImageNode,
-        accountDetail: AccountDetail?,
+        accountType: AccountType?,
+        isBusinessAccountExpired: Boolean,
         isHiddenNodesOnboarded: Boolean?,
     ) {
-        val isPaid = accountDetail?.levelDetail?.accountType?.isPaid ?: false
+        val isPaid = accountType?.isPaid ?: false
 
-        if (!isPaid) {
+        if (!isPaid || isBusinessAccountExpired) {
             val intent = HiddenNodesOnboardingActivity.createScreen(
                 context = this,
                 isOnboarding = false,

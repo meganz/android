@@ -13,12 +13,14 @@ sealed interface ChildrenNodesLoadState {
      * @param children List<FavouriteItem>
      * @param isBackPressedEnable ture is enable back pressed, otherwise is false
      * @param accountType AccountType
+     * @param isBusinessAccountExpired if the business account is expired
      */
     data class Success(
         val title: String,
         val children: List<FavouriteItem>,
         val isBackPressedEnable: Boolean,
         val accountType: AccountType? = null,
+        val isBusinessAccountExpired: Boolean = false,
     ) :
         ChildrenNodesLoadState
 

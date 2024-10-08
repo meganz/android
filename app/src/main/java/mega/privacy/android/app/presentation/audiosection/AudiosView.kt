@@ -5,7 +5,6 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
-import mega.privacy.android.domain.entity.AccountType
 
 /**
  * The compose view for displaying audios
@@ -13,7 +12,7 @@ import mega.privacy.android.domain.entity.AccountType
 @Composable
 fun AudiosView(
     items: List<AudioUiEntity>,
-    accountType: AccountType?,
+    shouldApplySensitiveMode: Boolean,
     isListView: Boolean,
     sortOrder: String,
     modifier: Modifier,
@@ -29,7 +28,7 @@ fun AudiosView(
     if (isListView) {
         AudioListView(
             items = items,
-            accountType = accountType,
+            shouldApplySensitiveMode = shouldApplySensitiveMode,
             lazyListState = listState,
             sortOrder = sortOrder,
             modifier = modifier,
@@ -43,7 +42,7 @@ fun AudiosView(
     } else {
         AudioGridView(
             items = items,
-            accountType = accountType,
+            shouldApplySensitiveMode = shouldApplySensitiveMode,
             lazyGridState = gridState,
             sortOrder = sortOrder,
             modifier = modifier,

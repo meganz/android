@@ -32,6 +32,7 @@ import mega.privacy.android.app.presentation.search.navigation.DATE_ADDED
 import mega.privacy.android.app.presentation.search.navigation.DATE_MODIFIED
 import mega.privacy.android.app.presentation.search.navigation.TYPE
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeSourceType.OTHER
@@ -41,6 +42,7 @@ import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.entity.search.TypeFilterOption
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
@@ -88,6 +90,7 @@ class SearchActivityViewModel @Inject constructor(
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     stateHandle: SavedStateHandle,
 ) : ViewModel() {
     /**
@@ -251,7 +254,7 @@ class SearchActivityViewModel @Inject constructor(
 
     private fun filterNonSensitiveNodes(nodes: List<TypedNode>?): List<TypedNode>? {
         val accountType = _state.value.accountType ?: return nodes
-        return if (showHiddenItems || !accountType.isPaid) {
+        return if (showHiddenItems || !accountType.isPaid || _state.value.isBusinessAccountExpired) {
             nodes
         } else {
             nodes?.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
@@ -564,8 +567,17 @@ class SearchActivityViewModel @Inject constructor(
     private fun monitorAccountDetail() {
         monitorAccountDetailUseCase()
             .onEach { accountDetail ->
+                val accountType = accountDetail.levelDetail?.accountType
+                val businessStatus =
+                    if (accountType?.isBusinessAccount == true) {
+                        getBusinessStatusUseCase()
+                    } else null
+
                 _state.update {
-                    it.copy(accountType = accountDetail.levelDetail?.accountType)
+                    it.copy(
+                        accountType = accountType,
+                        isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+                    )
                 }
                 if (_state.value.isSearching) return@onEach
 

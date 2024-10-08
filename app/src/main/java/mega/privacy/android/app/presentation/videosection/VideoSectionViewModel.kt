@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -41,6 +40,7 @@ import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
 import mega.privacy.android.app.presentation.videosection.view.videoSectionRoute
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -48,6 +48,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -109,6 +110,7 @@ class VideoSectionViewModel @Inject constructor(
     private val getVideoRecentlyWatchedUseCase: GetVideoRecentlyWatchedUseCase,
     private val clearRecentlyWatchedVideosUseCase: ClearRecentlyWatchedVideosUseCase,
     private val removeRecentlyWatchedItemUseCase: RemoveRecentlyWatchedItemUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -182,9 +184,16 @@ class VideoSectionViewModel @Inject constructor(
             monitorShowHiddenItemsUseCase(),
         ) { accountDetail, showHiddenItems ->
             this@VideoSectionViewModel.showHiddenItems = showHiddenItems
+            val accountType = accountDetail.levelDetail?.accountType
+            val businessStatus =
+                if (accountType?.isBusinessAccount == true) {
+                    getBusinessStatusUseCase()
+                } else null
+
             _state.update {
                 it.copy(
-                    accountDetail = accountDetail,
+                    accountType = accountType,
+                    isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
                     isPendingRefresh = true
                 )
             }
@@ -255,7 +264,8 @@ class VideoSectionViewModel @Inject constructor(
         val videoList = filterNonSensitiveItems(
             items = getVideoUIEntityList(),
             showHiddenItems = this@VideoSectionViewModel.showHiddenItems,
-            isPaid = _state.value.accountDetail?.levelDetail?.accountType?.isPaid,
+            isPaid = _state.value.accountType?.isPaid,
+            isBusinessAccountExpired = _state.value.isBusinessAccountExpired
         ).filterVideosByDuration()
             .filterVideosByLocation()
             .updateOriginalEntities()
@@ -953,16 +963,6 @@ class VideoSectionViewModel @Inject constructor(
         )
     }
 
-    private fun monitorAccountDetail() {
-        monitorAccountDetailUseCase()
-            .onEach { accountDetail ->
-                _state.update {
-                    it.copy(accountDetail = accountDetail)
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-
     private fun monitorIsHiddenNodesOnboarded() {
         viewModelScope.launch {
             val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
@@ -985,11 +985,12 @@ class VideoSectionViewModel @Inject constructor(
         items: List<VideoUIEntity>,
         showHiddenItems: Boolean?,
         isPaid: Boolean?,
+        isBusinessAccountExpired: Boolean,
     ) = withContext(defaultDispatcher) {
         showHiddenItems ?: return@withContext items
         isPaid ?: return@withContext items
 
-        return@withContext if (showHiddenItems || !isPaid) {
+        return@withContext if (showHiddenItems || !isPaid || isBusinessAccountExpired) {
             items
         } else {
             items.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
@@ -1032,12 +1033,13 @@ class VideoSectionViewModel @Inject constructor(
             if (isHiddenNodesEnabled) {
                 val hasNonSensitiveNode =
                     getSelectedNodes().any { !it.isMarkedSensitive }
-                val isPaid =
-                    _state.value.accountDetail?.levelDetail?.accountType?.isPaid ?: false
+                val isPaid = _state.value.accountType?.isPaid ?: false
+                val isBusinessAccountExpired = _state.value.isBusinessAccountExpired
+
                 isHideMenuActionVisible =
-                    !isPaid || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
+                    !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
                 isUnhideMenuActionVisible =
-                    isPaid && !hasNonSensitiveNode && !includeSensitiveInheritedNode
+                    isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
             }
 
             isRemoveLinkMenuActionVisible = if (selectedNodes.size == 1) {
@@ -1073,12 +1075,13 @@ class VideoSectionViewModel @Inject constructor(
             if (isHiddenNodesEnabled) {
                 val hasNonSensitiveNode =
                     selectedVideos.any { !it.isMarkedSensitive }
-                val isPaid =
-                    _state.value.accountDetail?.levelDetail?.accountType?.isPaid ?: false
+                val isPaid = _state.value.accountType?.isPaid ?: false
+                val isBusinessAccountExpired = _state.value.isBusinessAccountExpired
+
                 isHideMenuActionVisible =
-                    !isPaid || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
+                    !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
                 isUnhideMenuActionVisible =
-                    isPaid && !hasNonSensitiveNode && !includeSensitiveInheritedNode
+                    isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
             }
         }
         _state.update {

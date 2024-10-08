@@ -36,6 +36,7 @@ import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageM
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -43,6 +44,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatImageFile
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -101,6 +103,7 @@ class ImagePreviewViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
@@ -146,10 +149,19 @@ class ImagePreviewViewModel @Inject constructor(
             imageFetcher.monitorImageNodes(params),
         ) { showHiddenItems, accountDetail, isHiddenNodesOnboarded, imageNodes ->
 
+            val accountType = accountDetail.levelDetail?.accountType
+            val businessStatus =
+                if (accountType?.isBusinessAccount == true) {
+                    getBusinessStatusUseCase()
+                } else null
+
+            val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+
             val filteredImageNodes = filterNonSensitiveNodes(
                 imageNodes = imageNodes,
                 showHiddenItems = showHiddenItems,
-                isPaid = accountDetail.levelDetail?.accountType?.isPaid,
+                isPaid = accountType?.isPaid,
+                isBusinessAccountExpired = isBusinessAccountExpired,
             )
             val (currentImageNodeIndex, currentImageNode) = findCurrentImageNode(
                 filteredImageNodes
@@ -164,7 +176,8 @@ class ImagePreviewViewModel @Inject constructor(
                     currentImageNodeIndex = currentImageNodeIndex,
                     currentImageNode = currentImageNode,
                     isCurrentImageNodeAvailableOffline = isCurrentImageNodeAvailableOffline,
-                    accountDetail = accountDetail,
+                    accountType = accountType,
+                    isBusinessAccountExpired = isBusinessAccountExpired,
                     isHiddenNodesOnboarded = isHiddenNodesOnboarded
                 )
             }
@@ -252,11 +265,12 @@ class ImagePreviewViewModel @Inject constructor(
         imageNodes: List<ImageNode>,
         showHiddenItems: Boolean?,
         isPaid: Boolean?,
+        isBusinessAccountExpired: Boolean,
     ) = withContext(defaultDispatcher) {
         showHiddenItems ?: return@withContext imageNodes
         isPaid ?: return@withContext imageNodes
 
-        return@withContext if (showHiddenItems || !isPaid) {
+        return@withContext if (showHiddenItems || !isPaid || isBusinessAccountExpired) {
             imageNodes
         } else {
             imageNodes.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }

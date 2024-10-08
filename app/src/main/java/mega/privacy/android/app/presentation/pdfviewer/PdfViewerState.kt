@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.node.chat.ChatFile
  * @property shouldFinishActivity           Checks if activity should be finished
  * @property nameCollision                  Name collision if identified
  * @property accountType                    the account type
+ * @property isBusinessAccountExpired       if the business account is expired
  * @property isHiddenNodesOnboarded         if the user has been onboarded with hidden nodes
  * @property startChatOfflineDownloadEvent  Event to start chat node offline download
  * @property isNodeInBackups                if the node is in backups
@@ -27,6 +28,7 @@ data class PdfViewerState(
     val nameCollision: NameCollision? = null,
     val pdfStreamData: ByteArray? = null,
     val accountType: AccountType? = null,
+    val isBusinessAccountExpired: Boolean = false,
     val isHiddenNodesOnboarded: Boolean = false,
     val startChatOfflineDownloadEvent: StateEventWithContent<ChatFile> = consumed(),
     val isNodeInBackups: Boolean = false,

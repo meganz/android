@@ -141,7 +141,10 @@ class FavouriteFolderFragment : Fragment() {
                         setToolbarText(childrenState.title)
                         // According to the state to enable the onBackPressedCallback
                         onBackPressedCallback.isEnabled = childrenState.isBackPressedEnable
-                        adapter.updateAccountType(childrenState.accountType)
+                        adapter.updateAccountType(
+                            childrenState.accountType,
+                            childrenState.isBusinessAccountExpired,
+                        )
                         adapter.submitList(childrenState.children)
                     } else if (childrenState is ChildrenNodesLoadState.Empty) {
                         setToolbarText(

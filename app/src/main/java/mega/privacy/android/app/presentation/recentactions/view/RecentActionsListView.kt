@@ -20,12 +20,11 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.distinctUntilChanged
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionBucketUiEntity
 import mega.privacy.android.app.presentation.recentactions.view.previewdataprovider.SampleRecentActionDataProvider
-import mega.privacy.android.shared.original.core.ui.controls.lists.RecentActionListViewItem
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.shared.original.core.ui.controls.lists.RecentActionListViewItem
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 
@@ -42,12 +41,12 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 @Composable
 fun RecentActionsListView(
     groupedRecentActions: Map<String, List<RecentActionBucketUiEntity>>,
-    accountType: AccountType? = null,
+    shouldApplySensitiveMode: Boolean,
     showHiddenItems: Boolean = false,
     onMenuClick: (TypedFileNode) -> Unit = {},
     onItemClick: (RecentActionBucket) -> Unit = {},
     onScrollStateChanged: (isScrolling: Boolean) -> Unit = {},
-    backgroundColor: Color = MaterialTheme.colors.surface
+    backgroundColor: Color = MaterialTheme.colors.surface,
 ) {
     val listState = rememberLazyListState()
     LaunchedEffect(listState) {
@@ -90,7 +89,7 @@ fun RecentActionsListView(
                     updatedByText = item.updatedByText,
                     isFavourite = item.isFavourite,
                     labelColor = item.labelColorId?.let { colorResource(id = it) },
-                    isSensitive = accountType?.isPaid == true && isSensitive && showHiddenItems,
+                    isSensitive = shouldApplySensitiveMode && isSensitive && showHiddenItems,
                     onItemClick = { onItemClick(item.bucket) },
                     onMenuClick = { onMenuClick(item.bucket.nodes.first()) }
                 )
@@ -105,6 +104,9 @@ private fun RecentActionListViewPreview(
     @PreviewParameter(SampleRecentActionDataProvider::class) items: List<RecentActionBucketUiEntity>,
 ) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
-        RecentActionsListView(groupedRecentActions = items.groupBy { it.date })
+        RecentActionsListView(
+            groupedRecentActions = items.groupBy { it.date },
+            shouldApplySensitiveMode = false,
+        )
     }
 }

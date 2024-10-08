@@ -13,12 +13,20 @@ sealed interface FavouriteLoadState {
 
     /**
      * Get favourite list success
+     *
      * @param favourites FavouriteItem list
+     * @param selectedItems selected items
+     * @param accountType account type
+     * @param isBusinessAccountExpired if the business account is expired
+     * @param isHiddenNodesOnboarded if is hidden nodes onboarded
+     * @param showSearch show search
+     * @param isConnected is connected
      */
     data class Success(
         val favourites: List<FavouriteItem>,
         val selectedItems: Set<NodeId>,
         val accountType: AccountType? = null,
+        val isBusinessAccountExpired: Boolean = false,
         val isHiddenNodesOnboarded: Boolean? = null,
         override val showSearch: Boolean,
         override val isConnected: Boolean,

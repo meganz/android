@@ -22,12 +22,14 @@ import mega.privacy.android.app.presentation.audiosection.mapper.AudioUiEntityMa
 import mega.privacy.android.app.presentation.audiosection.model.AudioSectionState
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
 import mega.privacy.android.app.presentation.node.FileNodeContent
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -66,6 +68,7 @@ class AudioSectionViewModel @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AudioSectionState())
 
@@ -108,9 +111,16 @@ class AudioSectionViewModel @Inject constructor(
             monitorShowHiddenItemsUseCase(),
         ) { _, accountDetail, showHiddenItems ->
             this@AudioSectionViewModel.showHiddenItems = showHiddenItems
+            val accountType = accountDetail.levelDetail?.accountType
+            val businessStatus =
+                if (accountType?.isBusinessAccount == true) {
+                    getBusinessStatusUseCase()
+                } else null
+
             _state.update {
                 it.copy(
-                    accountDetail = accountDetail,
+                    accountType = accountType,
+                    isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
                     isPendingRefresh = true
                 )
             }
@@ -130,11 +140,12 @@ class AudioSectionViewModel @Inject constructor(
         items: List<AudioUiEntity>,
         showHiddenItems: Boolean?,
         isPaid: Boolean?,
+        isBusinessAccountExpired: Boolean,
     ) = withContext(defaultDispatcher) {
         showHiddenItems ?: return@withContext items
         isPaid ?: return@withContext items
 
-        return@withContext if (showHiddenItems || !isPaid) {
+        return@withContext if (showHiddenItems || !isPaid || isBusinessAccountExpired) {
             items
         } else {
             items.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
@@ -147,7 +158,8 @@ class AudioSectionViewModel @Inject constructor(
         val audioList = filterNonSensitiveItems(
             items = getAudioUiEntityList(),
             showHiddenItems = this@AudioSectionViewModel.showHiddenItems,
-            isPaid = _state.value.accountDetail?.levelDetail?.accountType?.isPaid,
+            isPaid = _state.value.accountType?.isPaid,
+            isBusinessAccountExpired = _state.value.isBusinessAccountExpired
         ).updateOriginalEntities().filterAudiosBySearchQuery()
 
         val sortOrder = getCloudSortOrder()

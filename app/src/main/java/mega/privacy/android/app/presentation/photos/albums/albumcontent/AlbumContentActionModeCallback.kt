@@ -59,12 +59,12 @@ class AlbumContentActionModeCallback(
 
             R.id.cab_menu_hide -> {
                 Analytics.tracker.trackEvent(AlbumContentHideNodeMenuItemEvent)
-                val isPaid =
-                    fragment.albumContentViewModel.state.value.accountType?.isPaid ?: false
-                val isHiddenNodesOnboarded =
-                    fragment.albumContentViewModel.state.value.isHiddenNodesOnboarded ?: false
+                val state = fragment.albumContentViewModel.state.value
+                val isPaid = state.accountType?.isPaid ?: false
+                val isHiddenNodesOnboarded = state.isHiddenNodesOnboarded ?: false
+                val isBusinessAccountExpired = state.isBusinessAccountExpired
 
-                if (!isPaid) {
+                if (!isPaid || isBusinessAccountExpired) {
                     val intent = HiddenNodesOnboardingActivity.createScreen(
                         context = fragment.requireContext(),
                         isOnboarding = false,

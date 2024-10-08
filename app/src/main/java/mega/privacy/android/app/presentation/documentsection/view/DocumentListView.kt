@@ -17,7 +17,6 @@ import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEnt
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
@@ -34,7 +33,7 @@ import nz.mega.sdk.MegaNode
 @Composable
 internal fun DocumentListView(
     items: List<DocumentUiEntity>,
-    accountType: AccountType?,
+    shouldApplySensitiveMode: Boolean,
     lazyListState: LazyListState,
     sortOrder: String,
     modifier: Modifier,
@@ -68,9 +67,9 @@ internal fun DocumentListView(
                 modifier = Modifier
                     .testTag("$DOCUMENT_SECTION_ITEM_VIEW_TEST_TAG$it")
                     .alpha(0.5f.takeIf {
-                        accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited)
+                        shouldApplySensitiveMode && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited)
                     } ?: 1f),
-                isSensitive = accountType?.isPaid == true && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited),
+                isSensitive = shouldApplySensitiveMode && (documentItem.isMarkedSensitive || documentItem.isSensitiveInherited),
                 showBlurEffect = true,
                 isSelected = documentItem.isSelected,
                 icon = documentItem.icon,
@@ -115,7 +114,7 @@ private fun DocumentListViewPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         DocumentListView(
             items = getPreviewItems(),
-            accountType = AccountType.FREE,
+            shouldApplySensitiveMode = false,
             lazyListState = rememberLazyListState(),
             sortOrder = "Size",
             modifier = Modifier,

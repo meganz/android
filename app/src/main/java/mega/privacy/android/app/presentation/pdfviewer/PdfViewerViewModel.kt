@@ -13,8 +13,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -44,6 +46,7 @@ class PdfViewerViewModel @Inject constructor(
     private val getChatFileUseCase: GetChatFileUseCase,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val savedStateHandle: SavedStateHandle,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
 
     private val handle: Long
@@ -242,8 +245,18 @@ class PdfViewerViewModel @Inject constructor(
     private fun monitorAccountDetail() {
         monitorAccountDetailUseCase()
             .onEach { accountDetail ->
+                val accountType = accountDetail.levelDetail?.accountType
+                val businessStatus =
+                    if (accountType?.isBusinessAccount == true) {
+                        getBusinessStatusUseCase()
+                    } else null
+
+                val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
                 _state.update {
-                    it.copy(accountType = accountDetail.levelDetail?.accountType)
+                    it.copy(
+                        accountType = accountDetail.levelDetail?.accountType,
+                        isBusinessAccountExpired = isBusinessAccountExpired,
+                    )
                 }
             }
             .launchIn(viewModelScope)

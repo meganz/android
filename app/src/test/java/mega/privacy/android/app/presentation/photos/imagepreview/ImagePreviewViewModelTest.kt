@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -95,6 +96,7 @@ class ImagePreviewViewModelTest {
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase = mock()
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
 
     @BeforeAll
     fun setup() {
@@ -129,6 +131,7 @@ class ImagePreviewViewModelTest {
         monitorAccountDetailUseCase,
         isHiddenNodesOnboardedUseCase,
         monitorShowHiddenItemsUseCase,
+        getBusinessStatusUseCase,
     )
 
     private fun initViewModel() {
@@ -161,6 +164,7 @@ class ImagePreviewViewModelTest {
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 
@@ -178,7 +182,8 @@ class ImagePreviewViewModelTest {
             val expectedNodes = underTest.filterNonSensitiveNodes(
                 imageNodes = imageNodes,
                 showHiddenItems = null,
-                isPaid = true
+                isPaid = true,
+                isBusinessAccountExpired = false,
             )
             assertThat(expectedNodes).isEqualTo(imageNodes)
         }
@@ -193,7 +198,8 @@ class ImagePreviewViewModelTest {
             val expectedNodes = underTest.filterNonSensitiveNodes(
                 imageNodes = imageNodes,
                 showHiddenItems = true,
-                isPaid = true
+                isPaid = true,
+                isBusinessAccountExpired = false,
             )
             assertThat(expectedNodes).isEqualTo(imageNodes)
         }
@@ -208,7 +214,8 @@ class ImagePreviewViewModelTest {
             val expectedNodes = underTest.filterNonSensitiveNodes(
                 imageNodes = imageNodes,
                 showHiddenItems = true,
-                isPaid = false
+                isPaid = false,
+                isBusinessAccountExpired = false,
             )
             assertThat(expectedNodes).isEqualTo(imageNodes)
         }
@@ -223,7 +230,8 @@ class ImagePreviewViewModelTest {
             val expectedNodes = underTest.filterNonSensitiveNodes(
                 imageNodes = imageNodes,
                 showHiddenItems = true,
-                isPaid = null
+                isPaid = null,
+                isBusinessAccountExpired = false,
             )
             assertThat(expectedNodes).isEqualTo(imageNodes)
         }
@@ -239,7 +247,8 @@ class ImagePreviewViewModelTest {
             val expectedNodes = underTest.filterNonSensitiveNodes(
                 imageNodes = imageNodes,
                 showHiddenItems = false,
-                isPaid = true
+                isPaid = true,
+                isBusinessAccountExpired = false,
             )
             assertThat(expectedNodes.size).isEqualTo(1)
             assertThat(expectedNodes).isEqualTo(listOf(nonSensitiveNode))

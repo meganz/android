@@ -149,8 +149,6 @@ internal class LegacyVideoPlayerViewModelTest {
             savedStateHandle = savedStateHandle,
             monitorVideoRepeatModeUseCase = monitorVideoRepeatModeUseCase,
             monitorSubFolderMediaDiscoverySettingsUseCase = mock(),
-            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-            isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getOfflineNodesByParentIdUseCase = getOfflineNodesByParentIdUseCase,
             getThumbnailUseCase = getThumbnailUseCase,

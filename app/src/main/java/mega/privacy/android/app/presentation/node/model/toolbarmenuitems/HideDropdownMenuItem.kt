@@ -7,7 +7,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.node.model.menuaction.HideDropdownMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.HideMenuAction
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -28,8 +30,10 @@ class HideDropdownMenuItem @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : NodeToolbarMenuItem<MenuAction> {
     private var isPaid: Boolean = false
+    private var isBusinessAccountExpired: Boolean = false
 
     override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
@@ -47,7 +51,8 @@ class HideDropdownMenuItem @Inject constructor(
         }
 
         isPaid = monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
-        if (!isPaid) {
+        isBusinessAccountExpired = getBusinessStatusUseCase() == BusinessAccountStatus.Expired
+        if (!isPaid || isBusinessAccountExpired) {
             return true
         }
 
@@ -67,7 +72,7 @@ class HideDropdownMenuItem @Inject constructor(
     ): () -> Unit = {
         parentScope.launch {
             val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
-            if (!this@HideDropdownMenuItem.isPaid) {
+            if (!this@HideDropdownMenuItem.isPaid || isBusinessAccountExpired) {
                 actionHandler(menuAction, selectedNodes)
             } else if (isHiddenNodesOnboarded) {
                 selectedNodes.forEach {

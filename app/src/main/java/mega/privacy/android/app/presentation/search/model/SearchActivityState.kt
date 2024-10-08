@@ -35,6 +35,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property navigationLevel list of parent handles
  * @property resetScroll to reset scroll position
  * @property accountType account type (free/paid)
+ * @property isBusinessAccountExpired if the business or pro flexi is expired
  */
 data class SearchActivityState(
     val searchDescriptionEnabled: Boolean? = null,
@@ -58,4 +59,5 @@ data class SearchActivityState(
     val navigationLevel: List<Pair<Long, String>> = emptyList(),
     val resetScroll: Boolean = false,
     val accountType: AccountType? = null,
+    val isBusinessAccountExpired: Boolean = false,
 )
