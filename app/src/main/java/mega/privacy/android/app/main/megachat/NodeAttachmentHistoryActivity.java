@@ -20,7 +20,6 @@ import static mega.privacy.android.app.utils.Constants.SELECTED_USERS;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
-import static mega.privacy.android.app.utils.Util.changeToolBarElevation;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -84,6 +83,7 @@ import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract;
 import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.extensions.EdgeToEdgeExtensionsKt;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -208,7 +208,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Timber.d("onCreate");
-        EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
 
         viewModel = new ViewModelProvider(this).get(NodeAttachmentHistoryViewModel.class);
@@ -230,8 +229,10 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
         registerReceiver(errorCopyingNodesReceiver,
                 new IntentFilter(BROADCAST_ACTION_ERROR_COPYING_NODES));
-
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_node_history);
+        tB = findViewById(R.id.toolbar_node_history);
+        EdgeToEdgeExtensionsKt.consumeInsetsWithToolbar(this, tB);
         addStartDownloadTransferView();
 
         if (savedInstanceState != null) {
@@ -239,7 +240,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         }
 
         //Set toolbar
-        tB = findViewById(R.id.toolbar_node_history);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         aB.setDisplayHomeAsUpEnabled(true);
@@ -1270,8 +1270,10 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
     public void checkScroll() {
         if (listView != null) {
-            changeToolBarElevation(this, tB, listView.canScrollVertically(-1)
-                    || (adapter != null && adapter.isMultipleSelect()));
+            boolean withElevation = listView.canScrollVertically(-1)
+                    || (adapter != null && adapter.isMultipleSelect());
+            float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+            tB.setElevation(withElevation ? elevation : 0);
         }
     }
 
