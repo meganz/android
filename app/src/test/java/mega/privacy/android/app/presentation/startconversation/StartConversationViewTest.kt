@@ -59,7 +59,6 @@ class StartConversationViewTest {
                 onSearchClicked = {},
                 onBackPressed = {},
                 onContactClicked = {},
-                onScrollChange = {},
                 onInviteContactsClicked = {}
             )
         }

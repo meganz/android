@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
-import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
@@ -57,7 +56,6 @@ class StartConversationActivity : ComponentActivity() {
     private lateinit var addContactActivityLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         resultLauncher =
@@ -111,13 +109,13 @@ class StartConversationActivity : ComponentActivity() {
         }
 
         viewModel.setFromChat(intent.getBooleanExtra(FROM_CHAT, false))
+        enableEdgeToEdge()
         setContent { StartConversationView() }
     }
 
     @Composable
     private fun StartConversationView() {
         val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
-        val isDark = themeMode.isDarkMode()
         val uiState by viewModel.state.collectAsState()
 
         OriginalTempTheme(isDark = themeMode.isDarkMode()) {
@@ -129,14 +127,10 @@ class StartConversationActivity : ComponentActivity() {
                 onCloseSearchClicked = viewModel::onCloseSearchTap,
                 onBackPressed = { finish() },
                 onSearchClicked = viewModel::onSearchTap,
-                onScrollChange = { scrolled -> onScrollChange(scrolled, isDark) },
                 onInviteContactsClicked = { onInviteContacts() }
             )
         }
     }
-
-    private fun onScrollChange(scrolled: Boolean, isDark: Boolean) =
-        changeStatusBarColor(scrolled = scrolled, isDark = isDark)
 
     private fun onActionTap(action: StartConversationAction) {
         when (action) {

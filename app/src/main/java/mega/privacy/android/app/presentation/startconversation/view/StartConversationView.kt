@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -75,7 +75,6 @@ fun StartConversationView(
     onCloseSearchClicked: () -> Unit,
     onBackPressed: () -> Unit,
     onSearchClicked: () -> Unit,
-    onScrollChange: (Boolean) -> Unit,
     onInviteContactsClicked: () -> Unit,
     onButtonClicked: (StartConversationAction) -> Unit = {},
 ) {
@@ -85,7 +84,7 @@ fun StartConversationView(
     val scaffoldState = rememberScaffoldState()
 
     Scaffold(
-        modifier = Modifier.systemBarsPadding(),
+        modifier = Modifier.navigationBarsPadding(),
         scaffoldState = scaffoldState,
         topBar = {
             if (state.contactItemList.isEmpty()) {
@@ -192,8 +191,6 @@ fun StartConversationView(
     }
 
     SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
-
-    onScrollChange(!firstItemVisible)
 }
 
 @Composable
@@ -376,7 +373,6 @@ private fun PreviewStartConversationView() {
             onCloseSearchClicked = {},
             onBackPressed = {},
             onSearchClicked = {},
-            onScrollChange = {},
             onInviteContactsClicked = {}
         )
     }

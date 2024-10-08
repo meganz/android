@@ -2,9 +2,11 @@ package mega.privacy.android.legacy.core.ui.controls.appbar
 
 import android.content.res.Configuration
 import android.view.ViewTreeObserver
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AppBarDefaults
@@ -185,7 +187,8 @@ fun CollapsedSearchAppBar(
         },
         backgroundColor = MaterialTheme.colors.surface,
         elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp,
-        modifier = modifier
+        modifier = modifier,
+        windowInsets = WindowInsets.systemBars,
     )
 }
 

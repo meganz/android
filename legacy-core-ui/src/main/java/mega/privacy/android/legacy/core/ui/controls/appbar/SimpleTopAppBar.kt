@@ -2,6 +2,8 @@ package mega.privacy.android.legacy.core.ui.controls.appbar
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -17,8 +19,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * A [Composable] that displays a Top App Bar with a Title and Back Button
@@ -70,6 +72,7 @@ fun SimpleTopAppBar(
 ) {
     TopAppBar(
         modifier = modifier,
+        windowInsets = WindowInsets.systemBars,
         title = {
             Text(
                 text = title,
