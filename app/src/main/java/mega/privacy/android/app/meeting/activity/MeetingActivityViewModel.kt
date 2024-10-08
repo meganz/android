@@ -186,7 +186,6 @@ class MeetingActivityViewModel @Inject constructor(
     private val getChatParticipants: GetChatParticipants,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val logoutUseCase: LogoutUseCase,
-    private val monitorFinishActivityUseCase: MonitorFinishActivityUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
@@ -231,6 +230,7 @@ class MeetingActivityViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     @ApplicationContext private val context: Context,
     private val getUserAvatarUseCase: GetUserAvatarUseCase,
+    private val megaChatRequestHandler: MegaChatRequestHandler,
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         MeetingState(
@@ -1137,14 +1137,10 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun logout() = viewModelScope.launch {
         runCatching {
+            megaChatRequestHandler.setIsLoggingRunning(true)
             logoutUseCase()
         }.onSuccess {
-            //We need to observe finish activity only when logout is success
-            //We are waiting for the logout process in MegaChatRequestHandler to finish with this monitor flow and then triggers navigating to LeftMeetingActivity
-            //if we navigate earlier MegaChatRequestHandler.isLoggingRunning will be false and app will navigate to default LoginActivity
-            monitorFinishActivityUseCase().collect { logoutFinished ->
-                _state.update { it.copy(shouldLaunchLeftMeetingActivity = logoutFinished) }
-            }
+            _state.update { it.copy(shouldLaunchLeftMeetingActivity = true) }
         }.onFailure {
             Timber.d("Error on logout $it")
         }
