@@ -87,7 +87,7 @@ extra["targetSdkVersion"] = 34
 extra["buildTools"] = "35.0.0"
 
 // Prebuilt MEGA SDK version
-extra["megaSdkVersion"] = "20241002.083119-rel"
+extra["megaSdkVersion"] = "20241007.062623-rel"
 
 //JDK and Java Version
 extra["jdk"] = "17"
