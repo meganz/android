@@ -36,6 +36,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 /**
  * Upload View
@@ -49,6 +50,7 @@ fun UploadDestinationView(
     uiState: UploadDestinationUiState,
     navigateToChats: () -> Unit,
     navigateToCloudDrive: () -> Unit,
+    handleBackPress: () -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState()
     MegaScaffold(
@@ -61,6 +63,7 @@ fun UploadDestinationView(
                 title = stringResource(id = R.string.title_upload_explorer),
                 appBarType = AppBarType.BACK_NAVIGATION,
                 elevation = 0.dp,
+                onNavigationPressed = handleBackPress
             )
         },
     ) {
@@ -73,7 +76,7 @@ fun UploadDestinationView(
         EventEffect(
             event = uiState.nameValidationError,
             onConsumed = { consumeNameValidationError() }) {
-            scaffoldState.snackbarHostState.showSnackbar(it)
+            scaffoldState.snackbarHostState.showAutoDurationSnackbar(it)
         }
 
         LazyColumn(
@@ -184,7 +187,7 @@ private fun UploadDestinationFooterView(
         modifier = Modifier.testTag(UPLOAD_DESTINATION_VIEW_CLOUD_DRIVE),
         text = stringResource(id = R.string.section_cloud_drive),
         onClick = {
-            if(isValidNameForUpload()) {
+            if (isValidNameForUpload()) {
                 navigateToCloudDrive()
             }
         },
@@ -212,18 +215,35 @@ private fun UploadViewPreview() {
         UploadDestinationView(
             uiState = UploadDestinationUiState(
                 importUiItems = listOf(
-                    ImportUiItem(originalFileName = "file1", filePath = "path1",fileName = "file1"),
-                    ImportUiItem(originalFileName = "file2", filePath = "path2", fileName = "file2"),
-                    ImportUiItem(originalFileName = "file3", filePath = "path3", fileName = "file3"),
-                    ImportUiItem(originalFileName = "file4", filePath = "path4", fileName = "file4"),
+                    ImportUiItem(
+                        originalFileName = "file1",
+                        filePath = "path1",
+                        fileName = "file1"
+                    ),
+                    ImportUiItem(
+                        originalFileName = "file2",
+                        filePath = "path2",
+                        fileName = "file2"
+                    ),
+                    ImportUiItem(
+                        originalFileName = "file3",
+                        filePath = "path3",
+                        fileName = "file3"
+                    ),
+                    ImportUiItem(
+                        originalFileName = "file4",
+                        filePath = "path4",
+                        fileName = "file4"
+                    ),
                 ),
             ),
-            isValidNameForUpload = {true},
+            isValidNameForUpload = { true },
             consumeNameValidationError = {},
             editFileName = {},
             updateFileName = {},
             navigateToChats = {},
             navigateToCloudDrive = {},
+            handleBackPress = {},
         )
     }
 }
@@ -235,24 +255,65 @@ private fun UploadViewInEditModePreview() {
         UploadDestinationView(
             uiState = UploadDestinationUiState(
                 importUiItems = listOf(
-                    ImportUiItem(originalFileName = "file1", filePath = "path1", fileName = "file1"),
-                    ImportUiItem(originalFileName = "file2", filePath = "path2", fileName = "file2"),
-                    ImportUiItem(originalFileName = "file3", filePath = "path3", fileName = "file3"),
-                    ImportUiItem(originalFileName = "file4", filePath = "path4", fileName = "file4"),
-                    ImportUiItem(originalFileName = "file5", filePath = "path5", fileName = "file5"),
-                    ImportUiItem(originalFileName = "file6", filePath = "path6", fileName = "file6"),
-                    ImportUiItem(originalFileName = "file7", filePath = "path7", fileName = "file7"),
-                    ImportUiItem(originalFileName = "file8", filePath = "path8", fileName = "file8"),
-                    ImportUiItem(originalFileName = "file9", filePath = "path9", fileName = "file9"),
+                    ImportUiItem(
+                        originalFileName = "file1",
+                        filePath = "path1",
+                        fileName = "file1"
+                    ),
+                    ImportUiItem(
+                        originalFileName = "file2",
+                        filePath = "path2",
+                        fileName = "file2"
+                    ),
+                    ImportUiItem(
+                        originalFileName = "file3",
+                        filePath = "path3",
+                        fileName = "file3"
+                    ),
+                    ImportUiItem(
+                        originalFileName = "file4",
+                        filePath = "path4",
+                        fileName = "file4"
+                    ),
+                    ImportUiItem(
+                        originalFileName = "file5",
+                        filePath = "path5",
+                        fileName = "file5"
+                    ),
+                    ImportUiItem(
+                        originalFileName = "file6",
+                        filePath = "path6",
+                        fileName = "file6"
+                    ),
+                    ImportUiItem(
+                        originalFileName = "file7",
+                        filePath = "path7",
+                        fileName = "file7"
+                    ),
+                    ImportUiItem(
+                        originalFileName = "file8",
+                        filePath = "path8",
+                        fileName = "file8"
+                    ),
+                    ImportUiItem(
+                        originalFileName = "file9",
+                        filePath = "path9",
+                        fileName = "file9"
+                    ),
                 ),
-                editableFile = ImportUiItem(originalFileName = "file5", filePath = "path5", fileName = "file5"),
+                editableFile = ImportUiItem(
+                    originalFileName = "file5",
+                    filePath = "path5",
+                    fileName = "file5"
+                ),
             ),
-            isValidNameForUpload = {true},
+            isValidNameForUpload = { true },
             consumeNameValidationError = {},
             editFileName = {},
             updateFileName = {},
             navigateToChats = {},
             navigateToCloudDrive = {},
+            handleBackPress = {},
         )
     }
 }

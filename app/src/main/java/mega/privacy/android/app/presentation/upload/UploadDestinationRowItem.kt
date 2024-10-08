@@ -36,9 +36,9 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 @Composable
 fun UploadDestinationRowItem(
     importUiItem: ImportUiItem,
-    isEditMode: Boolean = false,
     editFileName: (ImportUiItem?) -> Unit,
     updateFileName: (String) -> Unit,
+    isEditMode: Boolean = false,
 ) {
     Row(
         modifier = Modifier
@@ -49,11 +49,11 @@ fun UploadDestinationRowItem(
             data = importUiItem.filePath,
             contentScale = ContentScale.Crop,
             defaultImage = importUiItem.fileIcon ?: iconPackR.drawable.ic_generic_medium_solid,
+            contentDescription = "Edit",
             modifier = Modifier
                 .padding(end = 16.dp)
                 .size(48.dp)
                 .clip(RoundedCornerShape(8.dp)),
-            contentDescription = "Edit",
         )
         if (isEditMode) {
             GenericTextField(
@@ -79,7 +79,8 @@ fun UploadDestinationRowItem(
                 MegaText(
                     modifier = Modifier
                         .weight(1f)
-                        .horizontalScroll(scroll),
+                        .horizontalScroll(scroll)
+                        .clickable { editFileName(importUiItem) },
                     text = importUiItem.fileName.replace("\n", " "),
                     textColor = TextColor.Primary,
                     overflow = LongTextBehaviour.Visible(1)

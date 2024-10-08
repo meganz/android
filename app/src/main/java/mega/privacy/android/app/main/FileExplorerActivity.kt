@@ -47,13 +47,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.listeners.CreateFolderListener
 import mega.privacy.android.app.listeners.GetAttrUserListener
-import mega.privacy.android.app.main.legacycontact.AddContactActivity.ALLOW_ADD_PARTICIPANTS
-import mega.privacy.android.app.main.legacycontact.AddContactActivity.EXTRA_CHAT_LINK
-import mega.privacy.android.app.main.legacycontact.AddContactActivity.EXTRA_CHAT_TITLE
-import mega.privacy.android.app.main.legacycontact.AddContactActivity.EXTRA_CONTACTS
-import mega.privacy.android.app.main.legacycontact.AddContactActivity.EXTRA_CONTACT_TYPE
-import mega.privacy.android.app.main.legacycontact.AddContactActivity.EXTRA_EKR
-import mega.privacy.android.app.main.legacycontact.AddContactActivity.EXTRA_ONLY_CREATE_GROUP
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.CAMERA
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.COPY
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.IMPORT
@@ -65,12 +58,18 @@ import mega.privacy.android.app.main.FileExplorerActivity.Companion.SHARE_LINK
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.UPLOAD
 import mega.privacy.android.app.main.adapters.FileExplorerPagerAdapter
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
+import mega.privacy.android.app.main.legacycontact.AddContactActivity.ALLOW_ADD_PARTICIPANTS
+import mega.privacy.android.app.main.legacycontact.AddContactActivity.EXTRA_CHAT_LINK
+import mega.privacy.android.app.main.legacycontact.AddContactActivity.EXTRA_CHAT_TITLE
+import mega.privacy.android.app.main.legacycontact.AddContactActivity.EXTRA_CONTACTS
+import mega.privacy.android.app.main.legacycontact.AddContactActivity.EXTRA_CONTACT_TYPE
+import mega.privacy.android.app.main.legacycontact.AddContactActivity.EXTRA_EKR
+import mega.privacy.android.app.main.legacycontact.AddContactActivity.EXTRA_ONLY_CREATE_GROUP
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
-import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -366,11 +365,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         if (action != null && intent != null) {
             intent.action = action
         }
-        if(isFromUploadDestinationActivity) {
-            intent.serializable<HashMap<String,String>>(UploadDestinationActivity.EXTRA_NAME_MAP)?.let { nameMap ->
-                viewModel.setFileNames(nameMap)
-            }
-        }
 
         if (chatListItems.isNotEmpty()) {
             onIntentProcessed(filePreparedInfos)
@@ -632,10 +626,16 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun handleImportFromUploadDestination() {
         if (isFromUploadDestinationActivity) {
-            val fragment = intent.getIntExtra(UploadDestinationActivity.EXTRA_NAVIGATION, CLOUD_FRAGMENT)
+            val fragment =
+                intent.getIntExtra(UploadDestinationActivity.EXTRA_NAVIGATION, CLOUD_FRAGMENT)
             importFileF = true
             importFragmentSelected = fragment
             chooseFragment(fragment)
+            viewModel.ownFilePrepareTask(this, intent)
+            createAndShowProgressDialog(
+                false,
+                resources.getQuantityString(R.plurals.upload_prepare, 1)
+            )
         }
     }
 
@@ -1613,7 +1613,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     checkFileNameCollisionsUseCase(
                         files = infos.map {
                             DocumentEntity(
-                                name = viewModel.uiState.value.fileNames[it.originalFileName] ?: it.originalFileName,
+                                name = viewModel.uiState.value.fileNames[it.originalFileName]
+                                    ?: it.originalFileName,
                                 size = it.size,
                                 lastModified = it.lastModified,
                                 uri = UriPath(it.fileAbsolutePath),

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.upload
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -54,6 +55,7 @@ class UploadDestinationActivity : AppCompatActivity() {
      *
      * @param savedInstanceState
      */
+    @SuppressLint("UnsafeIntentLaunch")
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -79,7 +81,8 @@ class UploadDestinationActivity : AppCompatActivity() {
                                         editFileName = uploadDestinationViewModel::editFileName,
                                         updateFileName = uploadDestinationViewModel::updateFileName,
                                         navigateToCloudDrive = this::navigateToCloudDrive,
-                                        navigateToChats = this::navigateToChats
+                                        navigateToChats = this::navigateToChats,
+                                        handleBackPress = this::onBackPressed
                                     )
                                 }
                             )
@@ -131,6 +134,7 @@ class UploadDestinationActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("UnsafeIntentLaunch")
     private fun navigateToChats() {
         startActivity(
             intent.setClass(this, FileExplorerActivity::class.java).apply {
@@ -140,6 +144,7 @@ class UploadDestinationActivity : AppCompatActivity() {
         )
     }
 
+    @SuppressLint("UnsafeIntentLaunch")
     private fun navigateToCloudDrive() {
         startActivity(
             intent.setClass(this, FileExplorerActivity::class.java).apply {
