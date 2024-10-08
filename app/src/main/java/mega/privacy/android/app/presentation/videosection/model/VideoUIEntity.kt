@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.videosection.model
 
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
-import java.io.File
 import kotlin.time.Duration
 
 /**
@@ -33,9 +32,7 @@ data class VideoUIEntity(
     val name: String,
     val size: Long,
     val fileTypeInfo: FileTypeInfo,
-    val durationString: String?,
     val duration: Duration,
-    val thumbnail: File? = null,
     val isFavourite: Boolean = false,
     val nodeAvailableOffline: Boolean = false,
     val isSharedItems: Boolean = false,
@@ -44,6 +41,6 @@ data class VideoUIEntity(
     val isSelected: Boolean = false,
     val isMarkedSensitive: Boolean = false,
     val isSensitiveInherited: Boolean = false,
-    val watchedDate: String,
+    val watchedDate: Long = 0,
     val collectionTitle: String? = null
 )

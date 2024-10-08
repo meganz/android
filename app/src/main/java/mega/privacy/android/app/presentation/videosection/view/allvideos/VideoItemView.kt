@@ -51,11 +51,15 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -63,7 +67,7 @@ internal fun VideoItemView(
     @DrawableRes icon: Int,
     name: String,
     fileSize: String?,
-    duration: String?,
+    duration: Duration,
     isFavourite: Boolean,
     isSelected: Boolean,
     isSharedWithPublicLink: Boolean,
@@ -77,6 +81,10 @@ internal fun VideoItemView(
     onMenuClick: () -> Unit = {},
     isSensitive: Boolean = false,
 ) {
+    val durationInSecondsTextMapper = remember {
+        DurationInSecondsTextMapper()
+    }
+
     Row(
         modifier = modifier
             .combinedClickable(
@@ -94,7 +102,7 @@ internal fun VideoItemView(
                 .fillMaxHeight()
                 .blur(16.dp.takeIf { isSensitive } ?: 0.dp),
             thumbnailData = thumbnailData,
-            duration = duration,
+            duration = durationInSecondsTextMapper(duration),
             isFavourite = isFavourite
         )
 
@@ -138,7 +146,7 @@ internal fun VideoThumbnailView(
     @DrawableRes icon: Int,
     modifier: Modifier,
     thumbnailData: Any?,
-    duration: String?,
+    duration: String,
     isFavourite: Boolean,
 ) {
     Box(
@@ -163,18 +171,17 @@ internal fun VideoThumbnailView(
             modifier = thumbnailModifier.testTag(VIDEO_ITEM_THUMBNAIL_TEST_TAG)
         )
 
-        duration?.let {
-            Text(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = 5.dp, end = 5.dp)
-                    .height(16.dp)
-                    .testTag(VIDEO_ITEM_DURATION_VIEW_TEST_TAG),
-                text = it,
-                style = MaterialTheme.typography.caption,
-                color = Color.White
-            )
-        }
+        Text(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom = 5.dp, end = 5.dp)
+                .height(16.dp)
+                .testTag(VIDEO_ITEM_DURATION_VIEW_TEST_TAG),
+            text = duration,
+            style = MaterialTheme.typography.caption,
+            color = Color.White
+        )
+
         Image(
             painter = painterResource(id = R.drawable.ic_play_circle),
             contentDescription = VIDEO_ITEM_PLAY_ICON_CONTENT_DESCRIPTION,
@@ -367,7 +374,7 @@ private fun VideoItemViewWithFavouritePreview() {
             icon = iconPackR.drawable.ic_video_section_video_default_thumbnail,
             name = "testing_video_file_name_long_name_testing.mp4",
             fileSize = "1.3MB",
-            duration = "04:00",
+            duration = 240.toDuration(DurationUnit.SECONDS),
             isFavourite = true,
             onClick = {},
             thumbnailData = null,
@@ -387,7 +394,7 @@ private fun VideoItemViewWithoutFavouritePreview() {
             icon = iconPackR.drawable.ic_video_section_video_default_thumbnail,
             name = "name.mp4",
             fileSize = "1.3MB",
-            duration = "04:00",
+            duration = 240.toDuration(DurationUnit.SECONDS),
             isFavourite = false,
             onClick = {},
             thumbnailData = null,

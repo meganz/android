@@ -81,7 +81,7 @@ data class VideoSectionState(
     val isHideMenuActionVisible: Boolean = false,
     val isUnhideMenuActionVisible: Boolean = false,
     val isRemoveLinkMenuActionVisible: Boolean = false,
-    val groupedVideoRecentlyWatchedItems: Map<String, List<VideoUIEntity>> = emptyMap(),
+    val groupedVideoRecentlyWatchedItems: Map<Long, List<VideoUIEntity>> = emptyMap(),
     val clearRecentlyWatchedVideosSuccess: StateEvent = consumed,
     val removeRecentlyWatchedItemSuccess: StateEvent = consumed,
 )

@@ -36,6 +36,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoilApi::class)
 @HiltAndroidTest
@@ -46,14 +48,14 @@ class VideoItemViewTest {
 
     private val name = "Video Name"
     private val fileSize = "100 MB"
-    private val duration = "01:00"
+    private val duration = 60.seconds
     private val labelColor = Color.Red
 
     private fun setComposeContent(
         @DrawableRes icon: Int = R.drawable.ic_video_section_video_default_thumbnail,
         name: String = "",
         fileSize: String? = null,
-        duration: String? = null,
+        duration: Duration = 0.seconds,
         isFavourite: Boolean = false,
         isSelected: Boolean = false,
         isSharedWithPublicLink: Boolean = false,
@@ -100,9 +102,9 @@ class VideoItemViewTest {
     fun `test that the UIs are displayed correctly when parameters are default value`() {
         setComposeContent()
         VIDEO_ITEM_NAME_VIEW_TEST_TAG.assertIsDisplayedWithTag()
+        VIDEO_ITEM_DURATION_VIEW_TEST_TAG.assertIsDisplayedWithTag()
         listOf(
             VIDEO_ITEM_SIZE_VIEW_TEST_TAG,
-            VIDEO_ITEM_DURATION_VIEW_TEST_TAG,
             VIDEO_ITEM_LABEL_VIEW_TEST_TAG
         ).forEach {
             it.assertIsNotDisplayedWithTag()
@@ -156,7 +158,7 @@ class VideoItemViewTest {
         }
         VIDEO_ITEM_DURATION_VIEW_TEST_TAG.run {
             assertIsDisplayedWithTag()
-            assertTextEqualsWithTag(duration)
+            assertTextEqualsWithTag("1:00")
         }
         VIDEO_ITEM_LABEL_VIEW_TEST_TAG.assertIsDisplayedWithTag()
 

@@ -71,6 +71,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
+import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -1458,14 +1459,14 @@ class VideoSectionViewModelTest {
     fun `test that getVideoRecentlyWatched function returns as expected`() = runTest {
         val testHandles = listOf(1L, 2L, 3L)
         val testTimestamps = listOf(3000L, 2000L, 1000L)
-        val testWatchDates = listOf("12 April 2024", "11 April 2024", "10 April 2024")
         val testVideoNodes = testHandles.mapIndexed { index, handle ->
             initTypedVideoNode(handle, testTimestamps[index])
         }
         val testVideoEntities = testHandles.mapIndexed { index, handle ->
-            initVideoUIEntity(handle, testWatchDates[index])
+            initVideoUIEntity(handle, testTimestamps[index])
         }
-        val expectedRecentlyWatchedItems = testVideoEntities.groupBy { it.watchedDate }
+        val expectedRecentlyWatchedItems =
+            testVideoEntities.groupBy { TimeUnit.SECONDS.toDays(it.watchedDate) }
         testVideoNodes.forEachIndexed { index, node ->
             whenever(videoUIEntityMapper(node)).thenReturn(testVideoEntities[index])
         }
@@ -1488,7 +1489,7 @@ class VideoSectionViewModelTest {
         on { watchedTimestamp }.thenReturn(timestamp)
     }
 
-    private fun initVideoUIEntity(handle: Long, date: String) = mock<VideoUIEntity> {
+    private fun initVideoUIEntity(handle: Long, date: Long) = mock<VideoUIEntity> {
         on { id }.thenReturn(NodeId(handle))
         on { name }.thenReturn("video name")
         on { watchedDate }.thenReturn(date)

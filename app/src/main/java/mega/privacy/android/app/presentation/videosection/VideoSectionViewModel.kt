@@ -74,6 +74,7 @@ import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitle
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -1092,7 +1093,7 @@ class VideoSectionViewModel @Inject constructor(
         runCatching {
             getVideoRecentlyWatchedUseCase().map {
                 videoUIEntityMapper(it)
-            }.groupBy { it.watchedDate }
+            }.groupBy { TimeUnit.SECONDS.toDays(it.watchedDate) }
         }.onSuccess { group ->
             _state.update {
                 it.copy(groupedVideoRecentlyWatchedItems = group)

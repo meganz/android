@@ -390,8 +390,9 @@ public class TimeUtils implements Comparator<Calendar> {
         }
     }
 
-    public static String formatRecentlyWatchedDate(long ts, Context context) {
-        Calendar cal = Util.calculateDateFromTimestamp(ts);
+    public static String formatRecentlyWatchedDate(long days, Context context) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(TimeUnit.DAYS.toMillis(days));
         Calendar calToday = Calendar.getInstance();
         Calendar calYesterday = Calendar.getInstance();
         calYesterday.add(Calendar.DATE, -1);
@@ -404,8 +405,7 @@ public class TimeUtils implements Comparator<Calendar> {
         } else {
             Date date = cal.getTime();
             return new SimpleDateFormat(
-                    getBestDateTimePattern(getUserLocale(), "EEEE, MMM dd yyyy")
-                            .replace("dd MMM", "MMM dd") ,
+                    getBestDateTimePattern(getUserLocale(), "EEE, dd MMM yyyy"),
                     getUserLocale()).format(date);
         }
     }

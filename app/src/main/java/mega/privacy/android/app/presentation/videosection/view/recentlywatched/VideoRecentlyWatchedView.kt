@@ -39,6 +39,7 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenu
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VideoItemView
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
@@ -57,7 +58,7 @@ import nz.mega.sdk.MegaNode
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun VideoRecentlyWatchedView(
-    group: Map<String, List<VideoUIEntity>>,
+    group: Map<Long, List<VideoUIEntity>>,
     accountType: AccountType?,
     clearRecentlyWatchedVideosSuccess: StateEvent,
     removeRecentlyWatchedItemSuccess: StateEvent,
@@ -146,7 +147,7 @@ fun VideoRecentlyWatchedView(
                                     contentAlignment = Alignment.CenterStart
                                 ) {
                                     MegaText(
-                                        text = date,
+                                        text = TimeUtils.formatRecentlyWatchedDate(date, context),
                                         textColor = TextColor.Primary,
                                         modifier = Modifier.testTag(
                                             VIDEO_RECENTLY_WATCHED_HEADER_TEST_TAG
@@ -161,7 +162,7 @@ fun VideoRecentlyWatchedView(
                                     icon = iconPackR.drawable.ic_video_section_video_default_thumbnail,
                                     name = videoItem.name,
                                     fileSize = formatFileSize(videoItem.size, LocalContext.current),
-                                    duration = videoItem.durationString,
+                                    duration = videoItem.duration,
                                     isFavourite = videoItem.isFavourite,
                                     isSelected = videoItem.isSelected,
                                     isSharedWithPublicLink = videoItem.isSharedItems,

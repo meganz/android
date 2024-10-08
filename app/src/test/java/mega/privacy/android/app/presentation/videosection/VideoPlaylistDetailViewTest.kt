@@ -37,6 +37,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoilApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -226,7 +227,7 @@ class VideoPlaylistDetailViewTest {
             on { id }.thenReturn(NodeId(123456L))
             on { name }.thenReturn("video")
             on { size }.thenReturn(700L)
-            on { durationString }.thenReturn("10:00")
+            on { duration }.thenReturn(600.seconds)
         }
 
         val playlist = VideoPlaylistUIEntity(

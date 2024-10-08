@@ -173,7 +173,7 @@ internal fun AllVideosView(
                                 icon = iconPackR.drawable.ic_video_section_video_default_thumbnail,
                                 name = videoItem.name,
                                 fileSize = formatFileSize(videoItem.size, LocalContext.current),
-                                duration = videoItem.durationString,
+                                duration = videoItem.duration,
                                 isFavourite = videoItem.isFavourite,
                                 isSelected = videoItem.isSelected,
                                 isSharedWithPublicLink = videoItem.isSharedItems,

@@ -24,9 +24,9 @@ import mega.privacy.android.app.presentation.videosection.view.recentlywatched.V
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.VideoRecentlyWatchedView
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NodeId
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -37,15 +37,16 @@ class VideoRecentlyWatchedViewKtTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    private val testDate = "12 April 2024"
+    private val testTimestamp = 100L
+    private val testDate = "Sat, Apr 11, 1970"
     private val testEntity = mock<VideoUIEntity> {
         on { id }.thenReturn(NodeId(1L))
         on { name }.thenReturn("name")
         on { size }.thenReturn(1L)
     }
-    private val testGroup = mapOf((testDate to listOf(testEntity)))
+    private val testGroup = mapOf((testTimestamp to listOf(testEntity)))
 
-    @Before
+    @BeforeAll
     fun setUp() {
         val engine = FakeImageLoaderEngine.Builder().build()
         val imageLoader = ImageLoader.Builder(composeTestRule.activity)
@@ -55,7 +56,7 @@ class VideoRecentlyWatchedViewKtTest {
     }
 
     private fun setComposeContent(
-        group: Map<String, List<VideoUIEntity>> = emptyMap(),
+        group: Map<Long, List<VideoUIEntity>> = emptyMap(),
         accountType: AccountType? = AccountType.FREE,
         clearRecentlyWatchedVideosSuccess: StateEvent = consumed,
         removeRecentlyWatchedItemSuccess: StateEvent = consumed,
