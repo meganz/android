@@ -10,7 +10,7 @@ import mega.privacy.android.app.utils.Constants
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
-class QueryIfContactSouldBeAddedTask(addContactActivity: AddContactActivity) :
+class QueryIfContactShouldBeAddedTask(addContactActivity: AddContactActivity) :
     AsyncTask<Boolean, Void, Int>() {
     private val activityReference = WeakReference(addContactActivity)
     private fun activityRef() = activityReference.get().takeUnless { it == null || it.isFinishing }
@@ -82,17 +82,16 @@ class QueryIfContactSouldBeAddedTask(addContactActivity: AddContactActivity) :
         return 0
     }
 
-    fun shareContact() {
+    private fun shareContact() {
         val addContactActivity = activityRef() ?: return
-        addContactActivity.addShareContact(shareContactInfo)
-        val position = addContactActivity.filteredContactsShare.indexOf(shareContactInfo)
-        if (shareContactInfo!!.isMegaContact) {
+        shareContactInfo?.let { addContactActivity.addShareContact(it) }
+        if (shareContactInfo?.isMegaContact == true) {
             if (addContactActivity.filteredContactMEGA.size == 1) {
                 addContactActivity.filteredContactsShare.removeAt(0)
             }
-            addContactActivity.filteredContactMEGA.remove(shareContactInfo!!.getMegaContactAdapter())
-        } else if (shareContactInfo!!.isPhoneContact) {
-            addContactActivity.filteredContactsPhone.remove(shareContactInfo!!.phoneContactInfo)
+            addContactActivity.filteredContactMEGA.remove(shareContactInfo?.getMegaContactAdapter())
+        } else if (shareContactInfo?.isPhoneContact == true) {
+            addContactActivity.filteredContactsPhone.remove(shareContactInfo?.phoneContactInfo)
             if (addContactActivity.filteredContactsPhone.size == 0) {
                 addContactActivity.filteredContactsShare.removeAt(addContactActivity.filteredContactsShare.size - 2)
             }
@@ -101,9 +100,9 @@ class QueryIfContactSouldBeAddedTask(addContactActivity: AddContactActivity) :
         addContactActivity.setShareAdapterContacts(addContactActivity.filteredContactsShare)
     }
 
-    fun phoneContact() {
+    private fun phoneContact() {
         val addContactActivity = activityRef() ?: return
-        addContactActivity.addContact(phoneContactInfo)
+        phoneContactInfo?.let { addContactActivity.addContact(it) }
         addContactActivity.filteredContactsPhone.remove(phoneContactInfo)
         addContactActivity.setPhoneAdapterContacts(addContactActivity.filteredContactsPhone)
     }
@@ -118,7 +117,7 @@ class QueryIfContactSouldBeAddedTask(addContactActivity: AddContactActivity) :
             )
             builder.setCancelable(false)
 
-            val dialogClickListener = DialogInterface.OnClickListener { dialog, which ->
+            val dialogClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE -> {
                         if (addContactActivity.contactType == Constants.CONTACT_TYPE_DEVICE) {

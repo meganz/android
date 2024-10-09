@@ -26,8 +26,8 @@ internal class GetContactsTask(addContactActivity: AddContactActivity) :
                     mail = addContactActivity.contactsNewGroup[i]
                     for (j in addContactActivity.filteredContactMEGA.indices) {
                         contact = addContactActivity.filteredContactMEGA[j]
-                        if ((contact.megaUser != null && contact.megaUser!!.email == mail)
-                            || (contact.contact != null && contact.contact!!.email != null && contact.contact!!.email == mail)
+                        if ((contact.megaUser != null && contact.megaUser?.email == mail)
+                            || (contact.contact?.email != null && contact.contact?.email == mail)
                         ) {
                             addContactActivity.addedContactsMEGA.add(contact)
                             addContactActivity.filteredContactMEGA.remove(contact)
@@ -35,7 +35,7 @@ internal class GetContactsTask(addContactActivity: AddContactActivity) :
                         }
                     }
                 }
-                addContactActivity.adapterMEGAContacts.setContacts(addContactActivity.addedContactsMEGA)
+                addContactActivity.adapterMEGAContacts?.setContacts(addContactActivity.addedContactsMEGA)
             }
         } else if (addContactActivity.contactType == Constants.CONTACT_TYPE_DEVICE) {
             if (addContactActivity.queryPermissions) {
@@ -45,7 +45,7 @@ internal class GetContactsTask(addContactActivity: AddContactActivity) :
                 var contactPhone: PhoneContactInfo
                 var contactMEGA: MegaContactAdapter?
 
-                if (addContactActivity.filteredContactsPhone != null && !addContactActivity.filteredContactsPhone.isEmpty()) {
+                if (addContactActivity.filteredContactsPhone.isNotEmpty()) {
                     var i = 0
                     while (i < addContactActivity.filteredContactsPhone.size) {
                         found = false
@@ -76,7 +76,7 @@ internal class GetContactsTask(addContactActivity: AddContactActivity) :
             addContactActivity.shareContacts.clear()
             addContactActivity.filteredContactsShare.clear()
 
-            if (addContactActivity.filteredContactMEGA != null && !addContactActivity.filteredContactMEGA.isEmpty()) {
+            if (addContactActivity.filteredContactMEGA.isNotEmpty()) {
                 addContactActivity.shareContacts.add(ShareContactInfo(true, true, false))
                 for (i in addContactActivity.filteredContactMEGA.indices) {
                     contactMEGA = addContactActivity.filteredContactMEGA[i]
@@ -97,13 +97,13 @@ internal class GetContactsTask(addContactActivity: AddContactActivity) :
     override fun onPostExecute(avoid: Void?) {
         val addContactActivity = activityRef() ?: return
         Timber.d("onPostExecute GetContactsTask")
-        addContactActivity.progressBar.visibility = View.GONE
+        addContactActivity.progressBar?.visibility = View.GONE
         if (addContactActivity.searchExpand) {
             if (addContactActivity.isAsyncTaskRunning(addContactActivity.filterContactsTask)) {
-                addContactActivity.filterContactsTask.cancel(true)
+                addContactActivity.filterContactsTask?.cancel(true)
             }
             addContactActivity.filterContactsTask = FilterContactsTask(addContactActivity)
-            addContactActivity.filterContactsTask.execute()
+            addContactActivity.filterContactsTask?.execute()
         } else {
             if (addContactActivity.contactType == Constants.CONTACT_TYPE_MEGA) {
                 if (addContactActivity.newGroup) {
@@ -122,7 +122,7 @@ internal class GetContactsTask(addContactActivity: AddContactActivity) :
                     addContactActivity.getPhoneContactsTask = GetPhoneContactsTask(
                         addContactActivity
                     )
-                    addContactActivity.getPhoneContactsTask.execute()
+                    addContactActivity.getPhoneContactsTask?.execute()
                 }
             }
             addContactActivity.setTitleAB()
@@ -132,14 +132,15 @@ internal class GetContactsTask(addContactActivity: AddContactActivity) :
             addContactActivity.setSearchVisibility()
 
             if (addContactActivity.isConfirmAddShown) {
-                if (addContactActivity.isAsyncTaskRunning(addContactActivity.queryIfContactSouldBeAddedTask)) {
-                    addContactActivity.queryIfContactSouldBeAddedTask.cancel(true)
+                if (addContactActivity.isAsyncTaskRunning(addContactActivity.queryIfContactShouldBeAddedTask)) {
+                    addContactActivity.queryIfContactShouldBeAddedTask?.cancel(true)
                 }
                 Util.hideKeyboard(addContactActivity, 0)
-                addContactActivity.queryIfContactSouldBeAddedTask = QueryIfContactSouldBeAddedTask(
-                    addContactActivity
-                )
-                addContactActivity.queryIfContactSouldBeAddedTask.execute(true)
+                addContactActivity.queryIfContactShouldBeAddedTask =
+                    QueryIfContactShouldBeAddedTask(
+                        addContactActivity
+                    )
+                addContactActivity.queryIfContactShouldBeAddedTask?.execute(true)
             }
         }
     }

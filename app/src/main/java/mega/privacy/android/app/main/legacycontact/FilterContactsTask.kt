@@ -11,7 +11,7 @@ import timber.log.Timber
 import java.lang.ref.WeakReference
 import java.util.Locale
 
-internal class FilterContactsTask(addContactActivity: AddContactActivity) :
+class FilterContactsTask(addContactActivity: AddContactActivity) :
     AsyncTask<Void, Void, Void>() {
     private val activityReference = WeakReference(addContactActivity)
     private fun activityRef() = activityReference.get().takeUnless { it == null || it.isFinishing }
@@ -22,28 +22,32 @@ internal class FilterContactsTask(addContactActivity: AddContactActivity) :
         val addContactActivity = activityRef() ?: return null
         if (addContactActivity.searchExpand) {
             if (addContactActivity.searchAutoComplete != null) {
-                addContactActivity.inputString =
-                    addContactActivity.searchAutoComplete.text.toString()
+                addContactActivity.searchAutoComplete?.text?.toString()
+                    ?.let { addContactActivity.inputString = it }
             }
         } else {
-            addContactActivity.inputString = addContactActivity.typeContactEditText.text.toString()
+            addContactActivity.typeContactEditText?.text?.toString()
+                ?.let { addContactActivity.inputString = it }
         }
-        if (addContactActivity.inputString != null && addContactActivity.inputString != "") {
+        if (addContactActivity.inputString != "") {
             var contactMega: MegaContactAdapter
             var contactPhone: PhoneContactInfo
             var contactShare: ShareContactInfo
 
+            val inputStringLowercase = addContactActivity.inputString.lowercase(Locale.getDefault())
             if (addContactActivity.contactType == Constants.CONTACT_TYPE_MEGA) {
                 addContactActivity.queryContactMEGA.clear()
                 for (i in addContactActivity.filteredContactMEGA.indices) {
                     contactMega = addContactActivity.filteredContactMEGA[i]
-                    if (addContactActivity.getMegaContactMail(contactMega)
-                            .lowercase(Locale.getDefault()).contains(
-                            addContactActivity.inputString.lowercase(Locale.getDefault())
-                        )
-                        || contactMega.fullName!!.lowercase(Locale.getDefault()).contains(
-                            addContactActivity.inputString.lowercase(Locale.getDefault())
-                        )
+                    val contactEmail = addContactActivity.getMegaContactMail(contactMega)
+                        ?.lowercase(Locale.getDefault())
+                    val fullName = contactMega.fullName?.lowercase(Locale.getDefault())
+                    if (contactEmail?.contains(
+                            inputStringLowercase
+                        ) == true
+                        || fullName?.contains(
+                            inputStringLowercase
+                        ) == true
                     ) {
                         addContactActivity.queryContactMEGA.add(contactMega)
                     }
@@ -53,10 +57,10 @@ internal class FilterContactsTask(addContactActivity: AddContactActivity) :
                 for (i in addContactActivity.filteredContactsPhone.indices) {
                     contactPhone = addContactActivity.filteredContactsPhone[i]
                     if (contactPhone.email.lowercase(Locale.getDefault()).contains(
-                            addContactActivity.inputString.lowercase(Locale.getDefault())
+                            inputStringLowercase
                         )
                         || contactPhone.name.lowercase(Locale.getDefault()).contains(
-                            addContactActivity.inputString.lowercase(Locale.getDefault())
+                            inputStringLowercase
                         )
                     ) {
                         addContactActivity.queryContactsPhone.add(contactPhone)
@@ -72,16 +76,20 @@ internal class FilterContactsTask(addContactActivity: AddContactActivity) :
                         queryContactsShare.add(contactShare)
                     } else {
                         if (contactShare.isMegaContact) {
-                            if (addContactActivity.getMegaContactMail(contactShare.getMegaContactAdapter())
-                                    .lowercase(
+                            val contactEmail =
+                                addContactActivity.getMegaContactMail(contactShare.getMegaContactAdapter())
+                                    ?.lowercase(
                                         Locale.getDefault()
-                                    ).contains(
-                                    addContactActivity.inputString.lowercase(Locale.getDefault())
-                                )
-                                || contactShare.getMegaContactAdapter().fullName!!.lowercase(Locale.getDefault())
-                                    .contains(
-                                        addContactActivity.inputString.lowercase(Locale.getDefault())
                                     )
+                            val fullName =
+                                contactShare.getMegaContactAdapter().fullName?.lowercase(Locale.getDefault())
+                            if (contactEmail?.contains(
+                                    inputStringLowercase
+                                ) == true
+                                || fullName
+                                    ?.contains(
+                                        inputStringLowercase
+                                    ) == true
                             ) {
                                 queryContactsShare.add(contactShare)
                                 numMega++
@@ -90,12 +98,12 @@ internal class FilterContactsTask(addContactActivity: AddContactActivity) :
                             && ((contactShare.phoneContactInfo.email != null && contactShare.phoneContactInfo.email.lowercase(
                                 Locale.getDefault()
                             ).contains(
-                                addContactActivity.inputString.lowercase(Locale.getDefault())
+                                inputStringLowercase
                             ))
                                     || (contactShare.phoneContactInfo.name != null && contactShare.phoneContactInfo.name.lowercase(
                                 Locale.getDefault()
                             ).contains(
-                                addContactActivity.inputString.lowercase(Locale.getDefault())
+                                inputStringLowercase
                             )))
                         ) {
                             queryContactsShare.add(contactShare)
@@ -124,7 +132,7 @@ internal class FilterContactsTask(addContactActivity: AddContactActivity) :
         Timber.d("onPostExecute FilterContactsTask")
         val addContactActivity = activityRef() ?: return
         if (addContactActivity.contactType == Constants.CONTACT_TYPE_MEGA) {
-            if (addContactActivity.inputString != null && addContactActivity.inputString != "") {
+            if (addContactActivity.inputString != "") {
                 addContactActivity.setMegaAdapterContacts(
                     addContactActivity.queryContactMEGA,
                     MegaContactsAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT
@@ -136,13 +144,13 @@ internal class FilterContactsTask(addContactActivity: AddContactActivity) :
                 )
             }
         } else if (addContactActivity.contactType == Constants.CONTACT_TYPE_DEVICE) {
-            if (addContactActivity.inputString != null && addContactActivity.inputString != "") {
+            if (addContactActivity.inputString != "") {
                 addContactActivity.setPhoneAdapterContacts(addContactActivity.queryContactsPhone)
             } else {
                 addContactActivity.setPhoneAdapterContacts(addContactActivity.filteredContactsPhone)
             }
         } else {
-            if (addContactActivity.inputString != null && addContactActivity.inputString != "") {
+            if (addContactActivity.inputString != "") {
                 addContactActivity.setShareAdapterContacts(queryContactsShare)
             } else {
                 addContactActivity.setShareAdapterContacts(addContactActivity.filteredContactsShare)
@@ -151,14 +159,14 @@ internal class FilterContactsTask(addContactActivity: AddContactActivity) :
         addContactActivity.visibilityFastScroller()
 
         if (addContactActivity.isConfirmAddShown) {
-            if (addContactActivity.isAsyncTaskRunning(addContactActivity.queryIfContactSouldBeAddedTask)) {
-                addContactActivity.queryIfContactSouldBeAddedTask.cancel(true)
+            if (addContactActivity.isAsyncTaskRunning(addContactActivity.queryIfContactShouldBeAddedTask)) {
+                addContactActivity.queryIfContactShouldBeAddedTask?.cancel(true)
             }
             Util.hideKeyboard(addContactActivity, 0)
-            addContactActivity.queryIfContactSouldBeAddedTask = QueryIfContactSouldBeAddedTask(
+            addContactActivity.queryIfContactShouldBeAddedTask = QueryIfContactShouldBeAddedTask(
                 addContactActivity
             )
-            addContactActivity.queryIfContactSouldBeAddedTask.execute(true)
+            addContactActivity.queryIfContactShouldBeAddedTask?.execute(true)
         }
     }
 }

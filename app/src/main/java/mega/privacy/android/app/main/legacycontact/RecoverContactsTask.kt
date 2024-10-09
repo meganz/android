@@ -22,8 +22,8 @@ internal class RecoverContactsTask(addContactActivity: AddContactActivity) :
             var contactToAddMail: String? = null
             var contactToAdd: MegaContactAdapter
             var contact: MegaContactAdapter?
-            for (i in addContactActivity.savedaddedContacts.indices) {
-                val mail = addContactActivity.savedaddedContacts[i]
+            for (i in addContactActivity.savedAddedContacts.indices) {
+                val mail = addContactActivity.savedAddedContacts[i]
                 for (j in addContactActivity.filteredContactMEGA.indices) {
                     contact = addContactActivity.filteredContactMEGA[j]
                     contactToAddMail = addContactActivity.getMegaContactMail(contact)
@@ -51,11 +51,11 @@ internal class RecoverContactsTask(addContactActivity: AddContactActivity) :
             addContactActivity.getBothContacts()
             var contactMEGA: MegaContactAdapter?
             var contactPhone: PhoneContactInfo
-            var contact: ShareContactInfo? = null
+            var contact: ShareContactInfo?
             var found: Boolean
             addContactActivity.shareContacts.clear()
 
-            if (addContactActivity.filteredContactMEGA != null && !addContactActivity.filteredContactMEGA.isEmpty()) {
+            if (addContactActivity.filteredContactMEGA.isNotEmpty()) {
                 addContactActivity.shareContacts.add(ShareContactInfo(true, true, false))
                 for (i in addContactActivity.filteredContactMEGA.indices) {
                     contactMEGA = addContactActivity.filteredContactMEGA[i]
@@ -63,7 +63,7 @@ internal class RecoverContactsTask(addContactActivity: AddContactActivity) :
                     addContactActivity.shareContacts.add(contact)
                 }
             }
-            if (addContactActivity.filteredContactsPhone != null && !addContactActivity.filteredContactsPhone.isEmpty()) {
+            if (addContactActivity.filteredContactsPhone.isNotEmpty()) {
                 addContactActivity.shareContacts.add(ShareContactInfo(true, false, true))
                 var i = 0
                 while (i < addContactActivity.filteredContactsPhone.size) {
@@ -96,8 +96,8 @@ internal class RecoverContactsTask(addContactActivity: AddContactActivity) :
             addContactActivity.addedContactsShare.clear()
             var contactToAddMail: String? = null
 
-            for (i in addContactActivity.savedaddedContacts.indices) {
-                val mail = addContactActivity.savedaddedContacts[i]
+            for (i in addContactActivity.savedAddedContacts.indices) {
+                val mail = addContactActivity.savedAddedContacts[i]
                 Timber.d("mail[%d]: %s", i, mail)
                 for (j in addContactActivity.filteredContactsShare.indices) {
                     contact = addContactActivity.filteredContactsShare[j]
@@ -150,10 +150,10 @@ internal class RecoverContactsTask(addContactActivity: AddContactActivity) :
         addContactActivity.setAddedAdapterContacts()
         if (addContactActivity.searchExpand) {
             if (addContactActivity.isAsyncTaskRunning(addContactActivity.filterContactsTask)) {
-                addContactActivity.filterContactsTask.cancel(true)
+                addContactActivity.filterContactsTask?.cancel(true)
             }
             addContactActivity.filterContactsTask = FilterContactsTask(addContactActivity)
-            addContactActivity.filterContactsTask.execute()
+            addContactActivity.filterContactsTask?.execute()
         } else {
             if (addContactActivity.contactType == Constants.CONTACT_TYPE_MEGA) {
                 if (addContactActivity.onNewGroup) {
@@ -172,14 +172,15 @@ internal class RecoverContactsTask(addContactActivity: AddContactActivity) :
             addContactActivity.visibilityFastScroller()
 
             if (addContactActivity.isConfirmAddShown) {
-                if (addContactActivity.isAsyncTaskRunning(addContactActivity.queryIfContactSouldBeAddedTask)) {
-                    addContactActivity.queryIfContactSouldBeAddedTask.cancel(true)
+                if (addContactActivity.isAsyncTaskRunning(addContactActivity.queryIfContactShouldBeAddedTask)) {
+                    addContactActivity.queryIfContactShouldBeAddedTask?.cancel(true)
                 }
                 Util.hideKeyboard(addContactActivity, 0)
-                addContactActivity.queryIfContactSouldBeAddedTask = QueryIfContactSouldBeAddedTask(
-                    addContactActivity
-                )
-                addContactActivity.queryIfContactSouldBeAddedTask.execute(true)
+                addContactActivity.queryIfContactShouldBeAddedTask =
+                    QueryIfContactShouldBeAddedTask(
+                        addContactActivity
+                    )
+                addContactActivity.queryIfContactShouldBeAddedTask?.execute(true)
             }
         }
     }

@@ -8,7 +8,7 @@ import mega.privacy.android.app.utils.Constants
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
-internal class GetPhoneContactsTask(addContactActivity: AddContactActivity) :
+class GetPhoneContactsTask(addContactActivity: AddContactActivity) :
     AsyncTask<Void, Void, Void>() {
     private val activityReference = WeakReference(addContactActivity)
     private fun activityRef() = activityReference.get().takeUnless { it == null || it.isFinishing }
@@ -22,7 +22,7 @@ internal class GetPhoneContactsTask(addContactActivity: AddContactActivity) :
         var found: Boolean
         addContactActivity.shareContacts.clear()
 
-        if (!addContactActivity.filteredContactsShare.isEmpty()) {
+        if (addContactActivity.filteredContactsShare.isNotEmpty()) {
             val pos = addContactActivity.filteredContactsShare.size - 1
             val lastItem = addContactActivity.filteredContactsShare[pos]
 
@@ -31,7 +31,7 @@ internal class GetPhoneContactsTask(addContactActivity: AddContactActivity) :
             }
         }
 
-        if (addContactActivity.filteredContactsPhone != null && !addContactActivity.filteredContactsPhone.isEmpty()) {
+        if (addContactActivity.filteredContactsPhone.isNotEmpty()) {
             addContactActivity.shareContacts.add(ShareContactInfo(true, false, true))
             var i = 0
             while (i < addContactActivity.filteredContactsPhone.size) {
