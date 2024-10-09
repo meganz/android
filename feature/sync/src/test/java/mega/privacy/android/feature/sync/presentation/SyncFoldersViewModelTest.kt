@@ -174,18 +174,61 @@ class SyncFoldersViewModelTest {
     }
 
     @Test
-    fun `test that remove action removes folder pair`() = runTest {
+    fun `test that remove action changes the state to display the confirm dialog`() = runTest {
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
-        val folderPairId = 9999L
+        val syncUiItem = syncUiItems.first()
+        val expectedState =
+            SyncFoldersState(
+                syncUiItems = syncUiItems,
+                isFreeAccount = false,
+                showConfirmRemoveSyncFolderDialog = true,
+                syncUiItemToRemove = syncUiItem,
+            )
+        initViewModel()
+        underTest.handleAction(
+            SyncFoldersAction.RemoveFolderClicked(syncUiItem = syncUiItem)
+        )
+
+        underTest.uiState.test {
+            assertThat(awaitItem()).isEqualTo(expectedState)
+        }
+    }
+
+    @Test
+    fun `test that confirm the remove action removes folder pair`() = runTest {
+        whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
+        val folderPairId = syncUiItems.first().id
         whenever(removeFolderPairUseCase(folderPairId)).thenReturn(Unit)
         whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(stalledIssues))
         initViewModel()
+        underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItems.first()))
         underTest.handleAction(
-            SyncFoldersAction.RemoveFolderClicked(folderPairId)
+            SyncFoldersAction.OnRemoveFolderDialogConfirmed
         )
 
         verify(removeFolderPairUseCase).invoke(folderPairId)
     }
+
+    @Test
+    fun `test that cancel the remove action resets the state to do not display the confirm dialog`() =
+        runTest {
+            whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
+            val expectedState =
+                SyncFoldersState(
+                    syncUiItems = syncUiItems,
+                    isFreeAccount = false,
+                    showConfirmRemoveSyncFolderDialog = false,
+                    syncUiItemToRemove = null,
+                )
+            initViewModel()
+            underTest.handleAction(
+                SyncFoldersAction.OnRemoveFolderDialogDismissed
+            )
+
+            underTest.uiState.test {
+                assertThat(awaitItem()).isEqualTo(expectedState)
+            }
+        }
 
     @Test
     fun `test that view model pause run click pauses sync if sync is not paused`() = runTest {

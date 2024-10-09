@@ -13,7 +13,7 @@ internal fun SyncItemView(
     itemIndex: Int,
     cardExpanded: (SyncUiItem, Boolean) -> Unit,
     pauseRunClicked: (SyncUiItem) -> Unit,
-    removeFolderClicked: (folderPairId: Long) -> Unit,
+    removeFolderClicked: (SyncUiItem) -> Unit,
     issuesInfoClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
     isFreeAccount: Boolean,
@@ -30,7 +30,7 @@ internal fun SyncItemView(
             pauseRunClicked(sync)
         },
         removeFolderClicked = {
-            removeFolderClicked(sync.id)
+            removeFolderClicked(sync)
         },
         issuesInfoClicked = issuesInfoClicked,
         isLowBatteryLevel = isLowBatteryLevel,

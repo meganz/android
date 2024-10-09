@@ -58,7 +58,7 @@ internal fun SyncFoldersScreen(
     syncUiItems: List<SyncUiItem>,
     cardExpanded: (CardExpanded) -> Unit,
     pauseRunClicked: (SyncUiItem) -> Unit,
-    removeFolderClicked: (folderPairId: Long) -> Unit,
+    removeFolderClicked: (SyncUiItem) -> Unit,
     addFolderClicked: () -> Unit,
     upgradeAccountClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,

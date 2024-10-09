@@ -3,11 +3,13 @@ package mega.privacy.android.feature.sync.ui
 import mega.privacy.android.shared.resources.R as sharedResR
 import android.content.Context
 import androidx.activity.ComponentActivity
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -18,6 +20,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
+import mega.privacy.android.feature.sync.ui.synclist.folders.REMOVE_SYNC_FOLDER_CONFIRM_DIALOG_TEST_TAG
+import mega.privacy.android.feature.sync.ui.synclist.folders.RemoveSyncFolderConfirmDialog
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersScreen
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
@@ -78,7 +82,8 @@ class SyncFoldersScreenTest {
                 addFolderClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
-                state = syncFoldersState
+                state = syncFoldersState,
+                snackBarHostState = SnackbarHostState(),
             )
         }
 
@@ -96,7 +101,8 @@ class SyncFoldersScreenTest {
                 addFolderClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
-                state = SyncFoldersState(emptyList())
+                state = SyncFoldersState(emptyList()),
+                snackBarHostState = SnackbarHostState(),
             )
         }
 
@@ -127,7 +133,8 @@ class SyncFoldersScreenTest {
                 issuesInfoClicked = {},
                 state = SyncFoldersState(
                     syncUiItems = emptyList(), isFreeAccount = false
-                )
+                ),
+                snackBarHostState = SnackbarHostState(),
             )
         }
 
@@ -150,7 +157,8 @@ class SyncFoldersScreenTest {
                 addFolderClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
-                state = SyncFoldersState(emptyList())
+                state = SyncFoldersState(emptyList()),
+                snackBarHostState = SnackbarHostState(),
             )
         }
 
@@ -174,7 +182,8 @@ class SyncFoldersScreenTest {
                 issuesInfoClicked = {},
                 state = SyncFoldersState(
                     syncUiItems = emptyList(), isFreeAccount = false
-                )
+                ),
+                snackBarHostState = SnackbarHostState(),
             )
         }
 
@@ -201,5 +210,26 @@ class SyncFoldersScreenTest {
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that remove sync folder confirm dialog is properly displayed `() {
+        composeTestRule.setContent {
+            RemoveSyncFolderConfirmDialog(
+                onConfirm = {},
+                onDismiss = {}
+            )
+        }
+
+        composeTestRule.onNodeWithTag(REMOVE_SYNC_FOLDER_CONFIRM_DIALOG_TEST_TAG)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_sync_confirm_dialog_title))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_sync_confirm_dialog_message))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_sync_button))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.general_dialog_cancel_button))
+            .assertIsDisplayed()
     }
 }

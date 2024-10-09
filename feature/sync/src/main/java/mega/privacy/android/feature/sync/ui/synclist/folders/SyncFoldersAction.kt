@@ -8,7 +8,13 @@ internal sealed interface SyncFoldersAction {
 
     data class PauseRunClicked(val syncUiItem: SyncUiItem) : SyncFoldersAction
 
-    data class RemoveFolderClicked(val folderPairId: Long) : SyncFoldersAction
+    data class RemoveFolderClicked(val syncUiItem: SyncUiItem) : SyncFoldersAction
+
+    data object OnRemoveFolderDialogConfirmed : SyncFoldersAction
+
+    data object OnRemoveFolderDialogDismissed : SyncFoldersAction
 
     data object OnSyncsPausedErrorDialogDismissed : SyncFoldersAction
+
+    data object SnackBarShown : SyncFoldersAction
 }

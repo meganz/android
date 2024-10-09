@@ -282,7 +282,9 @@ private fun SyncCardFooter(
         ) {
             if (hasStalledIssues) {
                 MegaButtonWithIconAndText(
-                    modifier = Modifier.padding(end = 8.dp),
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
                     onClick = issuesInfoClicked,
                     icon = coreR.drawable.ic_info,
                     iconColor = StatusColor.Error.getStatusIconColor(),
@@ -292,8 +294,8 @@ private fun SyncCardFooter(
             }
             MegaButtonWithIconAndText(
                 modifier = Modifier
-                    .padding(end = 8.dp)
-                    .defaultMinSize(minWidth = 48.dp, minHeight = 36.dp),
+                    .padding(end = 16.dp)
+                    .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
                 onClick = pauseRunClicked,
                 icon = if (isSyncRunning) {
                     coreR.drawable.ic_pause
@@ -308,9 +310,12 @@ private fun SyncCardFooter(
                 enabled = !isLowBatteryLevel && !isError && !isFreeAccount
             )
             MegaButtonWithIconAndText(
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
                 onClick = removeFolderClicked,
                 icon = coreR.drawable.ic_minus_circle,
-                text = stringResource(id = R.string.sync_card_remove_sync)
+                text = stringResource(sharedR.string.sync_stop_sync_button),
             )
         }
     }

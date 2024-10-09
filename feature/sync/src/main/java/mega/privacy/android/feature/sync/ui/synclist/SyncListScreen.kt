@@ -8,13 +8,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,8 +54,8 @@ import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
-import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.mobile.analytics.event.SyncListBannerUpgradeButtonPressedEvent
 
@@ -87,6 +86,8 @@ internal fun SyncListScreen(
         initialValue = ModalBottomSheetValue.Hidden,
         confirmValueChange = { _ -> true }
     )
+
+    val scaffoldState = rememberScaffoldState(snackbarHostState = snackBarHostState)
 
     BottomSheet(
         modalSheetState = modalSheetState,
@@ -121,7 +122,8 @@ internal fun SyncListScreen(
             }
         }
     ) {
-        Scaffold(
+        MegaScaffold(
+            scaffoldState = scaffoldState,
             topBar = {
                 MegaAppBar(
                     title = title ?: stringResource(R.string.sync_toolbar_title),
@@ -133,7 +135,8 @@ internal fun SyncListScreen(
                     actions = actions,
                     onActionPressed = onActionPressed
                 )
-            }, content = { paddingValues ->
+            },
+            content = { paddingValues ->
                 SyncListScreenContent(
                     modifier = Modifier
                         .padding(paddingValues),
@@ -157,25 +160,18 @@ internal fun SyncListScreen(
                     syncStalledIssuesViewModel = syncStalledIssuesViewModel,
                     syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
                     selectedChip = selectedChip,
+                    snackBarHostState = scaffoldState.snackbarHostState,
                 )
             },
-            snackbarHost = {
-                SnackbarHost(
-                    hostState = snackBarHostState,
-                    snackbar = { data ->
-                        MegaSnackbar(snackbarData = data)
-                    }
-                )
-            }
         )
     }
 }
-
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun SyncListScreenContent(
     modifier: Modifier,
+    snackBarHostState: SnackbarHostState,
     stalledIssuesCount: Int,
     stalledIssuesDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
@@ -261,7 +257,8 @@ private fun SyncListScreenContent(
                 syncStalledIssuesViewModel = syncStalledIssuesViewModel,
                 syncFoldersViewModel = syncFoldersViewModel,
                 syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
-                syncFoldersState = syncFoldersState
+                syncFoldersState = syncFoldersState,
+                snackBarHostState = snackBarHostState,
             )
             PullRefreshIndicator(
                 modifier = Modifier.align(Alignment.TopCenter),
@@ -314,6 +311,7 @@ private fun SelectedChipScreen(
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
     syncFoldersState: SyncFoldersState,
+    snackBarHostState: SnackbarHostState,
 ) {
     when (checkedChip) {
         SYNC_FOLDERS -> {
@@ -322,7 +320,8 @@ private fun SelectedChipScreen(
                 upgradeAccountClicked = upgradeAccountClicked,
                 issuesInfoClicked = issuesInfoClicked,
                 viewModel = syncFoldersViewModel,
-                state = syncFoldersState
+                state = syncFoldersState,
+                snackBarHostState = snackBarHostState,
             )
         }
 
