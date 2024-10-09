@@ -247,7 +247,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 nodeOptionsViewModel.setRestoreNodeClicked(false)
             }
 
-            val accountType = state.accountDetail?.levelDetail?.accountType
+            val accountType = state.accountType
+            val isBusinessAccountExpired = state.isBusinessAccountExpired
             val isHiddenNodesOnboarded = state.isHiddenNodesOnboarded
             state.node?.let { node ->
                 if (megaApi.isInRubbish(node)) {
@@ -268,7 +269,14 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionLabel.setOnClickListener { onClick { onLabelClicked(node) } }
                 optionFavourite.setOnClickListener { onClick { onFavouriteClicked(node) } }
                 optionHideLayout.setOnClickListener {
-                    onClick { onHideClicked(node, accountType, isHiddenNodesOnboarded) }
+                    onClick {
+                        onHideClicked(
+                            node,
+                            accountType,
+                            isBusinessAccountExpired,
+                            isHiddenNodesOnboarded
+                        )
+                    }
                 }
                 optionHideHelp.setOnClickListener { showHiddenNodesOnboarding() }
                 optionDownload.setOnClickListener { onClick { onDownloadClicked(node) } }
@@ -426,7 +434,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         val isSensitiveInherited =
                             parentNode?.let { megaApi.isSensitiveInherited(it) } == true
 
-                        if (!isSensitiveInherited || !accountType.isPaid) {
+                        if (!isSensitiveInherited || !accountType.isPaid || isBusinessAccountExpired) {
                             View.VISIBLE
                         } else {
                             View.GONE
@@ -435,9 +443,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         View.GONE
                     }
                 optionHideProLabel.visibility =
-                    if (accountType?.isPaid == false) View.VISIBLE else View.GONE
+                    if (accountType?.isPaid != true || isBusinessAccountExpired) View.VISIBLE else View.GONE
                 optionHideHelp.visibility =
-                    if (accountType?.isPaid == true && !node.isMarkedSensitive) View.VISIBLE else View.GONE
+                    if (accountType?.isPaid == true && !isBusinessAccountExpired && !node.isMarkedSensitive) View.VISIBLE else View.GONE
                 if (accessLevel != MegaShare.ACCESS_OWNER || isTakenDown) {
                     counterShares--
                     optionShare.visibility = View.GONE
@@ -738,9 +746,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     if (node.isFavourite) RPack.drawable.ic_heart_broken_medium_regular_outline else RPack.drawable.ic_heart_medium_regular_outline,
                     0, 0, 0
                 )
-                optionHide.setText(if (accountType?.isPaid == false || !node.isMarkedSensitive) R.string.general_hide_node else R.string.general_unhide_node)
+                optionHide.setText(if (accountType?.isPaid != true || isBusinessAccountExpired || !node.isMarkedSensitive) R.string.general_hide_node else R.string.general_unhide_node)
                 optionHide.setCompoundDrawablesWithIntrinsicBounds(
-                    if (accountType?.isPaid == false || !node.isMarkedSensitive) RPack.drawable.ic_eye_off_medium_regular_outline else RPack.drawable.ic_eye_medium_regular_outline,
+                    if (accountType?.isPaid != true || isBusinessAccountExpired || !node.isMarkedSensitive) RPack.drawable.ic_eye_off_medium_regular_outline else RPack.drawable.ic_eye_medium_regular_outline,
                     0,
                     0,
                     0
@@ -1248,6 +1256,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private fun onHideClicked(
         node: MegaNode,
         accountType: AccountType?,
+        isBusinessAccountExpired: Boolean,
         isHiddenNodesOnboarded: Boolean?,
     ) {
         if (drawerItem == DrawerItem.CLOUD_DRIVE && !node.isMarkedSensitive) {
@@ -1257,7 +1266,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val isPaid = accountType?.isPaid ?: false
         val isHiddenNodesOnboarded = isHiddenNodesOnboarded ?: false
 
-        if (!isPaid) {
+        if (!isPaid || isBusinessAccountExpired) {
             val intent = HiddenNodesOnboardingActivity.createScreen(
                 context = requireContext(),
                 isOnboarding = false,

@@ -15,8 +15,10 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
@@ -56,6 +58,7 @@ class NodeOptionsViewModel @Inject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -101,8 +104,18 @@ class NodeOptionsViewModel @Inject constructor(
         viewModelScope.launch {
             monitorAccountDetailUseCase()
                 .collect { accountDetail ->
+                    val accountType = accountDetail.levelDetail?.accountType
+                    val businessStatus =
+                        if (accountType?.isBusinessAccount == true) {
+                            getBusinessStatusUseCase()
+                        } else null
+
+                    val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
                     _state.update {
-                        it.copy(accountDetail = accountDetail)
+                        it.copy(
+                            accountType = accountDetail.levelDetail?.accountType,
+                            isBusinessAccountExpired = isBusinessAccountExpired,
+                        )
                     }
                 }
         }

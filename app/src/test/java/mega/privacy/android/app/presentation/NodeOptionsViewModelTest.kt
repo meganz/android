@@ -20,6 +20,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
@@ -111,6 +112,7 @@ class NodeOptionsViewModelTest {
             )
         }.thenReturn(nodeDeviceCenterInformationFlow)
     }
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -127,6 +129,7 @@ class NodeOptionsViewModelTest {
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
             savedStateHandle = savedStateHandle,
         )
     }
