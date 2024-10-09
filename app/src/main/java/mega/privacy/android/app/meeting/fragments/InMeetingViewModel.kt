@@ -18,11 +18,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -32,9 +28,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx3.asFlowable
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
@@ -50,7 +47,6 @@ import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.ParticipantsChange
 import mega.privacy.android.app.presentation.meeting.model.ParticipantsChangeType
-import mega.privacy.android.app.usecase.call.AmIAloneOnAnyCallUseCase
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
@@ -85,6 +81,7 @@ import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarUseCase
+import mega.privacy.android.domain.usecase.call.AmIAloneOnAnyCallUseCase
 import mega.privacy.android.domain.usecase.call.BroadcastCallEndedUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
@@ -382,35 +379,31 @@ class InMeetingViewModel @Inject constructor(
         }
 
         amIAloneOnAnyCallUseCase()
-            .asFlowable(viewModelScope.coroutineContext)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { (chatId, onlyMeInTheCall, waitingForOthers, isReceivedChange) ->
-                    if (_state.value.currentChatId == chatId) {
-                        val millisecondsOnlyMeInCallDialog =
-                            TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog)
+            .catch { Timber.e(it) }
+            .map { (chatId, callId, onlyMeInTheCall, isReceivedChange) ->
+                val waitingForOthers = onlyMeInTheCall && chatManagement.isRequestSent(callId)
+                if (_state.value.currentChatId == chatId) {
+                    val millisecondsOnlyMeInCallDialog =
+                        TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog)
 
-                        if (onlyMeInTheCall) {
-                            hideBottomPanels()
-                            if (waitingForOthers && millisecondsOnlyMeInCallDialog <= 0) {
-                                _showOnlyMeBanner.value = false
-                                _showWaitingForOthersBanner.value = true
-                            } else {
-                                _showWaitingForOthersBanner.value = false
-                                if (waitingForOthers || !isReceivedChange) {
-                                    _showOnlyMeBanner.value = true
-                                }
-                            }
+                    if (onlyMeInTheCall) {
+                        hideBottomPanels()
+                        if (waitingForOthers && millisecondsOnlyMeInCallDialog <= 0) {
+                            _showOnlyMeBanner.value = false
+                            _showWaitingForOthersBanner.value = true
                         } else {
                             _showWaitingForOthersBanner.value = false
-                            _showOnlyMeBanner.value = false
+                            if (waitingForOthers || !isReceivedChange) {
+                                _showOnlyMeBanner.value = true
+                            }
                         }
+                    } else {
+                        _showWaitingForOthersBanner.value = false
+                        _showOnlyMeBanner.value = false
                     }
-                },
-                onError = Timber::e
-            )
-            .addTo(composite)
+                }
+            }
+            .launchIn(viewModelScope)
 
         monitorAvatarUpdates()
     }
@@ -966,22 +959,18 @@ class InMeetingViewModel @Inject constructor(
      * @return NumParticipantsChangesResult
      */
     private fun checkIfIAmTheOnlyOneOnTheCall(call: ChatCall): ParticipantsCountChange {
-        var waitingForOthers = false
         var onlyMeInTheCall = false
         if (isOneToOneCall().not()) {
             call.peerIdParticipants?.let { list ->
                 onlyMeInTheCall =
                     list.size == 1 && list.first() == state.value.myUserHandle
-
-                waitingForOthers = onlyMeInTheCall &&
-                        MegaApplication.getChatManagement().isRequestSent(call.callId)
             }
         }
 
         return ParticipantsCountChange(
-            call.chatId,
-            onlyMeInTheCall,
-            waitingForOthers,
+            chatId = call.chatId,
+            callId = call.callId,
+            onlyMeInTheCall = onlyMeInTheCall,
             isReceivedChange = true
         )
     }

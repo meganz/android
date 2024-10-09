@@ -19,6 +19,7 @@ import kotlinx.coroutines.rx3.asFlowable
 import kotlinx.coroutines.rx3.rxFlowable
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.CustomCountDownTimer
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.meeting.CallSoundType
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
+import mega.privacy.android.domain.usecase.call.AmIAloneOnAnyCallUseCase
 import mega.privacy.android.domain.usecase.call.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallsReconnectingStatusUseCase
@@ -65,6 +67,7 @@ class MonitorCallSoundsUseCase @Inject constructor(
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val amIAloneOnAnyCallUseCase: AmIAloneOnAnyCallUseCase,
     private val broadcastWaitingForOtherParticipantsHasEndedUseCase: BroadcastWaitingForOtherParticipantsHasEndedUseCase,
+    private val chatManagement: ChatManagement,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @MainImmediateDispatcher private val mainImmediateDispatcher: CoroutineDispatcher,
 ) {
@@ -170,7 +173,9 @@ class MonitorCallSoundsUseCase @Inject constructor(
             amIAloneOnAnyCallUseCase()
                 .asFlowable(sharingScope.coroutineContext)
                 .subscribeBy(
-                    onNext = { (chatId, onlyMeInTheCall, waitingForOthers) ->
+                    onNext = { (chatId, callId, onlyMeInTheCall) ->
+                        val waitingForOthers =
+                            onlyMeInTheCall && chatManagement.isRequestSent(callId)
                         removeWaitingForOthersCountDownTimer()
                         MegaApplication.getChatManagement().stopCounterToFinishCall()
 
