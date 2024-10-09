@@ -693,7 +693,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
                 override fun onAdLoaded() {
                     Timber.i("Ad loaded")
-                    onAdsViewLoaded()
+                    handleShowingAds("")
                 }
 
                 override fun onAdOpened() {
@@ -993,7 +993,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     setupAdsView()
                     googleAdsManager.checkLatestConsentInformation(
                         activity = this@ManagerActivity,
-                        onConsentInformationUpdated = { handleShowingAds("") }
+                        onConsentInformationUpdated = { fetchNewAd() }
                     )
                 }
             }.onFailure {
@@ -2445,8 +2445,12 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      */
     fun handleShowingAds(slotId: String) {
         //slotId is not used for now during the implementation of the new Ads SDK
-        if (this.isPortrait()) {
-            fetchNewAd()
+        if (this.isPortrait() && googleAdsManager.isAdRequestAvailable() &&
+            (drawerItem == DrawerItem.CLOUD_DRIVE || isInMainHomePage || isInPhotosPage)
+        ) {
+            showAdsView()
+            showBNVImmediate()
+            showHideBottomNavigationView(hide = false)
         } else {
             hideAdsView()
         }
@@ -2455,10 +2459,11 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun setupAdsView() {
         adsContainerView.removeAllViews()
         adsContainerView.addView(adView)
+        fetchNewAd()
     }
 
     /**
-     * Fetch a new Ad by creating new request
+     * Fetch a new Ad by fetching a new AdRequest and loading it into the AdView
      */
     private fun fetchNewAd() {
         googleAdsManager.fetchAdRequest()?.let {
@@ -2472,22 +2477,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     fun hideAdsView() {
         adsContainerView.isVisible = false
-    }
-
-    /**
-     * Checks if we can still show the Ad because loading the webpage takes
-     * time and the user could have navigated to another screen where the Ad shouldn't show
-     */
-    private fun onAdsViewLoaded() {
-
-        if (drawerItem == DrawerItem.CLOUD_DRIVE || isInMainHomePage || isInPhotosPage
-        ) {
-            showAdsView()
-            showBNVImmediate()
-            showHideBottomNavigationView(hide = false)
-        } else {
-            hideAdsView()
-        }
     }
 
     override fun onResume() {

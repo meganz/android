@@ -30,6 +30,7 @@ class GoogleAdsManager @Inject constructor(
 ) {
 
     private var isAdsFeatureEnabled: Boolean = false
+    private var isAdRequestAvailable: Boolean = false
 
     /**
      * Helper variable to get the AdSize for the ads.
@@ -45,6 +46,10 @@ class GoogleAdsManager @Inject constructor(
             consentInformation.privacyOptionsRequirementStatus ==
                     ConsentInformation.PrivacyOptionsRequirementStatus.REQUIRED
 
+    /**
+     * Check if an AdRequest is available to be used.
+     */
+    fun isAdRequestAvailable() = isAdRequestAvailable
 
     /**
      * Check if the ads feature is enabled.
@@ -120,11 +125,14 @@ class GoogleAdsManager @Inject constructor(
     /**
      * Fetch an AdRequest to be used in the AdManager.
      */
-    fun fetchAdRequest(): AdManagerAdRequest? =
-        if (isAdsEnabled() && consentInformation.canRequestAds()) {
+    fun fetchAdRequest(): AdManagerAdRequest? {
+        return if (isAdsEnabled() && consentInformation.canRequestAds()) {
+            isAdRequestAvailable = true
             AdManagerAdRequest.Builder().build()
         } else {
+            isAdRequestAvailable = false
             null
         }
+    }
 
 }
