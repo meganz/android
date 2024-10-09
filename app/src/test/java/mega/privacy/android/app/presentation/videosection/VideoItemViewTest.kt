@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.videosection
 
 import androidx.activity.ComponentActivity
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assertIsDisplayed
@@ -17,6 +18,8 @@ import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
 import coil.test.FakeImageLoaderEngine
 import dagger.hilt.android.testing.HiltAndroidTest
+import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_COLLECTION_TITLE_ICON_CONTENT_DESCRIPTION
+import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_COLLECTION_TITLE_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_DURATION_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_FAVOURITE_ICON_CONTENT_DESCRIPTION
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_LABEL_VIEW_TEST_TAG
@@ -50,12 +53,14 @@ class VideoItemViewTest {
     private val fileSize = "100 MB"
     private val duration = 60.seconds
     private val labelColor = Color.Red
+    private val collectionTitle = "Collection Title"
 
     private fun setComposeContent(
         @DrawableRes icon: Int = R.drawable.ic_video_section_video_default_thumbnail,
         name: String = "",
         fileSize: String? = null,
         duration: Duration = 0.seconds,
+        collectionTitle: String? = null,
         isFavourite: Boolean = false,
         isSelected: Boolean = false,
         isSharedWithPublicLink: Boolean = false,
@@ -74,6 +79,7 @@ class VideoItemViewTest {
                 name = name,
                 fileSize = fileSize,
                 duration = duration,
+                collectionTitle = collectionTitle,
                 isFavourite = isFavourite,
                 isSelected = isSelected,
                 isSharedWithPublicLink = isSharedWithPublicLink,
@@ -105,7 +111,8 @@ class VideoItemViewTest {
         VIDEO_ITEM_DURATION_VIEW_TEST_TAG.assertIsDisplayedWithTag()
         listOf(
             VIDEO_ITEM_SIZE_VIEW_TEST_TAG,
-            VIDEO_ITEM_LABEL_VIEW_TEST_TAG
+            VIDEO_ITEM_LABEL_VIEW_TEST_TAG,
+            VIDEO_ITEM_COLLECTION_TITLE_TEST_TAG
         ).forEach {
             it.assertIsNotDisplayedWithTag()
         }
@@ -121,7 +128,8 @@ class VideoItemViewTest {
         listOf(
             VIDEO_ITEM_FAVOURITE_ICON_CONTENT_DESCRIPTION,
             VIDEO_ITEM_OFFLINE_ICON_CONTENT_DESCRIPTION,
-            VIDEO_ITEM_LINK_ICON_CONTENT_DESCRIPTION
+            VIDEO_ITEM_LINK_ICON_CONTENT_DESCRIPTION,
+            VIDEO_ITEM_COLLECTION_TITLE_ICON_CONTENT_DESCRIPTION
         ).forEach {
             it.assertIsNotDisplayedWithDescription()
         }
@@ -139,9 +147,11 @@ class VideoItemViewTest {
     @Test
     fun `test that the UIs are correctly displayed when all parameters have values or are set to true`() {
         setComposeContent(
+            modifier = Modifier.fillMaxHeight(),
             name = name,
             fileSize = fileSize,
             duration = duration,
+            collectionTitle = collectionTitle,
             isFavourite = true,
             isSelected = true,
             isSharedWithPublicLink = true,
@@ -160,6 +170,10 @@ class VideoItemViewTest {
             assertIsDisplayedWithTag()
             assertTextEqualsWithTag("1:00")
         }
+        VIDEO_ITEM_COLLECTION_TITLE_TEST_TAG.run {
+            assertIsDisplayedWithTag()
+            assertTextEqualsWithTag(collectionTitle)
+        }
         VIDEO_ITEM_LABEL_VIEW_TEST_TAG.assertIsDisplayedWithTag()
 
         listOf(
@@ -168,7 +182,8 @@ class VideoItemViewTest {
             VIDEO_ITEM_MENU_ICON_CONTENT_DESCRIPTION,
             VIDEO_ITEM_PLAY_ICON_CONTENT_DESCRIPTION,
             VIDEO_ITEM_OFFLINE_ICON_CONTENT_DESCRIPTION,
-            VIDEO_ITEM_LINK_ICON_CONTENT_DESCRIPTION
+            VIDEO_ITEM_LINK_ICON_CONTENT_DESCRIPTION,
+            VIDEO_ITEM_COLLECTION_TITLE_ICON_CONTENT_DESCRIPTION
         ).forEach {
             it.assertIsDisplayedWithDescription()
         }

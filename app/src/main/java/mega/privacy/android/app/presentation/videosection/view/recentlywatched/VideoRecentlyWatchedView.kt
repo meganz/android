@@ -162,6 +162,7 @@ fun VideoRecentlyWatchedView(
                                     name = videoItem.name,
                                     fileSize = formatFileSize(videoItem.size, LocalContext.current),
                                     duration = videoItem.duration,
+                                    collectionTitle = videoItem.collectionTitle,
                                     isFavourite = videoItem.isFavourite,
                                     isSelected = videoItem.isSelected,
                                     isSharedWithPublicLink = videoItem.isSharedItems,

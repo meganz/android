@@ -75,6 +75,7 @@ internal fun VideoItemView(
     onClick: () -> Unit,
     thumbnailData: Any?,
     modifier: Modifier = Modifier,
+    collectionTitle: String? = null,
     showMenuButton: Boolean = true,
     nodeAvailableOffline: Boolean = false,
     onLongClick: (() -> Unit)? = null,
@@ -93,7 +94,7 @@ internal fun VideoItemView(
             )
             .padding(vertical = 8.dp, horizontal = 16.dp)
             .fillMaxWidth()
-            .height(71.dp)
+            .height(80.dp)
             .testTag(VIDEO_ITEM_VIEW_TEST_TAG)
     ) {
         VideoThumbnailView(
@@ -110,6 +111,7 @@ internal fun VideoItemView(
             modifier = Modifier.weight(1f),
             name = name,
             fileSize = fileSize,
+            collectionTitle = collectionTitle,
             showMenuButton = showMenuButton,
             isSelected = isSelected,
             nodeAvailableOffline = nodeAvailableOffline,
@@ -151,7 +153,7 @@ internal fun VideoThumbnailView(
 ) {
     Box(
         modifier = modifier
-            .width(126.dp)
+            .width(130.dp)
             .aspectRatio(1.77f)
     ) {
         val thumbnailModifier = Modifier
@@ -215,12 +217,19 @@ internal fun VideoInfoView(
     labelColor: Color?,
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
+    collectionTitle: String? = null,
 ) {
     Column(modifier = modifier) {
         VideoNameAndLabelView(
             name = name,
             labelColor = labelColor
         )
+
+        collectionTitle?.let {
+            CollectionTitleView(
+                collectionTitle = it
+            )
+        }
 
         VideoSizeAndIconsView(
             fileSize = fileSize,
@@ -277,7 +286,7 @@ internal fun VideoNameAndLabelView(
         }
     }
 
-    Row(modifier = modifier) {
+    Row(modifier = modifier.padding(bottom = 5.dp)) {
         val inlineContent = mapOf(
             inlineContentId to InlineTextContent(
                 Placeholder(
@@ -316,6 +325,28 @@ internal fun VideoNameAndLabelView(
 }
 
 @Composable
+internal fun CollectionTitleView(
+    collectionTitle: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Image(
+            painter = painterResource(id = iconPackR.drawable.ic_recently_watched_collection_title),
+            contentDescription = VIDEO_ITEM_COLLECTION_TITLE_ICON_CONTENT_DESCRIPTION,
+            modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .size(11.dp)
+        )
+        MegaText(
+            modifier = modifier.testTag(VIDEO_ITEM_COLLECTION_TITLE_TEST_TAG),
+            text = collectionTitle,
+            style = MaterialTheme.typography.caption,
+            textColor = TextColor.Secondary
+        )
+    }
+}
+
+@Composable
 internal fun VideoSizeAndIconsView(
     fileSize: String?,
     isSelected: Boolean,
@@ -325,7 +356,7 @@ internal fun VideoSizeAndIconsView(
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(modifier = modifier.padding(start = 10.dp, top = 10.dp)) {
+    Row(modifier = modifier.padding(start = 10.dp, top = 5.dp)) {
         fileSize?.let {
             MegaText(
                 modifier = Modifier.testTag(VIDEO_ITEM_SIZE_VIEW_TEST_TAG),
@@ -375,6 +406,7 @@ private fun VideoItemViewWithFavouritePreview() {
             name = "testing_video_file_name_long_name_testing.mp4",
             fileSize = "1.3MB",
             duration = 240.toDuration(DurationUnit.SECONDS),
+            collectionTitle = "Favourites",
             isFavourite = true,
             onClick = {},
             thumbnailData = null,
@@ -395,6 +427,7 @@ private fun VideoItemViewWithoutFavouritePreview() {
             name = "name.mp4",
             fileSize = "1.3MB",
             duration = 240.toDuration(DurationUnit.SECONDS),
+            collectionTitle = "abc",
             isFavourite = false,
             onClick = {},
             thumbnailData = null,
@@ -419,6 +452,16 @@ private fun VideoInfoViewPreview() {
             labelColor = Color.Red,
             onMenuClick = {},
             modifier = Modifier.height(87.dp)
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun CollectionTitleViewPreview() {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        CollectionTitleView(
+            collectionTitle = "Collection Title"
         )
     }
 }
@@ -507,3 +550,14 @@ const val VIDEO_ITEM_LINK_ICON_CONTENT_DESCRIPTION = "Link icon"
  * Test tag for the video item link icon view
  */
 const val VIDEO_ITEM_LINK_ICON_TEST_TAG = "video_item:image_link"
+
+/**
+ * Content description for the video item collection title icon
+ */
+const val VIDEO_ITEM_COLLECTION_TITLE_ICON_CONTENT_DESCRIPTION = "collection title icon"
+
+/**
+ * Test tag for the video item collection title view
+ */
+const val VIDEO_ITEM_COLLECTION_TITLE_TEST_TAG =
+    "video_item:collection_title_view"
