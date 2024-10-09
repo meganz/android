@@ -340,25 +340,28 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun getRecentlyWatchedVideoNodes(): List<TypedVideoNode> =
+    override suspend fun monitorRecentlyWatchedVideoNodes(): Flow<List<TypedVideoNode>> =
         withContext(ioDispatcher) {
             val offlineItems = getAllOfflineNodeHandle()
-            getRecentlyWatchedData()?.mapNotNull { item ->
-                megaApiGateway.getMegaNodeByHandle(item.videoHandle)?.let { megaNode ->
-                    val title = megaNode.getCollectionTitle(item.collectionId, item.collectionTitle)
-                    typedVideoNodeMapper(
-                        fileNode = megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()]),
-                        duration = megaNode.duration,
-                        watchedTimestamp = item.watchedTimestamp,
-                        collectionTitle = title
-                    )
-                }
-            }?.sortedByDescending { it.watchedTimestamp } ?: emptyList()
+            getRecentlyWatchedData().map { list ->
+                list.mapNotNull { item ->
+                    megaApiGateway.getMegaNodeByHandle(item.videoHandle)?.let { megaNode ->
+                        val title =
+                            megaNode.getCollectionTitle(item.collectionId, item.collectionTitle)
+                        typedVideoNodeMapper(
+                            fileNode = megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()]),
+                            duration = megaNode.duration,
+                            watchedTimestamp = item.watchedTimestamp,
+                            collectionTitle = title
+                        )
+                    }
+                }.sortedByDescending { it.watchedTimestamp }
+            }
         }
 
-    private suspend fun getRecentlyWatchedData(): List<VideoRecentlyWatchedItem>? {
+    private suspend fun getRecentlyWatchedData(): Flow<List<VideoRecentlyWatchedItem>> {
         migrateOldDataToDatabase()
-        return megaLocalRoomGateway.getAllRecentlyWatchedVideos().firstOrNull()
+        return megaLocalRoomGateway.getAllRecentlyWatchedVideos()
     }
 
     private suspend fun MegaNode.getCollectionTitle(

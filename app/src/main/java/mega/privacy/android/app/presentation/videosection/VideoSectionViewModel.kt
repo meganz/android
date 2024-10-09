@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -66,8 +67,8 @@ import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCa
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
-import mega.privacy.android.domain.usecase.videosection.GetVideoRecentlyWatchedUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
+import mega.privacy.android.domain.usecase.videosection.MonitorVideoRecentlyWatchedUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
@@ -107,7 +108,7 @@ class VideoSectionViewModel @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
-    private val getVideoRecentlyWatchedUseCase: GetVideoRecentlyWatchedUseCase,
+    private val monitorVideoRecentlyWatchedUseCase: MonitorVideoRecentlyWatchedUseCase,
     private val clearRecentlyWatchedVideosUseCase: ClearRecentlyWatchedVideosUseCase,
     private val removeRecentlyWatchedItemUseCase: RemoveRecentlyWatchedItemUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
@@ -174,6 +175,12 @@ class VideoSectionViewModel @Inject constructor(
                 if (it.isNotEmpty()) {
                     checkPlaylistDetailActionsVisible()
                 }
+            }
+        }
+
+        viewModelScope.launch {
+            monitorVideoRecentlyWatchedUseCase().conflate().collectLatest {
+                it.convertAndUpdateState()
             }
         }
     }
@@ -371,9 +378,6 @@ class VideoSectionViewModel @Inject constructor(
             setPendingRefreshNodes()
             loadVideoPlaylists()
         }
-
-    internal fun shouldShowSearchMenu() =
-        _state.value.currentVideoPlaylist == null && _state.value.allVideos.isNotEmpty()
 
     internal fun searchQuery(queryString: String) {
         searchQueryJob?.cancel()
@@ -1092,14 +1096,20 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    internal fun loadRecentlyWatchedVideos() = viewModelScope.launch {
+    internal fun refreshRecentlyWatchedVideos() = viewModelScope.launch {
+        monitorVideoRecentlyWatchedUseCase().firstOrNull().convertAndUpdateState()
+    }
+
+    private fun List<TypedVideoNode>?.convertAndUpdateState() {
         runCatching {
-            getVideoRecentlyWatchedUseCase().map {
+            this?.map {
                 videoUIEntityMapper(it)
-            }.groupBy { TimeUnit.SECONDS.toDays(it.watchedDate) }
+            }?.groupBy { TimeUnit.SECONDS.toDays(it.watchedDate) }
         }.onSuccess { group ->
-            _state.update {
-                it.copy(groupedVideoRecentlyWatchedItems = group)
+            group?.let {
+                _state.update {
+                    it.copy(groupedVideoRecentlyWatchedItems = group)
+                }
             }
         }.onFailure { error ->
             Timber.e(error)
@@ -1118,7 +1128,6 @@ class VideoSectionViewModel @Inject constructor(
                 clearRecentlyWatchedVideosUseCase()
                 _state.update {
                     it.copy(
-                        groupedVideoRecentlyWatchedItems = emptyMap(),
                         clearRecentlyWatchedVideosSuccess = triggered
                     )
                 }
@@ -1137,7 +1146,6 @@ class VideoSectionViewModel @Inject constructor(
                         removeRecentlyWatchedItemSuccess = triggered
                     )
                 }
-                loadRecentlyWatchedVideos()
             }.onFailure {
                 Timber.e(it)
             }

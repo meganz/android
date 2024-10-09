@@ -250,7 +250,7 @@ class VideoSectionFragment : Fragment() {
                 with(videoSectionViewModel) {
                     refreshNodes()
                     if (state.value.currentDestinationRoute == videoRecentlyWatchedRoute) {
-                        loadRecentlyWatchedVideos()
+                        refreshRecentlyWatchedVideos()
                     }
                     markHandledPendingRefresh()
                 }

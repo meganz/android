@@ -690,7 +690,7 @@ class VideoSectionRepositoryImplTest {
         }
 
     @Test
-    fun `test that getRecentlyWatchedVideoNodes returns the correct result with migrating the old data`() =
+    fun `test that monitorRecentlyWatchedVideoNodes returns the correct result with migrating the old data`() =
         runTest {
             val testHandle = 12345L
             val testTimestamp = 100000L
@@ -770,19 +770,22 @@ class VideoSectionRepositoryImplTest {
             whenever(megaApiGateway.getSetElements(anyOrNull())).thenReturn(megaSetElementList)
             whenever(megaApiGateway.getSet(anyOrNull())).thenReturn(megaSet)
 
-            val actual = underTest.getRecentlyWatchedVideoNodes()
-            verify(megaLocalRoomGateway).saveRecentlyWatchedVideos(testVideoRecentlyWatchedData)
-            verify(appPreferencesGateway).putString(
-                "PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS",
-                Json.encodeToString(emptyList<VideoRecentlyWatchedItem>())
-            )
-            assertThat(actual.isNotEmpty()).isTrue()
-            assertThat(actual.size).isEqualTo(3)
-            testTimestamps.sortedByDescending { it }.mapIndexed { index, expectedTimestamp ->
-                assertThat(actual[index].watchedTimestamp).isEqualTo(expectedTimestamp)
-                assertThat(actual[index].collectionTitle).isEqualTo(
-                    testCollectionTitles.reversed()[index]
+            underTest.monitorRecentlyWatchedVideoNodes().test {
+                val actual = awaitItem()
+                verify(megaLocalRoomGateway).saveRecentlyWatchedVideos(testVideoRecentlyWatchedData)
+                verify(appPreferencesGateway).putString(
+                    "PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS",
+                    Json.encodeToString(emptyList<VideoRecentlyWatchedItem>())
                 )
+                assertThat(actual.isNotEmpty()).isTrue()
+                assertThat(actual.size).isEqualTo(3)
+                testTimestamps.sortedByDescending { it }.mapIndexed { index, expectedTimestamp ->
+                    assertThat(actual[index].watchedTimestamp).isEqualTo(expectedTimestamp)
+                    assertThat(actual[index].collectionTitle).isEqualTo(
+                        testCollectionTitles.reversed()[index]
+                    )
+                }
+                cancelAndConsumeRemainingEvents()
             }
         }
 

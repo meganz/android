@@ -127,7 +127,7 @@ interface VideoSectionRepository {
      *
      * @return the list of video nodes that includes the watched timestamp
      */
-    suspend fun getRecentlyWatchedVideoNodes(): List<TypedVideoNode>
+    suspend fun monitorRecentlyWatchedVideoNodes(): Flow<List<TypedVideoNode>>
 
     /**
      * Clear the data of video recently watched

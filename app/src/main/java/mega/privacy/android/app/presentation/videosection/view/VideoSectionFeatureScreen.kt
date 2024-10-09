@@ -112,7 +112,6 @@ internal fun VideoSectionNavHost(
                 onDeleteDialogButtonClicked = viewModel::clearAllSelectedVideoPlaylists,
                 onMenuAction = { action ->
                     if (action is VideoSectionMenuAction.VideoRecentlyWatchedAction) {
-                        viewModel.loadRecentlyWatchedVideos()
                         navHostController.navigate(route = videoRecentlyWatchedRoute)
                     } else {
                         onMenuAction(action)

@@ -54,8 +54,8 @@ import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCa
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
-import mega.privacy.android.domain.usecase.videosection.GetVideoRecentlyWatchedUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
+import mega.privacy.android.domain.usecase.videosection.MonitorVideoRecentlyWatchedUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
@@ -104,7 +104,8 @@ class VideoSectionViewModelTest {
     private val fakeMonitorVideoPlaylistSetsUpdateFlow = MutableSharedFlow<List<Long>>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
-    private val getVideoRecentlyWatchedUseCase = mock<GetVideoRecentlyWatchedUseCase>()
+    private val monitorVideoRecentlyWatchedUseCase = mock<MonitorVideoRecentlyWatchedUseCase>()
+    private val fakeMonitorVideoRecentlyWatchedFlow = MutableSharedFlow<List<TypedVideoNode>>()
     private val clearRecentlyWatchedVideosUseCase = mock<ClearRecentlyWatchedVideosUseCase>()
     private val removeRecentlyWatchedItemUseCase = mock<RemoveRecentlyWatchedItemUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
@@ -160,6 +161,9 @@ class VideoSectionViewModelTest {
         wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(
             fakeMonitorAccountDetailFlow
         )
+        wheneverBlocking { monitorVideoRecentlyWatchedUseCase() }.thenReturn(
+            fakeMonitorVideoRecentlyWatchedFlow
+        )
         wheneverBlocking { getVideoPlaylistsUseCase() }.thenReturn(listOf())
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
         initUnderTest()
@@ -191,7 +195,7 @@ class VideoSectionViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             defaultDispatcher = StandardTestDispatcher(),
             getNodeContentUriUseCase = getNodeContentUriUseCase,
-            getVideoRecentlyWatchedUseCase = getVideoRecentlyWatchedUseCase,
+            monitorVideoRecentlyWatchedUseCase = monitorVideoRecentlyWatchedUseCase,
             clearRecentlyWatchedVideosUseCase = clearRecentlyWatchedVideosUseCase,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
@@ -216,7 +220,7 @@ class VideoSectionViewModelTest {
             removeVideosFromPlaylistUseCase,
             monitorVideoPlaylistSetsUpdateUseCase,
             getNodeContentUriUseCase,
-            getVideoRecentlyWatchedUseCase,
+            monitorVideoRecentlyWatchedUseCase,
             clearRecentlyWatchedVideosUseCase,
             removeRecentlyWatchedItemUseCase
         )
@@ -1460,32 +1464,33 @@ class VideoSectionViewModelTest {
         }
 
     @Test
-    fun `test that getVideoRecentlyWatched function returns as expected`() = runTest {
-        val testHandles = listOf(1L, 2L, 3L)
-        val testTimestamps = listOf(3000L, 2000L, 1000L)
-        val testVideoNodes = testHandles.mapIndexed { index, handle ->
-            initTypedVideoNode(handle, testTimestamps[index])
-        }
-        val testVideoEntities = testHandles.mapIndexed { index, handle ->
-            initVideoUIEntity(handle, testTimestamps[index])
-        }
-        val expectedRecentlyWatchedItems =
-            testVideoEntities.groupBy { TimeUnit.SECONDS.toDays(it.watchedDate) }
-        testVideoNodes.forEachIndexed { index, node ->
-            whenever(videoUIEntityMapper(node)).thenReturn(testVideoEntities[index])
-        }
-        whenever(getVideoRecentlyWatchedUseCase()).thenReturn(testVideoNodes)
+    fun `test that state is updated correctly after refreshRecentlyWatchedVideos is called`() =
+        runTest {
+            val testHandles = listOf(1L, 2L, 3L)
+            val testTimestamps = listOf(3000L, 2000L, 1000L)
+            val testVideoNodes = testHandles.mapIndexed { index, handle ->
+                initTypedVideoNode(handle, testTimestamps[index])
+            }
+            val testVideoEntities = testHandles.mapIndexed { index, handle ->
+                initVideoUIEntity(handle, testTimestamps[index])
+            }
+            val expectedRecentlyWatchedItems =
+                testVideoEntities.groupBy { TimeUnit.SECONDS.toDays(it.watchedDate) }
+            testVideoNodes.forEachIndexed { index, node ->
+                whenever(videoUIEntityMapper(node)).thenReturn(testVideoEntities[index])
+            }
 
-        initUnderTest()
-        underTest.loadRecentlyWatchedVideos()
-        underTest.state.drop(1).test {
-            val actual = awaitItem()
-            assertThat(actual.groupedVideoRecentlyWatchedItems).isEqualTo(
-                expectedRecentlyWatchedItems
-            )
-            cancelAndIgnoreRemainingEvents()
+            whenever(monitorVideoRecentlyWatchedUseCase()).thenReturn(flowOf(testVideoNodes))
+
+            initUnderTest()
+            underTest.refreshRecentlyWatchedVideos()
+            underTest.state.drop(1).test {
+                assertThat(awaitItem().groupedVideoRecentlyWatchedItems).isEqualTo(
+                    expectedRecentlyWatchedItems
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     private fun initTypedVideoNode(handle: Long, timestamp: Long) = mock<TypedVideoNode> {
         on { id }.thenReturn(NodeId((handle)))
@@ -1498,6 +1503,33 @@ class VideoSectionViewModelTest {
         on { name }.thenReturn("video name")
         on { watchedDate }.thenReturn(date)
     }
+
+    @Test
+    fun `test that state is updated correctly after monitorVideoRecentlyWatchedUseCase is triggered`() =
+        runTest {
+            val testHandles = listOf(1L, 2L, 3L)
+            val testTimestamps = listOf(3000L, 2000L, 1000L)
+            val testVideoNodes = testHandles.mapIndexed { index, handle ->
+                initTypedVideoNode(handle, testTimestamps[index])
+            }
+            val testVideoEntities = testHandles.mapIndexed { index, handle ->
+                initVideoUIEntity(handle, testTimestamps[index])
+            }
+            val expectedRecentlyWatchedItems =
+                testVideoEntities.groupBy { TimeUnit.SECONDS.toDays(it.watchedDate) }
+            testVideoNodes.forEachIndexed { index, node ->
+                whenever(videoUIEntityMapper(node)).thenReturn(testVideoEntities[index])
+            }
+            initUnderTest()
+            testScheduler.advanceUntilIdle()
+            fakeMonitorVideoRecentlyWatchedFlow.emit(testVideoNodes)
+            underTest.state.drop(1).test {
+                assertThat(awaitItem().groupedVideoRecentlyWatchedItems).isEqualTo(
+                    expectedRecentlyWatchedItems
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that isRecentlyWatchedEnabled function returns true`() = runTest {

@@ -6,7 +6,7 @@ import javax.inject.Inject
 /**
  * Use case to get video recently watched
  */
-class GetVideoRecentlyWatchedUseCase @Inject constructor(
+class MonitorVideoRecentlyWatchedUseCase @Inject constructor(
     private val videoSectionRepository: VideoSectionRepository,
 ) {
 
@@ -15,5 +15,5 @@ class GetVideoRecentlyWatchedUseCase @Inject constructor(
      *
      * @return the list of recently watched video nodes
      */
-    suspend operator fun invoke() = videoSectionRepository.getRecentlyWatchedVideoNodes()
+    suspend operator fun invoke() = videoSectionRepository.monitorRecentlyWatchedVideoNodes()
 }
