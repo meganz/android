@@ -40,14 +40,14 @@ import androidx.core.text.HtmlCompat
 import androidx.core.view.MenuItemCompat
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaContactAdapter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -71,7 +71,6 @@ import mega.privacy.android.app.main.model.AddContactState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsLimitWarningView
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
@@ -81,6 +80,7 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import nz.mega.sdk.MegaApiJava
@@ -113,10 +113,10 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
     MegaRequestListenerInterface, MegaGlobalListenerInterface {
 
     /**
-     * Get chat changes use case
+     * Monitor user last green updates use case
      */
     @Inject
-    lateinit var getChatChangesUseCase: GetChatChangesUseCase
+    lateinit var monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase
 
     /**
      * Navigator
@@ -3126,18 +3126,12 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
      * Receive changes to OnChatPresenceLastGreen and make the necessary changes
      */
     private fun checkChatChanges() {
-        val chatSubscription = getChatChangesUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .filter { result: GetChatChangesUseCase.Result? -> result is GetChatChangesUseCase.Result.OnChatPresenceLastGreen }
-            .map { result: GetChatChangesUseCase.Result -> result as GetChatChangesUseCase.Result.OnChatPresenceLastGreen }
-            .subscribe({ next: GetChatChangesUseCase.Result.OnChatPresenceLastGreen ->
-                val userHandle = next.userHandle
-                val lastGreen = next.lastGreen
-                onChatPresenceLastGreen(userHandle, lastGreen)
-            }, { t: Throwable? -> Timber.e(t) })
-
-        composite.add(chatSubscription)
+        lifecycleScope.launch {
+            monitorChatPresenceLastGreenUpdatesUseCase()
+                .collect {
+                    onChatPresenceLastGreen(it.handle, it.lastGreen)
+                }
+        }
     }
 
     private fun checkForUnVerifiedContacts(): Boolean {
