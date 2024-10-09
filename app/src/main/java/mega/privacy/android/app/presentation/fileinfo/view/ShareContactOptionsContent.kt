@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
@@ -28,6 +31,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 /**
  * Content for file contacts list bottom sheet
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ColumnScope.ShareContactOptionsContent(
     contactPermission: ContactPermission,
@@ -44,6 +48,7 @@ fun ColumnScope.ShareContactOptionsContent(
         } ?: "",
         dividerType = DividerType.SmallStartPadding,
         modifier = Modifier
+            .semantics { testTagsAsResourceId = true }
             .testTag(SHARE_CONTACT_OPTIONS_TITLE)
             .padding(vertical = 8.dp)
     )
