@@ -8,6 +8,7 @@ import nz.mega.sdk.MegaNode
  * @property canMoveNode
  * @property canRestoreNode
  * @property isOnline
+ * @property isAvailableOffline
  * @property node
  * @property shareData
  * @property nodeDeviceCenterInformation
@@ -20,6 +21,7 @@ data class NodeBottomSheetUIState(
     val canMoveNode: Boolean = false,
     val canRestoreNode: Boolean = false,
     val isOnline: Boolean = true,
+    val isAvailableOffline: Boolean = false,
     val node: MegaNode? = null,
     val shareData: NodeShareInformation? = null,
     val nodeDeviceCenterInformation: NodeDeviceCenterInformation? = null,

@@ -81,7 +81,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.manageEditTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare
-import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
@@ -276,8 +275,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionOffline.setOnClickListener {
                     onClick {
                         onOfflineClicked(
-                            node = node,
-                            nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
+                            isAvailableOffline = state.isAvailableOffline,
+                            nodeId = NodeId(node.handle),
                         )
                     }
                 }
@@ -413,7 +412,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     separatorInfo.visibility = View.GONE
                     optionRename.visibility = View.VISIBLE
                 } else {
-                    offlineSwitch.isChecked = OfflineUtils.availableOffline(requireContext(), node)
+                    offlineSwitch.isChecked = state.isAvailableOffline
                 }
                 optionLabel.visibility = if (isTakenDown) View.GONE else View.VISIBLE
                 optionFavourite.visibility = if (isTakenDown) View.GONE else View.VISIBLE
@@ -729,8 +728,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 offlineSwitch.setOnCheckedChangeListener { _, _ ->
                     onClick {
                         onOfflineClicked(
-                            node = node,
-                            nodeDeviceCenterInformation = state.nodeDeviceCenterInformation,
+                            isAvailableOffline = state.isAvailableOffline,
+                            nodeId = NodeId(node.handle),
                         )
                     }
                 }
@@ -1298,19 +1297,15 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun onOfflineClicked(
-        node: MegaNode,
-        nodeDeviceCenterInformation: NodeDeviceCenterInformation?,
+        isAvailableOffline: Boolean,
+        nodeId: NodeId,
     ) {
-        if (OfflineUtils.availableOffline(
-                requireContext(),
-                node
-            )
-        ) {
-            nodeOptionsViewModel.removeOfflineNode(node.handle)
+        if (isAvailableOffline) {
+            nodeOptionsViewModel.removeOfflineNode(nodeId)
             refreshView()
             Util.showSnackbar(activity, resources.getString(R.string.file_removed_offline))
         } else {
-            startDownloadViewModel.onSaveOfflineClicked(NodeId(node.handle))
+            startDownloadViewModel.onSaveOfflineClicked(nodeId)
         }
         setStateBottomSheetBehaviorHidden()
     }

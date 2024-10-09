@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactUserNameFromDatabaseUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
@@ -78,6 +79,11 @@ class NodeOptionsViewModelTest {
             invoke(NodeId(any()))
         }.thenReturn(false)
     }
+    private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase> {
+        onBlocking {
+            invoke(any())
+        }.thenReturn(true)
+    }
 
     private val nodeIdFlow = MutableStateFlow(-1L)
 
@@ -120,6 +126,7 @@ class NodeOptionsViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
+            isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -135,6 +142,7 @@ class NodeOptionsViewModelTest {
             assertThat(initial.shareData).isNull()
             assertThat(initial.nodeDeviceCenterInformation).isNull()
             assertThat(initial.shareKeyCreated).isNull()
+            assertThat(initial.isAvailableOffline).isFalse()
         }
     }
 

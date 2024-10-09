@@ -21,9 +21,10 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactUserNameFromDatabaseUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsHidingActionAllowedUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
@@ -54,6 +55,7 @@ class NodeOptionsViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
+    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -75,15 +77,16 @@ class NodeOptionsViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 savedStateHandle.getStateFlow(NODE_ID_KEY, -1L)
-                    .map { getNodeByHandle(it) },
+                    .map { getNodeByHandle(it) to isAvailableOffline(NodeId(it)) },
                 savedStateHandle.getStateFlow(SHARE_DATA_KEY, null),
                 savedStateHandle.getStateFlow(NODE_DEVICE_CENTER_INFORMATION_KEY, null),
                 shareKeyCreated,
                 monitorConnectivityUseCase(),
-            ) { node: MegaNode?, shareData: NodeShareInformation?, nodeDeviceCenterInformation: NodeDeviceCenterInformation?, shareKeyCreated: Boolean?, isOnline: Boolean ->
+            ) { nodeInfo: Pair<MegaNode?, Boolean>, shareData: NodeShareInformation?, nodeDeviceCenterInformation: NodeDeviceCenterInformation?, shareKeyCreated: Boolean?, isOnline: Boolean ->
                 { state: NodeBottomSheetUIState ->
                     state.copy(
-                        node = node,
+                        node = nodeInfo.first,
+                        isAvailableOffline = nodeInfo.second,
                         shareData = shareData,
                         nodeDeviceCenterInformation = nodeDeviceCenterInformation,
                         shareKeyCreated = shareKeyCreated,
@@ -119,6 +122,11 @@ class NodeOptionsViewModel @Inject constructor(
                 Timber.e(it)
             }
         }
+    }
+
+    private suspend fun isAvailableOffline(nodeId: NodeId): Boolean {
+        val node = getNodeByIdUseCase(nodeId) ?: return false
+        return isAvailableOfflineUseCase(node)
     }
 
     /**
@@ -200,9 +208,9 @@ class NodeOptionsViewModel @Inject constructor(
     /**
      * Remove offline node
      */
-    fun removeOfflineNode(handle: Long) {
+    fun removeOfflineNode(nodeId: NodeId) {
         viewModelScope.launch {
-            runCatching { removeOfflineNodeUseCase(NodeId(handle)) }
+            runCatching { removeOfflineNodeUseCase(nodeId) }
                 .onFailure {
                     Timber.e(it)
                 }
