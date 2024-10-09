@@ -24,6 +24,7 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -72,6 +73,7 @@ import mega.privacy.android.domain.entity.call.ChatSession
 import mega.privacy.android.domain.entity.call.ChatSessionChanges
 import mega.privacy.android.domain.entity.call.ChatSessionStatus
 import mega.privacy.android.domain.entity.call.ParticipantsCountChange
+import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
@@ -93,6 +95,7 @@ import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallReconnectingStatusUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatsUseCase
 import mega.privacy.android.domain.usecase.chat.SetChatTitleUseCase
@@ -217,6 +220,7 @@ class InMeetingViewModel @Inject constructor(
     private val monitorUserAvatarUpdatesUseCase: MonitorUserAvatarUpdatesUseCase,
     @ApplicationContext private val context: Context,
     private val getUserAvatarUseCase: GetUserAvatarUseCase,
+    private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
 ) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
 
     private val composite = CompositeDisposable()
@@ -2864,8 +2868,20 @@ class InMeetingViewModel @Inject constructor(
      * @param chatId Chat ID
      * @param callback
      */
-    fun registerConnectionUpdateListener(chatId: Long, callback: () -> Unit) =
-        inMeetingRepository.registerConnectionUpdateListener(chatId, callback)
+    fun registerConnectionUpdateListener(chatId: Long, callback: () -> Unit) {
+        runCatching {
+            viewModelScope.launch {
+                monitorChatConnectionStateUseCase().collect { chatConnection ->
+                    if (chatConnection.chatId == chatId && chatConnection.chatConnectionStatus == ChatConnectionStatus.Online) {
+                        callback()
+                        cancel()
+                    }
+                }
+            }
+        }.onFailure {
+            Timber.e(it)
+        }
+    }
 
     /**
      * Get my own information
@@ -3016,6 +3032,7 @@ class InMeetingViewModel @Inject constructor(
     fun addContact(context: Context, peerId: Long, callback: (String) -> Unit) {
         inMeetingRepository.addContact(context, peerId, callback)
     }
+
     /**
      * Method for clearing the list of speakers
      */
