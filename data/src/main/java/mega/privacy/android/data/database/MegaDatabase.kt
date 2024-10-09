@@ -17,6 +17,7 @@ import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.SdTransferDao
+import mega.privacy.android.data.database.dao.SyncShownNotificationDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
@@ -30,6 +31,7 @@ import mega.privacy.android.data.database.entity.ContactEntity
 import mega.privacy.android.data.database.entity.OfflineEntity
 import mega.privacy.android.data.database.entity.PendingTransferEntity
 import mega.privacy.android.data.database.entity.SdTransferEntity
+import mega.privacy.android.data.database.entity.SyncShownNotificationEntity
 import mega.privacy.android.data.database.entity.SyncSolvedIssueEntity
 import mega.privacy.android.data.database.entity.UserPausedSyncEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
@@ -52,6 +54,7 @@ import timber.log.Timber
         ChatPendingChangesEntity::class,
         VideoRecentlyWatchedEntity::class,
         PendingTransferEntity::class,
+        SyncShownNotificationEntity::class,
     ],
     version = MegaDatabaseConstant.DATABASE_VERSION,
     exportSchema = true,
@@ -72,6 +75,7 @@ import timber.log.Timber
         AutoMigration(89, 90),
         AutoMigration(90, 91),
         AutoMigration(91, 92),
+        AutoMigration(92, 93),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {
@@ -90,6 +94,8 @@ internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun syncSolvedIssuesDao(): SyncSolvedIssuesDao
 
     abstract fun userPausedSyncDao(): UserPausedSyncsDao
+
+    abstract fun syncShownNotificationDao(): SyncShownNotificationDao
 
     abstract fun cameraUploadsRecordDao(): CameraUploadsRecordDao
 

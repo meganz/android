@@ -26,6 +26,7 @@ import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.SdTransferDao
+import mega.privacy.android.data.database.dao.SyncShownNotificationDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.dao.TypedMessageDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
@@ -204,6 +205,11 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideUserPausedSyncDao(database: MegaDatabase): UserPausedSyncsDao =
         database.userPausedSyncDao()
+
+    @Provides
+    @Singleton
+    internal fun provideSyncShownNotificationDao(database: MegaDatabase): SyncShownNotificationDao =
+        database.syncShownNotificationDao()
 
     @Provides
     @Singleton

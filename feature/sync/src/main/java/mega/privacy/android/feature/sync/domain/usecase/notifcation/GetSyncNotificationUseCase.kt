@@ -58,7 +58,7 @@ class GetSyncNotificationUseCase @Inject constructor(
 
     private suspend fun getSyncErrorsNotification(syncs: List<FolderPair>): SyncNotificationMessage? {
         return if (!syncNotificationRepository.isSyncErrorsNotificationShown(syncs)) {
-            syncNotificationRepository.setSyncErrorsNotificationShown(syncs)
+            syncNotificationRepository.setSyncErrorsNotificationShown(syncs, shown = true)
             syncNotificationRepository.getSyncErrorsNotification()
         } else {
             null
@@ -67,7 +67,7 @@ class GetSyncNotificationUseCase @Inject constructor(
 
     private suspend fun getStalledIssuesNotification(stalledIssues: List<StalledIssue>): SyncNotificationMessage? {
         return if (!syncNotificationRepository.isSyncStalledIssuesNotificationShown(stalledIssues)) {
-            syncNotificationRepository.setSyncStalledIssuesNotificationShown(stalledIssues)
+            syncNotificationRepository.setSyncStalledIssuesNotificationShown(stalledIssues, true)
             syncNotificationRepository.getSyncStalledIssuesNotification()
         } else {
             null

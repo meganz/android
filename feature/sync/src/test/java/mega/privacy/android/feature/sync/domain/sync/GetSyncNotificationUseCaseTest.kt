@@ -181,7 +181,7 @@ internal class GetSyncNotificationUseCaseTest {
             )
 
             assertThat(result).isEqualTo(notification)
-            verify(syncNotificationRepository).setSyncErrorsNotificationShown(syncs)
+            verify(syncNotificationRepository).setSyncErrorsNotificationShown(syncs, true)
         }
 
     @Test
@@ -236,7 +236,10 @@ internal class GetSyncNotificationUseCaseTest {
             )
 
             assertThat(result).isEqualTo(notification)
-            verify(syncNotificationRepository).setSyncStalledIssuesNotificationShown(stalledIssues)
+            verify(syncNotificationRepository).setSyncStalledIssuesNotificationShown(
+                stalledIssues,
+                shown = true
+            )
         }
 
     @Test
