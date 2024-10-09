@@ -11,13 +11,19 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.InstantExecutorExtension
+import mega.privacy.android.app.TestSchedulerExtension
+import mega.privacy.android.app.extensions.withCoroutineExceptions
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
+import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
@@ -25,8 +31,10 @@ import mega.privacy.android.domain.usecase.node.CopyCollidedNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyCollidedNodesUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionResultUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionsResultUseCase
+import mega.privacy.android.domain.usecase.node.namecollision.NodeCollisionsWithSize
 import mega.privacy.android.domain.usecase.node.namecollision.ReorderNodeNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.UpdateNodeNameCollisionsResultUseCase
+import mega.privacy.android.domain.usecase.transfers.DeleteCacheFilesUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -35,14 +43,14 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.NullSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import mega.privacy.android.app.InstantExecutorExtension
-import mega.privacy.android.app.TestSchedulerExtension
-import mega.privacy.android.app.extensions.withCoroutineExceptions
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -58,7 +66,9 @@ internal class NameCollisionViewModelTest {
     private val getNodeNameCollisionResultUseCase: GetNodeNameCollisionResultUseCase = mock()
     private val getNodeNameCollisionsResultUseCase: GetNodeNameCollisionsResultUseCase = mock()
     private val reorderNodeNameCollisionsUseCase: ReorderNodeNameCollisionsUseCase = mock()
-    private val updateNodeNameCollisionsResultUseCase: UpdateNodeNameCollisionsResultUseCase = mock()
+    private val updateNodeNameCollisionsResultUseCase: UpdateNodeNameCollisionsResultUseCase =
+        mock()
+    private val deleteCacheFilesUseCase = mock<DeleteCacheFilesUseCase>()
 
     private fun initUnderTest() {
         underTest = NameCollisionViewModel(
@@ -78,6 +88,7 @@ internal class NameCollisionViewModelTest {
             getNodeByFingerprintAndParentNodeUseCase = mock(),
             moveCollidedNodeUseCase = mock(),
             moveCollidedNodesUseCase = mock(),
+            deleteCacheFilesUseCase = deleteCacheFilesUseCase,
         )
     }
 
@@ -88,7 +99,8 @@ internal class NameCollisionViewModelTest {
             copyCollidedNodeUseCase,
             copyCollidedNodesUseCase,
             getFileVersionsOption,
-            monitorUserUpdates
+            monitorUserUpdates,
+            deleteCacheFilesUseCase,
         )
     }
 
@@ -219,6 +231,66 @@ internal class NameCollisionViewModelTest {
             }
         }
     }
+
+    @Test
+    fun `test that cancel invokes deleteCacheFilesUseCase for single current collision path when cancel is invoked`() =
+        runTest {
+            val path = UriPath("/cacheFolder/Mega/file.txt")
+            val nameCollision = mock<FileNameCollision> {
+                on { this.path } doReturn path
+            }
+            val collisionResult = mock<NodeNameCollisionResult> {
+                on { this.nameCollision } doReturn nameCollision
+            }
+            whenever(getNodeNameCollisionResultUseCase(nameCollision)) doReturn collisionResult
+            initUnderTest()
+            underTest.setSingleData(nameCollision)
+            advanceUntilIdle()
+
+            underTest.cancel(false)
+            advanceUntilIdle()
+
+            verify(deleteCacheFilesUseCase).invoke(listOf(path))
+        }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that cancel invokes deleteCacheFilesUseCase for corresponding collision paths when cancel is invoked`(
+        applyNextFlag: Boolean,
+    ) = runTest {
+        val paths = (0..10).map { UriPath("/cacheFolder/Mega/file$it.txt") }
+        val expected = if (applyNextFlag) paths else listOf(paths.first())
+        val nameCollisions = paths.map { path ->
+            mock<FileNameCollision> {
+                on { this.path } doReturn path
+            }
+        }
+        val collisionResults = nameCollisions.map { nameCollision ->
+            mock<NodeNameCollisionResult> {
+                on { this.nameCollision } doReturn nameCollision
+            }
+        }
+        nameCollisions.forEachIndexed { index, nameCollision ->
+            whenever(getNodeNameCollisionResultUseCase(nameCollision)) doReturn collisionResults[index]
+            whenever(getNodeNameCollisionsResultUseCase(nameCollisions.drop(index))) doReturn
+                    collisionResults.drop(index)
+        }
+
+        whenever(reorderNodeNameCollisionsUseCase(nameCollisions)) doReturn NodeCollisionsWithSize(
+            nameCollisions,
+            nameCollisions.size - 1,
+            0,
+        )
+        initUnderTest()
+        underTest.setData(nameCollisions)
+        advanceUntilIdle()
+
+        underTest.cancel(applyNextFlag)
+        advanceUntilIdle()
+
+        verify(deleteCacheFilesUseCase).invoke(expected)
+    }
+
 
     companion object {
         @JvmField

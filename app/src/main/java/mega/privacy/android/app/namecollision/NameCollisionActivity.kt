@@ -90,13 +90,11 @@ class NameCollisionActivity : PasscodeActivity() {
 
             when {
                 collisionsList != null -> viewModel.setData(
-                    collisionsList.map { it.toDomainEntity() },
-                    this
+                    collisionsList.map { it.toDomainEntity() }
                 )
 
                 singleCollision != null -> viewModel.setSingleData(
-                    singleCollision.toDomainEntity(),
-                    this
+                    singleCollision.toDomainEntity()
                 )
 
                 else -> {
@@ -150,13 +148,13 @@ class NameCollisionActivity : PasscodeActivity() {
                 ).apply { data = LEARN_MORE_URI.toUri() })
         }
         binding.replaceUpdateMergeButton.setOnClickListener {
-            viewModel.replaceUpdateOrMerge(this, binding.applyForAllCheck.isChecked)
+            viewModel.replaceUpdateOrMerge(binding.applyForAllCheck.isChecked)
         }
         binding.cancelButton.setOnClickListener {
             viewModel.cancel(binding.applyForAllCheck.isChecked)
         }
         binding.renameButton.setOnClickListener {
-            viewModel.rename(this, binding.applyForAllCheck.isChecked)
+            viewModel.rename(binding.applyForAllCheck.isChecked)
         }
     }
 

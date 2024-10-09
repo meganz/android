@@ -1,6 +1,5 @@
 package mega.privacy.android.app.namecollision
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +9,7 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -51,6 +51,7 @@ import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisi
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionsResultUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.ReorderNodeNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.UpdateNodeNameCollisionsResultUseCase
+import mega.privacy.android.domain.usecase.transfers.DeleteCacheFilesUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
@@ -76,6 +77,7 @@ class NameCollisionViewModel @Inject constructor(
     private val getNodeByFingerprintAndParentNodeUseCase: GetNodeByFingerprintAndParentNodeUseCase,
     private val moveCollidedNodeUseCase: MoveCollidedNodeUseCase,
     private val moveCollidedNodesUseCase: MoveCollidedNodesUseCase,
+    private val deleteCacheFilesUseCase: DeleteCacheFilesUseCase,
 ) : ViewModel() {
     private val composite = CompositeDisposable()
 
@@ -154,13 +156,13 @@ class NameCollisionViewModel @Inject constructor(
      *
      * @param collision [NameCollision] to resolve.
      */
-    fun setSingleData(collision: NameCollision, context: Context) {
+    fun setSingleData(collision: NameCollision) {
         viewModelScope.launch {
             runCatching {
                 if (collision is NodeNameCollision.Default) {
                     checkCopyToOrigin(collision)
                 }
-                updateCurrentCollision(collision, context, true)
+                updateCurrentCollision(collision, true)
             }.onFailure { Timber.e("Exception setting single data $it") }
         }
     }
@@ -169,12 +171,10 @@ class NameCollisionViewModel @Inject constructor(
      * Update current name collision result
      *
      * @param collision [NameCollision] to resolve.
-     * @param context   Required Context for uploads.
      * @param rename    Whether to call rename() or not
      */
     private suspend fun updateCurrentCollision(
         collision: NameCollision,
-        context: Context,
         rename: Boolean,
     ) {
         runCatching {
@@ -184,7 +184,7 @@ class NameCollisionViewModel @Inject constructor(
             updateFileVersioningInfo()
             currentCollision.value?.let {
                 if (isCopyToOrigin && rename)
-                    rename(context, true)
+                    rename(true)
             }
         }.onFailure {
             Timber.e(it, "Error getting collisionResult")
@@ -197,9 +197,8 @@ class NameCollisionViewModel @Inject constructor(
      * Reorders the list to show files first, then folders. Then gets the current collision.
      *
      * @param collisions    ArrayList of [NameCollision] to resolve.
-     * @param context       Required Context for uploads.
      */
-    fun setData(collisions: List<NameCollision>, context: Context) {
+    fun setData(collisions: List<NameCollision>) {
         viewModelScope.launch {
             runCatching {
                 require(collisions.isNotEmpty()) { "Collisions list is empty" }
@@ -213,10 +212,10 @@ class NameCollisionViewModel @Inject constructor(
                 val reorderedCollisions = collisions.toMutableList()
                 pendingFileCollisions = pendingFiles
                 pendingFolderCollisions = pendingFolders
-                updateCurrentCollision(reorderedCollisions.first(), context, false)
+                updateCurrentCollision(reorderedCollisions.first(), false)
                 reorderedCollisions.removeAt(0)
                 if (reorderedCollisions.isNotEmpty()) {
-                    getPendingCollisions(reorderedCollisions, context)
+                    getPendingCollisions(reorderedCollisions)
                 }
             }.onFailure {
                 Timber.e("Exception setting data", it)
@@ -229,11 +228,9 @@ class NameCollisionViewModel @Inject constructor(
      * Gets the list with complete data of pending collisions.
      *
      * @param collisions    MutableList of [NameCollisionUiEntity] to resolve.
-     * @param context       Required Context for uploads.
      */
     private fun getPendingCollisions(
         collisions: MutableList<NameCollision>,
-        context: Context,
     ) {
         viewModelScope.launch {
             runCatching {
@@ -242,7 +239,7 @@ class NameCollisionViewModel @Inject constructor(
                 pendingCollisions.clear()
                 pendingCollisions.addAll(it)
                 if (isCopyToOrigin)
-                    rename(context, true)
+                    rename(true)
             }.onFailure {
                 Timber.e(it, "No pending collisions")
             }
@@ -372,12 +369,11 @@ class NameCollisionViewModel @Inject constructor(
      * or to a folder (merges) with which the current item has the collision. Applies the same
      * for the next ones if [applyOnNext].
      *
-     * @param context       Context required for start uploads.
      * @param applyOnNext   True if should apply for the next file or folder collisions if any,
      *                      false otherwise.
      */
-    fun replaceUpdateOrMerge(context: Context, applyOnNext: Boolean) {
-        proceedWithAction(context, applyOnNext)
+    fun replaceUpdateOrMerge(applyOnNext: Boolean) {
+        proceedWithAction(applyOnNext)
     }
 
     /**
@@ -386,6 +382,7 @@ class NameCollisionViewModel @Inject constructor(
      * @param applyOnNext   True if should dismiss the next file or folder collisions.
      */
     fun cancel(applyOnNext: Boolean) {
+        deleteCacheFilesForPendingFileCollisions(applyOnNext)
         when {
             applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 ->
                 proceedWithAllFiles(NameCollisionChoice.CANCEL)
@@ -395,13 +392,28 @@ class NameCollisionViewModel @Inject constructor(
         }
     }
 
+    private fun deleteCacheFilesForPendingFileCollisions(applyOnNext: Boolean) {
+        val pathsToDelete = buildList {
+            add(currentCollision.value)
+            if (applyOnNext) {
+                addAll(pendingCollisions)
+            }
+        }.mapNotNull { (it?.nameCollision as? FileNameCollision)?.path }
+        viewModelScope.launch(NonCancellable) {
+            runCatching {
+                deleteCacheFilesUseCase(pathsToDelete)
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
     /**
      * Renames the current item and the next ones if [applyOnNext]. Only available for files.
      *
-     * @param context       Required Context for uploads.
      * @param applyOnNext   True if should rename the next file collisions.
      */
-    fun rename(context: Context, applyOnNext: Boolean) {
+    fun rename(applyOnNext: Boolean) {
         renameNames.add(currentCollision.value?.nameCollision?.renameName ?: return)
         viewModelScope.launch {
             runCatching {
@@ -415,7 +427,7 @@ class NameCollisionViewModel @Inject constructor(
                 pendingCollisions.addAll(updatedCollisions)
                 renameNames.clear()
                 renameNames.addAll(updatedRenameNames)
-                proceedWithAction(context = context, applyOnNext = applyOnNext, rename = true)
+                proceedWithAction(applyOnNext = applyOnNext, rename = true)
             }.onFailure {
                 Timber.e(it)
             }
@@ -425,13 +437,11 @@ class NameCollisionViewModel @Inject constructor(
     /**
      * Proceeds with the user's choice for resolving the current collision and the next ones if [applyOnNext].
      *
-     * @param context       Required Context for uploads, null otherwise.
      * @param applyOnNext   True if should apply the same action for the next file or folder collisions,
      *                      false otherwise.
      * @param rename        True if the user's choice is rename, false otherwise.
      */
     fun proceedWithAction(
-        context: Context,
         applyOnNext: Boolean,
         rename: Boolean = false,
     ) {
@@ -503,7 +513,6 @@ class NameCollisionViewModel @Inject constructor(
     /**
      * Proceeds with the upload of the current collision.
      *
-     * @param context   Required context for start the service.
      * @param rename    True if should rename the file, false otherwise.
      */
     private fun singleUpload(rename: Boolean) {
