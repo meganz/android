@@ -20,24 +20,20 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
-import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.domain.usecase.FakeMonitorBackupFolder
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
-import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
-import mega.privacy.android.app.service.scanner.UnexpectedErrorInDocumentScanner
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
@@ -51,24 +47,26 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.UserAlert
+import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
-import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
+import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.environment.DevicePowerConnectionState
-import mega.privacy.android.domain.entity.call.ChatCallStatus
-import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -88,6 +86,9 @@ import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.contactrequest.GetIncomingContactRequestsUseCase
 import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestUpdatesUseCase
+import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
@@ -97,13 +98,10 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
-import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
-import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
-import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
+import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorUpgradeDialogClosedUseCase
@@ -113,6 +111,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
+import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
@@ -140,8 +139,6 @@ import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertDoesNotThrow
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
@@ -157,10 +154,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
-import mega.privacy.android.app.InstantExecutorExtension
-import mega.privacy.android.app.domain.usecase.FakeMonitorBackupFolder
-import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import java.io.File
 import java.util.stream.Stream
 import kotlin.test.assertFalse
@@ -347,6 +340,7 @@ class ManagerViewModelTest {
 
     private val filePrepareUseCase = mock<FilePrepareUseCase>()
     private val createFolderNodeUseCase: CreateFolderNodeUseCase = mock()
+    private val monitorChatListItemUpdates = MutableSharedFlow<ChatListItem>()
 
 
     private fun initViewModel() {
@@ -434,6 +428,7 @@ class ManagerViewModelTest {
             filePrepareUseCase = filePrepareUseCase,
             scannerHandler = scannerHandler,
             createFolderNodeUseCase = createFolderNodeUseCase,
+            monitorChatListItemUpdates = { monitorChatListItemUpdates }
         )
     }
 

@@ -45,6 +45,7 @@ import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
+import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.environment.DevicePowerConnectionState
@@ -62,6 +63,7 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
+import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
@@ -268,6 +270,7 @@ class ManagerViewModel @Inject constructor(
     private val filePrepareUseCase: FilePrepareUseCase,
     private val scannerHandler: ScannerHandler,
     private val createFolderNodeUseCase: CreateFolderNodeUseCase,
+    private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
 ) : ViewModel() {
 
     /**
@@ -524,13 +527,26 @@ class ManagerViewModel @Inject constructor(
         viewModelScope.launch {
             monitorDevicePowerConnectionStateUseCase().catch {
                 Timber.e(
-                    "An error occurred while monitoring the Device Power Connection State",
-                    it,
+                    "An error occurred while monitoring the Device Power Connection State $it"
                 )
             }.collect { state ->
                 Timber.d("The Device Power Connection State is $state")
                 if (state == DevicePowerConnectionState.Connected) {
                     startCameraUploadUseCase()
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            monitorChatListItemUpdates().catch {
+                Timber.e("An error occurred while monitoring the Chat List Item Updates $it")
+            }.collect {
+                Timber.d("The Chat List Item Updates is $it")
+                if (it.isPreview) {
+                    return@collect
+                }
+                if (it.changes == ChatListItemChanges.UnreadCount) {
+                    checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON)
                 }
             }
         }
@@ -1190,7 +1206,7 @@ class ManagerViewModel @Inject constructor(
                     ChatCallStatus.Connecting,
                     ChatCallStatus.Joining,
                     ChatCallStatus.InProgress,
-                    -> ScheduledMeetingStatus.Joined(call.duration)
+                        -> ScheduledMeetingStatus.Joined(call.duration)
 
                     else -> ScheduledMeetingStatus.NotStarted
                 }

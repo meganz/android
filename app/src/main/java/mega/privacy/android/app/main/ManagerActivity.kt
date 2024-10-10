@@ -97,9 +97,6 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -258,7 +255,6 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -435,9 +431,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var cookieDialogHandler: CookieDialogHandler
-
-    @Inject
-    lateinit var getChatChangesUseCase: GetChatChangesUseCase
 
     @Inject
     lateinit var checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase
@@ -902,7 +895,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             pathNavigationOffline = Constants.OFFLINE_ROOT
         }
         CacheFolderManager.createCacheFolders()
-        checkChatChanges()
         Timber.d("retryChatPendingConnections()")
         megaChatApi.retryPendingConnections(false)
 
@@ -7161,33 +7153,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
-    private fun onChatListItemUpdate(item: MegaChatListItem?) {
-        if (item != null) {
-            Timber.d("Chat ID:%s", item.chatId)
-            if (item.isPreview) {
-                return
-            }
-        } else {
-            Timber.w("Item NULL")
-            return
-        }
-        if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
-            viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON)
-        }
-    }
-
-    private fun onChatOnlineStatusUpdate(status: Int, inProgress: Boolean) {
-        Timber.d("Status: %d, In Progress: %s", status, inProgress)
-        if (chatsFragment == null) {
-            chatTabsFragment =
-                supportFragmentManager.findFragmentByTag(FragmentTag.RECENT_CHAT.tag) as? ChatTabsFragment
-        }
-    }
-
-    private fun onChatConnectionStateUpdate(chatId: Long, newState: Int) {
-        Timber.d("Chat ID: %d, New state: %d", chatId, newState)
-    }
-
     fun copyError() {
         try {
             dismissAlertDialogIfExists(statusDialog)
@@ -7324,14 +7289,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             if (drawerItem === DrawerItem.NOTIFICATIONS && activityLifecycleHandler.isActivityVisible) {
                 megaApi.acknowledgeUserAlerts()
             }
-        }
-    }
-
-    fun showKeyboardForSearch() {
-        if (searchView != null) {
-            searchView?.findViewById<View>(androidx.appcompat.R.id.search_src_text)
-                ?.let { showKeyboardDelayed(it) }
-            searchView?.requestFocus()
         }
     }
 
@@ -7739,32 +7696,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 handle: Long,
             ) = Unit
         })
-
-    /**
-     * Receive changes to OnChatListItemUpdate, OnChatOnlineStatusUpdate and OnChatConnectionStateUpdate and make the necessary changes
-     */
-    private fun checkChatChanges() {
-        getChatChangesUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ next: GetChatChangesUseCase.Result? ->
-                if (next is GetChatChangesUseCase.Result.OnChatListItemUpdate) {
-                    val item: MegaChatListItem? = next.item
-                    onChatListItemUpdate(item)
-                }
-                if (next is GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) {
-                    val status = next.status
-                    val inProgress = next.inProgress
-                    onChatOnlineStatusUpdate(status, inProgress)
-                }
-                if (next is GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) {
-                    val chatId = next.chatid
-                    val newState = next.newState
-                    onChatConnectionStateUpdate(chatId, newState)
-                }
-            }, { t: Throwable? -> Timber.e(t) })
-            .addTo(composite)
-    }
 
     /**
      * Updates the UI related to unread user alerts as per the [UnreadUserAlertsCheckType] received.
