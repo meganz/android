@@ -27,9 +27,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -47,15 +44,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.listeners.CreateFolderListener
 import mega.privacy.android.app.listeners.GetAttrUserListener
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.CAMERA
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.COPY
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.IMPORT
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.MOVE
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.SAVE
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.SELECT
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.SELECT_CAMERA_FOLDER
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.SHARE_LINK
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.UPLOAD
 import mega.privacy.android.app.main.adapters.FileExplorerPagerAdapter
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.ALLOW_ADD_PARTICIPANTS
@@ -104,6 +92,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.LoginMutex
+import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import nz.mega.sdk.MegaApiJava
@@ -136,7 +125,7 @@ import javax.inject.Inject
 /**
  * Activity used for several purposes like import content to the cloud, copies or movements.
  *
- * @property getChatChangesUseCase     [GetChatChangesUseCase]
+ * @property monitorChatPresenceLastGreenUpdatesUseCase     [MonitorChatPresenceLastGreenUpdatesUseCase]
  * @property copyNodeUseCase           [CopyNodeUseCase]
  * @property checkFileNameCollisionsUseCase [CheckFileNameCollisionsUseCase]
  * @property loginMutex                Mutex.
@@ -156,7 +145,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     ActionNodeCallback, SnackbarShower {
 
     @Inject
-    lateinit var getChatChangesUseCase: GetChatChangesUseCase
+    lateinit var monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase
 
     @Inject
     lateinit var checkFileNameCollisionsUseCase: CheckFileNameCollisionsUseCase
@@ -2009,7 +1998,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             if (error.errorCode != MegaError.API_OK) {
                 Timber.w("Login failed with error code: %s", error.errorCode)
                 runCatching { loginMutex.unlock() }
-                    .onFailure { Timber.w("Exception unlocking login mutex", it) }
+                    .onFailure { Timber.w("Exception unlocking login mutex $it") }
             } else {
                 with(binding) {
                     fileLoginProgressBar.isVisible = true
@@ -2045,7 +2034,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 binding.fileLoggingInLayout.isVisible = false
                 afterLoginAndFetch()
                 runCatching { loginMutex.unlock() }
-                    .onFailure { Timber.w("Exception unlocking login mutex", it) }
+                    .onFailure { Timber.w("Exception unlocking login mutex $it") }
             }
         }
     }
@@ -2600,15 +2589,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * Receive changes to OnChatPresenceLastGreen and make the necessary changes
      */
     fun checkChatChanges() {
-        getChatChangesUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .filter { result: GetChatChangesUseCase.Result? -> result is GetChatChangesUseCase.Result.OnChatPresenceLastGreen }
-            .map { result: GetChatChangesUseCase.Result -> result as GetChatChangesUseCase.Result.OnChatPresenceLastGreen }
-            .subscribe({ (userHandle, lastGreen): GetChatChangesUseCase.Result.OnChatPresenceLastGreen ->
-                onChatPresenceLastGreen(userHandle, lastGreen)
-            }) { t: Throwable? -> Timber.e(t) }
-            .addTo(composite)
+        collectFlow(monitorChatPresenceLastGreenUpdatesUseCase()) {
+            onChatPresenceLastGreen(it.handle, it.lastGreen)
+        }
     }
 
     private fun addStartUploadTransferView() {
