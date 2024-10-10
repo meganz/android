@@ -31,9 +31,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -53,9 +50,9 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.listeners.GetPeerAttributesListener
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
-import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.ContactController
+import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaParticipantsChatAdapter
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment
@@ -63,7 +60,6 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.Participan
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
 import mega.privacy.android.app.presentation.chat.groupInfo.GroupChatInfoViewModel
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.createForceAppUpdateDialog
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -84,6 +80,14 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
+import mega.privacy.android.domain.entity.chat.ChatListItem
+import mega.privacy.android.domain.entity.chat.ChatListItemChanges
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
+import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -91,7 +95,6 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRequestListenerInterface
@@ -108,7 +111,6 @@ import javax.inject.Inject
 /**
  * Activity which shows group chat room information.
  *
- * @property getChatChangesUseCase [GetChatChangesUseCase]
  * @property binding [ActivityGroupChatPropertiesBinding]
  * @property chatLink The chat link
  * @property chat [MegaChatRoom]
@@ -123,7 +125,16 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     MegaRequestListenerInterface, SnackbarShower {
 
     @Inject
-    lateinit var getChatChangesUseCase: GetChatChangesUseCase
+    lateinit var monitorChatListItemUpdates: MonitorChatListItemUpdates
+
+    @Inject
+    lateinit var monitorChatOnlineStatusUseCase: MonitorChatOnlineStatusUseCase
+
+    @Inject
+    lateinit var monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase
+
+    @Inject
+    lateinit var monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase
 
     @Inject
     lateinit var chatManagement: ChatManagement
@@ -1136,36 +1147,45 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
     }
 
-    private fun onChatListItemUpdate(item: MegaChatListItem) {
+    private fun onChatListItemUpdate(item: ChatListItem) {
         if (item.chatId != chatHandle) {
             return
         }
 
-        Timber.d("Chat ID: %s", item.chatId)
+        Timber.d("Chat ID: ${item.chatId}")
         chat = megaChatApi.getChatRoom(chatHandle)
 
-        if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)) {
-            Timber.d("Change participants")
-            updateParticipants()
-        } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
-            updateAdapterHeader()
-            updateParticipants()
-            invalidateOptionsMenu()
-        } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE) || item.hasChanged(
-                MegaChatListItem.CHANGE_TYPE_UPDATE_PREVIEWERS
-            )
-        ) {
-            updateAdapterHeader()
-        } else {
-            Timber.d("Changes other: %s", item.changes)
+        when (item.changes) {
+            ChatListItemChanges.Participants -> {
+                Timber.d("Change participants")
+                updateParticipants()
+            }
+
+            ChatListItemChanges.OwnPrivilege -> {
+                updateAdapterHeader()
+                updateParticipants()
+                invalidateOptionsMenu()
+            }
+
+            ChatListItemChanges.Title, ChatListItemChanges.UpdatePreviewers -> {
+                updateAdapterHeader()
+            }
+
+            else -> {
+                Timber.d("Changes other: ${item.changes}")
+            }
         }
     }
 
-    private fun onChatOnlineStatusUpdate(userHandle: Long, newStatus: Int, inProgress: Boolean) {
+    private fun onChatOnlineStatusUpdate(
+        userHandle: Long,
+        newStatus: UserChatStatus,
+        inProgress: Boolean,
+    ) {
         var status = newStatus
-        Timber.d("User Handle: %d, Status: %d, inProgress: %s", userHandle, status, inProgress)
+        Timber.d("User Handle: $userHandle, Status: ${status.name}, inProgress: $inProgress")
         if (inProgress) {
-            status = -1
+            status = UserChatStatus.Invalid
         }
 
         if (userHandle == megaChatApi.myUserHandle) {
@@ -1173,14 +1193,14 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             val position = participants.size - 1
             adapter?.updateContactStatus(position)
         } else {
-            Timber.d("Status update for the user: %s", userHandle)
+            Timber.d("Status update for the user: $userHandle")
             var indexToReplace = -1
             val itrReplace: ListIterator<MegaChatParticipant?> = participants.listIterator()
             while (itrReplace.hasNext()) {
                 val participant = itrReplace.next() ?: break
 
                 if (participant.handle == userHandle) {
-                    if (status != MegaChatApi.STATUS_ONLINE && status != MegaChatApi.STATUS_BUSY && status != MegaChatApi.STATUS_INVALID) {
+                    if (status != UserChatStatus.Online && status != UserChatStatus.Busy && status != UserChatStatus.Invalid) {
                         Timber.d("Request last green for user")
                         megaChatApi.requestLastGreen(userHandle, this)
                     } else {
@@ -1192,17 +1212,21 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             }
 
             if (indexToReplace != -1) {
-                Timber.d("Index to replace: %s", indexToReplace)
+                Timber.d("Index to replace: $indexToReplace")
                 adapter?.updateContactStatus(indexToReplace)
             }
         }
     }
 
-    private fun onChatConnectionStateUpdate(chatId: Long, newState: Int) {
-        Timber.d("Chat ID: %d, New state: %d", chatId, newState)
+    private fun onChatConnectionStateUpdate(chatId: Long, newState: ChatConnectionStatus) {
+        Timber.d("Chat ID: $chatId, New state: ${newState.name}")
         megaChatApi.getChatRoom(chatId)?.let { chatRoom ->
             if (CallUtil.isChatConnectedInOrderToInitiateACall(
-                    newState,
+                    if (newState == ChatConnectionStatus.Online) {
+                        MegaChatApi.CHAT_CONNECTION_ONLINE
+                    } else {
+                        -1
+                    },
                     chatRoom
                 ) && CallUtil.canCallBeStartedFromContactOption(
                     this,
@@ -1532,35 +1556,26 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
      * Receive changes to OnChatListItemUpdate, OnChatOnlineStatusUpdate, OnChatConnectionStateUpdate and and OnChatPresenceLastGreen make the necessary changes
      */
     private fun checkChatChanges() {
-        getChatChangesUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ next: GetChatChangesUseCase.Result? ->
-                if (next is GetChatChangesUseCase.Result.OnChatListItemUpdate) {
-                    val item = next.item
-                    item?.let { onChatListItemUpdate(it) }
-                }
 
-                if (next is GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) {
-                    val userHandle = next.userHandle
-                    val status = next.status
-                    val inProgress = next.inProgress
-                    onChatOnlineStatusUpdate(userHandle, status, inProgress)
-                }
+        collectFlow(monitorChatListItemUpdates()) {
+            onChatListItemUpdate(it)
+        }
 
-                if (next is GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) {
-                    val chatId = next.chatid
-                    val newState = next.newState
-                    onChatConnectionStateUpdate(chatId, newState)
-                }
+        collectFlow(monitorChatOnlineStatusUseCase()) {
+            onChatOnlineStatusUpdate(it.userHandle, it.status, it.inProgress)
+        }
 
-                if (next is GetChatChangesUseCase.Result.OnChatPresenceLastGreen) {
-                    val userHandle = next.userHandle
-                    val lastGreen = next.lastGreen
-                    onChatPresenceLastGreen(userHandle, lastGreen)
-                }
-            }) { t: Throwable? -> Timber.e(t) }
-            .addTo(composite)
+        collectFlow(monitorChatOnlineStatusUseCase()) {
+            onChatOnlineStatusUpdate(it.userHandle, it.status, it.inProgress)
+        }
+
+        collectFlow(monitorChatConnectionStateUseCase()) {
+            onChatConnectionStateUpdate(it.chatId, it.chatConnectionStatus)
+        }
+
+        collectFlow(monitorChatPresenceLastGreenUpdatesUseCase()) {
+            onChatPresenceLastGreen(it.handle, it.lastGreen)
+        }
     }
 
     fun getChatRoom() = megaChatApi.getChatRoom(chatHandle)
