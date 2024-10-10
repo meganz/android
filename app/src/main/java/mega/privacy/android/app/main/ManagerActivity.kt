@@ -36,8 +36,10 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
@@ -117,7 +119,7 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
-import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
+import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.extensions.isTablet
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -376,11 +378,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * The cause bitmap of elevating the app bar
      */
     private var mElevationCause = 0
-
-    /**
-     * True if any TabLayout is visible
-     */
-    private var mShowAnyTabLayout = false
 
     internal val viewModel: ManagerViewModel by viewModels()
     private val fileBrowserViewModel: FileBrowserViewModel by viewModels()
@@ -892,7 +889,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
-        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
         Timber.d("onCreate after call super")
         registerViewModelObservers()
@@ -916,7 +912,9 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         if (firstTimeAfterInstallation) {
             setStartScreenTimeStamp(this)
         }
+        enableEdgeToEdge()
         setupView()
+        consumeInsetsWithToolbar(customToolbar = appBarLayout)
         setGetProLabelText()
         initialiseChatBadgeView()
         setCallBadge()
@@ -2407,7 +2405,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
             permissionsFragment?.let { replaceFragment(it, FragmentTag.PERMISSIONS.tag) }
             onAskingPermissionsFragment = true
-            appBarLayout.visibility = View.GONE
+            setAppBarVisibility(false)
             setTabsVisibility()
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
             supportInvalidateOptionsMenu()
@@ -2424,7 +2422,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_USER
         }
         turnOnNotifications = false
-        appBarLayout.visibility = View.VISIBLE
+        setAppBarVisibility(true)
         deleteCurrentFragment()
         onAskingPermissionsFragment = false
         permissionsFragment = null
@@ -2533,12 +2531,12 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         // but stated here explicitly as statusBarColor should not be set from Android 15
         Timber.d("deleteTurnOnNotificationsFragment")
         turnOnNotifications = false
-        appBarLayout.visibility = View.VISIBLE
+        setAppBarVisibility(true)
         turnOnNotificationsFragment = null
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         supportInvalidateOptionsMenu()
         selectDrawerItem(drawerItem)
-        window?.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
+        setAppBarColor(ContextCompat.getColor(this, R.color.app_background))
     }
 
     private fun deleteCurrentFragment() {
@@ -2558,7 +2556,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         // but stated here explicitly as statusBarColor should not be set from Android 15
         Timber.d("setTurnOnNotificationsFragment")
         supportActionBar?.subtitle = null
-        appBarLayout.visibility = View.GONE
         deleteCurrentFragment()
         if (turnOnNotificationsFragment == null) {
             turnOnNotificationsFragment = TurnOnNotificationsFragment()
@@ -2570,13 +2567,13 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             )
         }
         setTabsVisibility()
-        appBarLayout.visibility = View.GONE
+        setAppBarVisibility(false)
         closeDrawer()
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         supportInvalidateOptionsMenu()
         hideFabButton()
         showHideBottomNavigationView(true)
-        window?.statusBarColor = ContextCompat.getColor(this, R.color.teal_500_teal_400)
+        setAppBarColor(ContextCompat.getColor(this, R.color.teal_500_teal_400))
     }
 
     private fun actionOpenFolder(handleIntent: Long) {
@@ -3068,7 +3065,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun selectDrawerItemCloudDrive() {
         Timber.d("selectDrawerItemCloudDrive")
-        appBarLayout.visibility = View.VISIBLE
+        setAppBarVisibility(true)
         tabLayoutShares.visibility = View.GONE
         viewPagerShares.visibility = View.GONE
         fragmentContainer.visibility = View.VISIBLE
@@ -3208,7 +3205,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
 
             DrawerItem.CHAT -> {
-                appBarLayout.visibility = View.VISIBLE
+                setAppBarVisibility(true)
                 supportActionBar?.title = getString(R.string.section_chat)
                 viewModel.setIsFirstNavigationLevel(true)
             }
@@ -3525,7 +3522,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun selectDrawerItemSharedItems() {
         Timber.d("selectDrawerItemSharedItems")
-        appBarLayout.visibility = View.VISIBLE
+        setAppBarVisibility(true)
         try {
             val notificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -3565,7 +3562,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun selectDrawerItemNotifications() {
         Timber.d("selectDrawerItemNotifications")
-        appBarLayout.visibility = View.VISIBLE
+        setAppBarVisibility(true)
         drawerItem = DrawerItem.NOTIFICATIONS
         setBottomNavigationMenuItemChecked(NO_BNV)
         replaceFragmentWithBackStack(
@@ -3579,7 +3576,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun selectDrawerItemTransfers() {
         Timber.d("selectDrawerItemTransfers")
-        appBarLayout.visibility = View.VISIBLE
+        setAppBarVisibility(true)
         transfersManagementViewModel.hideTransfersWidget()
         setBottomNavigationMenuItemChecked(NO_BNV)
         transfersManagementViewModel.checkIfShouldShowCompletedTab()
@@ -3634,7 +3631,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun setTabsVisibility() {
         tabLayoutShares.visibility = View.GONE
         viewPagerShares.visibility = View.GONE
-        mShowAnyTabLayout = false
         fragmentContainer.visibility = View.GONE
         navHostView.visibility = View.GONE
         updatePsaViewVisibility()
@@ -3660,7 +3656,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     viewPagerShares.isUserInputEnabled = true
                 }
                 viewPagerShares.visibility = View.VISIBLE
-                mShowAnyTabLayout = true
             }
 
             DrawerItem.HOMEPAGE -> navHostView.visibility = View.VISIBLE
@@ -3746,7 +3741,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     // of Homepage bottom sheet is calculated based on it
                     showBNVImmediate()
                     if (bottomNavigationCurrentItem == HOME_BNV) {
-                        appBarLayout.visibility = View.GONE
+                        setAppBarVisibility(false)
                     }
                     handleShowingAds(TAB_HOME_SLOT_ID)
                     updateTransfersWidgetVisibility()
@@ -3783,7 +3778,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 R.id.offline_file_info_compose -> {
                     homepageScreen = HomepageScreen.OFFLINE_FILE_INFO
                     updatePsaViewVisibility()
-                    appBarLayout.visibility = View.GONE
+                    setAppBarVisibility(false)
                     showHideBottomNavigationView(true)
                     hideAdsView()
                 }
@@ -3795,7 +3790,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             updateTransfersWidgetVisibility()
             updatePsaViewVisibility()
             if (destinationId != R.id.offlineFragmentCompose)
-                appBarLayout.visibility = View.VISIBLE
+                setAppBarVisibility(true)
             showHideBottomNavigationView(true)
             hideAdsView()
             supportInvalidateOptionsMenu()
@@ -3868,7 +3863,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         )
 
         // Homepage may hide the Appbar before
-        appBarLayout.visibility = View.VISIBLE
+        setAppBarVisibility(true)
         Util.resetActionBar(supportActionBar)
         updateTransfersWidgetVisibility()
         if (drawerItem == DrawerItem.TRANSFERS) {
@@ -3926,7 +3921,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             DrawerItem.RUBBISH_BIN -> {
                 showHideBottomNavigationView(true)
-                appBarLayout.visibility = View.VISIBLE
+                setAppBarVisibility(true)
 
                 rubbishBinComposeFragment = getRubbishBinComposeFragment()
                     ?: RubbishBinComposeFragment.newInstance()
@@ -3976,7 +3971,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 fabButton.visibility = View.GONE
                 if (homepageScreen === HomepageScreen.HOMEPAGE) {
                     showBNVImmediate()
-                    appBarLayout.visibility = View.GONE
+                    setAppBarVisibility(false)
                     showHideBottomNavigationView(false)
                     handleShowingAds(TAB_HOME_SLOT_ID)
                 } else {
@@ -3999,7 +3994,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 if (isInAlbumContent || isInFilterPage) {
                     showHideBottomNavigationView(true)
                 } else {
-                    appBarLayout.visibility = View.VISIBLE
+                    setAppBarVisibility(true)
                     if (getPhotosFragment() == null) {
                         photosFragment =
                             PhotosFragment.newInstance(viewModel.state().isFirstLogin)
@@ -4022,7 +4017,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             DrawerItem.BACKUPS -> {
                 viewModel.setIsFirstNavigationLevel(false)
                 showHideBottomNavigationView(hide = true)
-                appBarLayout.visibility = View.VISIBLE
+                setAppBarVisibility(true)
                 if (openFolderRefresh) {
                     onNodesBackupsUpdate()
                     openFolderRefresh = false
@@ -4174,7 +4169,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         fullscreenOfflineComposeFragment = fragment
         showFabButton()
         setBottomNavigationMenuItemChecked(HOME_BNV)
-        appBarLayout.visibility = View.VISIBLE
+        setAppBarVisibility(true)
         setToolbarTitle()
         supportInvalidateOptionsMenu()
     }
@@ -4191,7 +4186,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             // offline, and hide AppBarLayout when immediately on go back, we will see the flicker
             // of AppBarLayout, hide AppBarLayout when fullscreen offline is closed is better.
             if (isInMainHomePage) {
-                appBarLayout.visibility = View.GONE
+                setAppBarVisibility(false)
             }
         }
     }
@@ -7235,22 +7230,13 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         val elevation: Float = resources.getDimension(R.dimen.toolbar_elevation)
         val toolbarElevationColor = ColorUtils.getColorForElevation(this, elevation)
         val transparentColor = ContextCompat.getColor(this, android.R.color.transparent)
-        val onlySetToolbar = Util.isDarkMode(this) && !mShowAnyTabLayout
         if (mElevationCause > 0) {
-            if (onlySetToolbar) {
-                toolbar.setBackgroundColor(toolbarElevationColor)
-            } else {
-                toolbar.setBackgroundColor(transparentColor)
-                appBarLayout.elevation = elevation
-            }
+            toolbar.setBackgroundColor(toolbarElevationColor)
+            appBarLayout.elevation = elevation
         } else {
             toolbar.setBackgroundColor(transparentColor)
             appBarLayout.elevation = 0f
         }
-        ColorUtils.changeStatusBarColorForElevation(
-            this,
-            mElevationCause > 0 && !isInMainHomePage
-        )
     }
 
     /**
@@ -7927,6 +7913,19 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
             }
         }
+    }
+
+    /**
+     * Set app bar visibility
+     * We don't set the visibility to the appBarLayout directly because we keep status bar padding
+     */
+    private fun setAppBarVisibility(isVisible: Boolean) {
+        toolbar.isVisible = isVisible
+        setSupportActionBar(if (isVisible) toolbar else null)
+    }
+
+    private fun setAppBarColor(@ColorInt color: Int) {
+        appBarLayout.setBackgroundColor(color)
     }
 
     companion object {
