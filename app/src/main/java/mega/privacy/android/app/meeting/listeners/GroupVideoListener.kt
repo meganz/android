@@ -11,7 +11,7 @@ import timber.log.Timber
 import java.nio.ByteBuffer
 
 class GroupVideoListener(
-    textureView: TextureView,
+    textureView: TextureView?,
     peerId: Long,
     clientId: Long,
     isMe: Boolean,
@@ -23,7 +23,7 @@ class GroupVideoListener(
     private var bitmap: Bitmap? = null
     var textureView: TextureView? = null
     private var isLocal = false
-    var localRenderer: MegaSurfaceRenderer? = null
+    var localRenderer: MegaSurfaceRenderer
 
     override fun onChatVideoData(
         api: MegaChatApiJava,
@@ -32,31 +32,27 @@ class GroupVideoListener(
         height: Int,
         byteBuffer: ByteArray,
     ) {
-        kotlin.runCatching {
-            if (width == 0 || height == 0) {
-                return
-            }
+        if (width == 0 || height == 0) {
+            return
+        }
 
-            if (this.width != width || this.height != height) {
-                this.width = width
-                this.height = height
-                val viewWidth = textureView!!.width
-                val viewHeight = textureView!!.height
-                if (viewWidth != 0 && viewHeight != 0) {
-                    bitmap = localRenderer!!.createBitmap(width, height)
-                } else {
-                    this.width = INVALID_DIMENSION
-                    this.height = INVALID_DIMENSION
-                }
+        if (this.width != width || this.height != height) {
+            this.width = width
+            this.height = height
+            val viewWidth = textureView?.width
+            val viewHeight = textureView?.height
+            if (viewWidth != null && viewWidth != 0 && viewHeight != null && viewHeight != 0) {
+                bitmap = localRenderer.createBitmap(width, height)
+            } else {
+                this.width = INVALID_DIMENSION
+                this.height = INVALID_DIMENSION
             }
+        }
 
-            (bitmap ?: return).copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
+        (bitmap ?: return).copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
 
-            if (!isLocal || VideoCaptureUtils.isVideoAllowed()) {
-                localRenderer!!.drawBitmap(isLocal)
-            }
-        }.onFailure {
-            Timber.e("Error drawing video: $it")
+        if (!isLocal || VideoCaptureUtils.isVideoAllowed()) {
+            localRenderer.drawBitmap(isLocal)
         }
     }
 

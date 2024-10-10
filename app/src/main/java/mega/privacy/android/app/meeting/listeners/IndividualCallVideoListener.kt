@@ -16,7 +16,7 @@ import java.nio.ByteBuffer
  * A listener for metadata corresponding to video being rendered.
  */
 class IndividualCallVideoListener(
-    private val textureView: TextureView,
+    private val textureView: TextureView?,
     outMetrics: DisplayMetrics?,
     clientId: Long,
     isFloatingWindow: Boolean = true,
@@ -40,30 +40,27 @@ class IndividualCallVideoListener(
         height: Int,
         byteBuffer: ByteArray,
     ) {
-        runCatching {
-            if (width == 0 || height == 0) {
-                return
-            }
 
-            if (this.width != width || this.height != height) {
-                this.width = width
-                this.height = height
-                val viewWidth = textureView.width
-                val viewHeight = textureView.height
-                if (viewWidth != 0 && viewHeight != 0) {
-                    bitmap = renderer.createBitmap(width, height)
-                } else {
-                    this.width = Constants.INVALID_DIMENSION
-                    this.height = Constants.INVALID_DIMENSION
-                }
-            }
+        if (width == 0 || height == 0) {
+            return
+        }
 
-            (bitmap ?: return).copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
-            if (VideoCaptureUtils.isVideoAllowed()) {
-                renderer.drawBitmap(isLocal)
+        if (this.width != width || this.height != height) {
+            this.width = width
+            this.height = height
+            val viewWidth = textureView?.width
+            val viewHeight = textureView?.height
+            if (viewWidth != null && viewWidth != 0 && viewHeight != null && viewHeight != 0) {
+                bitmap = renderer.createBitmap(width, height)
+            } else {
+                this.width = Constants.INVALID_DIMENSION
+                this.height = Constants.INVALID_DIMENSION
             }
-        }.onFailure {
-            Timber.e(it)
+        }
+
+        (bitmap ?: return).copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
+        if (VideoCaptureUtils.isVideoAllowed()) {
+            renderer.drawBitmap(isLocal)
         }
     }
 

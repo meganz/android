@@ -181,8 +181,6 @@ class InMeetingRepository @Inject constructor(
         hiRes: Boolean,
         listener: MegaChatVideoListenerInterface,
     ) {
-        removeChatRemoteVideoListener(chatId, clientId, hiRes, listener)
-
         if (hiRes) {
             Timber.d("Add Chat remote video listener of client $clientId , with HiRes")
         } else {
