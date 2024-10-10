@@ -34,6 +34,7 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
+import mega.privacy.android.data.gateway.TransfersPreferencesGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -108,6 +109,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val deviceGateway: DeviceGateway,
     private val inProgressTransferMapper: InProgressTransferMapper,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
+    private val transfersPreferencesGateway: TransfersPreferencesGateway,
 ) : TransferRepository {
 
     private val monitorPausedTransfers = MutableStateFlow(false)
@@ -765,6 +767,17 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun updatePendingTransfer(
         updatePendingTransferRequest: UpdatePendingTransferRequest,
     ) = megaLocalRoomGateway.updatePendingTransfers(updatePendingTransferRequest)
+
+    override suspend fun setRequestFilesPermissionDenied() = withContext(ioDispatcher) {
+        transfersPreferencesGateway.setRequestFilesPermissionDenied()
+    }
+
+    override fun monitorRequestFilesPermissionDenied() =
+        transfersPreferencesGateway.monitorRequestFilesPermissionDenied()
+
+    override suspend fun clearPreferences() = withContext(ioDispatcher) {
+        transfersPreferencesGateway.clearPreferences()
+    }
 }
 
 private fun MegaTransfer.isBackgroundTransfer() =

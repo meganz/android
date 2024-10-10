@@ -25,6 +25,7 @@ import mega.privacy.android.data.preferences.migration.CredentialsPreferencesMig
 import mega.privacy.android.data.preferences.psa.psaPreferenceDataStoreName
 import mega.privacy.android.data.preferences.security.PasscodeDatastoreMigration
 import mega.privacy.android.data.preferences.security.passcodeDatastoreName
+import mega.privacy.android.data.preferences.transfersPreferencesDataStoreName
 import mega.privacy.android.data.qualifier.RequestPhoneNumberPreference
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import javax.inject.Named
@@ -140,4 +141,23 @@ internal object DataStoreModule {
             fileName = credentialDataStoreName
         )
     }
+
+    @Singleton
+    @Provides
+    @Named(transfersPreferencesDataStoreName)
+    fun provideTransfersPreferencesDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+        passcodeDatastoreMigration: PasscodeDatastoreMigration,
+    ): DataStore<Preferences> =
+        PreferenceDataStoreFactory.create(
+            corruptionHandler = ReplaceFileCorruptionHandler(
+                produceNewData = { emptyPreferences() }
+            ),
+            migrations = listOf(
+                passcodeDatastoreMigration
+            ),
+            scope = CoroutineScope(ioDispatcher),
+            produceFile = { context.preferencesDataStoreFile(transfersPreferencesDataStoreName) }
+        )
 }

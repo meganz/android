@@ -528,25 +528,65 @@ interface TransferRepository {
      */
     suspend fun removeInProgressTransfers(tags: Set<Int>)
 
-    fun getPendingTransfersByType(
-        transferType: TransferType,
-    ): Flow<List<PendingTransfer>>
+    /**
+     * Gets pending transfers by type.
+     */
+    fun getPendingTransfersByType(transferType: TransferType): Flow<List<PendingTransfer>>
 
+    /**
+     * Gets pending transfers by type and state.
+     */
     fun getPendingTransfersByTypeAndState(
         transferType: TransferType,
         pendingTransferState: PendingTransferState,
     ): Flow<List<PendingTransfer>>
 
+    /**
+     * Inserts a list of pending transfers.
+     */
     suspend fun insertPendingTransfers(pendingTransfer: List<InsertPendingTransferRequest>)
+
+    /**
+     * Updates a list of pending transfers.
+     */
     suspend fun updatePendingTransfers(
         updatePendingTransferRequests: List<UpdatePendingTransferRequest>,
     )
 
+    /**
+     * Updates a pending transfer.
+     */
     suspend fun updatePendingTransfer(
         updatePendingTransferRequest: UpdatePendingTransferRequest,
     )
 
+    /**
+     * Gets a pending transfer by tag.
+     */
     suspend fun getPendingTransfersByTag(tag: Int): PendingTransfer?
+
+    /**
+     * Deletes a pending transfer by tag.
+     */
     suspend fun deletePendingTransferByTag(tag: Int)
+
+    /**
+     * Deletes all pending transfers.
+     */
     suspend fun deleteAllPendingTransfers()
+
+    /**
+     * Sets whether the user has denied the file access permission request
+     */
+    suspend fun setRequestFilesPermissionDenied()
+
+    /**
+     * Monitors whether the user has denied the file access permission request
+     */
+    fun monitorRequestFilesPermissionDenied(): Flow<Boolean>
+
+    /**
+     * Clear all preferences
+     */
+    suspend fun clearPreferences()
 }

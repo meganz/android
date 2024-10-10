@@ -55,6 +55,7 @@ import mega.privacy.android.data.gateway.NotificationsGateway
 import mega.privacy.android.data.gateway.PermissionGateway
 import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.TelephonyGateway
+import mega.privacy.android.data.gateway.TransfersPreferencesGateway
 import mega.privacy.android.data.gateway.VerifyPurchaseGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
@@ -99,6 +100,7 @@ import mega.privacy.android.data.preferences.MediaPlayerPreferencesDatastore
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore
 import mega.privacy.android.data.preferences.SlideshowPreferencesDataStore
 import mega.privacy.android.data.preferences.StatisticsPreferencesDataStore
+import mega.privacy.android.data.preferences.TransfersPreferencesDataStore
 import mega.privacy.android.data.preferences.UIPreferencesDatastore
 import mega.privacy.android.data.preferences.psa.PsaPreferenceDataStore
 import mega.privacy.android.data.preferences.security.PasscodeDataStore
@@ -301,4 +303,8 @@ internal abstract class GatewayModule {
 
     @Binds
     abstract fun bindContactGateway(implementation: ContactGatewayImpl): ContactGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindTransfersPreferencesDataStoreGateway(implementation: TransfersPreferencesDataStore): TransfersPreferencesGateway
 }

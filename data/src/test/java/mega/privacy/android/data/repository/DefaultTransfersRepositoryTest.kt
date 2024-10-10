@@ -16,6 +16,7 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
+import mega.privacy.android.data.gateway.TransfersPreferencesGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -102,6 +103,7 @@ class DefaultTransfersRepositoryTest {
     private val deviceGateway = mock<DeviceGateway>()
     private val inProgressTransferMapper = mock<InProgressTransferMapper>()
     private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
+    private val transfersPreferencesGateway = mock<TransfersPreferencesGateway>()
 
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -135,6 +137,7 @@ class DefaultTransfersRepositoryTest {
             deviceGateway = deviceGateway,
             inProgressTransferMapper = inProgressTransferMapper,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
+            transfersPreferencesGateway = transfersPreferencesGateway,
         )
     }
 
@@ -1575,5 +1578,28 @@ class DefaultTransfersRepositoryTest {
                 updatePendingTransferRequests1,
                 updatePendingTransferRequests2
             )
+        }
+
+    @Test
+    fun `test that transfersPreferencesGateway invokes setRequestFilesPermissionDenied when setRequestFilesPermissionDenied is called`() =
+        runTest {
+            underTest.setRequestFilesPermissionDenied()
+            verify(transfersPreferencesGateway).setRequestFilesPermissionDenied()
+        }
+
+    @Test
+    fun `test that monitorRequestFilesPermissionDenied returns what transfersPreferencesGateway monitorRequestFilesPermissionDenied returns`() =
+        runTest {
+            val flow = flowOf(true)
+            whenever(transfersPreferencesGateway.monitorRequestFilesPermissionDenied())
+                .thenReturn(flow)
+            assertThat(underTest.monitorRequestFilesPermissionDenied()).isEqualTo(flow)
+        }
+
+    @Test
+    fun `test that transfersPreferencesGateway invokes clearPreferences when clearPreferences is called`() =
+        runTest {
+            underTest.clearPreferences()
+            verify(transfersPreferencesGateway).clearPreferences()
         }
 }
