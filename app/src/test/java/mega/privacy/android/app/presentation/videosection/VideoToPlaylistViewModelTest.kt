@@ -12,13 +12,12 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.videosection.VideoToPlaylistViewModel
 import mega.privacy.android.app.presentation.videosection.VideoToPlaylistViewModel.Companion.ERROR_MESSAGE_REPEATED_TITLE
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistSetUiEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistSetUiEntity
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.domain.entity.set.UserSet
-import mega.privacy.android.domain.entity.videosection.VideoPlaylist
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.videosection.AddVideoToMultiplePlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
@@ -222,7 +221,7 @@ class VideoToPlaylistViewModelTest {
     fun `test that create video playlist returns a video playlist with the right title`() =
         runTest {
             val expectedTitle = "video playlist title"
-            val expectedVideoPlaylist = mock<VideoPlaylist> {
+            val expectedVideoPlaylist = mock<UserVideoPlaylist> {
                 on { title }.thenReturn(expectedTitle)
             }
             whenever(createVideoPlaylistUseCase(expectedTitle)).thenReturn(expectedVideoPlaylist)
@@ -241,7 +240,7 @@ class VideoToPlaylistViewModelTest {
     fun `test that state is updated correctly when new video playlist title is invalid`() =
         runTest {
             val expectedTitle = "/video playlist title"
-            val expectedVideoPlaylist = mock<VideoPlaylist> {
+            val expectedVideoPlaylist = mock<UserVideoPlaylist> {
                 on { title }.thenReturn(expectedTitle)
             }
             whenever(createVideoPlaylistUseCase(expectedTitle)).thenReturn(expectedVideoPlaylist)
@@ -282,7 +281,7 @@ class VideoToPlaylistViewModelTest {
     fun `test that createVideoPlaylistUseCase is not invoked when createNewPlaylist is invoked and createVideoPlaylistJob is active`() =
         runTest {
             val expectedTitle = "video playlist title"
-            val expectedVideoPlaylist = mock<VideoPlaylist> {
+            val expectedVideoPlaylist = mock<UserVideoPlaylist> {
                 on { title }.thenReturn(expectedTitle)
             }
             val mockJob = mock<Job>()

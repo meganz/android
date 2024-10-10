@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.set.UserSet
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.BeforeAll
@@ -15,8 +16,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class VideoPlaylistMapperTest {
-    private lateinit var underTest: VideoPlaylistMapper
+class UserVideoPlaylistMapperTest {
+    private lateinit var underTest: UserVideoPlaylistMapper
 
     private val id = 123456L
     private val name = "title name"
@@ -41,7 +42,7 @@ class VideoPlaylistMapperTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = VideoPlaylistMapper()
+        underTest = UserVideoPlaylistMapper()
     }
 
     @Test
@@ -105,7 +106,7 @@ class VideoPlaylistMapperTest {
     }
 
     private fun assertMappedVideoPlaylistObject(
-        videoPlaylist: VideoPlaylist,
+        videoPlaylist: UserVideoPlaylist,
         expectedThumbnailSize: Int?,
         expectedNodeIdRelatedToThumbnail: NodeId?,
         expectedNumberOfVideos: Int,

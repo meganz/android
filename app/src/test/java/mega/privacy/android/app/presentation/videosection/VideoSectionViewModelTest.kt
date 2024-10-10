@@ -35,7 +35,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
-import mega.privacy.android.domain.entity.videosection.VideoPlaylist
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -496,8 +496,8 @@ class VideoSectionViewModelTest {
     @Test
     fun `test that the playlists returned correctly when search query is not empty`() = runTest {
         val testTitle = "new playlist"
-        val expectedVideoPlaylist = mock<VideoPlaylist> { on { title }.thenReturn(testTitle) }
-        val videoPlaylist = mock<VideoPlaylist> { on { title }.thenReturn("title") }
+        val expectedVideoPlaylist = mock<UserVideoPlaylist> { on { title }.thenReturn(testTitle) }
+        val videoPlaylist = mock<UserVideoPlaylist> { on { title }.thenReturn("title") }
         val expectedVideoPlaylistUIEntity =
             mock<VideoPlaylistUIEntity> { on { title }.thenReturn(testTitle) }
         val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> { on { title }.thenReturn("title") }
@@ -586,7 +586,7 @@ class VideoSectionViewModelTest {
     fun `test that create video playlist returns a video playlist with the right title`() =
         runTest {
             val expectedTitle = "video playlist title"
-            val expectedVideoPlaylist = mock<VideoPlaylist> {
+            val expectedVideoPlaylist = mock<UserVideoPlaylist> {
                 on { title }.thenReturn(expectedTitle)
             }
             val expectedVideoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
@@ -628,7 +628,7 @@ class VideoSectionViewModelTest {
         runTest {
             val testPlaylistID = NodeId(1L)
             val testVideoIDs = listOf(NodeId(1L), NodeId(2L), NodeId(3L))
-            val videoPlaylist = mock<VideoPlaylist> {
+            val videoPlaylist = mock<UserVideoPlaylist> {
                 on { title }.thenReturn("playlist")
                 on { id }.thenReturn(NodeId(1L))
             }
@@ -664,7 +664,7 @@ class VideoSectionViewModelTest {
         runTest {
             val testPlaylistID = NodeId(1L)
             val testVideoElementIDs = listOf(1L, 2L, 3L)
-            val videoPlaylist = mock<VideoPlaylist> {
+            val videoPlaylist = mock<UserVideoPlaylist> {
                 on { title }.thenReturn("playlist")
                 on { id }.thenReturn(NodeId(1L))
             }
@@ -1101,7 +1101,7 @@ class VideoSectionViewModelTest {
         val expectedVideos = (0..3).map { handle ->
             mock<TypedVideoNode> { on { id }.thenReturn(NodeId(handle.toLong())) }
         }
-        val videoPlaylist = mock<VideoPlaylist> {
+        val videoPlaylist = mock<UserVideoPlaylist> {
             on { id }.thenReturn(NodeId(1L))
             on { videos }.thenReturn(expectedVideos)
         }
@@ -1188,7 +1188,7 @@ class VideoSectionViewModelTest {
             val expectedVideoNode = mock<TypedVideoNode> {
                 on { id }.thenReturn(expectedId)
             }
-            val videoPlaylist = mock<VideoPlaylist> {
+            val videoPlaylist = mock<UserVideoPlaylist> {
                 on { id }.thenReturn(expectedId)
                 on { videos }.thenReturn(listOf(expectedVideoNode))
             }
@@ -1223,7 +1223,7 @@ class VideoSectionViewModelTest {
             val expectedVideoNode = mock<TypedVideoNode> {
                 on { id }.thenReturn(expectedId)
             }
-            val videoPlaylist = mock<VideoPlaylist> {
+            val videoPlaylist = mock<UserVideoPlaylist> {
                 on { id }.thenReturn(expectedId)
                 on { videos }.thenReturn(listOf(expectedVideoNode))
             }

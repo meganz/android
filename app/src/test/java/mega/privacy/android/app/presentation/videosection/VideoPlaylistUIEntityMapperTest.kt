@@ -8,7 +8,7 @@ import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMa
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
-import mega.privacy.android.domain.entity.videosection.VideoPlaylist
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -47,7 +47,7 @@ class VideoPlaylistUIEntityMapperTest {
     fun `test that VideoPlaylistUIEntity can be mapped correctly`() =
         runTest {
             whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(totalDuration)
-            val videoPlaylist = mock<VideoPlaylist> {
+            val videoPlaylist = mock<UserVideoPlaylist> {
                 on { id }.thenReturn(NodeId(id))
                 on { title }.thenReturn(title)
                 on { cover }.thenReturn(cover)
@@ -71,7 +71,7 @@ class VideoPlaylistUIEntityMapperTest {
 
             val testVideos = listOf<TypedVideoNode>(mock(), mock(), mock())
 
-            val videoPlaylist = mock<VideoPlaylist> {
+            val videoPlaylist = mock<UserVideoPlaylist> {
                 on { id }.thenReturn(NodeId(id))
                 on { title }.thenReturn(title)
                 on { cover }.thenReturn(cover)

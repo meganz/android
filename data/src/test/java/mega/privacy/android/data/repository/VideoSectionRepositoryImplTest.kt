@@ -18,7 +18,7 @@ import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
-import mega.privacy.android.data.mapper.videosection.VideoPlaylistMapper
+import mega.privacy.android.data.mapper.videosection.UserVideoPlaylistMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
@@ -30,7 +30,7 @@ import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.set.UserSet
-import mega.privacy.android.domain.entity.videosection.VideoPlaylist
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.repository.VideoSectionRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
@@ -70,7 +70,7 @@ class VideoSectionRepositoryImplTest {
     private val cancelTokenProvider = mock<CancelTokenProvider>()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val userSetMapper: UserSetMapper = ::createUserSet
-    private val videoPlaylistMapper = mock<VideoPlaylistMapper>()
+    private val userVideoPlaylistMapper = mock<UserVideoPlaylistMapper>()
     private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
     private val appPreferencesGateway = mock<AppPreferencesGateway>()
     private val videoRecentlyWatchedItemMapper = mock<VideoRecentlyWatchedItemMapper>()
@@ -90,7 +90,7 @@ class VideoSectionRepositoryImplTest {
             cancelTokenProvider = cancelTokenProvider,
             megaLocalRoomGateway = megaLocalRoomGateway,
             userSetMapper = userSetMapper,
-            videoPlaylistMapper = videoPlaylistMapper,
+            userVideoPlaylistMapper = userVideoPlaylistMapper,
             megaSearchFilterMapper = megaSearchFilterMapper,
             appPreferencesGateway = appPreferencesGateway,
             videoRecentlyWatchedItemMapper = videoRecentlyWatchedItemMapper,
@@ -106,7 +106,7 @@ class VideoSectionRepositoryImplTest {
             fileNodeMapper,
             typedVideoNodeMapper,
             megaLocalRoomGateway,
-            videoPlaylistMapper,
+            userVideoPlaylistMapper,
             appPreferencesGateway,
             videoRecentlyWatchedItemMapper
         )
@@ -257,7 +257,7 @@ class VideoSectionRepositoryImplTest {
             val testVideos: List<TypedVideoNode> =
                 listOf(typedVideoNode, typedVideoNode, typedVideoNode)
 
-            val testVideoPlaylist = mock<VideoPlaylist> {
+            val testVideoPlaylist = mock<UserVideoPlaylist> {
                 on { id }.thenReturn(NodeId(1L))
                 on { title }.thenReturn("video playlist title")
                 on { videos }.thenReturn(listOf(mock(), mock(), mock()))
@@ -276,7 +276,7 @@ class VideoSectionRepositoryImplTest {
                 typedVideoNode
             )
             whenever(megaApiGateway.isInRubbish(any())).thenReturn(false)
-            whenever(videoPlaylistMapper(userSet, testVideos)).thenReturn(testVideoPlaylist)
+            whenever(userVideoPlaylistMapper(userSet, testVideos)).thenReturn(testVideoPlaylist)
             initUnderTest()
             val actual = underTest.getVideoPlaylists()
             assertThat(actual.isNotEmpty()).isTrue()
@@ -321,13 +321,13 @@ class VideoSectionRepositoryImplTest {
         runTest {
             val userSet = getUserSetAndInitReturnValues()
 
-            val testVideoPlaylist = mock<VideoPlaylist> {
+            val testVideoPlaylist = mock<UserVideoPlaylist> {
                 on { id }.thenReturn(NodeId(1L))
                 on { title }.thenReturn("video playlist title")
             }
 
             whenever(megaApiGateway.isInRubbish(any())).thenReturn(true)
-            whenever(videoPlaylistMapper(userSet, emptyList())).thenReturn(testVideoPlaylist)
+            whenever(userVideoPlaylistMapper(userSet, emptyList())).thenReturn(testVideoPlaylist)
             initUnderTest()
             val actual = underTest.getVideoPlaylists()
             assertThat(actual.isNotEmpty()).isTrue()
@@ -354,7 +354,7 @@ class VideoSectionRepositoryImplTest {
             false,
         )
 
-        val expectedVideoPlaylist = mock<VideoPlaylist> {
+        val expectedVideoPlaylist = mock<UserVideoPlaylist> {
             on { id }.thenReturn(NodeId(userSet.id))
             on { title }.thenReturn(userSet.name)
         }
@@ -373,10 +373,11 @@ class VideoSectionRepositoryImplTest {
                 error
             )
         }
-        whenever(videoPlaylistMapper(any(), any())).thenReturn(expectedVideoPlaylist)
+        whenever(userVideoPlaylistMapper(any(), any())).thenReturn(expectedVideoPlaylist)
 
         val actual = underTest.createVideoPlaylist(userSet.name)
-        assertThat(actual.id.longValue).isEqualTo(userSet.id)
+        assertThat(actual is UserVideoPlaylist).isTrue()
+        assertThat((actual as UserVideoPlaylist).id.longValue).isEqualTo(userSet.id)
         assertThat(actual.title).isEqualTo(userSet.name)
     }
 

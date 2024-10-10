@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.videosection
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.videosection.VideoPlaylist
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.repository.VideoSectionRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -32,7 +32,7 @@ class CreateVideoPlaylistUseCaseTest {
     @Test
     fun `test that the created video playlist with the right title`() = runTest {
         val expectedTitle = "video playlist title"
-        val expectedVideoPlaylist = mock<VideoPlaylist> {
+        val expectedVideoPlaylist = mock<UserVideoPlaylist> {
             on { title }.thenReturn(expectedTitle)
         }
         whenever(videoSectionRepository.createVideoPlaylist(expectedTitle)).thenReturn(
@@ -40,6 +40,6 @@ class CreateVideoPlaylistUseCaseTest {
         )
 
         val actual = underTest(expectedTitle)
-        assertThat(actual.title).isEqualTo(expectedTitle)
+        assertThat((actual as? UserVideoPlaylist)?.title).isEqualTo(expectedTitle)
     }
 }

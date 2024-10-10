@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.videosection
 
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.repository.VideoSectionRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -37,19 +38,23 @@ class GetVideoPlaylistsUseCase @Inject constructor(
             SortOrder.ORDER_SIZE_DESC,
             SortOrder.ORDER_SIZE_ASC,
             -> {
-                playlists.sortedBy { it.title }
+                playlists.filterIsInstance<UserVideoPlaylist>().sortedBy { it.title }
             }
 
             SortOrder.ORDER_DEFAULT_DESC -> {
-                playlists.sortedByDescending { it.title }
+                playlists.filterIsInstance<UserVideoPlaylist>().sortedByDescending { it.title }
             }
 
             SortOrder.ORDER_MODIFICATION_ASC -> {
-                playlists.sortedBy { it.title }.sortedBy { it.creationTime }
+                playlists.filterIsInstance<UserVideoPlaylist>()
+                    .sortedBy { it.title }
+                    .sortedBy { it.creationTime }
             }
 
             SortOrder.ORDER_MODIFICATION_DESC -> {
-                playlists.sortedBy { it.title }.sortedByDescending { it.creationTime }
+                playlists.filterIsInstance<UserVideoPlaylist>()
+                    .sortedBy { it.title }
+                    .sortedByDescending { it.creationTime }
             }
 
             else -> playlists

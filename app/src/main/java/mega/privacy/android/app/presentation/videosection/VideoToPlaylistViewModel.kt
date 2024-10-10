@@ -14,6 +14,7 @@ import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistSe
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistSetUiEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoToPlaylistUiState
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.videosection.AddVideoToMultiplePlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
@@ -102,7 +103,7 @@ class VideoToPlaylistViewModel @Inject constructor(
                             )
                         }
                         loadVideoPlaylistSets()
-                        Timber.d("Created video playlist: ${videoPlaylist.title}")
+                        Timber.d("Created video playlist: ${(videoPlaylist as? UserVideoPlaylist)?.title}")
                     }.onFailure { exception ->
                         Timber.e(exception)
                         _uiState.update {

@@ -26,7 +26,7 @@ import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
-import mega.privacy.android.data.mapper.videosection.VideoPlaylistMapper
+import mega.privacy.android.data.mapper.videosection.UserVideoPlaylistMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
@@ -59,7 +59,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
     private val cancelTokenProvider: CancelTokenProvider,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val userSetMapper: UserSetMapper,
-    private val videoPlaylistMapper: VideoPlaylistMapper,
+    private val userVideoPlaylistMapper: UserVideoPlaylistMapper,
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
     private val appPreferencesGateway: AppPreferencesGateway,
     private val videoRecentlyWatchedItemMapper: VideoRecentlyWatchedItemMapper,
@@ -155,7 +155,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                 )
             }
         }
-        return videoPlaylistMapper(
+        return userVideoPlaylistMapper(
             userSet = this,
             videoNodeList = videoNodeList
         )
@@ -170,7 +170,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                             val newSet = megaRequest.megaSet
                             continuation.resumeWith(
                                 Result.success(
-                                    videoPlaylistMapper(
+                                    userVideoPlaylistMapper(
                                         userSet = newSet.toUserSet(),
                                         videoNodeList = emptyList()
                                     )

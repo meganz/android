@@ -3,16 +3,16 @@ package mega.privacy.android.data.mapper.videosection
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.set.UserSet
-import mega.privacy.android.domain.entity.videosection.VideoPlaylist
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-internal class VideoPlaylistMapper @Inject constructor() {
+internal class UserVideoPlaylistMapper @Inject constructor() {
 
     operator fun invoke(
         userSet: UserSet,
         videoNodeList: List<TypedVideoNode>,
-    ) = VideoPlaylist(
+    ) = UserVideoPlaylist(
         id = NodeId(userSet.id),
         title = userSet.name,
         cover = userSet.cover,

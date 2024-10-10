@@ -47,6 +47,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -722,7 +723,7 @@ class VideoSectionViewModel @Inject constructor(
                             )
                         }
                         loadVideoPlaylists()
-                        Timber.d("Current video playlist: ${videoPlaylist.title}")
+                        Timber.d("Current video playlist: ${(videoPlaylist as? UserVideoPlaylist)?.title}")
                     }.onFailure { exception ->
                         Timber.e(exception)
                         _state.update {
@@ -1008,7 +1009,7 @@ class VideoSectionViewModel @Inject constructor(
     internal fun getTypedVideoNodeById(id: NodeId) = originalData.firstOrNull { it.id == id }
 
     internal fun getTypedVideoNodeOfPlaylistById(id: NodeId) =
-        originalPlaylistData.firstOrNull {
+        originalPlaylistData.filterIsInstance<UserVideoPlaylist>().firstOrNull {
             it.id == _state.value.currentVideoPlaylist?.id
         }?.let { playlist ->
             playlist.videos?.firstOrNull { it.id == id }

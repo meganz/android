@@ -4,10 +4,9 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.videosection.VideoPlaylist
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.repository.VideoSectionRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -39,7 +38,7 @@ class GetVideoPlaylistsUseCaseTest {
     @Test
     fun `test that videoPlaylists is not empty`() = runTest {
         initOrder(SortOrder.ORDER_DEFAULT_ASC)
-        val list = listOf(mock<VideoPlaylist>())
+        val list = listOf(mock<UserVideoPlaylist>())
         whenever(videoSectionRepository.getVideoPlaylists()).thenReturn(list)
         assertThat(underTest()).isNotEmpty()
     }
@@ -60,9 +59,9 @@ class GetVideoPlaylistsUseCaseTest {
             whenever(videoSectionRepository.getVideoPlaylists()).thenReturn(list)
             val actual = underTest()
             assertThat(actual).isNotEmpty()
-            assertThat(actual[0].title).isEqualTo(playlist3.title)
-            assertThat(actual[1].title).isEqualTo(playlist2.title)
-            assertThat(actual[2].title).isEqualTo(playlist1.title)
+            assertThat((actual[0] as? UserVideoPlaylist)?.title).isEqualTo(playlist3.title)
+            assertThat((actual[1] as? UserVideoPlaylist)?.title).isEqualTo(playlist2.title)
+            assertThat((actual[2] as? UserVideoPlaylist)?.title).isEqualTo(playlist1.title)
         }
 
     @Test
@@ -81,9 +80,9 @@ class GetVideoPlaylistsUseCaseTest {
             whenever(videoSectionRepository.getVideoPlaylists()).thenReturn(list)
             val actual = underTest()
             assertThat(actual).isNotEmpty()
-            assertThat(actual[0].title).isEqualTo(playlist3.title)
-            assertThat(actual[1].title).isEqualTo(playlist2.title)
-            assertThat(actual[2].title).isEqualTo(playlist1.title)
+            assertThat((actual[0] as? UserVideoPlaylist)?.title).isEqualTo(playlist3.title)
+            assertThat((actual[1] as? UserVideoPlaylist)?.title).isEqualTo(playlist2.title)
+            assertThat((actual[2] as? UserVideoPlaylist)?.title).isEqualTo(playlist1.title)
         }
 
     @Test
@@ -102,9 +101,9 @@ class GetVideoPlaylistsUseCaseTest {
             whenever(videoSectionRepository.getVideoPlaylists()).thenReturn(list)
             val actual = underTest()
             assertThat(actual).isNotEmpty()
-            assertThat(actual[0].creationTime).isEqualTo(playlist3.creationTime)
-            assertThat(actual[1].creationTime).isEqualTo(playlist2.creationTime)
-            assertThat(actual[2].creationTime).isEqualTo(playlist1.creationTime)
+            assertThat((actual[0] as? UserVideoPlaylist)?.creationTime).isEqualTo(playlist3.creationTime)
+            assertThat((actual[1] as? UserVideoPlaylist)?.creationTime).isEqualTo(playlist2.creationTime)
+            assertThat((actual[2] as? UserVideoPlaylist)?.creationTime).isEqualTo(playlist1.creationTime)
         }
 
     @Test
@@ -123,9 +122,9 @@ class GetVideoPlaylistsUseCaseTest {
             whenever(videoSectionRepository.getVideoPlaylists()).thenReturn(list)
             val actual = underTest()
             assertThat(actual).isNotEmpty()
-            assertThat(actual[0].title).isEqualTo(playlist3.title)
-            assertThat(actual[1].title).isEqualTo(playlist2.title)
-            assertThat(actual[2].title).isEqualTo(playlist1.title)
+            assertThat((actual[0] as? UserVideoPlaylist)?.title).isEqualTo(playlist3.title)
+            assertThat((actual[1] as? UserVideoPlaylist)?.title).isEqualTo(playlist2.title)
+            assertThat((actual[2] as? UserVideoPlaylist)?.title).isEqualTo(playlist1.title)
         }
 
     @Test
@@ -145,7 +144,7 @@ class GetVideoPlaylistsUseCaseTest {
         title: String = "",
         numberOfVideos: Int = 0,
         creationTime: Long = 0L,
-    ) = VideoPlaylist(
+    ) = UserVideoPlaylist(
         id = NodeId(id),
         title = title,
         numberOfVideos = numberOfVideos,
