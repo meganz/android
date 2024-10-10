@@ -1186,4 +1186,24 @@ internal class NodeRepositoryImpl @Inject constructor(
                 stringListMapper(it)
             }
         }
+
+    override suspend fun moveOrRemoveDeconfiguredBackupNodes(
+        deconfiguredBackupRoot: NodeId,
+        backupDestination: NodeId,
+    ): NodeId = withContext(ioDispatcher) {
+        val result = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    continuation.resumeWith(Result.success(request to error))
+                }
+            )
+            megaApiGateway.moveOrRemoveDeconfiguredBackupNodes(
+                deconfiguredBackupRoot, backupDestination, listener
+            )
+        }
+        return@withContext when {
+            result.second.errorCode == MegaError.API_OK -> NodeId(result.first.nodeHandle)
+            else -> throw result.second.toException("moveOrRemoveDeconfiguredBackupNodes")
+        }
+    }
 }

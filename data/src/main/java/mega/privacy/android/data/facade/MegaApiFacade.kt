@@ -1549,4 +1549,16 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.creditCardCancelSubscriptions(reason, subscriptionId, canContact, listener)
     }
+
+    override fun moveOrRemoveDeconfiguredBackupNodes(
+        deconfiguredBackupRoot: NodeId,
+        backupDestination: NodeId,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        megaApi.moveOrRemoveDeconfiguredBackupNodes(
+            deconfiguredBackupRoot.longValue,
+            backupDestination.longValue,
+            listener
+        )
+    }
 }

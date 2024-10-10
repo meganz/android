@@ -811,4 +811,18 @@ interface NodeRepository {
      * @param searchString [String]
      */
     suspend fun getAllNodeTags(searchString: String): List<String>?
+
+    /**
+     * Move or Remove the nodes that used to be part of backup.
+     *
+     * @param deconfiguredBackupRoot The [NodeId] of the Sync to move or remove
+     * @param backupDestination The [NodeId] that [deconfiguredBackupRoot] will be moved to.
+     * If INVALID_HANDLE, files will be permanently deleted, otherwise files will be moved there.
+     *
+     * @return the [NodeId] handle of the Sync that was moved
+     */
+    suspend fun moveOrRemoveDeconfiguredBackupNodes(
+        deconfiguredBackupRoot: NodeId,
+        backupDestination: NodeId,
+    ): NodeId
 }
