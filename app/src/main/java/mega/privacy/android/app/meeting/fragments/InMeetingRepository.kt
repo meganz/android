@@ -3,21 +3,15 @@ package mega.privacy.android.app.meeting.fragments
 import android.content.Context
 import android.graphics.Bitmap
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.AddContactListener
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
@@ -35,7 +29,6 @@ import javax.inject.Singleton
 class InMeetingRepository @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
-    private val getChatChangesUseCase: GetChatChangesUseCase,
     @ApplicationContext private val context: Context,
 ) {
 
@@ -245,30 +238,6 @@ class InMeetingRepository @Inject constructor(
     ) {
         Timber.d("Rejoining to public chat with ID $chatId")
         megaChatApi.autorejoinPublicChat(chatId, publicChatHandle, listener)
-    }
-
-    fun registerConnectionUpdateListener(chatId: Long, callback: () -> Unit) {
-        var chatSubscription: Disposable? = null
-        chatSubscription = getChatChangesUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { change ->
-                    when (change) {
-                        is GetChatChangesUseCase.Result.OnChatConnectionStateUpdate -> {
-                            if (change.chatid == chatId && change.newState == MegaChatApi.CHAT_CONNECTION_ONLINE) {
-                                Timber.d("Connect to chat ${change.chatid} successfully!")
-                                callback()
-                                chatSubscription?.dispose()
-                            }
-                        }
-
-                        else -> {
-                            // Nothing to do
-                        }
-                    }
-                }
-            )
     }
 
     fun getMyFullName(): String {
