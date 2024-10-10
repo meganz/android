@@ -175,10 +175,11 @@ class AppRTCAudioManager @Inject constructor(
     private fun onProximitySensorChangedState() {
         val isNear = proximitySensor?.sensorReportsNearState() ?: false
         if (isNear) {
+            proximitySensor?.turnOffScreen()
+            Timber.d("Screen off")
+
             if (VideoCaptureUtils.isFrontCameraInUse()) {
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
-                proximitySensor?.turnOffScreen()
-                Timber.d("Screen off")
                 if (apprtcContext is MegaApplication && isSpeakerOn &&
                     (bluetoothManager?.state != AppRTCBluetoothManager.State.SCO_CONNECTED)
                 ) {
