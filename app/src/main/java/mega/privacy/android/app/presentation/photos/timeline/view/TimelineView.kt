@@ -79,18 +79,18 @@ fun TimelineView(
     photoDownload: PhotoDownload,
     timelineViewState: TimelineViewState,
     lazyGridState: LazyGridState,
-    onCardClick: (DateCard) -> Unit,
-    onTimeBarTabSelected: (TimeBarTab) -> Unit,
-    enableCUView: @Composable () -> Unit,
-    photosGridView: @Composable () -> Unit,
-    emptyView: @Composable () -> Unit,
-    onClickCameraUploadsSync: () -> Unit,
-    onClickCameraUploadsUploading: () -> Unit,
-    onChangeCameraUploadsPermissions: () -> Unit,
-    onCloseCameraUploadsLimitedAccess: () -> Unit,
+    onCardClick: (DateCard) -> Unit = {},
+    onTimeBarTabSelected: (TimeBarTab) -> Unit = {},
+    enableCUView: @Composable () -> Unit = {},
+    photosGridView: @Composable () -> Unit = {},
+    emptyView: @Composable () -> Unit = {},
+    onClickCameraUploadsSync: () -> Unit = {},
+    onClickCameraUploadsUploading: () -> Unit = {},
+    onChangeCameraUploadsPermissions: () -> Unit = {},
+    onCloseCameraUploadsLimitedAccess: () -> Unit = {},
     clearCameraUploadsMessage: () -> Unit = {},
-    clearCameraUploadsChangePermissionsMessage: () -> Unit,
-    clearCameraUploadsCompletedMessage: () -> Unit,
+    clearCameraUploadsChangePermissionsMessage: () -> Unit = {},
+    clearCameraUploadsCompletedMessage: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val isBarVisible by remember {
@@ -317,7 +317,8 @@ private fun HandlePhotosGridView(
                 CardListView(
                     state = lazyGridState,
                     dateCards = dateCards,
-                    shouldApplySensitiveMode = timelineViewState.accountType?.isPaid == true
+                    shouldApplySensitiveMode = timelineViewState.hiddenNodeEnabled
+                            && timelineViewState.accountType?.isPaid == true
                             && !timelineViewState.isBusinessAccountExpired,
                     photoDownload = photoDownload,
                     onCardClick = onCardClick,
@@ -410,8 +411,8 @@ fun NewEnableCameraUploadsButton(onClick: () -> Unit) {
 @Composable
 fun CameraUploadsLimitedAccess(
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-    onClose: () -> Unit,
+    onClick: () -> Unit = {},
+    onClose: () -> Unit = {},
 ) {
     val isLight = MaterialTheme.colors.isLight
 

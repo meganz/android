@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property accountType The account type.
  * @property isHiddenNodesOnboarded True if the hidden nodes are onboarded, false otherwise.
  * @property isBusinessAccountExpired True if the business account is expired, false otherwise.
+ * @property hiddenNodeEnabled True if the hidden node is enabled, false otherwise.
  */
 data class AlbumContentState(
     val isLoading: Boolean = true,
@@ -60,6 +61,7 @@ data class AlbumContentState(
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean? = null,
     val isBusinessAccountExpired: Boolean = false,
+    val hiddenNodeEnabled: Boolean = false,
 ) {
     val isAddingPhotosProgressCompleted: Boolean
         get() = !isAddingPhotos && totalAddedPhotos > 0

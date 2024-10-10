@@ -42,14 +42,14 @@ const val DATE_FORMAT_MONTH_WITH_DAY = "MMMM"
 @Composable
 fun PhotosGridView(
     modifier: Modifier,
-    timelineViewState: TimelineViewState = TimelineViewState(),
     downloadPhoto: PhotoDownload,
+    timelineViewState: TimelineViewState = TimelineViewState(),
     lazyGridState: LazyGridState = rememberLazyGridState(),
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
-    onEnableCameraUploads: () -> Unit,
-    onChangeCameraUploadsPermissions: () -> Unit,
-    onCloseCameraUploadsLimitedAccess: () -> Unit,
+    onEnableCameraUploads: () -> Unit = {},
+    onChangeCameraUploadsPermissions: () -> Unit = {},
+    onCloseCameraUploadsLimitedAccess: () -> Unit = {},
 ) {
     val configuration = LocalConfiguration.current
     val spanCount = remember(configuration.orientation, timelineViewState.currentZoomLevel) {
@@ -131,7 +131,8 @@ fun PhotosGridView(
                     photo = item.photo,
                     isSelected = item.isSelected,
                     currentZoomLevel = timelineViewState.currentZoomLevel,
-                    shouldApplySensitiveMode = timelineViewState.accountType?.isPaid == true
+                    shouldApplySensitiveMode = timelineViewState.hiddenNodeEnabled
+                            && timelineViewState.accountType?.isPaid == true
                             && !timelineViewState.isBusinessAccountExpired,
                     onClick = onClick,
                     onLongPress = onLongPress,

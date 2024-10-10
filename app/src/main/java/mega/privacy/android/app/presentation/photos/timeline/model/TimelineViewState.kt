@@ -60,6 +60,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property accountType                                Indicates the User's Account Type
  * @property isHiddenNodesOnboarded                     True if the Hidden Nodes have been onboarded
  * @property isBusinessAccountExpired                   True if the Business or Pro Flexi plan has expired
+ * @property hiddenNodeEnabled                          True if the Hidden Nodes feature is enabled
  */
 data class TimelineViewState(
     val photos: List<Photo> = emptyList(),
@@ -110,4 +111,5 @@ data class TimelineViewState(
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean = false,
     val isBusinessAccountExpired: Boolean = false,
+    val hiddenNodeEnabled: Boolean = false
 )

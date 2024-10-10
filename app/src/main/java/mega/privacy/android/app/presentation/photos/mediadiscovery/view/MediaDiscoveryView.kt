@@ -517,7 +517,7 @@ private fun MDView(
                                 )
                             }
                         },
-                        shouldApplySensitiveMode = mediaDiscoveryViewState.accountType?.isPaid == true
+                        shouldApplySensitiveMode = mediaDiscoveryViewState.hiddenNodeEnabled && mediaDiscoveryViewState.accountType?.isPaid == true
                                 && !mediaDiscoveryViewState.isBusinessAccountExpired,
                     )
                 }

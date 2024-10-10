@@ -15,6 +15,7 @@ data class AlbumCoverSelectionState(
     val isSelectionCompleted: Boolean = false,
     val accountType: AccountType? = null,
     val isBusinessAccountExpired: Boolean = false,
+    val hiddenNodeEnabled: Boolean = false,
 )
 
 typealias PhotoDownload = suspend (

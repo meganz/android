@@ -208,7 +208,8 @@ class MediaDiscoveryViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         accountType = accountType,
-                        isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+                        isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
+                        hiddenNodeEnabled = true,
                     )
                 }
 

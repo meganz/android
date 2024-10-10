@@ -19,7 +19,6 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
@@ -38,6 +37,7 @@ import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
 import mega.privacy.android.shared.original.core.ui.theme.teal_200
@@ -50,8 +50,8 @@ import mega.privacy.android.shared.original.core.ui.theme.white
 @Composable
 fun AlbumCoverSelectionScreen(
     viewModel: AlbumCoverSelectionViewModel = viewModel(),
-    onBackClicked: () -> Unit,
-    onCompletion: (message: String) -> Unit,
+    onBackClicked: () -> Unit = {},
+    onCompletion: (message: String) -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val lazyGridState = rememberLazyGridState()
@@ -63,7 +63,7 @@ fun AlbumCoverSelectionScreen(
         onCompletion = onCompletion,
     )
 
-    Scaffold(
+    MegaScaffold(
         modifier = Modifier.systemBarsPadding(),
         topBar = {
             AlbumCoverSelectionHeader(
@@ -76,7 +76,7 @@ fun AlbumCoverSelectionScreen(
                     lazyGridState = lazyGridState,
                     uiPhotos = state.uiPhotos,
                     selectedPhoto = state.selectedPhoto,
-                    shouldApplySensitiveMode = state.accountType?.isPaid == true
+                    shouldApplySensitiveMode = state.hiddenNodeEnabled && state.accountType?.isPaid == true
                             && !state.isBusinessAccountExpired,
                     onPhotoDownload = viewModel::downloadPhoto,
                     onPhotoSelection = viewModel::selectPhoto,

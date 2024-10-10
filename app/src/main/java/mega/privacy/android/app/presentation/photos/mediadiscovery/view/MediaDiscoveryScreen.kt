@@ -14,7 +14,6 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberScaffoldState
@@ -54,6 +53,7 @@ import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_050_white_alpha_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
@@ -66,10 +66,10 @@ fun MediaDiscoveryScreen(
     viewModel: MediaDiscoveryViewModel = viewModel(),
     mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = viewModel(),
     photoDownloaderViewModel: PhotoDownloaderViewModel = viewModel(),
-    onBackClicked: () -> Unit,
-    onPhotoClicked: (Photo) -> Unit,
-    onPhotoLongPressed: (Photo) -> Unit,
-    onImportClicked: () -> Unit,
+    onBackClicked: () -> Unit = {},
+    onPhotoClicked: (Photo) -> Unit = {},
+    onPhotoLongPressed: (Photo) -> Unit = {},
+    onImportClicked: () -> Unit = {},
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val lazyGridState = rememberLazyGridState()
@@ -101,7 +101,7 @@ fun MediaDiscoveryScreen(
         }
     )
 
-    Scaffold(
+    MegaScaffold(
         modifier = Modifier.systemBarsPadding(),
         topBar = {
             MDHeader(
@@ -201,24 +201,24 @@ fun MediaDiscoveryScreen(
 
 @Composable
 private fun MDHeader(
-    screenTitle: String? = null,
-    currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
-    selectedTimeBarTab: TimeBarTab,
     uiPhotos: List<UIPhoto>,
     numSelectedPhotos: Int,
     showMoreMenu: Boolean,
     showImportMenu: Boolean,
-    onBackClicked: () -> Unit,
-    onImportClicked: () -> Unit,
-    onSaveToDeviceClicked: () -> Unit,
-    onSortByClicked: () -> Unit,
-    onFilterClicked: () -> Unit,
-    onZoomInClicked: () -> Unit,
-    onZoomOutClicked: () -> Unit,
-    onMoreClicked: () -> Unit,
-    onMoreDismissed: () -> Unit,
-    onSelectAllClicked: () -> Unit,
-    onClearSelectionClicked: () -> Unit,
+    selectedTimeBarTab: TimeBarTab,
+    screenTitle: String? = null,
+    currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
+    onBackClicked: () -> Unit = {},
+    onImportClicked: () -> Unit = {},
+    onSaveToDeviceClicked: () -> Unit = {},
+    onSortByClicked: () -> Unit = {},
+    onFilterClicked: () -> Unit = {},
+    onZoomInClicked: () -> Unit = {},
+    onZoomOutClicked: () -> Unit = {},
+    onMoreClicked: () -> Unit = {},
+    onMoreDismissed: () -> Unit = {},
+    onSelectAllClicked: () -> Unit = {},
+    onClearSelectionClicked: () -> Unit = {},
 ) {
 
     TopAppBar(
@@ -376,32 +376,32 @@ private fun blackWhiteIconTint() = MaterialTheme.colors.black_white
 
 @Composable
 internal fun isZoomInValid(currentZoomLevel: ZoomLevel) =
-    currentZoomLevel != ZoomLevel.values()
+    currentZoomLevel != ZoomLevel.entries
         .first()
 
 @Composable
 internal fun isZoomOutValid(currentZoomLevel: ZoomLevel) =
-    currentZoomLevel != ZoomLevel.values()
+    currentZoomLevel != ZoomLevel.entries
         .last()
 
 @Composable
 private fun MediaDiscoveryContent(
-    currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     lazyGridState: LazyGridState,
     uiPhotos: List<UIPhoto>,
     shouldApplySensitiveMode: Boolean,
+    selectedPhotoIds: Set<Long>,
+    onPhotoDownload: PhotoDownload,
+    currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     selectedTimeBarTab: TimeBarTab = TimeBarTab.All,
     yearsCardList: List<DateCard> = emptyList(),
     monthsCardList: List<DateCard> = emptyList(),
     daysCardList: List<DateCard> = emptyList(),
-    selectedPhotoIds: Set<Long>,
-    onPhotoDownload: PhotoDownload,
-    onPhotoClicked: (Photo) -> Unit,
-    onPhotoLongPressed: (Photo) -> Unit,
-    onCardClicked: (DateCard) -> Unit,
+    onPhotoClicked: (Photo) -> Unit = {},
+    onPhotoLongPressed: (Photo) -> Unit = {},
+    onCardClicked: (DateCard) -> Unit = {},
     onTimeBarTabSelected: (TimeBarTab) -> Unit = {},
-    onZoomIn: () -> Unit,
-    onZoomOut: () -> Unit,
+    onZoomIn: () -> Unit = {},
+    onZoomOut: () -> Unit = {},
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),

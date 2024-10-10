@@ -154,7 +154,8 @@ internal class AlbumContentViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     accountType = accountType,
-                    isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+                    isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
+                    hiddenNodeEnabled = true,
                 )
             }
             if (_state.value.isLoading) return@onEach

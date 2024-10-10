@@ -21,11 +21,11 @@ internal fun DynamicView(
     photos: List<Photo>,
     smallWidth: Dp,
     photoDownload: PhotoDownload,
+    selectedPhotos: Set<Photo>,
+    endSpacing: Dp = 0.dp,
     shouldApplySensitiveMode: Boolean = false,
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
-    selectedPhotos: Set<Photo>,
-    endSpacing: Dp = 0.dp,
 ) {
     val dynamicList = remember(photos) {
         photos.chunked(3).mapIndexed { i, list ->

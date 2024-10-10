@@ -127,8 +127,9 @@ fun AlbumsView(
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
     val grids = 3.takeIf { isPortrait } ?: 4
 
-    val shouldApplySensitiveMode = albumsViewState.accountType?.isPaid == true
-            && !albumsViewState.isBusinessAccountExpired
+    val shouldApplySensitiveMode =
+        albumsViewState.hiddenNodeEnabled && albumsViewState.accountType?.isPaid == true
+                && !albumsViewState.isBusinessAccountExpired
 
     val scaffoldState = rememberScaffoldState()
 

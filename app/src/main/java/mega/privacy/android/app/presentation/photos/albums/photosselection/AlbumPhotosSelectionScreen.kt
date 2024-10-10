@@ -24,7 +24,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -68,6 +67,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
@@ -88,8 +88,8 @@ import mega.privacy.mobile.analytics.event.AlbumPhotosSelectionScreenEvent
 @Composable
 fun AlbumPhotosSelectionScreen(
     viewModel: AlbumPhotosSelectionViewModel = viewModel(),
-    onBackClicked: () -> Unit,
-    onCompletion: (albumId: AlbumId, numCommittedPhotos: Int) -> Unit,
+    onBackClicked: () -> Unit = {},
+    onCompletion: (albumId: AlbumId, numCommittedPhotos: Int) -> Unit = { _, _ -> },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isLight = MaterialTheme.colors.isLight
@@ -134,7 +134,7 @@ fun AlbumPhotosSelectionScreen(
         onCompletion = onCompletion,
     )
 
-    Scaffold(
+    MegaScaffold(
         modifier = Modifier.systemBarsPadding(),
         topBar = {
             AlbumPhotosSelectionHeader(
@@ -214,7 +214,7 @@ fun AlbumPhotosSelectionScreen(
                     lazyGridState = lazyGridState,
                     uiPhotos = state.uiPhotos,
                     selectedPhotoIds = state.selectedPhotoIds,
-                    shouldApplySensitiveMode = state.accountType?.isPaid == true
+                    shouldApplySensitiveMode = state.hiddenNodeEnabled && state.accountType?.isPaid == true
                             && !state.isBusinessAccountExpired,
                     onPhotoDownload = viewModel::downloadPhoto,
                     onPhotoSelection = { photo ->
@@ -505,7 +505,8 @@ private fun TimelinePhotosSource.text(): String = when (this) {
 }
 
 private fun locationFilterAnalytics(location: TimelinePhotosSource) =
-    Analytics.tracker.trackEvent(when (location) {
+    Analytics.tracker.trackEvent(
+        when (location) {
             ALL_PHOTOS -> AlbumPhotosSelectionAllLocationsButtonEvent
             CLOUD_DRIVE -> AlbumPhotosSelectionCloudDriveButtonEvent
             CAMERA_UPLOAD -> AlbumPhotosSelectionCameraUploadsButtonEvent
