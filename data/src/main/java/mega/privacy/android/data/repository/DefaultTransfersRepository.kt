@@ -42,6 +42,7 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
 import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
+import mega.privacy.android.data.mapper.transfer.CompletedTransferPendingTransferMapper
 import mega.privacy.android.data.mapper.transfer.InProgressTransferMapper
 import mega.privacy.android.data.mapper.transfer.PausedTransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
@@ -103,6 +104,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val workerManagerGateway: WorkManagerGateway,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val completedTransferMapper: CompletedTransferMapper,
+    private val completedTransferPendingTransferMapper: CompletedTransferPendingTransferMapper,
     private val cancelTokenProvider: CancelTokenProvider,
     private val megaNodeMapper: MegaNodeMapper,
     private val sdCardGateway: SDCardGateway,
@@ -451,6 +453,18 @@ internal class DefaultTransfersRepository @Inject constructor(
             removeInProgressTransfers(finishEventsAndPaths.keys.map { it.transfer.tag }.toSet())
             appEventGateway.broadcastCompletedTransfer()
         }
+    }
+
+    override suspend fun addCompletedTransferFromFailedPendingTransfer(
+        pendingTransfer: PendingTransfer,
+        sizeInBytes: Long,
+        error: Throwable,
+    ) = withContext(ioDispatcher) {
+        val completedTransfer =
+            completedTransferPendingTransferMapper(pendingTransfer, sizeInBytes, error)
+        megaLocalRoomGateway.addCompletedTransfer(completedTransfer)
+        removeInProgressTransfers(setOfNotNull(pendingTransfer.transferTag))
+        appEventGateway.broadcastCompletedTransfer()
     }
 
     override suspend fun addCompletedTransfersIfNotExist(transfers: List<CompletedTransfer>) =

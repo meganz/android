@@ -23,14 +23,15 @@ class GetPendingTransferNodeIdentifierUseCase @Inject constructor() {
                 PendingTransferNodeIdentifier.ChatAttachment(
                     typedNode.chatId,
                     typedNode.messageId,
-                    typedNode.messageIndex
+                    typedNode.messageIndex,
+                    typedNode.id,
                 )
             }
 
             is PublicLinkFile -> {
                 PendingTransferNodeIdentifier.PublicLinkFile(
                     typedNode.node.serializedData,
-                    typedNode.id
+                    typedNode.id,
                 )
             }
 

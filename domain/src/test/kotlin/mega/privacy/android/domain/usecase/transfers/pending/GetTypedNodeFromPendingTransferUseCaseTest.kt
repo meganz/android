@@ -78,8 +78,14 @@ class GetTypedNodeFromPendingTransferUseCaseTest {
             val chatId = 53L
             val messageId = 94L
             val messageIndex = 0
+            val nodeId = NodeId(589L)
             val nodeIdentifier =
-                PendingTransferNodeIdentifier.ChatAttachment(chatId, messageId, messageIndex)
+                PendingTransferNodeIdentifier.ChatAttachment(
+                    chatId,
+                    messageId,
+                    messageIndex,
+                    nodeId
+                )
             val pendingTransfer = mock<PendingTransfer> {
                 on { this.nodeIdentifier } doReturn nodeIdentifier
             }

@@ -208,6 +208,19 @@ interface TransferRepository {
     )
 
     /**
+     * Add failed completed transfers from a failed pending transfer
+     *
+     * @param pendingTransfer
+     * @param sizeInBytes Size of the node related to the pending transfer
+     * @param error The error that caused this pending transfer to fail
+     */
+    suspend fun addCompletedTransferFromFailedPendingTransfer(
+        pendingTransfer: PendingTransfer,
+        sizeInBytes: Long,
+        error: Throwable,
+    )
+
+    /**
      * Add completed transfers if not exist
      *
      * @param transfers

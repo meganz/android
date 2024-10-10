@@ -8,13 +8,17 @@ import mega.privacy.android.domain.entity.node.NodeId
  */
 @Serializable
 sealed interface PendingTransferNodeIdentifier {
+    /**
+     * Node Id of the original node
+     */
+    val nodeId: NodeId
 
     /**
      * Identifier for ordinary Cloud Drive nodes
      * @property nodeId
      */
     @Serializable
-    data class CloudDriveNode(val nodeId: NodeId) : PendingTransferNodeIdentifier
+    data class CloudDriveNode(override val nodeId: NodeId) : PendingTransferNodeIdentifier
 
     /**
      * Chat attachment node identifier
@@ -27,6 +31,7 @@ sealed interface PendingTransferNodeIdentifier {
         val chatId: Long,
         val messageId: Long,
         val messageIndex: Int,
+        override val nodeId: NodeId,
     ) : PendingTransferNodeIdentifier
 
     /**
@@ -37,7 +42,7 @@ sealed interface PendingTransferNodeIdentifier {
     @Serializable
     data class PublicLinkFile(
         val serializedData: String?,
-        val nodeId: NodeId,
+        override val nodeId: NodeId,
     ) : PendingTransferNodeIdentifier
 
     /**
@@ -45,6 +50,6 @@ sealed interface PendingTransferNodeIdentifier {
      * @property nodeId
      */
     @Serializable
-    data class PublicLinkFolder(val nodeId: NodeId) : PendingTransferNodeIdentifier
+    data class PublicLinkFolder(override val nodeId: NodeId) : PendingTransferNodeIdentifier
 
 }

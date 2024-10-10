@@ -29,15 +29,18 @@ class GetPendingTransferNodeIdentifierUseCaseTest {
         val chatId = 65L
         val messageId = 95L
         val messageIndex = 0
+        val nodeId = NodeId(867L)
         val typedNode = mock<ChatDefaultFile> {
             on { this.chatId } doReturn chatId
             on { this.messageId } doReturn messageId
             on { this.messageIndex } doReturn messageIndex
+            on { this.id } doReturn nodeId
         }
         val expected = PendingTransferNodeIdentifier.ChatAttachment(
             chatId,
             messageId,
             messageIndex,
+            nodeId,
         )
 
         val actual = underTest(typedNode)

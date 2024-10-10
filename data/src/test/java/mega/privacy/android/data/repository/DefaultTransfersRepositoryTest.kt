@@ -24,6 +24,7 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
 import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
+import mega.privacy.android.data.mapper.transfer.CompletedTransferPendingTransferMapper
 import mega.privacy.android.data.mapper.transfer.InProgressTransferMapper
 import mega.privacy.android.data.mapper.transfer.PausedTransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
@@ -93,6 +94,8 @@ class DefaultTransfersRepositoryTest {
     private val transferAppDataStringMapper: TransferAppDataStringMapper = mock()
     private val pausedTransferEventMapper = mock<PausedTransferEventMapper>()
     private val completedTransferMapper = mock<CompletedTransferMapper>()
+    private val completedTransferPendingTransferMapper =
+        mock<CompletedTransferPendingTransferMapper>()
     private val localStorageGateway: MegaLocalStorageGateway = mock()
     private val workerManagerGateway = mock<WorkManagerGateway>()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
@@ -127,6 +130,7 @@ class DefaultTransfersRepositoryTest {
             pausedTransferEventMapper = pausedTransferEventMapper,
             activeTransferTotalsMapper = activeTransferTotalsMapper,
             completedTransferMapper = completedTransferMapper,
+            completedTransferPendingTransferMapper = completedTransferPendingTransferMapper,
             localStorageGateway = localStorageGateway,
             workerManagerGateway = workerManagerGateway,
             megaLocalRoomGateway = megaLocalRoomGateway,
@@ -154,6 +158,7 @@ class DefaultTransfersRepositoryTest {
             megaLocalRoomGateway,
             cancelTokenProvider,
             completedTransferMapper,
+            completedTransferPendingTransferMapper,
             megaNodeMapper,
             sdCardGateway,
             deviceGateway,
@@ -732,6 +737,20 @@ class DefaultTransfersRepositoryTest {
             whenever(completedTransferMapper(transfer, error, path)).thenReturn(expected.first())
             underTest.addCompletedTransfers(mapOf(event to path))
             verify(megaLocalRoomGateway).addCompletedTransfers(expected)
+            verify(appEventGateway).broadcastCompletedTransfer()
+        }
+
+    @Test
+    fun `test that addCompletedTransferFromFailedPendingTransfer call local storage gateway addCompletedTransfer and app event gateway broadcastCompletedTransfer with the mapped transfers`() =
+        runTest {
+            val transfer = mock<PendingTransfer>()
+            val size = 100L
+            val error = mock<MegaException>()
+            val expected = mock<CompletedTransfer>()
+            whenever(completedTransferPendingTransferMapper(transfer, size, error))
+                .thenReturn(expected)
+            underTest.addCompletedTransferFromFailedPendingTransfer(transfer, size, error)
+            verify(megaLocalRoomGateway).addCompletedTransfer(expected)
             verify(appEventGateway).broadcastCompletedTransfer()
         }
 
