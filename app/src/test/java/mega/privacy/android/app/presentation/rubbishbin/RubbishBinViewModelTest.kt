@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
@@ -29,6 +30,7 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
@@ -71,6 +73,7 @@ class RubbishBinViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val accountDetailFakeFlow = MutableSharedFlow<AccountDetail>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -95,6 +98,7 @@ class RubbishBinViewModelTest {
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -116,6 +120,8 @@ class RubbishBinViewModelTest {
             Truth.assertThat(initial.isRubbishBinEmpty).isTrue()
             Truth.assertThat(initial.restoreType).isNull()
             Truth.assertThat(initial.accountType).isNull()
+            Truth.assertThat(initial.isBusinessAccountExpired).isFalse()
+            Truth.assertThat(initial.hiddenNodeEnabled).isFalse()
         }
     }
 
@@ -425,6 +431,9 @@ class RubbishBinViewModelTest {
 
     @Test
     fun `test that account type is updated when monitorAccountDetailUseCase emits`() = runTest {
+        stubCommon()
+        whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)).thenReturn(true)
+        initViewModel()
         val newAccountDetail = AccountDetail(
             levelDetail = AccountLevelDetail(
                 accountType = AccountType.PRO_I,
@@ -453,6 +462,7 @@ class RubbishBinViewModelTest {
         whenever(getRubbishBinFolderUseCase()).thenReturn(null)
         whenever(fileDurationMapper(any())).thenReturn(1.seconds)
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
     }
 
     @AfterEach

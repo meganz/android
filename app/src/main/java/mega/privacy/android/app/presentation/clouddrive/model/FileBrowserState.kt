@@ -54,6 +54,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property isHiddenNodesOnboarded if is hidden nodes onboarded
  * @property storageCapacity the storage capacity
  * @property isBusinessAccountExpired if the business or pro flexi is expired
+ * @property hiddenNodeEnabled if hidden node is enabled
  */
 data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -87,6 +88,7 @@ data class FileBrowserState(
     val isHiddenNodesOnboarded: Boolean = false,
     val storageCapacity: StorageOverQuotaCapacity? = null,
     val isBusinessAccountExpired: Boolean = false,
+    val hiddenNodeEnabled: Boolean = false,
 ) {
     val hasNoOpenedFolders get() = openedFolderNodeHandles.isEmpty()
 }

@@ -139,6 +139,7 @@ class FavouriteFolderViewModel @Inject constructor(
                                 currentHandle = folderInfo.currentHandle,
                                 accountType = accountType,
                                 isBusinessAccountExpired = isBusinessAccountExpired,
+                                hiddenNodeEnabled = true,
                             )
                         }
                     }
@@ -188,6 +189,7 @@ class FavouriteFolderViewModel @Inject constructor(
         currentHandle: Long,
         accountType: AccountType? = null,
         isBusinessAccountExpired: Boolean = false,
+        hiddenNodeEnabled: Boolean = false,
     ): ChildrenNodesLoadState {
         return withContext(ioDispatcher) {
             ChildrenNodesLoadState.Success(
@@ -215,6 +217,7 @@ class FavouriteFolderViewModel @Inject constructor(
                 isBackPressedEnable = currentHandle != currentRootHandle,
                 accountType = accountType,
                 isBusinessAccountExpired = isBusinessAccountExpired,
+                hiddenNodeEnabled = hiddenNodeEnabled
             )
         }
     }

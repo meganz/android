@@ -77,7 +77,8 @@ fun AudioSectionComposeView(
             else -> {
                 AudiosView(
                     items = items,
-                    shouldApplySensitiveMode = uiState.accountType?.isPaid == true
+                    shouldApplySensitiveMode = uiState.hiddenNodeEnabled
+                            && uiState.accountType?.isPaid == true
                             && !uiState.isBusinessAccountExpired,
                     isListView = uiState.currentViewType == ViewType.LIST,
                     listState = listState,

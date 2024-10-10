@@ -184,7 +184,8 @@ fun SearchComposeView(
                         modifier = Modifier.padding(padding),
                         fileTypeIconMapper = fileTypeIconMapper,
                         inSelectionMode = state.selectedNodes.isNotEmpty(),
-                        shouldApplySensitiveMode = state.accountType?.isPaid == true
+                        shouldApplySensitiveMode = state.hiddenNodeEnabled
+                                && state.accountType?.isPaid == true
                                 && !state.isBusinessAccountExpired,
                         nodeSourceType = nodeSourceType,
                     )

@@ -108,6 +108,7 @@ class RecentActionsComposeViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 accountType = accountDetail.levelDetail?.accountType,
+                                hiddenNodeEnabled = true,
                                 isBusinessAccountExpired = isBusinessAccountExpired,
                             )
                         }

@@ -163,7 +163,8 @@ internal fun AlbumContentScreen(
                     albumContentViewModel.togglePhotoSelection(photo)
                 },
                 selectedPhotos = albumContentState.selectedPhotos,
-                shouldApplySensitiveMode = albumContentState.hiddenNodeEnabled && albumContentState.accountType?.isPaid == true
+                shouldApplySensitiveMode = albumContentState.hiddenNodeEnabled
+                        && albumContentState.accountType?.isPaid == true
                         && !albumContentState.isBusinessAccountExpired,
             )
 

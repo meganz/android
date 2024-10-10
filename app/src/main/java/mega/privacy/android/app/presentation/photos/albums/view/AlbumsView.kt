@@ -128,7 +128,8 @@ fun AlbumsView(
     val grids = 3.takeIf { isPortrait } ?: 4
 
     val shouldApplySensitiveMode =
-        albumsViewState.hiddenNodeEnabled && albumsViewState.accountType?.isPaid == true
+        albumsViewState.hiddenNodeEnabled
+                && albumsViewState.accountType?.isPaid == true
                 && !albumsViewState.isBusinessAccountExpired
 
     val scaffoldState = rememberScaffoldState()

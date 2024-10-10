@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property resetScroll to reset scroll position
  * @property accountType account type (free/paid)
  * @property isBusinessAccountExpired if the business or pro flexi is expired
+ * @property hiddenNodeEnabled if hidden nodes are enabled
  */
 data class SearchActivityState(
     val searchDescriptionEnabled: Boolean? = null,
@@ -60,4 +61,5 @@ data class SearchActivityState(
     val resetScroll: Boolean = false,
     val accountType: AccountType? = null,
     val isBusinessAccountExpired: Boolean = false,
+    val hiddenNodeEnabled: Boolean = false,
 )

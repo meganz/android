@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.extensions.updateItemAt
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
@@ -70,6 +72,7 @@ class RubbishBinViewModel @Inject constructor(
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     /**
@@ -85,7 +88,11 @@ class RubbishBinViewModel @Inject constructor(
     init {
         nodeUpdates()
         checkViewType()
-        monitorAccountDetail()
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                monitorAccountDetail()
+            }
+        }
     }
 
     /**
@@ -131,6 +138,7 @@ class RubbishBinViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         accountType = accountType,
+                        hiddenNodeEnabled = true,
                         isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
                     )
                 }

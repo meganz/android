@@ -116,8 +116,12 @@ class SearchActivityViewModel @Inject constructor(
         monitorNodeUpdatesForSearch()
         initializeSearch()
         checkViewType()
-        monitorAccountDetail()
-        monitorShowHiddenItems()
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                monitorAccountDetail()
+                monitorShowHiddenItems()
+            }
+        }
     }
 
     private fun checkSearchFlags() {
@@ -576,6 +580,7 @@ class SearchActivityViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         accountType = accountType,
+                        hiddenNodeEnabled = true,
                         isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
                     )
                 }

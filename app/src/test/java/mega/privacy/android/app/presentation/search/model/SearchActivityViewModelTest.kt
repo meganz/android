@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
@@ -136,6 +137,7 @@ class SearchActivityViewModelTest {
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
         whenever(nodeSourceTypeToSearchTargetMapper(any())).thenReturn(SearchTarget.ROOT_NODES)
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
     }
 
     @AfterEach
@@ -416,6 +418,9 @@ class SearchActivityViewModelTest {
 
     @Test
     fun `test that sensitive nodes should be filtered with subscribed account`() = runTest {
+        stubCommon()
+        whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)).thenReturn(true)
+        initViewModel()
         // given
         val accountDetail = AccountDetail(
             levelDetail = AccountLevelDetail(
@@ -466,6 +471,9 @@ class SearchActivityViewModelTest {
 
     @Test
     fun `test that sensitive nodes should not be filtered with non-subscribed account`() = runTest {
+        stubCommon()
+        whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)).thenReturn(true)
+        initViewModel()
         // given
         val accountDetail = AccountDetail(
             levelDetail = AccountLevelDetail(

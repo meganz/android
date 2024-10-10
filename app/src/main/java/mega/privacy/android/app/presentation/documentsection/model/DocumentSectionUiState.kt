@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property accountType the account type
  * @property isHiddenNodesOnboarded if is hidden nodes onboarded
  * @property isBusinessAccountExpired if the business account is expired
+ * @property hiddenNodeEnabled if hidden node is enabled
  */
 data class DocumentSectionUiState(
     val allDocuments: List<DocumentUiEntity> = emptyList(),
@@ -31,4 +32,5 @@ data class DocumentSectionUiState(
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean = false,
     val isBusinessAccountExpired: Boolean = false,
+    val hiddenNodeEnabled: Boolean = false,
 )

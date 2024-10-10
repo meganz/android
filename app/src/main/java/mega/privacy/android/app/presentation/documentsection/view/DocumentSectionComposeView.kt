@@ -35,16 +35,16 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.documentsection.model.DocumentSectionUiState
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
-import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import nz.mega.sdk.MegaNode
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -126,7 +126,8 @@ internal fun DocumentSectionComposeView(
                     if (uiState.currentViewType == ViewType.LIST) {
                         DocumentListView(
                             items = items,
-                            shouldApplySensitiveMode = uiState.accountType?.isPaid == true
+                            shouldApplySensitiveMode = uiState.hiddenNodeEnabled
+                                    && uiState.accountType?.isPaid == true
                                     && !uiState.isBusinessAccountExpired,
                             lazyListState = listState,
                             sortOrder = sortOrder,
@@ -141,7 +142,8 @@ internal fun DocumentSectionComposeView(
                     } else {
                         DocumentGridView(
                             items = items,
-                            shouldApplySensitiveMode = uiState.accountType?.isPaid == true
+                            shouldApplySensitiveMode = uiState.hiddenNodeEnabled
+                                    && uiState.accountType?.isPaid == true
                                     && !uiState.isBusinessAccountExpired,
                             lazyGridState = gridState,
                             sortOrder = sortOrder,

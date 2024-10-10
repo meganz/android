@@ -35,6 +35,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property currentDestinationRoute the current destination route
  * @property updateToolbarTitle true is to update toolbar title
  * @property accountType the account type
+ * @property hiddenNodeEnabled if hidden node is enabled
  * @property isBusinessAccountExpired if the business account is expired
  * @property isHiddenNodesOnboarded if is hidden nodes onboarded
  * @property clickedItem the clicked item
@@ -75,6 +76,7 @@ data class VideoSectionState(
     val updateToolbarTitle: String? = null,
     val accountType: AccountType? = null,
     val isBusinessAccountExpired: Boolean = false,
+    val hiddenNodeEnabled: Boolean = false,
     val isHiddenNodesOnboarded: Boolean = false,
     val clickedItem: TypedVideoNode? = null,
     val clickedPlaylistDetailItem: TypedVideoNode? = null,

@@ -23,6 +23,7 @@ import nz.mega.sdk.MegaNode
  *  @property restoreType Determines the specific "Restore" behavior
  *  @property accountType
  *  @property isBusinessAccountExpired
+ *  @property hiddenNodeEnabled
  */
 data class RubbishBinState(
     val rubbishBinHandle: Long = -1L,
@@ -40,4 +41,5 @@ data class RubbishBinState(
     val restoreType: RestoreType? = null,
     val accountType: AccountType? = null,
     val isBusinessAccountExpired: Boolean = false,
+    val hiddenNodeEnabled: Boolean = false
 )

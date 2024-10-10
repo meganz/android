@@ -131,6 +131,7 @@ class DocumentSectionViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     accountType = accountType,
+                    hiddenNodeEnabled = true,
                     isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
                 )
             }

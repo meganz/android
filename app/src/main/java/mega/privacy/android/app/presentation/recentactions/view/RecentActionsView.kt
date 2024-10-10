@@ -38,7 +38,9 @@ fun RecentActionsView(
         } else {
             RecentActionsListView(
                 groupedRecentActions = uiState.groupedRecentActionItems,
-                shouldApplySensitiveMode = uiState.accountType?.isPaid == true && !uiState.isBusinessAccountExpired,
+                shouldApplySensitiveMode = uiState.hiddenNodeEnabled
+                        && uiState.accountType?.isPaid == true
+                        && !uiState.isBusinessAccountExpired,
                 showHiddenItems = uiState.showHiddenItems,
                 onItemClick = onItemClick,
                 onMenuClick = onMenuClick,

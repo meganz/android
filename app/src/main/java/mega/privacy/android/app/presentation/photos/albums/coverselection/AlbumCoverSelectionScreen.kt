@@ -76,7 +76,8 @@ fun AlbumCoverSelectionScreen(
                     lazyGridState = lazyGridState,
                     uiPhotos = state.uiPhotos,
                     selectedPhoto = state.selectedPhoto,
-                    shouldApplySensitiveMode = state.hiddenNodeEnabled && state.accountType?.isPaid == true
+                    shouldApplySensitiveMode = state.hiddenNodeEnabled
+                            && state.accountType?.isPaid == true
                             && !state.isBusinessAccountExpired,
                     onPhotoDownload = viewModel::downloadPhoto,
                     onPhotoSelection = viewModel::selectPhoto,

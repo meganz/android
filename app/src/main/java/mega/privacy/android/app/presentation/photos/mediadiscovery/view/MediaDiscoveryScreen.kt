@@ -167,7 +167,8 @@ fun MediaDiscoveryScreen(
                         yearsCardList = uiState.yearsCardList,
                         monthsCardList = uiState.monthsCardList,
                         daysCardList = uiState.daysCardList,
-                        shouldApplySensitiveMode = uiState.accountType?.isPaid == true
+                        shouldApplySensitiveMode = uiState.hiddenNodeEnabled
+                                && uiState.accountType?.isPaid == true
                                 && !uiState.isBusinessAccountExpired,
                         currentZoomLevel = uiState.currentZoomLevel,
                         selectedPhotoIds = uiState.selectedPhotoIds,

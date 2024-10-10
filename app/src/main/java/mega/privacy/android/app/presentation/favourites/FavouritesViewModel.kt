@@ -157,7 +157,8 @@ class FavouritesViewModel @Inject constructor(
                             favourites = filteredItems,
                             accountType = accountType,
                             isBusinessAccountExpired = isBusinessAccountExpired,
-                            isHiddenNodesOnboarded = isHiddenNodesOnboarded
+                            isHiddenNodesOnboarded = isHiddenNodesOnboarded,
+                            hiddenNodeEnabled = true,
                         )
                     } else {
                         FavouriteLoadState.Empty(search != null, isConnected)

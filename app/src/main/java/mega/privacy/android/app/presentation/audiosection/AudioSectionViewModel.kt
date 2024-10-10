@@ -121,7 +121,8 @@ class AudioSectionViewModel @Inject constructor(
                 it.copy(
                     accountType = accountType,
                     isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
-                    isPendingRefresh = true
+                    isPendingRefresh = true,
+                    hiddenNodeEnabled = true
                 )
             }
         }.catch { Timber.e(it) }

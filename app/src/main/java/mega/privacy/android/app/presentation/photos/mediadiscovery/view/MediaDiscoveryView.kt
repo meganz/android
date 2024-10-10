@@ -488,7 +488,8 @@ private fun MDView(
                             onSwitchListView = onSwitchListView
                         )
                     },
-                    shouldApplySensitiveMode = mediaDiscoveryViewState.accountType?.isPaid == true
+                    shouldApplySensitiveMode = mediaDiscoveryViewState.hiddenNodeEnabled
+                            && mediaDiscoveryViewState.accountType?.isPaid == true
                             && !mediaDiscoveryViewState.isBusinessAccountExpired,
                 )
             } else {
@@ -517,7 +518,8 @@ private fun MDView(
                                 )
                             }
                         },
-                        shouldApplySensitiveMode = mediaDiscoveryViewState.hiddenNodeEnabled && mediaDiscoveryViewState.accountType?.isPaid == true
+                        shouldApplySensitiveMode = mediaDiscoveryViewState.hiddenNodeEnabled
+                                && mediaDiscoveryViewState.accountType?.isPaid == true
                                 && !mediaDiscoveryViewState.isBusinessAccountExpired,
                     )
                 }

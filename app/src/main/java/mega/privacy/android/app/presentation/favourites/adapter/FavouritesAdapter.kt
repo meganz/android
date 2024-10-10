@@ -50,6 +50,7 @@ class FavouritesAdapter(
     private var selectionMode = false
     private var accountType: AccountType? = null
     private var isBusinessAccountExpired = false
+    private var hiddenNodeEnabled = false
 
     override fun getItemViewType(position: Int): Int = getItem(position).type
 
@@ -82,6 +83,7 @@ class FavouritesAdapter(
             selectionMode = selectionMode,
             accountType = accountType,
             isBusinessAccountExpired = isBusinessAccountExpired,
+            hiddenNodeEnabled = hiddenNodeEnabled
         )
     }
 
@@ -92,9 +94,14 @@ class FavouritesAdapter(
         selectionMode = isSelectionMode
     }
 
-    fun updateAccountType(accountType: AccountType?, isBusinessAccountExpired: Boolean) {
+    fun updateAccountType(
+        accountType: AccountType?,
+        isBusinessAccountExpired: Boolean,
+        hiddenNodeEnabled: Boolean,
+    ) {
         this.accountType = accountType
         this.isBusinessAccountExpired = isBusinessAccountExpired
+        this.hiddenNodeEnabled = hiddenNodeEnabled
     }
 
     companion object {
@@ -131,13 +138,15 @@ class FavouritesViewHolder(
         selectionMode: Boolean,
         accountType: AccountType?,
         isBusinessAccountExpired: Boolean,
+        hiddenNodeEnabled: Boolean,
     ) {
         with(binding) {
             when (this) {
                 is ItemFavouriteBinding -> {
                     item.favourite?.let { favourite: Favourite ->
                         val isSensitive =
-                            accountType?.isPaid == true
+                            hiddenNodeEnabled
+                                    && accountType?.isPaid == true
                                     && !isBusinessAccountExpired
                                     && (favourite.typedNode.isMarkedSensitive
                                     || favourite.typedNode.isSensitiveInherited)

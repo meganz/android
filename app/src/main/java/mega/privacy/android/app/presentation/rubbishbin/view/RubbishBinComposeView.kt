@@ -65,7 +65,8 @@ fun RubbishBinComposeView(
             onDisputeTakeDownClicked = onDisputeTakeDownClicked,
             fileTypeIconMapper = fileTypeIconMapper,
             inSelectionMode = uiState.isInSelection,
-            shouldApplySensitiveMode = uiState.accountType?.isPaid == true
+            shouldApplySensitiveMode = uiState.hiddenNodeEnabled
+                    && uiState.accountType?.isPaid == true
                     && !uiState.isBusinessAccountExpired,
         )
     } else {

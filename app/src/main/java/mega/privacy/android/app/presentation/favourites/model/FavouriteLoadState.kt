@@ -19,6 +19,7 @@ sealed interface FavouriteLoadState {
      * @param accountType account type
      * @param isBusinessAccountExpired if the business account is expired
      * @param isHiddenNodesOnboarded if is hidden nodes onboarded
+     * @param hiddenNodeEnabled if hidden node is enabled
      * @param showSearch show search
      * @param isConnected is connected
      */
@@ -28,6 +29,7 @@ sealed interface FavouriteLoadState {
         val accountType: AccountType? = null,
         val isBusinessAccountExpired: Boolean = false,
         val isHiddenNodesOnboarded: Boolean? = null,
+        val hiddenNodeEnabled: Boolean = false,
         override val showSearch: Boolean,
         override val isConnected: Boolean,
     ) :

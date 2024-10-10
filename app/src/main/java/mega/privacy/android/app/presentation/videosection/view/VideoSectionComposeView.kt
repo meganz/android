@@ -163,7 +163,8 @@ internal fun VideoSectionComposeView(
             allVideoView = {
                 AllVideosView(
                     items = uiState.allVideos,
-                    shouldApplySensitiveMode = uiState.accountType?.isPaid == true
+                    shouldApplySensitiveMode = uiState.hiddenNodeEnabled
+                            && uiState.accountType?.isPaid == true
                             && !uiState.isBusinessAccountExpired,
                     progressBarShowing = uiState.progressBarShowing,
                     searchMode = uiState.searchState == SearchWidgetState.EXPANDED,

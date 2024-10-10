@@ -14,6 +14,7 @@ sealed interface ChildrenNodesLoadState {
      * @param isBackPressedEnable ture is enable back pressed, otherwise is false
      * @param accountType AccountType
      * @param isBusinessAccountExpired if the business account is expired
+     * @param hiddenNodeEnabled if hidden node is enabled
      */
     data class Success(
         val title: String,
@@ -21,6 +22,7 @@ sealed interface ChildrenNodesLoadState {
         val isBackPressedEnable: Boolean,
         val accountType: AccountType? = null,
         val isBusinessAccountExpired: Boolean = false,
+        val hiddenNodeEnabled: Boolean = false,
     ) :
         ChildrenNodesLoadState
 

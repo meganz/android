@@ -699,6 +699,7 @@ class FileBrowserViewModelTest {
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
         whenever(shouldEnterMediaDiscoveryModeUseCase(any())).thenReturn(false)
         whenever(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)).thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)).thenReturn(true)
     }
 
     @AfterEach

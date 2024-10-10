@@ -140,9 +140,13 @@ class FileBrowserViewModel @Inject constructor(
         changeTransferOverQuotaBannerVisibility()
         monitorConnectivity()
         monitorNodeUpdates()
-        monitorAccountDetail()
-        monitorIsHiddenNodesOnboarded()
-        monitorShowHiddenItems()
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                monitorAccountDetail()
+                monitorIsHiddenNodesOnboarded()
+                monitorShowHiddenItems()
+            }
+        }
         monitorStorageOverQuotaCapacity()
     }
 
@@ -838,7 +842,8 @@ class FileBrowserViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         accountType = accountType,
-                        isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+                        isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
+                        hiddenNodeEnabled = true
                     )
                 }
                 if (_state.value.isLoading) return@onEach

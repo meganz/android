@@ -52,6 +52,7 @@ class FavouritesGridAdapter(
     private var selectionMode = false
     private var accountType: AccountType? = null
     private var isBusinessAccountExpired: Boolean = false
+    private var hiddenNodeEnabled: Boolean = false
 
     override fun getItemViewType(position: Int): Int = getItem(position).type
 
@@ -89,6 +90,7 @@ class FavouritesGridAdapter(
             selectionMode = selectionMode,
             accountType = accountType,
             isBusinessAccountExpired = isBusinessAccountExpired,
+            hiddenNodeEnabled = hiddenNodeEnabled,
         )
     }
 
@@ -109,9 +111,14 @@ class FavouritesGridAdapter(
         selectionMode = isSelectionMode
     }
 
-    fun updateAccountType(accountType: AccountType?, isBusinessAccountExpired: Boolean) {
+    fun updateAccountType(
+        accountType: AccountType?,
+        isBusinessAccountExpired: Boolean,
+        hiddenNodeEnabled: Boolean,
+    ) {
         this.accountType = accountType
         this.isBusinessAccountExpired = isBusinessAccountExpired
+        this.hiddenNodeEnabled = hiddenNodeEnabled
     }
 
 }
@@ -140,6 +147,7 @@ class FavouritesGridViewHolder(
         selectionMode: Boolean,
         accountType: AccountType?,
         isBusinessAccountExpired: Boolean,
+        hiddenNodeEnabled: Boolean,
     ) {
         with(binding) {
             when (this) {
@@ -212,7 +220,9 @@ class FavouritesGridViewHolder(
                         itemGirdFavourite.apply {
                             handleSensitiveEffect(
                                 view = itemGirdFavourite,
-                                shouldApplySensitiveMode = accountType?.isPaid == true && !isBusinessAccountExpired,
+                                shouldApplySensitiveMode = hiddenNodeEnabled
+                                        && accountType?.isPaid == true
+                                        && !isBusinessAccountExpired,
                                 favouriteNode = info.typedNode,
                             )
                             setOnLongClickListener {

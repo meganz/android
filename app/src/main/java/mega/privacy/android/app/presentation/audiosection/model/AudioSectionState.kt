@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property isHiddenNodesOnboarded if is hidden nodes onboarded
  * @property clickedItem the clicked item
  * @property isBusinessAccountExpired if the business account is expired
+ * @property hiddenNodeEnabled if hidden node is enabled
  */
 data class AudioSectionState(
     val allAudios: List<AudioUiEntity> = emptyList(),
@@ -37,4 +38,5 @@ data class AudioSectionState(
     val isHiddenNodesOnboarded: Boolean = false,
     val clickedItem: TypedAudioNode? = null,
     val isBusinessAccountExpired: Boolean = false,
+    val hiddenNodeEnabled: Boolean = false,
 )

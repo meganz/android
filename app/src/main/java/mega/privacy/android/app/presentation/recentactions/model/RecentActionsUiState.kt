@@ -21,4 +21,5 @@ data class RecentActionsUiState(
     val accountType: AccountType? = null,
     val isBusinessAccountExpired: Boolean = false,
     val showHiddenItems: Boolean = false,
+    val hiddenNodeEnabled: Boolean = false,
 )

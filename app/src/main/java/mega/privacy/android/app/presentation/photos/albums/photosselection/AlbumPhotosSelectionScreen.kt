@@ -214,7 +214,8 @@ fun AlbumPhotosSelectionScreen(
                     lazyGridState = lazyGridState,
                     uiPhotos = state.uiPhotos,
                     selectedPhotoIds = state.selectedPhotoIds,
-                    shouldApplySensitiveMode = state.hiddenNodeEnabled && state.accountType?.isPaid == true
+                    shouldApplySensitiveMode = state.hiddenNodeEnabled
+                            && state.accountType?.isPaid == true
                             && !state.isBusinessAccountExpired,
                     onPhotoDownload = viewModel::downloadPhoto,
                     onPhotoSelection = { photo ->

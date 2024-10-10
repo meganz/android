@@ -6,6 +6,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -13,6 +14,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import nz.mega.sdk.MegaNodeList
 import timber.log.Timber
@@ -27,6 +29,7 @@ class DefaultGetRecentActionNodes @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : GetRecentActionNodes {
 
     /**
@@ -56,10 +59,14 @@ class DefaultGetRecentActionNodes @Inject constructor(
     private suspend fun createNodeItem(node: TypedFileNode): NodeItem? =
         runCatching {
             val megaNode = getNodeByHandle.invoke(node.id.longValue)
-            val accountType = monitorAccountDetailUseCase().firstOrNull()?.levelDetail?.accountType
-            val isBusinessAccountExpired =
-                getBusinessStatusUseCase() == BusinessAccountStatus.Expired
-            val shouldApplySensitiveMode = accountType?.isPaid == true && !isBusinessAccountExpired
+            val hiddenNodeEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+            val shouldApplySensitiveMode = hiddenNodeEnabled && run {
+                val accountType =
+                    monitorAccountDetailUseCase().firstOrNull()?.levelDetail?.accountType
+                val isBusinessAccountExpired =
+                    getBusinessStatusUseCase() == BusinessAccountStatus.Expired
+                accountType?.isPaid == true && !isBusinessAccountExpired
+            }
             NodeItem(
                 node = megaNode,
                 thumbnail = getThumbnailUseCase(node.id.longValue),

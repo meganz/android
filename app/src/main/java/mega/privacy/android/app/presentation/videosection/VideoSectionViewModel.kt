@@ -201,6 +201,7 @@ class VideoSectionViewModel @Inject constructor(
                 it.copy(
                     accountType = accountType,
                     isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
+                    hiddenNodeEnabled = true,
                     isPendingRefresh = true
                 )
             }

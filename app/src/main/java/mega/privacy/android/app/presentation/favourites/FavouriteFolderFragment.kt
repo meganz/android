@@ -144,6 +144,7 @@ class FavouriteFolderFragment : Fragment() {
                         adapter.updateAccountType(
                             childrenState.accountType,
                             childrenState.isBusinessAccountExpired,
+                            childrenState.hiddenNodeEnabled,
                         )
                         adapter.submitList(childrenState.children)
                     } else if (childrenState is ChildrenNodesLoadState.Empty) {

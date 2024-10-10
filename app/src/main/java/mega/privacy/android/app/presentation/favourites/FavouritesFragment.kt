@@ -269,14 +269,16 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                                 listAdapter.updateSelectionMode(favouritesState.selectedItems.isNotEmpty())
                                 listAdapter.updateAccountType(
                                     favouritesState.accountType,
-                                    favouritesState.isBusinessAccountExpired
+                                    favouritesState.isBusinessAccountExpired,
+                                    favouritesState.hiddenNodeEnabled
                                 )
                                 listAdapter.submitList(favouritesState.favourites)
                             } else {
                                 gridAdapter.updateSelectionMode(favouritesState.selectedItems.isNotEmpty())
                                 gridAdapter.updateAccountType(
                                     favouritesState.accountType,
-                                    favouritesState.isBusinessAccountExpired
+                                    favouritesState.isBusinessAccountExpired,
+                                    favouritesState.hiddenNodeEnabled
                                 )
                                 gridAdapter.submitList(formatGridList(favouritesState))
                             }
