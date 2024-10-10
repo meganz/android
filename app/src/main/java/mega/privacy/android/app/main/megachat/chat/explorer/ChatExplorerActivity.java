@@ -33,6 +33,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -41,17 +42,16 @@ import java.util.ArrayList;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlin.Unit;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.app.extensions.EdgeToEdgeExtensionsKt;
 import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink;
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.domain.entity.chat.ChatListItem;
 import mega.privacy.android.domain.entity.contacts.User;
+import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -66,7 +66,7 @@ import timber.log.Timber;
 public class ChatExplorerActivity extends PasscodeActivity implements View.OnClickListener, MegaChatRequestListenerInterface {
 
     @Inject
-    GetChatChangesUseCase getChatChangesUseCase;
+    MonitorChatPresenceLastGreenUpdatesUseCase monitorChatPresenceLastGreenUpdatesUseCase;
 
     Toolbar tB;
     ActionBar aB;
@@ -321,19 +321,19 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
 
                     final boolean isEKR = intent.getBooleanExtra(AddContactActivity.EXTRA_EKR, false);
                     if (isEKR) {
-                        megaChatApi.createGroupChat(peers, chatTitle,  false, false, allowAddParticipants, this);
+                        megaChatApi.createGroupChat(peers, chatTitle, false, false, allowAddParticipants, this);
                     } else {
                         final boolean chatLink = intent.getBooleanExtra(AddContactActivity.EXTRA_CHAT_LINK, false);
 
                         if (chatLink) {
                             if (chatTitle != null && !chatTitle.isEmpty()) {
                                 CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
-                                megaChatApi.createPublicChat(peers, chatTitle,  false, false, allowAddParticipants, listener);
+                                megaChatApi.createPublicChat(peers, chatTitle, false, false, allowAddParticipants, listener);
                             } else {
                                 showAlert(this, getString(R.string.message_error_set_title_get_link), null);
                             }
                         } else {
-                            megaChatApi.createPublicChat(peers, chatTitle,  false, false, allowAddParticipants, this);
+                            megaChatApi.createPublicChat(peers, chatTitle, false, false, allowAddParticipants, this);
                         }
                     }
                 }
@@ -514,17 +514,10 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
      * Receive changes to OnChatPresenceLastGreen and make the necessary changes
      */
     public void checkChatChanges() {
-        Disposable chatSubscription = getChatChangesUseCase.get()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .filter(result -> result instanceof GetChatChangesUseCase.Result.OnChatPresenceLastGreen)
-                .map(result -> (GetChatChangesUseCase.Result.OnChatPresenceLastGreen) result)
-                .subscribe((next) -> {
-                    long userHandle = next.component1();
-                    int lastGreen = next.component2();
-                    onChatPresenceLastGreen(userHandle, lastGreen);
-                }, Timber::e);
-
-        composite.add(chatSubscription);
+        ViewExtensionsKt.collectFlow(this, monitorChatPresenceLastGreenUpdatesUseCase.invoke(), Lifecycle.State.STARTED, userPresenceLastGreen -> {
+            Timber.d("onChatPresenceLastGreen %s", userPresenceLastGreen);
+            onChatPresenceLastGreen(userPresenceLastGreen.getHandle(), userPresenceLastGreen.getLastGreen());
+            return Unit.INSTANCE;
+        });
     }
 }
