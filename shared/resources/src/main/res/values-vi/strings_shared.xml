@@ -716,4 +716,38 @@
     <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Nâng&#160;cấp ngay</string>
     <!-- Hidden nodes sharing albums -->
     <string name="hidden_nodes_sharing_albums">Có các mục ẩn nằm trong một hoặc nhiều album này. Việc thực&#160;hiện chia&#160;sẻ album sẽ làm các mục ẩn hiển&#160;thị cho những người bạn chia&#160;sẻ. Các mục vẫn sẽ được ẩn đi trong Ổ&#160;Mây của bạn.</string>
+    <!-- Backup title for toolbar when inside new backup screen -->
+    <string name="sync_add_new_backup_toolbar_title">Sao lưu</string>
+    <!-- Text for the header of the screen to add a new backup folder -->
+    <string name="sync_add_new_backup_header_text">Thêm thư&#160;mục sao lưu:</string>
+    <!-- Text to indicate the type of sync in the card header when adding a new backup folder -->
+    <string name="sync_add_new_backup_card_sync_type_text">Sao lưu</string>
+    <!-- Text for the label to select the device folder or source for a new backup folder -->
+    <string name="sync_add_new_backup_choose_device_folder_title">Tạo sao lưu từ</string>
+    <!-- Text for the label to indicate the destiny of a new backup folder -->
+    <string name="sync_add_new_backup_choose_mega_folder_title">Tạo sao lưu đến</string>
+    <!-- Backup text for the the button to begin backup -->
+    <string name="sync_add_new_backup_proceed_button_label">Sao Lưu Dự Phòng</string>
+    <!-- Title of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_title">Cho phép MEGA truy&#160;cập tất cả các tệp&#160;tin?</string>
+    <!-- Message of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_message">Để sao lưu các tệp&#160;tin của bạn, MEGA cần truy&#160;cập vào các tệp&#160;tin và thư&#160;mục trong thiết&#160;bị này. Dữ&#160;liệu của bạn luôn an&#160;toàn với chúng&#160;tôi.</string>
+    <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
+    <string name="sync_add_new_backup_storage_permission_banner">MEGA cần quyền truy&#160;cập vào bộ nhớ thiết&#160;bị của bạn để sao lưu thư&#160;mục cục&#160;bộ của bạn. [U]Chạm để cấp quyền truy&#160;cập[/U]</string>
+    <!--Success message displayed in the Login screen after the account has been activated-->
+    <string name="login_screen_account_confirmed_success_message">Tài&#160;khoản đã được kích&#160;hoạt rồi. Xin đăng&#160;nhập.</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_title">Cho phép MEGA truy&#160;cập các tệp&#160;tin trong thiết&#160;bị của bạn</string>
+    <!-- Context message in the files permission screen -->
+    <string name="files_permission_screen_message">Với việc cho phép MEGA truy&#160;cập vào các tệp&#160;tin của bạn, bạn có thể tải&#160;lên MEGA mà không cần phải tạo bản&#160;sao tạm thời, tiết&#160;kiệm dung&#160;lượng trong thiết&#160;bị của bạn và cho phép tải&#160;lên được nhanh hơn.</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_do_not_show_again_button">Đừng hiện cái này nữa</string>
+    <!-- Title of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_title">Dừng đồng bộ?</string>
+    <!-- Message of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_message">Thao&#160;tác này sẽ dừng quá&#160;trình đồng&#160;bộ hóa giữa hai thư&#160;mục nhưng sẽ không xóa đi các thư&#160;mục đó.</string>
+    <!-- Label for the button to stop a sync -->
+    <string name="sync_stop_sync_button">Ngừng đồng bộ</string>
+    <!-- Snackbar message to indicate that sync has been stopped -->
+    <string name="sync_snackbar_message_confirm_sync_stopped">Đồng&#160;bộ đã dừng</string>
 </resources>

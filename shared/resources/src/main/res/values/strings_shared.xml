@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
@@ -748,6 +748,12 @@
     <string name="sync_add_new_backup_storage_permission_banner">MEGA needs access to your device storage in order to back up your local folder. [U]Tap to grant access[/U]</string>
     <!--Success message displayed in the Login screen after the account has been activated-->
     <string name="login_screen_account_confirmed_success_message">Your account has been activated. Please log in.</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <!-- Context message in the files permission screen -->
+    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads to MEGA.</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_do_not_show_again_button">Don’t show this again</string>
     <!-- Title of the dialog to confirm stop a sync -->
     <string name="sync_stop_sync_confirm_dialog_title">Stop syncing?</string>
     <!-- Message of the dialog to confirm stop a sync -->
@@ -756,10 +762,4 @@
     <string name="sync_stop_sync_button">Stop sync</string>
     <!-- Snackbar message to indicate that sync has been stopped -->
     <string name="sync_snackbar_message_confirm_sync_stopped">Sync stopped</string>
-    <!-- Title in the files permission screen -->
-    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
-    <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads to MEGA.</string>
-    <!-- Title in the files permission screen -->
-    <string name="files_permission_screen_do_not_show_again_button">Don’t show this again</string>
 </resources>

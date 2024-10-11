@@ -735,9 +735,9 @@
     <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
     <string name="device_center_sync_backup_upgrade_dialog_message">Odblokuj możliwość synchronizacji i tworzenia kopii zapasowych urządzenia mobilnego do pojemność masowej w chmurze dzięki jednemu z naszych plan premium</string>
     <!-- Title of the share meeting link bottom panel -->
-    <string name="meetings_share_link_bottom_sheet_title">Meeting confirmed: Invite others to join</string>
+    <string name="meetings_share_link_bottom_sheet_title">Spotkanie potwierdzone: Zaproś innych do dołączenia</string>
     <!-- Button text of the send meeting link to chat -->
-    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Send link to chat</string>
+    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Wyślij link do czatu</string>
     <!-- Button text of the share meeting link -->
     <string name="meetings_share_link_bottom_sheet_button_share_link">Udostępnij link</string>
     <!-- Title for the inline warning banner when storage is almost full -->
@@ -752,4 +752,38 @@
     <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Zmień teraz</string>
     <!-- Hidden nodes sharing albums -->
     <string name="hidden_nodes_sharing_albums">W jednym lub więcej z tych albumów znajdują się ukryte elementy. Udostępnianie albumów oznacza, że ukryte elementy będą widoczne dla tych, którym udostępniasz. Elementy będą nadal ukryte na Dysku w chmurze.</string>
+    <!-- Backup title for toolbar when inside new backup screen -->
+    <string name="sync_add_new_backup_toolbar_title">Kopia zapasowa</string>
+    <!-- Text for the header of the screen to add a new backup folder -->
+    <string name="sync_add_new_backup_header_text">Dodaj katalog kopii zapasowej:</string>
+    <!-- Text to indicate the type of sync in the card header when adding a new backup folder -->
+    <string name="sync_add_new_backup_card_sync_type_text">Kopia zapasowa</string>
+    <!-- Text for the label to select the device folder or source for a new backup folder -->
+    <string name="sync_add_new_backup_choose_device_folder_title">Tworzenie kopii zapasowej z</string>
+    <!-- Text for the label to indicate the destiny of a new backup folder -->
+    <string name="sync_add_new_backup_choose_mega_folder_title">Wykonaj kopię do</string>
+    <!-- Backup text for the the button to begin backup -->
+    <string name="sync_add_new_backup_proceed_button_label">Kopia zapasowa</string>
+    <!-- Title of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_title">Zezwalaj MEGA na dostęp do wszystkich plik?</string>
+    <!-- Message of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_message">Aby wykonać kopię zapasową plik, MEGA potrzebuje dostępu do plik i katalog na urządzeniu. Twoje dane są u nas zawsze bezpieczne.</string>
+    <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
+    <string name="sync_add_new_backup_storage_permission_banner">MEGA potrzebuje dostępu do pojemność urządzenia, aby utworzyć kopię zapasową katalog lokalny. [U] Naciśnij, aby przyznać dostęp [/U]</string>
+    <!--Success message displayed in the Login screen after the account has been activated-->
+    <string name="login_screen_account_confirmed_success_message">Twoje konto zostało aktywowane. Proszę się zalogować.</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <!-- Context message in the files permission screen -->
+    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads to MEGA.</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_do_not_show_again_button">Nie pokazuj tego więcej</string>
+    <!-- Title of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_title">Przestań synchronizować?</string>
+    <!-- Message of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_message">Spowoduje to zatrzymanie procesu synchronizacji między dwoma katalogami, ale nie usunie katalogu.</string>
+    <!-- Label for the button to stop a sync -->
+    <string name="sync_stop_sync_button">Zatrzymaj synchronizację</string>
+    <!-- Snackbar message to indicate that sync has been stopped -->
+    <string name="sync_snackbar_message_confirm_sync_stopped">Synchronizacja zatrzymana</string>
 </resources>

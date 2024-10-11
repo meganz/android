@@ -740,4 +740,38 @@
     <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Upgradați acum</string>
     <!-- Hidden nodes sharing albums -->
     <string name="hidden_nodes_sharing_albums">Există elemente ascunse într-unul sau mai multe dintre aceste albume. Partajarea albumelor va însemna că elementele ascunse sunt vizibile pentru cei cu care partajați. Elementele vor fi în continuare ascunse în Unitatea cloud.</string>
+    <!-- Backup title for toolbar when inside new backup screen -->
+    <string name="sync_add_new_backup_toolbar_title">Backup</string>
+    <!-- Text for the header of the screen to add a new backup folder -->
+    <string name="sync_add_new_backup_header_text">Adăugați folder de backup:</string>
+    <!-- Text to indicate the type of sync in the card header when adding a new backup folder -->
+    <string name="sync_add_new_backup_card_sync_type_text">Backup</string>
+    <!-- Text for the label to select the device folder or source for a new backup folder -->
+    <string name="sync_add_new_backup_choose_device_folder_title">Faceți o copie de rezervă de la</string>
+    <!-- Text for the label to indicate the destiny of a new backup folder -->
+    <string name="sync_add_new_backup_choose_mega_folder_title">Fă backupuri în</string>
+    <!-- Backup text for the the button to begin backup -->
+    <string name="sync_add_new_backup_proceed_button_label">Backup</string>
+    <!-- Title of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_title">Permiteți MEGA să acceseze toate fișierele?</string>
+    <!-- Message of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_message">Pentru a face copii de rezervă ale fișierelor, MEGA are nevoie de acces la fișierele și folderele de pe dispozitiv. Datele dvs. sunt întotdeauna în siguranță la noi.</string>
+    <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
+    <string name="sync_add_new_backup_storage_permission_banner">MEGA are nevoie de acces la spațiul de stocare al dispozitivului dvs. pentru a face o copie de rezervă a folderului local. [U]Atingeți pentru a acorda acces[/U]</string>
+    <!--Success message displayed in the Login screen after the account has been activated-->
+    <string name="login_screen_account_confirmed_success_message">Contul tău a fost activat. Te rugăm să te autentifici.</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <!-- Context message in the files permission screen -->
+    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads to MEGA.</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_do_not_show_again_button">Nu afișa din nou</string>
+    <!-- Title of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_title">Opriți sincronizarea?</string>
+    <!-- Message of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_message">Aceasta va opri procesul de sincronizare între cele două foldere, dar nu va elimina folderele.</string>
+    <!-- Label for the button to stop a sync -->
+    <string name="sync_stop_sync_button">Oprește sincronizarea</string>
+    <!-- Snackbar message to indicate that sync has been stopped -->
+    <string name="sync_snackbar_message_confirm_sync_stopped">Sincronizarea sa oprit</string>
 </resources>

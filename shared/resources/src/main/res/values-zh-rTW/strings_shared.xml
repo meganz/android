@@ -716,4 +716,38 @@
     <string name="account_storage_over_quota_inline_error_banner_upgrade_link">立即升級</string>
     <!-- Hidden nodes sharing albums -->
     <string name="hidden_nodes_sharing_albums">其中一個或多個相簿中有隱藏的項目。共享相簿意味著與您共享的人可以看見隱藏的項目。這些項目仍將隱藏在您的雲端硬碟中。</string>
+    <!-- Backup title for toolbar when inside new backup screen -->
+    <string name="sync_add_new_backup_toolbar_title">備份</string>
+    <!-- Text for the header of the screen to add a new backup folder -->
+    <string name="sync_add_new_backup_header_text">新增備份資料夾：</string>
+    <!-- Text to indicate the type of sync in the card header when adding a new backup folder -->
+    <string name="sync_add_new_backup_card_sync_type_text">備份</string>
+    <!-- Text for the label to select the device folder or source for a new backup folder -->
+    <string name="sync_add_new_backup_choose_device_folder_title">備份來源</string>
+    <!-- Text for the label to indicate the destiny of a new backup folder -->
+    <string name="sync_add_new_backup_choose_mega_folder_title">備份到</string>
+    <!-- Backup text for the the button to begin backup -->
+    <string name="sync_add_new_backup_proceed_button_label">備份</string>
+    <!-- Title of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_title">允許MEGA存取所有檔案嗎？</string>
+    <!-- Message of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_message">要備份您的檔案，MEGA需要存取您裝置上的檔案和資料夾。您的資料在我們這裡始終是安全的。</string>
+    <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
+    <string name="sync_add_new_backup_storage_permission_banner">MEGA需要存取您的裝置儲存空間，以便備份您的本地資料夾。 [U]點選授予存取權限[/U]</string>
+    <!--Success message displayed in the Login screen after the account has been activated-->
+    <string name="login_screen_account_confirmed_success_message">您的帳戶已通過認證。請登入帳戶以開始使用。</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <!-- Context message in the files permission screen -->
+    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads to MEGA.</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_do_not_show_again_button">不再顯示此訊息</string>
+    <!-- Title of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_title">停止同步？</string>
+    <!-- Message of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_message">這將停止兩個資料夾之間的同步進程，但不會移除資料夾。</string>
+    <!-- Label for the button to stop a sync -->
+    <string name="sync_stop_sync_button">停止同步</string>
+    <!-- Snackbar message to indicate that sync has been stopped -->
+    <string name="sync_snackbar_message_confirm_sync_stopped">同步已停止</string>
 </resources>
