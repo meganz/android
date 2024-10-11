@@ -84,8 +84,8 @@ class CallSoundsController {
                 mMediaPlayer?.prepareAsync()
             }
 
-        } catch (e: IOException) {
-            Timber.e("IOException preparing mediaPlayer", e)
+        } catch (e: Exception) {
+            Timber.e("Exception preparing mediaPlayer", e)
         }
 
     }
