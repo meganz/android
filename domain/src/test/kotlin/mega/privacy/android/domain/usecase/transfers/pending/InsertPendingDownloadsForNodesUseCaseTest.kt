@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DestinationAndAppDataForDownloadResult
@@ -40,6 +41,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
         mock<DoesPathHaveSufficientSpaceForNodesUseCase>()
     private val getFileDestinationAndAppDataForDownloadUseCase =
         mock<GetFileDestinationAndAppDataForDownloadUseCase>()
+    private val fileSystemRepository = mock<FileSystemRepository>()
 
     @BeforeAll
     fun setUp() {
@@ -47,7 +49,8 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             transferRepository,
             getPendingTransferNodeIdentifierUseCase,
             doesPathHaveSufficientSpaceForNodesUseCase,
-            getFileDestinationAndAppDataForDownloadUseCase
+            getFileDestinationAndAppDataForDownloadUseCase,
+            fileSystemRepository,
         )
     }
 
@@ -57,7 +60,8 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             transferRepository,
             getPendingTransferNodeIdentifierUseCase,
             doesPathHaveSufficientSpaceForNodesUseCase,
-            getFileDestinationAndAppDataForDownloadUseCase
+            getFileDestinationAndAppDataForDownloadUseCase,
+            fileSystemRepository,
         )
         whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())) doReturn true
         val nodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(647L))
@@ -120,6 +124,15 @@ class InsertPendingDownloadsForNodesUseCaseTest {
 
             assertThat(actual).isEqualTo(expected)
         }
+
+    @Test
+    fun `test that folder is created`() = runTest {
+        val uriPath = UriPath(PATH_STRING)
+
+        underTest(listOf(mock()), uriPath, false)
+
+        verify(fileSystemRepository).createDirectory(PATH_STRING)
+    }
 
     companion object {
         private const val PATH_STRING = "uriPath/"
