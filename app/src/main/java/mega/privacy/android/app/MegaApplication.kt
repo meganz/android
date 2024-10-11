@@ -23,6 +23,7 @@ import dagger.Lazy
 import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.ChatManagement
@@ -242,7 +243,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
 
         setupMegaChatApi()
         getMiscFlagsIfNeeded()
-        applicationScope.launch {
+        applicationScope.launch(Dispatchers.IO) {
             runCatching {
                 // Initialize the Google Mobile Ads SDK on a background thread.
                 MobileAds.initialize(this@MegaApplication) {}
@@ -250,6 +251,8 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             }.onFailure {
                 Timber.e(it, "MobileAds initialization failed")
             }
+        }
+        applicationScope.launch {
             runCatching { updateApiServerUseCase() }
             // clear the cache files stored in the external cache folder.
             clearPublicCache()
