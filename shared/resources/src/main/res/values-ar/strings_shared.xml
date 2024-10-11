@@ -725,23 +725,23 @@
     <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_whats_new_label">ما الجديد</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_title">Easy, automated sync</string>
+    <string name="sync_promotion_bottom_sheet_title">المزامنة الآلية والسهلة</string>
     <!-- Body message of the bottom sheet to promote Sync feature -->
-    <string name="sync_promotion_bottom_sheet_body_message">Sync a folder on your device with MEGA to access the latest version of your files anywhere</string>
+    <string name="sync_promotion_bottom_sheet_body_message">قم بمزامنة مجلد على جهازك مع ميغا MEGA للوصول إلى أحدث إصدار من ملفاتك في أي مكان</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sync folders</string>
+    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">مجلدات المزامنة</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_free">Upgrade to use sync</string>
+    <string name="sync_promotion_bottom_sheet_primary_button_text_free">قم بالترقية لاستخدام المزامنة</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
     <string name="sync_promotion_bottom_sheet_secondary_button_text">اعرف أكثر</string>
     <!-- Sync option dialog cancel button -->
     <string name="settings_sync_option_cancel">إلغاء</string>
     <!-- Snackbar message displayed when sync option is selected -->
-    <string name="settings_sync_option_updated_message">Sync options updated</string>
+    <string name="settings_sync_option_updated_message">تم تحديث خيارات المزامنة</string>
     <!-- Title of the Contact Permission Explanation -->
-    <string name="title_enable_access_contact">Enable access to invite friends</string>
+    <string name="title_enable_access_contact">تمكين الوصول لدعوة الأصدقاء</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">In order to invite friends, you must allow MEGA to access your contact list</string>
+    <string name="subtitle_enable_access_contact">من أجل دعوة الأصدقاء، يجب السماح لميغا MEGA بالوصول إلى قائمة جهات الاتصال الخاصة بك</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">السماح بالوصول</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -755,13 +755,13 @@
     <!-- Label for the button or menu option to add a backup -->
     <string name="device_center_add_backup_button_option">إضافة نسخة احتياطية</string>
     <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_title">Upgrade your account</string>
+    <string name="device_center_sync_backup_upgrade_dialog_title">قم بترقية حسابك</string>
     <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_message">Unlock the power to sync and backup your mobile device to cloud storage with one of our premium plans</string>
+    <string name="device_center_sync_backup_upgrade_dialog_message">أطلق العنان لقوة مزامنة جهازك المحمول ونسخه احتياطيًا إلى التخزين السحابي باستخدام إحدى باقاتنا المتميزة</string>
     <!-- Title of the share meeting link bottom panel -->
-    <string name="meetings_share_link_bottom_sheet_title">Meeting confirmed: Invite others to join</string>
+    <string name="meetings_share_link_bottom_sheet_title">تم تأكيد الاجتماع: قم بدعوة الآخرين للانضمام</string>
     <!-- Button text of the send meeting link to chat -->
-    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Send link to chat</string>
+    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">إرسال رابط إلى المحادثة</string>
     <!-- Button text of the share meeting link -->
     <string name="meetings_share_link_bottom_sheet_button_share_link">مشاركة الرابط</string>
     <!-- Title for the inline warning banner when storage is almost full -->
@@ -776,4 +776,38 @@
     <string name="account_storage_over_quota_inline_error_banner_upgrade_link">رق حسابك الآن</string>
     <!-- Hidden nodes sharing albums -->
     <string name="hidden_nodes_sharing_albums">هناك عناصر مخفية في واحد أو أكثر من هذه الألبومات. تعني مشاركة الألبومات أن العناصر المخفية مرئية لأولئك الذين تشاركهم معهم. ستظل العناصر مخفية في السواقة السحابية الخاص بك.</string>
+    <!-- Backup title for toolbar when inside new backup screen -->
+    <string name="sync_add_new_backup_toolbar_title">النسخ الاحتياطي</string>
+    <!-- Text for the header of the screen to add a new backup folder -->
+    <string name="sync_add_new_backup_header_text">إضافة مجلد النسخ الاحتياطي:</string>
+    <!-- Text to indicate the type of sync in the card header when adding a new backup folder -->
+    <string name="sync_add_new_backup_card_sync_type_text">النسخ الاحتياطي</string>
+    <!-- Text for the label to select the device folder or source for a new backup folder -->
+    <string name="sync_add_new_backup_choose_device_folder_title">النسخ الاحتياطي من</string>
+    <!-- Text for the label to indicate the destiny of a new backup folder -->
+    <string name="sync_add_new_backup_choose_mega_folder_title">نسخ احتياطي إلى</string>
+    <!-- Backup text for the the button to begin backup -->
+    <string name="sync_add_new_backup_proceed_button_label">النسخ الاحتياطي</string>
+    <!-- Title of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_title">هل تسمح لميغا MEGAبالوصول إلى جميع الملفات؟</string>
+    <!-- Message of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_message">لنسخ ملفاتك احتياطيًا، تحتاج ميغا MEGA إلى الوصول إلى الملفات والمجلدات الموجودة على جهازك. بياناتك آمنة دائمًا معنا.</string>
+    <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
+    <string name="sync_add_new_backup_storage_permission_banner">MEGA needs access to your device storage in order to back up your local folder. [U]Tap to grant access[/U]</string>
+    <!--Success message displayed in the Login screen after the account has been activated-->
+    <string name="login_screen_account_confirmed_success_message">تم تفعيل حسابك بالفعل. يُرجى تسجيل الدخول.</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <!-- Context message in the files permission screen -->
+    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads to MEGA.</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_do_not_show_again_button">لا تُظهر هذا مرة أخرى</string>
+    <!-- Title of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_title">إيقاف المزامنة؟</string>
+    <!-- Message of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_message">This will stop the sync process between the two folders but won’t remove the folders.</string>
+    <!-- Label for the button to stop a sync -->
+    <string name="sync_stop_sync_button">أوقف المزامنة</string>
+    <!-- Snackbar message to indicate that sync has been stopped -->
+    <string name="sync_snackbar_message_confirm_sync_stopped">Sync stopped</string>
 </resources>

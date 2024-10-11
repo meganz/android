@@ -695,13 +695,13 @@
     <!-- Label for the button or menu option to add a backup -->
     <string name="device_center_add_backup_button_option">添加备份</string>
     <!-- Title of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_title">Upgrade your account</string>
+    <string name="device_center_sync_backup_upgrade_dialog_title">升级您的帐户</string>
     <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
-    <string name="device_center_sync_backup_upgrade_dialog_message">Unlock the power to sync and backup your mobile device to cloud storage with one of our premium plans</string>
+    <string name="device_center_sync_backup_upgrade_dialog_message">通过我们的高级方案，解锁将您的移动设备同步和备份到云端存储的功能</string>
     <!-- Title of the share meeting link bottom panel -->
-    <string name="meetings_share_link_bottom_sheet_title">Meeting confirmed: Invite others to join</string>
+    <string name="meetings_share_link_bottom_sheet_title">会议确认：邀请其他人加入</string>
     <!-- Button text of the send meeting link to chat -->
-    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Send link to chat</string>
+    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">发送聊天链接</string>
     <!-- Button text of the share meeting link -->
     <string name="meetings_share_link_bottom_sheet_button_share_link">共享链接</string>
     <!-- Title for the inline warning banner when storage is almost full -->
@@ -716,4 +716,38 @@
     <string name="account_storage_over_quota_inline_error_banner_upgrade_link">立即升级</string>
     <!-- Hidden nodes sharing albums -->
     <string name="hidden_nodes_sharing_albums">其中一个或多个相册包含隐藏的项目。共享相册意味着与您共享的人可以看到隐藏的项目。这些项目仍将隐藏在您的云盘中。</string>
+    <!-- Backup title for toolbar when inside new backup screen -->
+    <string name="sync_add_new_backup_toolbar_title">备份</string>
+    <!-- Text for the header of the screen to add a new backup folder -->
+    <string name="sync_add_new_backup_header_text">添加备份文件夹：</string>
+    <!-- Text to indicate the type of sync in the card header when adding a new backup folder -->
+    <string name="sync_add_new_backup_card_sync_type_text">备份</string>
+    <!-- Text for the label to select the device folder or source for a new backup folder -->
+    <string name="sync_add_new_backup_choose_device_folder_title">备份来源</string>
+    <!-- Text for the label to indicate the destiny of a new backup folder -->
+    <string name="sync_add_new_backup_choose_mega_folder_title">备份到</string>
+    <!-- Backup text for the the button to begin backup -->
+    <string name="sync_add_new_backup_proceed_button_label">备份</string>
+    <!-- Title of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_title">允许MEGA访问所有文件吗？</string>
+    <!-- Message of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_message">要备份您的文件，MEGA需要访问设您设备上的文件和文件夹。您的数据在我们这里始终是安全的。</string>
+    <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
+    <string name="sync_add_new_backup_storage_permission_banner">MEGA需要访问您设备的存储空间，以备份您的本地文件夹。[U]点按授予访问权限[/U]</string>
+    <!--Success message displayed in the Login screen after the account has been activated-->
+    <string name="login_screen_account_confirmed_success_message">您的帐户已激活。请登录。</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_title">允许MEGA访问您设备的文件</string>
+    <!-- Context message in the files permission screen -->
+    <string name="files_permission_screen_message">通过允许MEGA访问您的文件，您无需创建临时副本即可上传到MEGA，从而节省设备空间并加快上传MEGA的速度。</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_do_not_show_again_button">不再显示此信息</string>
+    <!-- Title of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_title">停止同步？</string>
+    <!-- Message of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_message">这将停止两个文件夹之间的同步进程，但不会删除文件夹。</string>
+    <!-- Label for the button to stop a sync -->
+    <string name="sync_stop_sync_button">停止同步</string>
+    <!-- Snackbar message to indicate that sync has been stopped -->
+    <string name="sync_snackbar_message_confirm_sync_stopped">同步已停止</string>
 </resources>

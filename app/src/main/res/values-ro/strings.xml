@@ -43,7 +43,7 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Se încarcă</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Adăugarea</string>
+    <string name="general_importing">Adăugarea&#8230;</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Se redirecționează</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
@@ -137,7 +137,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Ești utilizator nou pe MEGA?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">Creați un cont MEGA</string>
+    <string name="create_account">Înscrieți-vă</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">Introduceți adresa dvs. de e-mail</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->

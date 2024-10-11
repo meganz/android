@@ -716,4 +716,38 @@
     <string name="account_storage_over_quota_inline_error_banner_upgrade_link">今すぐアップグレード</string>
     <!-- Hidden nodes sharing albums -->
     <string name="hidden_nodes_sharing_albums">これらのアルバムの1つ以上に隠し項目があります。アルバムを共有すると、共有相手には非表示の項目が表示されることになります。当該項目は引き続きあなたのクラウドドライブに隠されたままになります。</string>
+    <!-- Backup title for toolbar when inside new backup screen -->
+    <string name="sync_add_new_backup_toolbar_title">バックアップ</string>
+    <!-- Text for the header of the screen to add a new backup folder -->
+    <string name="sync_add_new_backup_header_text">バックアップフォルダを追加：</string>
+    <!-- Text to indicate the type of sync in the card header when adding a new backup folder -->
+    <string name="sync_add_new_backup_card_sync_type_text">バックアップ</string>
+    <!-- Text for the label to select the device folder or source for a new backup folder -->
+    <string name="sync_add_new_backup_choose_device_folder_title">バックアップ元</string>
+    <!-- Text for the label to indicate the destiny of a new backup folder -->
+    <string name="sync_add_new_backup_choose_mega_folder_title">バックアップ先</string>
+    <!-- Backup text for the the button to begin backup -->
+    <string name="sync_add_new_backup_proceed_button_label">バックアップ</string>
+    <!-- Title of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_title">MEGAがすべてのファイルにアクセスするのを許可しますか？</string>
+    <!-- Message of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
+    <string name="sync_backup_access_storage_permission_dialog_message">ファイルをバックアップするには、MEGAはあなたのデバイスのファイルとフォルダにアクセスする必要があります。あなたのデータは常に安全に保管されます。</string>
+    <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
+    <string name="sync_add_new_backup_storage_permission_banner">MEGAは、あなたのローカルフォルダをバックアップするためにお使いのデバイスのストレージにアクセスする必要があります。[U]タップしてアクセスを許可する[/U]</string>
+    <!--Success message displayed in the Login screen after the account has been activated-->
+    <string name="login_screen_account_confirmed_success_message">あなたのアカウントは有効になっています。ログインしてください。</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_title">MEGAにデバイスのファイルへのアクセスを許可</string>
+    <!-- Context message in the files permission screen -->
+    <string name="files_permission_screen_message">MEGAにファイルへのアクセスを許可すると、一時コピーを作成せずにMEGAにアップロードできるため、デバイス上のスペースが節約され、MEGAへのアップロードが高速化されます。</string>
+    <!-- Title in the files permission screen -->
+    <string name="files_permission_screen_do_not_show_again_button">次回から表示しない</string>
+    <!-- Title of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_title">同期を停止しますか？</string>
+    <!-- Message of the dialog to confirm stop a sync -->
+    <string name="sync_stop_sync_confirm_dialog_message">これにより、2つのフォルダ間の同期プロセスは停止しますが、フォルダは削除されません。</string>
+    <!-- Label for the button to stop a sync -->
+    <string name="sync_stop_sync_button">同期の停止</string>
+    <!-- Snackbar message to indicate that sync has been stopped -->
+    <string name="sync_snackbar_message_confirm_sync_stopped">同期が停止しました</string>
 </resources>

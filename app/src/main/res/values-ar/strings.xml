@@ -1506,7 +1506,7 @@
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">لقد تلقيت %1$s من مساحة تخزين لتثبيتك تطبيق ميغا للهاتف المحمول MEGA mobile.</string>
     <!-- info paragraph about the completed achievement registration -->
-    <string name="result_paragraph_info_achievement_registration">You have received %1$s storage space as your free signup bonus.</string>
+    <string name="result_paragraph_info_achievement_registration">لقد استلمت %1$s من مساحة تخزين كمكافأة تسجيل مجانية.</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="zero">مجلد مشارك</item>
@@ -1993,7 +1993,7 @@
     <!-- Text button -->
     <string name="general_close">إغلاق</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-factor authenticator app</string>
+    <string name="no_authentication_apps_title">تطبيق المصادقة المزدوجة Two-Factor</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">هل ترغب في فتح متجر غوغل Google Play حتى تتمكن من تثبيت تطبيق المصادقة؟</string>
     <!-- Label Play Store -->
@@ -2115,7 +2115,7 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">تفعيل أو تعطيل النسخ المعدلة للملفات لكامل حسابك.\nتعطيل ميزة النسخ المعدلة للملفات لا تمنع جهات الاتصال الخاصة بك من إنشاء نسخ جديدة في الملفات المشاركة.</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Search contacts or type email address</string>
+    <string name="type_mail">ابحث عن جهات الاتصال أو اكتب عنوان البريد الإلكتروني</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_invite_contact">هل تريد إضافة %s الى جهات الاتصال خاصتك؟</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
