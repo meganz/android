@@ -60,7 +60,6 @@ import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallScreenOpenedUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
@@ -106,7 +105,6 @@ class MeetingActivityViewModelTest {
     private val checkChatLink: CheckChatLinkUseCase = mock()
     private val getChatParticipants: GetChatParticipants = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
-    private val logoutUseCase: LogoutUseCase = mock()
     private val monitorFinishActivityUseCase: MonitorFinishActivityUseCase = mock()
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase = mock()
@@ -178,7 +176,6 @@ class MeetingActivityViewModelTest {
             context,
             getChatParticipants,
             monitorConnectivityUseCase,
-            logoutUseCase,
             monitorFinishActivityUseCase,
             monitorChatCallUpdatesUseCase,
             monitorChatSessionUpdatesUseCase,
@@ -251,7 +248,6 @@ class MeetingActivityViewModelTest {
             context = context,
             getChatParticipants = getChatParticipants,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            logoutUseCase = logoutUseCase,
             monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
             getChatRoomUseCase = getChatRoomUseCase,
