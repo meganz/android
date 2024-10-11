@@ -176,23 +176,23 @@ class FileBrowserViewModelTest {
         ),
         Arguments.of(
             StorageState.Green,
-            null
+            StorageOverQuotaCapacity.DEFAULT
         ), Arguments.of(
             StorageState.Orange,
-            null
+            StorageOverQuotaCapacity.ALMOST_FULL
         ),
         Arguments.of(
             StorageState.Change,
-            null
+            StorageOverQuotaCapacity.DEFAULT
         ), Arguments.of(
             StorageState.Change,
-            null
+            StorageOverQuotaCapacity.DEFAULT
         ), Arguments.of(
             StorageState.Unknown,
-            null
+            StorageOverQuotaCapacity.DEFAULT
         ), Arguments.of(
             StorageState.PayWall,
-            null
+            StorageOverQuotaCapacity.DEFAULT
         )
     )
 
@@ -700,6 +700,9 @@ class FileBrowserViewModelTest {
         whenever(shouldEnterMediaDiscoveryModeUseCase(any())).thenReturn(false)
         whenever(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)).thenReturn(true)
         whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)).thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)).thenReturn(
+            true
+        )
     }
 
     @AfterEach

@@ -180,6 +180,9 @@ class MediaDiscoveryViewModelTest {
         whenever(savedStateHandle.get<Boolean>(any())) doReturn (null)
         whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
         whenever(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)).thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)).thenReturn(
+            true
+        )
     }
 
     @BeforeEach
@@ -221,23 +224,24 @@ class MediaDiscoveryViewModelTest {
         ),
         Arguments.of(
             StorageState.Green,
-            null
-        ), Arguments.of(
+            StorageOverQuotaCapacity.DEFAULT
+        ),
+        Arguments.of(
             StorageState.Orange,
-            null
+            StorageOverQuotaCapacity.ALMOST_FULL
         ),
         Arguments.of(
             StorageState.Change,
-            null
+            StorageOverQuotaCapacity.DEFAULT
         ), Arguments.of(
             StorageState.Change,
-            null
+            StorageOverQuotaCapacity.DEFAULT
         ), Arguments.of(
             StorageState.Unknown,
-            null
+            StorageOverQuotaCapacity.DEFAULT
         ), Arguments.of(
             StorageState.PayWall,
-            null
+            StorageOverQuotaCapacity.DEFAULT
         )
     )
 

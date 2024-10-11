@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.DEFAULT
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
@@ -86,7 +87,7 @@ data class FileBrowserState(
     @StringRes val errorMessage: Int? = null,
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean = false,
-    val storageCapacity: StorageOverQuotaCapacity? = null,
+    val storageCapacity: StorageOverQuotaCapacity = DEFAULT,
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
 ) {

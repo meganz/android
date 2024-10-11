@@ -24,6 +24,8 @@ import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
+import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.ALMOST_FULL
+import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.DEFAULT
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.FULL
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.getState
@@ -154,13 +156,14 @@ class FileBrowserViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner).let { isFullStorageOverQuotaBannerEnabled ->
+                    val isAlmostFullStorageQuotaBannerEnabled =
+                        getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)
                     if (isFullStorageOverQuotaBannerEnabled) {
-                        val storageCapacity =
-                            if (monitorStorageStateEventUseCase.getState() == StorageState.Red) {
-                                FULL
-                            } else {
-                                null
-                            }
+                        val storageCapacity = when (monitorStorageStateEventUseCase.getState()) {
+                            StorageState.Red -> FULL
+                            StorageState.Orange -> if (isAlmostFullStorageQuotaBannerEnabled) ALMOST_FULL else DEFAULT
+                            else -> DEFAULT
+                        }
                         _state.update {
                             it.copy(storageCapacity = storageCapacity)
                         }
@@ -168,9 +171,7 @@ class FileBrowserViewModel @Inject constructor(
                 }
             }.onFailure { throwable ->
                 Timber.e(throwable.message)
-                _state.update {
-                    it.copy(storageCapacity = null)
-                }
+                setStorageCapacityAsDefault()
             }
         }
     }
@@ -908,4 +909,13 @@ class FileBrowserViewModel @Inject constructor(
      */
     suspend fun isHidingActionAllowed(nodeId: NodeId): Boolean =
         isHidingActionAllowedUseCase(nodeId)
+
+    /**
+     * Reset storage capacity to default
+     */
+    fun setStorageCapacityAsDefault() {
+        _state.update {
+            it.copy(storageCapacity = DEFAULT)
+        }
+    }
 }

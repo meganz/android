@@ -7,6 +7,7 @@ import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCa
 import mega.privacy.android.shared.original.core.ui.controls.banners.InlineErrorBanner
 import mega.privacy.android.shared.original.core.ui.controls.banners.InlineWarningBanner
 import mega.privacy.android.shared.resources.R
+import mega.privacy.mobile.analytics.event.AlmostFullStorageOverQuotaBannerCloseButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AlmostFullStorageOverQuotaBannerDisplayedEvent
 import mega.privacy.mobile.analytics.event.AlmostFullStorageOverQuotaBannerUpgradeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.FullStorageOverQuotaBannerDisplayedEvent
@@ -15,17 +16,17 @@ import mega.privacy.mobile.analytics.event.FullStorageOverQuotaBannerUpgradeButt
 /**
  * Composable for the Storage Over Quota Banner
  * @param storageCapacity the storage capacity
- * @param onStorageFullWarningDismiss the callback when the storage full warning is dismissed
+ * @param onStorageAlmostFullWarningDismiss the callback when the storage almost full warning is dismissed
  * @param onUpgradeClicked the callback when the upgrade is clicked
  */
 @Composable
 fun StorageOverQuotaBanner(
     storageCapacity: StorageOverQuotaCapacity,
-    onStorageFullWarningDismiss: () -> Unit,
+    onStorageAlmostFullWarningDismiss: () -> Unit,
     onUpgradeClicked: () -> Unit,
 ) {
 
-    val storageFullActionString =
+    val storageActionString =
         stringResource(id = R.string.account_storage_over_quota_inline_error_banner_upgrade_link)
 
     if (storageCapacity == StorageOverQuotaCapacity.FULL) {
@@ -33,7 +34,7 @@ fun StorageOverQuotaBanner(
         InlineErrorBanner(
             title = stringResource(id = R.string.account_storage_over_quota_inline_error_banner_title),
             message = stringResource(id = R.string.account_storage_over_quota_inline_error_banner_message),
-            actionButtonText = storageFullActionString,
+            actionButtonText = storageActionString,
             onActionButtonClick = {
                 Analytics.tracker.trackEvent(FullStorageOverQuotaBannerUpgradeButtonPressedEvent)
                 onUpgradeClicked()
@@ -43,14 +44,17 @@ fun StorageOverQuotaBanner(
         InlineWarningBanner(
             title = stringResource(id = R.string.account_storage_over_quota_inline_warning_banner_title),
             message = stringResource(id = R.string.account_storage_over_quota_inline_warning_banner_message),
-            actionButtonText = storageFullActionString,
+            actionButtonText = storageActionString,
             onActionButtonClick = {
                 Analytics.tracker.trackEvent(
                     AlmostFullStorageOverQuotaBannerUpgradeButtonPressedEvent
                 )
                 onUpgradeClicked()
             },
-            onCloseClick = { onStorageFullWarningDismiss() }
+            onCloseClick = {
+                Analytics.tracker.trackEvent(AlmostFullStorageOverQuotaBannerCloseButtonPressedEvent)
+                onStorageAlmostFullWarningDismiss()
+            }
         )
     }
 }

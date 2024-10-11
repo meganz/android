@@ -64,6 +64,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.clouddrive.ui.StorageOverQuotaBanner
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryGlobalStateViewModel
@@ -195,7 +196,7 @@ fun MediaDiscoveryView(
                         )
                     }
                 },
-                onStorageFullWarningDismiss = onStorageFullWarningDismiss,
+                onStorageAlmostFullWarningDismiss = onStorageFullWarningDismiss,
                 onUpgradeClicked = onUpgradeClicked
             )
         } else {
@@ -428,10 +429,10 @@ private fun MDView(
     onTimeBarTabSelected: (TimeBarTab) -> Unit,
     onSwitchListView: () -> Unit,
     addFabButton: @Composable () -> Unit,
-    onStorageFullWarningDismiss: () -> Unit,
-    onUpgradeClicked: () -> Unit,
     photoDownloaderViewModel: PhotoDownloaderViewModel = viewModel(),
     showSettingDialog: Boolean = false,
+    onStorageAlmostFullWarningDismiss: () -> Unit,
+    onUpgradeClicked: () -> Unit,
 ) {
     val lazyGridState = rememberSaveable(
         mediaDiscoveryViewState.scrollStartIndex,
@@ -455,10 +456,10 @@ private fun MDView(
             mediaDiscoveryViewState.errorMessage?.let { errorMessage ->
                 WarningBanner(textString = stringResource(id = errorMessage), onCloseClick = null)
             }
-            mediaDiscoveryViewState.storageCapacity?.let {
+            if (mediaDiscoveryViewState.storageCapacity != StorageOverQuotaCapacity.DEFAULT) {
                 StorageOverQuotaBanner(
-                    storageCapacity = it,
-                    onStorageFullWarningDismiss = onStorageFullWarningDismiss,
+                    storageCapacity = mediaDiscoveryViewState.storageCapacity,
+                    onStorageAlmostFullWarningDismiss = onStorageAlmostFullWarningDismiss,
                     onUpgradeClicked = onUpgradeClicked
                 )
             }

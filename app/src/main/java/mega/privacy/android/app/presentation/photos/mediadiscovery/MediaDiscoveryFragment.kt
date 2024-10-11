@@ -50,6 +50,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import javax.inject.Inject
 
@@ -76,6 +77,12 @@ class MediaDiscoveryFragment : Fragment() {
 
     @Inject
     lateinit var imagePreviewProvider: ImagePreviewProvider
+
+    /**
+     * Allows navigation to specific features in the monolith :app
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,9 +130,9 @@ class MediaDiscoveryFragment : Fragment() {
                             onStartModalSheetShow = this@MediaDiscoveryFragment::onStartModalSheetShow,
                             onEndModalSheetHide = this@MediaDiscoveryFragment::onEndModalSheetHide,
                             onModalSheetVisibilityChange = this@MediaDiscoveryFragment::onModalSheetVisibilityChange,
-                            onStorageFullWarningDismiss = {},
+                            onStorageFullWarningDismiss = mediaDiscoveryViewModel::setStorageCapacityAsDefault,
                             onUpgradeClicked = {
-                                (activity as? ManagerActivity)?.navigateToUpgradeAccount()
+                                megaNavigator.openUpgradeAccount(requireContext())
                             },
                         )
                     }

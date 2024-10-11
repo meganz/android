@@ -25,6 +25,8 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.ALMOST_FULL
+import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.DEFAULT
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.FULL
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
@@ -152,13 +154,14 @@ class MediaDiscoveryViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner).let { isFullStorageOverQuotaBannerEnabled ->
+                    val isAlmostFullStorageQuotaBannerEnabled =
+                        getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)
                     if (isFullStorageOverQuotaBannerEnabled) {
-                        val storageCapacity =
-                            if (monitorStorageStateEventUseCase.getState() == StorageState.Red) {
-                                FULL
-                            } else {
-                                null
-                            }
+                        val storageCapacity = when (monitorStorageStateEventUseCase.getState()) {
+                            StorageState.Red -> FULL
+                            StorageState.Orange -> if (isAlmostFullStorageQuotaBannerEnabled) ALMOST_FULL else DEFAULT
+                            else -> DEFAULT
+                        }
                         _state.update {
                             it.copy(storageCapacity = storageCapacity)
                         }
@@ -166,9 +169,7 @@ class MediaDiscoveryViewModel @Inject constructor(
                 }
             }.onFailure { throwable ->
                 Timber.e(throwable.message)
-                _state.update {
-                    it.copy(storageCapacity = null)
-                }
+                setStorageCapacityAsDefault()
             }
         }
     }
@@ -774,4 +775,13 @@ class MediaDiscoveryViewModel @Inject constructor(
 
     internal suspend fun getNodeContentUri(nodeHandle: Long) =
         getNodeContentUriByHandleUseCase(nodeHandle)
+
+    /**
+     * Reset storage capacity to default
+     */
+    fun setStorageCapacityAsDefault() {
+        _state.update {
+            it.copy(storageCapacity = DEFAULT)
+        }
+    }
 }

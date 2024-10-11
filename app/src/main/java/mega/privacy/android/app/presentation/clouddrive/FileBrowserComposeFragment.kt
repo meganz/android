@@ -82,6 +82,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -136,6 +137,12 @@ class FileBrowserComposeFragment : Fragment() {
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
     private var tempNodeIds: List<NodeId> = listOf()
+
+    /**
+     * Allows navigation to specific features in the monolith :app
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
@@ -236,10 +243,10 @@ class FileBrowserComposeFragment : Fragment() {
                             onLinkClicked = ::navigateToLink,
                             onDisputeTakeDownClicked = ::navigateToLink,
                             onDismissClicked = fileBrowserViewModel::onBannerDismissClicked,
-                            onStorageFullWarningDismiss = {},
+                            onStorageAlmostFullWarningDismiss = fileBrowserViewModel::setStorageCapacityAsDefault,
                             onUpgradeClicked = {
                                 fileBrowserViewModel::onBannerDismissClicked
-                                (activity as? ManagerActivity)?.navigateToUpgradeAccount()
+                                megaNavigator.openUpgradeAccount(requireContext())
                             },
                             onEnterMediaDiscoveryClick = {
                                 disableSelectMode()

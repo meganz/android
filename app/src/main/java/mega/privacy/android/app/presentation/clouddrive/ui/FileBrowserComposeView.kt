@@ -22,6 +22,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
+import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
@@ -66,7 +67,7 @@ fun FileBrowserComposeView(
     onDismissClicked: () -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
-    onStorageFullWarningDismiss: () -> Unit,
+    onStorageAlmostFullWarningDismiss: () -> Unit,
 ) {
 
     var listStateMap by rememberSaveable(saver = ListGridStateMap.Saver) {
@@ -93,10 +94,10 @@ fun FileBrowserComposeView(
             WarningBanner(textString = stringResource(id = errorMessage), onCloseClick = null)
         }
 
-        uiState.storageCapacity?.let {
+        if (uiState.storageCapacity != StorageOverQuotaCapacity.DEFAULT) {
             StorageOverQuotaBanner(
-                storageCapacity = it,
-                onStorageFullWarningDismiss = onStorageFullWarningDismiss,
+                storageCapacity = uiState.storageCapacity,
+                onStorageAlmostFullWarningDismiss = onStorageAlmostFullWarningDismiss,
                 onUpgradeClicked = onUpgradeClicked
             )
         }

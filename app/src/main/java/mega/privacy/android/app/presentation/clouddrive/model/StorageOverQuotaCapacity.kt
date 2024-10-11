@@ -12,5 +12,10 @@ enum class StorageOverQuotaCapacity {
     /**
      * Full storage
      */
-    FULL
+    FULL,
+
+    /**
+     * Default value
+     */
+    DEFAULT
 }
