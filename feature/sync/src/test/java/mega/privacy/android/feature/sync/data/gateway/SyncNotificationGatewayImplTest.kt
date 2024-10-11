@@ -18,7 +18,7 @@ import org.mockito.kotlin.whenever
 class SyncNotificationGatewayImplTest {
 
     private val syncShownNotificationDao: SyncShownNotificationDao = mock()
-    private val underTest = SyncNotificationGatewayImpl(syncShownNotificationDao)
+    private val underTest = SyncNotificationGatewayImpl { syncShownNotificationDao }
 
     @AfterEach
     fun tearDown() {
