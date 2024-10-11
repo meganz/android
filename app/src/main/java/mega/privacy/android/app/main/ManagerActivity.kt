@@ -7851,8 +7851,10 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * We don't set the visibility to the appBarLayout directly because we keep status bar padding
      */
     private fun setAppBarVisibility(isVisible: Boolean) {
-        toolbar.isVisible = isVisible
-        setSupportActionBar(if (isVisible) toolbar else null)
+        if (toolbar.isVisible != isVisible) {
+            toolbar.isVisible = isVisible
+            setSupportActionBar(if (isVisible) toolbar else null)
+        }
     }
 
     private fun setAppBarColor(@ColorInt color: Int) {
