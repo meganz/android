@@ -103,8 +103,6 @@ import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.login.LogoutUseCase
-import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallScreenOpenedUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableAudioUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
@@ -140,8 +138,6 @@ import javax.inject.Inject
  * @property chatManagement                                 [ChatManagement]
  * @property setChatVideoInDeviceUseCase                    [SetChatVideoInDeviceUseCase]
  * @property checkChatLink                                  [CheckChatLinkUseCase]
- * @property logoutUseCase                                  [LogoutUseCase]
- * @property monitorFinishActivityUseCase                   [MonitorFinishActivityUseCase]
  * @property monitorChatCallUpdatesUseCase                  [MonitorChatCallUpdatesUseCase]
  * @property getChatRoomUseCase                             [GetChatRoomUseCase]
  * @property getChatCallUseCase                             [GetChatCallUseCase]
@@ -185,7 +181,6 @@ class MeetingActivityViewModel @Inject constructor(
     private val checkChatLink: CheckChatLinkUseCase,
     private val getChatParticipants: GetChatParticipants,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val logoutUseCase: LogoutUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
@@ -1138,7 +1133,6 @@ class MeetingActivityViewModel @Inject constructor(
     fun logout() = viewModelScope.launch {
         runCatching {
             megaChatRequestHandler.setIsLoggingRunning(true)
-            logoutUseCase()
         }.onSuccess {
             _state.update { it.copy(shouldLaunchLeftMeetingActivity = true) }
         }.onFailure {
