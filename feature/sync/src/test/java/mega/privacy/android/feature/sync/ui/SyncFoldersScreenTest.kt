@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
+import mega.privacy.android.feature.sync.ui.synclist.folders.REMOVE_BACKUP_FOLDER_CONFIRM_DIALOG_TEST_TAG
 import mega.privacy.android.feature.sync.ui.synclist.folders.REMOVE_SYNC_FOLDER_CONFIRM_DIALOG_TEST_TAG
 import mega.privacy.android.feature.sync.ui.synclist.folders.RemoveSyncFolderConfirmDialog
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
@@ -84,6 +85,7 @@ class SyncFoldersScreenTest {
                 issuesInfoClicked = {},
                 state = syncFoldersState,
                 snackBarHostState = SnackbarHostState(),
+                deviceName = "Device Name",
             )
         }
 
@@ -103,6 +105,7 @@ class SyncFoldersScreenTest {
                 issuesInfoClicked = {},
                 state = SyncFoldersState(emptyList()),
                 snackBarHostState = SnackbarHostState(),
+                deviceName = "Device Name",
             )
         }
 
@@ -135,6 +138,7 @@ class SyncFoldersScreenTest {
                     syncUiItems = emptyList(), isFreeAccount = false
                 ),
                 snackBarHostState = SnackbarHostState(),
+                deviceName = "Device Name",
             )
         }
 
@@ -159,6 +163,7 @@ class SyncFoldersScreenTest {
                 issuesInfoClicked = {},
                 state = SyncFoldersState(emptyList()),
                 snackBarHostState = SnackbarHostState(),
+                deviceName = "Device Name",
             )
         }
 
@@ -184,6 +189,7 @@ class SyncFoldersScreenTest {
                     syncUiItems = emptyList(), isFreeAccount = false
                 ),
                 snackBarHostState = SnackbarHostState(),
+                deviceName = "Device Name",
             )
         }
 
@@ -207,6 +213,7 @@ class SyncFoldersScreenTest {
                 isLoading = true,
                 showSyncsPausedErrorDialog = false,
                 onShowSyncsPausedErrorDialogDismissed = {},
+                deviceName = "Device Name",
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE).assertIsDisplayed()
@@ -216,6 +223,7 @@ class SyncFoldersScreenTest {
     fun `test that remove sync folder confirm dialog is properly displayed `() {
         composeTestRule.setContent {
             RemoveSyncFolderConfirmDialog(
+                syncType = SyncType.TYPE_TWOWAY,
                 onConfirm = {},
                 onDismiss = {}
             )
@@ -228,6 +236,28 @@ class SyncFoldersScreenTest {
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_sync_confirm_dialog_message))
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_sync_button))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.general_dialog_cancel_button))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that remove backup folder confirm dialog is properly displayed `() {
+        composeTestRule.setContent {
+            RemoveSyncFolderConfirmDialog(
+                syncType = SyncType.TYPE_BACKUP,
+                onConfirm = {},
+                onDismiss = {}
+            )
+        }
+
+        composeTestRule.onNodeWithTag(REMOVE_BACKUP_FOLDER_CONFIRM_DIALOG_TEST_TAG)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_confirm_dialog_title))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_confirm_dialog_message))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_button))
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.general_dialog_cancel_button))
             .assertIsDisplayed()

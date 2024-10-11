@@ -159,6 +159,7 @@ internal fun SyncListScreen(
                     syncFoldersViewModel = syncFoldersViewModel,
                     syncStalledIssuesViewModel = syncStalledIssuesViewModel,
                     syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
+                    deviceName = title ?: "",
                     selectedChip = selectedChip,
                     snackBarHostState = scaffoldState.snackbarHostState,
                 )
@@ -181,6 +182,7 @@ private fun SyncListScreenContent(
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
+    deviceName: String,
     selectedChip: SyncChip = SYNC_FOLDERS,
 ) {
     var checkedChip by rememberSaveable { mutableStateOf(selectedChip) }
@@ -259,6 +261,7 @@ private fun SyncListScreenContent(
                 syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
                 syncFoldersState = syncFoldersState,
                 snackBarHostState = snackBarHostState,
+                deviceName = deviceName,
             )
             PullRefreshIndicator(
                 modifier = Modifier.align(Alignment.TopCenter),
@@ -312,6 +315,7 @@ private fun SelectedChipScreen(
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
     syncFoldersState: SyncFoldersState,
     snackBarHostState: SnackbarHostState,
+    deviceName: String,
 ) {
     when (checkedChip) {
         SYNC_FOLDERS -> {
@@ -322,6 +326,7 @@ private fun SelectedChipScreen(
                 viewModel = syncFoldersViewModel,
                 state = syncFoldersState,
                 snackBarHostState = snackBarHostState,
+                deviceName = deviceName,
             )
         }
 

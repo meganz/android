@@ -762,4 +762,16 @@
     <string name="sync_stop_sync_button">Stop sync</string>
     <!-- Snackbar message to indicate that sync has been stopped -->
     <string name="sync_snackbar_message_confirm_sync_stopped">Sync stopped</string>
+    <!-- Title of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_title">Stop back up</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_message">This will stop the sync process between the two folders. A copy will be created and saved to your Cloud drive.</string>
+    <!-- Label for the button to stop a backup -->
+    <string name="sync_stop_backup_button">Stop backup</string>
+    <!-- Snackbar message to indicate that backup has been stopped -->
+    <string name="sync_snackbar_message_confirm_backup_stopped">Backup stopped</string>
+    <!-- Sync state updating -->
+    <string name="sync_list_sync_state_updating">Updating&#8230;</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_up_to_date">Up to date</string>
 </resources>

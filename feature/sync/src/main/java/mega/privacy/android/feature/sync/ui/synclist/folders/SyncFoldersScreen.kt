@@ -67,6 +67,7 @@ internal fun SyncFoldersScreen(
     isLoading: Boolean,
     showSyncsPausedErrorDialog: Boolean,
     onShowSyncsPausedErrorDialogDismissed: () -> Unit,
+    deviceName: String,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -108,7 +109,8 @@ internal fun SyncFoldersScreen(
                         issuesInfoClicked = issuesInfoClicked,
                         isLowBatteryLevel = isLowBatteryLevel,
                         isFreeAccount = isFreeAccount,
-                        errorRes = syncUiItems[itemIndex].error
+                        errorRes = syncUiItems[itemIndex].error,
+                        deviceName = deviceName,
                     )
                 }
             }
@@ -245,6 +247,7 @@ private fun SyncFoldersScreenEmptyStatePreview(
             isLoading = false,
             showSyncsPausedErrorDialog = false,
             onShowSyncsPausedErrorDialogDismissed = {},
+            deviceName = "Device Name",
         )
     }
 }
@@ -269,6 +272,7 @@ private fun SyncFoldersScreenLoadingStatePreview() {
             isLoading = true,
             showSyncsPausedErrorDialog = false,
             onShowSyncsPausedErrorDialogDismissed = {},
+            deviceName = "Device Name",
         )
     }
 }
@@ -304,6 +308,7 @@ private fun SyncFoldersScreenSyncingPreview(
             isLoading = false,
             showSyncsPausedErrorDialog = false,
             onShowSyncsPausedErrorDialogDismissed = {},
+            deviceName = "Device Name",
         )
     }
 }
@@ -339,6 +344,7 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview(
             isLoading = false,
             showSyncsPausedErrorDialog = false,
             onShowSyncsPausedErrorDialogDismissed = {},
+            deviceName = "Device Name",
         )
     }
 }

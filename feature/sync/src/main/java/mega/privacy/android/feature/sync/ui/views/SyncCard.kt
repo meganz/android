@@ -57,11 +57,13 @@ internal fun SyncCard(
     isLowBatteryLevel: Boolean,
     isFreeAccount: Boolean,
     @StringRes errorRes: Int?,
+    deviceName: String,
     modifier: Modifier = Modifier,
 ) {
     MegaCard(
         content = {
             SyncCardHeader(
+                syncType = sync.syncType,
                 folderPairName = sync.folderPairName,
                 status = sync.status,
                 hasStalledIssues = sync.hasStalledIssues,
@@ -78,16 +80,19 @@ internal fun SyncCard(
 
             AnimatedVisibility(visible = sync.expanded) {
                 SyncCardDetailedInfo(
+                    syncType = sync.syncType,
                     deviceStoragePath = sync.deviceStoragePath,
                     megaStoragePath = sync.megaStoragePath,
                     numberOfFiles = sync.numberOfFiles,
                     numberOfFolders = sync.numberOfFolders,
                     totalSizeInBytes = sync.totalSizeInBytes,
                     creationTime = sync.creationTime,
+                    deviceName = deviceName,
                 )
             }
 
             SyncCardFooter(
+                syncType = sync.syncType,
                 isSyncRunning = sync.status in arrayOf(
                     SyncStatus.SYNCING, SyncStatus.SYNCED
                 ),
@@ -108,6 +113,7 @@ internal fun SyncCard(
 
 @Composable
 private fun SyncCardHeader(
+    syncType: SyncType,
     folderPairName: String,
     status: SyncStatus,
     hasStalledIssues: Boolean,
@@ -124,7 +130,10 @@ private fun SyncCardHeader(
                 .padding(top = 16.dp)
         ) {
             Image(
-                painter = painterResource(IconPackR.drawable.ic_folder_sync_medium_solid),
+                painter = when (syncType) {
+                    SyncType.TYPE_BACKUP -> painterResource(id = IconPackR.drawable.ic_folder_backup_medium_solid)
+                    else -> painterResource(IconPackR.drawable.ic_folder_sync_medium_solid)
+                },
                 contentDescription = null,
                 modifier = Modifier.padding(end = 8.dp),
             )
@@ -138,9 +147,13 @@ private fun SyncCardHeader(
                     modifier = Modifier.padding(top = 2.dp, bottom = 2.dp),
                     statusText = when {
                         hasStalledIssues -> stringResource(id = R.string.sync_folders_sync_state_failed)
-                        status == SyncStatus.SYNCING -> stringResource(id = R.string.sync_list_sync_state_syncing)
+                        status == SyncStatus.SYNCING -> when (syncType) {
+                            SyncType.TYPE_BACKUP -> stringResource(id = sharedR.string.sync_list_sync_state_updating)
+                            else -> stringResource(id = R.string.sync_list_sync_state_syncing)
+                        }
+
                         status == SyncStatus.PAUSED -> stringResource(id = R.string.sync_list_sync_state_paused)
-                        else -> stringResource(id = R.string.sync_list_sync_state_synced)
+                        else -> stringResource(id = sharedR.string.sync_list_sync_state_up_to_date)
                     },
                     statusIcon = when {
                         hasStalledIssues -> iconPackR.drawable.ic_alert_circle_regular_medium_outline
@@ -167,12 +180,14 @@ private fun SyncCardHeader(
 
 @Composable
 private fun SyncCardDetailedInfo(
+    syncType: SyncType,
     deviceStoragePath: String,
     megaStoragePath: String,
     numberOfFiles: Int,
     numberOfFolders: Int,
     totalSizeInBytes: Long,
     creationTime: Long,
+    deviceName: String,
 ) {
     Column(Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)) {
         InfoRow(
@@ -183,8 +198,11 @@ private fun SyncCardDetailedInfo(
 
         InfoRow(
             title = stringResource(id = R.string.sync_folders_mega_storage),
-            info = megaStoragePath,
-            modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
+            info = when (syncType) {
+                SyncType.TYPE_BACKUP -> "Backups/$deviceName/$megaStoragePath"
+                else -> megaStoragePath
+            },
+            modifier = Modifier.padding(bottom = 8.dp, top = 8.dp),
         )
 
         InfoRow(
@@ -256,6 +274,7 @@ private fun InfoRow(
 
 @Composable
 private fun SyncCardFooter(
+    syncType: SyncType,
     isSyncRunning: Boolean,
     hasStalledIssues: Boolean,
     pauseRunClicked: () -> Unit,
@@ -315,7 +334,10 @@ private fun SyncCardFooter(
                     .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
                 onClick = removeFolderClicked,
                 icon = coreR.drawable.ic_minus_circle,
-                text = stringResource(sharedR.string.sync_stop_sync_button),
+                text = when (syncType) {
+                    SyncType.TYPE_BACKUP -> stringResource(sharedR.string.sync_stop_backup_button)
+                    else -> stringResource(sharedR.string.sync_stop_sync_button)
+                },
             )
         }
     }
@@ -349,6 +371,7 @@ private fun SyncCardExpandedPreview(
             isLowBatteryLevel = false,
             isFreeAccount = false,
             errorRes = null,
+            deviceName = "Device Name",
         )
     }
 }
@@ -381,6 +404,7 @@ private fun SyncCardExpandedWithBannerPreview(
             isLowBatteryLevel = false,
             isFreeAccount = false,
             errorRes = sharedR.string.general_sync_active_sync_below_path,
+            deviceName = "Device Name",
         )
     }
 }
@@ -412,7 +436,8 @@ private fun SyncCardCollapsedPreview(
             issuesInfoClicked = {},
             isLowBatteryLevel = false,
             isFreeAccount = false,
-            errorRes = null
+            errorRes = null,
+            deviceName = "Device Name",
         )
     }
 }
@@ -445,6 +470,7 @@ private fun SyncCardCollapsedWithBannerPreview(
             isLowBatteryLevel = false,
             isFreeAccount = false,
             errorRes = sharedR.string.general_sync_active_sync_below_path,
+            deviceName = "Device Name",
         )
     }
 }

@@ -17,6 +17,7 @@ internal fun SyncItemView(
     issuesInfoClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
     isFreeAccount: Boolean,
+    deviceName: String,
     @StringRes errorRes: Int? = null
 ) {
     val sync = syncUiItems[itemIndex]
@@ -35,7 +36,8 @@ internal fun SyncItemView(
         issuesInfoClicked = issuesInfoClicked,
         isLowBatteryLevel = isLowBatteryLevel,
         isFreeAccount = isFreeAccount,
-        errorRes = errorRes
+        errorRes = errorRes,
+        deviceName = deviceName,
     )
 }
 
