@@ -99,6 +99,19 @@ class NodeOptionsViewModel @Inject constructor(
             }.collect {
                 _state.update(it)
             }
+
+            runCatching {
+                val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
+                val isHidingActionAllowed = isHidingActionAllowedUseCase(NodeId(_state.value.node?.handle ?: 0))
+                _state.update {
+                    it.copy(
+                        isHiddenNodesOnboarded = isHiddenNodesOnboarded,
+                        isHidingActionAllowed = isHidingActionAllowed,
+                    )
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
         }
 
         viewModelScope.launch {
@@ -121,19 +134,6 @@ class NodeOptionsViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            runCatching {
-                val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
-                val isHidingActionAllowed =
-                    isHidingActionAllowedUseCase(NodeId(_state.value.node?.handle ?: 0))
-                _state.update {
-                    it.copy(
-                        isHiddenNodesOnboarded = isHiddenNodesOnboarded,
-                        isHidingActionAllowed = isHidingActionAllowed,
-                    )
-                }
-            }.onFailure {
-                Timber.e(it)
-            }
         }
     }
 

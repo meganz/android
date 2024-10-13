@@ -154,12 +154,22 @@ class FavouritesViewHolder(
 
                             listener(
                                 onSuccess = { _, _ ->
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && isSensitive) {
-                                        val blurRenderEffect = RenderEffect.createBlurEffect(
-                                            Util.dp2px(16f).toFloat(), Util.dp2px(16f).toFloat(),
-                                            Shader.TileMode.MIRROR
-                                        )
-                                        itemThumbnail.setRenderEffect(blurRenderEffect)
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                        if (isSensitive) {
+                                            val blurRenderEffect = RenderEffect.createBlurEffect(
+                                                Util.dp2px(16f).toFloat(),
+                                                Util.dp2px(16f).toFloat(),
+                                                Shader.TileMode.MIRROR
+                                            )
+                                            itemThumbnail.setRenderEffect(blurRenderEffect)
+                                        } else {
+                                            itemThumbnail.setRenderEffect(null)
+                                        }
+                                    }
+                                },
+                                onError = { _, _ ->
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                        itemThumbnail.setRenderEffect(null)
                                     }
                                 }
                             )
