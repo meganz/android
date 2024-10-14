@@ -35,6 +35,7 @@ import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
+import mega.privacy.android.data.mapper.node.NodeListMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelIntMapper
@@ -105,6 +106,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val megaExceptionMapper: MegaExceptionMapper,
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val nodeMapper: NodeMapper,
+    private val nodeListMapper: NodeListMapper,
     private val fileNodeMapper: FileNodeMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val offlineNodeInformationMapper: OfflineNodeInformationMapper,
@@ -672,21 +674,18 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getNodeByOriginalFingerprint(
+    override suspend fun getNodesByOriginalFingerprint(
         originalFingerprint: String,
         parentNodeId: NodeId?,
-    ): UnTypedNode? = withContext(ioDispatcher) {
-        val megaNode =
-            parentNodeId?.let { megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue) }
-        megaApiGateway.getNodesByOriginalFingerprint(originalFingerprint, megaNode)?.let {
-            if (it.size() > 0) {
-                return@let nodeMapper(megaNode = it[0], offline = getOfflineNode(it[0].handle))
-            }
-            return@let null
-        }.also {
-            Timber.d("Found node by original fingerprint with the same local fingerprint in node with handle: ${parentNodeId}, node : $it")
+    ): List<UnTypedNode> =
+        withContext(ioDispatcher) {
+            val parentNode =
+                parentNodeId?.let { megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue) }
+            megaApiGateway.getNodesByOriginalFingerprint(
+                originalFingerprint = originalFingerprint,
+                parentNode = parentNode,
+            )?.let { megaNodeList -> nodeListMapper(megaNodeList) }.orEmpty()
         }
-    }
 
     override suspend fun getNodeByFingerprintAndParentNode(
         fingerprint: String,
@@ -1035,7 +1034,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getNodesFromFingerPrint(fingerprint: String): List<UnTypedNode> {
+    override suspend fun getNodesByFingerprint(fingerprint: String): List<UnTypedNode> {
         return withContext(ioDispatcher) {
             megaApiGateway.getNodesByFingerprint(fingerprint).map {
                 convertToUnTypedNode(it)

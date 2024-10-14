@@ -140,7 +140,7 @@ class NameCollisionViewModel @Inject constructor(
                 node.fingerprint?.let { fingerprint ->
                     getNodeByFingerprintAndParentNodeUseCase(
                         fingerprint = fingerprint,
-                        parentNode = NodeId(collision.parentHandle)
+                        parentNodeId = NodeId(collision.parentHandle),
                     )?.let {
                         isCopyToOrigin = it.parentId.longValue == collision.parentHandle
                     }

@@ -30,6 +30,7 @@ import mega.privacy.android.data.mapper.node.FetchChildrenMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.FolderNodeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
+import mega.privacy.android.data.mapper.node.NodeListMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
@@ -95,33 +96,37 @@ import java.io.File
 import java.util.stream.Stream
 import kotlin.test.Ignore
 
+/**
+ * Test class for [NodeRepositoryImpl]
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class NodeRepositoryImplTest {
+internal class NodeRepositoryImplTest {
 
     private lateinit var underTest: NodeRepository
-    private val context: Context = mock()
-    private val megaApiGateway: MegaApiGateway = mock()
-    private val megaApiFolderGateway: MegaApiFolderGateway = mock()
-    private val megaChatApiGateway: MegaChatApiGateway = mock()
-    private val megaLocalStorageGateway: MegaLocalStorageGateway = mock()
-    private val shareDataMapper: ShareDataMapper = mock()
-    private val megaExceptionMapper: MegaExceptionMapper = mock()
-    private val sortOrderIntMapper: SortOrderIntMapper = mock()
-    private val cacheGateway: CacheGateway = mock()
-    private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
-    private val offlineNodeInformationMapper: OfflineNodeInformationMapper = mock()
-    private val offlineInformationMapper: OfflineInformationMapper = mock()
-    private val fileGateway: FileGateway = mock()
-    private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper = mock()
-    private val streamingGateway: StreamingGateway = mock()
-    private val nodeUpdateMapper: NodeUpdateMapper = mock()
-    private val folderNode: TypedFolderNode = mock()
-    private val publicLinkFolder: PublicLinkFolder = mock()
-    private val accessPermissionMapper: AccessPermissionMapper = mock()
+
+    private val context = mock<Context>()
+    private val megaApiGateway = mock<MegaApiGateway>()
+    private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
+    private val megaChatApiGateway = mock<MegaChatApiGateway>()
+    private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
+    private val shareDataMapper = mock<ShareDataMapper>()
+    private val megaExceptionMapper = mock<MegaExceptionMapper>()
+    private val sortOrderIntMapper = mock<SortOrderIntMapper>()
+    private val cacheGateway = mock<CacheGateway>()
+    private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
+    private val offlineNodeInformationMapper = mock<OfflineNodeInformationMapper>()
+    private val offlineInformationMapper = mock<OfflineInformationMapper>()
+    private val fileGateway = mock<FileGateway>()
+    private val chatFilesFolderUserAttributeMapper = mock<ChatFilesFolderUserAttributeMapper>()
+    private val streamingGateway = mock<StreamingGateway>()
+    private val nodeUpdateMapper = mock<NodeUpdateMapper>()
+    private val folderNode = mock<TypedFolderNode>()
+    private val publicLinkFolder = mock<PublicLinkFolder>()
+    private val accessPermissionMapper = mock<AccessPermissionMapper>()
     private val accessPermissionIntMapper: AccessPermissionIntMapper = AccessPermissionIntMapper()
     private val nodeShareKeyResultMapper = mock<NodeShareKeyResultMapper>()
-    private val fetChildrenMapper = mock<FetchChildrenMapper>()
+    private val fetchChildrenMapper = mock<FetchChildrenMapper>()
     private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
     private val offlineAvailabilityMapper: OfflineAvailabilityMapper = mock()
     private val megaNodeMapper = mock<MegaNodeMapper>()
@@ -129,6 +134,7 @@ class NodeRepositoryImplTest {
     private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
     private val stringListMapper = mock<StringListMapper>()
     private val workManagerGateway = mock<WorkManagerGateway>()
+
     private val fileNodeMapper = FileNodeMapper(
         cacheGateway = cacheGateway,
         megaApiGateway = megaApiGateway,
@@ -142,10 +148,12 @@ class NodeRepositoryImplTest {
         folderNodeMapper = FolderNodeMapper(
             megaApiGateway = megaApiGateway,
             megaApiFolderGateway = megaApiFolderGateway,
-            fetChildrenMapper = fetChildrenMapper,
+            fetChildrenMapper = fetchChildrenMapper,
             stringListMapper = stringListMapper,
         )
     )
+
+    private val nodeListMapper = NodeListMapper(nodeMapper = nodeMapper)
 
     val offline: Offline = mock()
     private val tag = "tag"
@@ -165,6 +173,7 @@ class NodeRepositoryImplTest {
             megaExceptionMapper = megaExceptionMapper,
             sortOrderIntMapper = sortOrderIntMapper,
             nodeMapper = nodeMapper,
+            nodeListMapper = nodeListMapper,
             fileNodeMapper = fileNodeMapper,
             fileTypeInfoMapper = fileTypeInfoMapper,
             offlineNodeInformationMapper = offlineNodeInformationMapper,
@@ -337,7 +346,7 @@ class NodeRepositoryImplTest {
     @Test
     fun `test that when getMegaNodeByHandle returns null then getNodeOutgoingShares returns an empty list`() =
         runTest {
-            whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle)).thenReturn(null)
+            whenever(megaApiGateway.getMegaNodeByHandle(NODE_HANDLE)).thenReturn(null)
             val actual = underTest.getNodeOutgoingShares(nodeId)
             assertThat(actual).isEmpty()
         }
@@ -346,7 +355,7 @@ class NodeRepositoryImplTest {
     fun `test that when getMegaNodeByHandle returns a node and getOutShares returns an empty list then getNodeOutgoingShares returns an empty list`() =
         runTest {
             val node: MegaNode = mock()
-            whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle)).thenReturn(node)
+            whenever(megaApiGateway.getMegaNodeByHandle(NODE_HANDLE)).thenReturn(node)
             whenever(megaApiGateway.getOutShares(node)).thenReturn(emptyList())
             val actual = underTest.getNodeOutgoingShares(nodeId)
             assertThat(actual).isEmpty()
@@ -358,7 +367,7 @@ class NodeRepositoryImplTest {
             val node: MegaNode = mock()
             val megaShare: MegaShare = mock()
             val share: ShareData = mock()
-            whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle)).thenReturn(node)
+            whenever(megaApiGateway.getMegaNodeByHandle(NODE_HANDLE)).thenReturn(node)
             whenever(megaApiGateway.getOutShares(node)).thenReturn(listOf(megaShare))
             whenever(shareDataMapper(megaShare)).thenReturn(share)
             val actual = underTest.getNodeOutgoingShares(nodeId)
@@ -1459,7 +1468,7 @@ class NodeRepositoryImplTest {
 
     @Test
     fun `test that getNodeChildrenFileTypes return the correct file types`() = runTest {
-        val node = mock<MegaNode>() {
+        val node = mock<MegaNode> {
             on { name }.thenReturn("123.jpg")
             on { duration }.thenReturn(0)
         }
@@ -1497,8 +1506,8 @@ class NodeRepositoryImplTest {
     )
 
     companion object {
-        private const val nodeHandle = 1L
-        private val nodeId = NodeId(nodeHandle)
+        private const val NODE_HANDLE = 1L
+        private val nodeId = NodeId(NODE_HANDLE)
         private val folderInfo = FolderTreeInfo(
             numberOfVersions = 2,
             sizeOfPreviousVersionsInBytes = 1000L,

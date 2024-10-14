@@ -27,7 +27,7 @@ class GetOwnNodeUseCase @Inject constructor(
             fileNode
         } else {
             fileNode.fingerprint?.let {
-                return nodeRepository.getNodesFromFingerPrint(it).find { node ->
+                return nodeRepository.getNodesByFingerprint(it).find { node ->
                     (nodeRepository.getOwnerNodeHandle(node.id) == userHandle)
                 }?.let { untypedNode ->
                     addNodeType(untypedNode)

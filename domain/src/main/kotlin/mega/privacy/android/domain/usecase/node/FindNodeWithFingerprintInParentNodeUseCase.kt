@@ -8,7 +8,7 @@ import javax.inject.Inject
  * or not (except the rubbish bin folder)
  */
 class FindNodeWithFingerprintInParentNodeUseCase @Inject constructor(
-    private val getNodeFromCloudUseCase: GetNodeFromCloudUseCase,
+    private val getNodeFromCloudDriveUseCase: GetNodeFromCloudDriveUseCase,
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
 ) {
 
@@ -28,22 +28,21 @@ class FindNodeWithFingerprintInParentNodeUseCase @Inject constructor(
         generatedFingerprint: String?,
         parentNodeId: NodeId,
     ): Pair<Boolean?, NodeId?> {
-        val nodeExists = getNodeFromCloudUseCase(
+
+        val cloudDriveNode = getNodeFromCloudDriveUseCase(
             fingerprint,
             generatedFingerprint,
             parentNodeId,
         )
 
-        return nodeExists?.let { node ->
+        return cloudDriveNode?.let { node ->
             val isNodeInRubbishBin = isNodeInRubbishBinUseCase(node.id)
             val isNodeInParentFolder =
                 node.parentId.longValue == parentNodeId.longValue
 
             when {
                 isNodeInParentFolder -> Pair(true, node.id)
-
                 !isNodeInRubbishBin && !isNodeInParentFolder -> Pair(false, node.id)
-
                 else -> Pair(null, node.id)
             }
         } ?: run {

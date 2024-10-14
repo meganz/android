@@ -14,9 +14,9 @@ class GetNodeByFingerprintAndParentNodeUseCase @Inject constructor(
     /**
      * Get [UnTypedNode] by fingerprint
      * @param fingerprint
-     * @param parentNode [NodeId]
+     * @param parentNodeId [NodeId]
      * @return [UnTypedNode]
      */
-    suspend operator fun invoke(fingerprint: String, parentNode: NodeId) =
-        nodeRepository.getNodeByFingerprintAndParentNode(fingerprint, parentNode)
+    suspend operator fun invoke(fingerprint: String, parentNodeId: NodeId) =
+        nodeRepository.getNodeByFingerprintAndParentNode(fingerprint, parentNodeId)
 }

@@ -408,15 +408,19 @@ interface NodeRepository {
     suspend fun getRootParentNode(nodeId: NodeId): UnTypedNode?
 
     /**
-     * Get [UnTypedNode] by original fingerprint
-     * @param originalFingerprint
-     * @param parentNodeId NodeId
-     * @return [UnTypedNode]
+     * Retrieves the list of Nodes having the same Original Fingerprint
+     *
+     * @param originalFingerprint The Original Fingerprint to search for all Nodes
+     * @param parentNodeId The parent Node Id. if non-null, then it will only return the list of
+     * Nodes under the parent Node. Otherwise, it will search for all Nodes in the account
+     *
+     * @return The list of Nodes having the same Original Fingerprint under the Parent Node.
+     * If no Parent Node is specified, it will return the list of Nodes from the entire account
      */
-    suspend fun getNodeByOriginalFingerprint(
+    suspend fun getNodesByOriginalFingerprint(
         originalFingerprint: String,
         parentNodeId: NodeId?,
-    ): UnTypedNode?
+    ): List<UnTypedNode>
 
     /**
      * Get [UnTypedNode] by fingerprint and parent node
@@ -709,11 +713,13 @@ interface NodeRepository {
     suspend fun getMyUserHandleBinary(): Long
 
     /**
-     * Gets nodes from fingerprint
-     * @param fingerprint
-     * @return list of [UnTypedNode]
+     * Retrieves the list of Nodes having the same Fingerprint
+     *
+     * @param fingerprint The fingerprint to search for all Nodes
+     *
+     * @return The list of Nodes having the same Fingerprint from the entire account
      */
-    suspend fun getNodesFromFingerPrint(fingerprint: String): List<UnTypedNode>
+    suspend fun getNodesByFingerprint(fingerprint: String): List<UnTypedNode>
 
     /**
      * Gets owner of node

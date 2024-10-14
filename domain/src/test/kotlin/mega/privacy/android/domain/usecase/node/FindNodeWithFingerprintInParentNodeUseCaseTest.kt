@@ -15,18 +15,21 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
+/**
+ * Test class for [FindNodeWithFingerprintInParentNodeUseCase]
+ */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class FindNodeWithFingerprintInParentNodeUseCaseTest {
+internal class FindNodeWithFingerprintInParentNodeUseCaseTest {
 
     private lateinit var underTest: FindNodeWithFingerprintInParentNodeUseCase
 
-    private val getNodeFromCloudUseCase = mock<GetNodeFromCloudUseCase>()
+    private val getNodeFromCloudDriveUseCase = mock<GetNodeFromCloudDriveUseCase>()
     private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = FindNodeWithFingerprintInParentNodeUseCase(
-            getNodeFromCloudUseCase = getNodeFromCloudUseCase,
+            getNodeFromCloudDriveUseCase = getNodeFromCloudDriveUseCase,
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
         )
     }
@@ -34,7 +37,7 @@ class FindNodeWithFingerprintInParentNodeUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            getNodeFromCloudUseCase,
+            getNodeFromCloudDriveUseCase,
             isNodeInRubbishBinUseCase,
         )
     }
@@ -73,7 +76,7 @@ class FindNodeWithFingerprintInParentNodeUseCaseTest {
                 else -> null
             }
 
-        whenever(getNodeFromCloudUseCase(fingerprint, generatedFingerprint, parentNodeId))
+        whenever(getNodeFromCloudDriveUseCase(fingerprint, generatedFingerprint, parentNodeId))
             .thenReturn(expectedNode)
         expectedNode?.let {
             whenever(isNodeInRubbishBinUseCase(it.id)).thenReturn(isNodeInRubbishBin)

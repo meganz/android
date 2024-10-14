@@ -51,7 +51,7 @@ class GetOwnNodeUseCaseTest {
         whenever(nodeRepository.getOwnerNodeHandle(NodeId(NOT_FOUND_USER_HANDLE_2))).thenReturn(
             NOT_FOUND_USER_HANDLE_2
         )
-        whenever(nodeRepository.getNodesFromFingerPrint(FINGER_PRINT)).thenReturn(fingerPrintNodes)
+        whenever(nodeRepository.getNodesByFingerprint(FINGER_PRINT)).thenReturn(fingerPrintNodes)
         whenever(addNodeType(expectedUntypedNode)).thenReturn(expected)
         val actual = underTest(fileNode)
         assertThat(actual).isEqualTo(expected)
