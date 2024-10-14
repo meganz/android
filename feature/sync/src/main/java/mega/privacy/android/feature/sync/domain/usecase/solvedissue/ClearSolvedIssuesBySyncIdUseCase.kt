@@ -7,7 +7,7 @@ import javax.inject.Inject
  * Use case to clear all the solved issues related to a specific sync id.
  *
  */
-internal class ClearSolvedIssuesBySyncIdUseCase @Inject constructor(
+class ClearSolvedIssuesBySyncIdUseCase @Inject constructor(
     private val syncSolvedIssuesRepository: SyncSolvedIssuesRepository
 ) {
 

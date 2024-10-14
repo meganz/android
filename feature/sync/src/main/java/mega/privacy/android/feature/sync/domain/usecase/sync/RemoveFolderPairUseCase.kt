@@ -7,7 +7,7 @@ import javax.inject.Inject
 /**
  * Use case to remove a sync and all its related solved issues.
  */
-internal class RemoveFolderPairUseCase @Inject constructor(
+class RemoveFolderPairUseCase @Inject constructor(
     private val syncRepository: SyncRepository,
     private val clearSolvedIssuesBySyncIdUseCase: ClearSolvedIssuesBySyncIdUseCase
 ) {

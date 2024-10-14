@@ -8,6 +8,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.collectChunked
@@ -19,8 +20,11 @@ import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.RemoveFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
+import mega.privacy.android.shared.sync.domain.IsSyncFeatureEnabledUseCase
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -38,6 +42,9 @@ class SyncMonitorViewModel @Inject constructor(
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val pauseResumeSyncsBasedOnBatteryAndWiFiUseCase: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
+    private val isSyncFeatureEnabledUseCase: IsSyncFeatureEnabledUseCase,
+    private val monitorSyncsUseCase: MonitorSyncsUseCase,
+    private val removeSyncUseCase: RemoveFolderPairUseCase,
 ) : ViewModel() {
 
     private var monitorTransferEventsJob: Job? = null
@@ -47,8 +54,15 @@ class SyncMonitorViewModel @Inject constructor(
      * Start monitoring sync state and sync transfers progress
      */
     fun startMonitoring() {
-        monitorCompletedSyncTransfers()
-        monitorSyncState()
+        if (isSyncFeatureEnabledUseCase()) {
+            monitorCompletedSyncTransfers()
+            monitorSyncState()
+        } else {
+            viewModelScope.launch {
+                val syncs = monitorSyncsUseCase().first()
+                syncs.forEach { removeSyncUseCase(it.id) }
+            }
+        }
     }
 
     private fun monitorCompletedSyncTransfers() {

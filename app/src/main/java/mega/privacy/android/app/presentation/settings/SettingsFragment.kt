@@ -168,7 +168,7 @@ class SettingsFragment :
                             state.mediaDiscoveryViewState != MediaDiscoveryViewSettings.DISABLED.ordinal
                     }
 
-                    findPreference<Preference>(KEY_FEATURES_SYNC)?.isEnabled = true
+                    findPreference<Preference>(KEY_FEATURES_SYNC)?.isVisible = state.syncEnabled
                     findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = state.chatEnabled
                     findPreference<Preference>(KEY_FEATURES_CALLS)?.isEnabled = state.callsEnabled
                     updatePasscodeLockSummary(state.passcodeLock)

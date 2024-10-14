@@ -20,6 +20,7 @@ import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventU
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.ui.SyncMonitorViewModel
+import mega.privacy.android.shared.sync.domain.IsSyncFeatureEnabledUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -44,6 +45,9 @@ class SyncMonitorViewModelTest {
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val pauseResumeSyncsBasedOnBatteryAndWiFiUseCase: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase =
         mock()
+    private val isSyncFeatureEnabledUseCase: IsSyncFeatureEnabledUseCase = mock {
+        on { invoke() }.thenReturn(true)
+    }
 
     private lateinit var underTest: SyncMonitorViewModel
 
@@ -134,6 +138,9 @@ class SyncMonitorViewModelTest {
             monitorBatteryInfoUseCase,
             monitorAccountDetailUseCase,
             pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
+            isSyncFeatureEnabledUseCase,
+            mock(),
+            mock()
         )
     }
 }

@@ -30,6 +30,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.sync.domain.IsSyncFeatureEnabledUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -54,6 +55,9 @@ internal class DeviceCenterViewModelTest {
     private val getDevicesUseCase = mock<GetDevicesUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val deviceUINodeListMapper = mock<DeviceUINodeListMapper>()
+    private val isSyncFeatureEnabledUseCase: IsSyncFeatureEnabledUseCase = mock {
+        on { invoke() } doReturn true
+    }
 
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock {
         onBlocking { invoke() } doReturn emptyFlow()
@@ -111,6 +115,7 @@ internal class DeviceCenterViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            isSyncFeatureEnabledUseCase = isSyncFeatureEnabledUseCase
         )
     }
 
