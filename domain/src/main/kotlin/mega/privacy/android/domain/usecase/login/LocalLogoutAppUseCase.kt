@@ -13,6 +13,7 @@ import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.psa.ClearPsaUseCase
+import mega.privacy.android.domain.usecase.transfers.filespermission.ClearTransfersPreferencesUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import javax.inject.Inject
 
@@ -32,6 +33,7 @@ class LocalLogoutAppUseCase @Inject constructor(
     private val albumRepository: AlbumRepository,
     private val clearPsaUseCase: ClearPsaUseCase,
     private val settingsRepository: SettingsRepository,
+    private val clearTransfersPreferencesUseCase: ClearTransfersPreferencesUseCase,
 ) {
 
     /**
@@ -43,6 +45,7 @@ class LocalLogoutAppUseCase @Inject constructor(
             deleteAllActiveTransfers()
             resetPauseTransfers()
         }
+        clearTransfersPreferencesUseCase()
         with(accountRepository) {
             resetAccountAuth()
             cancelAllNotifications()

@@ -15,6 +15,7 @@ import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.psa.ClearPsaUseCase
+import mega.privacy.android.domain.usecase.transfers.filespermission.ClearTransfersPreferencesUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -42,6 +43,7 @@ class LocalLogoutAppUseCaseTest {
     private val clearPsaUseCase = mock<ClearPsaUseCase>()
     private val settingsRepository = mock<SettingsRepository>()
     private val clearCameraUploadsRecordUseCase = mock<ClearCameraUploadsRecordUseCase>()
+    private val clearTransfersPreferencesUseCase = mock<ClearTransfersPreferencesUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -58,6 +60,7 @@ class LocalLogoutAppUseCaseTest {
             clearPsaUseCase = clearPsaUseCase,
             settingsRepository = settingsRepository,
             clearCameraUploadsRecordUseCase = clearCameraUploadsRecordUseCase,
+            clearTransfersPreferencesUseCase = clearTransfersPreferencesUseCase,
         )
     }
 
@@ -73,6 +76,7 @@ class LocalLogoutAppUseCaseTest {
             stopAudioService,
             clearPsaUseCase,
             clearCameraUploadsRecordUseCase,
+            clearTransfersPreferencesUseCase,
         )
     }
 
@@ -83,6 +87,7 @@ class LocalLogoutAppUseCaseTest {
         verify(transferRepository).cancelTransfers()
         verify(transferRepository).deleteAllActiveTransfers()
         verify(transferRepository).resetPauseTransfers()
+        verify(clearTransfersPreferencesUseCase).invoke()
         verify(accountRepository).resetAccountAuth()
         verify(accountRepository).cancelAllNotifications()
         verify(accountRepository).clearAppDataAndCache()
