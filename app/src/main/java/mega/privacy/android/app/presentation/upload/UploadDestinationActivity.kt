@@ -154,6 +154,18 @@ class UploadDestinationActivity : AppCompatActivity() {
         )
     }
 
+    /**
+     * handle new intents
+     * sets the new intent and updates the content
+     *
+     * @param intent
+     */
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent()
+    }
+
     companion object {
         /**
          * Extra name map
