@@ -244,9 +244,11 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     private suspend fun getVideoPlaylists() =
-        getVideoPlaylistsUseCase().updateOriginalPlaylistData().map { videoPlaylist ->
-            videoPlaylistUIEntityMapper(videoPlaylist)
-        }
+        getVideoPlaylistsUseCase()
+            .filterIsInstance<UserVideoPlaylist>()
+            .updateOriginalPlaylistData().map { videoPlaylist ->
+                videoPlaylistUIEntityMapper(videoPlaylist)
+            }
 
     private fun List<VideoPlaylist>.updateOriginalPlaylistData() = also { data ->
         if (originalPlaylistData.isNotEmpty()) {

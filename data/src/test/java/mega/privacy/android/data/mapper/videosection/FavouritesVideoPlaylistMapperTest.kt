@@ -4,8 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
-import mega.privacy.android.domain.entity.set.UserSet
-import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
+import mega.privacy.android.domain.entity.videosection.FavouritesVideoPlaylist
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -15,14 +14,9 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UserVideoPlaylistMapperTest {
-    private lateinit var underTest: UserVideoPlaylistMapper
+class FavouritesVideoPlaylistMapperTest {
+    private lateinit var underTest: FavouritesVideoPlaylistMapper
 
-    private val id = 123456L
-    private val name = "title name"
-    private val cover: Long? = null
-    private val creationTime = 100L
-    private val modificationTime = 200L
     private val duration = 100
 
     private val videoNodeList = listOf(
@@ -41,15 +35,14 @@ class UserVideoPlaylistMapperTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = UserVideoPlaylistMapper()
+        underTest = FavouritesVideoPlaylistMapper()
     }
 
     @Test
     fun `test that VideoPlaylist can be mapped correctly when videoNodeList is empty`() =
         runTest {
             val videoPlaylist = underTest(
-                userSet = initUserSet(),
-                videoNodeList = emptyList(),
+                videoNodeList = emptyList()
             )
             assertMappedVideoPlaylistObject(
                 videoPlaylist = videoPlaylist,
@@ -65,10 +58,7 @@ class UserVideoPlaylistMapperTest {
     fun `test that VideoPlaylist can be mapped correctly when videoNodeList is not empty`() =
         runTest {
             val expectedTotalDuration = (duration * videoNodeList.size).seconds
-            val videoPlaylist = underTest(
-                userSet = initUserSet(),
-                videoNodeList = videoNodeList,
-            )
+            val videoPlaylist = underTest(videoNodeList)
             assertMappedVideoPlaylistObject(
                 videoPlaylist = videoPlaylist,
                 expectedThumbnailSize = videoNodeList.size,
@@ -82,10 +72,7 @@ class UserVideoPlaylistMapperTest {
     @Test
     fun `test that VideoPlaylist can be mapped correctly when thumbnailList item is null`() =
         runTest {
-            val videoPlaylist = underTest(
-                userSet = initUserSet(),
-                videoNodeList = emptyList(),
-            )
+            val videoPlaylist = underTest(emptyList())
             assertMappedVideoPlaylistObject(
                 videoPlaylist = videoPlaylist,
                 expectedThumbnailSize = null,
@@ -96,16 +83,8 @@ class UserVideoPlaylistMapperTest {
             )
         }
 
-    private fun initUserSet() = mock<UserSet> {
-        on { id }.thenReturn(id)
-        on { name }.thenReturn(name)
-        on { cover }.thenReturn(cover)
-        on { creationTime }.thenReturn(creationTime)
-        on { modificationTime }.thenReturn(modificationTime)
-    }
-
     private fun assertMappedVideoPlaylistObject(
-        videoPlaylist: UserVideoPlaylist,
+        videoPlaylist: FavouritesVideoPlaylist,
         expectedThumbnailSize: Int?,
         expectedNodeIdRelatedToThumbnail: NodeId?,
         expectedNumberOfVideos: Int,
@@ -114,12 +93,7 @@ class UserVideoPlaylistMapperTest {
     ) {
         videoPlaylist.let {
             assertAll(
-                "Grouped Assertions of ${UserVideoPlaylist::class.simpleName}",
-                { assertThat(it.id.longValue).isEqualTo(id) },
-                { assertThat(it.title).isEqualTo(name) },
-                { assertThat(it.cover).isEqualTo(cover) },
-                { assertThat(it.creationTime).isEqualTo(creationTime) },
-                { assertThat(it.modificationTime).isEqualTo(modificationTime) },
+                "Grouped Assertions of ${FavouritesVideoPlaylist::class.simpleName}",
                 { assertThat(it.thumbnailList?.size).isEqualTo(expectedThumbnailSize) },
                 { assertThat(it.thumbnailList?.get(0)).isEqualTo(expectedNodeIdRelatedToThumbnail) },
                 { assertThat(it.numberOfVideos).isEqualTo(expectedNumberOfVideos) },

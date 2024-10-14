@@ -417,7 +417,10 @@ class VideoSectionViewModelTest {
     }
 
     private suspend fun initVideoPlaylistsReturned() {
-        whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(mock(), mock()))
+        val userVideoPlaylists = (1..2).map {
+            mock<UserVideoPlaylist>()
+        }
+        whenever(getVideoPlaylistsUseCase()).thenReturn(userVideoPlaylists)
         whenever(videoPlaylistUIEntityMapper(any())).thenReturn(videoPlaylistUIEntity)
     }
 

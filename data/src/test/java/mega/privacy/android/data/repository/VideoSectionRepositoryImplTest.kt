@@ -18,6 +18,7 @@ import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
+import mega.privacy.android.data.mapper.videosection.FavouritesVideoPlaylistMapper
 import mega.privacy.android.data.mapper.videosection.UserVideoPlaylistMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
 import mega.privacy.android.data.model.GlobalUpdate
@@ -30,6 +31,7 @@ import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.set.UserSet
+import mega.privacy.android.domain.entity.videosection.FavouritesVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.repository.VideoSectionRepository
 import nz.mega.sdk.MegaApiJava
@@ -74,6 +76,7 @@ class VideoSectionRepositoryImplTest {
     private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
     private val appPreferencesGateway = mock<AppPreferencesGateway>()
     private val videoRecentlyWatchedItemMapper = mock<VideoRecentlyWatchedItemMapper>()
+    private val favouritesVideoPlaylistMapper = mock<FavouritesVideoPlaylistMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -94,6 +97,7 @@ class VideoSectionRepositoryImplTest {
             megaSearchFilterMapper = megaSearchFilterMapper,
             appPreferencesGateway = appPreferencesGateway,
             videoRecentlyWatchedItemMapper = videoRecentlyWatchedItemMapper,
+            favouritesVideoPlaylistMapper = favouritesVideoPlaylistMapper,
             ioDispatcher = UnconfinedTestDispatcher()
         )
     }
@@ -108,7 +112,8 @@ class VideoSectionRepositoryImplTest {
             megaLocalRoomGateway,
             userVideoPlaylistMapper,
             appPreferencesGateway,
-            videoRecentlyWatchedItemMapper
+            videoRecentlyWatchedItemMapper,
+            favouritesVideoPlaylistMapper
         )
     }
 
@@ -157,7 +162,7 @@ class VideoSectionRepositoryImplTest {
         whenever(typedVideoNodeMapper(fileNode, node.duration, null)).thenReturn(typedVideoNode)
         initUnderTest()
         val actual = underTest.getAllVideos(SortOrder.ORDER_MODIFICATION_DESC)
-        assertThat(actual.isNotEmpty()).isTrue()
+        assertThat(actual).isNotEmpty()
         assertThat(actual.size).isEqualTo(2)
     }
 
@@ -178,11 +183,29 @@ class VideoSectionRepositoryImplTest {
             }
 
             initReturnValues(megaSetList, megaSetElementList)
+            initEmptyFavouritesVideoPlaylist()
             initUnderTest()
             val actual = underTest.getVideoPlaylists()
-            assertThat(actual.isNotEmpty()).isTrue()
-            assertThat(actual.size).isEqualTo(2)
+            assertThat(actual).isNotEmpty()
+            assertThat(actual.size).isEqualTo(3)
+            assertThat(actual[0] is FavouritesVideoPlaylist).isTrue()
         }
+
+    private suspend fun initEmptyFavouritesVideoPlaylist() {
+        val filter = mock<MegaSearchFilter>()
+        val token = mock<MegaCancelToken>()
+        whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+        whenever(
+            megaSearchFilterMapper(
+                searchTarget = SearchTarget.ROOT_NODES,
+                searchCategory = SearchCategory.VIDEO
+            )
+        ).thenReturn(filter)
+        whenever(
+            megaApiGateway.searchWithFilter(filter, sortOrderIntMapper(SortOrder.ORDER_NONE), token)
+        ).thenReturn(emptyList())
+        whenever(favouritesVideoPlaylistMapper(anyOrNull())).thenReturn(mock())
+    }
 
     @Test
     fun `test that get video playlists returns correctly when all set types are not SET_TYPE_PLAYLIST`() =
@@ -201,9 +224,12 @@ class VideoSectionRepositoryImplTest {
             }
 
             initReturnValues(megaSetList, megaSetElementList)
+            initEmptyFavouritesVideoPlaylist()
             initUnderTest()
             val actual = underTest.getVideoPlaylists()
-            assertThat(actual.isEmpty()).isTrue()
+            assertThat(actual).isNotEmpty()
+            assertThat(actual.size).isEqualTo(1)
+            assertThat(actual[0] is FavouritesVideoPlaylist).isTrue()
         }
 
     @Test
@@ -223,10 +249,12 @@ class VideoSectionRepositoryImplTest {
             }
 
             initReturnValues(megaSetList, megaSetElementList)
+            initEmptyFavouritesVideoPlaylist()
             initUnderTest()
             val actual = underTest.getVideoPlaylists()
-            assertThat(actual.isNotEmpty()).isTrue()
-            assertThat(actual.size).isEqualTo(1)
+            assertThat(actual).isNotEmpty()
+            assertThat(actual.size).isEqualTo(2)
+            assertThat(actual[0] is FavouritesVideoPlaylist).isTrue()
         }
 
     private suspend fun initReturnValues(
@@ -252,6 +280,7 @@ class VideoSectionRepositoryImplTest {
                 on { duration.inWholeSeconds }.thenReturn(100L)
                 on { isOutShared }.thenReturn(false)
                 on { watchedTimestamp }.thenReturn(0L)
+                on { isFavourite }.thenReturn(false)
             }
 
             val testVideos: List<TypedVideoNode> =
@@ -277,11 +306,12 @@ class VideoSectionRepositoryImplTest {
             )
             whenever(megaApiGateway.isInRubbish(any())).thenReturn(false)
             whenever(userVideoPlaylistMapper(userSet, testVideos)).thenReturn(testVideoPlaylist)
+            initEmptyFavouritesVideoPlaylist()
             initUnderTest()
             val actual = underTest.getVideoPlaylists()
-            assertThat(actual.isNotEmpty()).isTrue()
-            assertThat(actual.size).isEqualTo(1)
-            assertThat(actual[0].videos?.size).isEqualTo(3)
+            assertThat(actual).isNotEmpty()
+            assertThat(actual.size).isEqualTo(2)
+            assertThat(actual[1].videos?.size).isEqualTo(3)
         }
 
     private suspend fun getUserSetAndInitReturnValues(): UserSet {
@@ -328,11 +358,13 @@ class VideoSectionRepositoryImplTest {
 
             whenever(megaApiGateway.isInRubbish(any())).thenReturn(true)
             whenever(userVideoPlaylistMapper(userSet, emptyList())).thenReturn(testVideoPlaylist)
+            whenever(favouritesVideoPlaylistMapper(anyOrNull())).thenReturn(mock())
+            initEmptyFavouritesVideoPlaylist()
             initUnderTest()
             val actual = underTest.getVideoPlaylists()
-            assertThat(actual.isNotEmpty()).isTrue()
-            assertThat(actual.size).isEqualTo(1)
-            assertThat(actual[0]).isEqualTo(testVideoPlaylist)
+            assertThat(actual).isNotEmpty()
+            assertThat(actual.size).isEqualTo(2)
+            assertThat(actual[1]).isEqualTo(testVideoPlaylist)
         }
 
     @Test
@@ -649,6 +681,79 @@ class VideoSectionRepositoryImplTest {
         }
 
     @Test
+    fun `test that gets video playlists returns correctly with Favourites video playlist has the correct items`() =
+        runTest {
+            val megaSets = (1..2L).map {
+                createMegaSet(it)
+            }
+            val megaSetList = mock<MegaSetList> {
+                on { size() }.thenReturn(2L)
+                megaSets.mapIndexed { index, set ->
+                    on { get(index.toLong()) }.thenReturn(set)
+                }
+            }
+            val megaSetElementList = mock<MegaSetElementList> {
+                on { size() }.thenReturn(0L)
+            }
+            initReturnValues(megaSetList, megaSetElementList)
+
+            val megaNodes = (1..3L).map {
+                initMegaNode(it, it != 2L)
+            }
+            val fileNodes = megaNodes.map {
+                mock<TypedFileNode>()
+            }
+            val typedVideoNodes = megaNodes.map {
+                initTypedVideoNode(it.handle, 100, null, it.handle != 2L)
+            }
+            val expectedVideos = typedVideoNodes.filter { it.isFavourite }
+            val favouritesVideoPlaylist = mock<FavouritesVideoPlaylist> {
+                on { videos }.thenReturn(expectedVideos)
+            }
+            val filter = mock<MegaSearchFilter>()
+            val token = mock<MegaCancelToken>()
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(sortOrderIntMapper(SortOrder.ORDER_NONE)).thenReturn(ORDER_DEFAULT_DESC)
+            whenever(
+                megaSearchFilterMapper(
+                    searchTarget = SearchTarget.ROOT_NODES,
+                    searchCategory = SearchCategory.VIDEO
+                )
+            ).thenReturn(filter)
+            whenever(
+                megaApiGateway.searchWithFilter(
+                    filter,
+                    sortOrderIntMapper(SortOrder.ORDER_NONE),
+                    token
+                )
+            ).thenReturn(megaNodes)
+            whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(emptyList())
+            megaNodes.mapIndexed { index, node ->
+                whenever(
+                    fileNodeMapper(megaNode = node, requireSerializedData = false, offline = null)
+                ).thenReturn(fileNodes[index])
+                whenever(typedVideoNodeMapper(fileNodes[index], node.duration, null))
+                    .thenReturn(typedVideoNodes[index])
+            }
+            whenever(favouritesVideoPlaylistMapper(expectedVideos)).thenReturn(
+                favouritesVideoPlaylist
+            )
+
+            initUnderTest()
+            val actual = underTest.getVideoPlaylists()
+            assertThat(actual).isNotEmpty()
+            assertThat(actual.size).isEqualTo(3)
+            actual[0].let { playlist ->
+                assertThat(playlist is FavouritesVideoPlaylist).isTrue()
+                assertThat(playlist.videos?.size).isEqualTo(2)
+                playlist.videos?.let {
+                    assertThat(it[0].id.longValue).isEqualTo(1L)
+                    assertThat(it[1].id.longValue).isEqualTo(3L)
+                }
+            }
+        }
+
+    @Test
     fun `test that saveVideoRecentlyWatched function is invoked as expected with migrating the old data`() =
         runTest {
             val testHandle = 12345L
@@ -778,7 +883,7 @@ class VideoSectionRepositoryImplTest {
                     "PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS",
                     Json.encodeToString(emptyList<VideoRecentlyWatchedItem>())
                 )
-                assertThat(actual.isNotEmpty()).isTrue()
+                assertThat(actual).isNotEmpty()
                 assertThat(actual.size).isEqualTo(3)
                 testTimestamps.sortedByDescending { it }.mapIndexed { index, expectedTimestamp ->
                     assertThat(actual[index].watchedTimestamp).isEqualTo(expectedTimestamp)
@@ -790,18 +895,24 @@ class VideoSectionRepositoryImplTest {
             }
         }
 
-    private fun initMegaNode(nodeHandle: Long) = mock<MegaNode> {
+    private fun initMegaNode(nodeHandle: Long, favourite: Boolean = true) = mock<MegaNode> {
         on { handle }.thenReturn(nodeHandle)
         on { duration }.thenReturn(100)
-        on { isFavourite }.thenReturn(true)
+        on { isFavourite }.thenReturn(favourite)
     }
 
-    private fun initTypedVideoNode(nodeHandle: Long, timestamp: Long, title: String?) =
+    private fun initTypedVideoNode(
+        nodeHandle: Long,
+        timestamp: Long,
+        title: String?,
+        favourite: Boolean = false,
+    ) =
         mock<TypedVideoNode> {
             on { id }.thenReturn(NodeId(nodeHandle))
             on { duration }.thenReturn(100.seconds)
             on { watchedTimestamp }.thenReturn(timestamp)
             on { collectionTitle }.thenReturn(title)
+            on { isFavourite }.thenReturn(favourite)
         }
 
     @Test

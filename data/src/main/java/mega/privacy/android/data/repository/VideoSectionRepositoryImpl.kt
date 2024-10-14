@@ -26,6 +26,7 @@ import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.videos.TypedVideoNodeMapper
+import mega.privacy.android.data.mapper.videosection.FavouritesVideoPlaylistMapper
 import mega.privacy.android.data.mapper.videosection.UserVideoPlaylistMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
 import mega.privacy.android.data.model.GlobalUpdate
@@ -37,6 +38,7 @@ import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.set.UserSet
+import mega.privacy.android.domain.entity.videosection.FavouritesVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.VideoSectionRepository
@@ -63,6 +65,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
     private val appPreferencesGateway: AppPreferencesGateway,
     private val videoRecentlyWatchedItemMapper: VideoRecentlyWatchedItemMapper,
+    private val favouritesVideoPlaylistMapper: FavouritesVideoPlaylistMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : VideoSectionRepository {
     private val videoPlaylistsMap: MutableMap<Long, UserSet> = mutableMapOf()
@@ -71,16 +74,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
     override suspend fun getAllVideos(order: SortOrder): List<TypedVideoNode> =
         withContext(ioDispatcher) {
             val offlineItems = getAllOfflineNodeHandle()
-            val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
-            val filter = megaSearchFilterMapper(
-                searchTarget = SearchTarget.ROOT_NODES,
-                searchCategory = SearchCategory.VIDEO
-            )
-            megaApiGateway.searchWithFilter(
-                filter,
-                sortOrderIntMapper(order),
-                megaCancelToken,
-            ).map { megaNode ->
+            getAllVideoMegaNodes(order).map { megaNode ->
                 val isOutShared =
                     megaApiGateway.getMegaNodeByHandle(megaNode.parentHandle)?.isOutShare == true
                 typedVideoNodeMapper(
@@ -90,6 +84,19 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                 )
             }
         }
+
+    private suspend fun getAllVideoMegaNodes(order: SortOrder): List<MegaNode> {
+        val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
+        val filter = megaSearchFilterMapper(
+            searchTarget = SearchTarget.ROOT_NODES,
+            searchCategory = SearchCategory.VIDEO
+        )
+        return megaApiGateway.searchWithFilter(
+            filter,
+            sortOrderIntMapper(order),
+            megaCancelToken,
+        )
+    }
 
     private suspend fun getAllOfflineNodeHandle() =
         megaLocalRoomGateway.getAllOfflineInfo().associateBy { it.handle }
@@ -101,10 +108,26 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
     override suspend fun getVideoPlaylists(): List<VideoPlaylist> =
         withContext(ioDispatcher) {
             val offlineItems = getAllOfflineNodeHandle()
-            getAllUserSets().map { userSet ->
+            val systemVideoPlaylist = listOf(getFavouritesVideoPlaylist(offlineItems))
+            val userVideoPlaylists = getAllUserSets().map { userSet ->
                 userSet.toVideoPlaylist(offlineItems)
             }
+            systemVideoPlaylist + userVideoPlaylists
         }
+
+    private suspend fun getFavouritesVideoPlaylist(offlineItems: Map<String, Offline>): FavouritesVideoPlaylist {
+        val favouriteVideos =
+            getAllVideoMegaNodes(SortOrder.ORDER_NONE).filter { it.isFavourite }.map { megaNode ->
+                val isOutShared =
+                    megaApiGateway.getMegaNodeByHandle(megaNode.parentHandle)?.isOutShare == true
+                typedVideoNodeMapper(
+                    fileNode = megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()]),
+                    duration = megaNode.duration,
+                    isOutShared = isOutShared
+                )
+            }
+        return favouritesVideoPlaylistMapper(favouriteVideos)
+    }
 
     private suspend fun getAllUserSets(): List<UserSet> {
         videoPlaylistsMap.clear()

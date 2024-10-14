@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.videosection.FavouritesVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.repository.VideoSectionRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -21,6 +22,8 @@ class GetVideoPlaylistsUseCaseTest {
     private lateinit var underTest: GetVideoPlaylistsUseCase
     private val videoSectionRepository = mock<VideoSectionRepository>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
+
+    private val favouritesVideoPlaylist = mock<FavouritesVideoPlaylist>()
 
     @BeforeAll
     fun setUp() {
@@ -46,12 +49,13 @@ class GetVideoPlaylistsUseCaseTest {
     @Test
     fun `test that order of returned videoPlaylists is correctly when SortOrder is ORDER_DEFAULT_ASC`() =
         runTest {
-            val playlist1 = initVideoPlaylist(title = "c")
-            val playlist2 = initVideoPlaylist(title = "b")
-            val playlist3 = initVideoPlaylist(title = "a")
+            val playlist1 = initUserVideoPlaylist(title = "c")
+            val playlist2 = initUserVideoPlaylist(title = "b")
+            val playlist3 = initUserVideoPlaylist(title = "a")
 
             initOrder(SortOrder.ORDER_DEFAULT_ASC)
             val list = listOf(
+                favouritesVideoPlaylist,
                 playlist1,
                 playlist2,
                 playlist3
@@ -59,20 +63,22 @@ class GetVideoPlaylistsUseCaseTest {
             whenever(videoSectionRepository.getVideoPlaylists()).thenReturn(list)
             val actual = underTest()
             assertThat(actual).isNotEmpty()
-            assertThat((actual[0] as? UserVideoPlaylist)?.title).isEqualTo(playlist3.title)
-            assertThat((actual[1] as? UserVideoPlaylist)?.title).isEqualTo(playlist2.title)
-            assertThat((actual[2] as? UserVideoPlaylist)?.title).isEqualTo(playlist1.title)
+            assertThat((actual[0] is FavouritesVideoPlaylist)).isTrue()
+            assertThat((actual[1] as? UserVideoPlaylist)?.title).isEqualTo(playlist3.title)
+            assertThat((actual[2] as? UserVideoPlaylist)?.title).isEqualTo(playlist2.title)
+            assertThat((actual[3] as? UserVideoPlaylist)?.title).isEqualTo(playlist1.title)
         }
 
     @Test
     fun `test that order of returned videoPlaylists is based on ORDER_DEFAULT_ASC when SortOrder is ORDER_LABEL_DESC`() =
         runTest {
-            val playlist1 = initVideoPlaylist(title = "c")
-            val playlist2 = initVideoPlaylist(title = "b")
-            val playlist3 = initVideoPlaylist(title = "a")
+            val playlist1 = initUserVideoPlaylist(title = "c")
+            val playlist2 = initUserVideoPlaylist(title = "b")
+            val playlist3 = initUserVideoPlaylist(title = "a")
 
             initOrder(SortOrder.ORDER_LABEL_DESC)
             val list = listOf(
+                favouritesVideoPlaylist,
                 playlist1,
                 playlist2,
                 playlist3
@@ -80,20 +86,22 @@ class GetVideoPlaylistsUseCaseTest {
             whenever(videoSectionRepository.getVideoPlaylists()).thenReturn(list)
             val actual = underTest()
             assertThat(actual).isNotEmpty()
-            assertThat((actual[0] as? UserVideoPlaylist)?.title).isEqualTo(playlist3.title)
-            assertThat((actual[1] as? UserVideoPlaylist)?.title).isEqualTo(playlist2.title)
-            assertThat((actual[2] as? UserVideoPlaylist)?.title).isEqualTo(playlist1.title)
+            assertThat((actual[0] is FavouritesVideoPlaylist)).isTrue()
+            assertThat((actual[1] as? UserVideoPlaylist)?.title).isEqualTo(playlist3.title)
+            assertThat((actual[2] as? UserVideoPlaylist)?.title).isEqualTo(playlist2.title)
+            assertThat((actual[3] as? UserVideoPlaylist)?.title).isEqualTo(playlist1.title)
         }
 
     @Test
     fun `test that order of returned videoPlaylists is correctly when SortOrder is ORDER_MODIFICATION_ASC`() =
         runTest {
-            val playlist1 = initVideoPlaylist(title = "a", creationTime = 3L)
-            val playlist2 = initVideoPlaylist(title = "b", creationTime = 2L)
-            val playlist3 = initVideoPlaylist(title = "c", creationTime = 1L)
+            val playlist1 = initUserVideoPlaylist(title = "a", creationTime = 3L)
+            val playlist2 = initUserVideoPlaylist(title = "b", creationTime = 2L)
+            val playlist3 = initUserVideoPlaylist(title = "c", creationTime = 1L)
 
             initOrder(SortOrder.ORDER_MODIFICATION_ASC)
             val list = listOf(
+                favouritesVideoPlaylist,
                 playlist1,
                 playlist2,
                 playlist3
@@ -101,20 +109,22 @@ class GetVideoPlaylistsUseCaseTest {
             whenever(videoSectionRepository.getVideoPlaylists()).thenReturn(list)
             val actual = underTest()
             assertThat(actual).isNotEmpty()
-            assertThat((actual[0] as? UserVideoPlaylist)?.creationTime).isEqualTo(playlist3.creationTime)
-            assertThat((actual[1] as? UserVideoPlaylist)?.creationTime).isEqualTo(playlist2.creationTime)
-            assertThat((actual[2] as? UserVideoPlaylist)?.creationTime).isEqualTo(playlist1.creationTime)
+            assertThat((actual[0] is FavouritesVideoPlaylist)).isTrue()
+            assertThat((actual[1] as? UserVideoPlaylist)?.creationTime).isEqualTo(playlist3.creationTime)
+            assertThat((actual[2] as? UserVideoPlaylist)?.creationTime).isEqualTo(playlist2.creationTime)
+            assertThat((actual[3] as? UserVideoPlaylist)?.creationTime).isEqualTo(playlist1.creationTime)
         }
 
     @Test
     fun `test that order of returned videoPlaylists is based on ORDER_DEFAULT_ASC when SortOrder is ORDER_MODIFICATION_ASC and creationTimes are same`() =
         runTest {
-            val playlist1 = initVideoPlaylist(title = "c", creationTime = 0L)
-            val playlist2 = initVideoPlaylist(title = "b", creationTime = 0L)
-            val playlist3 = initVideoPlaylist(title = "a", creationTime = 0L)
+            val playlist1 = initUserVideoPlaylist(title = "c", creationTime = 0L)
+            val playlist2 = initUserVideoPlaylist(title = "b", creationTime = 0L)
+            val playlist3 = initUserVideoPlaylist(title = "a", creationTime = 0L)
 
             initOrder(SortOrder.ORDER_MODIFICATION_ASC)
             val list = listOf(
+                favouritesVideoPlaylist,
                 playlist1,
                 playlist2,
                 playlist3
@@ -122,9 +132,10 @@ class GetVideoPlaylistsUseCaseTest {
             whenever(videoSectionRepository.getVideoPlaylists()).thenReturn(list)
             val actual = underTest()
             assertThat(actual).isNotEmpty()
-            assertThat((actual[0] as? UserVideoPlaylist)?.title).isEqualTo(playlist3.title)
-            assertThat((actual[1] as? UserVideoPlaylist)?.title).isEqualTo(playlist2.title)
-            assertThat((actual[2] as? UserVideoPlaylist)?.title).isEqualTo(playlist1.title)
+            assertThat((actual[0] is FavouritesVideoPlaylist)).isTrue()
+            assertThat((actual[1] as? UserVideoPlaylist)?.title).isEqualTo(playlist3.title)
+            assertThat((actual[2] as? UserVideoPlaylist)?.title).isEqualTo(playlist2.title)
+            assertThat((actual[3] as? UserVideoPlaylist)?.title).isEqualTo(playlist1.title)
         }
 
     @Test
@@ -139,7 +150,7 @@ class GetVideoPlaylistsUseCaseTest {
         whenever(getCloudSortOrder()).thenReturn(order)
     }
 
-    private fun initVideoPlaylist(
+    private fun initUserVideoPlaylist(
         id: Long = 1L,
         title: String = "",
         numberOfVideos: Int = 0,

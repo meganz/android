@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.videosection
 
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.videosection.SystemVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.repository.VideoSectionRepository
@@ -29,8 +30,9 @@ class GetVideoPlaylistsUseCase @Inject constructor(
             }
         }
 
-    private suspend fun orderVideoPlaylists(playlists: List<VideoPlaylist>) =
-        when (getCloudSortOrder()) {
+    private suspend fun orderVideoPlaylists(playlists: List<VideoPlaylist>): List<VideoPlaylist> {
+        val systemVideoPlaylist = playlists.filterIsInstance<SystemVideoPlaylist>()
+        val userVideoPlaylist = when (getCloudSortOrder()) {
             SortOrder.ORDER_DEFAULT_ASC,
             SortOrder.ORDER_LABEL_DESC,
             SortOrder.ORDER_FAV_DESC,
@@ -59,4 +61,6 @@ class GetVideoPlaylistsUseCase @Inject constructor(
 
             else -> playlists
         }
+        return systemVideoPlaylist + userVideoPlaylist
+    }
 }
