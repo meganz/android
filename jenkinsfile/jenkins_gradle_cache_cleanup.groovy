@@ -34,8 +34,9 @@ pipeline {
             script {
                 common = load('jenkinsfile/common.groovy')
                 common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
-                slackSend color: 'danger', message: "Jenkins gradle clean up failed! <@U02G29K2065>"
-                slackUploadFile filePath: CONSOLE_LOG_FILE, initialComment: 'Jenkins Log'
+                String jenkinsLog = common.uploadFileToArtifactory("jenkins_gradle_cache_cleanup", CONSOLE_LOG_FILE)
+                String buildLog = "Build Log: <${jenkinsLog}|${CONSOLE_LOG_FILE}>"
+                slackSend color: 'danger', message: "${buildLog}\nJenkins gradle clean up failed! <@U02G29K2065>"
             }
         }
         success {

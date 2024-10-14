@@ -51,15 +51,17 @@ pipeline {
                 // Don't send message for validation errors
                 if (BUILD_STEP != 'Validation') {
                     common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
+                    String jenkinsLog = common.uploadFileToArtifactory("android_promote", CONSOLE_LOG_FILE)
+                    String buildLog = "Build Log: <${jenkinsLog}|${CONSOLE_LOG_FILE}>"
                     String track = params.TRACK.toLowerCase()
                     String version = params.VERSION
                     String versionName = extractVersionName(version)
                     String percentage = params.PERCENTAGE
-                    String message = ""
+                    String message = "${buildLog}\n"
                     if (isHaltRollout(percentage)) {
-                        message = "Hi <!subteam^S02B2PB5SG7>, halting the $track rollout for v${version} has failed, please check."
+                        message += "Hi <!subteam^S02B2PB5SG7>, halting the $track rollout for v${version} has failed, please check."
                     } else {
-                        message = "Hi <!subteam^S02B2PB5SG7>, the promotion to $track has failed for v${version} at ${percentage}% rollout, please check."
+                        message += "Hi <!subteam^S02B2PB5SG7>, the promotion to $track has failed for v${version} at ${percentage}% rollout, please check."
                     }
 
                     def slackChannelId = common.fetchSlackChannelIdsByReleaseVersion(versionName)[0]
@@ -68,7 +70,6 @@ pipeline {
                     } else {
                         slackSend channel: slackChannelId, color: "danger", message: message, replyBroadcast: true
                     }
-                    slackUploadFile filePath: CONSOLE_LOG_FILE, initialComment: 'Jenkins Log'
                 }
             }
         }

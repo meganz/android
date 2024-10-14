@@ -51,9 +51,10 @@ pipeline {
             script {
                 withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
                     def comment = ":x: Android Lint Build failed"
-                    slackSend color: "danger", message: comment
                     sh 'curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o console.txt'
-                    slackUploadFile filePath: "console.txt", initialComment: "Android Build Log"
+                    String jenkinsLog = common.uploadFileToArtifactory("lint_and_warning", CONSOLE_LOG_FILE)
+                    String buildLog = "Build Log: <${jenkinsLog}|${CONSOLE_LOG_FILE}>"
+                    slackSend color: "danger", message: buildLog + "\n" + comment
                 }
             }
         }

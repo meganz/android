@@ -71,9 +71,10 @@ pipeline {
         failure {
             script {
                 common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
-                String postfix = "Hi <!subteam^S02B2PB5SG7>, internal release pipeline has failed, please check."  // Notify all Android devs in Slack
+                String jenkinsLog = common.uploadFileToArtifactory("android_release_internal", CONSOLE_LOG_FILE)
+                String buildLog = "Build Log: <${jenkinsLog}|${CONSOLE_LOG_FILE}>"
+                String postfix = "${buildLog}\nHi <!subteam^S02B2PB5SG7>, internal release pipeline has failed, please check."  // Notify all Android devs in Slack
                 slackSend color: 'danger', message: common.releaseFailureMessage("\n", postfix)
-                slackUploadFile filePath: CONSOLE_LOG_FILE, initialComment: 'Jenkins Log'
             }
         }
         success {

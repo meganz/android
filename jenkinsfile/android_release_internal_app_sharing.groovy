@@ -49,9 +49,8 @@ pipeline {
             script {
                 common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
 
+                String jenkinsLog = common.uploadFileToArtifactory("android_internal_app_sharing", CONSOLE_LOG_FILE)
                 if (hasGitLabMergeRequest()) {
-                    String jenkinsLog = common.uploadFileToArtifactory(CONSOLE_LOG_FILE)
-
                     def message = ""
                     if (triggeredByDeliverInternalAppSharing()) {
                         message = common.releaseFailureMessage("<br/>") +
@@ -59,8 +58,8 @@ pipeline {
                     }
                     common.sendToMR(message)
                 } else {
-                    slackSend color: 'danger', message: common.releaseFailureMessage("\n")
-                    slackUploadFile filePath: CONSOLE_LOG_FILE, initialComment: 'Jenkins Log'
+                    String postfix = "Build Log: <${jenkinsLog}|${CONSOLE_LOG_FILE}>"
+                    slackSend color: 'danger', message: common.releaseFailureMessage("\n", postfix)
                 }
             }
         }
@@ -68,7 +67,7 @@ pipeline {
             script {
                 if (hasGitLabMergeRequest()) {
                     common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
-                    String link = common.uploadFileToArtifactory(CONSOLE_LOG_FILE)
+                    String link = common.uploadFileToArtifactory("android_internal_app_sharing", CONSOLE_LOG_FILE)
 
                     if (triggeredByDeliverInternalAppSharing()) {
                         def message = releaseSuccessMessage("<br/>", common) +

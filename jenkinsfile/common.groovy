@@ -683,6 +683,29 @@ String uploadFileToArtifactory(String fileName) {
 }
 
 /**
+ * Upload a file to Artifactory.
+ * The file will be uploaded to "android-mega/pipeline-uploads" folder in Artifactory.
+ * The file will be uploaded to a folder and named "folder/<BUILD_NUMBER>-<FILE_NAME>".
+ * @param fileName the file to upload
+ * @return the URL of the uploaded file.
+ */
+String uploadFileToArtifactory(String folder, String fileName) {
+    String targetFolder = "artifactory/android-mega/pipeline-uploads"
+    String targetFile = "${folder}/${env.BUILD_NUMBER}-${fileName}"
+
+    useArtifactory() {
+        String remoteTargetPath = "${env.ARTIFACTORY_BASE_URL}/${targetFolder}/${targetFile}"
+        String uploadCmd = "curl -u ${env.ARTIFACTORY_USER}:${env.ARTIFACTORY_ACCESS_TOKEN} -T ${fileName} ${remoteTargetPath}"
+        sh """
+            cd ${WORKSPACE}
+            ${uploadCmd}
+            ls
+        """
+    }
+    return "${env.ARTIFACTORY_BASE_URL}:443/${targetFolder}/${targetFile}"
+}
+
+/**
  * Fetch slack channel->thread IDs by release version from Artifactory
  * @param version the release version
  * @return a list of slack channel IDs. The first element is the Slack #android channel->release thread ID for release version, the second element is the #qa > release thread ID.

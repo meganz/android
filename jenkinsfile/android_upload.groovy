@@ -71,21 +71,20 @@ pipeline {
 
                 if (triggerByDeliverQaCmd()) {
                     if (common.hasGitLabMergeRequest()) {
-                        String jsonJenkinsLog = common.uploadFileToArtifactory(CONSOLE_LOG_FILE)
+                        String mrNumber = common.getMrNumber()
+                        String folder = "android_upload/MR-${mrNumber}"
+                        String jenkinsLog = common.uploadFileToArtifactory(folder, CONSOLE_LOG_FILE)
 
-                        String message = firebaseUploadFailureMessage("<br/>", true) +
-                                "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${jsonJenkinsLog})"
+                        String message = firebaseUploadFailureMessage("<br/>", jenkinsLog, true)
 
                         common.sendToMR(message)
-                    } else {
-                        slackSend color: 'danger', message: firebaseUploadFailureMessage("\n", true)
-                        slackUploadFile filePath: 'console.txt', initialComment: 'Jenkins Log'
                     }
                 } else if (triggerByPushToDevelop()) {
-                    slackSend color: 'danger', message: firebaseUploadFailureMessage("\n", false)
-                    slackUploadFile filePath: 'console.txt', initialComment: 'Jenkins Log'
+                    String jenkinsLog = common.uploadFileToArtifactory("android_upload", CONSOLE_LOG_FILE)
+
+                    slackSend color: 'danger', message: firebaseUploadFailureMessage("\n", jenkinsLog, false)
                 } else if (triggerByPublishSdkCmd()) {
-                    String jenkinsLog = common.uploadFileToArtifactory(CONSOLE_LOG_FILE)
+                    String jenkinsLog = common.uploadFileToArtifactory("android_upload", CONSOLE_LOG_FILE)
 
                     // upload SDK build log if SDK build fails
                     String sdkBuildMessage = ""
@@ -104,8 +103,7 @@ pipeline {
 
                     common.sendToMR(message)
 
-                    slackSend color: 'danger', message: publishSdkFailureMessage("\n")
-                    slackUploadFile filePath: 'console.txt', initialComment: 'Jenkins Log'
+                    slackSend color: 'danger', message: publishSdkFailureMessage("\n") + "Build Log: <${jenkinsLog}|${CONSOLE_LOG_FILE}>"
                 }
             }
         }
@@ -491,7 +489,7 @@ private String formattedCommentAuthor() {
  * @param useCommenterAsAuthor True if author should be the name of user who initiated the build by comment
  * @return failure message
  */
-private String firebaseUploadFailureMessage(String lineBreak, boolean useCommenterAsAuthor) {
+private String firebaseUploadFailureMessage(String lineBreak, String logFile, boolean useCommenterAsAuthor) {
     String author = useCommenterAsAuthor ? formattedCommentAuthor() : gitlabUserName
     String message = ":x: Android Firebase Upload Build Failed!(BuildNumber: ${env.BUILD_NUMBER})" +
             "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
@@ -503,7 +501,7 @@ private String firebaseUploadFailureMessage(String lineBreak, boolean useComment
     } else if (env.gitlabActionType == "NOTE") {
         message += "${lineBreak}Trigger Reason: MR comment (${gitlabTriggerPhrase})"
     }
-
+    message += "Build Log: <${logFile}|${CONSOLE_LOG_FILE}>"
     if (env.gitlabTargetBranch == "develop" && env.gitlabSourceBranch == "develop") {
         message += "${lineBreak}Hi <!subteam^S02B2PB5SG7>,  latest `develop` has build failure, please check."  //notify all Android devs
     }

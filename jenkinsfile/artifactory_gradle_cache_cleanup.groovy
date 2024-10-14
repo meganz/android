@@ -26,8 +26,9 @@ pipeline {
         failure {
             script {
                 common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
-                slackSend color: 'danger', message: cleanupFailureMessage()
-                slackUploadFile filePath: CONSOLE_LOG_FILE, initialComment: 'Jenkins Log'
+                String jenkinsLog = common.uploadFileToArtifactory("artifactory_gradle_cache_cleanup", CONSOLE_LOG_FILE)
+                String buildLog = "Build Log: <${jenkinsLog}|${CONSOLE_LOG_FILE}>"
+                slackSend color: 'danger', message: "${buildLog}\n" + cleanupFailureMessage()
             }
         }
         success {

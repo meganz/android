@@ -102,40 +102,30 @@ pipeline {
             script {
                 common = load('jenkinsfile/common.groovy')
 
-                if (common.hasGitLabMergeRequest()) {
 
-                    // download Jenkins console log
-                    common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
+                // download Jenkins console log
+                common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
 
-                    // upload Jenkins console log
-                    String jenkinsLog = common.uploadFileToArtifactory(CONSOLE_LOG_FILE)
+                // upload Jenkins console log
+                String mrNumber = common.getMrNumber()
+                String folder = "android-build/MR-${mrNumber}"
+                String jenkinsLog = common.uploadFileToArtifactory(folder, CONSOLE_LOG_FILE)
 
-                    // upload unit test report if unit test fail
+                // upload unit test report if unit test fail
 
-                    String unitTestResult = ""
-                    for (def module in UNIT_TEST_RESULT_LINK_MAP.keySet()) {
-                        String result = UNIT_TEST_RESULT_LINK_MAP[module]
-                        unitTestResult += "<br>$module Unit Test: [$module test report](${result})"
-                    }
-
-                    def failureMessage = ":x: Build Failed(Build: ${env.BUILD_NUMBER})" +
-                            "<br/>Failure Stage: ${BUILD_STEP}" +
-                            "<br/>Last Commit Message: ${getLastCommitMessage()}" +
-                            "Last Commit ID: ${env.GIT_COMMIT}" +
-                            "<br/>Build Log: [${env.CONSOLE_LOG_FILE}](${jenkinsLog})" +
-                            unitTestResult
-                    common.sendToMR(failureMessage)
-                } else {
-                    withCredentials([usernameColonPassword(credentialsId: 'Jenkins-Login', variable: 'CREDENTIALS')]) {
-                        def comment = ":x: Android Build failed for branch: ${env.GIT_BRANCH}"
-                        if (env.CHANGE_URL) {
-                            comment = ":x: Android Build failed for branch: ${env.GIT_BRANCH} \nMR Link:${env.CHANGE_URL}"
-                        }
-                        slackSend color: "danger", message: comment
-                        sh 'curl -u $CREDENTIALS ${BUILD_URL}/consoleText -o console.txt'
-                        slackUploadFile filePath: "console.txt", initialComment: "Android Build Log"
-                    }
+                String unitTestResult = ""
+                for (def module in UNIT_TEST_RESULT_LINK_MAP.keySet()) {
+                    String result = UNIT_TEST_RESULT_LINK_MAP[module]
+                    unitTestResult += "<br>$module Unit Test: [$module test report](${result})"
                 }
+
+                def failureMessage = ":x: Build Failed(Build: ${env.BUILD_NUMBER})" +
+                        "<br/>Failure Stage: ${BUILD_STEP}" +
+                        "<br/>Last Commit Message: ${getLastCommitMessage()}" +
+                        "Last Commit ID: ${env.GIT_COMMIT}" +
+                        "<br/>Build Log: [${env.CONSOLE_LOG_FILE}](${jenkinsLog})" +
+                        unitTestResult
+                common.sendToMR(failureMessage)
             }
         }
         success {
