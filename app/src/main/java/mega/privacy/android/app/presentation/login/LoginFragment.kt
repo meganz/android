@@ -700,11 +700,12 @@ class LoginFragment : Fragment() {
      * Launches an intent to [FileExplorerActivity]
      */
     private fun toSharePage() = with(requireActivity()) {
-        startActivity(Intent(requireContext(), FileExplorerActivity::class.java).apply {
-            putExtra(FileExplorerActivity.EXTRA_SHARE_INFOS, intentShareInfo)
-            action = intent?.getStringExtra(FileExplorerActivity.EXTRA_SHARE_ACTION)
-            type = intent?.getStringExtra(FileExplorerActivity.EXTRA_SHARE_TYPE)
-        })
+        startActivity(
+            this.intent.setClass(requireContext(), FileExplorerActivity::class.java).apply {
+                putExtra(FileExplorerActivity.EXTRA_SHARE_INFOS, intentShareInfo)
+                action = intent?.getStringExtra(FileExplorerActivity.EXTRA_SHARE_ACTION)
+                type = intent?.getStringExtra(FileExplorerActivity.EXTRA_SHARE_TYPE)
+            })
         finish()
     }
 

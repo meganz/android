@@ -44,6 +44,15 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.listeners.CreateFolderListener
 import mega.privacy.android.app.listeners.GetAttrUserListener
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.CAMERA
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.COPY
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.IMPORT
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.MOVE
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.SAVE
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.SELECT
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.SELECT_CAMERA_FOLDER
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.SHARE_LINK
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.UPLOAD
 import mega.privacy.android.app.main.adapters.FileExplorerPagerAdapter
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.ALLOW_ADD_PARTICIPANTS
@@ -333,7 +342,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         filePreparedInfos = info
 
         if (needLogin) {
-            val loginIntent = Intent(this@FileExplorerActivity, LoginActivity::class.java)
+            val loginIntent = intent.setClass(this@FileExplorerActivity, LoginActivity::class.java)
                 .apply {
                     putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
                     putExtra(EXTRA_SHARE_ACTION, intent.action)
