@@ -703,6 +703,18 @@ class FileBrowserViewModelTest {
         whenever(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)).thenReturn(
             true
         )
+        whenever(monitorStorageStateEventUseCase()).thenReturn(
+            MutableStateFlow(
+                StorageStateEvent(
+                    handle = 1L,
+                    eventString = "",
+                    number = 1L,
+                    text = "",
+                    type = EventType.Storage,
+                    storageState = StorageState.Red
+                )
+            )
+        )
     }
 
     @AfterEach

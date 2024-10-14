@@ -152,25 +152,26 @@ class MediaDiscoveryViewModel @Inject constructor(
 
     private fun monitorStorageOverQuotaCapacity() {
         viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner).let { isFullStorageOverQuotaBannerEnabled ->
-                    val isAlmostFullStorageQuotaBannerEnabled =
-                        getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)
-                    if (isFullStorageOverQuotaBannerEnabled) {
-                        val storageCapacity = when (monitorStorageStateEventUseCase.getState()) {
-                            StorageState.Red -> FULL
+            monitorStorageStateEventUseCase()
+                .collectLatest { storageStateEvent ->
+                    runCatching {
+                        val isAlmostFullStorageQuotaBannerEnabled =
+                            getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)
+                        val isFullStorageOverQuotaBannerEnabled =
+                            getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)
+                        val storageCapacity = when (storageStateEvent.storageState) {
+                            StorageState.Red -> if (isFullStorageOverQuotaBannerEnabled) FULL else DEFAULT
                             StorageState.Orange -> if (isAlmostFullStorageQuotaBannerEnabled) ALMOST_FULL else DEFAULT
                             else -> DEFAULT
                         }
                         _state.update {
                             it.copy(storageCapacity = storageCapacity)
                         }
+                    }.onFailure { throwable ->
+                        Timber.e(throwable.message)
+                        setStorageCapacityAsDefault()
                     }
                 }
-            }.onFailure { throwable ->
-                Timber.e(throwable.message)
-                setStorageCapacityAsDefault()
-            }
         }
     }
 

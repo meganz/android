@@ -28,7 +28,6 @@ import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCa
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.DEFAULT
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.FULL
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
@@ -152,27 +151,31 @@ class FileBrowserViewModel @Inject constructor(
         monitorStorageOverQuotaCapacity()
     }
 
+    /**
+     * Monitor storage quota capacity
+     */
     private fun monitorStorageOverQuotaCapacity() {
         viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner).let { isFullStorageOverQuotaBannerEnabled ->
-                    val isAlmostFullStorageQuotaBannerEnabled =
-                        getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)
-                    if (isFullStorageOverQuotaBannerEnabled) {
-                        val storageCapacity = when (monitorStorageStateEventUseCase.getState()) {
-                            StorageState.Red -> FULL
+            monitorStorageStateEventUseCase()
+                .collectLatest { storageStateEvent ->
+                    runCatching {
+                        val isAlmostFullStorageQuotaBannerEnabled =
+                            getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)
+                        val isFullStorageOverQuotaBannerEnabled =
+                            getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)
+                        val storageCapacity = when (storageStateEvent.storageState) {
+                            StorageState.Red -> if (isFullStorageOverQuotaBannerEnabled) FULL else DEFAULT
                             StorageState.Orange -> if (isAlmostFullStorageQuotaBannerEnabled) ALMOST_FULL else DEFAULT
                             else -> DEFAULT
                         }
                         _state.update {
                             it.copy(storageCapacity = storageCapacity)
                         }
+                    }.onFailure { throwable ->
+                        Timber.e(throwable.message)
+                        setStorageCapacityAsDefault()
                     }
                 }
-            }.onFailure { throwable ->
-                Timber.e(throwable.message)
-                setStorageCapacityAsDefault()
-            }
         }
     }
 

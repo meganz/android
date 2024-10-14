@@ -11,6 +11,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -183,6 +184,18 @@ class MediaDiscoveryViewModelTest {
         whenever(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)).thenReturn(
             true
         )
+        whenever(monitorStorageStateEventUseCase()).thenReturn(
+            MutableStateFlow(
+                StorageStateEvent(
+                    handle = 1L,
+                    eventString = "",
+                    number = 1L,
+                    text = "",
+                    type = EventType.Storage,
+                    storageState = StorageState.Red
+                )
+            )
+        )
     }
 
     @BeforeEach
@@ -260,8 +273,14 @@ class MediaDiscoveryViewModelTest {
             type = EventType.Storage,
             storageState = storageState
         )
-        whenever(monitorStorageStateEventUseCase()).thenReturn(MutableStateFlow(storageStateEvent))
-        commonStub()
+        runBlocking {
+            commonStub()
+            whenever(monitorStorageStateEventUseCase()).thenReturn(
+                MutableStateFlow(
+                    storageStateEvent
+                )
+            )
+        }
         initViewModel()
         advanceUntilIdle()
         underTest.state.test {
