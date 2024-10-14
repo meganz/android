@@ -23,8 +23,8 @@ class FilesPermissionViewTest {
     val composeRule = createComposeRule()
 
     private val onAllowClick = mock<() -> Unit>()
-    private val onNotNowClick = mock<() -> Unit>()
     private val onDoNotShowAgainClick = mock<() -> Unit>()
+    private val onStartTransferAndDismiss = mock<() -> Unit>()
 
     @Test
     fun `test that FilesPermissionView is correctly displayed`() {
@@ -56,7 +56,7 @@ class FilesPermissionViewTest {
     fun `test that Not now button invokes correctly on click`() {
         initComposeRule()
         composeRule.onNodeWithTag(NOT_NOW_BUTTON_TAG).performClick()
-        verify(onNotNowClick).invoke()
+        verify(onStartTransferAndDismiss).invoke()
     }
 
     @Test
@@ -64,14 +64,15 @@ class FilesPermissionViewTest {
         initComposeRule()
         composeRule.onNodeWithTag(DO_NOT_SHOW_AGAIN_BUTTON_TAG).performClick()
         verify(onDoNotShowAgainClick).invoke()
+        verify(onStartTransferAndDismiss).invoke()
     }
 
     private fun initComposeRule() {
         composeRule.setContent {
             FilesPermissionView(
                 onAllowClick = onAllowClick,
-                onNotNowClick = onNotNowClick,
-                onDoNotShowAgainClick = onDoNotShowAgainClick
+                onDoNotShowAgainClick = onDoNotShowAgainClick,
+                onStartTransferAndDismiss = onStartTransferAndDismiss
             )
         }
     }

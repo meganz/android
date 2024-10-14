@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.view.View
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.SnackbarHostState
@@ -55,6 +56,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeTransfersDialog
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.filespermission.FilesPermissionView
 import mega.privacy.android.app.presentation.transfers.view.dialog.TransferInProgressDialog
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
@@ -86,6 +88,7 @@ internal fun StartTransferComponent(
     var eventWithoutWritePermission by remember {
         mutableStateOf<TransferTriggerEvent?>(null)
     }
+    var showFilesPermissionRequest by rememberSaveable { mutableStateOf(false) }
     val notificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
     } else {
@@ -115,7 +118,7 @@ internal fun StartTransferComponent(
     EventEffect(
         event = event,
         onConsumed = onConsumeEvent,
-        action = {
+        action = { triggerEvent ->
             notificationPermission?.status?.let { permissionStatus ->
                 if (permissionStatus.shouldShowRationale) {
                     context.startActivity(
@@ -125,13 +128,36 @@ internal fun StartTransferComponent(
                     notificationPermission.launchPermissionRequest()
                 }
             }
-            if (mediaReadPermission?.status?.isGranted == false) {
-                eventWithoutWritePermission = it
-                mediaReadPermission.launchPermissionRequest()
-            } else {
-                viewModel.startTransfer(it)
+            when {
+                shouldAskForFilesPermission(uiState.requestFilesPermissionDenied, triggerEvent) -> {
+                    eventWithoutWritePermission = triggerEvent
+                    showFilesPermissionRequest = true
+                }
+
+                mediaReadPermission?.status?.isGranted == false -> {
+                    eventWithoutWritePermission = triggerEvent
+                    mediaReadPermission.launchPermissionRequest()
+                }
+
+                else -> {
+                    viewModel.startTransfer(triggerEvent)
+                }
             }
         })
+
+    if (showFilesPermissionRequest) {
+        FilesPermissionView(
+            onDoNotShowAgainClick = { viewModel.setRequestFilesPermissionDenied() },
+            onStartTransferAndDismiss = {
+                eventWithoutWritePermission?.let { event ->
+                    viewModel.startTransfer(event)
+                    showFilesPermissionRequest = false
+                    eventWithoutWritePermission = null
+                }
+            }
+        )
+    }
+
     StartTransferComponent(
         uiState = uiState,
         onOneOffEventConsumed = viewModel::consumeOneOffEvent,
@@ -487,4 +513,13 @@ private fun consumeMessageAction(
         )
     }
 }
+
+private fun shouldAskForFilesPermission(
+    requestFilesPermissionDenied: Boolean,
+    transferTriggerEvent: TransferTriggerEvent,
+) = (transferTriggerEvent is TransferTriggerEvent.StartChatUpload
+        || transferTriggerEvent is TransferTriggerEvent.StartUpload)
+        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+        && requestFilesPermissionDenied.not()
+        && !Environment.isExternalStorageManager()
 

@@ -56,6 +56,8 @@ import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptTo
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
+import mega.privacy.android.domain.usecase.transfers.filespermission.MonitorRequestFilesPermissionDeniedUseCase
+import mega.privacy.android.domain.usecase.transfers.filespermission.SetRequestFilesPermissionDeniedUseCase
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
@@ -97,6 +99,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val saveUriToDeviceUseCase: SaveUriToDeviceUseCase,
     private val getCurrentUploadSpeedUseCase: GetCurrentUploadSpeedUseCase,
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
+    private val monitorRequestFilesPermissionDeniedUseCase: MonitorRequestFilesPermissionDeniedUseCase,
+    private val setRequestFilesPermissionDeniedUseCase: SetRequestFilesPermissionDeniedUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -109,6 +113,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     init {
         checkDownloadRating()
         checkUploadRating()
+        monitorRequestFilesPermissionDenied()
     }
 
     /**
@@ -784,6 +789,21 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         }
                     }
             }
+        }
+    }
+
+    private fun monitorRequestFilesPermissionDenied() {
+        viewModelScope.launch {
+            monitorRequestFilesPermissionDeniedUseCase().collect { denied ->
+                _uiState.update { state -> state.copy(requestFilesPermissionDenied = denied) }
+            }
+        }
+    }
+
+    fun setRequestFilesPermissionDenied() {
+        viewModelScope.launch {
+            runCatching { setRequestFilesPermissionDeniedUseCase() }
+                .onFailure { Timber.e(it) }
         }
     }
 }
