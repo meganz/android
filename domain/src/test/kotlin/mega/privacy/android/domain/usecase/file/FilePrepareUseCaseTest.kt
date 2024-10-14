@@ -1,20 +1,17 @@
 package mega.privacy.android.domain.usecase.file
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.toDocumentEntity
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.usecase.transfers.GetFileForUploadUseCase
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.Mockito.`when`
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -25,26 +22,22 @@ import java.io.File
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FilePrepareUseCaseTest {
 
-    private val getFileForUploadUseCase: GetFileForUploadUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
 
     private lateinit var filePrepareUseCase: FilePrepareUseCase
 
     private val testScheduler = TestCoroutineScheduler()
-    private val testDispatcher = StandardTestDispatcher(testScheduler)
 
     @BeforeAll
     fun setUp() {
         filePrepareUseCase = FilePrepareUseCase(
-            getFileForUploadUseCase,
             fileSystemRepository,
-            testDispatcher
         )
     }
 
     @BeforeEach
     fun reset() {
-        reset(getFileForUploadUseCase, fileSystemRepository)
+        reset(fileSystemRepository)
     }
 
     @Test
@@ -63,10 +56,7 @@ class FilePrepareUseCaseTest {
             on { absolutePath } doReturn "uri2"
         }
         val documentEntities = listOf(file1.toDocumentEntity(), file2.toDocumentEntity())
-        whenever(fileSystemRepository.getDocumentFileName(UriPath("uri1"))).thenReturn("name1")
-        whenever(fileSystemRepository.getDocumentFileName(UriPath("uri2"))).thenReturn("name2")
-        `when`(getFileForUploadUseCase("uri1", false)).thenReturn(file1)
-        `when`(getFileForUploadUseCase("uri2", false)).thenReturn(file2)
+        whenever(fileSystemRepository.getDocumentEntities(uriPaths)).thenReturn(documentEntities)
 
         val result = filePrepareUseCase(uriPaths)
 
@@ -77,19 +67,7 @@ class FilePrepareUseCaseTest {
     fun `test invoke with empty UriPaths`() = runTest(testScheduler) {
         val uriPaths = emptyList<UriPath>()
 
-        val result = filePrepareUseCase(uriPaths)
-
-        assertEquals(emptyList<DocumentEntity>(), result)
-    }
-
-    @Test
-    fun `test invoke with null DocumentEntities`() = runTest(testScheduler) {
-        val uriPaths = listOf(UriPath("uri1"), UriPath("uri2"))
-        whenever(fileSystemRepository.getDocumentFileName(UriPath("uri1"))).thenReturn("name1")
-        whenever(fileSystemRepository.getDocumentFileName(UriPath("uri2"))).thenReturn("name2")
-        `when`(getFileForUploadUseCase("uri1", false)).thenReturn(null)
-        `when`(getFileForUploadUseCase("uri2", false)).thenReturn(null)
-
+        whenever(fileSystemRepository.getDocumentEntities(uriPaths)).thenReturn(emptyList())
         val result = filePrepareUseCase(uriPaths)
 
         assertEquals(emptyList<DocumentEntity>(), result)

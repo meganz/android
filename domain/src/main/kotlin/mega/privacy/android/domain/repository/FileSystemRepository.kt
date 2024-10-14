@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
@@ -496,4 +497,17 @@ interface FileSystemRepository {
      * @return file name
      */
     suspend fun getDocumentFileName(uri: UriPath): String
+
+    /**
+     * Get document entities
+     */
+    suspend fun getDocumentEntities(uris: List<UriPath>): List<DocumentEntity>
+
+    /**
+     * Get file from uri
+     *
+     * @param uri
+     * @return
+     */
+    suspend fun getFileFromUri(uri: UriPath): File?
 }

@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.PermissionRepository
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileForUploadUseCase
@@ -30,13 +31,15 @@ class GetFileForUploadUseCaseTest {
     private val getCacheFileForUploadUseCase = mock<GetCacheFileForUploadUseCase>()
     private val doesPathHaveSufficientSpaceUseCase = mock<DoesPathHaveSufficientSpaceUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
+    private val permissionRepository = mock<PermissionRepository>()
 
     @BeforeAll
     fun setup() {
         underTest = GetFileForUploadUseCase(
-            getCacheFileForUploadUseCase,
-            doesPathHaveSufficientSpaceUseCase,
-            fileSystemRepository,
+            getCacheFileForUploadUseCase = getCacheFileForUploadUseCase,
+            doesPathHaveSufficientSpaceUseCase = doesPathHaveSufficientSpaceUseCase,
+            fileSystemRepository = fileSystemRepository,
+            permissionRepository = permissionRepository,
         )
     }
 
@@ -60,6 +63,7 @@ class GetFileForUploadUseCaseTest {
     ) = runTest {
         val path = "/file.txt"
         val file = mock<File>()
+        whenever(permissionRepository.hasManageExternalStoragePermission()).thenReturn(false)
         whenever(fileSystemRepository.isFilePath(path)).thenReturn(true)
         whenever(fileSystemRepository.getFileByPath(path)).thenReturn(file)
         assertThat(underTest.invoke(path, isChatUpload)).isEqualTo(file)
@@ -72,6 +76,7 @@ class GetFileForUploadUseCaseTest {
     ) = runTest {
         val uri = "file://file.txt"
         val file = mock<File>()
+        whenever(permissionRepository.hasManageExternalStoragePermission()).thenReturn(false)
         whenever(fileSystemRepository.isFileUri(uri)).thenReturn(true)
         whenever(fileSystemRepository.getFileFromFileUri(uri)).thenReturn(file)
         assertThat(underTest.invoke(uri, isChatUpload)).isEqualTo(file)
@@ -85,6 +90,7 @@ class GetFileForUploadUseCaseTest {
         val uriString = "content://example.txt"
         val filePath = "/folder/example.txt"
         val file = File(filePath)
+        whenever(permissionRepository.hasManageExternalStoragePermission()).thenReturn(false)
         whenever(fileSystemRepository.isContentUri(any())).thenReturn(true)
         whenever(fileSystemRepository.getFileNameFromUri(uriString)).thenReturn(filePath)
         whenever(getCacheFileForUploadUseCase(any(), any())).thenReturn(file)
@@ -100,6 +106,7 @@ class GetFileForUploadUseCaseTest {
         val uriString = "content://example.txt"
         val filePath = "/folder/example.txt"
         val file = File(filePath)
+        whenever(permissionRepository.hasManageExternalStoragePermission()).thenReturn(false)
         whenever(doesPathHaveSufficientSpaceUseCase(any(), any())) doReturn false
         whenever(fileSystemRepository.isContentUri(any())).thenReturn(true)
         whenever(fileSystemRepository.getFileNameFromUri(uriString)).thenReturn(filePath)
@@ -108,5 +115,36 @@ class GetFileForUploadUseCaseTest {
             underTest.invoke(uriString, isChatUpload)
         }
         verify(fileSystemRepository, never()).copyContentUriToFile(UriPath(uriString), file)
+    }
+
+    @ParameterizedTest(name = " and isChatUpload is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that the file is returned when uri is a content uri and permission is enabled`(
+        isChatUpload: Boolean,
+    ) = runTest {
+        val uriString = "content://example.txt"
+        val filePath = "/folder/example.txt"
+        val file = File(filePath)
+        whenever(permissionRepository.hasManageExternalStoragePermission()).thenReturn(true)
+        whenever(fileSystemRepository.isContentUri(any())).thenReturn(true)
+        whenever(fileSystemRepository.getFileFromUri(UriPath(uriString))).thenReturn(file)
+        assertThat(underTest.invoke(uriString, isChatUpload)).isEqualTo(file)
+    }
+
+    @ParameterizedTest(name = " and isChatUpload is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that a copy of the file is returned when uri is a content uri, permission is enabled and can't find the file from uri`(
+        isChatUpload: Boolean,
+    ) = runTest {
+        val uriString = "content://example.txt"
+        val filePath = "/folder/example.txt"
+        val file = File(filePath)
+        whenever(permissionRepository.hasManageExternalStoragePermission()).thenReturn(true)
+        whenever(fileSystemRepository.isContentUri(any())).thenReturn(true)
+        whenever(fileSystemRepository.getFileFromUri(UriPath(uriString))).thenReturn(null)
+        whenever(fileSystemRepository.getFileNameFromUri(uriString)).thenReturn(filePath)
+        whenever(getCacheFileForUploadUseCase(any(), any())).thenReturn(file)
+        assertThat(underTest.invoke(uriString, isChatUpload)).isEqualTo(file)
+        verify(fileSystemRepository).copyContentUriToFile(UriPath(uriString), file)
     }
 }

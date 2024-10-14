@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
+import mega.privacy.android.domain.repository.PermissionRepository
 import java.io.File
 import javax.inject.Inject
 
@@ -17,6 +18,7 @@ class GetFileForUploadUseCase @Inject constructor(
     private val getCacheFileForUploadUseCase: GetCacheFileForUploadUseCase,
     private val doesPathHaveSufficientSpaceUseCase: DoesPathHaveSufficientSpaceUseCase,
     private val fileSystemRepository: FileSystemRepository,
+    private val permissionRepository: PermissionRepository,
 ) {
     /**
      * Invoke
@@ -34,21 +36,23 @@ class GetFileForUploadUseCase @Inject constructor(
             }
 
             fileSystemRepository.isContentUri(uriOrPathString) -> {
-                fileSystemRepository.getFileNameFromUri(uriOrPathString)?.let {
-                    getCacheFileForUploadUseCase(
-                        file = File(it),
-                        isChatUpload = isChatUpload,
-                    )?.also { destination ->
-                        val size = fileSystemRepository.getFileSizeFromUri(it) ?: 0L
-                        if (!doesPathHaveSufficientSpaceUseCase(destination.parent, size)) {
-                            throw NotEnoughStorageException()
+                takeIf { permissionRepository.hasManageExternalStoragePermission() }
+                    ?.let { fileSystemRepository.getFileFromUri(UriPath(uriOrPathString)) }
+                    ?: fileSystemRepository.getFileNameFromUri(uriOrPathString)?.let {
+                        getCacheFileForUploadUseCase(
+                            file = File(it),
+                            isChatUpload = isChatUpload,
+                        )?.also { destination ->
+                            val size = fileSystemRepository.getFileSizeFromUri(it) ?: 0L
+                            if (!doesPathHaveSufficientSpaceUseCase(destination.parent, size)) {
+                                throw NotEnoughStorageException()
+                            }
+                            fileSystemRepository.copyContentUriToFile(
+                                UriPath(uriOrPathString),
+                                destination
+                            )
                         }
-                        fileSystemRepository.copyContentUriToFile(
-                            UriPath(uriOrPathString),
-                            destination
-                        )
                     }
-                }
             }
 
             else -> {

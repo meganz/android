@@ -1,7 +1,7 @@
 package mega.privacy.android.data.repository
 
-import android.Manifest
 import android.os.Build
+import android.os.Environment
 import mega.privacy.android.data.gateway.PermissionGateway
 import mega.privacy.android.domain.repository.PermissionRepository
 import timber.log.Timber
@@ -31,4 +31,11 @@ internal class PermissionRepositoryImpl @Inject constructor(
 
     override fun hasAudioPermission(): Boolean =
         permissionGateway.hasPermissions(permissionGateway.getAudioPermissionByVersion())
+
+    override fun hasManageExternalStoragePermission(): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Environment.isExternalStorageManager()
+        } else {
+            permissionGateway.hasPermissions(permissionGateway.getReadExternalStoragePermission())
+        }
 }

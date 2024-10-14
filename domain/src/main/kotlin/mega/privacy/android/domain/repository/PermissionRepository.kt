@@ -14,4 +14,9 @@ interface PermissionRepository {
      * Has audio permission
      */
     fun hasAudioPermission(): Boolean
+
+    /**
+     * Has manage external storage permission
+     */
+    fun hasManageExternalStoragePermission(): Boolean
 }

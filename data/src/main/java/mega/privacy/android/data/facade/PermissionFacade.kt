@@ -91,7 +91,7 @@ internal class PermissionFacade @Inject constructor(
      *
      * @return READ_EXTERNAL_STORAGE
      */
-    fun getReadExternalStoragePermission() = READ_EXTERNAL_STORAGE
+    override fun getReadExternalStoragePermission() = READ_EXTERNAL_STORAGE
 
     /**
      * Get READ_MEDIA_VIDEO

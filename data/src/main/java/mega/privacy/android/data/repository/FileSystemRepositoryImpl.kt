@@ -47,6 +47,7 @@ import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
@@ -657,5 +658,16 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             DocumentFile.fromSingleUri(context, rawUri)
         } ?: throw FileNotFoundException("Content uri doesn't exist: $rawUri")
         document.name.orEmpty()
+    }
+
+    override suspend fun getDocumentEntities(uris: List<UriPath>): List<DocumentEntity> =
+        withContext(ioDispatcher) {
+            fileGateway.getDocumentEntities(uris.map { Uri.parse(it.value) })
+        }
+
+    override suspend fun getFileFromUri(uri: UriPath): File? = withContext(ioDispatcher) {
+        fileGateway.getFileFromUri(Uri.parse(uri.value))?.also {
+            Timber.d("getFileFromUri uri: $uri, file path: $it")
+        }
     }
 }

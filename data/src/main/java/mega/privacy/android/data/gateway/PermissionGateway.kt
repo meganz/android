@@ -29,4 +29,9 @@ interface PermissionGateway {
      * Provide getPartialMediaPermission
      */
     fun getPartialMediaPermission(): String
+
+    /**
+     * Provide get external storage permission
+     */
+    fun getReadExternalStoragePermission(): String
 }

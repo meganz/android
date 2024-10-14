@@ -1,6 +1,7 @@
 package mega.privacy.android.data.facade
 
 import android.annotation.SuppressLint
+import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -25,6 +26,7 @@ import android.provider.MediaStore.VOLUME_INTERNAL
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresPermission
 import androidx.core.content.FileProvider
 import androidx.core.net.toFile
 import androidx.core.net.toUri
@@ -714,6 +716,113 @@ internal class FileFacade @Inject constructor(
         val sanitized = path.replace(" ", "")
 
         return isDataFromExternalApp && isPathInsecure(sanitized)
+    }
+
+    override suspend fun getDocumentEntities(uris: List<Uri>): List<DocumentEntity> {
+        return uris.mapNotNull { uri ->
+            if (DocumentsContract.isTreeUri(uri)) {
+                DocumentFile.fromTreeUri(context, uri)
+            } else {
+                DocumentFile.fromSingleUri(context, uri)
+            }?.let { it ->
+                val childFiles = if (it.isDirectory) it.listFiles() else emptyArray()
+                documentFileMapper(
+                    file = it,
+                    numFiles = childFiles.count { it.isFile },
+                    numFolders = childFiles.count { it.isDirectory },
+                )
+            }
+        }
+    }
+
+    @RequiresPermission(android.Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+    override suspend fun getFileFromUri(uri: Uri): File? {
+        runCatching { getRealPathFromUri(context, uri) }
+            .onFailure {
+                Timber.e(it, "Failed to get real path from uri")
+            }.getOrNull()?.let { path ->
+                return File(path).takeIf { it.exists() }
+            }
+        return null
+    }
+
+    private fun getRealPathFromUri(context: Context, uri: Uri): String? {
+        when {
+            DocumentsContract.isDocumentUri(context, uri) -> {
+                when (uri.authority) {
+                    isExternalStorageUri() -> {
+                        val docId = DocumentsContract.getDocumentId(uri)
+                        val split = docId.split(":")
+                        return Environment.getExternalStorageDirectory().toString() + "/" + split[1]
+                    }
+
+                    isDownloadDocumentUri() -> {
+                        var id = DocumentsContract.getDocumentId(uri).orEmpty()
+                        if (id.startsWith("raw:")) {
+                            return id.substring(4)
+                        } else if (id.startsWith("msf:")) {
+                            id = id.split(":")[1]
+                        }
+                        val contentUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            ContentUris.withAppendedId(
+                                MediaStore.Downloads.EXTERNAL_CONTENT_URI, id.toLong()
+                            )
+                        } else {
+                            ContentUris.withAppendedId(
+                                Uri.parse("content://downloads/public_downloads"),
+                                id.toLong()
+                            )
+                        }
+                        return getDataColumn(context, contentUri, null, null)
+                    }
+
+                    isMediaDocumentUri() -> {
+                        val docId = DocumentsContract.getDocumentId(uri)
+                        val split = docId.split(":")
+                        val contentUri = when (split[0]) {
+                            "image" -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                            "video" -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                            "audio" -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                            else -> null
+                        }
+                        val selection = "_id=?"
+                        val selectionArgs = arrayOf(split[1])
+                        return getDataColumn(context, contentUri, selection, selectionArgs)
+                    }
+                }
+            }
+
+            "content".equals(uri.scheme, ignoreCase = true) -> {
+                return getDataColumn(context, uri, null, null)
+            }
+
+            "file".equals(uri.scheme, ignoreCase = true) -> {
+                return uri.path
+            }
+        }
+        return null
+    }
+
+    private fun isMediaDocumentUri() = "com.android.providers.media.documents"
+
+    private fun isDownloadDocumentUri() = "com.android.providers.downloads.documents"
+
+    private fun isExternalStorageUri() = "com.android.externalstorage.documents"
+
+    private fun getDataColumn(
+        context: Context,
+        uri: Uri?,
+        selection: String?,
+        selectionArgs: Array<String>?,
+    ): String? {
+        uri?.let {
+            context.contentResolver.query(it, arrayOf(DATA), selection, selectionArgs, null)
+        }?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                return cursor.getString(cursor.getColumnIndexOrThrow(DATA))
+            }
+        }
+        return null
     }
 
     private companion object {

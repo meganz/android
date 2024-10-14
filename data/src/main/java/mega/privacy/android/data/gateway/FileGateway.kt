@@ -3,6 +3,7 @@ package mega.privacy.android.data.gateway
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
@@ -397,4 +398,19 @@ interface FileGateway {
      * @return true if the path is insecure
      */
     fun isPathInsecure(path: String): Boolean
+
+    /**
+     * Get document entities
+     */
+    suspend fun getDocumentEntities(uris: List<Uri>): List<DocumentEntity>
+
+    /**
+     * Get file from uri
+     *
+     * @param uri uri of the file
+     * @return file null if not found
+     * or manage storage permission is not granted
+     * or selected a file inside downloads folder sometimes it returns null
+     */
+    suspend fun getFileFromUri(uri: Uri): File?
 }
