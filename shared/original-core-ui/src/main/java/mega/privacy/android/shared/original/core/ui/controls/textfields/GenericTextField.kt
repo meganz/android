@@ -65,6 +65,7 @@ fun GenericTextField(
     imeAction: ImeAction = ImeAction.Done,
     keyboardType: KeyboardType = KeyboardType.Text,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    trailingIcon: @Composable (() -> Unit)? = null,
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(
         textColor = MegaOriginalTheme.colors.text.primary,
         backgroundColor = MegaOriginalTheme.colors.background.surface1,
@@ -102,13 +103,14 @@ fun GenericTextField(
             singleLine = singleLine,
         ) {
             GenericDecorationBox(
-                text,
-                it,
-                singleLine,
-                interactionSource,
-                isError,
-                placeholder,
-                colors,
+                text = text,
+                innerTextField = it,
+                singleLine = singleLine,
+                interactionSource = interactionSource,
+                isError = isError,
+                placeholder = placeholder,
+                colors = colors,
+                trailingIcon = trailingIcon
             )
         }
     }
@@ -177,13 +179,14 @@ fun GenericTextField(
             singleLine = singleLine,
         ) {
             GenericDecorationBox(
-                textFieldValue.text,
-                it,
-                singleLine,
-                interactionSource,
-                isError,
-                placeholder,
-                colors
+                text = textFieldValue.text,
+                innerTextField = it,
+                trailingIcon = null,
+                singleLine = singleLine,
+                interactionSource = interactionSource,
+                isError = isError,
+                placeholder = placeholder,
+                colors = colors
             )
         }
     }
@@ -206,6 +209,7 @@ private fun GenericError(errorText: String?) {
 private fun GenericDecorationBox(
     text: String,
     innerTextField: @Composable () -> Unit,
+    trailingIcon: @Composable (() -> Unit)? = null,
     singleLine: Boolean,
     interactionSource: MutableInteractionSource,
     isError: Boolean,
@@ -230,7 +234,8 @@ private fun GenericDecorationBox(
         contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
             start = 0.dp,
             bottom = 7.dp
-        )
+        ),
+        trailingIcon = trailingIcon
     )
 }
 
