@@ -98,6 +98,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOth
 import mega.privacy.android.domain.usecase.chat.SetChatTitleUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorContactVisibilityUpdateUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ChatLogoutUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableAudioLevelMonitorUseCase
@@ -164,6 +165,7 @@ import kotlin.time.DurationUnit
  * @property getStringFromStringResMapper        [GetStringFromStringResMapper]
  * @property isEphemeralPlusPlusUseCase         [IsEphemeralPlusPlusUseCase]
  * @property isRaiseToHandSuggestionShownUseCase [IsRaiseToHandSuggestionShownUseCase]
+ * @property monitorContactVisibilityUpdateUseCase [MonitorContactVisibilityUpdateUseCase]
  * @property state                              Current view state as [InMeetingUiState]
  * @property context                            Application context
  */
@@ -217,6 +219,7 @@ class InMeetingViewModel @Inject constructor(
     private val monitorUserAvatarUpdatesUseCase: MonitorUserAvatarUpdatesUseCase,
     @ApplicationContext private val context: Context,
     private val getUserAvatarUseCase: GetUserAvatarUseCase,
+    private val monitorContactVisibilityUpdateUseCase: MonitorContactVisibilityUpdateUseCase,
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
 ) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -332,6 +335,7 @@ class InMeetingViewModel @Inject constructor(
         getMyUserHandle()
         startMonitorWaitingForOtherParticipantsHasEnded()
         startMonitoringLocalVideoChanges()
+        startMonitorContactVisibilityUpdates()
 
         viewModelScope.launch {
             runCatching {
@@ -1236,6 +1240,14 @@ class InMeetingViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+    }
+
+    private fun startMonitorContactVisibilityUpdates() {
+        viewModelScope.launch {
+            monitorContactVisibilityUpdateUseCase()
+                .catch { Timber.e(it) }
+                .collect { updateParticipantsVisibility(it.id) }
         }
     }
 

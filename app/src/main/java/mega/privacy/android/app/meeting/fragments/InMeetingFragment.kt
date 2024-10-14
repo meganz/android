@@ -50,7 +50,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
@@ -227,10 +226,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    private val visibilityChangeObserver = Observer<Long> {
-        Timber.d("Change in the visibility of a participant")
-        inMeetingViewModel.updateParticipantsVisibility(it)
-    }
 
     /**
      * Method that updates the Bottom panel
@@ -673,9 +668,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun initLiveEventBus() {
         LiveEventBus.get(EVENT_CONTACT_NAME_CHANGE, Long::class.java)
             .observe(this, nameChangeObserver)
-
-        LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long::class.java)
-            .observe(this, visibilityChangeObserver)
     }
 
     private fun initToolbar() {

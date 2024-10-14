@@ -13,7 +13,6 @@ import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -25,7 +24,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
@@ -118,10 +116,6 @@ class GlobalListener @Inject constructor(
             val myUserHandle = api.myUserHandle
             val isMyChange =
                 myUserHandle != null && myUserHandle == MegaApiJava.userHandleToBase64(user.handle)
-            if (user.changes == 0L && !isMyChange) {
-                LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long::class.java)
-                    .post(user.handle)
-            }
             if (user.hasChanged(MegaUser.CHANGE_TYPE_PUSH_SETTINGS.toLong()) && user.isOwnChange == 0) {
                 applicationScope.launch {
                     runCatching {
@@ -248,9 +242,6 @@ class GlobalListener @Inject constructor(
                     cr.status
                 )
                 RatingHandlerImpl(appContext).showRatingBaseOnContacts()
-            }
-            if (cr.status == MegaContactRequest.STATUS_ACCEPTED) {
-                LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long::class.java).post(cr.handle)
             }
         }
     }
