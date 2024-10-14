@@ -4,9 +4,8 @@
 	android:id="@+id/relative_container_add_contact"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:fitsSystemWindows="true"
-	android:focusable="true"
-	android:focusableInTouchMode="true">
+	android:focusable="false"
+	android:focusableInTouchMode="false">
 
 	<com.google.android.material.appbar.MaterialToolbar
 		android:id="@+id/add_contact_toolbar"

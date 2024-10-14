@@ -31,13 +31,12 @@ import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.SearchView.SearchAutoComplete
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
-import androidx.core.view.MenuItemCompat
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -57,7 +56,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener
 import mega.privacy.android.app.components.twemoji.EmojiEditText
-import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
+import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.main.PhoneContactInfo
 import mega.privacy.android.app.main.ShareContactInfo
 import mega.privacy.android.app.main.adapters.AddContactsAdapter
@@ -269,11 +268,6 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
     private var mailsFromAchievements: ArrayList<String> = ArrayList()
 
     private var searchMenuItem: MenuItem? = null
-
-    /**
-     * Search auto complete
-     */
-    var searchAutoComplete: SearchAutoComplete? = null
 
     /**
      * Search expand
@@ -693,53 +687,41 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
 
         searchMenuItem = menu.findItem(R.id.action_search)
 
-        val searchView = MenuItemCompat.getActionView(searchMenuItem) as SearchView
+        val searchView = searchMenuItem?.actionView as SearchView?
+        searchView?.queryHint = getString(R.string.hint_action_search)
+        searchView?.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent))
+        searchView?.setIconifiedByDefault(true)
 
-        searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text)
-        searchAutoComplete?.setHint(getString(R.string.hint_action_search))
-        val v = searchView.findViewById<View>(androidx.appcompat.R.id.search_plate)
-        v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent))
 
-        searchView.setIconifiedByDefault(true)
-
-        searchAutoComplete?.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                Util.hideKeyboard(addContactActivity, 0)
-                return@OnEditorActionListener true
+        searchMenuItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                Timber.d("onMenuItemActionExpand")
+                searchExpand = true
+                typeContactEditText?.text?.clear()
+                if (isAsyncTaskRunning(filterContactsTask)) {
+                    filterContactsTask?.cancel(true)
+                }
+                filterContactsTask = FilterContactsTask(this@AddContactActivity)
+                filterContactsTask?.execute()
+                setSendInvitationVisibility()
+                return true
             }
-            false
+
+            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                Timber.d("onMenuItemActionCollapse")
+                searchExpand = false
+                setSendInvitationVisibility()
+                supportActionBar?.let { setTitleAB() }
+                if (isAsyncTaskRunning(filterContactsTask)) {
+                    filterContactsTask?.cancel(true)
+                }
+                return true
+            }
         })
-
-        MenuItemCompat.setOnActionExpandListener(
-            searchMenuItem,
-            object : MenuItemCompat.OnActionExpandListener {
-                override fun onMenuItemActionExpand(item: MenuItem): Boolean {
-                    Timber.d("onMenuItemActionExpand")
-                    searchExpand = true
-                    typeContactEditText?.text?.clear()
-                    if (isAsyncTaskRunning(filterContactsTask)) {
-                        filterContactsTask?.cancel(true)
-                    }
-                    filterContactsTask = FilterContactsTask(this@AddContactActivity)
-                    filterContactsTask?.execute()
-                    setSendInvitationVisibility()
-                    return true
-                }
-
-                override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
-                    Timber.d("onMenuItemActionCollapse")
-                    searchExpand = false
-                    setSendInvitationVisibility()
-                    supportActionBar?.let { setTitleAB() }
-                    if (isAsyncTaskRunning(filterContactsTask)) {
-                        filterContactsTask?.cancel(true)
-                    }
-                    return true
-                }
-            })
-        searchView.maxWidth = Int.MAX_VALUE
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        searchView?.maxWidth = Int.MAX_VALUE
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
+                hideSoftKeyboard()
                 return true
             }
 
@@ -769,7 +751,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         if (searchExpand && searchMenuItem != null) {
             searchMenuItem?.expandActionView()
             Timber.d("searchView != null inputString: %s", savedInputString)
-            searchView.setQuery(savedInputString, false)
+            searchView?.setQuery(savedInputString, false)
             if (recoverContactsTask != null && recoverContactsTask?.status == AsyncTask.Status.FINISHED) {
                 filterContactsTask = FilterContactsTask(this)
                 filterContactsTask?.execute()
@@ -782,6 +764,13 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         }
 
         return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun hideSoftKeyboard() {
+        currentFocus?.let {
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(it.windowToken, 0)
+        }
     }
 
     fun setSearchVisibility() {
@@ -797,12 +786,6 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         if (searchMenuItem?.isVisible != visible) {
             searchMenuItem?.setVisible(visible)
         }
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        Timber.d("onPrepareOptionsMenu")
-
-        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -824,7 +807,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
                 } else {
                     shareWith(addedContactsShare)
                 }
-                Util.hideKeyboard(addContactActivity, 0)
+                hideSoftKeyboard()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -858,10 +841,8 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         outState.putStringArrayList("mailsFromAchievements", mailsFromAchievements)
         outState.putBoolean("searchExpand", searchExpand)
         if (searchExpand) {
-            if (searchAutoComplete != null) {
-                if (searchAutoComplete != null) {
-                    outState.putString("inputString", searchAutoComplete?.text.toString())
-                }
+            (searchMenuItem?.actionView as SearchView?)?.query?.let {
+                outState.putString("inputString", it.toString())
             }
         } else {
             if (typeContactEditText != null) {
@@ -888,9 +869,13 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         saveContactsAdded(outState)
     }
 
-    fun isAsyncTaskRunning(asyncTask: AsyncTask<*, *, *>?): Boolean {
-        return asyncTask != null && asyncTask.status == AsyncTask.Status.RUNNING
-    }
+    /**
+     * Is async task running
+     *
+     * @param asyncTask
+     */
+    fun isAsyncTaskRunning(asyncTask: AsyncTask<*, *, *>?) =
+        asyncTask != null && asyncTask.status == AsyncTask.Status.RUNNING
 
     private fun saveContactsAdded(outState: Bundle) {
         var finished = true
@@ -980,7 +965,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        this.enableEdgeToEdgeAndConsumeInsets()
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
@@ -1075,12 +1060,13 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         }
 
         tB.visibility = View.VISIBLE
+        consumeInsetsWithToolbar(customToolbar = tB)
         setSupportActionBar(tB)
         supportActionBar?.let {
             it.setHomeButtonEnabled(true)
             it.setDisplayHomeAsUpEnabled(true)
-            it.setTitle("")
-            it.setSubtitle("")
+            it.title = ""
+            it.subtitle = ""
         }
 
         participantsLimitWarningView = findViewById(R.id.participants_limit_warning_view)
@@ -1108,9 +1094,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         typeContactEditText?.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 if (searchExpand) {
-                    if (searchAutoComplete != null) {
-                        searchAutoComplete?.text?.clear()
-                    }
+                    (searchMenuItem?.actionView as SearchView?)?.setQuery("", false)
                     if (searchMenuItem != null) {
                         searchMenuItem?.collapseActionView()
                     }
@@ -1548,8 +1532,8 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         if (typeContactEditText?.text?.isNotEmpty() == true) {
             typeContactEditText?.text?.clear()
         }
+        hideSoftKeyboard()
         typeContactEditText?.clearFocus()
-        Util.hideKeyboard(addContactActivity, 0)
 
         var foundIndex = -1
         for (i in addedContactsShare.indices) {
@@ -1633,7 +1617,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         if (searchExpand && searchMenuItem != null) {
             searchMenuItem?.collapseActionView()
         }
-        Util.hideKeyboard(addContactActivity, 0)
+        hideSoftKeyboard()
 
         if (addedContactsMEGA.contains(contact)) {
             deleteContact(addedContactsMEGA.indexOf(contact))
@@ -1692,8 +1676,8 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         if (typeContactEditText?.text.toString() != "") {
             typeContactEditText?.text?.clear()
         }
+        hideSoftKeyboard()
         typeContactEditText?.clearFocus()
-        Util.hideKeyboard(addContactActivity, 0)
 
         var found = false
         for (i in addedContactsPhone.indices) {
@@ -1828,7 +1812,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
      * @param message
      */
     fun showSnackbar(message: String) {
-        Util.hideKeyboard(addContactActivity, 0)
+        hideSoftKeyboard()
         relativeLayout?.let { showSnackbar(it, message) }
     }
 
@@ -1846,9 +1830,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
 
         val index = filteredContactMEGA.indexOf(contact)
         if (searchExpand) {
-            if (searchAutoComplete != null) {
-                inputString = searchAutoComplete?.text.toString()
-            }
+            setInputStringToSearchQueryText()
         } else {
             inputString = typeContactEditText?.text.toString()
         }
@@ -1905,9 +1887,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         Timber.d("Size filteredContactsPhone: %s", filteredContactsPhone.size)
 
         if (searchExpand) {
-            if (searchAutoComplete != null) {
-                inputString = searchAutoComplete?.text.toString()
-            }
+            setInputStringToSearchQueryText()
         } else {
             inputString = typeContactEditText?.text.toString()
         }
@@ -2170,7 +2150,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
                         setError()
                     }
                     if (this.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Util.hideKeyboard(addContactActivity, 0)
+                        hideSoftKeyboard()
                     }
                 } else {
                     Timber.d("Last character is: %s", last)
@@ -2191,7 +2171,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
                         setError()
                     }
                     if (this.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Util.hideKeyboard(addContactActivity, 0)
+                        hideSoftKeyboard()
                     }
                 } else {
                     Timber.d("Last character is: %s", last)
@@ -2211,13 +2191,13 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         refreshKeyboard()
     }
 
-    override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent): Boolean {
+    override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent?): Boolean {
         refreshKeyboard()
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             val s = v.text.toString()
             Timber.d("s: %s", s)
             if (s.isEmpty() || s == "null" || s == "") {
-                Util.hideKeyboard(addContactActivity, 0)
+                hideSoftKeyboard()
             } else {
                 if (contactType == Constants.CONTACT_TYPE_DEVICE) {
                     val isValid = isValidEmail(s.trim { it <= ' ' })
@@ -2226,12 +2206,12 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
                         queryIfContactShouldBeAddedTask = QueryIfContactShouldBeAddedTask(this)
                         queryIfContactShouldBeAddedTask?.execute(false)
                         typeContactEditText?.text?.clear()
-                        Util.hideKeyboard(addContactActivity, 0)
+                        hideSoftKeyboard()
                     } else {
                         setError()
                     }
                     if (this.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Util.hideKeyboard(addContactActivity, 0)
+                        hideSoftKeyboard()
                     }
                 } else if (contactType == Constants.CONTACT_TYPE_BOTH) {
                     val isValid = isValidEmail(s.trim { it <= ' ' })
@@ -2240,12 +2220,12 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
                         queryIfContactShouldBeAddedTask = QueryIfContactShouldBeAddedTask(this)
                         queryIfContactShouldBeAddedTask?.execute(false)
                         typeContactEditText?.text?.clear()
-                        Util.hideKeyboard(addContactActivity, 0)
+                        hideSoftKeyboard()
                     } else {
                         setError()
                     }
                     if (this.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        Util.hideKeyboard(addContactActivity, 0)
+                        hideSoftKeyboard()
                     }
                 }
                 if (isAsyncTaskRunning(filterContactsTask)) {
@@ -2256,22 +2236,22 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
             }
             return true
         }
-        if ((event.keyCode == KeyEvent.KEYCODE_ENTER) || (actionId == EditorInfo.IME_ACTION_SEND)) {
+        if ((event?.keyCode == KeyEvent.KEYCODE_ENTER) || (actionId == EditorInfo.IME_ACTION_SEND)) {
             if (contactType == Constants.CONTACT_TYPE_DEVICE) {
                 if (addedContactsPhone.isEmpty()) {
-                    Util.hideKeyboard(addContactActivity, 0)
+                    hideSoftKeyboard()
                 } else {
                     inviteContacts(addedContactsPhone)
                 }
             } else if (contactType == Constants.CONTACT_TYPE_MEGA) {
                 if (addedContactsMEGA.isEmpty()) {
-                    Util.hideKeyboard(addContactActivity, 0)
+                    hideSoftKeyboard()
                 } else {
                     setResultContacts(addedContactsMEGA, true)
                 }
             } else {
                 if (addedContactsShare.isEmpty()) {
-                    Util.hideKeyboard(addContactActivity, 0)
+                    hideSoftKeyboard()
                 } else {
                     shareWith(addedContactsShare)
                 }
@@ -2294,9 +2274,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
             if (createNewGroup || comesFromChat) {
                 if (adapter == MegaContactsAdapter.ITEM_VIEW_TYPE_LIST_ADD_CONTACT) {
                     if (searchExpand) {
-                        if (searchAutoComplete != null) {
-                            inputString = searchAutoComplete?.text.toString()
-                        }
+                        setInputStringToSearchQueryText()
                     } else {
                         inputString = typeContactEditText?.text.toString()
                     }
@@ -2379,9 +2357,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
 
     private fun itemClick(view: View, position: Int) {
         if (searchExpand) {
-            if (searchAutoComplete != null) {
-                inputString = searchAutoComplete?.text.toString()
-            }
+            setInputStringToSearchQueryText()
         } else {
             inputString = typeContactEditText?.text.toString()
         }
@@ -2446,6 +2422,16 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
     }
 
     /**
+     * Set input string to search query text
+     *
+     */
+    fun setInputStringToSearchQueryText() {
+        (searchMenuItem?.actionView as SearchView?)?.let {
+            inputString = it.query.toString()
+        }
+    }
+
+    /**
      * Get mega contact mail
      *
      * @param contact
@@ -2505,7 +2491,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         } else {
             newGroup()
         }
-        Util.hideKeyboard(addContactActivity, 0)
+        hideSoftKeyboard()
     }
 
     private fun toInviteContact() {
@@ -2558,7 +2544,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
                         shareWith(addedContactsShare)
                     }
                 }
-                Util.hideKeyboard(this, 0)
+                hideSoftKeyboard()
             }
         }
     }
@@ -2628,7 +2614,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         intent.putStringArrayListExtra(EXTRA_CONTACTS, contacts)
 
         setResult(RESULT_OK, intent)
-        Util.hideKeyboard(addContactActivity, 0)
+        hideSoftKeyboard()
         finish()
     }
 
@@ -2755,7 +2741,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         }
 
         setResult(RESULT_OK, intent)
-        Util.hideKeyboard(addContactActivity, 0)
+        hideSoftKeyboard()
         finish()
     }
 
@@ -2781,7 +2767,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
 
         intent.putExtra(EXTRA_MEGA_CONTACTS, false)
         setResult(RESULT_OK, intent)
-        Util.hideKeyboard(addContactActivity, 0)
+        hideSoftKeyboard()
         finish()
     }
 
@@ -2813,7 +2799,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
 
         intent.putExtra(EXTRA_MEGA_CONTACTS, false)
         setResult(RESULT_OK, intent)
-        Util.hideKeyboard(addContactActivity, 0)
+        hideSoftKeyboard()
         finish()
     }
 
@@ -2862,6 +2848,10 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         }
     }
 
+    /**
+     * Set recyclers visibility
+     *
+     */
     fun setRecyclersVisibility() {
         if (contactType == Constants.CONTACT_TYPE_MEGA) {
             if (filteredContactMEGA.size > 0) {

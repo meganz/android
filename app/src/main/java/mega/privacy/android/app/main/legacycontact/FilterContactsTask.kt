@@ -21,10 +21,7 @@ class FilterContactsTask(addContactActivity: AddContactActivity) :
     override fun doInBackground(vararg voids: Void): Void? {
         val addContactActivity = activityRef() ?: return null
         if (addContactActivity.searchExpand) {
-            if (addContactActivity.searchAutoComplete != null) {
-                addContactActivity.searchAutoComplete?.text?.toString()
-                    ?.let { addContactActivity.inputString = it }
-            }
+            addContactActivity.setInputStringToSearchQueryText()
         } else {
             addContactActivity.typeContactEditText?.text?.toString()
                 ?.let { addContactActivity.inputString = it }
