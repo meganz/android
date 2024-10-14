@@ -57,6 +57,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import mega.privacy.android.app.TEST_USER_ACCOUNT
 import mega.privacy.android.app.extensions.asHotFlow
+import mega.privacy.android.shared.sync.domain.IsSyncFeatureEnabledUseCase
 import java.util.stream.Stream
 
 @ExperimentalCoroutinesApi
@@ -89,6 +90,9 @@ class SettingsViewModelTest {
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val setAudioBackgroundPlayEnabledUseCase = mock<SetAudioBackgroundPlayEnabledUseCase>()
+    private val isSyncFeatureEnabledUseCase = mock<IsSyncFeatureEnabledUseCase> {
+        onBlocking { invoke() }.thenReturn(true)
+    }
 
     @BeforeEach
     fun setUp() {
@@ -176,7 +180,8 @@ class SettingsViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             setShowHiddenItemsUseCase = mock(),
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-            setAudioBackgroundPlayEnabledUseCase = setAudioBackgroundPlayEnabledUseCase
+            setAudioBackgroundPlayEnabledUseCase = setAudioBackgroundPlayEnabledUseCase,
+            isSyncFeatureEnabledUseCase = isSyncFeatureEnabledUseCase
         )
     }
 

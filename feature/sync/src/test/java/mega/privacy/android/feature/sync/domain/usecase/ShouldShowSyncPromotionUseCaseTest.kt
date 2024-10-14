@@ -3,19 +3,24 @@ package mega.privacy.android.feature.sync.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.feature.sync.domain.repository.SyncPromotionPreferencesRepository
+import mega.privacy.android.shared.sync.domain.IsSyncFeatureEnabledUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.mock
 import org.mockito.Mockito.reset
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.TimeUnit
 
 class ShouldShowSyncPromotionUseCaseTest {
 
     private val syncPromotionPreferencesRepository: SyncPromotionPreferencesRepository = mock()
+    private val isSyncFeatureEnabledUseCase: IsSyncFeatureEnabledUseCase = mock {
+        on { invoke() }.thenReturn(true)
+    }
 
     private val underTest = ShouldShowSyncPromotionUseCase(
-        syncPromotionPreferencesRepository = syncPromotionPreferencesRepository
+        syncPromotionPreferencesRepository = syncPromotionPreferencesRepository,
+        isSyncFeatureEnabledUseCase = isSyncFeatureEnabledUseCase
     )
 
     @AfterEach

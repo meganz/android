@@ -28,6 +28,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.sync.domain.IsSyncFeatureEnabledUseCase
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -51,6 +52,7 @@ internal class DeviceCenterViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val isSyncFeatureEnabledUseCase: IsSyncFeatureEnabledUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DeviceCenterUiState())
@@ -167,7 +169,8 @@ internal class DeviceCenterViewModel @Inject constructor(
         )
     }
 
-    fun shouldNavigateToSyncs(deviceUINode: DeviceUINode) = deviceUINode is OwnDeviceUINode
+    fun shouldNavigateToSyncs(deviceUINode: DeviceUINode) =
+        deviceUINode is OwnDeviceUINode && isSyncFeatureEnabledUseCase()
 
     /**
      * Handles specific Back Press behavior
