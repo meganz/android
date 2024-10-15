@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -99,19 +100,6 @@ class NodeOptionsViewModel @Inject constructor(
             }.collect {
                 _state.update(it)
             }
-
-            runCatching {
-                val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
-                val isHidingActionAllowed = isHidingActionAllowedUseCase(NodeId(_state.value.node?.handle ?: 0))
-                _state.update {
-                    it.copy(
-                        isHiddenNodesOnboarded = isHiddenNodesOnboarded,
-                        isHidingActionAllowed = isHidingActionAllowed,
-                    )
-                }
-            }.onFailure {
-                Timber.e(it)
-            }
         }
 
         viewModelScope.launch {
@@ -134,6 +122,20 @@ class NodeOptionsViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            runCatching {
+                val nodeId = savedStateHandle.getStateFlow(NODE_ID_KEY, -1L).first()
+                val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
+                val isHidingActionAllowed =
+                    isHidingActionAllowedUseCase(NodeId(nodeId))
+                _state.update {
+                    it.copy(
+                        isHiddenNodesOnboarded = isHiddenNodesOnboarded,
+                        isHidingActionAllowed = isHidingActionAllowed,
+                    )
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 
