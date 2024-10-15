@@ -160,7 +160,10 @@ internal fun VideoSelectedView(
                         showSortOrder = showSortOrder,
                         showChangeViewType = showChangeViewType,
                         listState = currentListState.lazyListState,
-                        fileTypeIconMapper = fileTypeIconMapper
+                        fileTypeIconMapper = fileTypeIconMapper,
+                        shouldApplySensitiveMode = uiState.hiddenNodeEnabled
+                                && uiState.accountType?.isPaid == true
+                                && !uiState.isBusinessAccountExpired,
                     )
                 } else {
                     val newList =
@@ -185,6 +188,9 @@ internal fun VideoSelectedView(
                         showMediaDiscoveryButton = showMediaDiscoveryButton,
                         isPublicNode = false,
                         fileTypeIconMapper = fileTypeIconMapper,
+                        shouldApplySensitiveMode = uiState.hiddenNodeEnabled
+                                && uiState.accountType?.isPaid == true
+                                && !uiState.isBusinessAccountExpired,
                     )
                 }
             }

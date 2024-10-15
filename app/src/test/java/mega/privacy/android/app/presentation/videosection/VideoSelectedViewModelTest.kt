@@ -4,9 +4,9 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.videosection.VideoSelectedViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -17,10 +17,14 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
@@ -71,11 +75,17 @@ class VideoSelectedViewModelTest {
         on { id }.thenReturn(nodeId)
     }
 
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+
     @BeforeEach
     fun setUp() {
         wheneverBlocking { monitorViewType() }.thenReturn(fakeMonitorViewTypeFlow)
         wheneverBlocking { getFileBrowserNodeChildrenUseCase(any()) }.thenReturn(emptyList())
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_NONE)
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
         initUnderTest()
     }
 
@@ -86,7 +96,12 @@ class VideoSelectedViewModelTest {
             getParentNodeUseCase = getParentNodeUseCase,
             getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
             setViewType = setViewType,
-            monitorViewType = monitorViewType
+            monitorViewType = monitorViewType,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
+            defaultDispatcher = UnconfinedTestDispatcher()
         )
     }
 

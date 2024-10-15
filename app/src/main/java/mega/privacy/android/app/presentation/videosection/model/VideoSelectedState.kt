@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.videosection.model
 
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -19,6 +20,9 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property query search query
  * @property searchState SearchWidgetState
  * @property selectedNodeHandles the selected node handles
+ * @property accountType the account type
+ * @property isBusinessAccountExpired  if the business account is expired
+ * @property hiddenNodeEnabled if hidden node is enabled
  */
 data class VideoSelectedState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -31,4 +35,7 @@ data class VideoSelectedState(
     val query: String? = null,
     val searchState: SearchWidgetState = SearchWidgetState.COLLAPSED,
     val selectedNodeHandles: List<Long> = emptyList(),
+    val accountType: AccountType? = null,
+    val isBusinessAccountExpired: Boolean = false,
+    val hiddenNodeEnabled: Boolean = false,
 )

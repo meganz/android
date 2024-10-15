@@ -36,6 +36,7 @@ internal fun <T : TypedNode> VideoSelectedNodeListView(
     showSortOrder: Boolean,
     listState: LazyListState,
     fileTypeIconMapper: FileTypeIconMapper,
+    shouldApplySensitiveMode: Boolean,
     modifier: Modifier = Modifier,
     showChangeViewType: Boolean = true,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
@@ -66,7 +67,9 @@ internal fun <T : TypedNode> VideoSelectedNodeListView(
                 isSelected = nodeUIItemList[it].isSelected,
                 icon = item.node.getNodeItemThumbnail(fileTypeIconMapper = fileTypeIconMapper),
                 thumbnailData = ThumbnailRequest(item.node.id),
-                onItemClicked = { onItemClicked(nodeUIItemList[it]) }
+                onItemClicked = { onItemClicked(nodeUIItemList[it]) },
+                isSensitive = shouldApplySensitiveMode && (item.isMarkedSensitive || item.isSensitiveInherited),
+                showBlurEffect = true,
             )
             Divider(
                 modifier = Modifier
@@ -96,7 +99,8 @@ private fun VideoSelectedNodeListViewFoldersPreview(
             listState = LazyListState(),
             showChangeViewType = true,
             listContentPadding = PaddingValues(0.dp),
-            fileTypeIconMapper = FileTypeIconMapper()
+            fileTypeIconMapper = FileTypeIconMapper(),
+            shouldApplySensitiveMode = false
         )
     }
 }

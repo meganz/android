@@ -3,24 +3,36 @@ package mega.privacy.android.app.presentation.videosection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.videosection.model.VideoSelectedState
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
@@ -38,6 +50,11 @@ class VideoSelectedViewModel @Inject constructor(
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase,
     private val setViewType: SetViewType,
     private val monitorViewType: MonitorViewType,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(VideoSelectedState())
@@ -47,9 +64,41 @@ class VideoSelectedViewModel @Inject constructor(
      */
     val state: StateFlow<VideoSelectedState> = _state.asStateFlow()
 
+    private var showHiddenItems: Boolean? = null
+
     init {
         refreshNodes()
         checkViewType()
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                handleHiddenNodesUIFlow()
+            }
+        }
+    }
+
+    private fun handleHiddenNodesUIFlow() {
+        combine(
+            monitorAccountDetailUseCase(),
+            monitorShowHiddenItemsUseCase(),
+        ) { accountDetail, showHiddenItems ->
+            this@VideoSelectedViewModel.showHiddenItems = showHiddenItems
+            val accountType = accountDetail.levelDetail?.accountType
+            val businessStatus =
+                if (accountType?.isBusinessAccount == true) {
+                    getBusinessStatusUseCase()
+                } else null
+
+            _state.update {
+                it.copy(
+                    accountType = accountType,
+                    isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
+                    hiddenNodeEnabled = true,
+                )
+            }
+
+            refreshNodes()
+        }.catch { Timber.e(it) }
+            .launchIn(viewModelScope)
     }
 
     private fun checkViewType() {
@@ -65,12 +114,20 @@ class VideoSelectedViewModel @Inject constructor(
         topBarTitle: String? = null,
     ) = viewModelScope.launch {
         val childrenNodes = getFileBrowserNodeChildrenUseCase(parentHandle ?: -1)
-        val nodeUIItems = childrenNodes.getNodeUIItems().filterBySearchQuery()
+        val nodeUIItems = childrenNodes.getNodeUIItems()
+
+        val filteredItems = filterNonSensitiveItems(
+            items = nodeUIItems,
+            showHiddenItems = showHiddenItems,
+            isPaid = _state.value.accountType?.isPaid,
+            isBusinessAccountExpired = _state.value.isBusinessAccountExpired
+        ).filterBySearchQuery()
+
         val sortOrder = getCloudSortOrder()
 
         _state.update {
             it.copy(
-                nodesList = nodeUIItems,
+                nodesList = filteredItems,
                 isLoading = false,
                 sortOrder = sortOrder,
                 topBarTitle = topBarTitle,
@@ -80,6 +137,22 @@ class VideoSelectedViewModel @Inject constructor(
                 else
                     it.openedFolderNodeHandles
             )
+        }
+    }
+
+    private suspend fun filterNonSensitiveItems(
+        items: List<NodeUIItem<TypedNode>>,
+        showHiddenItems: Boolean?,
+        isPaid: Boolean?,
+        isBusinessAccountExpired: Boolean,
+    ) = withContext(defaultDispatcher) {
+        showHiddenItems ?: return@withContext items
+        isPaid ?: return@withContext items
+
+        return@withContext if (showHiddenItems || !isPaid || isBusinessAccountExpired) {
+            items
+        } else {
+            items.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
         }
     }
 
