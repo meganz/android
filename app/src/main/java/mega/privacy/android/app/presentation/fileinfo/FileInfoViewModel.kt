@@ -251,16 +251,20 @@ class FileInfoViewModel @Inject constructor(
                 setNodeDescriptionUseCase(nodeHandle = nodeId, description = description)
             }.onSuccess {
                 _uiState.update {
-                    if (it.descriptionText.isEmpty()) {
-                        it.copy(
-                            oneOffViewEvent = triggered(FileInfoOneOffViewEvent.Message.NodeDescriptionAdded),
-                            descriptionText = description
-                        )
-                    } else {
-                        it.copy(
-                            oneOffViewEvent = triggered(FileInfoOneOffViewEvent.Message.NodeDescriptionUpdated),
-                            descriptionText = description
-                        )
+                    when {
+                        it.descriptionText.isEmpty() && description.isNotEmpty() ->
+                            it.copy(
+                                oneOffViewEvent = triggered(FileInfoOneOffViewEvent.Message.NodeDescriptionAdded),
+                                descriptionText = description
+                            )
+
+                        it.descriptionText.isNotEmpty() ->
+                            it.copy(
+                                oneOffViewEvent = triggered(FileInfoOneOffViewEvent.Message.NodeDescriptionUpdated),
+                                descriptionText = description
+                            )
+
+                        else -> it
                     }
                 }
             }.onFailure {

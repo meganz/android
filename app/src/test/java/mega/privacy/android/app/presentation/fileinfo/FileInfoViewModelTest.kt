@@ -2,7 +2,8 @@ package mega.privacy.android.app.presentation.fileinfo
 
 import app.cash.turbine.Event
 import app.cash.turbine.test
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -285,6 +286,7 @@ internal class FileInfoViewModelTest {
         whenever(typedFileNode.thumbnailPath).thenReturn(null)
         whenever(typedFileNode.hasPreview).thenReturn(false)
         whenever(isAvailableOffline.invoke(any())).thenReturn(true)
+        whenever(setNodeDescriptionUseCase(NodeId(any()), any())).thenReturn(Unit)
         whenever(getAvailableNodeActionsUseCase(any())).thenReturn(emptyList())
         whenever(getNodeOutSharesUseCase(nodeId)).thenReturn(emptyList())
         whenever(getContactVerificationWarningUseCase()).thenReturn(false)
@@ -303,7 +305,7 @@ internal class FileInfoViewModelTest {
             for (n in 0..5) {
                 whenever(typedFileNode.versionCount).thenReturn(n)
                 underTest.setNode(node.handle, true)
-                Truth.assertThat(underTest.uiState.value.historyVersions).isEqualTo(n)
+                assertThat(underTest.uiState.value.historyVersions).isEqualTo(n)
             }
         }
 
@@ -313,7 +315,7 @@ internal class FileInfoViewModelTest {
             suspend fun verify(isNodeInBackups: Boolean) {
                 whenever(isNodeInBackupsUseCase(NODE_HANDLE)).thenReturn(isNodeInBackups)
                 underTest.setNode(node.handle, true)
-                Truth.assertThat(underTest.uiState.value.isNodeInBackups).isEqualTo(isNodeInBackups)
+                assertThat(underTest.uiState.value.isNodeInBackups).isEqualTo(isNodeInBackups)
             }
             verify(true)
             verify(false)
@@ -327,7 +329,7 @@ internal class FileInfoViewModelTest {
                 underTest.setNode(node.handle, true)
                 underTest.uiState.test {
                     val state = awaitItem()
-                    Truth.assertThat(state.isNodeInRubbish).isEqualTo(isNodeInRubbish)
+                    assertThat(state.isNodeInRubbish).isEqualTo(isNodeInRubbish)
                 }
             }
             verify(true)
@@ -339,7 +341,7 @@ internal class FileInfoViewModelTest {
         runTest {
             whenever(typedFileNode.versionCount).thenReturn(1)
             underTest.setNode(node.handle, true)
-            Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
+            assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
         }
 
     @Test
@@ -347,7 +349,7 @@ internal class FileInfoViewModelTest {
         runTest {
             whenever(typedFileNode.versionCount).thenReturn(2)
             underTest.setNode(node.handle, true)
-            Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
+            assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
         }
 
     @Test
@@ -355,7 +357,7 @@ internal class FileInfoViewModelTest {
         runTest {
             whenever(typedFileNode.versionCount).thenReturn(0)
             underTest.setNode(node.handle, true)
-            Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(false)
+            assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(false)
         }
 
     @Test
@@ -363,7 +365,7 @@ internal class FileInfoViewModelTest {
         runTest {
             whenever(isConnectedToInternetUseCase.invoke()).thenReturn(false)
             underTest.moveNodeCheckingCollisions(parentId)
-            Truth.assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
+            assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
                 .isEqualTo(FileInfoOneOffViewEvent.NotConnected)
 
         }
@@ -373,7 +375,7 @@ internal class FileInfoViewModelTest {
         runTest {
             whenever(isConnectedToInternetUseCase.invoke()).thenReturn(false)
             underTest.copyNodeCheckingCollisions(parentId)
-            Truth.assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
+            assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
                 .isEqualTo(FileInfoOneOffViewEvent.NotConnected)
         }
 
@@ -402,7 +404,7 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.moveNodeCheckingCollisions(parentId)
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Moving::class.java)?.also {
-                Truth.assertThat(it.exception).isNull()
+                assertThat(it.exception).isNull()
             }
         }
 
@@ -413,7 +415,7 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.moveNodeCheckingCollisions(parentId)
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Moving::class.java)?.also {
-                Truth.assertThat(it.exception).isNotNull()
+                assertThat(it.exception).isNotNull()
             }
         }
 
@@ -424,7 +426,7 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.removeNode()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.MovingToRubbish::class.java)?.also {
-                Truth.assertThat(it.exception).isNull()
+                assertThat(it.exception).isNull()
             }
         }
 
@@ -435,7 +437,7 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.removeNode()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.MovingToRubbish::class.java)?.also {
-                Truth.assertThat(it.exception).isNotNull()
+                assertThat(it.exception).isNotNull()
             }
         }
 
@@ -446,7 +448,7 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.removeNode()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Deleting::class.java)?.also {
-                Truth.assertThat(it.exception).isNull()
+                assertThat(it.exception).isNull()
             }
         }
 
@@ -457,7 +459,7 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.removeNode()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Deleting::class.java)?.also {
-                Truth.assertThat(it.exception).isNotNull()
+                assertThat(it.exception).isNotNull()
             }
         }
 
@@ -468,7 +470,7 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.copyNodeCheckingCollisions(parentId)
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Copying::class.java)?.also {
-                Truth.assertThat(it.exception).isNull()
+                assertThat(it.exception).isNull()
             }
         }
 
@@ -479,7 +481,7 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.copyNodeCheckingCollisions(parentId)
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Copying::class.java)?.also {
-                Truth.assertThat(it.exception).isNotNull()
+                assertThat(it.exception).isNotNull()
             }
         }
 
@@ -490,7 +492,7 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.deleteHistoryVersions()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.DeletingVersions::class.java)?.also {
-                Truth.assertThat(it.exception).isNull()
+                assertThat(it.exception).isNull()
             }
         }
 
@@ -501,8 +503,8 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.deleteHistoryVersions()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.DeletingVersions::class.java)?.also {
-                Truth.assertThat(it.exception).isNotNull()
-                Truth.assertThat(it.exception)
+                assertThat(it.exception).isNotNull()
+                assertThat(it.exception)
                     .isNotInstanceOf(VersionsNotDeletedException::class.java)
             }
         }
@@ -516,13 +518,73 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.deleteHistoryVersions()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.DeletingVersions::class.java)?.also {
-                Truth.assertThat(it.exception).isNotNull()
-                Truth.assertThat(it.exception).isInstanceOf(VersionsNotDeletedException::class.java)
+                assertThat(it.exception).isNotNull()
+                assertThat(it.exception).isInstanceOf(VersionsNotDeletedException::class.java)
                 (it.exception as? VersionsNotDeletedException)?.let { exception ->
-                    Truth.assertThat(exception.totalNotDeleted).isEqualTo(errors)
-                    Truth.assertThat(exception.totalRequestedToDelete).isEqualTo(total)
+                    assertThat(exception.totalNotDeleted).isEqualTo(errors)
+                    assertThat(exception.totalRequestedToDelete).isEqualTo(total)
                 }
             }
+        }
+
+    @Test
+    fun `test that NodeDescriptionAdded event is triggered when setting a new non empty description`() =
+        runTest {
+            whenever(setNodeDescriptionUseCase(NodeId(any()), any())).thenReturn(Unit)
+            underTest.setNode(node.handle, true)
+            val newDescription = "new description"
+            underTest.setNodeDescription(newDescription)
+            testEventIsOfType(FileInfoOneOffViewEvent.Message.NodeDescriptionAdded::class.java)
+            assertThat(underTest.uiState.value.descriptionText).isEqualTo(newDescription)
+        }
+
+    @Test
+    fun `test that NodeDescriptionUpdated event is triggered when updating a non empty description`() =
+        runTest {
+            whenever(setNodeDescriptionUseCase(NodeId(any()), any())).thenReturn(Unit)
+            underTest.setNode(node.handle, true)
+            val initialDescription = "initial description"
+            underTest.setNodeDescription(initialDescription)
+            val updatedDescription = "updated description"
+            underTest.setNodeDescription(updatedDescription)
+            testEventIsOfType(FileInfoOneOffViewEvent.Message.NodeDescriptionUpdated::class.java)
+            assertThat(underTest.uiState.value.descriptionText).isEqualTo(updatedDescription)
+        }
+
+    @Test
+    fun `test that no OneOffEvent is triggered when not changing an empty description`() =
+        runTest {
+            whenever(setNodeDescriptionUseCase(NodeId(any()), any())).thenReturn(Unit)
+            underTest.setNode(node.handle, true)
+            underTest.setNodeDescription("")
+            assertThat(underTest.uiState.value.oneOffViewEvent).isInstanceOf(
+                StateEventWithContentConsumed::class.java
+            )
+            assertThat(underTest.uiState.value.descriptionText).isEqualTo("")
+        }
+
+    @Test
+    fun `test that NodeDescriptionUpdated event is triggered when setting the same description`() =
+        runTest {
+            whenever(setNodeDescriptionUseCase(NodeId(any()), any())).thenReturn(Unit)
+            underTest.setNode(node.handle, true)
+            val sameDescription = "same description"
+            underTest.setNodeDescription(sameDescription)
+            underTest.setNodeDescription(sameDescription)
+            testEventIsOfType(FileInfoOneOffViewEvent.Message.NodeDescriptionUpdated::class.java)
+            assertThat(underTest.uiState.value.descriptionText).isEqualTo(sameDescription)
+        }
+
+    @Test
+    fun `test that no OneOffEvent is triggered when setting node description fails`() =
+        runTest {
+            whenever(setNodeDescriptionUseCase(NodeId(any()), any())).thenThrow(RuntimeException())
+            underTest.setNode(node.handle, true)
+            val description = "a description"
+            underTest.setNodeDescription(description)
+            assertThat(underTest.uiState.value.oneOffViewEvent).isInstanceOf(
+                StateEventWithContentConsumed::class.java
+            )
         }
 
     @Test
@@ -626,10 +688,10 @@ internal class FileInfoViewModelTest {
     fun `test on-off event is removed from state once is consumed`() {
         `test CollisionDetected event is launched when a collision is found while copying`()
         runTest {
-            Truth.assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
+            assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
                 .isNotNull()
             underTest.consumeOneOffEvent()
-            Truth.assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
+            assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
                 .isNull()
         }
     }
@@ -642,7 +704,7 @@ internal class FileInfoViewModelTest {
         underTest.setNode(node.handle, true)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
             val state = awaitItem()
-            Truth.assertThat(state).isEqualTo(previewUri)
+            assertThat(state).isEqualTo(previewUri)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -659,7 +721,7 @@ internal class FileInfoViewModelTest {
         whenever(typedFileNode.thumbnailPath).thenReturn(null)
         underTest.setNode(node.handle, true)
         underTest.uiState.test {
-            Truth.assertThat(cancelAndConsumeRemainingEvents().any { it is Event.Error }).isFalse()
+            assertThat(cancelAndConsumeRemainingEvents().any { it is Event.Error }).isFalse()
         }
     }
 
@@ -670,7 +732,7 @@ internal class FileInfoViewModelTest {
         underTest.setNode(node.handle, true)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
             val state = awaitItem()
-            Truth.assertThat(state).isEqualTo("file:$thumbUri")
+            assertThat(state).isEqualTo("file:$thumbUri")
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -683,7 +745,7 @@ internal class FileInfoViewModelTest {
         underTest.setNode(node.handle, true)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
             val state = awaitItem()
-            Truth.assertThat(state).isEqualTo(previewUri)
+            assertThat(state).isEqualTo(previewUri)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -729,7 +791,7 @@ internal class FileInfoViewModelTest {
             whenever(getContactItemFromInShareFolder.invoke(folderNode, false)).thenReturn(mock())
             whenever(getNodeAccessPermission.invoke(folderNode.id)).thenReturn(expected)
             underTest.setNode(folderNode.id.longValue)
-            Truth.assertThat(underTest.uiState.value.accessPermission)
+            assertThat(underTest.uiState.value.accessPermission)
                 .isEqualTo(expected)
             verify(getNodeAccessPermission, times(1)).invoke(nodeId)
         }
@@ -748,7 +810,7 @@ internal class FileInfoViewModelTest {
                 flowOf(listOf(NodeChanges.Inshare))
             )
             underTest.setNode(node.handle, true)
-            Truth.assertThat(underTest.uiState.value.accessPermission)
+            assertThat(underTest.uiState.value.accessPermission)
                 .isEqualTo(expectedChanged)
             verify(getNodeAccessPermission, times(2)).invoke(nodeId)
         }
@@ -775,7 +837,7 @@ internal class FileInfoViewModelTest {
         val expected = mock<List<ContactPermission>>()
         whenever(getNodeOutSharesUseCase.invoke(nodeId)).thenReturn(expected)
         underTest.setNode(node.handle, true)
-        Truth.assertThat(underTest.uiState.value.outShares).isEqualTo(expected)
+        assertThat(underTest.uiState.value.outShares).isEqualTo(expected)
     }
 
     @Test
@@ -797,7 +859,7 @@ internal class FileInfoViewModelTest {
         val expected = true
         whenever(isAvailableOffline.invoke(typedFileNode)).thenReturn(expected)
         underTest.setNode(node.handle, true)
-        Truth.assertThat(underTest.uiState.value.isAvailableOffline).isEqualTo(expected)
+        assertThat(underTest.uiState.value.isAvailableOffline).isEqualTo(expected)
     }
 
     @Test
@@ -858,7 +920,7 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.initiateRemoveNode(false)
             underTest.uiState.mapNotNull { it.requiredExtraAction }.test {
-                Truth.assertThat(awaitItem()).isEqualTo(FileInfoExtraAction.ConfirmRemove.Delete)
+                assertThat(awaitItem()).isEqualTo(FileInfoExtraAction.ConfirmRemove.Delete)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -871,7 +933,7 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.initiateRemoveNode(true)
             underTest.uiState.mapNotNull { it.requiredExtraAction }.test {
-                Truth.assertThat(awaitItem())
+                assertThat(awaitItem())
                     .isEqualTo(FileInfoExtraAction.ConfirmRemove.SendToRubbish)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -886,7 +948,7 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.initiateRemoveNode(true)
             underTest.uiState.mapNotNull { it.requiredExtraAction }.test {
-                Truth.assertThat(awaitItem())
+                assertThat(awaitItem())
                     .isEqualTo(FileInfoExtraAction.ConfirmRemove.SendToRubbishCameraUploads)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -901,7 +963,7 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle, true)
             underTest.initiateRemoveNode(true)
             underTest.uiState.mapNotNull { it.requiredExtraAction }.test {
-                Truth.assertThat(awaitItem())
+                assertThat(awaitItem())
                     .isEqualTo(FileInfoExtraAction.ConfirmRemove.SendToRubbishSecondaryMediaUploads)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -945,9 +1007,9 @@ internal class FileInfoViewModelTest {
             underTest.setNode(folderNode.id.longValue)
             underTest.uiState.test {
                 val actual = awaitItem()
-                Truth.assertThat(actual.folderTreeInfo).isEqualTo(folderTreeInfo)
-                Truth.assertThat(actual.isAvailableOfflineAvailable).isTrue()
-                Truth.assertThat(actual.sizeInBytes)
+                assertThat(actual.folderTreeInfo).isEqualTo(folderTreeInfo)
+                assertThat(actual.isAvailableOfflineAvailable).isTrue()
+                assertThat(actual.sizeInBytes)
                     .isEqualTo(actualSize + versionsSize)
             }
         }
@@ -957,7 +1019,7 @@ internal class FileInfoViewModelTest {
         runTest {
             underTest.setNode(node.handle, true)
             underTest.startDownloadNode()
-            Truth.assertThat((underTest.uiState.value.downloadEvent as? StateEventWithContentTriggered)?.content)
+            assertThat((underTest.uiState.value.downloadEvent as? StateEventWithContentTriggered)?.content)
                 .isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
         }
 
@@ -968,7 +1030,7 @@ internal class FileInfoViewModelTest {
             whenever(isAvailableOffline(any())).thenReturn(false)
             underTest.setNode(node.handle, true)
             underTest.availableOfflineChanged(true)
-            Truth.assertThat((underTest.uiState.value.downloadEvent as? StateEventWithContentTriggered)?.content)
+            assertThat((underTest.uiState.value.downloadEvent as? StateEventWithContentTriggered)?.content)
                 .isInstanceOf(TransferTriggerEvent.StartDownloadForOffline::class.java)
         }
 
@@ -1005,7 +1067,7 @@ internal class FileInfoViewModelTest {
         clazz: Class<T>,
     ): T? {
         return getEvent().also {
-            Truth.assertThat(it).isInstanceOf(clazz)
+            assertThat(it).isInstanceOf(clazz)
         } as? T?
     }
 
@@ -1013,9 +1075,9 @@ internal class FileInfoViewModelTest {
         finishedJobClass: Class<T>,
     ): FileInfoOneOffViewEvent.Finished? {
         return getEvent().also {
-            Truth.assertThat(it).isInstanceOf(FileInfoOneOffViewEvent.Finished::class.java)
+            assertThat(it).isInstanceOf(FileInfoOneOffViewEvent.Finished::class.java)
             val jobFinished = (it as FileInfoOneOffViewEvent.Finished).jobFinished
-            Truth.assertThat(jobFinished).isInstanceOf(finishedJobClass)
+            assertThat(jobFinished).isInstanceOf(finishedJobClass)
         } as? FileInfoOneOffViewEvent.Finished?
     }
 
@@ -1236,10 +1298,10 @@ internal class FileInfoViewModelTest {
         block: () -> Unit,
     ) = runTest {
         underTest.uiState.map { it.jobInProgressState }.distinctUntilChanged().test {
-            Truth.assertThat(awaitItem()).isNull()
+            assertThat(awaitItem()).isNull()
             block()
-            Truth.assertThat(awaitItem()).isEqualTo(progress)
-            Truth.assertThat(awaitItem()).isNull()
+            assertThat(awaitItem()).isEqualTo(progress)
+            assertThat(awaitItem()).isNull()
             cancelAndIgnoreRemainingEvents()
         }
     }
