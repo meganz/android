@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -185,4 +186,19 @@ interface PhotosRepository {
      * Set hidden nodes onboarded
      */
     suspend fun setHiddenNodesOnboarded()
+
+    /**
+     * Monitor image result from cache
+     */
+    fun monitorImageResult(nodeId: NodeId): Flow<ImageResult>?
+
+    /**
+     * Save image result into cache
+     */
+    suspend fun saveImageResult(nodeId: NodeId, imageResult: ImageResult)
+
+    /**
+     * Clear all image result from cache
+     */
+    fun clearImageResult(uncompletedOnly: Boolean)
 }

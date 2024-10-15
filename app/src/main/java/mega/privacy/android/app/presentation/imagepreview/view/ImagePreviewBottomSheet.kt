@@ -74,7 +74,7 @@ internal fun ImagePreviewBottomSheet(
     showShareMenu: suspend (ImageNode) -> Boolean,
     showRenameMenu: suspend (ImageNode) -> Boolean,
     showHideMenu: suspend (ImageNode) -> Boolean,
-    showUnHideMenu: suspend (ImageNode) -> Boolean,
+    showUnhideMenu: suspend (ImageNode) -> Boolean,
     forceHideHiddenMenus: () -> Boolean,
     showMoveMenu: suspend (ImageNode) -> Boolean,
     showCopyMenu: suspend (ImageNode) -> Boolean,
@@ -106,7 +106,7 @@ internal fun ImagePreviewBottomSheet(
     onClickRename: () -> Unit = {},
     onClickHide: () -> Unit = {},
     onClickHideHelp: () -> Unit = {},
-    onClickUnHide: () -> Unit = {},
+    onClickUnhide: () -> Unit = {},
     onClickMove: () -> Unit = {},
     onClickCopy: () -> Unit = {},
     onClickRestore: () -> Unit = {},
@@ -186,8 +186,8 @@ internal fun ImagePreviewBottomSheet(
                 value = showHideMenu(imageNode)
             }
 
-            val isUnHideMenuVisible by produceState(false, imageNode) {
-                value = showUnHideMenu(imageNode)
+            val isUnhideMenuVisible by produceState(false, imageNode) {
+                value = showUnhideMenu(imageNode)
             }
 
             val isMoveMenuVisible by produceState(false, imageNode) {
@@ -441,13 +441,13 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (isHiddenNodesEnabled && !forceHideHiddenMenus() && accountType?.isPaid == true && !isBusinessAccountExpired && isUnHideMenuVisible) {
+                if (isHiddenNodesEnabled && !forceHideHiddenMenus() && accountType?.isPaid == true && !isBusinessAccountExpired && isUnhideMenuVisible) {
                     MenuActionListTile(
                         icon = painterResource(id = IconPack.drawable.ic_eye_medium_regular_outline),
                         text = stringResource(id = R.string.general_unhide_node),
-                        onActionClicked = onClickUnHide,
+                        onActionClicked = onClickUnhide,
                         dividerType = null,
-                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_UN_HIDE),
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_UNHIDE),
                     )
                 }
 

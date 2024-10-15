@@ -51,6 +51,7 @@ import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -75,6 +76,7 @@ import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaSearchFilter
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -123,6 +125,8 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val photosCache: MutableMap<NodeId, Photo> = mutableMapOf()
 
     private val imageNodesCache: MutableMap<NodeId, ImageNode> = mutableMapOf()
+
+    private val imageResultCache: MutableMap<NodeId, MutableStateFlow<ImageResult>> = mutableMapOf()
 
     @Volatile
     private var offlineNodesCache: Map<String, Offline> = mapOf()
@@ -960,6 +964,44 @@ internal class DefaultPhotosRepository @Inject constructor(
         }
     }
 
+    override fun monitorImageResult(nodeId: NodeId): Flow<ImageResult>? {
+        return try {
+            imageResultCache[nodeId] ?: run {
+                imageResultCache[nodeId] = MutableStateFlow(ImageResult())
+                null
+            }
+        } catch (e: Throwable) {
+            Timber.e(e)
+            null
+        }
+    }
+
+    override suspend fun saveImageResult(nodeId: NodeId, imageResult: ImageResult) {
+        try {
+            imageResultCache.getOrPut(nodeId) { MutableStateFlow(ImageResult()) }
+                .emit(imageResult.copy())
+
+            if (imageResult.isFullyLoaded) {
+                imageResultCache.remove(nodeId)
+            }
+        } catch (e: Throwable) {
+            Timber.e(e)
+        }
+    }
+
+    override fun clearImageResult(uncompletedOnly: Boolean) {
+        try {
+            if (uncompletedOnly) {
+                imageResultCache.entries.removeIf { !it.value.value.isFullyLoaded }
+            } else {
+                imageResultCache.clear()
+            }
+        } catch (e: Throwable) {
+            Timber.e(e)
+            imageResultCache.clear()
+        }
+    }
+
     override fun clearCache() {
         isInitialized = false
 
@@ -972,6 +1014,7 @@ internal class DefaultPhotosRepository @Inject constructor(
         offlineNodesCache = mapOf()
         photosCache.clear()
         imageNodesCache.clear()
+        imageResultCache.clear()
 
         photosFlow.value = null
         imageNodesFlow.value = null

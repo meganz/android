@@ -2,7 +2,6 @@
 
 package mega.privacy.android.app.presentation.imagepreview.slideshow.view
 
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
@@ -18,7 +17,6 @@ import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -27,11 +25,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
@@ -42,13 +40,20 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
+import me.saket.telephoto.zoomable.DoubleClickToZoomListener
+import me.saket.telephoto.zoomable.ZoomSpec
+import me.saket.telephoto.zoomable.ZoomableImageState
+import me.saket.telephoto.zoomable.ZoomableState
+import me.saket.telephoto.zoomable.coil.ZoomableAsyncImage
+import me.saket.telephoto.zoomable.rememberZoomableImageState
+import me.saket.telephoto.zoomable.rememberZoomableState
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R.drawable
 import mega.privacy.android.app.R.string
@@ -56,10 +61,12 @@ import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowVie
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction.SettingOptionsMenuAction
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
 import mega.privacy.mobile.analytics.event.SlideShowScreenEvent
@@ -67,12 +74,19 @@ import timber.log.Timber
 
 @Composable
 fun SlideshowScreen(
-    viewModel: SlideshowViewModel = hiltViewModel(),
     onClickSettingMenu: () -> Unit,
+    onClickBack: () -> Unit,
+    viewModel: SlideshowViewModel = hiltViewModel(),
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     val imageNodes = viewState.imageNodes
+
+    if (viewState.isInitialized && imageNodes.isEmpty()) {
+        LaunchedEffect(Unit) {
+            onClickBack()
+        }
+    }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -89,8 +103,10 @@ fun SlideshowScreen(
     }
 
     if (imageNodes.isNotEmpty()) {
+        val zoomableStateMap = remember { mutableMapOf<NodeId, ZoomableState?>() }
+
         val scaffoldState = rememberScaffoldState()
-        val photoState = rememberPhotoState()
+        val coroutineScope = rememberCoroutineScope()
         val order = viewState.order ?: SlideshowOrder.Shuffle
         val speed = viewState.speed ?: SlideshowSpeed.Normal
         val repeat = viewState.repeat
@@ -101,16 +117,14 @@ fun SlideshowScreen(
         ) {
             imageNodes.size
         }
-        val onBackPressedDispatcher =
-            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
-        Scaffold(
+        MegaScaffold(
             modifier = Modifier.systemBarsPadding(),
             scaffoldState = scaffoldState,
             topBar = {
                 if (!isPlaying) {
                     SlideshowTopBar(
-                        onClickBack = { onBackPressedDispatcher?.onBackPressed() },
+                        onClickBack = onClickBack,
                         onClickSettingMenu = onClickSettingMenu
                     )
                 }
@@ -119,8 +133,15 @@ fun SlideshowScreen(
                 if (!isPlaying) {
                     SlideshowBottomBar(
                         onPlayOrPauseSlideshow = {
-                            photoState.resetScale()
-                            viewModel.updateIsPlaying(isPlaying = true)
+                            coroutineScope.launch {
+                                val page = pagerState.currentPage
+                                for (candidatePage in page - 1..page + 1) {
+                                    viewState.imageNodes.getOrNull(candidatePage)?.let { node ->
+                                        zoomableStateMap[node.id]?.resetZoom()
+                                    }
+                                }
+                                viewModel.updateIsPlaying(isPlaying = true)
+                            }
                         },
                     )
                 }
@@ -133,17 +154,12 @@ fun SlideshowScreen(
                 downloadImage = viewModel::monitorImageResult,
                 getImagePath = viewModel::getHighestResolutionImagePath,
                 getErrorImagePath = viewModel::getFallbackImagePath,
-                photoState = photoState,
                 onTapImage = { viewModel.updateIsPlaying(false) },
-            ) {
-                LaunchedEffect(pagerState.canScrollForward) {
-                    // Not repeat and the last one.
-                    if (!pagerState.canScrollForward && !repeat && isPlaying) {
-                        Timber.d("Slideshow canScrollForward")
-                        viewModel.updateIsPlaying(false)
-                    }
+                onImageZooming = { viewModel.updateIsPlaying(false) },
+                onCacheImageState = { node, zoomState ->
+                    zoomableStateMap[node.id] = zoomState
                 }
-            }
+            )
         }
 
         LaunchedEffect(isPlaying) {
@@ -171,7 +187,6 @@ fun SlideshowScreen(
             // When order change, restart slideshow
             snapshotFlow { order }.distinctUntilChanged().collect {
                 if (viewState.shouldPlayFromFirst) {
-                    Timber.d("Slideshow shouldPlayFromFirst")
                     pagerState.animateScrollToPage(0)
                     viewModel.shouldPlayFromFirst(shouldPlayFromFirst = false)
                 }
@@ -179,17 +194,20 @@ fun SlideshowScreen(
         }
 
         LaunchedEffect(pagerState.currentPage) {
-            // When move to next, reset scale
-            if (photoState.isScaled) {
-                Timber.d("Slideshow reset scaled")
-                photoState.resetScale()
+            val page = pagerState.currentPage
+
+            for (candidatePage in page - 1..page + 1) {
+                viewState.imageNodes.getOrNull(candidatePage)?.let { node ->
+                    coroutineScope.launch {
+                        zoomableStateMap[node.id]?.resetZoom()
+                    }
+                }
             }
         }
 
-        LaunchedEffect(photoState.isScaled) {
-            // Observe if scaling, then pause slideshow
-            if (photoState.isScaled) {
-                Timber.d("Slideshow is scaling")
+        LaunchedEffect(pagerState.canScrollForward) {
+            // Not repeat and the last one.
+            if (!pagerState.canScrollForward && !repeat && isPlaying) {
                 viewModel.updateIsPlaying(false)
             }
         }
@@ -244,26 +262,32 @@ private fun SlideshowTopBar(
 private fun SlideShowContent(
     paddingValues: PaddingValues,
     pagerState: PagerState,
-    photoState: PhotoState,
     imageNodes: List<ImageNode>,
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
     getImagePath: suspend (ImageResult?) -> String?,
     getErrorImagePath: suspend (ImageResult?) -> String?,
     onTapImage: () -> Unit,
-    handleEffectComposable: @Composable () -> Unit,
+    onImageZooming: (ZoomableState) -> Unit,
+    onCacheImageState: (ImageNode, ZoomableState) -> Unit,
 ) {
-    Box(modifier = Modifier.padding(paddingValues)) {
+
+    Box(
+        modifier = Modifier
+            .padding(paddingValues)
+            .fillMaxSize()
+    ) {
         HorizontalPager(
             modifier = Modifier
                 .fillMaxSize(),
             state = pagerState,
-            beyondBoundsPageCount = 5,
+            beyondBoundsPageCount = minOf(3, imageNodes.size),
             key = { imageNodes.getOrNull(it)?.id?.longValue ?: -1L }
         ) { index ->
 
             val imageNode = imageNodes[index]
             val imageResultPair by produceState<Pair<String?, String?>>(
-                initialValue = Pair(null, null)
+                initialValue = Pair(null, null),
+                key1 = imageNode
             ) {
                 downloadImage(imageNode).collectLatest { imageResult ->
                     value = Pair(
@@ -275,30 +299,40 @@ private fun SlideShowContent(
 
             val (fullSizePath, errorImagePath) = imageResultPair
 
+            val zoomableState = rememberZoomableState(
+                zoomSpec = ZoomSpec(maxZoomFactor = Int.MAX_VALUE.toFloat())
+            )
+            val imageState = rememberZoomableImageState(zoomableState)
+            onCacheImageState(imageNode, imageState.zoomableState)
+
+            LaunchedEffect(zoomableState.zoomFraction) {
+                val fraction = zoomableState.zoomFraction
+                if (fraction != null && fraction > 0.0f) {
+                    onImageZooming(zoomableState)
+                }
+            }
+
             ImageContent(
-                photoState = photoState,
+                imageState = imageState,
                 onTapImage = onTapImage,
                 fullSizePath = if (imageNode.serializedData == "localFile") imageNode.fullSizePath else fullSizePath,
                 errorImagePath = if (imageNode.serializedData == "localFile") imageNode.fullSizePath else errorImagePath,
             )
-
-            handleEffectComposable()
         }
     }
 }
 
 @Composable
 private fun ImageContent(
-    photoState: PhotoState,
+    imageState: ZoomableImageState,
     onTapImage: () -> Unit,
     fullSizePath: String?,
     errorImagePath: String?,
 ) {
-    PhotoBox(
+    Box(
         modifier = Modifier.fillMaxSize(),
-        state = photoState,
-        onTap = { onTapImage() }
     ) {
+
         var imagePath by remember(fullSizePath) {
             mutableStateOf(fullSizePath)
         }
@@ -315,11 +349,16 @@ private fun ImageContent(
             .crossfade(true)
             .build()
 
-        AsyncImage(
+        ZoomableAsyncImage(
             model = request,
-            contentDescription = null,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.fillMaxWidth()
+            state = imageState,
+            contentDescription = "Image Preview",
+            modifier = Modifier
+                .fillMaxSize(),
+            onClick = {
+                onTapImage()
+            },
+            onDoubleClick = DoubleClickToZoomListener.cycle(maxZoomFactor = 3f),
         )
     }
 }

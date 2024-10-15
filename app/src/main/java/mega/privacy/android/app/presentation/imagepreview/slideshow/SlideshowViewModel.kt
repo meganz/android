@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,6 +32,7 @@ import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
+import mega.privacy.android.domain.usecase.imagepreview.ClearImageResultUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
@@ -50,6 +52,7 @@ class SlideshowViewModel @Inject constructor(
     private val monitorSlideshowRepeatSettingUseCase: MonitorSlideshowRepeatSettingUseCase,
     private val checkUri: CheckFileUriUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val clearImageResultUseCase: ClearImageResultUseCase,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
         get() = savedStateHandle[ImagePreviewViewModel.IMAGE_NODE_FETCHER_SOURCE]
@@ -71,6 +74,7 @@ class SlideshowViewModel @Inject constructor(
         monitorImageNodes()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun monitorImageNodes() {
         val imageFetcher = imageNodeFetchers[imagePreviewFetcherSource] ?: return
         imageFetcher.monitorImageNodes(params)
@@ -89,6 +93,7 @@ class SlideshowViewModel @Inject constructor(
             val sortedItems = sortItems(filteredImageNodes, order)
             _state.update {
                 it.copy(
+                    isInitialized = true,
                     imageNodes = sortedItems,
                     isPlaying = true
                 )
@@ -199,4 +204,6 @@ class SlideshowViewModel @Inject constructor(
                 it.copy(repeat = isRepeat ?: false)
             }
         }.launchIn(viewModelScope)
+
+    fun clearImageResultCache() = clearImageResultUseCase(true)
 }

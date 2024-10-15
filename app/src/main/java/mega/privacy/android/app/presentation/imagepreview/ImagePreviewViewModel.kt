@@ -55,6 +55,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
+import mega.privacy.android.domain.usecase.imagepreview.ClearImageResultUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
@@ -103,6 +104,7 @@ class ImagePreviewViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val clearImageResultUseCase: ClearImageResultUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -822,6 +824,8 @@ class ImagePreviewViewModel @Inject constructor(
             it.copy(isMagnifierMode = !it.isMagnifierMode)
         }
     }
+
+    fun clearImageResultCache() = clearImageResultUseCase(false)
 
     companion object {
         const val IMAGE_NODE_FETCHER_SOURCE = "image_node_fetcher_source"

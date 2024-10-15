@@ -51,7 +51,7 @@ internal class GetImageUseCaseTest {
     @BeforeAll
     fun setUp() {
         underTest =
-            GetImageUseCase(isFullSizeRequiredUseCase)
+            GetImageUseCase(isFullSizeRequiredUseCase, mock())
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 

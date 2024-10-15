@@ -301,6 +301,7 @@ dependencies {
     implementation(testlib.hamcrest)
     implementation(lib.mega.analytics)
     implementation(lib.kotlin.serialisation)
+    implementation(lib.zoomable.image.coil)
 
     // Debug
     debugImplementation(lib.nocturn)

@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 /**
  * Slideshow ViewState
  *
+ * @property isInitialized
  * @property imageNodes Slideshow imageNodes
  * @property order Slideshow play order
  * @property speed Slideshow speed
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
  * @property isFirstInSlideshow Is first time in slideshow
  */
 data class SlideshowState(
+    val isInitialized: Boolean = false,
     val imageNodes: List<ImageNode> = emptyList(),
     val order: SlideshowOrder? = null,
     val speed: SlideshowSpeed? = null,

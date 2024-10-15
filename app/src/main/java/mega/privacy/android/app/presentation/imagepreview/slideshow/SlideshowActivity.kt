@@ -42,6 +42,7 @@ class SlideshowActivity : BaseActivity() {
                             onClickSettingMenu = {
                                 navController.navigate("slideshowSetting")
                             },
+                            onClickBack = ::finish,
                         )
                     }
 
@@ -51,5 +52,10 @@ class SlideshowActivity : BaseActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        slideshowViewModel.clearImageResultCache()
+        super.onDestroy()
     }
 }

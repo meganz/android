@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageProgress
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.TypedImageNode
+import mega.privacy.android.domain.repository.PhotosRepository
 import javax.inject.Inject
 
 /**
@@ -14,6 +15,7 @@ import javax.inject.Inject
  */
 class GetImageUseCase @Inject constructor(
     private val isFullSizeRequiredUseCase: IsFullSizeRequiredUseCase,
+    private val photosRepository: PhotosRepository,
 ) {
     /**
      * Invoke
@@ -30,75 +32,82 @@ class GetImageUseCase @Inject constructor(
         fullSize: Boolean,
         highPriority: Boolean,
         resetDownloads: () -> Unit,
-    ): Flow<ImageResult> = flow {
-        val imageResult = ImageResult(
-            isVideo = node.type is VideoFileTypeInfo,
-            thumbnailUri = node.thumbnailPath?.let { "$FILE$it" },
-            previewUri = node.previewPath?.let { "$FILE$it" },
-            fullSizeUri = node.fullSizePath?.let { "$FILE$it" },
-        )
+    ): Flow<ImageResult> {
+        return photosRepository.monitorImageResult(node.id) ?: flow {
+            val imageResult = ImageResult(
+                isVideo = node.type is VideoFileTypeInfo,
+                thumbnailUri = node.thumbnailPath?.let { "$FILE$it" },
+                previewUri = node.previewPath?.let { "$FILE$it" },
+                fullSizeUri = node.fullSizePath?.let { "$FILE$it" },
+            )
 
-        val fullSizeRequired = isFullSizeRequiredUseCase(
-            node,
-            fullSize
-        )
+            val fullSizeRequired = isFullSizeRequiredUseCase(node, fullSize)
 
-        if ((!fullSizeRequired && node.previewPath != null) || node.fullSizePath != null) {
-            imageResult.isFullyLoaded = true
-            emit(imageResult)
-            return@flow
-        } else {
-            emit(imageResult)
-        }
-
-        if (node.thumbnailPath == null) {
-            runCatching {
-                node.fetchThumbnail()
-            }.onSuccess {
-                imageResult.thumbnailUri = "$FILE$it"
+            if ((!fullSizeRequired && node.previewPath != null) || node.fullSizePath != null) {
+                imageResult.isFullyLoaded = true
                 emit(imageResult)
+                photosRepository.saveImageResult(node.id, imageResult)
+                return@flow
+            } else {
+                emit(imageResult)
+                photosRepository.saveImageResult(node.id, imageResult)
             }
-        }
 
-        if (node.previewPath == null) {
-            runCatching {
-                node.fetchPreview()
-            }.onSuccess {
-                imageResult.previewUri = "$FILE$it"
-                if (fullSizeRequired) {
+            if (node.thumbnailPath == null) {
+                runCatching {
+                    node.fetchThumbnail()
+                }.onSuccess {
+                    imageResult.thumbnailUri = "$FILE$it"
                     emit(imageResult)
-                } else {
-                    imageResult.isFullyLoaded = true
-                    emit(imageResult)
-                    return@flow
-                }
-            }.onFailure { exception ->
-                if (!fullSizeRequired) {
-                    throw exception
+                    photosRepository.saveImageResult(node.id, imageResult)
                 }
             }
-        }
 
-        if (fullSizeRequired) {
-            node.fetchFullImage(highPriority) {
-                resetDownloads()
-            }.catch { exception -> throw exception }.collect { result ->
-                when (result) {
-                    is ImageProgress.Started -> {
-                        imageResult.transferTag = result.transferTag
+            if (node.previewPath == null) {
+                runCatching {
+                    node.fetchPreview()
+                }.onSuccess {
+                    imageResult.previewUri = "$FILE$it"
+                    if (fullSizeRequired) {
                         emit(imageResult)
-                    }
-
-                    is ImageProgress.InProgress -> {
-                        imageResult.totalBytes = result.totalBytes
-                        imageResult.transferredBytes = result.transferredBytes
-                        emit(imageResult)
-                    }
-
-                    is ImageProgress.Completed -> {
+                        photosRepository.saveImageResult(node.id, imageResult)
+                    } else {
                         imageResult.isFullyLoaded = true
-                        imageResult.fullSizeUri = "$FILE${result.path}"
                         emit(imageResult)
+                        photosRepository.saveImageResult(node.id, imageResult)
+                        return@flow
+                    }
+                }.onFailure { exception ->
+                    if (!fullSizeRequired) {
+                        throw exception
+                    }
+                }
+            }
+
+            if (fullSizeRequired) {
+                node.fetchFullImage(highPriority) {
+                    resetDownloads()
+                }.catch { exception -> throw exception }.collect { result ->
+                    when (result) {
+                        is ImageProgress.Started -> {
+                            imageResult.transferTag = result.transferTag
+                            emit(imageResult)
+                            photosRepository.saveImageResult(node.id, imageResult)
+                        }
+
+                        is ImageProgress.InProgress -> {
+                            imageResult.totalBytes = result.totalBytes
+                            imageResult.transferredBytes = result.transferredBytes
+                            emit(imageResult)
+                            photosRepository.saveImageResult(node.id, imageResult)
+                        }
+
+                        is ImageProgress.Completed -> {
+                            imageResult.isFullyLoaded = true
+                            imageResult.fullSizeUri = "$FILE${result.path}"
+                            emit(imageResult)
+                            photosRepository.saveImageResult(node.id, imageResult)
+                        }
                     }
                 }
             }

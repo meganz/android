@@ -36,6 +36,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
+import mega.privacy.android.domain.usecase.imagepreview.ClearImageResultUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
@@ -96,6 +97,7 @@ class ImagePreviewViewModelTest {
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase = mock()
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
+    private val clearImageResultUseCase: ClearImageResultUseCase = mock()
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
 
     @BeforeAll
@@ -163,6 +165,7 @@ class ImagePreviewViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            clearImageResultUseCase = clearImageResultUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
