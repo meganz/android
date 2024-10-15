@@ -134,7 +134,8 @@ internal fun StartTransferComponent(
                     showFilesPermissionRequest = true
                 }
 
-                mediaReadPermission?.status?.isGranted == false -> {
+                triggerEvent !is TransferTriggerEvent.StartUpload.TextFile
+                        && mediaReadPermission?.status?.isGranted == false -> {
                     eventWithoutWritePermission = triggerEvent
                     mediaReadPermission.launchPermissionRequest()
                 }
@@ -518,7 +519,8 @@ private fun shouldAskForFilesPermission(
     requestFilesPermissionDenied: Boolean,
     transferTriggerEvent: TransferTriggerEvent,
 ) = (transferTriggerEvent is TransferTriggerEvent.StartChatUpload
-        || transferTriggerEvent is TransferTriggerEvent.StartUpload)
+        || (transferTriggerEvent is TransferTriggerEvent.StartUpload
+        && transferTriggerEvent !is TransferTriggerEvent.StartUpload.TextFile))
         && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
         && requestFilesPermissionDenied.not()
         && !Environment.isExternalStorageManager()
