@@ -48,6 +48,7 @@ internal const val BOTTOM_SHEET_HEADER =
  * @param onAddBackupClicked Lambda that is executed when the "Add backup" Tile is selected
  * @param onBottomSheetDismissed Lambda that is executed when the bottom sheet is dismissed
  * @param isFreeAccount True if is a Free account or False otherwise
+ * @param isAndroidSyncFeatureEnabled True if the Android Sync feature is enabled or False otherwise
  */
 @Composable
 internal fun DeviceBottomSheetBody(
@@ -60,6 +61,7 @@ internal fun DeviceBottomSheetBody(
     onBottomSheetDismissed: () -> Unit,
     isFreeAccount: Boolean,
     isBackupForAndroidEnabled: Boolean,
+    isAndroidSyncFeatureEnabled: Boolean,
 ) {
     Column(Modifier.testTag(BOTTOM_SHEET_CONTAINER)) {
         MenuActionNodeHeaderWithBody(
@@ -97,6 +99,7 @@ internal fun DeviceBottomSheetBody(
                     },
                     isFreeAccount = isFreeAccount,
                     isBackupForAndroidEnabled = isBackupForAndroidEnabled,
+                    isAndroidSyncFeatureEnabled = isAndroidSyncFeatureEnabled
                 )
             }
 
@@ -175,6 +178,7 @@ private fun DeviceBottomSheetBodyPreview(
             onBottomSheetDismissed = {},
             isFreeAccount = true,
             isBackupForAndroidEnabled = true,
+            isAndroidSyncFeatureEnabled = true
         )
     }
 }

@@ -27,6 +27,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property infoSelectedItem The item selected to show its Info
  * @property isFreeAccount True if is a Free account or False otherwise
  * @property enabledFlags Enabled flags
+ * @property isSyncFeatureEnabled True if the Sync feature is enabled or False otherwise
  */
 data class DeviceCenterUiState(
     val devices: List<DeviceCenterUINode> = emptyList(),
@@ -43,6 +44,7 @@ data class DeviceCenterUiState(
     val searchWidgetState: SearchWidgetState = SearchWidgetState.COLLAPSED,
     val infoSelectedItem: DeviceCenterUINode? = null,
     val isFreeAccount: Boolean = true,
+    val isSyncFeatureEnabled: Boolean = false,
     val enabledFlags: Set<Feature> = emptySet(),
 ) {
     val itemsToDisplay: List<DeviceCenterUINode> = selectedDevice?.folders ?: devices
