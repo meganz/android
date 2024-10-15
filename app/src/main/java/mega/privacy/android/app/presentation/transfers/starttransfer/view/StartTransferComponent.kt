@@ -56,7 +56,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeTransfersDialog
-import mega.privacy.android.app.presentation.transfers.starttransfer.view.filespermission.FilesPermissionView
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.filespermission.FilesPermissionDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.TransferInProgressDialog
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
@@ -147,14 +147,14 @@ internal fun StartTransferComponent(
         })
 
     if (showFilesPermissionRequest) {
-        FilesPermissionView(
+        FilesPermissionDialog(
             onDoNotShowAgainClick = { viewModel.setRequestFilesPermissionDenied() },
             onStartTransferAndDismiss = {
                 eventWithoutWritePermission?.let { event ->
                     viewModel.startTransfer(event)
-                    showFilesPermissionRequest = false
-                    eventWithoutWritePermission = null
                 }
+                showFilesPermissionRequest = false
+                eventWithoutWritePermission = null
             }
         )
     }

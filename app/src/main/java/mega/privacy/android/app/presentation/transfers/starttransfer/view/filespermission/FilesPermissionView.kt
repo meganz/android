@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,57 +25,49 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.FullScreenDialog
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 @Composable
-internal fun FilesPermissionView(
+internal fun FilesPermissionDialog(
     onDoNotShowAgainClick: () -> Unit,
     onStartTransferAndDismiss: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val manageStoragePermissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             onStartTransferAndDismiss()
         }
 
-    Dialog(
-        properties = DialogProperties(usePlatformDefaultWidth = false),
+    FullScreenDialog(
         onDismissRequest = onStartTransferAndDismiss,
     ) {
-        Surface(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            FilesPermissionView(
-                onAllowClick = {
-                    runCatching {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            manageStoragePermissionLauncher.launch(
-                                Intent(
-                                    ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                                    Uri.parse("package:" + BuildConfig.APPLICATION_ID)
-                                )
+        FilesPermissionView(
+            onAllowClick = {
+                runCatching {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        manageStoragePermissionLauncher.launch(
+                            Intent(
+                                ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                                Uri.parse("package:" + BuildConfig.APPLICATION_ID)
                             )
-                        }
-                    }.onFailure { _ ->
-                        // handle case activity not found
-                        onStartTransferAndDismiss()
+                        )
                     }
-                },
-                onDoNotShowAgainClick = onDoNotShowAgainClick,
-                onStartTransferAndDismiss = onStartTransferAndDismiss,
-                modifier = modifier,
-            )
-        }
+                }.onFailure { _ ->
+                    // handle case activity not found
+                    onStartTransferAndDismiss()
+                }
+            },
+            onDoNotShowAgainClick = onDoNotShowAgainClick,
+            onStartTransferAndDismiss = onStartTransferAndDismiss,
+        )
     }
 }
 
@@ -145,7 +136,7 @@ internal fun FilesPermissionView(
         },
         modifier = Modifier
             .testTag(DO_NOT_SHOW_AGAIN_BUTTON_TAG)
-            .padding(top = 20.dp),
+            .padding(top = 20.dp, bottom = 68.dp),
     )
 }
 
@@ -153,7 +144,7 @@ internal fun FilesPermissionView(
 @Composable
 private fun FilesPermissionViewPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
-        FilesPermissionView(
+        FilesPermissionDialog(
             onDoNotShowAgainClick = {},
             onStartTransferAndDismiss = {},
         )
