@@ -90,7 +90,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.changesInStatusInSession }
             .distinctUntilChanged()) {
             it?.apply {
-                if (!inMeetingViewModel.isOneToOneCall()) {
+                if (inMeetingViewModel.isOneToOneCall() == false) {
                     when (status) {
                         ChatSessionStatus.Invalid -> {}
                         ChatSessionStatus.Progress -> {

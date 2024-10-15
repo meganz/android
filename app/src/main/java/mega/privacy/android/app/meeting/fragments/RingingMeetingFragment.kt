@@ -191,7 +191,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.chat }
             .distinctUntilChanged()) {
             it?.run {
-                if (inMeetingViewModel.isOneToOneCall()) {
+                if (inMeetingViewModel.isOneToOneCall() == true) {
                     val callerId = it.peerHandlesList[0]
                     getImageAvatarCall(callerId)?.let { bitmap ->
                         binding.avatar.setImageBitmap(bitmap)

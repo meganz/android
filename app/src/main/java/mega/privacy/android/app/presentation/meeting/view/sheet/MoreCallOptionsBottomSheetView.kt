@@ -115,7 +115,7 @@ private fun BottomSheetContent(
 
             Column(modifier = Modifier.verticalScroll(rememberScrollState()))
             {
-                if (isRaiseToSpeakFeatureFlagEnabled && !isOneToOneCall) {
+                if (isRaiseToSpeakFeatureFlagEnabled && isOneToOneCall == false) {
                     BottomSheetMenuItemView(
                         modifier = Modifier.testTag(CALL_OPTIONS_BOTTOM_SHEET_RAISE_HAND_BUTTON),
                         res = R.drawable.raise_hand_icon,

@@ -162,7 +162,7 @@ class AppRTCAudioManager @Inject constructor(
     fun startProximitySensor(): Boolean {
         if (registerProximitySensor()) {
             Timber.d("Starting proximity sensor")
-            proximitySensor!!.start()
+            proximitySensor?.start()
             return true
         }
         return false

@@ -126,9 +126,9 @@ data class InMeetingUiState(
      * @return True, if it's one to one call. False, if it's a group call or a meeting.
      */
     val isOneToOneCall
-        get():Boolean = chat?.let {
+        get():Boolean? = chat?.let {
             it.isMeeting.not() && it.isGroup.not()
-        } ?: run { false }
+        } ?: run { null }
 
     /**
      * Is call on hold

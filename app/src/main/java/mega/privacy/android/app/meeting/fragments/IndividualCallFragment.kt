@@ -20,7 +20,6 @@ import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.databinding.IndividualCallFragmentBinding
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
-import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getCurrentOrientation
@@ -157,9 +156,9 @@ class IndividualCallFragment : MeetingBaseFragment() {
             inMeetingViewModel.setChatId(it)
         }
 
-        viewLifecycleOwner.collectFlow(sharedModel.state) { state: MeetingState ->
-            raisedHandIcon?.isVisible =
-                state.isRaiseToSpeakFeatureFlagEnabled && state.isMyHandRaisedToSpeak
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.isMyHandRaisedToSpeak }
+            .distinctUntilChanged()) {
+            raisedHandIcon?.isVisible = it
         }
 
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.shouldUpdateLocalAVFlags }
@@ -173,7 +172,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.sessionOnHoldChanges }
             .distinctUntilChanged()) { session ->
             session?.apply {
-                if (inMeetingViewModel.isOneToOneCall() && isAdded) {
+                if (inMeetingViewModel.isOneToOneCall() == true && isAdded) {
                     Timber.d("Check changes in session on hold")
                     checkChangesInOnHold(isOnHold)
                 }
@@ -183,7 +182,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.changesInAVFlagsInSession }
             .distinctUntilChanged()) {
             it?.let { chatSession ->
-                if (inMeetingViewModel.isOneToOneCall()) {
+                if (inMeetingViewModel.isOneToOneCall() == true) {
                     Timber.d("Check changes in remote AVFlags")
                     when {
                         isFloatingWindow -> checkItIsOnlyAudio()
@@ -220,7 +219,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.changesInHiResInSession }
             .distinctUntilChanged()) { session ->
             session?.apply {
-                if (!isFloatingWindow && inMeetingViewModel.isOneToOneCall() && isAdded) {
+                if (!isFloatingWindow && inMeetingViewModel.isOneToOneCall() == true && isAdded) {
                     if (canReceiveVideoHiRes && isHiResVideo) {
                         Timber.d("Can receive high-resolution video")
 
@@ -335,7 +334,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * Check if is an audio call
      */
     private fun checkItIsOnlyAudio() {
-        if (!isFloatingWindow || !inMeetingViewModel.isOneToOneCall()) return
+        if (!isFloatingWindow || inMeetingViewModel.isOneToOneCall() != true) return
 
         if (inMeetingViewModel.isAudioCall()) {
             Timber.d("Is only audio call, hide avatar")
@@ -386,7 +385,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * Method to control the Call on hold icon visibility
      */
     private fun showCallOnHoldIcon() {
-        val isOneToOneCall = inMeetingViewModel.isOneToOneCall()
+        val isOneToOneCall = inMeetingViewModel.isOneToOneCall() == true
         val isCallOnHold = inMeetingViewModel.state.value.isCallOnHold == true
         val isSessionOnHold = inMeetingViewModel.state.value.isSessionOnHold == true
 
@@ -430,7 +429,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
     fun checkVideoOn(peerId: Long, clientId: Long) {
         if (isInvalid(peerId, clientId)) return
         val currentCall = inMeetingViewModel.getCall()
-        val isOneToOneCall = inMeetingViewModel.isOneToOneCall()
+        val isOneToOneCall = inMeetingViewModel.isOneToOneCall() == true
         if ((currentCall != null && currentCall.status != ChatCallStatus.Joining && currentCall.status != ChatCallStatus.InProgress) ||
             (!inMeetingViewModel.isMe(peerId) && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) ||
             (inMeetingViewModel.isMe(peerId) &&
@@ -473,8 +472,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
         when {
             videoListener != null -> {
                 Timber.d("Video listener not null")
-                videoListener!!.height = 0
-                videoListener!!.width = 0
+                videoListener?.height = 0
+                videoListener?.width = 0
             }
 
             inMeetingViewModel.isMe(peerId) -> {
@@ -496,7 +495,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                     videoTextureView,
                     resources.displayMetrics,
                     clientId,
-                    isFloatingWindow = false
+                    isFloatingWindow
                 )
                 Timber.d("Participant $clientId video listener created")
 
@@ -542,7 +541,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         if (isOnHold) {
             Timber.d("Call or session on hold")
             //It's on hold
-            if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isMe(this.peerId) && isFloatingWindow) {
+            if (inMeetingViewModel.isOneToOneCall() == true && inMeetingViewModel.isMe(this.peerId) && isFloatingWindow) {
                 closeVideo(peerId, this.clientId)
                 checkItIsOnlyAudio()
                 return
