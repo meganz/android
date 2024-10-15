@@ -131,11 +131,7 @@ internal fun VideoItemView(
                 contentDescription = VIDEO_ITEM_MENU_ICON_CONTENT_DESCRIPTION,
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .clickable {
-                        if (!isSelected) {
-                            onMenuClick()
-                        }
-                    }
+                    .clickable(enabled = !isSelected, onClick = onMenuClick)
                     .testTag(VIDEO_ITEM_MENU_ICON_TEST_TAG),
                 alignment = Alignment.CenterEnd,
             )

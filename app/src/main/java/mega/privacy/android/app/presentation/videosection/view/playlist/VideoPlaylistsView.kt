@@ -287,6 +287,7 @@ internal fun VideoPlaylistsView(
                                 },
                                 totalDuration = videoPlaylistItem.totalDuration,
                                 isSelected = videoPlaylistItem.isSelected,
+                                isSystemVideoPlaylist = videoPlaylistItem.isSystemVideoPlayer,
                                 onClick = { onClick(videoPlaylistItem, it) },
                                 onMenuClick = {
                                     clickedItem = it

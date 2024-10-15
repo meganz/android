@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.videosection
 
+import android.content.Context
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
@@ -8,6 +9,8 @@ import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMa
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.domain.entity.videosection.FavouritesVideoPlaylist
+import mega.privacy.android.domain.entity.videosection.SystemVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
@@ -22,6 +25,7 @@ import kotlin.time.Duration.Companion.seconds
 class VideoPlaylistUIEntityMapperTest {
     private lateinit var underTest: VideoPlaylistUIEntityMapper
 
+    private val context = mock<Context>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
     private val videoUIEntityMapper = mock<VideoUIEntityMapper>()
 
@@ -38,13 +42,14 @@ class VideoPlaylistUIEntityMapperTest {
     @BeforeAll
     fun setUp() {
         underTest = VideoPlaylistUIEntityMapper(
-            durationInSecondsTextMapper,
-            videoUIEntityMapper
+            durationInSecondsTextMapper = durationInSecondsTextMapper,
+            videoUIEntityMapper = videoUIEntityMapper,
+            context = context
         )
     }
 
     @Test
-    fun `test that VideoPlaylistUIEntity can be mapped correctly`() =
+    fun `test that VideoPlaylistUIEntity can be mapped correctly when video playlist is UserVideoPlaylist`() =
         runTest {
             whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(totalDuration)
             val videoPlaylist = mock<UserVideoPlaylist> {
@@ -58,13 +63,15 @@ class VideoPlaylistUIEntityMapperTest {
                 on { totalDuration }.thenReturn(10.seconds)
                 on { videos }.thenReturn(null)
             }
-            assertMappedVideoPlaylistUIEntity(
-                videoPlaylistUIEntity = underTest(videoPlaylist)
+            assertMappedVideoPlaylistUIEntityByUserVideoPlaylist(
+                videoPlaylistUIEntity = underTest(videoPlaylist),
+                expectedId = id,
+                isSystemVideoPlaylist = false
             )
         }
 
     @Test
-    fun `test that VideoPlaylistUIEntity can be mapped correctly when video is not null`() =
+    fun `test that VideoPlaylistUIEntity can be mapped correctly when video is not null when video playlist is UserVideoPlaylist`() =
         runTest {
             whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(totalDuration)
             whenever(videoUIEntityMapper(anyOrNull())).thenReturn(mock())
@@ -82,19 +89,104 @@ class VideoPlaylistUIEntityMapperTest {
                 on { totalDuration }.thenReturn(10.seconds)
                 on { videos }.thenReturn(testVideos)
             }
-            assertMappedVideoPlaylistUIEntity(
-                videoPlaylistUIEntity = underTest(videoPlaylist), testVideos.size
+            assertMappedVideoPlaylistUIEntityByUserVideoPlaylist(
+                videoPlaylistUIEntity = underTest(videoPlaylist),
+                expectedId = id,
+                isSystemVideoPlaylist = false,
+                expectedVideosSize = testVideos.size
             )
         }
 
-    private fun assertMappedVideoPlaylistUIEntity(
+    @Test
+    fun `test that VideoPlaylistUIEntity can be mapped correctly when video playlist is SystemVideoPlaylist`() =
+        runTest {
+            whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(totalDuration)
+            val videoPlaylist = mock<SystemVideoPlaylist> {
+                on { thumbnailList }.thenReturn(thumbnailList)
+                on { numberOfVideos }.thenReturn(numberOfVideos)
+                on { totalDuration }.thenReturn(10.seconds)
+                on { videos }.thenReturn(null)
+            }
+            assertMappedVideoPlaylistUIEntityBySystemVideoPlaylist(
+                videoPlaylistUIEntity = underTest(videoPlaylist),
+                expectedId = -1,
+                isSystemVideoPlaylist = true
+            )
+        }
+
+    @Test
+    fun `test that VideoPlaylistUIEntity can be mapped correctly when video is not null when video playlist is SystemVideoPlaylist`() =
+        runTest {
+            whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(totalDuration)
+            whenever(videoUIEntityMapper(anyOrNull())).thenReturn(mock())
+
+            val testVideos = listOf<TypedVideoNode>(mock(), mock(), mock())
+
+            val videoPlaylist = mock<SystemVideoPlaylist> {
+                on { thumbnailList }.thenReturn(thumbnailList)
+                on { numberOfVideos }.thenReturn(numberOfVideos)
+                on { totalDuration }.thenReturn(10.seconds)
+                on { videos }.thenReturn(testVideos)
+            }
+            assertMappedVideoPlaylistUIEntityBySystemVideoPlaylist(
+                videoPlaylistUIEntity = underTest(videoPlaylist),
+                expectedId = -1,
+                isSystemVideoPlaylist = true,
+                expectedVideosSize = testVideos.size
+            )
+        }
+
+    @Test
+    fun `test that VideoPlaylistUIEntity can be mapped correctly when video playlist is FavouritesVideoPlaylist`() =
+        runTest {
+            whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(totalDuration)
+            whenever(context.getString(anyOrNull())).thenReturn("")
+            val videoPlaylist = mock<FavouritesVideoPlaylist> {
+                on { thumbnailList }.thenReturn(thumbnailList)
+                on { numberOfVideos }.thenReturn(numberOfVideos)
+                on { totalDuration }.thenReturn(10.seconds)
+                on { videos }.thenReturn(null)
+            }
+            assertMappedVideoPlaylistUIEntityBySystemVideoPlaylist(
+                videoPlaylistUIEntity = underTest(videoPlaylist),
+                expectedId = -1,
+                isSystemVideoPlaylist = true
+            )
+        }
+
+    @Test
+    fun `test that VideoPlaylistUIEntity can be mapped correctly when video is not null when video playlist is FavouritesVideoPlaylist`() =
+        runTest {
+            whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(totalDuration)
+            whenever(videoUIEntityMapper(anyOrNull())).thenReturn(mock())
+            whenever(context.getString(anyOrNull())).thenReturn("")
+
+            val testVideos = listOf<TypedVideoNode>(mock(), mock(), mock())
+
+            val videoPlaylist = mock<FavouritesVideoPlaylist> {
+                on { thumbnailList }.thenReturn(thumbnailList)
+                on { numberOfVideos }.thenReturn(numberOfVideos)
+                on { totalDuration }.thenReturn(10.seconds)
+                on { videos }.thenReturn(testVideos)
+            }
+            assertMappedVideoPlaylistUIEntityBySystemVideoPlaylist(
+                videoPlaylistUIEntity = underTest(videoPlaylist),
+                expectedId = -1,
+                isSystemVideoPlaylist = true,
+                expectedVideosSize = testVideos.size
+            )
+        }
+
+    private fun assertMappedVideoPlaylistUIEntityByUserVideoPlaylist(
         videoPlaylistUIEntity: VideoPlaylistUIEntity,
+        expectedId: Long = id,
+        isSystemVideoPlaylist: Boolean,
         expectedVideosSize: Int? = null,
     ) {
         videoPlaylistUIEntity.let {
             Assertions.assertAll(
                 "Grouped Assertions of ${VideoPlaylistUIEntity::class.simpleName}",
-                { assertThat(it.id.longValue).isEqualTo(id) },
+                { assertThat(it.id.longValue).isEqualTo(expectedId) },
                 { assertThat(it.title).isEqualTo(title) },
                 { assertThat(it.cover).isEqualTo(cover) },
                 { assertThat(it.creationTime).isEqualTo(creationTime) },
@@ -103,7 +195,28 @@ class VideoPlaylistUIEntityMapperTest {
                 { assertThat(it.thumbnailList?.get(0)).isEqualTo(testNodeId) },
                 { assertThat(it.numberOfVideos).isEqualTo(numberOfVideos) },
                 { assertThat(it.totalDuration).isEqualTo(totalDuration) },
-                { assertThat(it.videos?.size).isEqualTo(expectedVideosSize) }
+                { assertThat(it.videos?.size).isEqualTo(expectedVideosSize) },
+                { assertThat(it.isSystemVideoPlayer).isEqualTo(isSystemVideoPlaylist) }
+            )
+        }
+    }
+
+    private fun assertMappedVideoPlaylistUIEntityBySystemVideoPlaylist(
+        videoPlaylistUIEntity: VideoPlaylistUIEntity,
+        expectedId: Long = id,
+        isSystemVideoPlaylist: Boolean,
+        expectedVideosSize: Int? = null,
+    ) {
+        videoPlaylistUIEntity.let {
+            Assertions.assertAll(
+                "Grouped Assertions of ${VideoPlaylistUIEntity::class.simpleName}",
+                { assertThat(it.id.longValue).isEqualTo(expectedId) },
+                { assertThat(it.thumbnailList?.size).isEqualTo(thumbnailList.size) },
+                { assertThat(it.thumbnailList?.get(0)).isEqualTo(testNodeId) },
+                { assertThat(it.numberOfVideos).isEqualTo(numberOfVideos) },
+                { assertThat(it.totalDuration).isEqualTo(totalDuration) },
+                { assertThat(it.videos?.size).isEqualTo(expectedVideosSize) },
+                { assertThat(it.isSystemVideoPlayer).isEqualTo(isSystemVideoPlaylist) }
             )
         }
     }

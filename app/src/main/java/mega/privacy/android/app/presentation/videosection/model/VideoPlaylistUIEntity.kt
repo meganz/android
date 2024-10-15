@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.node.NodeId
  * @property totalDuration the total duration of videos in the playlist
  * @property videos the videos in the playlist
  * @property isSelected the playlist if is selected
+ * @property isSystemVideoPlayer the playlist if is system video player
  */
 data class VideoPlaylistUIEntity(
     val id: NodeId,
@@ -27,4 +28,5 @@ data class VideoPlaylistUIEntity(
     val totalDuration: String,
     val videos: List<VideoUIEntity>?,
     val isSelected: Boolean = false,
+    val isSystemVideoPlayer: Boolean = false
 )

@@ -211,7 +211,8 @@ fun VideoPlaylistDetailView(
                         else -> onMenuActionClick(action)
                     }
                 },
-                onBackPressed = onBackPressed
+                onBackPressed = onBackPressed,
+                isSystemVideoPlaylist = playlist?.isSystemVideoPlayer == true
             )
         },
         snackbarHost = {

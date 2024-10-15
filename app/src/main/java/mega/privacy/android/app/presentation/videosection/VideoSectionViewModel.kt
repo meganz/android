@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,10 +42,12 @@ import mega.privacy.android.app.presentation.videosection.view.videoSectionRoute
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.domain.entity.videosection.FavouritesVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
@@ -212,20 +213,44 @@ class VideoSectionViewModel @Inject constructor(
 
     private fun refreshNodesIfAnyUpdates() {
         viewModelScope.launch {
-            merge(
-                monitorNodeUpdatesUseCase().filter {
-                    it.changes.keys.any { node ->
-                        node is FileNode && node.type is VideoFileTypeInfo
-                    }
-                },
-                monitorOfflineNodeUpdatesUseCase()
-            ).conflate()
+            monitorNodeUpdatesUseCase().filter {
+                it.changes.keys.any { node ->
+                    node is FileNode && node.type is VideoFileTypeInfo
+                }
+            }.map { nodeUpdate -> nodeUpdate.changes }
+                .conflate()
                 .catch {
                     Timber.e(it)
-                }.collect {
+                }.collectLatest { changes ->
                     setPendingRefreshNodes()
+                    val isFavouriteChange =
+                        changes.values.flatten().any { it == NodeChanges.Favourite }
+                    val changedNodeIds = changes.keys.map { it.id.longValue }
+                    if (isFavouriteChange || hasMatchingIdWithFavouritesPlaylist(changedNodeIds)) {
+                        refreshVideoPlaylistsWithUpdateCurrentVideoPlaylist()
+                    }
                 }
         }
+        viewModelScope.launch {
+            monitorOfflineNodeUpdatesUseCase().map { offline ->
+                offline.map { it.handle.toLong() }
+            }.conflate()
+                .catch {
+                    Timber.e(it)
+                }.collectLatest {
+                    setPendingRefreshNodes()
+                    if (hasMatchingIdWithFavouritesPlaylist(it)) {
+                        refreshVideoPlaylistsWithUpdateCurrentVideoPlaylist()
+                    }
+                }
+        }
+    }
+
+    private fun hasMatchingIdWithFavouritesPlaylist(list: List<Long>): Boolean {
+        val favouritesVideoIds = originalPlaylistData.firstOrNull {
+            it is FavouritesVideoPlaylist
+        }?.videos?.map { it.id.longValue }?.toSet() ?: emptySet()
+        return list.any { id -> favouritesVideoIds.contains(id) }
     }
 
     private fun loadVideoPlaylists() {
@@ -244,11 +269,9 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     private suspend fun getVideoPlaylists() =
-        getVideoPlaylistsUseCase()
-            .filterIsInstance<UserVideoPlaylist>()
-            .updateOriginalPlaylistData().map { videoPlaylist ->
-                videoPlaylistUIEntityMapper(videoPlaylist)
-            }
+        getVideoPlaylistsUseCase().updateOriginalPlaylistData().map { videoPlaylist ->
+            videoPlaylistUIEntityMapper(videoPlaylist)
+        }
 
     private fun List<VideoPlaylist>.updateOriginalPlaylistData() = also { data ->
         if (originalPlaylistData.isNotEmpty()) {
@@ -603,6 +626,7 @@ class VideoSectionViewModel @Inject constructor(
         updateVideoPlaylistItemInSelectionState(item = item, index = index)
 
     private fun updateVideoPlaylistItemInSelectionState(item: VideoPlaylistUIEntity, index: Int) {
+        if (item.isSystemVideoPlayer) return
         val isSelected = !item.isSelected
         val selectedHandles = updateSelectedHandles(
             videoID = item.id.longValue,
@@ -793,14 +817,20 @@ class VideoSectionViewModel @Inject constructor(
             }
         }
 
-    private fun refreshVideoPlaylistsWithUpdateCurrentVideoPlaylist() =
+    private fun refreshVideoPlaylistsWithUpdateCurrentVideoPlaylist() {
         viewModelScope.launch {
-            val videoPlaylists =
-                getVideoPlaylists().updateOriginalPlaylistEntities()
-                    .filterVideoPlaylistsBySearchQuery()
-            val updatedCurrentVideoPlaylist = videoPlaylists.firstOrNull {
-                it.id == _state.value.currentVideoPlaylist?.id
-            }
+            val videoPlaylists = getVideoPlaylists().updateOriginalPlaylistEntities()
+                .filterVideoPlaylistsBySearchQuery()
+            val updatedCurrentVideoPlaylist =
+                _state.value.currentVideoPlaylist?.let { currentPlaylist ->
+                    if (currentPlaylist.isSystemVideoPlayer) {
+                        videoPlaylists.firstOrNull { it.isSystemVideoPlayer }
+                    } else {
+                        videoPlaylists.firstOrNull {
+                            it.id == currentPlaylist.id
+                        }
+                    }
+                }
             _state.update {
                 it.copy(
                     videoPlaylists = videoPlaylists,
@@ -810,6 +840,7 @@ class VideoSectionViewModel @Inject constructor(
                 )
             }
         }
+    }
 
     internal fun removeVideosFromPlaylist(playlistID: NodeId, videoElementIDs: List<Long>) =
         viewModelScope.launch {
@@ -1011,10 +1042,18 @@ class VideoSectionViewModel @Inject constructor(
     internal fun getTypedVideoNodeById(id: NodeId) = originalData.firstOrNull { it.id == id }
 
     internal fun getTypedVideoNodeOfPlaylistById(id: NodeId) =
-        originalPlaylistData.filterIsInstance<UserVideoPlaylist>().firstOrNull {
-            it.id == _state.value.currentVideoPlaylist?.id
-        }?.let { playlist ->
-            playlist.videos?.firstOrNull { it.id == id }
+        _state.value.currentVideoPlaylist?.let { currentPlaylist ->
+            if (currentPlaylist.isSystemVideoPlayer) {
+                originalPlaylistData.firstOrNull {
+                    it is FavouritesVideoPlaylist
+                }?.videos?.firstOrNull { it.id == id }
+            } else {
+                originalPlaylistData.filterIsInstance<UserVideoPlaylist>().firstOrNull {
+                    it.id == _state.value.currentVideoPlaylist?.id
+                }?.let { playlist ->
+                    playlist.videos?.firstOrNull { it.id == id }
+                }
+            }
         }
 
     internal fun updateClickedItem(value: TypedVideoNode?) =

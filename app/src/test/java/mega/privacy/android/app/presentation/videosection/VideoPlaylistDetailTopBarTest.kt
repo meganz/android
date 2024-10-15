@@ -27,6 +27,7 @@ class VideoPlaylistDetailTopBarTest {
 
     private fun setComposeContent(
         title: String = "",
+        isSystemVideoPlaylist: Boolean = false,
         isActionMode: Boolean = false,
         selectedSize: Int = 0,
         onMenuActionClick: (VideoSectionMenuAction?) -> Unit = {},
@@ -40,7 +41,8 @@ class VideoPlaylistDetailTopBarTest {
                 isUnhideMenuActionVisible = false,
                 isHideMenuActionVisible = false,
                 onMenuActionClick = onMenuActionClick,
-                onBackPressed = onBackPressed
+                onBackPressed = onBackPressed,
+                isSystemVideoPlaylist = isSystemVideoPlaylist
             )
         }
     }
@@ -129,5 +131,29 @@ class VideoPlaylistDetailTopBarTest {
             useUnmergedTree = true
         ).performClick()
         onMenuActionClick.invoke(VideoSectionMenuAction.VideoSectionRemoveAction)
+    }
+
+    @Test
+    fun `test that more action is not displayed when isSystemVideoPlaylist is true`() {
+        setComposeContent(isSystemVideoPlaylist = true)
+        composeTestRule.onNodeWithTag(
+            testTag = TEST_TAG_VIDEO_SECTION_MORE_ACTION,
+            useUnmergedTree = true
+        )
+            .apply {
+                assertIsNotDisplayed()
+            }
+    }
+
+    @Test
+    fun `test that more action is displayed when isSystemVideoPlaylist is false`() {
+        setComposeContent(isSystemVideoPlaylist = false)
+        composeTestRule.onNodeWithTag(
+            testTag = TEST_TAG_VIDEO_SECTION_MORE_ACTION,
+            useUnmergedTree = true
+        )
+            .apply {
+                assertIsDisplayed()
+            }
     }
 }

@@ -52,6 +52,7 @@ internal fun VideoPlaylistItemView(
     onClick: () -> Unit,
     thumbnailList: List<Any?>?,
     modifier: Modifier = Modifier,
+    isSystemVideoPlaylist: Boolean = false,
     showMenuButton: Boolean = true,
     onLongClick: (() -> Unit)? = null,
     onMenuClick: () -> Unit = {},
@@ -84,23 +85,21 @@ internal fun VideoPlaylistItemView(
             isSelected = isSelected
         )
 
-        Image(
-            painter = painterResource(
-                id = if (isSelected)
-                    R.drawable.ic_select_thumbnail
-                else
-                    mega.privacy.android.core.R.drawable.ic_dots_vertical_grey
-            ),
-            contentDescription = "3 dots",
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .clickable {
-                    if (!isSelected) {
-                        onMenuClick()
-                    }
-                },
-            alignment = Alignment.CenterEnd,
-        )
+        if (!isSystemVideoPlaylist) {
+            Image(
+                painter = painterResource(
+                    id = if (isSelected)
+                        R.drawable.ic_select_thumbnail
+                    else
+                        mega.privacy.android.core.R.drawable.ic_dots_vertical_grey
+                ),
+                contentDescription = "3 dots",
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .clickable(enabled = !isSelected, onClick = onMenuClick),
+                alignment = Alignment.CenterEnd,
+            )
+        }
     }
 }
 

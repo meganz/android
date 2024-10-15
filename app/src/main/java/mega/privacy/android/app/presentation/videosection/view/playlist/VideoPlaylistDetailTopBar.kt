@@ -15,6 +15,7 @@ internal fun VideoPlaylistDetailTopBar(
     title: String,
     isActionMode: Boolean,
     selectedSize: Int,
+    isSystemVideoPlaylist: Boolean,
     isHideMenuActionVisible: Boolean,
     isUnhideMenuActionVisible: Boolean,
     onMenuActionClick: (VideoSectionMenuAction?) -> Unit,
@@ -53,7 +54,10 @@ internal fun VideoPlaylistDetailTopBar(
             appBarType = AppBarType.BACK_NAVIGATION,
             title = title,
             onNavigationPressed = onBackPressed,
-            actions = listOf(VideoSectionMenuAction.VideoSectionMoreAction),
+            actions = if (isSystemVideoPlaylist)
+                emptyList()
+            else
+                listOf(VideoSectionMenuAction.VideoSectionMoreAction),
             onActionPressed = { onMenuActionClick(it as? VideoSectionMenuAction) }
         )
     }

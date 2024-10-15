@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
@@ -30,12 +31,15 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.domain.entity.videosection.FavouritesVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
+import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -65,6 +69,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -76,6 +81,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+@ExtendWith(TimberJUnit5Extension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VideoSectionViewModelTest {
@@ -293,6 +299,158 @@ class VideoSectionViewModelTest {
                 underTest.markHandledPendingRefresh()
                 assertThat(awaitItem().isPendingRefresh).isFalse()
                 cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that state is correctly updated when monitorOfflineNodeUpdatesUseCase is triggered`() =
+        runTest {
+            val testHandle = 1L
+            val userPlaylists: List<VideoPlaylist> = (1..3L).map {
+                mock<UserVideoPlaylist>()
+            }
+            val favouriteVideos = (testHandle..3L).map {
+                initTypedVideoNode(it)
+            }
+            val favouritesPlaylist: VideoPlaylist = mock<FavouritesVideoPlaylist> {
+                on { videos }.thenReturn(favouriteVideos)
+            }
+            val offlineUpdates = listOf(
+                mock<Offline> {
+                    on { handle }.thenReturn(testHandle.toString())
+                }
+            )
+            val videoPlaylists: List<VideoPlaylist> = listOf(favouritesPlaylist) + userPlaylists
+            val playlistEntities = videoPlaylists.map {
+                initVideoPlaylistEntity(
+                    if (it is UserVideoPlaylist) {
+                        it.id.longValue
+                    } else {
+                        -1
+                    }
+                )
+            }
+            whenever(getVideoPlaylistsUseCase())
+                .thenReturn(listOf(favouritesPlaylist))
+                .thenReturn(videoPlaylists)
+            videoPlaylists.forEachIndexed { index, playlist ->
+                whenever(videoPlaylistUIEntityMapper(playlist)).thenReturn(playlistEntities[index])
+            }
+            underTest.onTabSelected(VideoSectionTab.Playlists)
+            underTest.updateCurrentVideoPlaylist(playlistEntities[0])
+            testScheduler.advanceUntilIdle()
+
+            underTest.state.drop(1).test {
+                fakeMonitorOfflineNodeUpdatesFlow.emit(offlineUpdates)
+                assertThat(awaitItem().isPendingRefresh).isTrue()
+                awaitItem().let {
+                    assertThat(it.currentVideoPlaylist).isNotNull()
+                    assertThat(it.currentVideoPlaylist?.id?.longValue).isEqualTo(-1)
+                    assertThat(it.currentVideoPlaylist?.isSystemVideoPlayer).isTrue()
+                }
+            }
+        }
+
+    private fun initVideoPlaylistEntity(handle: Long) = mock<VideoPlaylistUIEntity> {
+        on { id }.thenReturn(NodeId(handle))
+        on { title }.thenReturn("playlist")
+        on { isSystemVideoPlayer }.thenReturn(handle == -1L)
+    }
+
+    @Test
+    fun `test that state is correctly updated when monitorNodeUpdatesUseCase is triggered`() =
+        runTest {
+            val testHandle = 1L
+            val userPlaylists: List<VideoPlaylist> = (1..3L).map {
+                mock<UserVideoPlaylist>()
+            }
+            val favouriteVideos = (testHandle..3L).map {
+                initTypedVideoNode(it)
+            }
+            val favouritesPlaylist: VideoPlaylist = mock<FavouritesVideoPlaylist> {
+                on { videos }.thenReturn(favouriteVideos)
+            }
+            val testNode = mock<FileNode> {
+                on { id }.thenReturn(NodeId(testHandle))
+                on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
+            }
+            val nodeUpdate = NodeUpdate(mapOf(testNode to emptyList()))
+            val videoPlaylists: List<VideoPlaylist> = listOf(favouritesPlaylist) + userPlaylists
+            val playlistEntities = videoPlaylists.map {
+                initVideoPlaylistEntity(
+                    if (it is UserVideoPlaylist) {
+                        it.id.longValue
+                    } else {
+                        -1
+                    }
+                )
+            }
+            whenever(getVideoPlaylistsUseCase())
+                .thenReturn(listOf(favouritesPlaylist))
+                .thenReturn(videoPlaylists)
+            videoPlaylists.forEachIndexed { index, playlist ->
+                whenever(videoPlaylistUIEntityMapper(playlist)).thenReturn(playlistEntities[index])
+            }
+            underTest.onTabSelected(VideoSectionTab.Playlists)
+            underTest.updateCurrentVideoPlaylist(playlistEntities[0])
+            testScheduler.advanceUntilIdle()
+
+            underTest.state.drop(1).test {
+                fakeMonitorNodeUpdatesFlow.emit(nodeUpdate)
+                assertThat(awaitItem().isPendingRefresh).isTrue()
+                awaitItem().let {
+                    assertThat(it.currentVideoPlaylist).isNotNull()
+                    assertThat(it.currentVideoPlaylist?.id?.longValue).isEqualTo(-1)
+                    assertThat(it.currentVideoPlaylist?.isSystemVideoPlayer).isTrue()
+                }
+            }
+        }
+
+    @Test
+    fun `test that state is correctly updated when monitorNodeUpdatesUseCase when NodeChanges is Favourite`() =
+        runTest {
+            val testHandle = 1L
+            val userPlaylists: List<VideoPlaylist> = (1..3L).map {
+                mock<UserVideoPlaylist>()
+            }
+            val favouriteVideos = (testHandle..3L).map {
+                initTypedVideoNode(it)
+            }
+            val favouritesPlaylist: VideoPlaylist = mock<FavouritesVideoPlaylist> {
+                on { videos }.thenReturn(favouriteVideos)
+            }
+            val testNode = mock<FileNode> {
+                on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
+            }
+            val nodeUpdate = NodeUpdate(mapOf(testNode to listOf(NodeChanges.Favourite)))
+            val videoPlaylists: List<VideoPlaylist> = listOf(favouritesPlaylist) + userPlaylists
+            val playlistEntities = videoPlaylists.map {
+                initVideoPlaylistEntity(
+                    if (it is UserVideoPlaylist) {
+                        it.id.longValue
+                    } else {
+                        -1
+                    }
+                )
+            }
+            whenever(getVideoPlaylistsUseCase())
+                .thenReturn(listOf(favouritesPlaylist))
+                .thenReturn(videoPlaylists)
+            videoPlaylists.forEachIndexed { index, playlist ->
+                whenever(videoPlaylistUIEntityMapper(playlist)).thenReturn(playlistEntities[index])
+            }
+            underTest.onTabSelected(VideoSectionTab.Playlists)
+            underTest.updateCurrentVideoPlaylist(playlistEntities[0])
+            testScheduler.advanceUntilIdle()
+
+            underTest.state.drop(1).test {
+                fakeMonitorNodeUpdatesFlow.emit(nodeUpdate)
+                assertThat(awaitItem().isPendingRefresh).isTrue()
+                awaitItem().let {
+                    assertThat(it.currentVideoPlaylist).isNotNull()
+                    assertThat(it.currentVideoPlaylist?.id?.longValue).isEqualTo(-1)
+                    assertThat(it.currentVideoPlaylist?.isSystemVideoPlayer).isTrue()
+                }
             }
         }
 
@@ -1495,7 +1653,7 @@ class VideoSectionViewModelTest {
             }
         }
 
-    private fun initTypedVideoNode(handle: Long, timestamp: Long) = mock<TypedVideoNode> {
+    private fun initTypedVideoNode(handle: Long, timestamp: Long = 0L) = mock<TypedVideoNode> {
         on { id }.thenReturn(NodeId((handle)))
         on { name }.thenReturn("video name")
         on { watchedTimestamp }.thenReturn(timestamp)

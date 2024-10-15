@@ -8,6 +8,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -250,14 +251,26 @@ class SyncFoldersScreenTest {
                 onDismiss = {}
             )
         }
+        val syncStopBackupConfirmDialogTitle =
+            composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_confirm_dialog_title)
+        val syncStopBackupButton =
+            composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_button)
+        if (syncStopBackupConfirmDialogTitle == syncStopBackupButton) {
+            composeTestRule.onAllNodesWithText(syncStopBackupConfirmDialogTitle).let { nodes ->
+                nodes[0].assertIsDisplayed()
+                nodes[1].assertIsDisplayed()
+            }
+        } else {
+            composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_confirm_dialog_title))
+                .assertIsDisplayed()
+            composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_button))
+                .assertIsDisplayed()
+        }
 
         composeTestRule.onNodeWithTag(REMOVE_BACKUP_FOLDER_CONFIRM_DIALOG_TEST_TAG)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_confirm_dialog_title))
-            .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_confirm_dialog_message))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_button))
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.general_dialog_cancel_button))
             .assertIsDisplayed()
