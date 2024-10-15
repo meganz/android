@@ -65,6 +65,9 @@ internal class DeviceCenterViewModel @Inject constructor(
     private var monitorConnectivityJob: Job? = null
 
     init {
+        _state.update {
+            it.copy(isSyncFeatureEnabled = isSyncFeatureEnabledUseCase())
+        }
         monitorNetworkConnectivity()
         monitorAccountDetail()
         checkFeatureFlags()

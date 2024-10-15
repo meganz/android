@@ -43,6 +43,7 @@ internal class DeviceBottomSheetBodyTest {
                 onBottomSheetDismissed = {},
                 isFreeAccount = false,
                 isBackupForAndroidEnabled = true,
+                isAndroidSyncFeatureEnabled = true
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER)
@@ -70,6 +71,7 @@ internal class DeviceBottomSheetBodyTest {
                 onBottomSheetDismissed = {},
                 isFreeAccount = false,
                 isBackupForAndroidEnabled = true,
+                isAndroidSyncFeatureEnabled = true
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER)
