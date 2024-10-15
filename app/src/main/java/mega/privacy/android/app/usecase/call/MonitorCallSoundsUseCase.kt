@@ -1,27 +1,17 @@
 package mega.privacy.android.app.usecase.call
 
-import android.os.Handler
-import android.os.Looper
-import androidx.lifecycle.MutableLiveData
-import io.reactivex.rxjava3.core.BackpressureStrategy
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.ProducerScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.rx3.asFlowable
-import kotlinx.coroutines.rx3.rxFlowable
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.components.CustomCountDownTimer
-import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.utils.Constants.SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL
@@ -32,8 +22,6 @@ import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatSessionStatus
 import mega.privacy.android.domain.entity.call.ChatSessionTermCode
-import mega.privacy.android.domain.entity.chat.ChatRoom
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.call.AmIAloneOnAnyCallUseCase
@@ -47,6 +35,7 @@ import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseC
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -68,7 +57,6 @@ class MonitorCallSoundsUseCase @Inject constructor(
     private val amIAloneOnAnyCallUseCase: AmIAloneOnAnyCallUseCase,
     private val broadcastWaitingForOtherParticipantsHasEndedUseCase: BroadcastWaitingForOtherParticipantsHasEndedUseCase,
     private val chatManagement: ChatManagement,
-    @ApplicationScope private val sharingScope: CoroutineScope,
     @MainImmediateDispatcher private val mainImmediateDispatcher: CoroutineDispatcher,
 ) {
 
@@ -88,216 +76,184 @@ class MonitorCallSoundsUseCase @Inject constructor(
         val clientId: Long,
     )
 
-    var finishCallCountDownTimer: CustomCountDownTimer? = null
-    var waitingForOthersCountDownTimer: CustomCountDownTimer? = null
     private var shouldPlaySoundWhenShowWaitingRoomDialog: Boolean = true
 
     val participants = ArrayList<ParticipantInfo>()
-    val disposable = CompositeDisposable()
 
     /**
      * Method to get the appropriate sound
      *
      * @return CallSoundType
      */
-    operator fun invoke() =
-        Flowable.create({ emitter ->
-
-            rxFlowable<Boolean> { monitorCallsReconnectingStatusUseCase() }
-                .subscribeBy(
-                    onNext = {
-                        if (it) {
-                            Timber.d("Call reconnecting")
-                            emitter.onNext(CallSoundType.CALL_RECONNECTING)
-                        }
-                    },
-                    onError = { error ->
-                        Timber.e(error.stackTraceToString())
-                    }
-                ).addTo(disposable)
-
-            sharingScope.launch {
-                monitorChatSessionUpdatesUseCase().catch {
-                    Timber.e(it.stackTraceToString())
-                }.collect { sessionUpdate ->
-                    with(sessionUpdate) {
-                        val session = session ?: return@with
-                        val participant =
-                            ParticipantInfo(peerId = session.peerId, clientId = session.clientId)
-                        call?.apply {
-                            getChatRoomUseCase(chatId)?.let { chat ->
-                                if (!chat.isGroup && !chat.isMeeting) {
-                                    when (session.status) {
-                                        ChatSessionStatus.Progress -> {
-                                            Timber.d("Session in progress")
-                                            stopCountDown(chatId, participant)
-                                        }
-
-                                        ChatSessionStatus.Destroyed -> {
-                                            (when (session.termCode) {
-                                                ChatSessionTermCode.NonRecoverable -> false
-                                                ChatSessionTermCode.Recoverable -> true
-                                                else -> null
-                                            })?.let { isRecoverableSession ->
-                                                if (isRecoverableSession) {
-                                                    Timber.d("Session destroyed, recoverable session. Wait 10 seconds to hang up")
-                                                    startFinishCallCountDown(
-                                                        chat,
-                                                        callId,
-                                                        participant,
-                                                        SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
-                                                    )
-
-                                                } else {
-                                                    Timber.d("Session destroyed, unrecoverable session.")
-                                                    stopCountDown(
-                                                        chatId,
-                                                        participant
-                                                    )
-                                                }
-                                            }
-                                        }
-
-                                        else -> {}
-                                    }
-                                }
-                            }
-                        } ?: run {
-                            stopCountDown(INVALID_HANDLE, participant)
-                        }
-
-                    }
+    operator fun invoke() = channelFlow<CallSoundType> {
+        launch {
+            monitorCallsReconnectingStatusUseCase().catch {
+                Timber.e(it)
+            }.collectLatest { isReconnecting ->
+                if (isReconnecting) {
+                    Timber.d("Call reconnecting")
+                    send(CallSoundType.CALL_RECONNECTING)
                 }
             }
+        }
 
-            amIAloneOnAnyCallUseCase()
-                .asFlowable(sharingScope.coroutineContext)
-                .subscribeBy(
-                    onNext = { (chatId, callId, onlyMeInTheCall) ->
-                        val waitingForOthers =
-                            onlyMeInTheCall && chatManagement.isRequestSent(callId)
-                        removeWaitingForOthersCountDownTimer()
-                        MegaApplication.getChatManagement().stopCounterToFinishCall()
+        launch {
+            monitorChatSessionUpdatesUseCase().catch {
+                Timber.e(it)
+            }.collectLatest { sessionUpdate ->
+                with(sessionUpdate) {
+                    val session = session ?: return@with
+                    val participant =
+                        ParticipantInfo(peerId = session.peerId, clientId = session.clientId)
+                    call?.apply {
+                        getChatRoomUseCase(chatId)?.let { chat ->
+                            if (!chat.isGroup && !chat.isMeeting) {
+                                when (session.status) {
+                                    ChatSessionStatus.Progress -> {
+                                        Timber.d("Session in progress")
+                                        checkParticipants(chatId, participant)
+                                    }
 
-                        if (onlyMeInTheCall) {
-                            if (waitingForOthers) {
-                                val liveD: MutableLiveData<Boolean> = MutableLiveData()
-                                waitingForOthersCountDownTimer = CustomCountDownTimer(liveD)
-
-                                liveD.observeOnce { counterState ->
-                                    counterState?.let { isFinished ->
-                                        if (isFinished) {
-                                            MegaApplication.getChatManagement()
-                                                .startCounterToFinishCall(chatId)
-
-                                            broadcastWaitingForOtherParticipantsHasEnded(
-                                                chatId
-                                            )
-
-                                            megaChatApi.getChatCall(chatId)?.let { call ->
-                                                if (call.hasLocalAudio()) {
-                                                    Timber.d("I am the only participant in the group call/meeting, muted micro")
-                                                    megaChatApi.disableAudio(call.chatid, null)
+                                    ChatSessionStatus.Destroyed -> {
+                                        (when (session.termCode) {
+                                            ChatSessionTermCode.NonRecoverable -> false
+                                            ChatSessionTermCode.Recoverable -> true
+                                            else -> null
+                                        })?.let { isRecoverableSession ->
+                                            if (isRecoverableSession) {
+                                                Timber.d("Session destroyed, recoverable session. Wait 10 seconds to hang up")
+                                                if (participants.contains(participant)) {
+                                                    delay(
+                                                        TimeUnit.SECONDS.toMillis(
+                                                            SECONDS_TO_WAIT_TO_RECOVER_CONTACT_CONNECTION
+                                                        )
+                                                    )
+                                                    hangCall(callId)
                                                 }
+                                            } else {
+                                                Timber.d("Session destroyed, unrecoverable session.")
+                                                checkParticipants(
+                                                    chatId,
+                                                    participant
+                                                )
                                             }
-
-                                            removeWaitingForOthersCountDownTimer()
                                         }
                                     }
-                                }
 
-                                waitingForOthersCountDownTimer?.start(
+                                    else -> {}
+                                }
+                            }
+                        }
+                    } ?: run {
+                        checkParticipants(INVALID_HANDLE, participant)
+                    }
+
+                }
+            }
+        }
+
+        launch {
+            amIAloneOnAnyCallUseCase()
+                .collectLatest { (chatId, callId, onlyMeInTheCall) ->
+                    withContext(mainImmediateDispatcher) {
+                        MegaApplication.getChatManagement().stopCounterToFinishCall()
+                    }
+                    val waitingForOthers =
+                        onlyMeInTheCall && chatManagement.isRequestSent(callId)
+                    if (onlyMeInTheCall) {
+                        if (waitingForOthers) {
+                            delay(
+                                TimeUnit.SECONDS.toMillis(
                                     SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL
                                 )
-                            } else {
+                            )
+                            MegaApplication.getChatManagement()
+                                .startCounterToFinishCall(chatId)
+
+                            broadcastWaitingForOtherParticipantsHasEnded(
+                                chatId
+                            )
+
+                            megaChatApi.getChatCall(chatId)?.let { call ->
+                                if (call.hasLocalAudio()) {
+                                    Timber.d("I am the only participant in the group call/meeting, muted micro")
+                                    megaChatApi.disableAudio(call.chatid, null)
+                                }
+                            }
+                        } else {
+                            withContext(mainImmediateDispatcher) {
                                 MegaApplication.getChatManagement()
                                     .startCounterToFinishCall(chatId)
                             }
-                        } else {
-                            MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = false
                         }
-                    },
-                    onError = { error ->
-                        Timber.e(error.stackTraceToString())
+                    } else {
+                        MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = false
                     }
-                )
-                .addTo(disposable)
+                }
+        }
 
-            sharingScope.launch {
-                monitorChatCallUpdatesUseCase()
-                    .collectLatest { call ->
-                        withContext(mainImmediateDispatcher) {
-                            call.changes?.apply {
-                                Timber.d("Monitor chat call updated, changes $this")
-                                if (contains(ChatCallChanges.Status)) {
-                                    when (call.status) {
-                                        ChatCallStatus.TerminatingUserParticipation -> {
-                                            Timber.d("Terminating user participation")
-                                            removeWaitingForOthersCountDownTimer()
-                                            MegaApplication.getChatManagement()
-                                                .stopCounterToFinishCall()
-                                            rtcAudioManagerGateway.removeRTCAudioManager()
-                                            emitter.onNext(CallSoundType.CALL_ENDED)
-                                        }
-
-                                        else -> {}
-                                    }
+        launch {
+            monitorChatCallUpdatesUseCase()
+                .collectLatest { call ->
+                    call.changes?.apply {
+                        Timber.d("Monitor chat call updated, changes $this")
+                        if (contains(ChatCallChanges.Status)) {
+                            when (call.status) {
+                                ChatCallStatus.TerminatingUserParticipation -> {
+                                    Timber.d("Terminating user participation")
+                                    MegaApplication.getChatManagement()
+                                        .stopCounterToFinishCall()
+                                    rtcAudioManagerGateway.removeRTCAudioManager()
+                                    send(CallSoundType.CALL_ENDED)
                                 }
 
-                                if (contains(ChatCallChanges.WaitingRoomUsersEntered)) {
-                                    if (call.waitingRoom?.peers?.size == 1) {
-                                        shouldPlaySoundWhenShowWaitingRoomDialog = true
-                                        Handler(Looper.getMainLooper()).postDelayed({
-                                            if (shouldPlaySoundWhenShowWaitingRoomDialog) {
-                                                emitter.onNext(CallSoundType.WAITING_ROOM_USERS_ENTERED)
-                                            }
-                                        }, 1000)
-                                    }
-                                }
+                                else -> {}
+                            }
+                        }
 
-                                if (contains(ChatCallChanges.WaitingRoomUsersLeave)) {
-                                    shouldPlaySoundWhenShowWaitingRoomDialog = false
-                                }
+                        if (contains(ChatCallChanges.WaitingRoomUsersEntered)) {
+                            if (call.waitingRoom?.peers?.size == 1) {
+                                shouldPlaySoundWhenShowWaitingRoomDialog = true
+                                startWaitingRoomSound()
+                            }
+                        }
 
-                                if (contains(ChatCallChanges.OutgoingRingingStop)) {
-                                    if (MegaApplication.getChatManagement()
-                                            .isRequestSent(call.callId) && call.numParticipants == ONE_PARTICIPANT
-                                    ) {
-                                        hangCall(call.callId)
-                                    }
-                                }
+                        if (contains(ChatCallChanges.WaitingRoomUsersLeave)) {
+                            shouldPlaySoundWhenShowWaitingRoomDialog = false
+                        }
+
+                        if (contains(ChatCallChanges.OutgoingRingingStop)) {
+                            if (MegaApplication.getChatManagement()
+                                    .isRequestSent(call.callId) && call.numParticipants == ONE_PARTICIPANT
+                            ) {
+                                hangCall(call.callId)
                             }
                         }
                     }
-            }
+                }
+        }
 
-            sharingScope.launch {
-                getParticipantsChangesUseCase()
-                    .collectLatest { result ->
-                        val isEnabled = getCallsSoundNotifications()
-                            .firstOrNull() == CallsSoundNotifications.Enabled
+        launch {
+            getParticipantsChangesUseCase()
+                .collectLatest { result ->
+                    val isEnabled = getCallsSoundNotifications()
+                        .firstOrNull() == CallsSoundNotifications.Enabled
 
-                        if (isEnabled) {
-                            when (result.typeChange) {
-                                TYPE_JOIN -> emitter.onNext(CallSoundType.PARTICIPANT_JOINED_CALL)
-                                TYPE_LEFT -> emitter.onNext(CallSoundType.PARTICIPANT_LEFT_CALL)
-                            }
+                    if (isEnabled) {
+                        when (result.typeChange) {
+                            TYPE_JOIN -> send(CallSoundType.PARTICIPANT_JOINED_CALL)
+                            TYPE_LEFT -> send(CallSoundType.PARTICIPANT_LEFT_CALL)
                         }
                     }
-            }
-
-            emitter.setCancellable {
-                removeWaitingForOthersCountDownTimer()
-                disposable.clear()
-            }
-
-        }, BackpressureStrategy.LATEST).asFlow()
+                }
+        }
+    }
 
     /**
      * Broadcasting that waiting for other participants has ended
      */
-    private fun broadcastWaitingForOtherParticipantsHasEnded(chatId: Long) {
-        sharingScope.launch {
+    private fun CoroutineScope.broadcastWaitingForOtherParticipantsHasEnded(chatId: Long) {
+        launch {
             broadcastWaitingForOtherParticipantsHasEndedUseCase(chatId, false)
         }
     }
@@ -307,58 +263,32 @@ class MonitorCallSoundsUseCase @Inject constructor(
      *
      * @param callId    Call id
      */
-    private fun hangCall(callId: Long) {
-        sharingScope.launch {
+    private fun CoroutineScope.hangCall(callId: Long) {
+        launch {
             runCatching {
                 hangChatCallUseCase(callId)
-            }.onSuccess {
-                removeFinishCallCountDownTimer()
             }.onFailure {
                 Timber.e(it.stackTraceToString())
             }
         }
     }
 
-    /**
-     * Method to start the countdown to hang up the call
-     *
-     */
-    private suspend fun startFinishCallCountDown(
-        chat: ChatRoom,
-        callId: Long,
-        participant: ParticipantInfo,
-        seconds: Long,
-    ) = withContext(mainImmediateDispatcher) {
-
-        if (!chat.isGroup && !chat.isMeeting && participants.contains(participant)) {
-            if (finishCallCountDownTimer == null) {
-                participants.remove(participant)
-
-                val countDownTimerLiveData: MutableLiveData<Boolean> = MutableLiveData()
-                finishCallCountDownTimer = CustomCountDownTimer(countDownTimerLiveData)
-
-                countDownTimerLiveData.observeOnce { counterState ->
-                    counterState?.let { isFinished ->
-                        if (isFinished) {
-                            Timber.d("Count down timer ends. Hang call")
-                            hangCall(callId)
-                        }
-                    }
-                }
+    private fun ProducerScope<CallSoundType>.startWaitingRoomSound() {
+        this.launch {
+            delay(1000)
+            if (shouldPlaySoundWhenShowWaitingRoomDialog) {
+                send(CallSoundType.WAITING_ROOM_USERS_ENTERED)
             }
-
-            Timber.d("Count down timer starts")
-            finishCallCountDownTimer?.start(seconds)
         }
     }
 
     /**
-     * Method to stop the countdown
+     * Method to check the participants
      *
      * @param chatId        Chat ID
      * @param participant   ParticipantInfo
      */
-    private fun stopCountDown(chatId: Long, participant: ParticipantInfo) {
+    private fun checkParticipants(chatId: Long, participant: ParticipantInfo) {
         megaChatApi.getChatRoom(chatId)?.let { chat ->
             if (!chat.isGroup && !chat.isMeeting) {
                 var participantToRemove: ParticipantInfo? = null
@@ -371,32 +301,8 @@ class MonitorCallSoundsUseCase @Inject constructor(
                 if (participantToRemove != null) {
                     participants.remove(participantToRemove)
                 }
-
                 participants.add(participant)
-                removeFinishCallCountDownTimer()
             }
         }
-    }
-
-    /**
-     * Remove Finish call Count down timer
-     */
-    private fun removeFinishCallCountDownTimer() {
-        finishCallCountDownTimer?.apply {
-            Timber.d("Count down timer stops")
-            stop()
-        }
-        finishCallCountDownTimer = null
-    }
-
-    /**
-     * Remove Waiting for others Count down timer
-     */
-    private fun removeWaitingForOthersCountDownTimer() {
-        waitingForOthersCountDownTimer?.apply {
-            Timber.d("Count down timer stops")
-            stop()
-        }
-        waitingForOthersCountDownTimer = null
     }
 }
