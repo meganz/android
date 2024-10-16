@@ -105,10 +105,11 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
         super.onStart()
 
         val dialog = dialog ?: return
-        BottomSheetBehavior.from(dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet)).run {
-            state = BottomSheetBehavior.STATE_HALF_EXPANDED
-            maxWidth = ViewGroup.LayoutParams.MATCH_PARENT
-        }
+        BottomSheetBehavior.from(dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet))
+            .run {
+                state = BottomSheetBehavior.STATE_HALF_EXPANDED
+                maxWidth = ViewGroup.LayoutParams.MATCH_PARENT
+            }
     }
 
     override fun onResume() {
@@ -133,32 +134,42 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
     }
 
     /**
-     * Sets the initial state of a BottomSheet and its state.
+     * Calculate peek height based on visible views
      */
-    private fun setBottomSheetBehavior() {
+    protected fun calculatePeekHeight() {
         val customPeekHeight = getCustomPeekHeight()
-
         BottomSheetBehavior.from(contentView.parent as View).apply {
             state = when {
                 savedState >= BottomSheetBehavior.STATE_EXPANDED -> {
                     peekHeight = customPeekHeight
                     savedState
                 }
+
                 customPeekHeight == contentView.height -> {
                     BottomSheetBehavior.STATE_EXPANDED
                 }
+
                 else -> {
                     peekHeight = customPeekHeight
                     BottomSheetBehavior.STATE_COLLAPSED
                 }
             }
+        }
+    }
 
+    /**
+     * Sets the initial state of a BottomSheet and its state.
+     */
+    private fun setBottomSheetBehavior() {
+        calculatePeekHeight()
+        BottomSheetBehavior.from(contentView.parent as View).apply {
             addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
                     when (newState) {
                         BottomSheetBehavior.STATE_HIDDEN -> {
                             dismissAllowingStateLoss()
                         }
+
                         BottomSheetBehavior.STATE_EXPANDED -> {
                             if (isLandscape) {
                                 return
@@ -176,6 +187,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
                                 }
                             }
                         }
+
                         else -> {
                             if (isLandscape) {
                                 return
@@ -224,12 +236,15 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
             is LinearLayout -> {
                 (contentView as LinearLayout).getChildAt(0).height
             }
+
             is RelativeLayout -> {
                 (contentView as RelativeLayout).getChildAt(0).height
             }
+
             is ConstraintLayout -> {
                 (contentView as ConstraintLayout).getChildAt(0).height
             }
+
             else -> 0
         }
 
@@ -286,6 +301,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
 
                 metrics.bounds.height() - insets.bottom - insets.top
             }
+
             else -> {
                 val windowInsets = requireActivity().window.decorView.rootWindowInsets
 

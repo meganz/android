@@ -788,6 +788,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     }
                 }
             }
+            // Recalculate bottom sheet peek height after visibility of views are updated
+            calculatePeekHeight()
         }
         super.onViewCreated(view, savedInstanceState)
     }

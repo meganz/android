@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -80,8 +81,17 @@ class NodeOptionsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             combine(
-                savedStateHandle.getStateFlow(NODE_ID_KEY, -1L)
-                    .map { getNodeByHandle(it) to isAvailableOffline(NodeId(it)) },
+                savedStateHandle.getStateFlow(NODE_ID_KEY, -1L).map {
+                    val megaNode = async {
+                        runCatching {
+                            getNodeByHandle(it)
+                        }.onFailure {
+                            Timber.e(it)
+                        }.getOrNull()
+                    }
+                    val availableOffline = async { isAvailableOffline(NodeId(it)) }
+                    megaNode.await() to availableOffline.await()
+                },
                 savedStateHandle.getStateFlow(SHARE_DATA_KEY, null),
                 savedStateHandle.getStateFlow(NODE_DEVICE_CENTER_INFORMATION_KEY, null),
                 shareKeyCreated,
@@ -139,10 +149,10 @@ class NodeOptionsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun isAvailableOffline(nodeId: NodeId): Boolean {
+    private suspend fun isAvailableOffline(nodeId: NodeId) = runCatching {
         val node = getNodeByIdUseCase(nodeId) ?: return false
-        return isAvailableOfflineUseCase(node)
-    }
+        isAvailableOfflineUseCase(node)
+    }.getOrDefault(false)
 
     /**
      * Mark hidden nodes onboarding has shown
