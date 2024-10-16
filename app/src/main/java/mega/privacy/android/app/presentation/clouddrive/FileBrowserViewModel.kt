@@ -24,6 +24,7 @@ import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
+import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.ALMOST_FULL
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.DEFAULT
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.FULL
@@ -34,6 +35,7 @@ import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMa
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.account.AccountStorageDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -134,6 +136,10 @@ class FileBrowserViewModel @Inject constructor(
 
     private var showHiddenItems: Boolean = true
 
+    private var cachedAccountStorageDetails: AccountStorageDetail? = null
+
+    private var isFullStorageOverQuotaBannerEnabled = false
+
     init {
         refreshNodes()
         monitorMediaDiscovery()
@@ -141,9 +147,9 @@ class FileBrowserViewModel @Inject constructor(
         changeTransferOverQuotaBannerVisibility()
         monitorConnectivity()
         monitorNodeUpdates()
+        monitorAccountDetail()
         viewModelScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
-                monitorAccountDetail()
                 monitorIsHiddenNodesOnboarded()
                 monitorShowHiddenItems()
             }
@@ -161,12 +167,12 @@ class FileBrowserViewModel @Inject constructor(
                     runCatching {
                         val isAlmostFullStorageQuotaBannerEnabled =
                             getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)
-                        val isFullStorageOverQuotaBannerEnabled =
+                        isFullStorageOverQuotaBannerEnabled =
                             getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)
                         val storageCapacity = when (storageStateEvent.storageState) {
                             StorageState.Red -> if (isFullStorageOverQuotaBannerEnabled) FULL else DEFAULT
                             StorageState.Orange -> if (isAlmostFullStorageQuotaBannerEnabled) ALMOST_FULL else DEFAULT
-                            else -> DEFAULT
+                            else -> getCachedStorageCapacity()
                         }
                         _state.update {
                             it.copy(storageCapacity = storageCapacity)
@@ -837,25 +843,42 @@ class FileBrowserViewModel @Inject constructor(
     private fun monitorAccountDetail() {
         monitorAccountDetailUseCase()
             .onEach { accountDetail ->
-                val accountType = accountDetail.levelDetail?.accountType
-                val businessStatus =
-                    if (accountType?.isBusinessAccount == true) {
-                        getBusinessStatusUseCase()
-                    } else null
+                cachedAccountStorageDetails = accountDetail.storageDetail
+                _state.update { it.copy(storageCapacity = getCachedStorageCapacity()) }
+                if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                    val accountType = accountDetail.levelDetail?.accountType
+                    val businessStatus =
+                        if (accountType?.isBusinessAccount == true) {
+                            getBusinessStatusUseCase()
+                        } else null
 
-                _state.update {
-                    it.copy(
-                        accountType = accountType,
-                        isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
-                        hiddenNodeEnabled = true
-                    )
+                    _state.update {
+                        it.copy(
+                            accountType = accountType,
+                            isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
+                            hiddenNodeEnabled = true
+                        )
+                    }
+                    if (_state.value.isLoading) return@onEach
+
+                    val nodes = filterNonSensitiveNodes(nodes = _state.value.sourceNodesList)
+                    _state.update { it.copy(nodesList = nodes) }
                 }
-                if (_state.value.isLoading) return@onEach
-
-                val nodes = filterNonSensitiveNodes(nodes = _state.value.sourceNodesList)
-                _state.update { it.copy(nodesList = nodes) }
             }
             .launchIn(viewModelScope)
+    }
+
+    /**
+     *  Get cached storage capacity based on [cachedAccountStorageDetails]
+     */
+    private fun getCachedStorageCapacity(): StorageOverQuotaCapacity {
+        return if (isFullStorageOverQuotaBannerEnabled) {
+            cachedAccountStorageDetails?.let {
+                if (it.usedPercentage >= 100) FULL else DEFAULT
+            } ?: DEFAULT
+        } else {
+            DEFAULT
+        }
     }
 
     private fun monitorShowHiddenItems() {

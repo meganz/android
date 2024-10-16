@@ -25,12 +25,12 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.ALMOST_FULL
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.DEFAULT
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.FULL
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
-import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.PARAM_ERROR_MESSAGE
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
@@ -50,6 +50,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.account.AccountStorageDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -139,6 +140,9 @@ class MediaDiscoveryViewModel @Inject constructor(
     private var fromFolderLink: Boolean? = null
     internal var showHiddenItems: Boolean? = null
 
+    private var cachedAccountStorageDetails: AccountStorageDetail? = null
+    private var isFullStorageOverQuotaBannerEnabled = false
+
     init {
         fromFolderLink =
             savedStateHandle.get<Boolean>(MediaDiscoveryActivity.INTENT_KEY_FROM_FOLDER_LINK)
@@ -157,12 +161,12 @@ class MediaDiscoveryViewModel @Inject constructor(
                     runCatching {
                         val isAlmostFullStorageQuotaBannerEnabled =
                             getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)
-                        val isFullStorageOverQuotaBannerEnabled =
+                        isFullStorageOverQuotaBannerEnabled =
                             getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)
                         val storageCapacity = when (storageStateEvent.storageState) {
                             StorageState.Red -> if (isFullStorageOverQuotaBannerEnabled) FULL else DEFAULT
                             StorageState.Orange -> if (isAlmostFullStorageQuotaBannerEnabled) ALMOST_FULL else DEFAULT
-                            else -> DEFAULT
+                            else -> getCachedStorageCapacity()
                         }
                         _state.update {
                             it.copy(storageCapacity = storageCapacity)
@@ -201,6 +205,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     internal fun monitorAccountDetail(loadPhotosDone: Boolean, sourcePhotos: List<Photo>) =
         monitorAccountDetailUseCase()
             .onEach { accountDetail ->
+                cachedAccountStorageDetails = accountDetail.storageDetail
                 val accountType = accountDetail.levelDetail?.accountType
                 val businessStatus =
                     if (accountType?.isBusinessAccount == true) {
@@ -212,6 +217,7 @@ class MediaDiscoveryViewModel @Inject constructor(
                         accountType = accountType,
                         isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
                         hiddenNodeEnabled = true,
+                        storageCapacity = getCachedStorageCapacity()
                     )
                 }
 
@@ -235,6 +241,19 @@ class MediaDiscoveryViewModel @Inject constructor(
                         it.copy(isConnectedToNetwork = isConnected)
                     }
                 }
+        }
+    }
+
+    /**
+     *  Get cached storage capacity based on [cachedAccountStorageDetails]
+     */
+    private fun getCachedStorageCapacity(): StorageOverQuotaCapacity {
+        return if (isFullStorageOverQuotaBannerEnabled) {
+            cachedAccountStorageDetails?.let {
+                if (it.usedPercentage >= 100) FULL else DEFAULT
+            } ?: DEFAULT
+        } else {
+            DEFAULT
         }
     }
 

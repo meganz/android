@@ -130,7 +130,7 @@ class MediaDiscoveryFragment : Fragment() {
                             onStartModalSheetShow = this@MediaDiscoveryFragment::onStartModalSheetShow,
                             onEndModalSheetHide = this@MediaDiscoveryFragment::onEndModalSheetHide,
                             onModalSheetVisibilityChange = this@MediaDiscoveryFragment::onModalSheetVisibilityChange,
-                            onStorageFullWarningDismiss = mediaDiscoveryViewModel::setStorageCapacityAsDefault,
+                            onStorageAlmostFullWarningDismiss = mediaDiscoveryViewModel::setStorageCapacityAsDefault,
                             onUpgradeClicked = {
                                 megaNavigator.openUpgradeAccount(requireContext())
                             },

@@ -200,6 +200,7 @@ fun MediaDiscoveryScreen(
     )
 }
 
+
 @Composable
 private fun MDHeader(
     uiPhotos: List<UIPhoto>,

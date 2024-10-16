@@ -39,7 +39,6 @@ class NotificationViewModel @Inject constructor(
     private val notificationMapper: NotificationMapper,
 ) : ViewModel() {
 
-    private var isPromoNotificationsEnabled = false
     private val _state = MutableStateFlow(NotificationState())
     val state = _state.asStateFlow()
 

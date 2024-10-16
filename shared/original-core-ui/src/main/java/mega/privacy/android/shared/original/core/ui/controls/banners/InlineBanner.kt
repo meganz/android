@@ -3,19 +3,16 @@ package mega.privacy.android.shared.original.core.ui.controls.banners
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -68,8 +65,6 @@ private fun InlineBaseBanner(
                         end = 16.dp
                     )
                     .weight(1f),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-
             ) {
                 MegaText(
                     text = title,
@@ -77,24 +72,25 @@ private fun InlineBaseBanner(
                     style = MaterialTheme.typography.subtitle1medium
                 )
 
+                Spacer(modifier = Modifier.size(8.dp))
+
                 MegaText(
                     text = message,
                     textColor = TextColor.Primary,
                     style = MaterialTheme.typography.body2
                 )
 
-                TextButton(
-                    modifier = modifier,
-                    onClick = onActionButtonClick,
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color.Transparent,
-                        contentColor = MegaOriginalTheme.colors.text.accent,
-                        disabledBackgroundColor = Color.Transparent,
-                        disabledContentColor = MegaOriginalTheme.colors.text.disabled,
-                    ),
-                    contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp)
-                ) {
+                Spacer(modifier = Modifier.size(4.dp))
+
+                Box(
+                    modifier = Modifier.clickable { onActionButtonClick() }) {
                     Text(
+                        modifier = Modifier.padding(
+                            top = 4.dp,
+                            bottom = 4.dp,
+                            start = 0.dp,
+                            end = 4.dp
+                        ),
                         text = actionButtonText,
                         textDecoration = TextDecoration.Underline,
                         color = MegaOriginalTheme.colors.support.info,

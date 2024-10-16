@@ -101,7 +101,7 @@ fun MediaDiscoveryView(
     onStartModalSheetShow: () -> Unit,
     onEndModalSheetHide: () -> Unit,
     onModalSheetVisibilityChange: (Boolean) -> Unit,
-    onStorageFullWarningDismiss: () -> Unit,
+    onStorageAlmostFullWarningDismiss: () -> Unit,
     onUpgradeClicked: () -> Unit,
     mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = viewModel(),
     mediaDiscoveryViewModel: MediaDiscoveryViewModel = viewModel(),
@@ -168,23 +168,49 @@ fun MediaDiscoveryView(
     )
 
 
-    if (mediaDiscoveryViewState.loadPhotosDone) {
-        if (mediaDiscoveryViewState.uiPhotoList.isNotEmpty()) {
-            MDView(
-                mediaDiscoveryViewState = mediaDiscoveryViewState,
-                onOKButtonClicked = onOKButtonClicked,
-                onSettingButtonClicked = onSettingButtonClicked,
-                showSettingDialog = showSettingDialog,
-                onZoomIn = onZoomIn,
-                onZoomOut = onZoomOut,
-                onPhotoClicked = onPhotoClicked,
-                onPhotoLongPressed = onPhotoLongPressed,
-                onCardClick = onCardClick,
-                onTimeBarTabSelected = onTimeBarTabSelected,
-                onSwitchListView = onSwitchListView,
-                addFabButton = {
+    Column {
+        if (mediaDiscoveryViewState.storageCapacity != StorageOverQuotaCapacity.DEFAULT) {
+            StorageOverQuotaBanner(
+                storageCapacity = mediaDiscoveryViewState.storageCapacity,
+                onStorageAlmostFullWarningDismiss = onStorageAlmostFullWarningDismiss,
+                onUpgradeClicked = onUpgradeClicked
+            )
+        }
+        if (mediaDiscoveryViewState.loadPhotosDone) {
+            if (mediaDiscoveryViewState.uiPhotoList.isNotEmpty()) {
+                MDView(
+                    mediaDiscoveryViewState = mediaDiscoveryViewState,
+                    onOKButtonClicked = onOKButtonClicked,
+                    onSettingButtonClicked = onSettingButtonClicked,
+                    showSettingDialog = showSettingDialog,
+                    onZoomIn = onZoomIn,
+                    onZoomOut = onZoomOut,
+                    onPhotoClicked = onPhotoClicked,
+                    onPhotoLongPressed = onPhotoLongPressed,
+                    onCardClick = onCardClick,
+                    onTimeBarTabSelected = onTimeBarTabSelected,
+                    onSwitchListView = onSwitchListView,
+                    addFabButton = {
+                        if (shouldShowFabButton) {
+                            AddFabButton(
+                                onFabClick = {
+                                    coroutineScope.launch {
+                                        showModalSheet(
+                                            onStartModalSheetShow = onStartModalSheetShow,
+                                            modalSheetState = modalSheetState,
+                                        )
+                                    }
+                                }
+                            )
+                        }
+                    })
+            } else {
+                Box(modifier = Modifier.fillMaxSize()) {
                     if (shouldShowFabButton) {
                         AddFabButton(
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                             onFabClick = {
                                 coroutineScope.launch {
                                     showModalSheet(
@@ -195,39 +221,19 @@ fun MediaDiscoveryView(
                             }
                         )
                     }
-                },
-                onStorageAlmostFullWarningDismiss = onStorageFullWarningDismiss,
-                onUpgradeClicked = onUpgradeClicked
-            )
-        } else {
-            Box(modifier = Modifier.fillMaxSize()) {
-                if (shouldShowFabButton) {
-                    AddFabButton(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                        onFabClick = {
-                            coroutineScope.launch {
-                                showModalSheet(
-                                    onStartModalSheetShow = onStartModalSheetShow,
-                                    modalSheetState = modalSheetState,
-                                )
-                            }
-                        }
-                    )
-                }
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
-                    ListViewIconButton(
-                        onSwitchListView = onSwitchListView
-                    )
-                    EmptyView(mediaDiscoveryViewState.currentMediaType)
+                    Column(
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        ListViewIconButton(
+                            onSwitchListView = onSwitchListView
+                        )
+                        EmptyView(mediaDiscoveryViewState.currentMediaType)
+                    }
                 }
             }
+        } else {
+            PhotosSkeletonView()
         }
-    } else {
-        PhotosSkeletonView()
     }
 
     MediaDiscoveryBottomSheet(
@@ -431,8 +437,6 @@ private fun MDView(
     addFabButton: @Composable () -> Unit,
     photoDownloaderViewModel: PhotoDownloaderViewModel = viewModel(),
     showSettingDialog: Boolean = false,
-    onStorageAlmostFullWarningDismiss: () -> Unit,
-    onUpgradeClicked: () -> Unit,
 ) {
     val lazyGridState = rememberSaveable(
         mediaDiscoveryViewState.scrollStartIndex,
@@ -454,13 +458,9 @@ private fun MDView(
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             mediaDiscoveryViewState.errorMessage?.let { errorMessage ->
-                WarningBanner(textString = stringResource(id = errorMessage), onCloseClick = null)
-            }
-            if (mediaDiscoveryViewState.storageCapacity != StorageOverQuotaCapacity.DEFAULT) {
-                StorageOverQuotaBanner(
-                    storageCapacity = mediaDiscoveryViewState.storageCapacity,
-                    onStorageAlmostFullWarningDismiss = onStorageAlmostFullWarningDismiss,
-                    onUpgradeClicked = onUpgradeClicked
+                WarningBanner(
+                    textString = stringResource(id = errorMessage),
+                    onCloseClick = null
                 )
             }
             if (showSettingDialog) {
