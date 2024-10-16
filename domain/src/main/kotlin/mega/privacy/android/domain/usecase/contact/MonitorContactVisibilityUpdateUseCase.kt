@@ -44,7 +44,6 @@ class MonitorContactVisibilityUpdateUseCase @Inject constructor(
                     currentVisibilities
                 }
             }.collect {}
-        awaitCancellation()
     }
 
     private suspend fun getCurrentVisibilities() = contactsRepository.getVisibleContacts()

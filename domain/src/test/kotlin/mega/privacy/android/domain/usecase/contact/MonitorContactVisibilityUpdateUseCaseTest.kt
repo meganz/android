@@ -59,6 +59,7 @@ class MonitorContactVisibilityUpdateUseCaseTest {
 
         underTest().test {
             assertThat(awaitItem()).isEqualTo(userId1)
+            awaitComplete()
         }
     }
 
@@ -96,6 +97,7 @@ class MonitorContactVisibilityUpdateUseCaseTest {
         underTest().test {
             assertThat(awaitItem()).isEqualTo(userId1)
             assertThat(awaitItem()).isEqualTo(userId1)
+            awaitComplete()
         }
     }
 
@@ -118,7 +120,7 @@ class MonitorContactVisibilityUpdateUseCaseTest {
         whenever(accountRepository.monitorUserUpdates()).thenReturn(flowOf(userUpdate))
 
         underTest().test {
-            expectNoEvents()
+            awaitComplete()
         }
     }
 }
