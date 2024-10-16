@@ -1,10 +1,12 @@
 package mega.privacy.android.app.presentation.videosection.view
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
@@ -74,7 +76,8 @@ internal fun VideoSectionTopBar(
             leadingActions = if (isRecentlyWatchedEnabled) {
                 listOf(VideoSectionMenuAction.VideoRecentlyWatchedAction)
             } else null,
-            onActionPressed = { onMenuActionClicked(it as? VideoSectionMenuAction) }
+            onActionPressed = { onMenuActionClicked(it as? VideoSectionMenuAction) },
+            windowInsets = WindowInsets(0.dp)
         )
     }
 }

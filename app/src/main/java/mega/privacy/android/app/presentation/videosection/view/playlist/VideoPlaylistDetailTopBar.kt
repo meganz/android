@@ -1,10 +1,12 @@
 package mega.privacy.android.app.presentation.videosection.view.playlist
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -58,7 +60,8 @@ internal fun VideoPlaylistDetailTopBar(
                 emptyList()
             else
                 listOf(VideoSectionMenuAction.VideoSectionMoreAction),
-            onActionPressed = { onMenuActionClick(it as? VideoSectionMenuAction) }
+            onActionPressed = { onMenuActionClick(it as? VideoSectionMenuAction) },
+            windowInsets = WindowInsets(0.dp)
         )
     }
 }

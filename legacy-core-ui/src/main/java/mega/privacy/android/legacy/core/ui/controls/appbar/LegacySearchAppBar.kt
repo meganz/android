@@ -6,7 +6,8 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AppBarDefaults
@@ -84,6 +85,7 @@ fun LegacySearchAppBar(
     actions: List<MenuAction>? = null,
     leadingActions: List<MenuAction>? = null,
     onActionPressed: ((MenuAction) -> Unit)? = null,
+    windowInsets: WindowInsets = WindowInsets.statusBars,
 ) {
     when (searchWidgetState) {
         SearchWidgetState.COLLAPSED -> {
@@ -97,6 +99,7 @@ fun LegacySearchAppBar(
                     leadingActions = leadingActions,
                     onActionPressed = onActionPressed,
                     modifier = modifier,
+                    windowInsets = windowInsets
                 )
             }
         }
@@ -109,7 +112,8 @@ fun LegacySearchAppBar(
                 onCloseClicked = onCloseClicked,
                 elevation = elevation,
                 modifier = modifier,
-                isHideAfterSearch = isHideAfterSearch
+                isHideAfterSearch = isHideAfterSearch,
+                windowInsets = windowInsets
             )
         }
     }
@@ -131,6 +135,7 @@ fun CollapsedSearchAppBar(
     maxActionsToShow: Int = 3,
     enabled: Boolean = true,
     showSearchButton: Boolean = true,
+    windowInsets: WindowInsets = WindowInsets.statusBars,
 ) {
     val iconColor = if (MaterialTheme.colors.isLight) Color.Black else Color.White
 
@@ -188,7 +193,7 @@ fun CollapsedSearchAppBar(
         backgroundColor = MaterialTheme.colors.surface,
         elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp,
         modifier = modifier,
-        windowInsets = WindowInsets.systemBars,
+        windowInsets = windowInsets,
     )
 }
 
@@ -204,6 +209,7 @@ fun ExpandedSearchAppBar(
     elevation: Boolean,
     modifier: Modifier = Modifier,
     isHideAfterSearch: Boolean = false,
+    windowInsets: WindowInsets = WindowInsets.statusBars,
 ) {
     var textFieldValue by remember {
         mutableStateOf(
@@ -213,6 +219,7 @@ fun ExpandedSearchAppBar(
     Surface(
         modifier = modifier
             .fillMaxWidth()
+            .windowInsetsPadding(windowInsets)
             .height(56.dp),
         elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp,
         color = MaterialTheme.colors.surface

@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
@@ -89,6 +89,7 @@ fun MegaAppBar(
     maxActionsToShow: Int = 4,
     enabled: Boolean = true,
     elevation: Dp = LocalMegaAppBarElevation.current,
+    windowInsets: WindowInsets = WindowInsets.statusBars,
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides MegaAppBarColors(
         iconsTintColor = MegaOriginalTheme.colors.icon.primary,
@@ -106,7 +107,8 @@ fun MegaAppBar(
         actions = actions.addClick(onActionPressed),
         maxActionsToShow = maxActionsToShow,
         enabled = enabled,
-        elevation = elevation
+        elevation = elevation,
+        windowInsets = windowInsets
     )
 }
 
@@ -140,6 +142,7 @@ fun MegaAppBar(
     maxActionsToShow: Int = 4,
     enabled: Boolean = true,
     elevation: Dp = LocalMegaAppBarElevation.current,
+    windowInsets: WindowInsets = WindowInsets.statusBars,
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides MegaAppBarColors(
         iconsTintColor = MegaOriginalTheme.colors.icon.primary,
@@ -157,7 +160,8 @@ fun MegaAppBar(
         actions = actions,
         maxActionsToShow = maxActionsToShow,
         enabled = enabled,
-        elevation = elevation
+        elevation = elevation,
+        windowInsets = windowInsets
     )
 }
 
@@ -197,6 +201,7 @@ fun MegaAppBar(
     maxActionsToShow: Int = 4,
     enabled: Boolean = true,
     elevation: Dp = LocalMegaAppBarElevation.current,
+    windowInsets: WindowInsets = WindowInsets.statusBars,
 ) = CompositionLocalProvider(
     LocalMegaAppBarColors provides MegaAppBarColors(
         iconsTintColor = MegaOriginalTheme.colors.icon.primary,
@@ -223,7 +228,8 @@ fun MegaAppBar(
         actions = actions.addClick(onActionPressed),
         maxActionsToShow = maxActionsToShow,
         enabled = enabled,
-        elevation = elevation
+        elevation = elevation,
+        windowInsets = windowInsets
     )
 }
 
@@ -272,6 +278,7 @@ internal fun BaseMegaAppBar(
     maxActionsToShow: Int = 4,
     enabled: Boolean = true,
     elevation: Dp = LocalMegaAppBarElevation.current,
+    windowInsets: WindowInsets = WindowInsets.statusBars,
 ) = BaseMegaAppBar(
     appBarType = appBarType,
     titleAndSubtitle = {
@@ -288,7 +295,8 @@ internal fun BaseMegaAppBar(
     badgeCount = badgeCount,
     maxActionsToShow = maxActionsToShow,
     enabled = enabled,
-    elevation = elevation
+    elevation = elevation,
+    windowInsets = windowInsets
 )
 
 @Composable
@@ -302,6 +310,7 @@ internal fun BaseMegaAppBar(
     maxActionsToShow: Int = 4,
     enabled: Boolean = true,
     elevation: Dp = LocalMegaAppBarElevation.current,
+    windowInsets: WindowInsets = WindowInsets.statusBars,
 ) {
     val backgroundColor by animateColorAsState(
         targetValue = (if (elevation == 0.dp) MegaOriginalTheme.colors.background.pageBackground else MegaOriginalTheme.colors.background.surface1)
@@ -320,7 +329,7 @@ internal fun BaseMegaAppBar(
     }
     TopAppBar(
         title = titleAndSubtitle,
-        windowInsets = WindowInsets.systemBars,
+        windowInsets = windowInsets,
         backgroundColor = backgroundColor,
         modifier = modifier.testTag(TEST_TAG_APP_BAR),
         navigationIcon = appBarType.takeIf { it != AppBarType.NONE }?.composeLet {

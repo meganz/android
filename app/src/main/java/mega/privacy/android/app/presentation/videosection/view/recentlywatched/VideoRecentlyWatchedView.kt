@@ -6,6 +6,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -118,7 +119,8 @@ fun VideoRecentlyWatchedView(
                 } else null,
                 onActionPressed = { onActionPressed(it as? VideoSectionMenuAction) },
                 onNavigationPressed = onBackPressed,
-                elevation = if (isInFirstItem) AppBarDefaults.TopAppBarElevation else 0.dp
+                elevation = if (isInFirstItem) AppBarDefaults.TopAppBarElevation else 0.dp,
+                windowInsets = WindowInsets(0.dp)
             )
         }
     ) { paddingValue ->
