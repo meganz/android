@@ -749,17 +749,31 @@
     <!--Success message displayed in the Login screen after the account has been activated-->
     <string name="login_screen_account_confirmed_success_message">Ihr Account wurde aktiviert. Bitte melden Sie sich an.</string>
     <!-- Title in the files permission screen -->
-    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <string name="files_permission_screen_title">Erlauben Sie MEGA den Zugriff auf die Dateien auf Ihrem Gerät</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads to MEGA.</string>
+    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">Nicht mehr anzeigen</string>
     <!-- Title of the dialog to confirm stop a sync -->
-    <string name="sync_stop_sync_confirm_dialog_title">Stop syncing?</string>
+    <string name="sync_stop_sync_confirm_dialog_title">Synchronisierung beenden?</string>
     <!-- Message of the dialog to confirm stop a sync -->
-    <string name="sync_stop_sync_confirm_dialog_message">This will stop the sync process between the two folders but won’t remove the folders.</string>
+    <string name="sync_stop_sync_confirm_dialog_message">Dadurch wird die Synchronisierung zwischen den beiden Ordnern beendet, aber die Ordner werden nicht gelöscht.</string>
     <!-- Label for the button to stop a sync -->
     <string name="sync_stop_sync_button">Synchronisierung beenden</string>
     <!-- Snackbar message to indicate that sync has been stopped -->
-    <string name="sync_snackbar_message_confirm_sync_stopped">Sync stopped</string>
+    <string name="sync_snackbar_message_confirm_sync_stopped">Synchronisierung beendet</string>
+    <!-- Title of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_title">Backup beenden</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_message">Dadurch wird die Synchronisierung zwischen den beiden Ordnern beendet. Es wird eine Kopie erstellt und in Ihrem Cloud Drive gespeichert.</string>
+    <!-- Label for the button to stop a backup -->
+    <string name="sync_stop_backup_button">Backup beenden</string>
+    <!-- Snackbar message to indicate that backup has been stopped -->
+    <string name="sync_snackbar_message_confirm_backup_stopped">Backup beendet</string>
+    <!-- Sync state updating -->
+    <string name="sync_list_sync_state_updating">Wird aktualisiert&#8230;</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_up_to_date">Vollständig synchronisiert</string>
+    <!-- Title of Favourites video playlist in the video section -->
+    <string name="video_section_title_favourite_playlist">Favoriten</string>
 </resources>

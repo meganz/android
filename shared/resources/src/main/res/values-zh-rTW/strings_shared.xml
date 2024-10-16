@@ -619,7 +619,7 @@
     <!-- Option in the survey indicating that the user needs features MEGA doesn't have -->
     <string name="account_cancel_subscription_survey_option_missing_features">我需要的功能MEGA沒有提供</string>
     <!-- Option in the survey indicating that the user is switching to a different provider -->
-    <string name="account_cancel_subscription_survey_option_switch_provider">我改用一個我更喜歡的供應商</string>
+    <string name="account_cancel_subscription_survey_option_switch_provider">我改用一個我更喜歡的服務商</string>
     <!-- Option in the survey indicating that the user finds MEGA confusing and difficult to use -->
     <string name="account_cancel_subscription_survey_option_confusing">我發現MEGA令人困惑而且難以使用</string>
     <!-- Option in the survey indicating dissatisfaction with support and customer service -->
@@ -737,9 +737,9 @@
     <!--Success message displayed in the Login screen after the account has been activated-->
     <string name="login_screen_account_confirmed_success_message">您的帳戶已通過認證。請登入帳戶以開始使用。</string>
     <!-- Title in the files permission screen -->
-    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <string name="files_permission_screen_title">允許MEGA存取您裝置的檔案</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads to MEGA.</string>
+    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">不再顯示此訊息</string>
     <!-- Title of the dialog to confirm stop a sync -->
@@ -750,4 +750,18 @@
     <string name="sync_stop_sync_button">停止同步</string>
     <!-- Snackbar message to indicate that sync has been stopped -->
     <string name="sync_snackbar_message_confirm_sync_stopped">同步已停止</string>
+    <!-- Title of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_title">停止備份</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_message">這將停止兩個資料夾之間的同步進程。將建立一個副本並將其儲存到您的雲端硬碟。</string>
+    <!-- Label for the button to stop a backup -->
+    <string name="sync_stop_backup_button">停止備份</string>
+    <!-- Snackbar message to indicate that backup has been stopped -->
+    <string name="sync_snackbar_message_confirm_backup_stopped">備份停止</string>
+    <!-- Sync state updating -->
+    <string name="sync_list_sync_state_updating">正在更新⋯</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_up_to_date">最新的</string>
+    <!-- Title of Favourites video playlist in the video section -->
+    <string name="video_section_title_favourite_playlist">收藏</string>
 </resources>

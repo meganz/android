@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
@@ -751,7 +751,7 @@
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads to MEGA.</string>
+    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">Don’t show this again</string>
     <!-- Title of the dialog to confirm stop a sync -->

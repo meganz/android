@@ -705,9 +705,9 @@
     <!-- Message of the upgrade dialog displayed for free accounts when try to add a new sync or backup -->
     <string name="device_center_sync_backup_upgrade_dialog_message">Unlock the power to sync and backup your mobile device to cloud storage with one of our premium plans</string>
     <!-- Title of the share meeting link bottom panel -->
-    <string name="meetings_share_link_bottom_sheet_title">Meeting confirmed: Invite others to join</string>
+    <string name="meetings_share_link_bottom_sheet_title">Pertemuan dikonfirmasi: Undang orang lain untuk bergabung</string>
     <!-- Button text of the send meeting link to chat -->
-    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Send link to chat</string>
+    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Kirim tautan ke obrolan</string>
     <!-- Button text of the share meeting link -->
     <string name="meetings_share_link_bottom_sheet_button_share_link">Dapatkan tautan</string>
     <!-- Title for the inline warning banner when storage is almost full -->
@@ -745,15 +745,29 @@
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads to MEGA.</string>
+    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">Jangan tampilkan ini lagi</string>
     <!-- Title of the dialog to confirm stop a sync -->
-    <string name="sync_stop_sync_confirm_dialog_title">Stop syncing?</string>
+    <string name="sync_stop_sync_confirm_dialog_title">Hentikan sinkronisasi?</string>
     <!-- Message of the dialog to confirm stop a sync -->
     <string name="sync_stop_sync_confirm_dialog_message">This will stop the sync process between the two folders but won’t remove the folders.</string>
     <!-- Label for the button to stop a sync -->
     <string name="sync_stop_sync_button">Berhenti menyinkronkan</string>
     <!-- Snackbar message to indicate that sync has been stopped -->
     <string name="sync_snackbar_message_confirm_sync_stopped">Sync stopped</string>
+    <!-- Title of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_title">Hentikan pencadangan</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_message">This will stop the sync process between the two folders. A copy will be created and saved to your Cloud drive.</string>
+    <!-- Label for the button to stop a backup -->
+    <string name="sync_stop_backup_button">Hentikan pencadangan</string>
+    <!-- Snackbar message to indicate that backup has been stopped -->
+    <string name="sync_snackbar_message_confirm_backup_stopped">Pencadangan dihentikan</string>
+    <!-- Sync state updating -->
+    <string name="sync_list_sync_state_updating">Memperbarui&#8230;</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_up_to_date">Terkini</string>
+    <!-- Title of Favourites video playlist in the video section -->
+    <string name="video_section_title_favourite_playlist">Favorit</string>
 </resources>

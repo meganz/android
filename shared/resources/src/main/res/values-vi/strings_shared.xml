@@ -739,7 +739,7 @@
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">Cho phép MEGA truy&#160;cập các tệp&#160;tin trong thiết&#160;bị của bạn</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">Với việc cho phép MEGA truy&#160;cập vào các tệp&#160;tin của bạn, bạn có thể tải&#160;lên MEGA mà không cần phải tạo bản&#160;sao tạm thời, tiết&#160;kiệm dung&#160;lượng trong thiết&#160;bị của bạn và cho phép tải&#160;lên được nhanh hơn.</string>
+    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">Đừng hiện cái này nữa</string>
     <!-- Title of the dialog to confirm stop a sync -->
@@ -750,4 +750,18 @@
     <string name="sync_stop_sync_button">Ngừng đồng bộ</string>
     <!-- Snackbar message to indicate that sync has been stopped -->
     <string name="sync_snackbar_message_confirm_sync_stopped">Đồng&#160;bộ đã dừng</string>
+    <!-- Title of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_title">Chấm dứt sao lưu</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_message">Thao&#160;tác này sẽ dừng quá&#160;trình đồng&#160;bộ hóa giữa hai thư&#160;mục. Một bản&#160;sao sẽ được tạo và lưu vào Ổ&#160;Mây của bạn.</string>
+    <!-- Label for the button to stop a backup -->
+    <string name="sync_stop_backup_button">Chấm dứt sao lưu</string>
+    <!-- Snackbar message to indicate that backup has been stopped -->
+    <string name="sync_snackbar_message_confirm_backup_stopped">Sao lưu chấm dứt</string>
+    <!-- Sync state updating -->
+    <string name="sync_list_sync_state_updating">Đang cập nhật&#8230;</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_up_to_date">Đã cập nhật</string>
+    <!-- Title of Favourites video playlist in the video section -->
+    <string name="video_section_title_favourite_playlist">Ưa thích</string>
 </resources>

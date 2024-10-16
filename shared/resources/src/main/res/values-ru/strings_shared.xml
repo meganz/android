@@ -773,9 +773,9 @@
     <!--Success message displayed in the Login screen after the account has been activated-->
     <string name="login_screen_account_confirmed_success_message">Ваша учётная запись активирована. Пожалуйста, авторизируйтесь.</string>
     <!-- Title in the files permission screen -->
-    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <string name="files_permission_screen_title">Разрешите MEGA доступ к файлам устройства</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads to MEGA.</string>
+    <string name="files_permission_screen_message">Предоставляя MEGA доступ к файлам, вы можете загружать их в MEGA без создания временных копий. Это экономит место на устройстве и ускоряет загрузку.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">Больше не показывать</string>
     <!-- Title of the dialog to confirm stop a sync -->
@@ -786,4 +786,18 @@
     <string name="sync_stop_sync_button">Остановить синхронизацию</string>
     <!-- Snackbar message to indicate that sync has been stopped -->
     <string name="sync_snackbar_message_confirm_sync_stopped">Синхронизация остановлена</string>
+    <!-- Title of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_title">Остановить резервное копирование</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_message">Синхронизация между двумя папками прекратится. Копия будет создана и сохранена на Облачном диске.</string>
+    <!-- Label for the button to stop a backup -->
+    <string name="sync_stop_backup_button">Остановить резервное копирование</string>
+    <!-- Snackbar message to indicate that backup has been stopped -->
+    <string name="sync_snackbar_message_confirm_backup_stopped">Резервное копирование остановлено</string>
+    <!-- Sync state updating -->
+    <string name="sync_list_sync_state_updating">Обновление&#8230;</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_up_to_date">Синхронизировано</string>
+    <!-- Title of Favourites video playlist in the video section -->
+    <string name="video_section_title_favourite_playlist">Избранное</string>
 </resources>

@@ -761,9 +761,9 @@
     <!--Success message displayed in the Login screen after the account has been activated-->
     <string name="login_screen_account_confirmed_success_message">Tu cuenta está activa. Por favor, inicia sesión.</string>
     <!-- Title in the files permission screen -->
-    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <string name="files_permission_screen_title">Permite que MEGA acceda a los archivos de tu dispositivo</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads to MEGA.</string>
+    <string name="files_permission_screen_message">Si permites que MEGA acceda a tus archivos, podrás subirlos sin crear copias temporales, lo que ahorra espacio en tu dispositivo y permite una subida más rápida a MEGA.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">No volver a mostrar</string>
     <!-- Title of the dialog to confirm stop a sync -->
@@ -774,4 +774,18 @@
     <string name="sync_stop_sync_button">Detener sincronización</string>
     <!-- Snackbar message to indicate that sync has been stopped -->
     <string name="sync_snackbar_message_confirm_sync_stopped">Sincronización detenida</string>
+    <!-- Title of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_title">Detener backup</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_message">Esto detendrá el proceso de sincronización entre las dos carpetas. Se creará una copia y se guardará en tu Nube.</string>
+    <!-- Label for the button to stop a backup -->
+    <string name="sync_stop_backup_button">Detener backup</string>
+    <!-- Snackbar message to indicate that backup has been stopped -->
+    <string name="sync_snackbar_message_confirm_backup_stopped">Backup detenido</string>
+    <!-- Sync state updating -->
+    <string name="sync_list_sync_state_updating">Actualizando&#8230;</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_up_to_date">Actualizado</string>
+    <!-- Title of Favourites video playlist in the video section -->
+    <string name="video_section_title_favourite_playlist">Favoritos</string>
 </resources>

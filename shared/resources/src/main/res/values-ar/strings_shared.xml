@@ -799,7 +799,7 @@
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads to MEGA.</string>
+    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">لا تُظهر هذا مرة أخرى</string>
     <!-- Title of the dialog to confirm stop a sync -->
@@ -810,4 +810,18 @@
     <string name="sync_stop_sync_button">أوقف المزامنة</string>
     <!-- Snackbar message to indicate that sync has been stopped -->
     <string name="sync_snackbar_message_confirm_sync_stopped">Sync stopped</string>
+    <!-- Title of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_title">أوقف النسخ الاحتياطي</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_message">This will stop the sync process between the two folders. A copy will be created and saved to your Cloud drive.</string>
+    <!-- Label for the button to stop a backup -->
+    <string name="sync_stop_backup_button">أوقف النسخ الاحتياطي</string>
+    <!-- Snackbar message to indicate that backup has been stopped -->
+    <string name="sync_snackbar_message_confirm_backup_stopped">توقف النسخ الاحتياطي</string>
+    <!-- Sync state updating -->
+    <string name="sync_list_sync_state_updating">جارٍ التحديث&#8230;</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_up_to_date">لا يوجد تحديثات</string>
+    <!-- Title of Favourites video playlist in the video section -->
+    <string name="video_section_title_favourite_playlist">المفضلة</string>
 </resources>

@@ -739,7 +739,7 @@
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">MEGAにデバイスのファイルへのアクセスを許可</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">MEGAにファイルへのアクセスを許可すると、一時コピーを作成せずにMEGAにアップロードできるため、デバイス上のスペースが節約され、MEGAへのアップロードが高速化されます。</string>
+    <string name="files_permission_screen_message">MEGAにファイルへのアクセスを許可すると、一時コピーを作成せずにMEGAにアップロードできるため、デバイス上のスペースが節約され、アップロードが高速化されます。</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">次回から表示しない</string>
     <!-- Title of the dialog to confirm stop a sync -->
@@ -750,4 +750,18 @@
     <string name="sync_stop_sync_button">同期の停止</string>
     <!-- Snackbar message to indicate that sync has been stopped -->
     <string name="sync_snackbar_message_confirm_sync_stopped">同期が停止しました</string>
+    <!-- Title of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_title">バックアップの停止</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_message">これにより、2つのフォルダ間の同期プロセスが停止します。コピーが作成され、クラウドドライブに保存されます。</string>
+    <!-- Label for the button to stop a backup -->
+    <string name="sync_stop_backup_button">バックアップの停止</string>
+    <!-- Snackbar message to indicate that backup has been stopped -->
+    <string name="sync_snackbar_message_confirm_backup_stopped">バックアップが停止しました</string>
+    <!-- Sync state updating -->
+    <string name="sync_list_sync_state_updating">更新中&#8230;</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_up_to_date">最新版</string>
+    <!-- Title of Favourites video playlist in the video section -->
+    <string name="video_section_title_favourite_playlist">お気に入り</string>
 </resources>

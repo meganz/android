@@ -749,9 +749,9 @@
     <!--Success message displayed in the Login screen after the account has been activated-->
     <string name="login_screen_account_confirmed_success_message">Uw account is geactiveerd. Log in.</string>
     <!-- Title in the files permission screen -->
-    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <string name="files_permission_screen_title">Geef MEGA toegang tot de bestanden van uw apparaat</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads to MEGA.</string>
+    <string name="files_permission_screen_message">Door MEGA-toegang tot uw bestanden toe te staan, kunt u uploaden naar MEGA zonder tijdelijke kopieën te maken, wat ruimte op uw apparaat bespaart en snellere uploads mogelijk maakt.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">Laat dit niet meer zien</string>
     <!-- Title of the dialog to confirm stop a sync -->
@@ -762,4 +762,18 @@
     <string name="sync_stop_sync_button">Synchroniseren stoppen</string>
     <!-- Snackbar message to indicate that sync has been stopped -->
     <string name="sync_snackbar_message_confirm_sync_stopped">Synchronisatie is gestopt</string>
+    <!-- Title of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_title">Back-up stoppen</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_message">Dit zal het synchronisatieproces tussen de twee mappen stoppen. Er wordt een kopie gemaakt en opgeslagen op uw Cloud-schijf.</string>
+    <!-- Label for the button to stop a backup -->
+    <string name="sync_stop_backup_button">Back-up stoppen</string>
+    <!-- Snackbar message to indicate that backup has been stopped -->
+    <string name="sync_snackbar_message_confirm_backup_stopped">Back-up gestopt</string>
+    <!-- Sync state updating -->
+    <string name="sync_list_sync_state_updating">Updaten&#8230;</string>
+    <!-- Sync state up to date -->
+    <string name="sync_list_sync_state_up_to_date">Bijgewerkt</string>
+    <!-- Title of Favourites video playlist in the video section -->
+    <string name="video_section_title_favourite_playlist">Favorieten</string>
 </resources>
