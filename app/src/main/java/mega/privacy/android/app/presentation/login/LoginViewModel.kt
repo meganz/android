@@ -58,6 +58,7 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.ClearLastRegisteredEmailUseCase
@@ -131,6 +132,7 @@ class LoginViewModel @Inject constructor(
     private val transfersManagement: TransfersManagement,
     private val clearUserCredentialsUseCase: ClearUserCredentialsUseCase,
     private val startUploadsWorkerUseCase: StartUploadsWorkerUseCase,
+    private val getHistoricalProcessExitReasonsUseCase: GetHistoricalProcessExitReasonsUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -150,6 +152,16 @@ class LoginViewModel @Inject constructor(
     private var pendingAction: String? = null
 
     private val cleanFetchNodesUpdate by lazy { FetchNodesUpdate() }
+
+    init {
+        viewModelScope.launch {
+            runCatching {
+                getHistoricalProcessExitReasonsUseCase()
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
 
     /**
      * Reset some states values.

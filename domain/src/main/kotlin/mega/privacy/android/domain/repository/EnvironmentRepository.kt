@@ -113,4 +113,9 @@ interface EnvironmentRepository {
      * Get the number of available processors
      */
     fun availableProcessors(): Int
+
+    /**
+     * Get historical process exit reasons and log to Timber
+     */
+    suspend fun getHistoricalProcessExitReasons()
 }

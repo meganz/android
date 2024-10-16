@@ -30,6 +30,7 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.ClearLastRegisteredEmailUseCase
@@ -110,6 +111,8 @@ internal class LoginViewModelTest {
     private val transfersManagement = mock<TransfersManagement>()
     private val clearUserCredentialsUseCase = mock<ClearUserCredentialsUseCase>()
     private val startUploadsWorkerUseCase = mock<StartUploadsWorkerUseCase>()
+    private val getHistoricalProcessExitReasonsUseCase =
+        mock<GetHistoricalProcessExitReasonsUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -150,6 +153,7 @@ internal class LoginViewModelTest {
             transfersManagement = transfersManagement,
             clearUserCredentialsUseCase = clearUserCredentialsUseCase,
             startUploadsWorkerUseCase = startUploadsWorkerUseCase,
+            getHistoricalProcessExitReasonsUseCase = getHistoricalProcessExitReasonsUseCase
         )
     }
 
@@ -367,6 +371,11 @@ internal class LoginViewModelTest {
         underTest.clearUserCredentials()
         advanceUntilIdle()
         verify(clearUserCredentialsUseCase).invoke()
+    }
+
+    @Test
+    fun `test that getHistoricalProcessExitReasonsUseCase invoke correctly`() = runTest {
+        verify(getHistoricalProcessExitReasonsUseCase).invoke()
     }
 
     companion object {

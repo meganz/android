@@ -154,6 +154,7 @@ internal abstract class RepositoryModule {
     abstract fun bindNetworkRepository(repository: DefaultNetworkRepository): NetworkRepository
 
     @Binds
+    @Singleton
     abstract fun bindDeviceRepository(implementation: EnvironmentRepositoryImpl): EnvironmentRepository
 
     @Binds

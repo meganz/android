@@ -77,6 +77,8 @@ dependencies {
     implementation(androidx.security.crypto)
     implementation(google.tink)
 
+    implementation(google.protobuff)
+
     // Testing dependencies
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.truth.ext)

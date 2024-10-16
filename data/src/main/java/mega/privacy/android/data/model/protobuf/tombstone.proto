@@ -5,7 +5,7 @@
 * Use Command: $protoc --java_out=${OUTPUT_DIR} path/to/your/proto/file
 */
 syntax = "proto3";
-option java_package = "mega.privacy.android.app.protobuf";
+option java_package = "mega.privacy.android.data.model.protobuf";
 option java_outer_classname = "TombstoneProtos";
 // NOTE TO OEMS:
 // If you add custom fields to this proto, do not use numbers in the reserved range.
