@@ -139,6 +139,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import org.robolectric.annotation.Config
 import java.io.File
 import java.util.UUID
 import java.util.concurrent.Executor
@@ -149,6 +150,7 @@ import java.util.concurrent.Executors
  */
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
+@Config(sdk = [34])
 internal class CameraUploadsWorkerTest {
 
     private lateinit var underTest: CameraUploadsWorker

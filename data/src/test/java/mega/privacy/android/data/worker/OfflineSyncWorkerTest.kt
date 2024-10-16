@@ -23,6 +23,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.robolectric.annotation.Config
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -33,6 +34,7 @@ import java.util.concurrent.Executors
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Config(sdk = [34])
 class OfflineSyncWorkerTest {
     private lateinit var underTest: OfflineSyncWorker
 
