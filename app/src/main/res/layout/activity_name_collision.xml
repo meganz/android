@@ -99,49 +99,12 @@
                 app:layout_constraintTop_toBottomOf="@+id/replace_update_merge_button" />
 
             <TextView
-                android:id="@+id/cancel_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey700White075"
-                app:layout_constraintTop_toBottomOf="@+id/replace_update_merge_separator"
-                tools:text="No files will be changed. You will keep the file below:" />
-
-            <include
-                android:id="@+id/cancel_view"
-                layout="@layout/view_name_collision_option"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cancel_info" />
-
-            <Button
-                android:id="@+id/cancel_button"
-                style="@style/Widget.Mega.Button.Transparent"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cancel_view"
-                tools:text="DON'T UPLOAD" />
-
-            <View
-                android:id="@+id/cancel_separator"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="14dp"
-                android:background="@color/grey_012_white_012"
-                app:layout_constraintTop_toBottomOf="@+id/cancel_button" />
-
-            <TextView
                 android:id="@+id/rename_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey700White075"
-                app:layout_constraintTop_toBottomOf="@+id/cancel_separator"
+                app:layout_constraintTop_toBottomOf="@+id/replace_update_merge_separator"
                 tools:text="The file you are uploading will be renamed as:" />
 
             <include
@@ -164,13 +127,51 @@
                 app:layout_constraintTop_toBottomOf="@+id/rename_view"
                 tools:text="UPLOAD AND RENAME" />
 
+            <View
+                android:id="@+id/rename_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="14dp"
+                android:background="@color/grey_012_white_012"
+                app:layout_constraintTop_toBottomOf="@+id/rename_button" />
+
+            <TextView
+                android:id="@+id/cancel_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey700White075"
+                app:layout_constraintTop_toBottomOf="@+id/rename_separator"
+                tools:text="No files will be changed. You will keep the file below:" />
+
+            <include
+                android:id="@+id/cancel_view"
+                layout="@layout/view_name_collision_option"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cancel_info" />
+
+            <Button
+                android:id="@+id/cancel_button"
+                style="@style/Widget.Mega.Button.Transparent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cancel_view"
+                tools:text="DON'T UPLOAD" />
+
+
             <CheckBox
                 android:id="@+id/apply_for_all_check"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey700White075"
-                app:layout_constraintTop_toBottomOf="@+id/rename_button"
+                app:layout_constraintTop_toBottomOf="@+id/cancel_button"
                 tools:text="Apply this option to the next 5 conflicts" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

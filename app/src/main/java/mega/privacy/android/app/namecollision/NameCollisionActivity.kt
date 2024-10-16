@@ -336,7 +336,7 @@ class NameCollisionActivity : PasscodeActivity() {
 
         binding.cancelButton.text = getString(cancelButtonId)
 
-        binding.cancelSeparator.isVisible = isFile
+        binding.renameSeparator.isVisible = isFile
         binding.renameInfo.isVisible = isFile
         binding.renameView.optionView.isVisible = isFile
         binding.renameButton.isVisible = isFile
