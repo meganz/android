@@ -17,7 +17,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.launchIn
@@ -138,8 +137,6 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
     private var emptyGeneralText: Spanned? = null
 
     private lateinit var itemDecoration: PositionDividerItemDecoration
-
-    private var disposable: Disposable? = null
 
     private val fileExplorerActivity: FileExplorerActivity
         get() = (requireActivity() as FileExplorerActivity)
@@ -422,11 +419,6 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             }
         }
         super.onViewCreated(view, savedInstanceState)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        disposable?.dispose()
     }
 
     /**

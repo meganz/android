@@ -244,19 +244,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         }
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (megaChatApi != null) {
-            if (context instanceof ChatExplorerActivity) {
-                ((ChatExplorerActivity) context).composite.clear();
-            } else if (context instanceof FileExplorerActivity) {
-                ((FileExplorerActivity) context).composite.clear();
-            }
-        }
-    }
-
     private void collectFlows() {
         ViewExtensionsKt.collectFlow(
                 this,

@@ -18,7 +18,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -222,9 +221,6 @@ class InMeetingViewModel @Inject constructor(
     private val monitorContactVisibilityUpdateUseCase: MonitorContactVisibilityUpdateUseCase,
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
 ) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
-
-    private val composite = CompositeDisposable()
-
     /**
      * private UI state
      */
@@ -2818,13 +2814,6 @@ class InMeetingViewModel @Inject constructor(
             }
             Timber.d("Num visible participants is ${visibleParticipants.size}")
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-
-        composite.clear()
-
     }
 
     /**

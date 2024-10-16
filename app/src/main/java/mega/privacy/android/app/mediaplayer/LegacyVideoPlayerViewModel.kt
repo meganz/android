@@ -23,7 +23,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -229,9 +228,6 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     private val saveVideoRecentlyWatchedUseCase: SaveVideoRecentlyWatchedUseCase,
     private val getFileUriUseCase: GetFileUriUseCase,
 ) : ViewModel(), SearchCallback.Data {
-
-    private val compositeDisposable = CompositeDisposable()
-
     private var currentIntent: Intent? = null
 
     private var currentMediaPlayerMediaId: String? = null
@@ -1729,8 +1725,6 @@ class LegacyVideoPlayerViewModel @Inject constructor(
      */
     private fun clear() {
         applicationScope.launch {
-            compositeDisposable.dispose()
-
             if (needStopStreamingServer) {
                 megaApiHttpServerStop()
                 megaApiFolderHttpServerStopUseCase()

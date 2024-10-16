@@ -21,7 +21,6 @@ import com.google.firebase.ktx.Firebase
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.Lazy
 import dagger.hilt.android.HiltAndroidApp
-import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -236,7 +235,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         } else {
             Firebase.crashlytics.setCrashlyticsCollectionEnabled(false)
         }
-        RxJavaPlugins.setErrorHandler { throwable: Throwable? -> handleUncaughtException(throwable) }
 
         registerActivityLifecycleCallbacks(activityLifecycleHandler)
         isVerifySMSShowed = false

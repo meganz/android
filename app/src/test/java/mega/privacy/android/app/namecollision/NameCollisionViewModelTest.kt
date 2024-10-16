@@ -12,7 +12,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.InstantExecutorExtension
-import mega.privacy.android.app.TestSchedulerExtension
 import mega.privacy.android.app.extensions.withCoroutineExceptions
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -54,7 +53,7 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ExtendWith(value = [InstantExecutorExtension::class, TestSchedulerExtension::class])
+@ExtendWith(value = [InstantExecutorExtension::class])
 internal class NameCollisionViewModelTest {
     private lateinit var underTest: NameCollisionViewModel
 

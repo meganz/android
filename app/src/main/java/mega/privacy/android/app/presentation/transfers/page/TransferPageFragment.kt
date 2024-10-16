@@ -17,7 +17,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
@@ -77,8 +76,6 @@ internal class TransferPageFragment : Fragment() {
     private val legacyTransfersFragment: LegacyTransfersFragment?
         get() = childFragmentManager.findFragmentByTag(TRANSFERS_TAG) as? LegacyTransfersFragment
 
-    private val composite = CompositeDisposable()
-
     private var cancelAllTransfersMenuItem: MenuItem? = null
     private var playTransfersMenuIcon: MenuItem? = null
     private var pauseTransfersMenuIcon: MenuItem? = null
@@ -119,7 +116,6 @@ internal class TransferPageFragment : Fragment() {
     override fun onDestroyView() {
         _binding = null
         confirmationTransfersDialog?.dismiss()
-        composite.clear()
         super.onDestroyView()
     }
 

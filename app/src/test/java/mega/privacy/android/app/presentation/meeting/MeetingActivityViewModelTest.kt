@@ -4,8 +4,6 @@ import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -74,7 +72,6 @@ import mega.privacy.android.domain.usecase.meeting.MutePeersUseCase
 import mega.privacy.android.domain.usecase.meeting.StartVideoDeviceUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -94,7 +91,6 @@ class MeetingActivityViewModelTest {
 
     private lateinit var underTest: MeetingActivityViewModel
 
-    private val scheduler = Schedulers.trampoline()
     private val meetingActivityRepository: MeetingActivityRepository = mock()
     private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
     private val getCallIdsOfOthersCallsUseCase: GetCallIdsOfOthersCallsUseCase = mock()
@@ -156,11 +152,6 @@ class MeetingActivityViewModelTest {
     private val context: Context = mock()
 
     private val chatId = 123L
-
-    @BeforeAll
-    fun initialise() {
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler { scheduler }
-    }
 
     @BeforeEach
     fun setUp() {

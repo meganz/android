@@ -274,9 +274,6 @@ dependencies {
         kaptTest(google.hilt.android.compiler)
     }
 
-    // RX
-    implementation(lib.bundles.rx)
-
     // Fresco
     implementation(lib.bundles.fresco)
     implementation(lib.facebook.inferannotation)
@@ -326,7 +323,6 @@ dependencies {
     testImplementation(google.hilt.android.test)
     testImplementation(androidx.work.test)
     testImplementation(androidx.navigation.testing)
-    testImplementation(lib.rx.coroutines)
 
     //jUnit 5
     testImplementation(platform(testlib.junit5.bom))

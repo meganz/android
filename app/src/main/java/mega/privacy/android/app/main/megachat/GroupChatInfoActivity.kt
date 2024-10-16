@@ -362,7 +362,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(contactUpdateReceiver)
-        composite.clear()
     }
 
     private fun setParticipants() {

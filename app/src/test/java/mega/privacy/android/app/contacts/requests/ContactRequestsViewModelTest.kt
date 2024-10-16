@@ -24,12 +24,10 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verifyBlocking
 import mega.privacy.android.app.InstantExecutorExtension
-import mega.privacy.android.app.TestSchedulerExtension
 
 @ExtendWith(
     InstantExecutorExtension::class,
     CoroutineMainDispatcherExtension::class,
-    TestSchedulerExtension::class
 )
 class ContactRequestsViewModelTest {
     private lateinit var underTest: ContactRequestsViewModel

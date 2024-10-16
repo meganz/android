@@ -33,7 +33,6 @@ import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -136,8 +135,6 @@ import kotlin.time.Duration.Companion.seconds
  * @property dbH                            [DatabaseHandler]
  * @property myAccountInfo                  [MyAccountInfo]
  * @property transfersManagement            [TransfersManagement]
- * @property loggingSettings                [LegacyLoggingSettings]
- * @property composite                      [CompositeDisposable]
  * @property app                            [MegaApplication]
  * @property outMetrics                     [DisplayMetrics]
  * @property isResumeTransfersWarningShown  True if the warning should be shown, false otherwise.
@@ -174,9 +171,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     @Inject
     lateinit var resetSdkLoggerUseCase: ResetSdkLoggerUseCase
-
-    @JvmField
-    var composite = CompositeDisposable()
 
     @Inject
     lateinit var getAccountDetailsUseCase: GetAccountDetailsUseCase
@@ -584,7 +578,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
 
     override fun onDestroy() {
-        composite.clear()
         unregisterReceiver(sslErrorReceiver)
         unregisterReceiver(takenDownFilesReceiver)
         unregisterReceiver(showSnackbarReceiver)

@@ -8,7 +8,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -79,8 +78,6 @@ class NameCollisionViewModel @Inject constructor(
     private val moveCollidedNodesUseCase: MoveCollidedNodesUseCase,
     private val deleteCacheFilesUseCase: DeleteCacheFilesUseCase,
 ) : ViewModel() {
-    private val composite = CompositeDisposable()
-
     private val _uiState = MutableStateFlow(NameCollisionUiState())
 
     /**
@@ -800,10 +797,4 @@ class NameCollisionViewModel @Inject constructor(
      * Gets the throwable.
      */
     fun onExceptionThrown(): LiveData<Throwable> = throwable
-
-
-    override fun onCleared() {
-        super.onCleared()
-        composite.clear()
-    }
 }

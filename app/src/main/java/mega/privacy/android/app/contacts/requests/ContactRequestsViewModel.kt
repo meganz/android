@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -38,9 +37,6 @@ internal class ContactRequestsViewModel @Inject constructor(
     private val monitorContactRequestsUseCase: MonitorContactRequestsUseCase,
     private val contactRequestItemMapper: ContactRequestItemMapper,
 ) : ViewModel() {
-
-    private val composite = CompositeDisposable()
-
     private val _state = MutableStateFlow<ContactRequestsState>(
         ContactRequestsState.Empty
     )
@@ -133,9 +129,4 @@ internal class ContactRequestsViewModel @Inject constructor(
                 else -> INCOMING.ordinal
             }
         }.asLiveData(context = viewModelScope.coroutineContext)
-
-    override fun onCleared() {
-        super.onCleared()
-        composite.clear()
-    }
 }

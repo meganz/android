@@ -2901,7 +2901,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         Timber.d("onDestroy()")
         dbH.removeSentPendingMessages()
         megaApi.removeRequestListener(this)
-        composite.clear()
         reconnectDialog?.cancel()
         dismissAlertDialogIfExists(processFileDialog)
         cookieDialogHandler.onDestroy()

@@ -15,7 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.disposables.Disposable
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -125,8 +124,6 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
     private var emptyGeneralText: Spanned? = null
 
     private lateinit var itemDecoration: PositionDividerItemDecoration
-
-    private var disposable: Disposable? = null
 
     private val fileExplorerActivity: FileExplorerActivity
         get() = (requireActivity() as FileExplorerActivity)
@@ -380,7 +377,6 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
 
     override fun onDestroyView() {
         super.onDestroyView()
-        disposable?.dispose()
         _binding = null
     }
 

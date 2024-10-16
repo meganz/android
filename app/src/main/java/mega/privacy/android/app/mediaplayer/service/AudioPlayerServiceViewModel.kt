@@ -12,7 +12,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.source.ShuffleOrder
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -188,8 +187,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
     monitorAudioRepeatModeUseCase: MonitorAudioRepeatModeUseCase,
 ) : AudioPlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener,
     SearchCallback.Data {
-    private val compositeDisposable = CompositeDisposable()
-
     private var backgroundPlayEnabled = monitorAudioBackgroundPlayEnabledUseCase().stateIn(
         sharingScope,
         SharingStarted.Eagerly,
@@ -1332,8 +1329,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     override fun clear() {
         applicationScope.launch {
-            compositeDisposable.dispose()
-
             if (needStopStreamingServer) {
                 megaApiHttpServerStop()
                 megaApiFolderHttpServerStopUseCase()
