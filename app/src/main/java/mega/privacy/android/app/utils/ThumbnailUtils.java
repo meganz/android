@@ -6,9 +6,7 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static nz.mega.sdk.MegaUtilsAndroid.createThumbnail;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -18,12 +16,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.provider.BaseColumns;
-import android.provider.MediaStore;
-import android.provider.MediaStore.MediaColumns;
-import android.provider.MediaStore.Video.Thumbnails;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
@@ -35,15 +28,11 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
-import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ThumbnailCache;
 import mega.privacy.android.app.main.adapters.FileStorageAdapter;
-import mega.privacy.android.app.main.adapters.FileStorageAdapter.ViewHolderFileStorage;
 import mega.privacy.android.app.main.adapters.MegaExplorerAdapter;
 import mega.privacy.android.app.main.adapters.MegaExplorerAdapter.ViewHolderExplorer;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
@@ -160,40 +149,6 @@ public class ThumbnailUtils {
         path.close();//Given close, last lineto can be removed.
 
         return path;
-    }
-
-    static class VideoThumbGeneratorListener implements MegaRequestListenerInterface {
-
-        @Override
-        public void onRequestStart(MegaApiJava api, MegaRequest request) {
-
-
-        }
-
-        @Override
-        public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
-
-        }
-
-        @Override
-        public void onRequestFinish(MegaApiJava api, MegaRequest request,
-                                    MegaError e) {
-            if (e.getErrorCode() == MegaError.API_OK) {
-                Timber.d("OK thumb de video");
-            } else {
-                Timber.e("ERROR thumb de video: %s", e.getErrorString());
-            }
-
-        }
-
-        @Override
-        public void onRequestTemporaryError(MegaApiJava api,
-                                            MegaRequest request, MegaError e) {
-
-
-        }
-
     }
 
     static class ThumbnailDownloadListenerListBrowser implements MegaRequestListenerInterface {
@@ -630,45 +585,6 @@ public class ThumbnailUtils {
         MegaNode document;
     }
 
-
-    /*
-     * This async task is to patch thumbnail picture to video or image files
-     * in device folder when select device file to upload
-     */
-    static class AttachThumbnailToFileStorageExplorerTask extends AsyncTask<FileDocument, Void, Boolean> {
-
-        Context context;
-        File thumbFile;
-        File originalFile;
-        FileStorageAdapter adapter;
-        MegaApiAndroid megaApi;
-        int position;
-
-        AttachThumbnailToFileStorageExplorerTask(Context context, MegaApiAndroid megaApi, FileStorageAdapter adapter, int position) {
-            this.context = context;
-            this.adapter = adapter;
-            this.thumbFile = null;
-            this.megaApi = megaApi;
-            this.position = position;
-        }
-
-        @Override
-        protected Boolean doInBackground(FileDocument... params) {
-            Timber.d("Attach Thumbnails to file storage explorer Start");
-            File thumbDir = getThumbFolder(context);
-            this.originalFile = params[0].getFile();
-            thumbFile = new File(thumbDir, megaApi.getFingerprint(this.originalFile.getAbsolutePath()) + ".jpg");
-            return createThumbnail(this.originalFile, thumbFile);
-        }
-
-        @Override
-        protected void onPostExecute(Boolean shouldContinueObject) {
-            if (shouldContinueObject) {
-                onThumbnailGeneratedExplorer(megaApi, this.thumbFile, this.originalFile, adapter, position);
-            }
-        }
-    }
-
     static class AttachThumbnailTaskExplorer extends AsyncTask<ResizerParams, Void, Boolean> {
         Context context;
         MegaApiAndroid megaApi;
@@ -946,7 +862,6 @@ public class ThumbnailUtils {
 
     }
 
-
     public static void createThumbnailExplorer(Context context, MegaNode document, ViewHolderExplorer holder, MegaApiAndroid megaApi, MegaExplorerAdapter adapter) {
 
         if (!MimeTypeList.typeForName(document.getName()).isImage()) {
@@ -965,137 +880,6 @@ public class ThumbnailUtils {
 
     }
 
-    public static void createThumbnailExplorer(Context context, FileDocument document, ViewHolderFileStorage holder, MegaApiAndroid megaApi, FileStorageAdapter adapter, int position) {
-        if (!MimeTypeList.typeForName(document.getName()).isImage() &&
-                !MimeTypeList.typeForName(document.getName()).isVideo()) {
-            Timber.d("no image or video");
-            return;
-        }
-
-        // if the document is gone or deleted
-        String key = megaApi.getFingerprint(document.getFile().getAbsolutePath());
-        if (key == null) {
-            Timber.d("no key");
-            return;
-        }
-
-        // if the thumbnail bitmap is cached in memory cache
-        Bitmap bitmap = getThumbnailFromCache(key);
-        if (bitmap == null) {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            File directoryCachedFile = new File(getThumbFolder(context), key + ".jpg");
-            if (directoryCachedFile.exists()) {
-                bitmap = BitmapFactory.decodeFile(directoryCachedFile.getAbsolutePath(), options);
-            }
-        }
-
-        if (bitmap != null) {
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-            params.height = params.width = dp2px(Constants.THUMBNAIL_SIZE_DP);
-            int margin = dp2px(Constants.THUMBNAIL_MARGIN_DP);
-            params.setMargins(margin, 0, margin, 0);
-            holder.imageView.setImageBitmap(getRoundedBitmap(context, bitmap, dp2px(THUMB_CORNER_RADIUS_DP)));
-            return;
-        }
-
-        // There is no cache before, we have to start an async task to have the thumbnail bitmap
-        new AttachThumbnailToFileStorageExplorerTask(context, megaApi, adapter, position).execute(document);
-
-    }
-
-    public static void createThumbnailVideo(Context context, String localPath, MegaApiAndroid megaApi, long handle) {
-        Timber.d("createThumbnailVideo: %s : %d", localPath, handle);
-
-        //mp4 and 3gp OK, other formats check from Android DB with loadVideoThumbnail
-        // mov, mkv, flv not working even not in Android DB
-
-        MegaNode videoNode = megaApi.getNodeByHandle(handle);
-
-        if (videoNode == null) {
-            Timber.w("videoNode is NULL");
-            return;
-        }
-
-        Bitmap bmThumbnail;
-        // MICRO_KIND, size: 96 x 96 thumbnail
-        bmThumbnail = android.media.ThumbnailUtils.createVideoThumbnail(localPath, Thumbnails.MICRO_KIND);
-        if (bmThumbnail == null) {
-            Timber.d("Create video thumb NULL, get with Cursor");
-            bmThumbnail = loadVideoThumbnail(localPath, context);
-        } else {
-            Timber.d("Create Video Thumb worked!");
-        }
-
-        if (bmThumbnail != null) {
-            Bitmap resizedBitmap = Bitmap.createScaledBitmap(bmThumbnail, 200, 200, false);
-
-            Timber.d("After resize thumb: %d : %d", resizedBitmap.getHeight(), resizedBitmap.getWidth());
-
-            try {
-                File thumbDir = getThumbFolder(context);
-                File thumbVideo = new File(thumbDir, videoNode.getBase64Handle() + ".jpg");
-
-                thumbVideo.createNewFile();
-
-                FileOutputStream out = null;
-                try {
-                    out = new FileOutputStream(thumbVideo);
-                    boolean result = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
-                    if (result) {
-                        Timber.d("Compress OK!");
-                        megaApi.setThumbnail(videoNode, thumbVideo.getAbsolutePath(), new VideoThumbGeneratorListener());
-                    } else {
-                        Timber.d("Not Compress");
-                    }
-                } catch (Exception e) {
-                    Timber.e(e, "Error with FileOutputStream");
-                } finally {
-                    try {
-                        if (out != null) {
-                            out.close();
-                        }
-                    } catch (IOException e) {
-                        Timber.e(e);
-                    }
-                }
-
-            } catch (IOException e1) {
-                Timber.e(e1, "Error creating new thumb file");
-            }
-        } else {
-            Timber.w("Create video thumb NULL");
-        }
-    }
-
-    private static final String SELECTION = MediaColumns.DATA + "=?";
-    private static final String[] PROJECTION = {BaseColumns._ID};
-
-    public static Bitmap loadVideoThumbnail(String videoFilePath, Context context) {
-        Timber.d("loadVideoThumbnail");
-        Bitmap result = null;
-        Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-        String[] selectionArgs = {videoFilePath};
-        ContentResolver cr = context.getContentResolver();
-        Cursor cursor = null;
-        try {
-            cursor = cr.query(uri, PROJECTION, SELECTION, selectionArgs, null);
-            if (cursor.moveToFirst()) {
-                // it's the only & first thing in projection, so it is 0
-                long videoId = cursor.getLong(0);
-                result = MediaStore.Video.Thumbnails.getThumbnail(cr, videoId, Thumbnails.MICRO_KIND, null);
-            }
-            cursor.close();
-            return result;
-        } catch (Exception ex) {
-            Timber.e(ex);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return null;
-    }
 
     public interface ThumbnailInterface {
         long getDocument();

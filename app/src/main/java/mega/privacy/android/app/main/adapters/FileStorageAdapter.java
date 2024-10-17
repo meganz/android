@@ -19,13 +19,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import coil.Coil;
+import coil.request.ImageRequest;
+import coil.transform.RoundedCornersTransformation;
 import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.FileStorageActivity;
 import mega.privacy.android.app.main.FileStorageActivity.Mode;
-import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import timber.log.Timber;
 
@@ -113,8 +116,22 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
                 if (document.isFolder()) {
                     holder.imageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_folder_medium_solid);
                 } else {
-                    holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
-                    ThumbnailUtils.createThumbnailExplorer(context, document, holder, this.megaApi, this, position);
+                    if (MimeTypeList.typeForName(document.getName()).isImage() || MimeTypeList.typeForName(document.getName()).isVideo()) {
+                        String filePath = document.getFile().getAbsolutePath();
+                        String key = megaApi.getFingerprint(filePath);
+                        if (!TextUtil.isTextEmpty(key)) {
+                            Coil.imageLoader(context).enqueue(
+                                    new ImageRequest.Builder(context)
+                                            .placeholder(MimeTypeList.typeForName(document.getName()).getIconResourceId())
+                                            .data(filePath)
+                                            .target(holder.imageView)
+                                            .transformations(new RoundedCornersTransformation(context.getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
+                                            .build()
+                            );
+                        }
+                    } else {
+                        holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
+                    }
                 }
                 break;
         }
