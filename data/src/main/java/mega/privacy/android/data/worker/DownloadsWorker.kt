@@ -7,7 +7,13 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.transformWhile
+import kotlinx.coroutines.launch
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMapper
 import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
@@ -23,8 +29,10 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUntilFinishedUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfers.pending.GetPendingTransfersByTypeUseCase
+import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingDownloadsUseCase
 import timber.log.Timber
 
 /**
@@ -38,7 +46,6 @@ class DownloadsWorker @AssistedInject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     handleTransferEventUseCase: HandleTransferEventUseCase,
-    private val monitorOngoingActiveTransfersUntilFinishedUseCase: MonitorOngoingActiveTransfersUntilFinishedUseCase,
     areTransfersPausedUseCase: AreTransfersPausedUseCase,
     getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     overQuotaNotificationBuilder: OverQuotaNotificationBuilder,
@@ -52,6 +59,9 @@ class DownloadsWorker @AssistedInject constructor(
     crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
+    private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
+    private val getPendingTransfersByTypeUseCase: GetPendingTransfersByTypeUseCase,
+    private val startAllPendingDownloadsUseCase: StartAllPendingDownloadsUseCase,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
@@ -75,7 +85,40 @@ class DownloadsWorker @AssistedInject constructor(
     override val updateNotificationId = DOWNLOAD_UPDATE_NOTIFICATION_ID
 
     override fun monitorProgress(): Flow<MonitorOngoingActiveTransfersResult> =
-        monitorOngoingActiveTransfersUntilFinishedUseCase(type)
+        combine(
+            monitorOngoingActiveTransfersUseCase(type),
+            getPendingTransfersByTypeUseCase(type),
+        ) { monitorOngoingActiveTransfersResult, pendingTransfersNotSend ->
+            monitorOngoingActiveTransfersResult to pendingTransfersNotSend.size
+        }.transformWhile { (ongoingActiveTransfersResult, notSendPendingTransfers) ->
+            emit(ongoingActiveTransfersResult)
+            Timber.d("Download progress emitted: $notSendPendingTransfers ${ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers()}")
+            //keep monitoring if and only if there are pending transfers or transfers in progress
+            val keepMonitoring =
+                notSendPendingTransfers > 0 || (ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers() && !ongoingActiveTransfersResult.transfersOverQuota)
+            if (!keepMonitoring) {
+                Timber.d("DownloadWorker keep monitoring false due to no more transfers to start and all finished: $notSendPendingTransfers, ${ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers()}")
+            }
+            return@transformWhile keepMonitoring
+        }
+            .catch {
+                Timber.e(it)
+            }
+            .onCompletion {
+                Timber.d("DownloadWorker monitor progress finished $it")
+            }
+
+
+    override suspend fun doWorkInternal(scope: CoroutineScope) {
+        scope.launch {
+            super.doWorkInternal(this)
+        }
+        scope.launch {
+            startAllPendingDownloadsUseCase()
+                .catch { Timber.e("Error on downloading nodes", it) }
+                .collect { Timber.d("Start downloading $it nodes") }
+        }
+    }
 
     override suspend fun createUpdateNotification(
         activeTransferTotals: ActiveTransferTotals,
