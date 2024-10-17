@@ -5,16 +5,12 @@ import static android.view.View.VISIBLE;
 import static mega.privacy.android.app.MimeTypeList.typeForName;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX;
-import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
 import static mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder;
 import static mega.privacy.android.app.utils.Util.hideKeyboardView;
 import static mega.privacy.android.app.utils.Util.showKeyboardDelayed;
 
 import android.content.Context;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -30,22 +26,22 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import coil.Coil;
+import coil.request.ImageRequest;
+import coil.transform.RoundedCornersTransformation;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.main.FileExplorerActivity;
-import mega.privacy.android.app.main.ImportFilesFragment;
 import mega.privacy.android.domain.entity.ShareTextInfo;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -79,60 +75,6 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
      */
     public void setFooterListener(OnImportFilesAdapterFooterListener listener) {
         onImportFilesAdapterFooterListener = listener;
-    }
-
-    class ThumbnailsTask extends AsyncTask<Object, Void, Void> {
-
-        ShareInfo file;
-        ViewHolderImportFiles holder;
-        Uri uri;
-
-        @Override
-        protected Void doInBackground(Object... objects) {
-            file = (ShareInfo) objects[0];
-            holder = (ViewHolderImportFiles) objects[1];
-
-            if (file != null) {
-                File thumb = getThumbnail(file);
-
-                if (thumb.exists()) {
-                    uri = Uri.parse(thumb.getAbsolutePath());
-                } else {
-                    boolean thumbnailCreated = megaApi.createThumbnail(file.getFileAbsolutePath(), thumb.getAbsolutePath());
-                    if (thumbnailCreated) {
-                        uri = Uri.parse(thumb.getAbsolutePath());
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (uri != null && holder != null) {
-                holder.thumbnail.setImageURI(uri);
-                if (holder.currentPosition >= 0 && holder.currentPosition < files.size()) {
-                    notifyItemChanged(holder.currentPosition);
-                }
-            }
-        }
-    }
-
-    /**
-     * Gets the thumbnail if exists from the ShareInfo received.
-     *
-     * @param file ShareInfo to get its thumbnail.
-     * @return The thumbnail if exist.
-     */
-    private File getThumbnail(ShareInfo file) {
-        File childThumbDir = new File(getThumbFolder(context), ImportFilesFragment.THUMB_FOLDER);
-
-        if (!childThumbDir.exists()) {
-            childThumbDir.mkdirs();
-        }
-
-        return new File(childThumbDir, file.getTitle() + JPG_EXTENSION);
     }
 
     /**
@@ -279,25 +221,18 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 ShareInfo file = (ShareInfo) getItem(position);
                 fileName = file.getTitle();
 
-                Uri uri = null;
-
                 if (typeForName(file.getTitle()).isImage()
                         || typeForName(file.getTitle()).isVideo()
                         || typeForName(file.getTitle()).isVideoMimeType()) {
-                    File thumb = getThumbnail(file);
-
-                    if (thumb.exists()) {
-                        uri = Uri.parse(thumb.getAbsolutePath());
-
-                        if (uri != null) {
-                            ((ViewHolderImportFiles) holder).thumbnail.setImageURI(Uri.fromFile(thumb));
-                        }
-                    } else {
-                        new ThumbnailsTask().execute(file, holder);
-                    }
-                }
-
-                if (uri == null) {
+                    Coil.imageLoader(context).enqueue(
+                            new ImageRequest.Builder(context)
+                                    .placeholder(typeForName(file.getTitle()).getIconResourceId())
+                                    .data(file.getFileAbsolutePath())
+                                    .target(((ViewHolderImportFiles) holder).thumbnail)
+                                    .transformations(new RoundedCornersTransformation(context.getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
+                                    .build()
+                    );
+                } else {
                     ((ViewHolderImportFiles) holder).thumbnail.setImageResource(typeForName(file.getTitle()).getIconResourceId());
                 }
 
@@ -447,7 +382,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public static class ViewHolderImportFiles extends RecyclerView.ViewHolder {
 
         RelativeLayout itemLayout;
-        SimpleDraweeView thumbnail;
+        ImageView thumbnail;
         TextInputLayout nameLayout;
         EmojiEditText name;
         RelativeLayout editButton;

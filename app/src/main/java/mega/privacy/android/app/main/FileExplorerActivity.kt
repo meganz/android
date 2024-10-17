@@ -88,7 +88,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.cloudRootHandle
 import mega.privacy.android.app.utils.MegaNodeUtil.existsMyChatFilesFolder
 import mega.privacy.android.app.utils.MegaNodeUtil.myChatFilesFolder
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
-import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
@@ -2113,16 +2112,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         megaApi.removeGlobalListener(this)
         megaApi.removeRequestListener(this)
         megaChatApi.removeChatRequestListener(this)
-        val childThumbDir =
-            File(ThumbnailUtils.getThumbFolder(this), ImportFilesFragment.THUMB_FOLDER)
-
-        if (FileUtil.isFileAvailable(childThumbDir)) {
-            try {
-                deleteFile(childThumbDir)
-            } catch (e: IOException) {
-                Timber.w(e, "IOException deleting childThumbDir.")
-            }
-        }
         dismissAlertDialogIfExists(statusDialog)
         dismissAlertDialogIfExists(newFolderDialog)
         super.onDestroy()

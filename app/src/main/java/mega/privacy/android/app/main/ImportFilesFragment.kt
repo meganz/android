@@ -255,12 +255,6 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
     }
 
     companion object {
-
-        /**
-         * Constant for temporary folder in which the thumbnails are stored.
-         */
-        const val THUMB_FOLDER = "ImportFilesThumb"
-
         /**
          * Creates a new instance of [ImportFilesFragment].
          *

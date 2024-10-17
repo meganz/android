@@ -6,14 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="80dp">
 
-    <com.facebook.drawee.view.SimpleDraweeView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/thumbnail_file"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_centerVertical="true"
-        android:scaleType="centerCrop"
-        app:roundWithOverlayColor="@color/white_black"
-        app:roundedCornerRadius="4dp" />
+        android:scaleType="centerCrop" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_file_layout"
