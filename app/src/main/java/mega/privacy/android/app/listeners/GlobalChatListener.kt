@@ -91,14 +91,18 @@ class GlobalChatListener @Inject constructor(
 
     private fun onChatListItemUpdate(item: MegaChatListItem) {
         if (!item.isGroup) return
-        if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
-            if (item.ownPrivilege != MegaChatRoom.PRIV_RM) {
-                chatManagement.checkActiveGroupChat(item.chatId)
-            } else {
-                chatManagement.removeActiveChatAndNotificationShown(item.chatId)
-            }
+
+        if ((item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV) && item.ownPrivilege != MegaChatRoom.PRIV_RM) || item.hasChanged(
+                MegaChatListItem.CHANGE_TYPE_CALL
+            )
+        ) {
+            chatManagement.checkActiveGroupChat(item.chatId)
         }
-        if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
+
+        if ((item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV) && item.ownPrivilege == MegaChatRoom.PRIV_RM) || item.hasChanged(
+                MegaChatListItem.CHANGE_TYPE_CLOSED
+            )
+        ) {
             chatManagement.removeActiveChatAndNotificationShown(item.chatId)
         }
     }
