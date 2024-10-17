@@ -3123,11 +3123,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         if (drawerItem == null) {
             return@launch
         }
-        if (drawerItem == DrawerItem.DEVICE_CENTER) {
-            supportActionBar?.hide()
-        } else {
-            supportActionBar?.show()
-        }
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE -> {
                 supportActionBar?.subtitle = null
@@ -3939,6 +3934,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             DrawerItem.DEVICE_CENTER -> {
                 viewModel.setIsFirstNavigationLevel(true)
+                setAppBarVisibility(false)
                 setBottomNavigationMenuItemChecked(NO_BNV)
                 supportInvalidateOptionsMenu()
                 hideFabButton()
@@ -7850,9 +7846,13 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * We don't set the visibility to the appBarLayout directly because we keep status bar padding
      */
     private fun setAppBarVisibility(isVisible: Boolean) {
-        if (toolbar.isVisible != isVisible) {
-            toolbar.isVisible = isVisible
-            setSupportActionBar(if (isVisible) toolbar else null)
+        Timber.d("setAppBarVisibility called with $isVisible")
+        if (supportActionBar?.isShowing != isVisible) {
+            if (isVisible) {
+                supportActionBar?.show()
+            } else {
+                supportActionBar?.hide()
+            }
         }
     }
 
