@@ -29,6 +29,7 @@ class TransferAppDataStringMapper @Inject constructor() {
             when (this) {
                 is TransferAppData.ChatUpload -> listOf(pendingMessageId.toString())
                 is TransferAppData.SdCardDownload -> listOf(targetPath, targetUri)
+                is TransferAppData.OriginalContentUri -> listOf(originalUri)
 
                 else -> emptyList()
             }

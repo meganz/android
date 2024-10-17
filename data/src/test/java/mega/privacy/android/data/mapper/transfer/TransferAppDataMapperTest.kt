@@ -4,6 +4,7 @@ import com.google.common.truth.Truth
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.BackgroundTransfer
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.CameraUpload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatUpload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OriginalContentUri
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SDCardDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_INDICATOR
@@ -95,6 +96,14 @@ class TransferAppDataMapperTest {
             val raw = "CHAT_UPLOAD>chatId"
             Truth.assertThat(underTest(raw)).isEmpty()
         }
+
+        @Test
+        fun `test that a OriginalContentUri is mapped correctly`() {
+            val uri = "content://com.android.externalstorage.documents/tree/primary%3A"
+            val raw = "ORIGINAL_URI>$uri"
+            val expected = TransferAppData.OriginalContentUri(uri)
+            Truth.assertThat(underTest(raw)).containsExactly(expected)
+        }
     }
 
     private fun provideWrongParameters() = wrongParameters
@@ -138,6 +147,8 @@ class TransferAppDataMapperTest {
                     to listOf(TransferAppData.BackgroundTransfer),
             generateAppDataString(SDCardDownload, TARGET_PATH, TARGET_URI)
                     to listOf(TransferAppData.SdCardDownload(TARGET_PATH, TARGET_URI)),
+            generateAppDataString(OriginalContentUri, TARGET_URI)
+                    to listOf(TransferAppData.OriginalContentUri(TARGET_URI)),
         )
 
         private fun generateAppDataString(

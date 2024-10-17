@@ -3,6 +3,7 @@ package mega.privacy.android.data.mapper.transfer
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.BackgroundTransfer
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.CameraUpload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatUpload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OriginalContentUri
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SDCardDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -43,6 +44,10 @@ class TransferAppDataMapper @Inject constructor() {
                     }
 
                     BackgroundTransfer -> TransferAppData.BackgroundTransfer
+
+                    OriginalContentUri -> values.firstIfNotBlank()?.let {
+                        TransferAppData.OriginalContentUri(it)
+                    }
 
                     else -> null
                 }

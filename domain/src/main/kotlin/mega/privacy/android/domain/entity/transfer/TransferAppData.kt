@@ -37,4 +37,10 @@ sealed interface TransferAppData {
      * @param targetUri the target uri in the sd card where the file will be moved once downloaded
      */
     data class SdCardDownload(val targetPath: String, val targetUri: String?) : TransferAppData
+
+    /**
+     * Identify the original content URI of an upload transfer that needs to be copied to the cache folder for retry purposes.
+     * @param originalUri
+     */
+    data class OriginalContentUri(val originalUri: String) : TransferAppData
 }
