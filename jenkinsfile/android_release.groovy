@@ -120,6 +120,7 @@ pipeline {
                             // write slackResponse.threadId to local file and upload to slackInfoPath
                             slackChannelId = slackResponse.threadId
                             qaSlackChannelId = qaSlackResponse.threadId
+                            def slackInfoFileName = "slack_info.txt"
                             sh """
                                cd ${WORKSPACE}
                                echo ${slackChannelId},${qaSlackChannelId} > ${slackInfoFileName}
