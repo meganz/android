@@ -8,8 +8,11 @@ import android.view.WindowManager
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
@@ -24,6 +27,7 @@ import androidx.compose.ui.window.SecureFlagPolicy
  * dialog's window.
  * @param content The content to be displayed inside the dialog.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FullScreenDialog(
     onDismissRequest: () -> Unit,
@@ -42,7 +46,11 @@ fun FullScreenDialog(
         onDismissRequest = onDismissRequest,
     ) {
         Surface(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .semantics {
+                    testTagsAsResourceId = true
+                },
         ) {
             val activityWindow = LocalView.current.context.getActivityWindow()
             val dialogWindow = (LocalView.current.parent as? DialogWindowProvider)?.window
