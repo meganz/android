@@ -12,13 +12,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -37,6 +36,10 @@ fun UploadDestinationRowItem(
     updateFileName: (String) -> Unit,
     isEditMode: Boolean = false,
 ) {
+    val focusManager = LocalFocusManager.current
+    LaunchedEffect(importUiItem.filePath) {
+        focusManager.clearFocus()
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -52,10 +55,8 @@ fun UploadDestinationRowItem(
                 .size(48.dp)
                 .clip(RoundedCornerShape(8.dp)),
         )
-        val focusRequester = remember { FocusRequester() }
         GenericTextField(
             modifier = Modifier
-                .focusRequester(focusRequester)
                 .onFocusChanged {
                     if (it.isFocused) {
                         editFileName(importUiItem)
