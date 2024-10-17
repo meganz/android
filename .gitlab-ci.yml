@@ -3,11 +3,10 @@ variables:
   GIT_DEPTH: 0
 
 stages:
-  - scan
-  - wait_for_jenkins # This is a workaround until DevOps moves our gitleaks step to Jenkins. This will not impact CI/CD times, as this is running in parallel.
+  - scan_and_wait
 
 scan:
-  stage: scan
+  stage: scan_and_wait
   image:
     name: mega-docker.artifactory.developers.mega.co.nz:8443/gitleaks:v8.18.2-mega-1.0
     entrypoint: [""]
@@ -15,7 +14,7 @@ scan:
     - gitleaks detect -v --redact -c .gitleaks/gitleaks.toml
 
 wait_for_jenkins:
-  stage: wait_for_jenkins
+  stage: scan_and_wait
   script:
     - echo "Waiting for Jenkins..."
     - sleep 300  # 5 minutes
