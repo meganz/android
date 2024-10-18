@@ -186,14 +186,12 @@ internal class MegaLocalRoomFacade @Inject constructor(
         completedTransferDao.get().deleteAllCompletedTransfers()
 
     override suspend fun getCompletedTransfersByState(states: List<Int>): List<CompletedTransfer> {
-        val encryptedStates = states.mapNotNull { encryptData(it.toString()) }
-        return completedTransferDao.get().getCompletedTransfersByState(encryptedStates)
+        return completedTransferDao.get().getCompletedTransfersByState(states)
             .map { entity -> completedTransferModelMapper(entity) }
     }
 
     override suspend fun deleteCompletedTransfersByState(states: List<Int>): List<CompletedTransfer> {
-        val encryptedStates = states.mapNotNull { encryptData(it.toString()) }
-        val entities = completedTransferDao.get().getCompletedTransfersByState(encryptedStates)
+        val entities = completedTransferDao.get().getCompletedTransfersByState(states)
         deleteCompletedTransferBatch(entities.mapNotNull { it.id })
         return entities.map { entity -> completedTransferModelMapper(entity) }
     }

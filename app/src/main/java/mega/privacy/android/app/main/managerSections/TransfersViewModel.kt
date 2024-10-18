@@ -471,6 +471,19 @@ class TransfersViewModel @Inject constructor(
     }
 
     /**
+     * Retry all canceled or failed transfers
+     */
+    fun retryAllTransfers() = viewModelScope.launch(ioDispatcher) {
+        runCatching { getFailedOrCanceledTransfersUseCase() }
+            .onSuccess { transfers ->
+                transfers.forEach { transfer ->
+                    retryTransfer(transfer)
+                    deleteCompletedTransferUseCase(transfer, false)
+                }
+            }
+    }
+
+    /**
      * trigger retry transfer event
      */
     suspend fun retryTransfer(transfer: CompletedTransfer) {
@@ -492,6 +505,7 @@ class TransfersViewModel @Inject constructor(
                     val appData = appData?.let { transferAppDataMapper(it) }
                     val isChatUpload =
                         appData?.any { it is TransferAppData.ChatUpload } == true
+                    val path = appData?.getOriginalContentUri() ?: originalPath
 
                     if (isChatUpload) {
                         viewModelScope.launch {
@@ -503,14 +517,14 @@ class TransfersViewModel @Inject constructor(
                                 _uiState.update { state ->
                                     state.copy(
                                         startEvent = triggered(
-                                            getUploadTriggerEvent(originalPath, parentHandle)
+                                            getUploadTriggerEvent(path, parentHandle)
                                         )
                                     )
                                 }
                             }
                         }
                     } else {
-                        getUploadTriggerEvent(originalPath, parentHandle)
+                        getUploadTriggerEvent(path, parentHandle)
                     }
                 }
 
@@ -523,10 +537,13 @@ class TransfersViewModel @Inject constructor(
         }
     }
 
+    private fun List<TransferAppData>.getOriginalContentUri(): String? = this
+        .filterIsInstance<TransferAppData.OriginalContentUri>()
+        .firstOrNull()?.originalUri
+
     private fun getUploadTriggerEvent(path: String, parentHandle: Long): TransferTriggerEvent {
-        val file = File(path)
         return TransferTriggerEvent.StartUpload.Files(
-            mapOf(file.absolutePath to null),
+            mapOf(path to null),
             NodeId(parentHandle)
         )
     }

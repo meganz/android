@@ -50,7 +50,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.io.File
 import java.math.BigInteger
 
 @ExperimentalCoroutinesApi
@@ -350,7 +349,6 @@ internal class TransfersViewModelTest {
     fun `test that retryTransfer triggers a StartUpload event when it is an upload and is not a chat upload`() =
         runTest {
             val path = "path"
-            val file = File(path)
             val parentHandle = 123L
             val transfer = mock<CompletedTransfer> {
                 on { type } doReturn MegaTransfer.TYPE_UPLOAD
@@ -359,9 +357,39 @@ internal class TransfersViewModelTest {
             }
             val expected = triggered(
                 TransferTriggerEvent.StartUpload.Files(
-                    mapOf(file.absolutePath to null),
+                    mapOf(path to null),
                     NodeId(parentHandle)
                 )
+            )
+
+            underTest.retryTransfer(transfer)
+
+            underTest.uiState.map { it.startEvent }.test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that original content uri is used on retry when the app data contains an original content uri`() =
+        runTest {
+            val path = "path"
+            val contentUri = "content://foo"
+            val parentHandle = 123L
+            val appDataString = "appDataStringRaw"
+            val transfer = mock<CompletedTransfer> {
+                on { type } doReturn MegaTransfer.TYPE_UPLOAD
+                on { this.parentHandle } doReturn parentHandle
+                on { originalPath } doReturn path
+                on { appData } doReturn appDataString
+            }
+            val expected = triggered(
+                TransferTriggerEvent.StartUpload.Files(
+                    mapOf(contentUri to null),
+                    NodeId(parentHandle)
+                )
+            )
+            whenever(transferAppDataMapper(appDataString)) doReturn listOf(
+                TransferAppData.OriginalContentUri(contentUri)
             )
 
             underTest.retryTransfer(transfer)
@@ -418,7 +446,6 @@ internal class TransfersViewModelTest {
     fun `test that retryTransfer updates state correctly when it is an upload, is a chat upload and RetryChatUploadUseCase throws ChatUploadNotRetriedException`() =
         runTest {
             val path = "path"
-            val file = File(path)
             val parentHandle = 123L
             val appData = "appData"
             val transfer = mock<CompletedTransfer> {
@@ -431,7 +458,7 @@ internal class TransfersViewModelTest {
             val chatUploadAppData = listOf(chatUpload)
             val expected = triggered(
                 TransferTriggerEvent.StartUpload.Files(
-                    mapOf(file.absolutePath to null),
+                    mapOf(path to null),
                     NodeId(parentHandle)
                 )
             )

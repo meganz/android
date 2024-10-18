@@ -368,7 +368,7 @@ internal class TransferPageFragment : Fragment() {
      * Retries all the failed and cancelled transfers.
      */
     private fun retryAllTransfers() {
-        viewModel.deleteFailedOrCancelledTransfers()
+        transfersViewModel.retryAllTransfers()
     }
 
     private fun setConfirmationTransfersDialogNotCancellableAndShow() {

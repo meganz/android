@@ -94,9 +94,3 @@ data class UploadFileInfo(
     val fileName: String?,
     val appData: List<TransferAppData>? = null,
 )
-
-/**
- * Utility function to simplify the migration to UploadFileInfo
- */
-fun Map<File, String?>.toUploadFileInfoList() =
-    this.map { UploadFileInfo(it.key, it.value) }

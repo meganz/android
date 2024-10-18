@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileForUploadUseCase
@@ -27,6 +28,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.AdditionalAnswers
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -54,6 +56,7 @@ class StartUploadsWithWorkerUseCaseTest {
     private val destinationId = NodeId(1L)
     private val file = mock<File> {
         on { path }.thenReturn(path)
+        on { absolutePath }.thenReturn(path)
     }
 
     @BeforeAll
@@ -118,11 +121,42 @@ class StartUploadsWithWorkerUseCaseTest {
         whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
         underTest(urisWithNames, destinationId, false).test {
             verify(uploadFilesUseCase).invoke(
-                eq(mapOf(file to null).toUploadFileInfoList()), NodeId(eq(destinationId.longValue)), any()
+                argThat { singleOrNull()?.file == file },
+                NodeId(eq(destinationId.longValue)), any()
             )
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that app data with original destination is send to upload files use case when getFileForUploadUseCase returns a different path`() =
+        runTest {
+            val cacheFile = File("fileInCache")
+            whenever(getFileForUploadUseCase(path, false)).thenReturn(cacheFile)
+            underTest(urisWithNames, destinationId, false).test {
+                verify(uploadFilesUseCase).invoke(
+                    argThat {
+                        singleOrNull()?.appData?.filterIsInstance<TransferAppData.OriginalContentUri>()
+                            ?.singleOrNull()?.originalUri == path
+                    },
+                    NodeId(eq(destinationId.longValue)), any(),
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that app data is not send to upload files use case when getFileForUploadUseCase returns the same path`() =
+        runTest {
+            whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
+            underTest(urisWithNames, destinationId, false).test {
+                verify(uploadFilesUseCase).invoke(
+                    argThat { singleOrNull()?.appData == null },
+                    NodeId(eq(destinationId.longValue)), any()
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that TransferNotStarted is emitted when getFileForUploadUseCase returns null`() =
@@ -157,7 +191,7 @@ class StartUploadsWithWorkerUseCaseTest {
         whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
         underTest(urisWithNames, destinationId, expected).test {
             verify(uploadFilesUseCase).invoke(
-                eq(mapOf(file to null).toUploadFileInfoList()),
+                any(),
                 NodeId(eq(destinationId.longValue)),
                 isHighPriority = eq(expected),
             )
@@ -171,7 +205,7 @@ class StartUploadsWithWorkerUseCaseTest {
         whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
         underTest(urisWithNames, destinationId, false).test {
             verify(uploadFilesUseCase).invoke(
-                eq(mapOf(file to null).toUploadFileInfoList()),
+                any(),
                 NodeId(eq(destinationId.longValue)),
                 any(),
             )

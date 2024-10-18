@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.exception.StorageStatePayWallException
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
@@ -60,7 +61,10 @@ class StartUploadsWithWorkerUseCase @Inject constructor(
                             )
                         }
                         fileResult.getOrNull()?.let { file ->
-                            UploadFileInfo(file, name)
+                            val appdata = if (file.absolutePath == originalUri) null else {
+                                listOf(TransferAppData.OriginalContentUri(originalUri))
+                            }
+                            UploadFileInfo(file, name, appdata)
                         }
                     }
                 emitAll(startTransfersAndThenWorkerFlow(
