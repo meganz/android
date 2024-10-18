@@ -2,15 +2,13 @@
  * This script is to promote Alpha builds to Beta or Production in Google Play Store
  */
 
-
-import com.cloudbees.plugins.credentials.CredentialsProvider
 import com.google.api.services.androidpublisher.AndroidPublisher
-import com.google.api.services.androidpublisher.AndroidPublisherScopes
 import com.google.api.services.androidpublisher.model.Track
 import com.google.api.services.androidpublisher.model.TrackRelease
-import com.google.jenkins.plugins.credentials.oauth.GoogleOAuth2ScopeRequirement
 import com.google.jenkins.plugins.credentials.oauth.GoogleRobotCredentials
 import org.jenkinsci.plugins.googleplayandroidpublisher.Util
+import org.jenkinsci.plugins.googleplayandroidpublisher.CredentialsHandler
+import hudson.model.Item
 
 @Library('jenkins-android-shared-lib') _
 /**
@@ -22,6 +20,117 @@ def common
  * To store the current build step
  */
 BUILD_STEP = ''
+
+properties([
+        parameters([
+                activeChoice(
+                        choiceType: 'PT_SINGLE_SELECT',
+                        description: 'Target track/channel to promote to',
+                        filterLength: 1,
+                        filterable: false,
+                        name: 'TRACK',
+                        randomName: 'choice-parameter-162835218411553',
+                        script: groovyScript(
+                                fallbackScript: [classpath: [], oldScript: '', sandbox: false, script: ''],
+                                script: [classpath: [], oldScript: '', sandbox: false, script: 'return ["Select", "Beta", "Production"]']
+                        )
+                ),
+                reactiveChoice(
+                        choiceType: 'PT_SINGLE_SELECT',
+                        description: 'Rollout percentage or halt',
+                        filterLength: 1,
+                        filterable: false,
+                        name: 'PERCENTAGE',
+                        randomName: 'choice-parameter-162835226979567',
+                        referencedParameters: '',
+                        script: groovyScript(
+                                fallbackScript: [classpath: [], oldScript: '', sandbox: false, script: ''],
+                                script: [classpath: [], oldScript: '', sandbox: false, script: '''
+                                    return ["Select":"Select", "0":"0%", "25":"25%", "50":"50%", "100":"100%", "Halt Rollout":"Halt Rollout"]
+                                ''']
+                        )
+                ),
+                reactiveChoice(
+                        choiceType: 'PT_SINGLE_SELECT',
+                        description: 'Version of the build to be promoted',
+                        name: 'VERSION',
+                        filterLength: 1,
+                        filterable: false,
+                        randomName: 'choice-parameter-162835228262015',
+                        referencedParameters: '',
+                        script: groovyScript(
+                                fallbackScript: [classpath: [], oldScript: '', sandbox: false, script: ''],
+                                script: [classpath: [], oldScript: '', sandbox: false, script: '''
+                                    // Groovy script needs to be written in plain text due to the Active Choices plugin limitation,
+                                    // Any script changes needs to be approved in Jenkins > Android-Promote > Configure
+                                    
+                                    import com.google.api.services.androidpublisher.AndroidPublisher
+                                    import com.google.api.services.androidpublisher.model.Track
+                                    import com.google.api.services.androidpublisher.model.TrackRelease
+                                    import com.google.jenkins.plugins.credentials.oauth.GoogleRobotCredentials
+                                    import org.jenkinsci.plugins.googleplayandroidpublisher.Util
+                                    import org.jenkinsci.plugins.googleplayandroidpublisher.CredentialsHandler
+                                    import hudson.model.Item;
+                                    import com.google.api.services.androidpublisher.model.TrackRelease
+                                    import jenkins.model.Jenkins
+
+                                    def googleCredentialsId = 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL'
+                                    def packageName = 'mega.privacy.android.app'
+                                  
+                                    
+                                    // Get credentials
+                                    Item currentItem = Jenkins.instance.getItemByFullName("Android-Promote")
+                                    GoogleRobotCredentials credentials = CredentialsHandler.getById(googleCredentialsId, currentItem)
+                                    def publisher = Util.getPublisherClient(credentials, "4.2")
+                                
+                                    // Create a new edit session
+                                    AndroidPublisher.Edits edits = publisher.edits()
+                                    def edit = edits.insert(packageName, null).execute()
+                                    String editId = edit.getId()
+                                
+                                    // Get versions from all track
+                                    List<String> trackNames = ["alpha", "beta", "production"]
+                                    List<String> versions = []
+                                    versions.add("Select")
+                                    trackNames.each { name ->
+                                        // Get the track details for the current track
+                                        def track = edits.tracks().get(packageName, editId, name).execute()
+                                        track.getReleases().each { release ->
+                                            def status = release.getStatus()
+                                            def isFullRolloutInProduction = status == "completed" && name == "production"
+                                            if(!isFullRolloutInProduction) {
+                                                def userFraction = release.getUserFraction()
+                                                def rolloutInfo = ""
+                                                if (status == "inProgress") {
+                                                    rolloutInfo = "at ${userFraction * 100 as int}% rollout"
+                                                } else if (status == "completed") {
+                                                    rolloutInfo = "at 100% rollout"
+                                                } else if (status == "halted") {
+                                                    rolloutInfo = "at halted status)"
+                                                } 
+                                                def versionName = release.getName().replaceFirst(/\\([^)]*\\)$/, " - Currently in $name $rolloutInfo")
+                                                versions.add(versionName)
+                                            }
+                                        }
+                                    }
+                                    edits.delete(packageName, editId).execute();
+                                    return versions
+                                    ''']
+                        )
+                ),
+                activeChoiceHtml(
+                        choiceType: 'ET_FORMATTED_HIDDEN_HTML',
+                        name: 'Override CSS',
+                        omitValueField: false,
+                        randomName: 'choice-parameter-162835235332942',
+                        referencedParameters: '',
+                        script: groovyScript(
+                                fallbackScript: [classpath: [], oldScript: '', sandbox: false, script: ''],
+                                script: [classpath: [], oldScript: '', sandbox: false, script: '''return """<style>.active-choice select{-webkit-appearance:none;-moz-appearance:none;appearance:none;border:2px solid var(--input-border);border-radius:var(--form-input-border-radius);box-shadow:0 0 0 10px transparent;display:block;max-width:100%!important;min-height:38px;padding:var(--form-input-padding);transition:var(--standard-transition);width:100%!important}.active-choice{position:relative;width:100%}.active-choice:after{background-color:currentColor;bottom:0;content:"";-webkit-mask-image:url("data:image/svg+xml;charset=UTF-8,%3c?xml version='1.0' encoding='UTF-8'?%3e%3csvg width='336px' height='192px' viewBox='0 0 336 192' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3e%3ctitle%3ePath%3c/title%3e%3cg id='Page-1' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3e%3cg id='arrow' transform='translate(0.000000, 0.000000)' fill='%23FF0000' fill-rule='nonzero'%3e%3cpath d='M7.02943725,7.02943725 C16.3053957,-2.24652118 31.2852799,-2.34214962 40.6788451,6.74255194 L40.9705627,7.02943725 L168,134.059 L295.029437,7.02943725 C304.305396,-2.24652118 319.28528,-2.34214962 328.678845,6.74255194 L328.970563,7.02943725 C338.246521,16.3053957 338.34215,31.2852799 329.257448,40.6788451 L328.970563,40.9705627 L184.970563,184.970563 C175.694604,194.246521 160.71472,194.34215 151.321155,185.257448 L151.029437,184.970563 L7.02943725,40.9705627 C-2.34314575,31.5979797 -2.34314575,16.4020203 7.02943725,7.02943725 Z' id='Path'%3e%3c/path%3e%3c/g%3e%3c/g%3e%3c/svg%3e");mask-image:url("data:image/svg+xml;charset=UTF-8,%3c?xml version='1.0' encoding='UTF-8'?%3e%3csvg width='336px' height='192px' viewBox='0 0 336 192' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3e%3ctitle%3ePath%3c/title%3e%3cg id='Page-1' stroke='none' stroke-width='1' fill='none' fill-rule='evenodd'%3e%3cg id='arrow' transform='translate(0.000000, 0.000000)' fill='%23FF0000' fill-rule='nonzero'%3e%3cpath d='M7.02943725,7.02943725 C16.3053957,-2.24652118 31.2852799,-2.34214962 40.6788451,6.74255194 L40.9705627,7.02943725 L168,134.059 L295.029437,7.02943725 C304.305396,-2.24652118 319.28528,-2.34214962 328.678845,6.74255194 L328.970563,7.02943725 C338.246521,16.3053957 338.34215,31.2852799 329.257448,40.6788451 L328.970563,40.9705627 L184.970563,184.970563 C175.694604,194.246521 160.71472,194.34215 151.321155,185.257448 L151.029437,184.970563 L7.02943725,40.9705627 C-2.34314575,31.5979797 -2.34314575,16.4020203 7.02943725,7.02943725 Z' id='Path'%3e%3c/path%3e%3c/g%3e%3c/g%3e%3c/svg%3e");-webkit-mask-position:center;mask-position:center;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:contain;mask-size:contain;pointer-events:none;position:absolute;right:13px;top:0;width:12px}</style>"""''']
+                        )
+                )
+        ]),
+])
 
 pipeline {
     agent { label 'mac-jenkins-slave-android || mac-jenkins-slave' }
@@ -37,12 +146,6 @@ pipeline {
         LC_ALL = 'en_US.UTF-8'
         LANG = 'en_US.UTF-8'
         CONSOLE_LOG_FILE = 'console.txt'
-    }
-
-    parameters {
-        choice(name: 'TRACK', choices: ['Select', 'Alpha', 'Beta', 'Production'], description: 'Target track/channel to promote to')
-        choice(name: 'PERCENTAGE', choices: ['Select', '0', '25', '50', '100', 'Halt Rollout'], description: 'Rollout percentage or halt')
-        string(name: 'VERSION', defaultValue: '', description: 'Version of the build to be promoted, e.g. 14.4(242750450)')
     }
 
     post {
@@ -162,22 +265,10 @@ private static def isHaltRollout(percentage) {
     return percentage == 'Halt Rollout'
 }
 
-private def haltRollout(credentialsId, packageName, trackName, versionCode) {
-    def build = currentBuild.rawBuild
-
+private def haltRollout(googleCredentialsId, packageName, trackName, versionCode) {
     // Generate GoogleRobotCredentials credentials with scope
-    GoogleOAuth2ScopeRequirement requirements = new GoogleOAuth2ScopeRequirement() {
-        @Override
-        public Collection<String> getScopes() {
-            return Collections.singleton(AndroidPublisherScopes.ANDROIDPUBLISHER)
-        }
-    }
-    GoogleRobotCredentials credentials = CredentialsProvider.findCredentialById(
-            credentialsId,
-            GoogleRobotCredentials.class,
-            build,
-            requirements
-    )
+    Item item = currentBuild.rawBuild.parent
+    GoogleRobotCredentials credentials = CredentialsHandler.getById(googleCredentialsId, item)
 
     // Use Google Play Android Publisher Jenkins plugin's util method to create a publisher client
     def publisher = Util.getPublisherClient(credentials, "4.2")
@@ -229,9 +320,11 @@ def validateParams(params) {
     }
 
     if (!params.VERSION) {
-        error("'VERSION' parameter is missing. Please provide the version of the build (e.g., 14.1(242330236)).")
+        error("'VERSION' parameter is missing. Please specify the version of the build (e.g., 14.1(242330236)).")
+    } else if (params.PERCENTAGE == 'Select') {
+        error("'VERSION' parameter was not selected. Please choose a version (e.g., 14.1(242330236)).")
     } else if (!isValidVersion(params.VERSION)) {
-        error("Invalid 'VERSION' format. Please provide a valid version (e.g., 14.1(242330236))")
+        error("Invalid 'VERSION' parameter was selected. Please choose a valid version (e.g., 14.1(242330236)).")
     }
 }
 
@@ -241,7 +334,7 @@ def validateParams(params) {
  * @return
  */
 private static def isValidVersion(String version) {
-    def pattern = ~/^\d+\.\d+(\.\d+)?\(\d+\)$/
+    def pattern = ~/^\d+\.\d+(\.\d+)?\(\d+\)(.+)$/
     return pattern.matcher(version).matches()
 }
 
