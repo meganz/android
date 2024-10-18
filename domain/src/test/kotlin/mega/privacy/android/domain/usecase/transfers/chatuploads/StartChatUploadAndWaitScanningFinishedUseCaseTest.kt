@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.usecase.transfers.uploads.UploadFileInfo
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFilesUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -27,7 +28,8 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
     private lateinit var underTest: StartChatUploadAndWaitScanningFinishedUseCase
 
     private val uploadFilesUseCase = mock<UploadFilesUseCase>()
-    private val getOrCreateMyChatsFilesFolderIdUseCase = mock<GetOrCreateMyChatsFilesFolderIdUseCase>()
+    private val getOrCreateMyChatsFilesFolderIdUseCase =
+        mock<GetOrCreateMyChatsFilesFolderIdUseCase>()
     private val handleChatUploadTransferEventUseCase = mock<HandleChatUploadTransferEventUseCase>()
 
     @BeforeAll
@@ -53,17 +55,19 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
     fun `test that upload files use case is invoked when the use case is invoked`() = runTest {
         val filesAndNames = mapOf(mock<File>() to "name")
         val pendingMessageIds = listOf(1L, 2L, 3L)
-        whenever(uploadFilesUseCase(any(), NodeId(any()), any(), any())) doReturn emptyFlow()
+        whenever(uploadFilesUseCase(any(), NodeId(any()), any())) doReturn emptyFlow()
+        val appData = pendingMessageIds.map {
+            TransferAppData.ChatUpload(it)
+        }
 
         underTest(filesAndNames, pendingMessageIds)
 
         // Then
         verify(uploadFilesUseCase).invoke(
-            filesAndNames,
-            myChatsFolderId,
-            pendingMessageIds.map {
-                TransferAppData.ChatUpload(it)
+            filesAndNames.map {
+                UploadFileInfo(it.key, it.value, appData)
             },
+            myChatsFolderId,
             false
         )
     }
@@ -82,7 +86,6 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
                 uploadFilesUseCase(
                     any(),
                     NodeId(any()),
-                    any(),
                     any(),
                 )
             ) doReturn flowOf(expected)
@@ -111,7 +114,6 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
                     uploadFilesUseCase(
                         any(),
                         NodeId(any()),
-                        any(),
                         any(),
                     )
                 ) doReturn flow {

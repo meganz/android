@@ -118,7 +118,7 @@ class StartUploadsWithWorkerUseCaseTest {
         whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
         underTest(urisWithNames, destinationId, false).test {
             verify(uploadFilesUseCase).invoke(
-                eq(mapOf(file to null)), NodeId(eq(destinationId.longValue)), eq(null), any()
+                eq(mapOf(file to null).toUploadFileInfoList()), NodeId(eq(destinationId.longValue)), any()
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -157,9 +157,8 @@ class StartUploadsWithWorkerUseCaseTest {
         whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
         underTest(urisWithNames, destinationId, expected).test {
             verify(uploadFilesUseCase).invoke(
-                eq(mapOf(file to null)),
+                eq(mapOf(file to null).toUploadFileInfoList()),
                 NodeId(eq(destinationId.longValue)),
-                eq(null),
                 isHighPriority = eq(expected),
             )
             cancelAndIgnoreRemainingEvents()
@@ -172,9 +171,8 @@ class StartUploadsWithWorkerUseCaseTest {
         whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
         underTest(urisWithNames, destinationId, false).test {
             verify(uploadFilesUseCase).invoke(
-                eq(mapOf(file to null)),
+                eq(mapOf(file to null).toUploadFileInfoList()),
                 NodeId(eq(destinationId.longValue)),
-                eq(null),
                 any(),
             )
             cancelAndConsumeRemainingEvents()
@@ -223,7 +221,7 @@ class StartUploadsWithWorkerUseCaseTest {
     }
 
     private fun mockFlow(flow: Flow<MultiTransferEvent>) {
-        whenever(uploadFilesUseCase(any(), NodeId(any()), anyOrNull(), any()))
+        whenever(uploadFilesUseCase(any(), NodeId(any()), anyOrNull()))
             .thenReturn(flow)
     }
 }

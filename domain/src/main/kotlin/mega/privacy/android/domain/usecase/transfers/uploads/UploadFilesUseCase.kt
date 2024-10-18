@@ -25,7 +25,7 @@ class UploadFilesUseCase @Inject constructor(
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val transferRepository: TransferRepository,
     private val cacheRepository: CacheRepository,
-) : AbstractTransferNodesUseCase<File, String>(
+) : AbstractTransferNodesUseCase<UploadFileInfo, String>(
     cancelCancelTokenUseCase,
     invalidateCancelTokenUseCase,
     handleTransferEventUseCase,
@@ -35,40 +35,38 @@ class UploadFilesUseCase @Inject constructor(
     /**
      * Invoke
      *
-     * @param filesAndNames files and / or folders to be uploaded, associated with the desired node's name or null if there are no changes
-     * @param parentFolderId destination folder id where [filesAndNames] will be uploaded
-     * @param appData Custom app data to save in the MegaTransfer object.
+     * @param uploadFileInfos files and / or folders with the data needed to do the upload
+     * @param parentFolderId destination folder id where [uploadFileInfos] will be uploaded
      * @param isHighPriority Whether the file or folder should be placed on top of the upload queue or not, chat uploads are always priority regardless of this parameter
      *
      * @return a flow of [MultiTransferEvent]s to monitor the download state and progress
      */
     operator fun invoke(
-        filesAndNames: Map<File, String?>,
+        uploadFileInfos: List<UploadFileInfo>,
         parentFolderId: NodeId,
-        appData: List<TransferAppData>?,
         isHighPriority: Boolean,
     ): Flow<MultiTransferEvent> {
         return super.commonInvoke(
-            items = filesAndNames.keys.toList(),
+            items = uploadFileInfos,
             null,
-        ) { file ->
-            val isSourceTemporary = cacheRepository.isFileInCacheDirectory(file)
-            if (!appData.isNullOrEmpty() && appData.all { it is TransferAppData.ChatTransferAppData }) {
+        ) { uploadFileInfo ->
+            val isSourceTemporary = cacheRepository.isFileInCacheDirectory(uploadFileInfo.file)
+            if (!uploadFileInfo.appData.isNullOrEmpty() && uploadFileInfo.appData.all { it is TransferAppData.ChatTransferAppData }) {
                 @Suppress("UNCHECKED_CAST")
                 transferRepository.startUploadForChat(
-                    localPath = file.absolutePath,
+                    localPath = uploadFileInfo.file.absolutePath,
                     parentNodeId = parentFolderId,
-                    fileName = filesAndNames[file],
-                    appData = appData as List<TransferAppData.ChatTransferAppData>,
+                    fileName = uploadFileInfo.fileName,
+                    appData = uploadFileInfo.appData as List<TransferAppData.ChatTransferAppData>,
                     isSourceTemporary = isSourceTemporary,
                 )
             } else {
                 transferRepository.startUpload(
-                    localPath = file.absolutePath,
+                    localPath = uploadFileInfo.file.absolutePath,
                     parentNodeId = parentFolderId,
-                    fileName = filesAndNames[file],
-                    modificationTime = file.lastModified() / 1000,
-                    appData = appData,
+                    fileName = uploadFileInfo.fileName,
+                    modificationTime = uploadFileInfo.file.lastModified() / 1000,
+                    appData = uploadFileInfo.appData,
                     isSourceTemporary = isSourceTemporary,
                     shouldStartFirst = isHighPriority,
                 )
@@ -76,10 +74,29 @@ class UploadFilesUseCase @Inject constructor(
         }
     }
 
-    override fun generateIdFromItem(item: File): String =
-        item.path
+    override fun generateIdFromItem(item: UploadFileInfo): String =
+        item.file.path
 
     override fun generateIdFromTransferEvent(transferEvent: TransferEvent) =
         transferEvent.transfer.localPath
 
 }
+
+/**
+ * Class to encapsulate the information needed to upload a file
+ *
+ * @param file the [File] to be uploaded
+ * @param fileName the name of the file if it should be renamed, if null the original name will be kept
+ * @param appData the appData for this file
+ */
+data class UploadFileInfo(
+    val file: File,
+    val fileName: String?,
+    val appData: List<TransferAppData>? = null,
+)
+
+/**
+ * Utility function to simplify the migration to UploadFileInfo
+ */
+fun Map<File, String?>.toUploadFileInfoList() =
+    this.map { UploadFileInfo(it.key, it.value) }

@@ -13,7 +13,6 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileForUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractStartTransfersWithWorkerUseCase
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -47,23 +46,29 @@ class StartUploadsWithWorkerUseCase @Inject constructor(
                 }
         } else {
             flow {
-                val filesAndNames: Map<Result<File?>, String?> = urisWithNames.mapKeys {
-                    runCatching {
-                        getFileForUploadUseCase(it.key, false)
+                val uploadFileInfos: List<UploadFileInfo> =
+                    urisWithNames.mapNotNull { (originalUri, name) ->
+                        val fileResult = runCatching {
+                            getFileForUploadUseCase(originalUri, false)
+                        }
+                        if (fileResult.getOrNull() == null) {
+                            emit(
+                                MultiTransferEvent.TransferNotStarted(
+                                    name,
+                                    fileResult.exceptionOrNull()
+                                )
+                            )
+                        }
+                        fileResult.getOrNull()?.let { file ->
+                            UploadFileInfo(file, name)
+                        }
                     }
-                }
-                filesAndNames.filter { it.key.getOrNull() == null }.forEach { (f, s) ->
-                    emit(MultiTransferEvent.TransferNotStarted(s, f.exceptionOrNull()))
-                }
                 emitAll(startTransfersAndThenWorkerFlow(
                     doTransfers = {
                         uploadFilesUseCase(
-                            filesAndNames = filesAndNames
-                                .filter { it.key.getOrNull() != null }
-                                .mapKeys { it.key.getOrNull()!! },
+                            uploadFileInfos = uploadFileInfos,
                             parentFolderId = destinationId,
-                            appData = null,
-                            isHighPriority = isHighPriority
+                            isHighPriority = isHighPriority,
                         )
                     },
                     startWorker = {

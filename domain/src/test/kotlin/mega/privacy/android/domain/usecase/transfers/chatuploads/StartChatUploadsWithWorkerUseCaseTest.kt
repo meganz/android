@@ -22,6 +22,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.GetPendingMessageUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.UploadFileInfo
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFilesUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.AdditionalAnswers
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -93,7 +95,8 @@ class StartChatUploadsWithWorkerUseCaseTest {
         val file = mockFile()
         underTest(file, NodeId(11L), 1L).test {
             verify(uploadFilesUseCase).invoke(
-                eq(mapOf(file to null)), NodeId(any()), any(), any()
+                argThat { this.firstOrNull()?.file == file },
+                NodeId(any()), any(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -104,9 +107,8 @@ class StartChatUploadsWithWorkerUseCaseTest {
         val file = mockFile()
         underTest(file, NodeId(11L), 1L).test {
             verify(uploadFilesUseCase).invoke(
-                filesAndNames = any(),
+                uploadFileInfos = any(),
                 parentFolderId = NodeId(any()),
-                appData = any(),
                 isHighPriority = eq(true)
             )
             cancelAndIgnoreRemainingEvents()
@@ -134,7 +136,6 @@ class StartChatUploadsWithWorkerUseCaseTest {
                 any(),
                 NodeId(eq(chatFilesFolderId.longValue)),
                 any(),
-                any(),
             )
             cancelAndConsumeRemainingEvents()
         }
@@ -143,11 +144,13 @@ class StartChatUploadsWithWorkerUseCaseTest {
     @Test
     fun `test that chat upload app data is set`() = runTest {
         val pendingMessageId = 1L
-        underTest(mockFile(), NodeId(11L), pendingMessageId).test {
+        val file = mockFile()
+        val expected =
+            UploadFileInfo(file, null, listOf(TransferAppData.ChatUpload(pendingMessageId)))
+        underTest(file, NodeId(11L), pendingMessageId).test {
             verify(uploadFilesUseCase).invoke(
-                any(),
+                eq(listOf(expected)),
                 NodeId(any()),
-                eq(listOf(TransferAppData.ChatUpload(pendingMessageId))),
                 any(),
             )
             cancelAndIgnoreRemainingEvents()
@@ -158,11 +161,13 @@ class StartChatUploadsWithWorkerUseCaseTest {
     fun `test that chat upload app data is set correctly when there are multiple pending messages ids`() =
         runTest {
             val pendingMessageIds = longArrayOf(1L, 2L, 3L)
-            underTest(mockFile(), NodeId(11L), *pendingMessageIds).test {
+            val file = mockFile()
+            val expected =
+                UploadFileInfo(file, null, pendingMessageIds.map { TransferAppData.ChatUpload(it) })
+            underTest(file, NodeId(11L), *pendingMessageIds).test {
                 verify(uploadFilesUseCase).invoke(
-                    any(),
+                    eq(listOf(expected)),
                     NodeId(any()),
-                    eq(pendingMessageIds.map { TransferAppData.ChatUpload(it) }),
                     any(),
                 )
                 cancelAndIgnoreRemainingEvents()
@@ -237,7 +242,9 @@ class StartChatUploadsWithWorkerUseCaseTest {
         whenever(getPendingMessageUseCase(1L)) doReturn pendingMessage
         underTest(file, NodeId(11L), pendingMessageId).test {
             verify(uploadFilesUseCase).invoke(
-                eq(mapOf(file to pendingMessageName)), NodeId(any()), any(), any()
+                argThat { this.firstOrNull()?.fileName == pendingMessageName },
+                NodeId(any()),
+                any(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -256,7 +263,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
                 TransferEvent.TransferStartEvent(transfer), 0, 0
             )
             whenever(
-                uploadFilesUseCase(any(), NodeId(any()), any(), any())
+                uploadFilesUseCase(any(), NodeId(any()), any())
             ) doReturn flowOf(event)
 
             underTest(file, NodeId(11L), pendingMessageId).test {
@@ -271,7 +278,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
     }
 
     private fun mockFlow(flow: Flow<MultiTransferEvent>) {
-        whenever(uploadFilesUseCase(any(), NodeId(any()), anyOrNull(), any()))
+        whenever(uploadFilesUseCase(any(), NodeId(any()), anyOrNull()))
             .thenReturn(flow)
     }
 }

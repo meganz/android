@@ -99,7 +99,7 @@ class UploadFilesUseCaseTest {
     @ValueSource(booleans = [true, false])
     fun `test that repository start upload is called with the proper priority`(priority: Boolean) =
         runTest {
-            underTest(mapOf(file to null), parentId, null, priority).test {
+            underTest(listOf(UploadFileInfo(file, null)), parentId, priority).test {
 
                 verify(transferRepository).startUpload(
                     ABSOLUTE_PATH,
@@ -121,7 +121,7 @@ class UploadFilesUseCaseTest {
     ) =
         runTest {
             whenever(cacheRepository.isFileInCacheDirectory(file)) doReturn isSourceTemporary
-            underTest(mapOf(file to null), parentId, null, false).test {
+            underTest(listOf(UploadFileInfo(file, null)), parentId, false).test {
 
                 verify(transferRepository).startUpload(
                     ABSOLUTE_PATH,
@@ -142,8 +142,7 @@ class UploadFilesUseCaseTest {
         appData: List<TransferAppData>?,
     ) = runTest {
         underTest(
-            mapOf(file to null), parentId, appData,
-            isHighPriority = false,
+            listOf(UploadFileInfo(file, null, appData)), parentId, isHighPriority = false,
         ).test {
             verify(transferRepository).startUpload(
                 ABSOLUTE_PATH,
@@ -158,13 +157,37 @@ class UploadFilesUseCaseTest {
         }
     }
 
+    @Test
+    fun `test that repository start upload is called with the proper appData for each file`() =
+        runTest {
+            val uploadFileInfos = fileNodesAndNullNames.mapIndexed { index, it ->
+                it.copy(appData = (0..index).map { mock<TransferAppData.SdCardDownload>() })
+            }
+            underTest(
+                uploadFileInfos, parentId, isHighPriority = false,
+            ).test {
+                uploadFileInfos.forEach {
+                    verify(transferRepository).startUpload(
+                        it.file.absolutePath,
+                        parentId,
+                        null,
+                        MODIFIED_TIME_SECS,
+                        it.appData,
+                        isSourceTemporary = false,
+                        shouldStartFirst = false,
+                    )
+                }
+                awaitComplete()
+            }
+        }
+
     @ParameterizedTest(name = "appdata: \"{0}\"")
     @MethodSource("provideChatAppData")
     fun `test that repository start upload for chat is called when appData is chat transfer app data`(
         appData: List<TransferAppData.ChatTransferAppData>,
     ) = runTest {
         underTest(
-            mapOf(file to null), parentId, appData,
+            listOf(UploadFileInfo(file, null, appData)), parentId,
             isHighPriority = false
         ).test {
             verify(transferRepository).startUploadForChat(
@@ -186,7 +209,7 @@ class UploadFilesUseCaseTest {
         runTest {
             whenever(cacheRepository.isFileInCacheDirectory(file)) doReturn isSourceTemporary
             val chatAppData = listOf(TransferAppData.ChatUpload(12345L))
-            underTest(mapOf(file to null), parentId, chatAppData, false).test {
+            underTest(listOf(UploadFileInfo(file, null, chatAppData)), parentId, false).test {
 
                 verify(transferRepository).startUploadForChat(
                     ABSOLUTE_PATH,
@@ -220,12 +243,12 @@ class UploadFilesUseCaseTest {
     fun `test that repository start upload is invoked for each nodeId when start upload is invoked`() =
         runTest {
             underTest(
-                fileNodesAndNullNames, parentId, null,
+                fileNodesAndNullNames, parentId,
                 isHighPriority = false,
             ).test {
-                fileNodesAndNullNames.keys.forEach { file ->
+                fileNodesAndNullNames.forEach { uploadFileInfo ->
                     verify(transferRepository).startUpload(
-                        file.absolutePath,
+                        uploadFileInfo.file.absolutePath,
                         parentId,
                         null,
                         MODIFIED_TIME_SECS,
@@ -244,7 +267,7 @@ class UploadFilesUseCaseTest {
         runTest {
             stubDelay()
             underTest(
-                fileNodesAndNullNames, parentId, null,
+                fileNodesAndNullNames, parentId,
                 isHighPriority = false,
             ).test {
                 cancel()
@@ -258,7 +281,7 @@ class UploadFilesUseCaseTest {
         runTest {
             stubDelay()
             underTest(
-                fileNodesAndNullNames, parentId, null,
+                fileNodesAndNullNames, parentId,
                 isHighPriority = false,
             ).test {
                 cancel()
@@ -272,7 +295,7 @@ class UploadFilesUseCaseTest {
         runTest {
             stubDelay()
             underTest(
-                fileNodesAndNullNames, parentId, null,
+                fileNodesAndNullNames, parentId,
                 isHighPriority = false,
             ).test {
                 verify(cancelCancelTokenUseCase, never()).invoke()
@@ -285,7 +308,7 @@ class UploadFilesUseCaseTest {
         runTest {
             stubSingleEvents()
             underTest(
-                fileNodesAndNullNames, parentId, null,
+                fileNodesAndNullNames, parentId,
                 isHighPriority = false,
             )
                 .filterIsInstance<MultiTransferEvent.SingleTransferEvent>().test {
@@ -307,7 +330,7 @@ class UploadFilesUseCaseTest {
         runTest {
             stubSingleEvents()
             underTest(
-                fileNodesAndNullNames, parentId, null,
+                fileNodesAndNullNames, parentId,
                 isHighPriority = false,
             )
                 .filterIsInstance<MultiTransferEvent.SingleTransferEvent>().test {
@@ -322,7 +345,7 @@ class UploadFilesUseCaseTest {
     @Test
     fun `test that fileName is used in startUpload when is not null`() = runTest {
         val name = "RenamedFile"
-        underTest(mapOf(file to name), parentId, null, false).test {
+        underTest(listOf(UploadFileInfo(file, name)), parentId, false).test {
 
             verify(transferRepository).startUpload(
                 ABSOLUTE_PATH,
@@ -343,7 +366,7 @@ class UploadFilesUseCaseTest {
         appData: List<TransferAppData.ChatTransferAppData>,
     ) = runTest {
         val name = "RenamedFile"
-        underTest(mapOf(file to name), parentId, appData, false).test {
+        underTest(listOf(UploadFileInfo(file, name, appData)), parentId, false).test {
             verify(transferRepository).startUploadForChat(
                 ABSOLUTE_PATH,
                 parentId,
@@ -356,10 +379,10 @@ class UploadFilesUseCaseTest {
     }
 
     private fun stubDelay() {
-        fileNodesAndNullNames.keys.forEach { file ->
+        fileNodesAndNullNames.forEach { fiuploadFileInfoe ->
             whenever(
                 transferRepository.startUpload(
-                    file.absolutePath,
+                    fiuploadFileInfoe.file.absolutePath,
                     parentId,
                     null,
                     MODIFIED_TIME_SECS,
@@ -380,10 +403,10 @@ class UploadFilesUseCaseTest {
             mock<TransferEvent.TransferUpdateEvent> { on { it.transfer }.thenReturn(transfer) },
             mock<TransferEvent.TransferFinishEvent> { on { it.transfer }.thenReturn(transfer) },
         )
-        fileNodesAndNullNames.keys.forEach { file ->
+        fileNodesAndNullNames.forEach { uploadFileInfo ->
             whenever(
                 transferRepository.startUpload(
-                    file.absolutePath,
+                    uploadFileInfo.file.absolutePath,
                     parentId,
                     null,
                     MODIFIED_TIME_SECS,
@@ -404,13 +427,16 @@ class UploadFilesUseCaseTest {
             on { lastModified() }.thenReturn(MODIFIED_TIME_MILLIS)
         }
         private val fileNodesAndNullNames = (0L..10L).map { nodeId ->
-            mock<File> {
-                on { name }.thenReturn("$FILE_NAME$nodeId")
-                on { path }.thenReturn("$ABSOLUTE_PATH$nodeId")
-                on { absolutePath }.thenReturn("$ABSOLUTE_PATH$nodeId")
-                on { lastModified() }.thenReturn(MODIFIED_TIME_MILLIS)
-            }
-        }.associateWith { null }
+            UploadFileInfo(
+                mock<File> {
+                    on { name }.thenReturn("$FILE_NAME$nodeId")
+                    on { path }.thenReturn("$ABSOLUTE_PATH$nodeId")
+                    on { absolutePath }.thenReturn("$ABSOLUTE_PATH$nodeId")
+                    on { lastModified() }.thenReturn(MODIFIED_TIME_MILLIS)
+                },
+                null
+            )
+        }
         private val parentId = NodeId(1L)
 
         private const val ABSOLUTE_PATH = "root/parent/destination/File"
