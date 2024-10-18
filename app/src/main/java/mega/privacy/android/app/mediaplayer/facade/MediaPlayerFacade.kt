@@ -17,6 +17,7 @@ import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.common.Player.STATE_IDLE
+import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
@@ -123,6 +124,18 @@ class MediaPlayerFacade @Inject constructor(
                         super.onVideoSizeChanged(videoSize)
                         mediaPlayerCallback.onVideoSizeCallback(videoSize.width, videoSize.height)
                     }
+
+                    override fun onTracksChanged(tracks: Tracks) {
+                        val availableTrackTypes = (0 until exoPlayer.rendererCount).map {
+                            exoPlayer.getRendererType(it)
+                        }.filter { tracks.isTypeSelected(it) }
+
+                        if (availableTrackTypes.any { it == C.TRACK_TYPE_TEXT }.not()
+                            && tracks.isTypeSupported(C.TRACK_TYPE_TEXT)
+                        ) {
+                            switchRendererToTextTrackType()
+                        }
+                    }
                 })
                 addAnalyticsListener(object :
                     EventLogger("MediaPlayer") {
@@ -144,6 +157,28 @@ class MediaPlayerFacade @Inject constructor(
         }
         player = MediaMegaPlayer(exoPlayer)
         playerNotificationManager?.setPlayer(player)
+    }
+
+    private fun switchRendererToTextTrackType() {
+        val mappedTrackInfo = trackSelector.currentMappedTrackInfo
+        val mediaUri = exoPlayer.currentMediaItem?.localConfiguration?.uri
+        if (mappedTrackInfo != null) {
+            (0 until mappedTrackInfo.rendererCount).firstOrNull {
+                mappedTrackInfo.getRendererType(it) == C.TRACK_TYPE_TEXT
+            }?.let {
+                Timber.d("SwitchTrackInfo: Switch renderer to text track type, the media uri: $mediaUri")
+                val parameters = trackSelector.parameters.buildUpon()
+                    .setRendererDisabled(it, false)
+                    .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
+                    .build()
+                trackSelector.setParameters(parameters)
+                exoPlayer.prepare()
+                exoPlayer.play()
+            }
+                ?: Timber.d("SwitchTrackInfo: There is no text track type found, the media uri: $mediaUri")
+        } else {
+            Timber.d("SwitchTrackInfo: There is no mapped track info found, the media uri: $mediaUri")
+        }
     }
 
     override fun createPlayerControlNotification(playerNotificationParams: PlayerNotificationCreatedParams) {
