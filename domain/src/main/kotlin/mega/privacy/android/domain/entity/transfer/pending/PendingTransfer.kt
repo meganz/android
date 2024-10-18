@@ -48,9 +48,9 @@ data class PendingTransfer(
     )
 
     /**
-     * If true, this Pending transfer has finished and is not needed anymore, either because the transfer has already started or failed.
+     * If true, this Pending transfer is not needed anymore, either because the transfer has already started or failed.
      */
-    fun finished() = state in listOf(
+    fun resolved() = state in listOf(
         PendingTransferState.AlreadyStarted,
         PendingTransferState.ErrorStarting,
     )
@@ -58,5 +58,5 @@ data class PendingTransfer(
     /**
      * If true, this pending transfer is still needed to start or monitor the start of the transfer.
      */
-    fun notFinished() = !finished()
+    fun notResolved() = !resolved()
 }

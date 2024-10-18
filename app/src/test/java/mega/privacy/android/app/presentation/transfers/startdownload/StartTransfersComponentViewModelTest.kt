@@ -5,7 +5,6 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -30,6 +29,8 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
+import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
@@ -53,15 +54,19 @@ import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptTo
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWorkerAndWaitUntilIsStartedUseCase
 import mega.privacy.android.domain.usecase.transfers.filespermission.MonitorRequestFilesPermissionDeniedUseCase
 import mega.privacy.android.domain.usecase.transfers.filespermission.SetRequestFilesPermissionDeniedUseCase
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
+import mega.privacy.android.domain.usecase.transfers.pending.DeleteAllPendingTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.pending.MonitorNotResolvedPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWithWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -122,6 +127,11 @@ class StartTransfersComponentViewModelTest {
         }
     private val setRequestFilesPermissionDeniedUseCase =
         mock<SetRequestFilesPermissionDeniedUseCase>()
+    private val startDownloadsWorkerAndWaitUntilIsStartedUseCase =
+        mock<StartDownloadsWorkerAndWaitUntilIsStartedUseCase>()
+    private val deleteAllPendingTransfersUseCase = mock<DeleteAllPendingTransfersUseCase>()
+    private val monitorNotResolvedPendingTransfersUseCase =
+        mock<MonitorNotResolvedPendingTransfersUseCase>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -177,7 +187,10 @@ class StartTransfersComponentViewModelTest {
             cancelCancelTokenUseCase = cancelCancelTokenUseCase,
             monitorRequestFilesPermissionDeniedUseCase = monitorRequestFilesPermissionDeniedUseCase,
             setRequestFilesPermissionDeniedUseCase = setRequestFilesPermissionDeniedUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+            startDownloadsWorkerAndWaitUntilIsStartedUseCase = startDownloadsWorkerAndWaitUntilIsStartedUseCase,
+            deleteAllPendingTransfersUseCase = deleteAllPendingTransfersUseCase,
+            monitorNotResolvedPendingTransfersUseCase = monitorNotResolvedPendingTransfersUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -213,6 +226,9 @@ class StartTransfersComponentViewModelTest {
             getCurrentUploadSpeedUseCase,
             cancelCancelTokenUseCase,
             setRequestFilesPermissionDeniedUseCase,
+            startDownloadsWorkerAndWaitUntilIsStartedUseCase,
+            deleteAllPendingTransfersUseCase,
+            monitorNotResolvedPendingTransfersUseCase,
         )
         initialStub()
     }
@@ -315,7 +331,6 @@ class StartTransfersComponentViewModelTest {
                 .isInstanceOf(StartTransferJobInProgress.ScanningTransfers::class.java)
         }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test that ScanningTransfersProgress is updated when start download use case emits new folder update values`() =
         runTest {
@@ -794,6 +809,106 @@ class StartTransfersComponentViewModelTest {
 
         underTest.setRequestFilesPermissionDenied()
         verify(setRequestFilesPermissionDeniedUseCase).invoke()
+    }
+
+    @Nested
+    inner class StartInWorkerTests {
+        @BeforeEach
+        fun initialSetup() = runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.StartDownloadsInWorker)).thenReturn(true)
+        }
+
+        @Test
+        fun `test that startDownloadsWorkerAndWaitUntilIsStartedUseCase is invoked when a download starts`() =
+            runTest {
+                commonStub()
+
+                underTest.startTransfer(startDownloadEvent)
+
+                verify(startDownloadsWorkerAndWaitUntilIsStartedUseCase)()
+            }
+
+        @Test
+        fun `test that ui state is updated with pending transfers from monitorNotResolvedPendingTransfersUseCase when a download starts`() =
+            runTest {
+                commonStub()
+                val expectedList = listOf(
+                    TransferStage.STAGE_NONE,
+                    TransferStage.STAGE_SCANNING,
+                    TransferStage.STAGE_CREATING_TREE,
+                )
+
+                val pendingTransfers = expectedList.map { stage ->
+                    listOf(mock<PendingTransfer> {
+                        on { this.scanningFoldersData } doReturn
+                                PendingTransfer.ScanningFoldersData(stage)
+                    })
+                }
+
+                whenever(monitorNotResolvedPendingTransfersUseCase(TransferType.DOWNLOAD)) doReturn flow {
+                    pendingTransfers.forEach {
+                        emit(it)
+                        yield()
+                    }
+                    awaitCancellation()
+                }
+
+                underTest.uiState.test {
+                    println(awaitItem())//ignore initial
+                    underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
+                    expectedList.forEach { expected ->
+                        val actual =
+                            (awaitItem().jobInProgressState as? StartTransferJobInProgress.ScanningTransfers)?.stage
+                        println(actual)
+                        assertThat(actual).isEqualTo(expected)
+                    }
+                }
+
+                assertThat(underTest.uiState.value.jobInProgressState)
+                    .isInstanceOf(StartTransferJobInProgress.ScanningTransfers::class.java)
+            }
+
+        @Test
+        fun `test that FinishDownloadProcessing event is emitted when monitorNotResolvedPendingTransfersUseCase finishes`() =
+            runTest {
+                commonStub()
+                val pendingTransfer = mock<PendingTransfer> {
+                    val scanningFoldersData = PendingTransfer.ScanningFoldersData(
+                        TransferStage.STAGE_TRANSFERRING_FILES,
+                    )
+                    on { this.scanningFoldersData } doReturn scanningFoldersData
+                    on { this.startedFiles } doReturn 1
+                }
+                val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
+                whenever(monitorNotResolvedPendingTransfersUseCase(TransferType.DOWNLOAD)) doReturn
+                        flowOf(listOf(pendingTransfer))
+
+                underTest.startTransfer(triggerEvent)
+
+                assertThat(underTest.uiState.value.jobInProgressState).isNull()
+                assertCurrentEventIsEqualTo(
+                    StartTransferEvent.FinishDownloadProcessing(null, 1, 1, 0, triggerEvent)
+                )
+            }
+
+        @Test
+        fun `test that deleteAllPendingTransfersUseCase is invoked when monitorNotResolvedPendingTransfersUseCase finishes`() =
+            runTest {
+                commonStub()
+                val pendingTransfer = mock<PendingTransfer> {
+                    val scanningFoldersData = PendingTransfer.ScanningFoldersData(
+                        TransferStage.STAGE_TRANSFERRING_FILES,
+                    )
+                    on { this.scanningFoldersData } doReturn scanningFoldersData
+                }
+                val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
+                whenever(monitorNotResolvedPendingTransfersUseCase(TransferType.DOWNLOAD)) doReturn
+                        flowOf(listOf(pendingTransfer))
+
+                underTest.startTransfer(triggerEvent)
+
+                verify(deleteAllPendingTransfersUseCase)()
+            }
     }
 
     private fun provideDownloadNodeParameters() = listOf(
