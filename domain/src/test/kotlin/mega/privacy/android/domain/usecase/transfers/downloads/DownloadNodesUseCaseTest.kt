@@ -125,7 +125,7 @@ class DownloadNodesUseCaseTest {
     @ParameterizedTest(name = "appdata: \"{0}\"")
     @MethodSource("provideAppData")
     fun `test that repository start download is called with the proper appData`(
-        appData: TransferAppData?,
+        appData: List<TransferAppData>?,
     ) = runTest {
         underTest(listOf(node), DESTINATION_PATH_FOLDER, appData, false).test {
             verify(transferRepository).startDownload(
@@ -154,11 +154,12 @@ class DownloadNodesUseCaseTest {
     }
 
     private fun provideAppData() = listOf(
-        TransferAppData.BackgroundTransfer,
-        TransferAppData.SdCardDownload("target", null),
-        TransferAppData.CameraUpload,
-        TransferAppData.VoiceClip,
-        TransferAppData.ChatUpload(12345L)
+        listOf(TransferAppData.BackgroundTransfer),
+        listOf(TransferAppData.SdCardDownload("target", null)),
+        listOf(TransferAppData.CameraUpload),
+        listOf(TransferAppData.VoiceClip),
+        listOf(TransferAppData.ChatUpload(12345L)),
+        listOf(TransferAppData.BackgroundTransfer, TransferAppData.CameraUpload),
     )
 
 

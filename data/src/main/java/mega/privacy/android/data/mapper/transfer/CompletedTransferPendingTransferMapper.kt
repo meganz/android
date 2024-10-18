@@ -37,7 +37,7 @@ class CompletedTransferPendingTransferMapper @Inject constructor(
         sizeInBytes: Long,
         error: Throwable,
     ) = CompletedTransfer(
-        appData = transferAppDataStringMapper(listOfNotNull(pendingTransfer.appData)),
+        appData = transferAppDataStringMapper(pendingTransfer.appData),
         error = error.localizedMessage ?: error::class.simpleName,
         fileName = pendingTransfer.path
             .split(File.separator).lastOrNull { it.isNotBlank() } ?: "",

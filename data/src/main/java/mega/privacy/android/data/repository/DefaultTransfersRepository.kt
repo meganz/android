@@ -248,7 +248,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     override fun startDownload(
         node: TypedNode,
         localPath: String,
-        appData: TransferAppData?,
+        appData: List<TransferAppData>?,
         shouldStartFirst: Boolean,
     ) = callbackFlow {
         val megaNode = runCatching { megaNodeMapper(node) }.getOrNull()
@@ -259,7 +259,7 @@ internal class DefaultTransfersRepository @Inject constructor(
             node = megaNode,
             localPath = localPath,
             fileName = megaNode.name,
-            appData = appData?.let { transferAppDataStringMapper(listOf(it)) },
+            appData = transferAppDataStringMapper(appData),
             startFirst = shouldStartFirst,
             cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
             collisionCheck = COLLISION_CHECK_FINGERPRINT,

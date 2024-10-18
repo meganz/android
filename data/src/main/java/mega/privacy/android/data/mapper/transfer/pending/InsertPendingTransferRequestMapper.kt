@@ -15,7 +15,7 @@ internal class InsertPendingTransferRequestMapper @Inject constructor(
             nodeIdentifier = nodeIdentifier,
             transferTag = null,
             path = path,
-            appData = transferAppDataStringMapper(listOfNotNull(appData)),
+            appData = transferAppDataStringMapper(appData),
             isHighPriority = isHighPriority,
             scanningFoldersData = PendingTransferEntity.ScanningFoldersDataEntity(),
             startedFiles = 0,

@@ -32,7 +32,7 @@ internal class PendingTransferEntityMapperTest {
         transferType = TransferType.DOWNLOAD,
         nodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(11111L)),
         path = "file/path",
-        appData = TransferAppData.ChatUpload(454L),
+        appData = listOf(TransferAppData.ChatUpload(454L)),
         isHighPriority = true,
         scanningFoldersData = PendingTransfer.ScanningFoldersData(
             stage = TransferStage.STAGE_SCANNING,
@@ -57,7 +57,7 @@ internal class PendingTransferEntityMapperTest {
     @Test
     fun `test that a pending transfer is mapped into a pending transfer entity`() = runTest {
         val appDataString = "appData"
-        whenever(appDataMapper(listOfNotNull(pendingTransfer.appData))) doReturn appDataString
+        whenever(appDataMapper(pendingTransfer.appData)) doReturn appDataString
         val pendingTransferEntity = underTest(pendingTransfer)
 
         assertAll(

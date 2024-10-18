@@ -25,7 +25,7 @@ data class PendingTransfer(
     val transferType: TransferType,
     val nodeIdentifier: PendingTransferNodeIdentifier,
     val path: String,
-    val appData: TransferAppData?,
+    val appData: List<TransferAppData>?,
     val isHighPriority: Boolean,
     val scanningFoldersData: ScanningFoldersData = ScanningFoldersData(),
     val startedFiles: Int = 0,

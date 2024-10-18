@@ -130,7 +130,7 @@ class StartAllPendingDownloadsUseCaseTest {
             val pendingTransfers = (0..5).map { index ->
                 mock<PendingTransfer> {
                     on { path } doReturn "path/file$index.txt"
-                    on { appData } doReturn mock<TransferAppData.ChatUpload>()
+                    on { appData } doReturn listOf(mock<TransferAppData.ChatUpload>())
                     on { isHighPriority } doReturn (index == 2)
 
                 }

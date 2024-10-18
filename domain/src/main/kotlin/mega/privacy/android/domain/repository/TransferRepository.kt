@@ -258,7 +258,7 @@ interface TransferRepository {
     fun startDownload(
         node: TypedNode,
         localPath: String,
-        appData: TransferAppData?,
+        appData: List<TransferAppData>?,
         shouldStartFirst: Boolean,
     ): Flow<TransferEvent>
 

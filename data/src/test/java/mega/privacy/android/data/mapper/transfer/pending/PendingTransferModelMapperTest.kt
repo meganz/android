@@ -55,8 +55,8 @@ internal class PendingTransferModelMapperTest {
 
     @Test
     fun `test that a pending transfer is mapped into a pending transfer entity`() = runTest {
-        val appData = TransferAppData.ChatUpload(454L)
-        whenever(appDataMapper(pendingTransferEntity.appData ?: "")) doReturn listOf(appData)
+        val appData = listOf(TransferAppData.ChatUpload(454L))
+        whenever(appDataMapper(pendingTransferEntity.appData ?: "")) doReturn appData
         val pendingTransfer = underTest(pendingTransferEntity)
 
         assertAll(

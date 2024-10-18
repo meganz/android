@@ -68,7 +68,7 @@ class CompletedTransferPendingTransferMapperTest {
         val path = if (offline) offlinePath else "/path/"
         val fullPath = "$path$fileName"
         val appDataString = "appData"
-        val appData = mock<TransferAppData.ChatUpload>()
+        val appData = listOf(mock<TransferAppData.ChatUpload>())
         val exceptionMessage = "Some Exception"
         val exception = RuntimeException(exceptionMessage)
         val pendingTransfer = mock<PendingTransfer> {
@@ -82,7 +82,7 @@ class CompletedTransferPendingTransferMapperTest {
         whenever(stringWrapper.getSizeString(size)) doReturn (sizeString)
         whenever(transferTypeIntMapper(TransferType.DOWNLOAD)) doReturn (MegaTransfer.TYPE_DOWNLOAD)
         whenever(fileGateway.getOfflineFilesRootPath()) doReturn offlinePath
-        whenever(transferAppDataStringMapper(listOf(appData))) doReturn appDataString
+        whenever(transferAppDataStringMapper(appData)) doReturn appDataString
         val actual = underTest(pendingTransfer, size, exception)
         assertAll(
             { assertThat(actual.fileName).isEqualTo(fileName) },

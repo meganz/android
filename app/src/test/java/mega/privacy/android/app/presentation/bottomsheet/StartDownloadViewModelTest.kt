@@ -186,7 +186,7 @@ class StartDownloadViewModelTest {
             downloadNodesUseCase(
                 nodes = listOf(chatFile),
                 destinationPath = cachePath,
-                appData = TransferAppData.VoiceClip,
+                appData = listOf(TransferAppData.VoiceClip),
                 isHighPriority = true,
             )
         ) doReturn downloadFlow

@@ -317,7 +317,7 @@ class StartDownloadsWithWorkerUseCaseTest {
                 awaitComplete()
             }
             verify(downloadNodesUseCase)
-                .invoke(any(), anyOrNull(), eq(expectedAppData), any())
+                .invoke(any(), anyOrNull(), eq(listOf(expectedAppData)), any())
         }
 
     @Test

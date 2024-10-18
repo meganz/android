@@ -99,7 +99,7 @@ class StartDownloadsWithWorkerUseCase @Inject constructor(
                             downloadNodesUseCase(
                                 nodes,
                                 destinationPathForSdk,
-                                appData = appData,
+                                appData = listOfNotNull(appData),
                                 isHighPriority = isHighPriority
                             )
                         },

@@ -45,7 +45,7 @@ class DownloadNodesUseCase @Inject constructor(
     operator fun invoke(
         nodes: List<TypedNode>,
         destinationPath: String,
-        appData: TransferAppData?,
+        appData: List<TransferAppData>?,
         isHighPriority: Boolean,
     ): Flow<MultiTransferEvent> {
         if (destinationPath.isEmpty()) {

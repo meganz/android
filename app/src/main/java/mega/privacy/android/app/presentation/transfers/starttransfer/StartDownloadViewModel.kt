@@ -279,7 +279,7 @@ class StartDownloadViewModel @Inject constructor(
             downloadNodesUseCase(
                 nodes = listOf(node),
                 destinationPath = "${voiceClipFile.parent}${File.separator}",
-                appData = TransferAppData.VoiceClip,
+                appData = listOf(TransferAppData.VoiceClip),
                 isHighPriority = true,
             ).lastOrNull()
         }

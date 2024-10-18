@@ -49,7 +49,7 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
                     transferType = TransferType.DOWNLOAD,
                     nodeIdentifier = getPendingTransferNodeIdentifierUseCase(node),
                     path = folderDestination.value.ensureEndsWithFileSeparator(),
-                    appData = appData,
+                    appData = appData?.let { listOf(it) },
                     isHighPriority = isHighPriority,
                 )
             }

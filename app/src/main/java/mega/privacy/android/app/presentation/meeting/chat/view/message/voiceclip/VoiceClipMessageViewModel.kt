@@ -120,7 +120,7 @@ class VoiceClipMessageViewModel @Inject constructor(
         downloadNodesUseCase(
             nodes = listOf(node),
             destinationPath = destinationPath,
-            appData = TransferAppData.VoiceClip,
+            appData = listOf(TransferAppData.VoiceClip),
             isHighPriority = true,
         )
             .onCompletion {
