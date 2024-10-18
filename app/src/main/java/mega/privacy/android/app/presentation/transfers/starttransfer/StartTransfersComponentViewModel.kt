@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
@@ -40,6 +41,7 @@ import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
@@ -101,6 +103,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     private val monitorRequestFilesPermissionDeniedUseCase: MonitorRequestFilesPermissionDeniedUseCase,
     private val setRequestFilesPermissionDeniedUseCase: SetRequestFilesPermissionDeniedUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -350,6 +353,28 @@ internal class StartTransfersComponentViewModel @Inject constructor(
      * common logic to start downloading nodes, either for offline or ordinary download
      */
     private suspend fun startDownloadNodes(
+        nodes: List<TypedNode>,
+        isHighPriority: Boolean,
+        getUri: suspend () -> String?,
+        transferTriggerEvent: TransferTriggerEvent,
+    ) {
+        if (getFeatureFlagValueUseCase(AppFeatures.StartDownloadsInWorker)) {
+            startDownloadNodesInWorker(nodes, isHighPriority, getUri, transferTriggerEvent)
+        } else {
+            startDownloadNodesInViewModel(nodes, isHighPriority, getUri, transferTriggerEvent)
+        }
+    }
+
+    private suspend fun startDownloadNodesInWorker(
+        nodes: List<TypedNode>,
+        isHighPriority: Boolean,
+        getUri: suspend () -> String?,
+        transferTriggerEvent: TransferTriggerEvent,
+    ) {
+        //TRAN 398
+    }
+
+    private suspend fun startDownloadNodesInViewModel(
         nodes: List<TypedNode>,
         isHighPriority: Boolean,
         getUri: suspend () -> String?,

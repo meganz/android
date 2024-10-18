@@ -193,7 +193,16 @@ enum class AppFeatures(override val description: String, private val defaultValu
     NewUploadDestinationActivity(
         "Enable upload destination activity",
         false
-    );
+    ),
+
+    /**
+     * Start downloads in the worker instead of in the view model
+     */
+    StartDownloadsInWorker(
+        "Start downloads in the worker instead of in the view model",
+        false,
+    ),
+    ;
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =

@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
@@ -138,6 +140,7 @@ class StartTransfersComponentViewModelTest {
         on { allTransfersUpdated } doReturn true
         on { startedFiles } doReturn 1
     }
+    val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -174,6 +177,7 @@ class StartTransfersComponentViewModelTest {
             cancelCancelTokenUseCase = cancelCancelTokenUseCase,
             monitorRequestFilesPermissionDeniedUseCase = monitorRequestFilesPermissionDeniedUseCase,
             setRequestFilesPermissionDeniedUseCase = setRequestFilesPermissionDeniedUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 
@@ -213,7 +217,7 @@ class StartTransfersComponentViewModelTest {
         initialStub()
     }
 
-    private fun initialStub() {
+    private fun initialStub() = runTest {
         whenever(monitorOngoingActiveTransfersUseCase(any())).thenReturn(emptyFlow())
         whenever(startDownloadsWithWorkerUseCase(any(), any(), any())).thenReturn(emptyFlow())
         whenever(
@@ -224,6 +228,7 @@ class StartTransfersComponentViewModelTest {
             )
         ).thenReturn(emptyFlow())
         whenever(monitorRequestFilesPermissionDeniedUseCase()).thenReturn(emptyFlow())
+        whenever(getFeatureFlagValueUseCase(AppFeatures.StartDownloadsInWorker)).thenReturn(false)
     }
 
     @ParameterizedTest
