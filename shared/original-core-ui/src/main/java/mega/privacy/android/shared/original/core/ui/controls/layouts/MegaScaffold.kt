@@ -9,11 +9,17 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -64,6 +70,7 @@ import mega.privacy.android.shared.original.core.ui.utils.accumulateDirectionalS
  * @param scrollableContentState [ScrollableState] of the content. It will be used to set the [topBar] elevation and to hide the [floatingActionButton] in case [hideFloatingActionButtonOnScrollUp] is true
  * @param scrollableContentIsReversed set to true if the scrollable content associated to [scrollableContentState] is reversed to set the elevation for [topBar] correctly
  * @param hideFloatingActionButtonOnScrollUp if true and the scroll state is set as [scrollableContentState] the fab button will be hidden when the content is scrolled down and shown when is scrolled up again
+ * @param blurContent nullable lambda to indicate if blur content and what to do on tap
  * @param content content of your screen. The lambda receives an [PaddingValues] that should be
  * applied to the content root via Modifier.padding to properly offset top and bottom bars. If
  * you're using VerticalScroller, apply this modifier to the child of the scroller, and not on
@@ -79,6 +86,7 @@ fun MegaScaffold(
     scrollableContentState: ScrollableState? = null,
     scrollableContentIsReversed: Boolean = false,
     hideFloatingActionButtonOnScrollUp: Boolean = false,
+    blurContent: (() -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val scaffoldContentScrollOffset by remember(scrollableContentState) {
@@ -114,7 +122,10 @@ fun MegaScaffold(
             }
 
             MegaScaffold(
-                modifier, scaffoldState, topBar, bottomBar,
+                modifier = modifier,
+                scaffoldState = scaffoldState,
+                topBar = topBar,
+                bottomBar = bottomBar,
                 floatingActionButton = {
                     AnimatedVisibility(
                         visible = isFabVisible,
@@ -128,11 +139,18 @@ fun MegaScaffold(
                         floatingActionButton()
                     }
                 },
+                blurContent = blurContent,
                 content = content,
             )
         } else {
             MegaScaffold(
-                modifier, scaffoldState, topBar, bottomBar, floatingActionButton, content
+                modifier = modifier,
+                scaffoldState = scaffoldState,
+                topBar = topBar,
+                bottomBar = bottomBar,
+                floatingActionButton = floatingActionButton,
+                blurContent = blurContent,
+                content = content
             )
         }
     }
@@ -146,14 +164,25 @@ private fun MegaScaffold(
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
+    blurContent: (() -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     CompositionLocalProvider(LocalSnackBarHostState provides scaffoldState.snackbarHostState) {
         Scaffold(
             modifier = modifier,
             scaffoldState = scaffoldState,
-            topBar = topBar,
-            bottomBar = bottomBar,
+            topBar = {
+                BarContent(
+                    content = topBar,
+                    blurContent = blurContent,
+                )
+            },
+            bottomBar = {
+                BarContent(
+                    content = bottomBar,
+                    blurContent = blurContent,
+                )
+            },
             snackbarHost = {
                 SnackbarHost(hostState = it) { data ->
                     MegaSnackbar(snackbarData = data)
@@ -161,8 +190,40 @@ private fun MegaScaffold(
             },
             floatingActionButton = floatingActionButton,
             backgroundColor = MegaOriginalTheme.colors.background.pageBackground,
-            content = content
+            content = { paddingValues ->
+                content.invoke(paddingValues)
+                if (blurContent != null) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = MegaOriginalTheme.colors.background.blur)
+                            .clickable(indication = null,
+                                interactionSource = remember { MutableInteractionSource() },
+                                onClick = { blurContent.invoke() }),
+                    ) { }
+                }
+            },
         )
+    }
+}
+
+@Composable
+private fun BarContent(
+    blurContent: (() -> Unit)? = null,
+    content: @Composable () -> Unit = {},
+) {
+    Box(modifier = Modifier.height(IntrinsicSize.Min)) {
+        content()
+        if (blurContent != null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = MegaOriginalTheme.colors.background.blur)
+                    .clickable(indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = { blurContent.invoke() }),
+            ) { }
+        }
     }
 }
 
