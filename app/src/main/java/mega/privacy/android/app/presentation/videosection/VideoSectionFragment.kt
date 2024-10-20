@@ -43,7 +43,6 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenu
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionFeatureScreen
-import mega.privacy.android.app.presentation.videosection.view.recentlywatched.videoRecentlyWatchedRoute
 import mega.privacy.android.app.presentation.videosection.view.videoSectionRoute
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.Constants.ORDER_VIDEO_PLAYLIST
@@ -249,9 +248,7 @@ class VideoSectionFragment : Fragment() {
             if (isPendingRefresh) {
                 with(videoSectionViewModel) {
                     refreshNodes()
-                    if (state.value.currentDestinationRoute == videoRecentlyWatchedRoute) {
-                        refreshRecentlyWatchedVideos()
-                    }
+                    refreshRecentlyWatchedVideos()
                     markHandledPendingRefresh()
                 }
             }
