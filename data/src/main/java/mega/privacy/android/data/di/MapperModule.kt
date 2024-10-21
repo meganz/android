@@ -17,7 +17,6 @@ import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.CountryCallingCodeMapper
 import mega.privacy.android.data.mapper.CountryMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
-import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.LocalPricingMapper
@@ -35,7 +34,6 @@ import mega.privacy.android.data.mapper.SortOrderMapper
 import mega.privacy.android.data.mapper.SortOrderMapperImpl
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.mapper.StorageStateIntMapper
-import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.VideoMapper
@@ -59,7 +57,6 @@ import mega.privacy.android.data.mapper.toContactRequest
 import mega.privacy.android.data.mapper.toCountry
 import mega.privacy.android.data.mapper.toCountryCallingCodes
 import mega.privacy.android.data.mapper.toDuration
-import mega.privacy.android.data.mapper.toEvent
 import mega.privacy.android.data.mapper.toImage
 import mega.privacy.android.data.mapper.toLocalPricing
 import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
@@ -68,7 +65,6 @@ import mega.privacy.android.data.mapper.toMegaPurchase
 import mega.privacy.android.data.mapper.toMegaSku
 import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toPricing
-import mega.privacy.android.data.mapper.toStorageState
 import mega.privacy.android.data.mapper.toUserAlert
 import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toVideo
@@ -141,23 +137,11 @@ internal abstract class MapperModule {
         fun provideVideosMapper(): VideoMapper = ::toVideo
 
         /**
-         * Provide event mapper
-         */
-        @Provides
-        fun provideEventMapper(): EventMapper = ::toEvent
-
-        /**
          * Provide media store file type uri mapper
          */
         @Provides
         fun provideMediaStoreFileTypeUriMapper(): MediaStoreFileTypeUriMapper =
             ::toMediaStoreFileTypeUri
-
-        /**
-         * Provide storage state mapper
-         */
-        @Provides
-        fun provideStorageStateMapper(): StorageStateMapper = ::toStorageState
 
         /**
          * Provide [StorageState] to [Int] mapper

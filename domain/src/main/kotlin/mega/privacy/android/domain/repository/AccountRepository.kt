@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.MyAccountUpdate
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
@@ -683,4 +684,11 @@ interface AccountRepository {
      * @return [User] The current user.
      */
     suspend fun getCurrentUser(): User?
+
+    /**
+     * Get the account's storage state
+     *
+     * @return [Int] The storage state
+     */
+    suspend fun getStorageState(): StorageState
 }

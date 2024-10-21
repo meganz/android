@@ -5,29 +5,37 @@ import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.NormalEvent
 import mega.privacy.android.domain.entity.StorageStateEvent
 import nz.mega.sdk.MegaEvent
+import javax.inject.Inject
 
 /**
  * Map [MegaEvent] to [Event]
  */
-typealias EventMapper = (@JvmSuppressWildcards MegaEvent) -> @JvmSuppressWildcards Event
+class EventMapper @Inject constructor(
+    private val storageStateMapper: StorageStateMapper,
+) {
+    /**
+     * Map [MegaEvent] to [Event].
+     *
+     * Return value can be subclass of [Event]
+     */
+    operator fun invoke(megaEvent: MegaEvent): Event = when (mapType(megaEvent.type)) {
+        EventType.Storage -> StorageStateEvent(
+            handle = megaEvent.handle,
+            eventString = megaEvent.eventString.orEmpty(),
+            number = megaEvent.number,
+            text = megaEvent.text.orEmpty(),
+            type = EventType.Storage,
+            storageState = storageStateMapper(megaEvent.number.toInt())
+        )
 
-/**
- * Map [MegaEvent] to [Event]. Return value can be subclass of [Event]
- */
-internal fun toEvent(megaEvent: MegaEvent): Event = when (mapType(megaEvent.type)) {
-    EventType.Storage -> StorageStateEvent(
-        handle = megaEvent.handle,
-        eventString = megaEvent.eventString.orEmpty(),
-        number = megaEvent.number,
-        text = megaEvent.text.orEmpty(),
-        type = EventType.Storage,
-        storageState = toStorageState(megaEvent.number.toInt()))
-    else -> NormalEvent(
-        handle = megaEvent.handle,
-        eventString = megaEvent.eventString.orEmpty(),
-        number = megaEvent.number,
-        text = megaEvent.text.orEmpty(),
-        type = mapType(megaEvent.type))
+        else -> NormalEvent(
+            handle = megaEvent.handle,
+            eventString = megaEvent.eventString.orEmpty(),
+            number = megaEvent.number,
+            text = megaEvent.text.orEmpty(),
+            type = mapType(megaEvent.type)
+        )
+    }
 }
 
 private fun mapType(type: Int): EventType = when (type) {
@@ -44,6 +52,4 @@ private fun mapType(type: Int): EventType = when (type) {
     MegaEvent.EVENT_KEY_MODIFIED -> EventType.KeyModified
     MegaEvent.EVENT_MISC_FLAGS_READY -> EventType.MiscFlagsReady
     else -> EventType.Unknown
-
 }
-

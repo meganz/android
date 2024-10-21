@@ -3,14 +3,27 @@ package mega.privacy.android.data.mapper
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.NormalEvent
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import nz.mega.sdk.MegaEvent
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.whenever
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EventMapperTest {
 
+    private lateinit var underTest: EventMapper
+
+    private val storageStateMapper = mock<StorageStateMapper>()
     private val megaEvent = mock<MegaEvent> {
         on { handle }.thenReturn(12L)
         on { eventString }.thenReturn("eventString")
@@ -18,74 +31,89 @@ class EventMapperTest {
         on { text }.thenReturn("text")
     }
 
-    @Test
-    fun `test that event type can be mapped correctly`() {
-        val unknownEventType = 100
-        val expectedResults = HashMap<Int, EventType>().apply {
-            put(MegaEvent.EVENT_COMMIT_DB, EventType.CommitDb)
-            put(MegaEvent.EVENT_ACCOUNT_CONFIRMATION, EventType.AccountConfirmation)
-            put(MegaEvent.EVENT_CHANGE_TO_HTTPS, EventType.ChangeToHttps)
-            put(MegaEvent.EVENT_DISCONNECT, EventType.Disconnect)
-            put(MegaEvent.EVENT_ACCOUNT_BLOCKED, EventType.AccountBlocked)
-            put(MegaEvent.EVENT_STORAGE, EventType.Storage)
-            put(MegaEvent.EVENT_NODES_CURRENT, EventType.NodesCurrent)
-            put(MegaEvent.EVENT_MEDIA_INFO_READY, EventType.MediaInfoReady)
-            put(MegaEvent.EVENT_STORAGE_SUM_CHANGED, EventType.StorageSumChanged)
-            put(MegaEvent.EVENT_BUSINESS_STATUS, EventType.BusinessStatus)
-            put(MegaEvent.EVENT_KEY_MODIFIED, EventType.KeyModified)
-            put(MegaEvent.EVENT_MISC_FLAGS_READY, EventType.MiscFlagsReady)
-            put(unknownEventType, EventType.Unknown)  // invalid value
-        }
-
-        expectedResults.forEach { (key, value) ->
-            megaEvent.stub {
-                on { type }.thenReturn(key)
-            }
-            val actual = toEvent(megaEvent)
-            assertThat(actual.type).isEqualTo(value)
-        }
+    @BeforeAll
+    fun setup() {
+        underTest = EventMapper(
+            storageStateMapper
+        )
     }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(storageStateMapper)
+    }
+
+    @ParameterizedTest(name = "when Mega event type from SDK is {0}, EventType is {1}")
+    @MethodSource("provideEventTypeParameters")
+    fun `test that event type can be mapped correctly`(
+        megaEventType: Int,
+        expectedEventType: EventType,
+    ) {
+        whenever(storageStateMapper(any())).thenReturn(StorageState.Green)
+        megaEvent.stub {
+            on { type }.thenReturn(megaEventType)
+        }
+        val actual = underTest(megaEvent)
+        assertThat(actual.type).isEqualTo(expectedEventType)
+    }
+
+    private fun provideEventTypeParameters() = listOf(
+        arrayOf(MegaEvent.EVENT_COMMIT_DB, EventType.CommitDb),
+        arrayOf(MegaEvent.EVENT_ACCOUNT_CONFIRMATION, EventType.AccountConfirmation),
+        arrayOf(MegaEvent.EVENT_CHANGE_TO_HTTPS, EventType.ChangeToHttps),
+        arrayOf(MegaEvent.EVENT_DISCONNECT, EventType.Disconnect),
+        arrayOf(MegaEvent.EVENT_ACCOUNT_BLOCKED, EventType.AccountBlocked),
+        arrayOf(MegaEvent.EVENT_STORAGE, EventType.Storage),
+        arrayOf(MegaEvent.EVENT_NODES_CURRENT, EventType.NodesCurrent),
+        arrayOf(MegaEvent.EVENT_MEDIA_INFO_READY, EventType.MediaInfoReady),
+        arrayOf(MegaEvent.EVENT_STORAGE_SUM_CHANGED, EventType.StorageSumChanged),
+        arrayOf(MegaEvent.EVENT_BUSINESS_STATUS, EventType.BusinessStatus),
+        arrayOf(MegaEvent.EVENT_KEY_MODIFIED, EventType.KeyModified),
+        arrayOf(MegaEvent.EVENT_MISC_FLAGS_READY, EventType.MiscFlagsReady),
+        arrayOf(100, EventType.Unknown),
+    )
 
     @Test
     fun `test that StorageStateEvent instance is returned for a storage state`() {
+        whenever(storageStateMapper(any())).thenReturn(StorageState.Green)
         megaEvent.stub {
             on { type }.thenReturn(MegaEvent.EVENT_STORAGE)
         }
-        assertThat(toEvent(megaEvent)).isInstanceOf(StorageStateEvent::class.java)
+        assertThat(underTest(megaEvent)).isInstanceOf(StorageStateEvent::class.java)
     }
 
-    @Test
-    fun `test that NormalEvent instance is returned for non storage state events`() {
-        // list of event types, excluding Storage
-        val expectedTypes = listOf(
-            MegaEvent.EVENT_COMMIT_DB,
-            MegaEvent.EVENT_ACCOUNT_CONFIRMATION,
-            MegaEvent.EVENT_CHANGE_TO_HTTPS,
-            MegaEvent.EVENT_DISCONNECT,
-            MegaEvent.EVENT_ACCOUNT_BLOCKED,
-            MegaEvent.EVENT_NODES_CURRENT,
-            MegaEvent.EVENT_MEDIA_INFO_READY,
-            MegaEvent.EVENT_STORAGE_SUM_CHANGED,
-            MegaEvent.EVENT_BUSINESS_STATUS,
-            MegaEvent.EVENT_KEY_MODIFIED,
-            MegaEvent.EVENT_MISC_FLAGS_READY,
-        )
-
-        expectedTypes.forEach { t ->
-            megaEvent.stub {
-                on { type }.thenReturn(t)
-            }
-            assertThat(toEvent(megaEvent)).isInstanceOf(NormalEvent::class.java)
+    @ParameterizedTest(name = "when non-storage state Mega event is {0}")
+    @MethodSource("provideNonStorageStateEvents")
+    fun `test that NormalEvent instance is returned for non storage state events`(
+        megaEventType: Int,
+    ) {
+        megaEvent.stub {
+            on { type }.thenReturn(megaEventType)
         }
+        assertThat(underTest(megaEvent)).isInstanceOf(NormalEvent::class.java)
     }
+
+    private fun provideNonStorageStateEvents() = listOf(
+        arrayOf(MegaEvent.EVENT_COMMIT_DB),
+        arrayOf(MegaEvent.EVENT_ACCOUNT_CONFIRMATION),
+        arrayOf(MegaEvent.EVENT_CHANGE_TO_HTTPS),
+        arrayOf(MegaEvent.EVENT_DISCONNECT),
+        arrayOf(MegaEvent.EVENT_ACCOUNT_BLOCKED),
+        arrayOf(MegaEvent.EVENT_NODES_CURRENT),
+        arrayOf(MegaEvent.EVENT_MEDIA_INFO_READY),
+        arrayOf(MegaEvent.EVENT_STORAGE_SUM_CHANGED),
+        arrayOf(MegaEvent.EVENT_BUSINESS_STATUS),
+        arrayOf(MegaEvent.EVENT_KEY_MODIFIED),
+        arrayOf(MegaEvent.EVENT_MISC_FLAGS_READY),
+    )
 
     @Test
     fun `test that event mapping is successful when text in MegaNode is null`() {
         megaEvent.stub {
             on { text }.thenReturn(null)
         }
-        assertThat(toEvent(megaEvent)).isInstanceOf(NormalEvent::class.java)
-        assertThat(toEvent(megaEvent).text).isEqualTo("")
+        assertThat(underTest(megaEvent)).isInstanceOf(NormalEvent::class.java)
+        assertThat(underTest(megaEvent).text).isEqualTo("")
     }
 
     @Test
@@ -93,8 +121,8 @@ class EventMapperTest {
         megaEvent.stub {
             on { eventString }.thenReturn(null)
         }
-        assertThat(toEvent(megaEvent)).isInstanceOf(NormalEvent::class.java)
-        assertThat(toEvent(megaEvent).eventString).isEqualTo("")
+        assertThat(underTest(megaEvent)).isInstanceOf(NormalEvent::class.java)
+        assertThat(underTest(megaEvent).eventString).isEqualTo("")
 
     }
 

@@ -8,26 +8,38 @@ import nz.mega.sdk.MegaApiJava.STORAGE_STATE_ORANGE
 import nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL
 import nz.mega.sdk.MegaApiJava.STORAGE_STATE_RED
 import nz.mega.sdk.MegaApiJava.STORAGE_STATE_UNKNOWN
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class StorageStateMapperTest {
 
-    @Test
-    fun `test that storage type can be mapped correctly`() {
-        val unknownState = 100
-        val expectedResults = mapOf(
-            STORAGE_STATE_UNKNOWN to StorageState.Unknown,
-            STORAGE_STATE_GREEN to StorageState.Green,
-            STORAGE_STATE_ORANGE to StorageState.Orange,
-            STORAGE_STATE_RED to StorageState.Red,
-            STORAGE_STATE_CHANGE to StorageState.Change,
-            STORAGE_STATE_PAYWALL to StorageState.PayWall,
-            unknownState to StorageState.Unknown,
-        )
+    private lateinit var underTest: StorageStateMapper
 
-        expectedResults.forEach { (key, value) ->
-            val actual = toStorageState(key)
-            assertThat(actual).isEqualTo(value)
-        }
+    @BeforeAll
+    fun setup() {
+        underTest = StorageStateMapper()
     }
+
+    @ParameterizedTest(name = "when storage state from SDK is {0}, StorageState is {1}")
+    @MethodSource("provideStorageStateParameters")
+    fun `test that storage state can be mapped correctly`(
+        storageState: Int,
+        expected: StorageState,
+    ) {
+        val actual = underTest(storageState)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    private fun provideStorageStateParameters() = listOf(
+        arrayOf(STORAGE_STATE_UNKNOWN, StorageState.Unknown),
+        arrayOf(STORAGE_STATE_GREEN, StorageState.Green),
+        arrayOf(STORAGE_STATE_ORANGE, StorageState.Orange),
+        arrayOf(STORAGE_STATE_RED, StorageState.Red),
+        arrayOf(STORAGE_STATE_CHANGE, StorageState.Change),
+        arrayOf(STORAGE_STATE_PAYWALL, StorageState.PayWall),
+        arrayOf(100, StorageState.Unknown),
+    )
 }

@@ -45,6 +45,7 @@ import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
+import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
@@ -61,6 +62,7 @@ import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -132,6 +134,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property recoveryKeyToFileMapper      [RecoveryKeyToFileMapper]
  * @property cameraUploadsSettingsPreferenceGateway [CameraUploadsSettingsPreferenceGateway]
  * @property cookieSettingsMapper         [CookieSettingsMapper]
+ * @property storageStateMapper           [StorageStateMapper]
  */
 @ExperimentalContracts
 internal class DefaultAccountRepository @Inject constructor(
@@ -170,6 +173,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val cookieSettingsIntMapper: CookieSettingsIntMapper,
     private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>,
     private val userMapper: UserMapper,
+    private val storageStateMapper: StorageStateMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -1320,6 +1324,27 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun getCurrentUser(): User? = withContext(ioDispatcher) {
         megaApiGateway.myUser?.let { userMapper(it) }
     }
+
+    override suspend fun getStorageState(): StorageState =
+        withContext(ioDispatcher) {
+            val storageStateUserAttribute = MegaApiJava.USER_ATTR_STORAGE_STATE
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        if (error.errorCode == MegaError.API_OK) {
+                            continuation.resumeWith(
+                                Result.success(
+                                    storageStateMapper(request.number.toInt())
+                                )
+                            )
+                        } else {
+                            continuation.failWithError(error, "getStorageState")
+                        }
+                    }
+                )
+                megaApiGateway.getUserAttribute(storageStateUserAttribute, listener)
+            }
+        }
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"

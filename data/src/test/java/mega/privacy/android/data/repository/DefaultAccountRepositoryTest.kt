@@ -28,6 +28,7 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
+import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
@@ -45,6 +46,7 @@ import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.achievement.AchievementType
@@ -135,10 +137,13 @@ class DefaultAccountRepositoryTest {
     private val cookieSettingsIntMapper = mock<CookieSettingsIntMapper>()
     private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
     private val userUpdateMapper =
-        mock<UserUpdateMapper> { on { invoke(any()) } doReturn UserUpdate(
-            changes = emptyMap(),
-            emailMap = emptyMap()
-        ) }
+        mock<UserUpdateMapper> {
+            on { invoke(any()) } doReturn UserUpdate(
+                changes = emptyMap(),
+                emailMap = emptyMap()
+            )
+        }
+    private val storageStateMapper = mock<StorageStateMapper>()
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -198,7 +203,8 @@ class DefaultAccountRepositoryTest {
             cameraUploadsSettingsPreferenceGateway,
             cookieSettingsMapper,
             cookieSettingsIntMapper,
-            credentialsPreferencesGateway
+            credentialsPreferencesGateway,
+            storageStateMapper,
         )
     }
 
@@ -241,7 +247,8 @@ class DefaultAccountRepositoryTest {
             cookieSettingsMapper = cookieSettingsMapper,
             cookieSettingsIntMapper = cookieSettingsIntMapper,
             credentialsPreferencesGateway = { credentialsPreferencesGateway },
-            userMapper = userMapper
+            userMapper = userMapper,
+            storageStateMapper = storageStateMapper,
         )
 
     }
@@ -1949,4 +1956,47 @@ class DefaultAccountRepositoryTest {
             }
         )
     )
+
+    @Test
+    fun `test that current storage state is returned when getStorageState is called`() = runTest {
+        val expectedStorageState = StorageState.Green
+        whenever(megaApiGateway.getUserAttribute(any(), any())).thenAnswer {
+            (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock {
+                    on { number }.thenReturn(0)
+                },
+                mock {
+                    on { errorCode }.thenReturn(MegaError.API_OK)
+                }
+            )
+        }
+        whenever(storageStateMapper(any())).thenReturn(expectedStorageState)
+        val result = underTest.getStorageState()
+        assertThat(result).isEqualTo(expectedStorageState)
+    }
+
+    @Test
+    fun `test that get storage state throws an exception when the api returns an error`() =
+        runTest {
+            val api = mock<MegaApiJava>()
+            val request = mock<MegaRequest> {
+                on { number }.thenReturn(-9)
+            }
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK + 1)
+            }
+
+            whenever(megaApiGateway.getUserAttribute(any(), any())).thenAnswer {
+                (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api,
+                    request,
+                    error
+                )
+            }
+            whenever(storageStateMapper(any())).thenReturn(StorageState.Unknown)
+            assertThrows<MegaException> {
+                underTest.getStorageState()
+            }
+        }
 }
