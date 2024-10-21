@@ -37,15 +37,15 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.chat.list.view.ChatDivider
 import mega.privacy.android.app.presentation.chat.list.view.ChatUserStatusView
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
+import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import kotlin.random.Random
 
 /**
@@ -221,15 +221,19 @@ internal fun ChatRoomItemBottomSheetView(
                     }
                 }
 
-                MenuItem(
-                    modifier = Modifier.testTag("info"),
-                    res = iconPackR.drawable.ic_info_medium_regular_outline,
-                    text = R.string.general_info,
-                    description = "Info",
-                    onClick = onInfoClick
-                )
+                val isGroup = item !is IndividualChatRoomItem
 
-                ChatDivider()
+                if (isGroup || item.hasPermissions) {
+                    MenuItem(
+                        modifier = Modifier.testTag("info"),
+                        res = iconPackR.drawable.ic_info_medium_regular_outline,
+                        text = R.string.general_info,
+                        description = "Info",
+                        onClick = onInfoClick
+                    )
+
+                    ChatDivider()
+                }
 
                 if (item.hasPermissions) {
                     MenuItem(
@@ -242,24 +246,27 @@ internal fun ChatRoomItemBottomSheetView(
                     ChatDivider()
                 }
 
-                if (item.isMuted) {
-                    MenuItem(
-                        modifier = Modifier.testTag("unmute"),
-                        res = R.drawable.ic_bell,
-                        text = R.string.general_unmute,
-                        description = "Unmute",
-                        onClick = onUnmuteClick
-                    )
-                } else {
-                    MenuItem(
-                        modifier = Modifier.testTag("mute"),
-                        res = R.drawable.ic_bell_off,
-                        text = R.string.general_mute,
-                        description = "Mute",
-                        onClick = onMuteClick
-                    )
+                if ((isGroup && item.isActive) || (isGroup.not() && item.hasPermissions)) {
+                    if (item.isMuted) {
+                        MenuItem(
+                            modifier = Modifier.testTag("unmute"),
+                            res = R.drawable.ic_bell,
+                            text = R.string.general_unmute,
+                            description = "Unmute",
+                            onClick = onUnmuteClick
+                        )
+                    } else {
+                        MenuItem(
+                            modifier = Modifier.testTag("mute"),
+                            res = R.drawable.ic_bell_off,
+                            text = R.string.general_mute,
+                            description = "Mute",
+                            onClick = onMuteClick
+                        )
+                    }
+
+                    ChatDivider()
                 }
-                ChatDivider()
 
                 MenuItem(
                     modifier = Modifier.testTag("archive"),
