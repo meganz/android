@@ -24,7 +24,7 @@
                 android:id="@+id/navigation_drawer_account_section"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="40dp">
+                android:paddingTop="60dp">
 
                 <RelativeLayout
                     android:id="@+id/navigation_drawer_user_account_relative_layout_profile_avatar"
