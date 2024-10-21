@@ -5964,11 +5964,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         ) {
             drawerLayout.closeDrawer(GravityCompat.START)
         }
-        val isCrossAccountMatch =
-            intent?.getBooleanExtra(UpgradeAccountActivity.IS_CROSS_ACCOUNT_MATCH, false) ?: false
-        startActivity(Intent(this, UpgradeAccountActivity::class.java).apply {
-            putExtra(UpgradeAccountActivity.IS_CROSS_ACCOUNT_MATCH, isCrossAccountMatch)
-        })
+        startActivity(Intent(this, UpgradeAccountActivity::class.java))
         myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.MANAGER
     }
 

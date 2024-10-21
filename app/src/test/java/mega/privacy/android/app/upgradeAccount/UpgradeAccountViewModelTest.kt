@@ -9,8 +9,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity.Companion.IS_CROSS_ACCOUNT_MATCH
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
 import mega.privacy.android.app.upgradeAccount.model.UserSubscription
@@ -99,7 +97,6 @@ class UpgradeAccountViewModelTest {
 
     private fun initViewModel() {
         underTest = UpgradeAccountViewModel(
-            savedStateHandle = savedStateHandle,
             getMonthlySubscriptionsUseCase = getMonthlySubscriptionsUseCase,
             getYearlySubscriptionsUseCase = getYearlySubscriptionsUseCase,
             getCurrentSubscriptionPlanUseCase = getCurrentSubscriptionPlanUseCase,
@@ -110,19 +107,6 @@ class UpgradeAccountViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
-    }
-
-    @Test
-    fun `test that isCrossAccountMatch should be set based on savedStateHandle value`() = runTest {
-        savedStateHandle[IS_CROSS_ACCOUNT_MATCH] = false
-        whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
-        whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
-
-        initViewModel()
-
-        underTest.state.test {
-            assertThat(awaitItem().isCrossAccountMatch).isFalse()
-        }
     }
 
     @Test

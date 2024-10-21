@@ -14,7 +14,6 @@ import mega.privacy.android.domain.entity.AccountType
  * @property chosenPlan account type chosen by user (when user taps on one of the plans)
  * @property isPaymentMethodAvailable boolean to determine if Payments are available through Google Play Store
  * @property userSubscription user subscription to determine if user has current yearly or monthly subscription
- * @property isCrossAccountMatch boolean to determine if the account passed is the same as the one currently logged in
  * @property showNoAdsFeature boolean to determine if No Ads feature should be shown or hidden (part of the In-App Advertisement experiment)
  * @constructor Create default Upgrade Account state
  */
@@ -28,6 +27,5 @@ data class UpgradeAccountState(
     val chosenPlan: AccountType = AccountType.FREE,
     val isPaymentMethodAvailable: Boolean = true,
     val userSubscription: UserSubscription = UserSubscription.NOT_SUBSCRIBED,
-    val isCrossAccountMatch: Boolean = true,
     val showNoAdsFeature: Boolean = false,
 )

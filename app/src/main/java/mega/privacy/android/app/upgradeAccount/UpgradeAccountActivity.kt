@@ -47,12 +47,4 @@ class UpgradeAccountActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
-
-    companion object {
-
-        /**
-         * Key to save the flag indicating if the match is cross account.
-         */
-        const val IS_CROSS_ACCOUNT_MATCH = "is_cross_account_match"
-    }
 }

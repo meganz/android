@@ -162,10 +162,7 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
 
             Constants.ACTION_SHOW_UPGRADE_ACCOUNT -> Intent(activity, LoginActivity::class.java)
                 .apply {
-                    val isCrossAccountMatch =
-                        intent.getBooleanExtra(UpgradeAccountActivity.IS_CROSS_ACCOUNT_MATCH, false)
                     putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                    putExtra(UpgradeAccountActivity.IS_CROSS_ACCOUNT_MATCH, isCrossAccountMatch)
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     action = Constants.ACTION_SHOW_UPGRADE_ACCOUNT
                 }

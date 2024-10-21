@@ -137,7 +137,6 @@ class UpgradeAccountFragment : Fragment() {
                         }
                     }
                 },
-                showBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(true) },
                 hideBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(false) },
                 onDialogConfirmButtonClicked = {
                     upgradeAccountViewModel.setShowBuyNewSubscriptionDialog(
@@ -152,8 +151,7 @@ class UpgradeAccountFragment : Fragment() {
                     upgradeAccountViewModel.setShowBuyNewSubscriptionDialog(
                         showBuyNewSubscriptionDialog = false
                     )
-                },
-                showUpgradeWarningBanner = uiState.isCrossAccountMatch.not()
+                }
             )
         }
     }
