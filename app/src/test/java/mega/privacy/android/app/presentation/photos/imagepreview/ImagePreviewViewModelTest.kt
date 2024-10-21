@@ -14,6 +14,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewVideoLauncher
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_NODE_FETCHER_SOURCE
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -185,6 +186,27 @@ class ImagePreviewViewModelTest {
             val expectedNodes = underTest.filterNonSensitiveNodes(
                 imageNodes = imageNodes,
                 showHiddenItems = null,
+                isPaid = true,
+                isBusinessAccountExpired = false,
+            )
+            assertThat(expectedNodes).isEqualTo(imageNodes)
+        }
+
+    @Test
+    fun `test that filterNonSensitiveNodes return nodes when from Rubbish Bin regardless of params`() =
+        runTest {
+            commonStub()
+            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+                .thenReturn(ImagePreviewFetcherSource.RUBBISH_BIN)
+            initViewModel()
+            val imageNodes = listOf(
+                createNonSensitiveNode(),
+                createSensitiveNode(),
+            )
+
+            val expectedNodes = underTest.filterNonSensitiveNodes(
+                imageNodes = imageNodes,
+                showHiddenItems = false,
                 isPaid = true,
                 isBusinessAccountExpired = false,
             )
