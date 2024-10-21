@@ -938,7 +938,7 @@ internal class DefaultContactsRepository @Inject constructor(
             userMapper(it)
         }
 
-    override val monitorContactCacheUpdates: Flow<UserUpdate> = monitorContactUpdates()
+    private val _monitorContactCacheUpdates: Flow<UserUpdate> = monitorContactUpdates()
         .filter {
             val validChanges = setOf(
                 UserChanges.Alias,
@@ -956,6 +956,8 @@ internal class DefaultContactsRepository @Inject constructor(
         }
         .catch { Timber.e(it, "updateContactCache failed") }
         .shareIn(sharingScope, SharingStarted.WhileSubscribed())
+
+    override val monitorContactCacheUpdates: Flow<UserUpdate> = _monitorContactCacheUpdates
 
     private suspend fun updateContactCache(userUpdate: UserUpdate) {
         Timber.d("updateContactCache")

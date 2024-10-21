@@ -4,7 +4,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDAT
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
 import static mega.privacy.android.app.utils.Constants.NAME;
@@ -14,10 +13,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import android.content.Context;
 import android.content.Intent;
 
-import com.jeremyliao.liveeventbus.LiveEventBus;
-
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.domain.entity.Contact;
@@ -90,22 +86,6 @@ public class ContactUtil {
         return null;
     }
 
-    /**
-     * Method for obtaining the nickname to be displayed in the notifications in the notifications section.
-     *
-     * @param context Context of Activity.
-     * @param email   The user email.
-     * @return The nickname.
-     */
-    public static String getNicknameForNotificationsSection(Context context, String email) {
-        String nickname = getNicknameContact(email);
-        if (nickname != null) {
-            return String.format(context.getString(R.string.section_notification_user_with_nickname), nickname, email);
-        }
-
-        return email;
-    }
-
     public static String buildFullName(String name, String lastName, String mail) {
         String fullName = "";
         if (!isTextEmpty(name)) {
@@ -149,17 +129,14 @@ public class ContactUtil {
 
     public static void notifyNicknameUpdate(Context context, long userHandle) {
         notifyUserNameUpdate(context, ACTION_UPDATE_NICKNAME, userHandle);
-        LiveEventBus.get(EVENT_CONTACT_NAME_CHANGE, Long.class).post(userHandle);
     }
 
     public static void notifyFirstNameUpdate(Context context, long userHandle) {
         notifyUserNameUpdate(context, ACTION_UPDATE_FIRST_NAME, userHandle);
-        LiveEventBus.get(EVENT_CONTACT_NAME_CHANGE, Long.class).post(userHandle);
     }
 
     public static void notifyLastNameUpdate(Context context, long userHandle) {
         notifyUserNameUpdate(context, ACTION_UPDATE_LAST_NAME, userHandle);
-        LiveEventBus.get(EVENT_CONTACT_NAME_CHANGE, Long.class).post(userHandle);
     }
 
     public static void notifyUserNameUpdate(Context context, String action, long userHandle) {

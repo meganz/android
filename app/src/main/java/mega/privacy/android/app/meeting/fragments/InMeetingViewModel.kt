@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -77,8 +78,13 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
+import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
+import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
+import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarUseCase
 import mega.privacy.android.domain.usecase.call.AmIAloneOnAnyCallUseCase
 import mega.privacy.android.domain.usecase.call.BroadcastCallEndedUseCase
@@ -220,6 +226,8 @@ class InMeetingViewModel @Inject constructor(
     private val getUserAvatarUseCase: GetUserAvatarUseCase,
     private val monitorContactVisibilityUpdateUseCase: MonitorContactVisibilityUpdateUseCase,
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
+    monitorContactCacheUpdates: MonitorContactCacheUpdates,
+    monitorUserUpdates: MonitorUserUpdates,
 ) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
     /**
      * private UI state
@@ -243,6 +251,20 @@ class InMeetingViewModel @Inject constructor(
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
 
     private var meetingLeftTimerJob: Job? = null
+
+    /**
+     * Monitor contact and user update
+     */
+    val monitorContactAndUserUpdate = merge(
+        monitorContactCacheUpdates(),
+        monitorUserUpdates().filter { it == UserChanges.Firstname || it == UserChanges.Lastname }
+            .map {
+                UserUpdate(
+                    changes = mapOf(UserId(getMyUserHandleUseCase()) to listOf(it)),
+                    emailMap = emptyMap()
+                )
+            }
+    )
 
     /**
      * Check if is online (connected to Internet)
@@ -1521,6 +1543,32 @@ class InMeetingViewModel @Inject constructor(
                     else -> participant
                 }
             }?.toMutableList()
+            updateMeetingInfoBottomPanel()
+        }
+        return listWithChanges
+    }
+
+    /**
+     * Update participants name
+     */
+    fun updateParticipantsName(
+        userUpdate: UserUpdate,
+    ): MutableSet<Participant> {
+        val listWithChanges = mutableSetOf<Participant>()
+        participants.value = participants.value?.map { participant ->
+            val userChanges = userUpdate.changes[UserId(participant.peerId)].orEmpty()
+            if (userChanges.any {
+                    it == UserChanges.Lastname || it == UserChanges.Firstname || it == UserChanges.Alias
+                }) {
+                val newName = getParticipantName(participant.peerId)
+                if (newName != participant.name) {
+                    listWithChanges.add(participant)
+                    return@map participant.copy(name = newName)
+                }
+            }
+            return@map participant
+        }?.toMutableList()
+        if (listWithChanges.isNotEmpty()) {
             updateMeetingInfoBottomPanel()
         }
         return listWithChanges

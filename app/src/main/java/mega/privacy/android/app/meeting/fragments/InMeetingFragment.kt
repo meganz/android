@@ -32,7 +32,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.navigation.fragment.findNavController
@@ -40,8 +39,9 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.MegaApplication
@@ -49,7 +49,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.twemoji.EmojiTextView
-import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
@@ -123,7 +122,6 @@ import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import timber.log.Timber
@@ -218,14 +216,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var orientation: Int = Configuration.ORIENTATION_PORTRAIT
 
     val inMeetingViewModel: InMeetingViewModel by activityViewModels()
-
-    private val nameChangeObserver = Observer<Long> { peerId ->
-        if (peerId != MegaApiJava.INVALID_HANDLE) {
-            Timber.d("Change in name")
-            updateParticipantInfo(peerId, NAME_CHANGE)
-        }
-    }
-
 
     /**
      * Method that updates the Bottom panel
@@ -665,9 +655,27 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
+    @FlowPreview
     private fun initLiveEventBus() {
-        LiveEventBus.get(EVENT_CONTACT_NAME_CHANGE, Long::class.java)
-            .observe(this, nameChangeObserver)
+        viewLifecycleOwner.collectFlow(
+            inMeetingViewModel.monitorContactAndUserUpdate
+                .debounce(1000)
+        ) { userUpdate ->
+            Timber.d("Contacts changed $userUpdate")
+            val listParticipants = inMeetingViewModel.updateParticipantsName(userUpdate)
+            if (listParticipants.isNotEmpty()) {
+                gridViewCallFragment?.let {
+                    if (it.isAdded) {
+                        it.updateNameOrAvatar(listParticipants, NAME_CHANGE)
+                    }
+                }
+                speakerViewCallFragment?.let {
+                    if (it.isAdded) {
+                        it.updateNameOrAvatar(listParticipants, NAME_CHANGE)
+                    }
+                }
+            }
+        }
     }
 
     private fun initToolbar() {
@@ -1120,7 +1128,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     }
 
                     false -> updateOnHoldRemote(session = it)
-                    null -> { }
+                    null -> {}
                 }
             }
         }
