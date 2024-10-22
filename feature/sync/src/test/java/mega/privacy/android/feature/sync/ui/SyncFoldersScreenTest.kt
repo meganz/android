@@ -87,6 +87,7 @@ class SyncFoldersScreenTest {
                 state = syncFoldersState,
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
+                isBackupForAndroidEnabled = false,
             )
         }
 
@@ -107,6 +108,7 @@ class SyncFoldersScreenTest {
                 state = SyncFoldersState(emptyList()),
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
+                isBackupForAndroidEnabled = false,
             )
         }
 
@@ -119,6 +121,34 @@ class SyncFoldersScreenTest {
         composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON)
             .assertIsDisplayed()
             .assertTextEquals(context.getString(sharedResR.string.general_upgrade_now_label))
+    }
+
+    @Test
+    fun `test that folders list empty state is properly displayed when backup feature is enabled (free account)`() {
+        whenever(state.value).thenReturn(SyncFoldersState(emptyList()))
+        whenever(viewModel.uiState).thenReturn(state)
+        composeTestRule.setContent {
+            SyncFoldersRoute(
+                viewModel = viewModel,
+                addFolderClicked = {},
+                upgradeAccountClicked = {},
+                issuesInfoClicked = {},
+                state = SyncFoldersState(emptyList()),
+                snackBarHostState = SnackbarHostState(),
+                deviceName = "Device Name",
+                isBackupForAndroidEnabled = true,
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(TAG_SYNC_LIST_SCREEN_NO_ITEMS)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS)
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON)
+            .assertIsDisplayed()
+            .assertTextEquals(context.getString(sharedResR.string.device_center_sync_backup_see_upgrade_options_button_label))
     }
 
     @Test
@@ -140,6 +170,7 @@ class SyncFoldersScreenTest {
                 ),
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
+                isBackupForAndroidEnabled = false,
             )
         }
 
@@ -150,6 +181,37 @@ class SyncFoldersScreenTest {
         composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON)
             .assertIsDisplayed()
             .assertTextEquals(context.getString(sharedResR.string.device_center_sync_add_new_syn_button_option))
+    }
+
+    @Test
+    fun `test that folders list empty state is properly displayed when backup feature is enabled (non free account)`() {
+        whenever(state.value).thenReturn(
+            SyncFoldersState(
+                syncUiItems = emptyList(), isFreeAccount = false
+            )
+        )
+        whenever(viewModel.uiState).thenReturn(state)
+        composeTestRule.setContent {
+            SyncFoldersRoute(
+                viewModel = viewModel,
+                addFolderClicked = {},
+                upgradeAccountClicked = {},
+                issuesInfoClicked = {},
+                state = SyncFoldersState(
+                    syncUiItems = emptyList(), isFreeAccount = false
+                ),
+                snackBarHostState = SnackbarHostState(),
+                deviceName = "Device Name",
+                isBackupForAndroidEnabled = true,
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(TAG_SYNC_LIST_SCREEN_NO_ITEMS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS)
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON)
+            .assertDoesNotExist()
     }
 
     @Test
@@ -165,6 +227,7 @@ class SyncFoldersScreenTest {
                 state = SyncFoldersState(emptyList()),
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
+                isBackupForAndroidEnabled = false,
             )
         }
 
@@ -191,6 +254,7 @@ class SyncFoldersScreenTest {
                 ),
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
+                isBackupForAndroidEnabled = false,
             )
         }
 
@@ -215,6 +279,7 @@ class SyncFoldersScreenTest {
                 showSyncsPausedErrorDialog = false,
                 onShowSyncsPausedErrorDialogDismissed = {},
                 deviceName = "Device Name",
+                isBackupForAndroidEnabled = false,
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE).assertIsDisplayed()

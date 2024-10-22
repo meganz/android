@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
 import androidx.annotation.StringRes
+import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.feature.sync.ui.model.SyncOption
 
 internal data class SyncListState(
@@ -9,4 +10,5 @@ internal data class SyncListState(
     val shouldShowCleanSolvedIssueMenuItem: Boolean = false,
     val selectedSyncOption: SyncOption = SyncOption.WI_FI_OR_MOBILE_DATA,
     val isFreeAccount: Boolean = true,
+    val enabledFlags: Set<Feature> = emptySet(),
 )

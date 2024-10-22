@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
@@ -776,4 +776,12 @@
     <string name="sync_list_sync_state_up_to_date">Up to date</string>
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favourites</string>
+    <!-- Title of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_title">No connections are set up</string>
+    <!-- Message of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_message">Sync or backup a folder on your device with a folder on MEGA</string>
+    <!-- Message of the synced folder list empty state for free accounts -->
+    <string name="device_center_sync_backup_list_empty_state_message_free_account">Upgrade to a premium account to keep your important information safe and up-to-date with sync and backup</string>
+    <!-- Synced folder list empty state "See upgrade options" button label -->
+    <string name="device_center_sync_backup_see_upgrade_options_button_label">See upgrade options</string>
 </resources>

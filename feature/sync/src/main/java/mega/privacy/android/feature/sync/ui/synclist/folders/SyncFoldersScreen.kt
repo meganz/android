@@ -64,6 +64,7 @@ internal fun SyncFoldersScreen(
     showSyncsPausedErrorDialog: Boolean,
     onShowSyncsPausedErrorDialogDismissed: () -> Unit,
     deviceName: String,
+    isBackupForAndroidEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -83,6 +84,7 @@ internal fun SyncFoldersScreen(
                         isFreeAccount = isFreeAccount,
                         addFolderClicked = addFolderClicked,
                         upgradeNowClicked = upgradeAccountClicked,
+                        isBackupForAndroidEnabled = isBackupForAndroidEnabled,
                         modifier = Modifier
                             .fillParentMaxHeight()
                             .fillParentMaxWidth()
@@ -131,60 +133,106 @@ private fun SyncFoldersScreenEmptyState(
     isFreeAccount: Boolean,
     addFolderClicked: () -> Unit,
     upgradeNowClicked: () -> Unit,
+    isBackupForAndroidEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 32.dp),
+        modifier = if (isBackupForAndroidEnabled) {
+            modifier
+                .verticalScroll(rememberScrollState())
+                .padding(all = 48.dp)
+        } else {
+            modifier
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 32.dp)
+        },
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = if (isBackupForAndroidEnabled) {
+            Arrangement.Top
+        } else {
+            Arrangement.Center
+        }
     ) {
         Image(
             painterResource(R.drawable.no_syncs_placeholder),
             contentDescription = "Sync folders empty state image",
         )
         MegaText(
-            text = stringResource(id = sharedResR.string.device_center_sync_list_empty_state_title),
+            text = if (isBackupForAndroidEnabled) {
+                stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_title)
+            } else {
+                stringResource(id = sharedResR.string.device_center_sync_list_empty_state_title)
+            },
             textColor = TextColor.Primary,
             modifier = Modifier.padding(top = 32.dp),
             style = MaterialTheme.typography.h6Medium
         )
-        val messageTypography =
-            if (isFreeAccount) MaterialTheme.typography.subtitle2medium else MaterialTheme.typography.subtitle2
-        MegaText(
-            text = stringResource(id = sharedResR.string.device_center_sync_list_empty_state_message),
-            textColor = if (isFreeAccount) TextColor.Primary else TextColor.Secondary,
-            modifier = Modifier.padding(top = 16.dp),
-            style = messageTypography.copy(textAlign = TextAlign.Center),
-        )
-        if (isFreeAccount) {
+        if (isBackupForAndroidEnabled) {
             MegaText(
-                text = stringResource(id = sharedResR.string.device_center_sync_list_empty_state_message_free_account),
+                text = if (isFreeAccount) {
+                    stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_message_free_account)
+                } else {
+                    stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_message)
+                },
                 textColor = TextColor.Secondary,
                 modifier = Modifier
                     .padding(top = 16.dp)
-                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS),
+                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT),
                 style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
             )
+        } else {
+            val messageTypography =
+                if (isFreeAccount) MaterialTheme.typography.subtitle2medium else MaterialTheme.typography.subtitle2
+            MegaText(
+                text = stringResource(id = sharedResR.string.device_center_sync_list_empty_state_message),
+                textColor = if (isFreeAccount) TextColor.Primary else TextColor.Secondary,
+                modifier = Modifier.padding(top = 16.dp),
+                style = messageTypography.copy(textAlign = TextAlign.Center),
+            )
+            if (isFreeAccount) {
+                MegaText(
+                    text = stringResource(id = sharedResR.string.device_center_sync_list_empty_state_message_free_account),
+                    textColor = TextColor.Secondary,
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS),
+                    style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
+                )
+            }
         }
 
         val isLandscape =
             LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-        RaisedDefaultMegaButton(
-            textId = if (isFreeAccount) sharedResR.string.general_upgrade_now_label else sharedResR.string.device_center_sync_add_new_syn_button_option,
-            onClick = if (isFreeAccount) {
-                Analytics.tracker.trackEvent(SyncListEmptyStateUpgradeButtonPressedEvent)
-                upgradeNowClicked
-            } else {
-                addFolderClicked
-            },
-            modifier = Modifier
-                .padding(top = if (isLandscape) 32.dp else if (isFreeAccount) 108.dp else 162.dp)
-                .defaultMinSize(minWidth = 232.dp)
-                .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON),
-        )
+        if (isBackupForAndroidEnabled) {
+            if (isFreeAccount) {
+                RaisedDefaultMegaButton(
+                    textId = sharedResR.string.device_center_sync_backup_see_upgrade_options_button_label,
+                    onClick = {
+                        Analytics.tracker.trackEvent(SyncListEmptyStateUpgradeButtonPressedEvent)
+                        upgradeNowClicked()
+                    },
+                    modifier = Modifier
+                        .padding(top = if (isLandscape) 32.dp else 144.dp)
+                        .defaultMinSize(minWidth = 232.dp)
+                        .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON),
+                )
+            }
+        } else {
+            RaisedDefaultMegaButton(
+                textId = if (isFreeAccount) sharedResR.string.general_upgrade_now_label else sharedResR.string.device_center_sync_add_new_syn_button_option,
+                onClick = if (isFreeAccount) {
+                    Analytics.tracker.trackEvent(SyncListEmptyStateUpgradeButtonPressedEvent)
+                    upgradeNowClicked
+                } else {
+                    addFolderClicked
+                },
+                modifier = Modifier
+                    .padding(top = if (isLandscape) 32.dp else if (isFreeAccount) 108.dp else 162.dp)
+                    .defaultMinSize(minWidth = 232.dp)
+                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON),
+            )
+        }
     }
 }
 
@@ -230,6 +278,7 @@ private fun SyncFoldersScreenEmptyStatePreview(
             showSyncsPausedErrorDialog = false,
             onShowSyncsPausedErrorDialogDismissed = {},
             deviceName = "Device Name",
+            isBackupForAndroidEnabled = true,
         )
     }
 }
@@ -255,6 +304,7 @@ private fun SyncFoldersScreenLoadingStatePreview() {
             showSyncsPausedErrorDialog = false,
             onShowSyncsPausedErrorDialogDismissed = {},
             deviceName = "Device Name",
+            isBackupForAndroidEnabled = true,
         )
     }
 }
@@ -291,6 +341,7 @@ private fun SyncFoldersScreenSyncingPreview(
             showSyncsPausedErrorDialog = false,
             onShowSyncsPausedErrorDialogDismissed = {},
             deviceName = "Device Name",
+            isBackupForAndroidEnabled = true,
         )
     }
 }
@@ -327,10 +378,13 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview(
             showSyncsPausedErrorDialog = false,
             onShowSyncsPausedErrorDialogDismissed = {},
             deviceName = "Device Name",
+            isBackupForAndroidEnabled = true,
         )
     }
 }
 
+internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT =
+    "sync_list_screen_empty_status_text"
 internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS =
     "sync_list_screen_empty_status_text_for_free_accounts"
 internal const val TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON =

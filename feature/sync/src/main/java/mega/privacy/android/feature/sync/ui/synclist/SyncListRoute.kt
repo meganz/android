@@ -22,6 +22,7 @@ import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIs
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLatestModifiedTimeEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLocalFileEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseRemoteFileEvent
@@ -71,6 +72,11 @@ internal fun SyncListRoute(
                 showUpgradeDialog = true
             } else {
                 onBackupFolderClicked()
+            }
+        },
+        onAddFolderClicked = {
+            if (state.isFreeAccount) {
+                showUpgradeDialog = true
             }
         },
         actionSelected = { item, selectedAction ->
@@ -140,9 +146,18 @@ internal fun SyncListRoute(
 
     if (showUpgradeDialog) {
         Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogDisplayedEvent)
+        val isBackupForAndroidEnabled = state.enabledFlags.contains(SyncFeatures.BackupForAndroid)
         MegaAlertDialog(
-            title = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_title),
-            body = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_message),
+            title = if (isBackupForAndroidEnabled) {
+                stringResource(id = sharedR.string.device_center_sync_backup_upgrade_dialog_title)
+            } else {
+                stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_title)
+            },
+            body = if (isBackupForAndroidEnabled) {
+                stringResource(id = sharedR.string.device_center_sync_backup_upgrade_dialog_message)
+            } else {
+                stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_message)
+            },
             confirmButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_confirm_button),
             cancelButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_cancel_button),
             onConfirm = {

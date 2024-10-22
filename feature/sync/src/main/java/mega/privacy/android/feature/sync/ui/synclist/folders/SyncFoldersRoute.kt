@@ -31,6 +31,7 @@ internal fun SyncFoldersRoute(
     state: SyncFoldersState,
     snackBarHostState: SnackbarHostState,
     deviceName: String,
+    isBackupForAndroidEnabled: Boolean,
 ) {
     SyncFoldersScreen(
         syncUiItems = state.syncUiItems,
@@ -52,6 +53,7 @@ internal fun SyncFoldersRoute(
             viewModel.handleAction(OnSyncsPausedErrorDialogDismissed)
         },
         deviceName = deviceName,
+        isBackupForAndroidEnabled = isBackupForAndroidEnabled,
     )
 
     state.syncUiItemToRemove?.let { syncUiItemToRemove ->

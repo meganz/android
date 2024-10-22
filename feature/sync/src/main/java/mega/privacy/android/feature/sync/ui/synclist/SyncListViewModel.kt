@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
@@ -22,6 +23,7 @@ import mega.privacy.android.feature.sync.domain.usecase.solvedissue.ClearSyncSol
 import mega.privacy.android.feature.sync.domain.usecase.solvedissue.MonitorSyncSolvedIssuesUseCase
 import mega.privacy.android.feature.sync.ui.mapper.stalledissue.StalledIssueItemMapper
 import mega.privacy.android.feature.sync.ui.model.SyncOption
+import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -36,17 +38,33 @@ internal class SyncListViewModel @Inject constructor(
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
     private val getAccountTypeUseCase: GetAccountTypeUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncListState())
     val state: StateFlow<SyncListState> = _state.asStateFlow()
 
     init {
+        checkFeatureFlags()
         observeOnboardingFlow()
         monitorStalledIssue()
         monitorSolvedIssue()
         monitorSyncByWifiSetting()
         getAndMonitorAccountType()
+    }
+
+    private fun checkFeatureFlags() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(SyncFeatures.BackupForAndroid)
+            }.onSuccess { isBackupForAndroidEnabled ->
+                if (isBackupForAndroidEnabled) {
+                    _state.update {
+                        it.copy(enabledFlags = state.value.enabledFlags.plus(SyncFeatures.BackupForAndroid))
+                    }
+                }
+            }.onFailure(Timber::e)
+        }
     }
 
     private fun observeOnboardingFlow() {

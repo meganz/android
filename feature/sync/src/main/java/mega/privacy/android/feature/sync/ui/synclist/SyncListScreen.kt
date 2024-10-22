@@ -78,6 +78,7 @@ internal fun SyncListScreen(
     stalledIssuesCount: Int,
     onSyncFolderClicked: () -> Unit,
     onBackupFolderClicked: () -> Unit,
+    onAddFolderClicked: () -> Unit,
     actionSelected: (item: StalledIssueUiItem, selectedAction: StalledIssueResolutionAction) -> Unit,
     snackBarHostState: SnackbarHostState,
     syncPermissionsManager: SyncPermissionsManager,
@@ -156,26 +157,42 @@ internal fun SyncListScreen(
                 )
             },
             floatingActionButton = {
-                if (syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) {
-                    if (isBackupForAndroidEnabled) {
-                        MegaMultiFloatingActionButton(
-                            items = listOf(
-                                MultiFloatingActionButtonItem(
-                                    icon = painterResource(id = iconPackR.drawable.ic_sync_01),
-                                    label = stringResource(id = R.string.sync_toolbar_title),
-                                    onClicked = onSyncFolderClicked,
+                if (isBackupForAndroidEnabled) {
+                    when {
+                        syncFoldersState.isFreeAccount && syncFoldersState.syncUiItems.isNotEmpty() -> {
+                            MegaFloatingActionButton(
+                                onClick = onAddFolderClicked,
+                                modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
+                            ) {
+                                Icon(
+                                    painter = painterResource(CoreUiR.drawable.ic_plus),
+                                    contentDescription = null,
+                                )
+                            }
+                        }
+
+                        syncFoldersState.isFreeAccount.not() -> {
+                            MegaMultiFloatingActionButton(
+                                items = listOf(
+                                    MultiFloatingActionButtonItem(
+                                        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                                        label = stringResource(id = R.string.sync_toolbar_title),
+                                        onClicked = onSyncFolderClicked,
+                                    ),
+                                    MultiFloatingActionButtonItem(
+                                        icon = painterResource(id = iconPackR.drawable.ic_database),
+                                        label = stringResource(id = sharedResR.string.sync_add_new_backup_toolbar_title),
+                                        onClicked = onBackupFolderClicked,
+                                    ),
                                 ),
-                                MultiFloatingActionButtonItem(
-                                    icon = painterResource(id = iconPackR.drawable.ic_database),
-                                    label = stringResource(id = sharedResR.string.sync_add_new_backup_toolbar_title),
-                                    onClicked = onBackupFolderClicked,
-                                ),
-                            ),
-                            modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB),
-                            multiFabState = multiFabState,
-                            onStateChanged = { state -> multiFabState.value = state }
-                        )
-                    } else {
+                                modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB),
+                                multiFabState = multiFabState,
+                                onStateChanged = { state -> multiFabState.value = state }
+                            )
+                        }
+                    }
+                } else {
+                    if (syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) {
                         MegaFloatingActionButton(
                             onClick = onSyncFolderClicked,
                             modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
@@ -319,6 +336,7 @@ private fun SyncListScreenContent(
                 syncFoldersState = syncFoldersState,
                 snackBarHostState = snackBarHostState,
                 deviceName = deviceName,
+                isBackupForAndroidEnabled = syncFoldersState.enabledFlags.contains(SyncFeatures.BackupForAndroid),
             )
             PullRefreshIndicator(
                 modifier = Modifier.align(Alignment.TopCenter),
@@ -373,6 +391,7 @@ private fun SelectedChipScreen(
     syncFoldersState: SyncFoldersState,
     snackBarHostState: SnackbarHostState,
     deviceName: String,
+    isBackupForAndroidEnabled: Boolean,
 ) {
     when (checkedChip) {
         SYNC_FOLDERS -> {
@@ -384,6 +403,7 @@ private fun SelectedChipScreen(
                 state = syncFoldersState,
                 snackBarHostState = snackBarHostState,
                 deviceName = deviceName,
+                isBackupForAndroidEnabled = isBackupForAndroidEnabled,
             )
         }
 
