@@ -200,7 +200,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     StartDownloadsInWorker(
         "Start downloads in the worker instead of in the view model",
-        false,
+        true,
     ),
     ;
 
