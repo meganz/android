@@ -522,7 +522,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        initLiveEventBus()
         takeActionByArgs()
 
         // Set on page tapping listener.
@@ -650,29 +649,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         outMetrics.widthPixels,
                         outMetrics.heightPixels
                     )
-                }
-            }
-        }
-    }
-
-    @FlowPreview
-    private fun initLiveEventBus() {
-        viewLifecycleOwner.collectFlow(
-            inMeetingViewModel.monitorContactAndUserUpdate
-                .debounce(1000)
-        ) { userUpdate ->
-            Timber.d("Contacts changed $userUpdate")
-            val listParticipants = inMeetingViewModel.updateParticipantsName(userUpdate)
-            if (listParticipants.isNotEmpty()) {
-                gridViewCallFragment?.let {
-                    if (it.isAdded) {
-                        it.updateNameOrAvatar(listParticipants, NAME_CHANGE)
-                    }
-                }
-                speakerViewCallFragment?.let {
-                    if (it.isAdded) {
-                        it.updateNameOrAvatar(listParticipants, NAME_CHANGE)
-                    }
                 }
             }
         }
@@ -1270,6 +1246,26 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.isInPipMode }) {
             checkChildFragments()
             Timber.d("Currently Picture in Picture Mode is $it")
+        }
+
+        viewLifecycleOwner.collectFlow(
+            inMeetingViewModel.monitorContactAndUserUpdate
+                .debounce(1000)
+        ) { userUpdate ->
+            Timber.d("Contacts changed $userUpdate")
+            val listParticipants = inMeetingViewModel.updateParticipantsName(userUpdate)
+            if (listParticipants.isNotEmpty()) {
+                gridViewCallFragment?.let {
+                    if (it.isAdded) {
+                        it.updateNameOrAvatar(listParticipants, NAME_CHANGE)
+                    }
+                }
+                speakerViewCallFragment?.let {
+                    if (it.isAdded) {
+                        it.updateNameOrAvatar(listParticipants, NAME_CHANGE)
+                    }
+                }
+            }
         }
     }
 

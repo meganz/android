@@ -18,7 +18,6 @@ import coil.decode.VideoFrameDecoder
 import com.google.android.gms.ads.MobileAds
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.Lazy
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
@@ -225,7 +224,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         themeModeState.initialise()
         callChangesObserver.init()
-        LiveEventBus.config().enableLogger(false)
 
         // Setup handler and RxJava for uncaught exceptions.
         if (!BuildConfig.DEBUG) {

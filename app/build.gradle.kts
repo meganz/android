@@ -172,7 +172,6 @@ dependencies {
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
     implementation(project(":shared:sync"))
     "baselineProfile"(project(":baselineprofile"))
-    implementation(project(":liveeventbus-x"))
     implementation(project(":analytics"))
     implementation(project(":icon-pack"))
     implementation(project(":feature:sync"))
