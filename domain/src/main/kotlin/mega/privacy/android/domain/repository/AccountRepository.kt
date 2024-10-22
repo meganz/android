@@ -691,4 +691,20 @@ interface AccountRepository {
      * @return [Int] The storage state
      */
     suspend fun getStorageState(): StorageState
+
+    /**
+     * Set timestamp when user closed Almost Full Storage Quota warning banner
+     *
+     * @param timestamp
+     */
+    suspend fun setAlmostFullStorageBannerClosingTimestamp(timestamp: Long)
+
+    /**
+     * Get the timestamp, when the almost full storage quota banner was closed
+     *
+     * @return Flow of timestamp
+     */
+    fun monitorAlmostFullStorageBannerClosingTimestamp(): Flow<Long?>
+
+
 }

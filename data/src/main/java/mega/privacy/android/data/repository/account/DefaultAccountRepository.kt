@@ -38,6 +38,7 @@ import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPrefer
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
+import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountDetailMapper
@@ -135,6 +136,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property cameraUploadsSettingsPreferenceGateway [CameraUploadsSettingsPreferenceGateway]
  * @property cookieSettingsMapper         [CookieSettingsMapper]
  * @property storageStateMapper           [StorageStateMapper]
+ * @property uiPreferencesGateway         [UIPreferencesGateway]
  */
 @ExperimentalContracts
 internal class DefaultAccountRepository @Inject constructor(
@@ -174,6 +176,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>,
     private val userMapper: UserMapper,
     private val storageStateMapper: StorageStateMapper,
+    private val uiPreferencesGateway: UIPreferencesGateway,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -1345,6 +1348,17 @@ internal class DefaultAccountRepository @Inject constructor(
                 megaApiGateway.getUserAttribute(storageStateUserAttribute, listener)
             }
         }
+
+    override suspend fun setAlmostFullStorageBannerClosingTimestamp(timestamp: Long) {
+        withContext(ioDispatcher) {
+            uiPreferencesGateway.setAlmostFullStorageBannerClosingTimestamp(
+                timestamp
+            )
+        }
+    }
+
+    override fun monitorAlmostFullStorageBannerClosingTimestamp(): Flow<Long?> =
+        uiPreferencesGateway.monitorAlmostFullStorageBannerClosingTimestamp().flowOn(ioDispatcher)
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"

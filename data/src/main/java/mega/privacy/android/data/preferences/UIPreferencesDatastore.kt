@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -21,6 +22,8 @@ private const val MEDIA_DISCOVERY_VIEW = "MEDIA_DISCOVERY_VIEW"
 private const val SUBFOLDER_MEDIA_DISCOVERY = "SUBFOLDER_MEDIA_DISCOVERY"
 private const val SHOW_OFFLINE_WARNING_VIEW = "SHOW_OFFLINE_WARNING_VIEW"
 private const val VIEW_TYPE = "VIEW_TYPE"
+private const val ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP =
+    "ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP"
 private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
     name = USER_INTERFACE_PREFERENCES,
     produceMigrations = {
@@ -45,6 +48,8 @@ internal class UIPreferencesDatastore @Inject constructor(
     private val subFolderMediaDiscoveryKey = booleanPreferencesKey(SUBFOLDER_MEDIA_DISCOVERY)
     private val viewTypeKey = intPreferencesKey(VIEW_TYPE)
     private val offlineWarningViewKey = booleanPreferencesKey(SHOW_OFFLINE_WARNING_VIEW)
+    private val almostFullStorageBannerClosingTimestampKey =
+        longPreferencesKey(ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP)
 
     override fun monitorPreferredStartScreen() =
         context.uiPreferenceDataStore.monitor(preferredStartScreenKey)
@@ -100,5 +105,14 @@ internal class UIPreferencesDatastore @Inject constructor(
 
     override fun monitorOfflineWarningMessageVisibility(): Flow<Boolean?> =
         context.uiPreferenceDataStore.monitor(offlineWarningViewKey)
+
+    override fun monitorAlmostFullStorageBannerClosingTimestamp(): Flow<Long?> =
+        context.uiPreferenceDataStore.monitor(almostFullStorageBannerClosingTimestampKey)
+
+    override suspend fun setAlmostFullStorageBannerClosingTimestamp(timestamp: Long) {
+        context.uiPreferenceDataStore.edit {
+            it[almostFullStorageBannerClosingTimestampKey] = timestamp
+        }
+    }
 
 }

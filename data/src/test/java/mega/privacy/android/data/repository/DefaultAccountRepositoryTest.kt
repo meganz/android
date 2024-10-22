@@ -23,6 +23,7 @@ import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPrefer
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
+import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
@@ -136,6 +137,7 @@ class DefaultAccountRepositoryTest {
     private val cookieSettingsMapper = mock<CookieSettingsMapper>()
     private val cookieSettingsIntMapper = mock<CookieSettingsIntMapper>()
     private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
+    private val uiPreferencesGateway = mock<UIPreferencesGateway>()
     private val userUpdateMapper =
         mock<UserUpdateMapper> {
             on { invoke(any()) } doReturn UserUpdate(
@@ -205,6 +207,7 @@ class DefaultAccountRepositoryTest {
             cookieSettingsIntMapper,
             credentialsPreferencesGateway,
             storageStateMapper,
+            uiPreferencesGateway
         )
     }
 
@@ -249,6 +252,7 @@ class DefaultAccountRepositoryTest {
             credentialsPreferencesGateway = { credentialsPreferencesGateway },
             userMapper = userMapper,
             storageStateMapper = storageStateMapper,
+            uiPreferencesGateway = uiPreferencesGateway
         )
 
     }
@@ -1997,6 +2001,27 @@ class DefaultAccountRepositoryTest {
             whenever(storageStateMapper(any())).thenReturn(StorageState.Unknown)
             assertThrows<MegaException> {
                 underTest.getStorageState()
+            }
+        }
+
+    @Test
+    fun `test that uiPreferencesGateway sets timestamp when almost full storage quota banner was closed`() =
+        runTest {
+            val timestamp = 123456L
+            underTest.setAlmostFullStorageBannerClosingTimestamp(timestamp)
+            verify(uiPreferencesGateway).setAlmostFullStorageBannerClosingTimestamp(timestamp)
+        }
+
+    @Test
+    fun `test that uiPreferencesGateway invokes monitorAlmostFullStorageBannerClosingTimestamp function`() =
+        runTest {
+            val timestamp = 123456L
+            whenever(uiPreferencesGateway.monitorAlmostFullStorageBannerClosingTimestamp()).thenReturn(
+                flowOf(timestamp)
+            )
+            underTest.monitorAlmostFullStorageBannerClosingTimestamp().test {
+                assertThat(awaitItem()).isEqualTo(timestamp)
+                cancelAndIgnoreRemainingEvents()
             }
         }
 }

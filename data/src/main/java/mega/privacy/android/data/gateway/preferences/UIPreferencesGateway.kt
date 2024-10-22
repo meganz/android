@@ -91,4 +91,18 @@ interface UIPreferencesGateway {
      */
     fun monitorOfflineWarningMessageVisibility(): Flow<Boolean?>
 
+    /**
+     * Set almost full storage quota banner timestamp
+     *
+     * @param timestamp
+     */
+    suspend fun setAlmostFullStorageBannerClosingTimestamp(timestamp: Long)
+
+    /**
+     * Monitor almost full storage quota banner timestamp
+     *
+     * @return almost full storage quota banner timestamp
+     */
+    fun monitorAlmostFullStorageBannerClosingTimestamp(): Flow<Long?>
+
 }
