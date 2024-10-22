@@ -991,6 +991,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.isOneToOneCall }
+            .distinctUntilChanged()) {
+            it?.let { isOneToOneCall ->
+                updatePanel()
+            }
+        }
+
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.call?.status }
             .distinctUntilChanged()) { callStatus ->
             callStatus?.let { status ->
@@ -1008,7 +1015,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     }
 
                     ChatCallStatus.InProgress -> {
-                        updatePanel()
                         bottomFloatingPanelViewHolder?.disableEnableButtons(true)
                         checkMenuItemsVisibility()
                         checkChildFragments()
@@ -1524,7 +1530,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             if (inMeetingViewModel.state.value.hasLocalVideo) {
                 sharedModel.camInitiallyOn()
             }
-            updatePanel()
             return
         }
     }

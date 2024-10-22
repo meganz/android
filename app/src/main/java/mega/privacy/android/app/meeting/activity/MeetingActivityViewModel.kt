@@ -2142,8 +2142,9 @@ class MeetingActivityViewModel @Inject constructor(
 
             chatParticipantsNotInCall.find { it.handle == chatParticipant.handle }
                 ?.let { participant ->
-                    if (participantAdded) {
-                        chatParticipantsNotInCall.remove(participant)
+                    chatParticipantsNotInCall.remove(participant)
+                    if (!participantAdded) {
+                        chatParticipantsNotInCall.add(chatParticipant)
                     }
                 } ?: run {
                 if (!participantAdded) {
