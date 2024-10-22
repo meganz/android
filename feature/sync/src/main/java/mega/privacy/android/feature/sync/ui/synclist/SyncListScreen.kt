@@ -23,11 +23,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
@@ -46,10 +48,19 @@ import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIs
 import mega.privacy.android.feature.sync.ui.views.ConflictDetailsDialog
 import mega.privacy.android.feature.sync.ui.views.IssuesResolutionDialog
 import mega.privacy.android.feature.sync.ui.views.SyncPermissionWarningBanner
+import mega.privacy.android.icon.pack.R as iconPackR
+import androidx.compose.material.Icon
+import androidx.compose.ui.platform.testTag
+import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_FAB
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.banners.ActionBanner
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
+import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaFloatingActionButton
+import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaMultiFloatingActionButton
+import mega.privacy.android.shared.original.core.ui.controls.buttons.MultiFloatingActionButtonItem
+import mega.privacy.android.shared.original.core.ui.controls.buttons.MultiFloatingActionButtonState
+import mega.privacy.android.shared.original.core.ui.controls.buttons.rememberMultiFloatingActionButtonState
 import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
@@ -57,13 +68,16 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.mobile.analytics.event.SyncListBannerUpgradeButtonPressedEvent
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun SyncListScreen(
     stalledIssuesCount: Int,
-    addFolderClicked: () -> Unit,
+    onSyncFolderClicked: () -> Unit,
+    onBackupFolderClicked: () -> Unit,
     actionSelected: (item: StalledIssueUiItem, selectedAction: StalledIssueResolutionAction) -> Unit,
     snackBarHostState: SnackbarHostState,
     syncPermissionsManager: SyncPermissionsManager,
@@ -88,6 +102,10 @@ internal fun SyncListScreen(
     )
 
     val scaffoldState = rememberScaffoldState(snackbarHostState = snackBarHostState)
+
+    val syncFoldersState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
+    val isBackupForAndroidEnabled =
+        syncFoldersState.enabledFlags.contains(SyncFeatures.BackupForAndroid)
 
     BottomSheet(
         modalSheetState = modalSheetState,
@@ -122,6 +140,7 @@ internal fun SyncListScreen(
             }
         }
     ) {
+        val multiFabState = rememberMultiFloatingActionButtonState()
         MegaScaffold(
             scaffoldState = scaffoldState,
             topBar = {
@@ -135,6 +154,44 @@ internal fun SyncListScreen(
                     actions = actions,
                     onActionPressed = onActionPressed
                 )
+            },
+            floatingActionButton = {
+                if (syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) {
+                    if (isBackupForAndroidEnabled) {
+                        MegaMultiFloatingActionButton(
+                            items = listOf(
+                                MultiFloatingActionButtonItem(
+                                    icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                                    label = stringResource(id = R.string.sync_toolbar_title),
+                                    onClicked = onSyncFolderClicked,
+                                ),
+                                MultiFloatingActionButtonItem(
+                                    icon = painterResource(id = iconPackR.drawable.ic_database),
+                                    label = stringResource(id = sharedResR.string.sync_add_new_backup_toolbar_title),
+                                    onClicked = onBackupFolderClicked,
+                                ),
+                            ),
+                            modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB),
+                            multiFabState = multiFabState,
+                            onStateChanged = { state -> multiFabState.value = state }
+                        )
+                    } else {
+                        MegaFloatingActionButton(
+                            onClick = onSyncFolderClicked,
+                            modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
+                        ) {
+                            Icon(
+                                painter = painterResource(CoreUiR.drawable.ic_plus),
+                                contentDescription = stringResource(id = sharedResR.string.device_center_sync_add_new_syn_button_option),
+                            )
+                        }
+                    }
+                }
+            },
+            blurContent = if (isBackupForAndroidEnabled && multiFabState.value == MultiFloatingActionButtonState.EXPANDED) { ->
+                multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
+            } else {
+                null
             },
             content = { paddingValues ->
                 SyncListScreenContent(
@@ -153,7 +210,7 @@ internal fun SyncListScreen(
                             modalSheetState.show()
                         }
                     },
-                    addFolderClicked = addFolderClicked,
+                    addFolderClicked = onSyncFolderClicked,
                     syncPermissionsManager = syncPermissionsManager,
                     onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
                     syncFoldersViewModel = syncFoldersViewModel,

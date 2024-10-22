@@ -22,6 +22,7 @@ import mega.privacy.android.domain.usecase.account.IsProAccountUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -40,6 +41,7 @@ import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
+import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -71,6 +73,7 @@ class SyncFoldersViewModelTest {
     private val isProAccountUseCase: IsProAccountUseCase = mock()
     private val getRootNodeUseCase: GetRootNodeUseCase = mock()
     private val moveDeconfiguredBackupNodesUseCase: MoveDeconfiguredBackupNodesUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private lateinit var underTest: SyncFoldersViewModel
 
     private val folderPairs = listOf(
@@ -157,6 +160,7 @@ class SyncFoldersViewModelTest {
             isProAccountUseCase,
             getRootNodeUseCase,
             moveDeconfiguredBackupNodesUseCase,
+            getFeatureFlagValueUseCase,
         )
     }
 
@@ -340,6 +344,13 @@ class SyncFoldersViewModelTest {
         assertThat(underTest.uiState.value.isFreeAccount).isTrue()
     }
 
+    @Test
+    fun `test that check feature flags method updates the state properly`() = runTest {
+        whenever(getFeatureFlagValueUseCase(SyncFeatures.BackupForAndroid)).thenReturn(true)
+        initViewModel()
+        assertThat(underTest.uiState.value.enabledFlags.contains(SyncFeatures.BackupForAndroid))
+    }
+
     private fun getSyncUiItem(status: SyncStatus): SyncUiItem = SyncUiItem(
         id = 3L,
         syncType = SyncType.TYPE_TWOWAY,
@@ -370,6 +381,7 @@ class SyncFoldersViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getRootNodeUseCase = getRootNodeUseCase,
             moveDeconfiguredBackupNodesUseCase = moveDeconfiguredBackupNodesUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 }

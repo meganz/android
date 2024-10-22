@@ -35,7 +35,9 @@ import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
+import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -57,6 +59,7 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val moveDeconfiguredBackupNodesUseCase: MoveDeconfiguredBackupNodesUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SyncFoldersState(emptyList()))
@@ -65,6 +68,7 @@ internal class SyncFoldersViewModel @Inject constructor(
     private var showSyncsPausedErrorDialogShown = false
 
     init {
+        checkFeatureFlags()
         viewModelScope.launch {
             runCatching {
                 _uiState.update { state -> state.copy(isLoading = true) }
@@ -94,6 +98,20 @@ internal class SyncFoldersViewModel @Inject constructor(
                 }
                 checkOverQuotaStatus()
             }
+        }
+    }
+
+    private fun checkFeatureFlags() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(SyncFeatures.BackupForAndroid)
+            }.onSuccess { isBackupForAndroidEnabled ->
+                if (isBackupForAndroidEnabled) {
+                    _uiState.update {
+                        it.copy(enabledFlags = uiState.value.enabledFlags.plus(SyncFeatures.BackupForAndroid))
+                    }
+                }
+            }.onFailure(Timber::e)
         }
     }
 

@@ -214,11 +214,19 @@ internal fun NavGraphBuilder.syncNavGraph(
             SyncListRoute(
                 hiltViewModel(),
                 syncPermissionsManager,
-                addFolderClicked = {
+                onSyncFolderClicked = {
                     Analytics.tracker.trackEvent(AndroidSyncFABButtonEvent)
                     navController.navigate(
                         getSyncNewFolderRoute(
                             syncType = SyncType.TYPE_TWOWAY,
+                            deviceName = deviceName
+                        )
+                    )
+                },
+                onBackupFolderClicked = {
+                    navController.navigate(
+                        getSyncNewFolderRoute(
+                            syncType = SyncType.TYPE_BACKUP,
                             deviceName = deviceName
                         )
                     )

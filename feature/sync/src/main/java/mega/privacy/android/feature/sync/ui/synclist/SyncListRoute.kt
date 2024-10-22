@@ -38,7 +38,8 @@ import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogUpgradeButton
 internal fun SyncListRoute(
     viewModel: SyncListViewModel,
     syncPermissionsManager: SyncPermissionsManager,
-    addFolderClicked: () -> Unit,
+    onSyncFolderClicked: () -> Unit,
+    onBackupFolderClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
@@ -58,11 +59,18 @@ internal fun SyncListRoute(
 
     SyncListScreen(
         stalledIssuesCount = state.stalledIssuesCount,
-        addFolderClicked = {
+        onSyncFolderClicked = {
             if (state.isFreeAccount) {
                 showUpgradeDialog = true
             } else {
-                addFolderClicked()
+                onSyncFolderClicked()
+            }
+        },
+        onBackupFolderClicked = {
+            if (state.isFreeAccount) {
+                showUpgradeDialog = true
+            } else {
+                onBackupFolderClicked()
             }
         },
         actionSelected = { item, selectedAction ->
@@ -112,7 +120,7 @@ internal fun SyncListRoute(
                     if (state.isFreeAccount) {
                         showUpgradeDialog = true
                     } else {
-                        addFolderClicked()
+                        onSyncFolderClicked()
                     }
                 }
 

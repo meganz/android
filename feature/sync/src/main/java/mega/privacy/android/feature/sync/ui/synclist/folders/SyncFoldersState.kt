@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
 import androidx.annotation.StringRes
+import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 
 internal data class SyncFoldersState(
@@ -14,4 +15,5 @@ internal data class SyncFoldersState(
     val showConfirmRemoveSyncFolderDialog: Boolean = false,
     val syncUiItemToRemove: SyncUiItem? = null,
     @StringRes val snackbarMessage: Int? = null,
+    val enabledFlags: Set<Feature> = emptySet(),
 )

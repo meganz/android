@@ -92,7 +92,8 @@ class SyncListRouteTest {
             SyncListRoute(
                 viewModel = viewModel,
                 syncPermissionsManager = syncPermissionsManager,
-                addFolderClicked = {},
+                onSyncFolderClicked = {},
+                onBackupFolderClicked = {},
                 onOpenUpgradeAccountClicked = {},
                 syncFoldersViewModel = syncFoldersViewModel,
                 syncStalledIssuesViewModel = syncStalledIssuesViewModel,

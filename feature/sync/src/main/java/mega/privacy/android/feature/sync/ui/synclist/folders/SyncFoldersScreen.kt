@@ -15,11 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -126,20 +122,6 @@ internal fun SyncFoldersScreen(
                 onDismiss = onShowSyncsPausedErrorDialogDismissed,
                 bodyTextColor = TextColor.Primary,
             )
-        }
-        if (syncUiItems.isNotEmpty() || isLoading) {
-            FloatingActionButton(
-                onClick = { addFolderClicked() },
-                modifier = Modifier
-                    .padding(16.dp)
-                    .align(Alignment.BottomEnd)
-                    .testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
-            ) {
-                Icon(
-                    Icons.Filled.Add,
-                    contentDescription = stringResource(id = sharedResR.string.device_center_sync_add_new_syn_button_option)
-                )
-            }
         }
     }
 }
