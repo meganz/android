@@ -75,7 +75,7 @@ import mega.privacy.android.app.presentation.settings.passcode.PasscodeSettingsA
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncActivity
 import javax.inject.Inject
@@ -175,12 +175,17 @@ class SettingsFragment :
                     updateSubFolderMediaDiscovery(state.subFolderMediaDiscoveryChecked)
                     findPreference<SwitchPreferenceCompat>(KEY_HIDDEN_ITEMS)?.apply {
                         val accountType = state.accountDetail?.levelDetail?.accountType
+                        val isHiddenNodesEnabled = state.isHiddenNodesEnabled == true
+                        isVisible = if (isHiddenNodesEnabled && accountType?.isPaid == true) {
+                            if (accountType.isBusinessAccount) {
+                                viewModel.getBusinessStatus() != BusinessAccountStatus.Expired
+                            } else {
+                                true
+                            }
+                        } else {
+                            false
+                        }
 
-                        isVisible = state.isHiddenNodesEnabled == true && accountType !in listOf(
-                            null,
-                            AccountType.FREE,
-                            AccountType.UNKNOWN,
-                        )
                         isChecked = state.showHiddenItems
                     }
                     cookiePolicyLink = state.cookiePolicyLink

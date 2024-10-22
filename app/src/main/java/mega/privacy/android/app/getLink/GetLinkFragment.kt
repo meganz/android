@@ -276,10 +276,12 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             return
         }
 
+        val isPaid = viewModel.state.value.accountType?.isPaid ?: false
+        val isBusinessAccountExpired = viewModel.state.value.isBusinessAccountExpired
         viewModel.hasSensitiveItemsFlow
             .filterNotNull()
             .onEach { sensitiveType ->
-                if (sensitiveType > 0) {
+                if (isPaid && !isBusinessAccountExpired && sensitiveType > 0) {
                     showSharingSensitiveItemsWarningDialog(sensitiveType)
                 } else {
                     initNode()

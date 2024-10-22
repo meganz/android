@@ -60,6 +60,7 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
@@ -68,6 +69,7 @@ import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
@@ -135,6 +137,7 @@ class TextEditorViewModel @Inject constructor(
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val savedStateHandle: SavedStateHandle,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -840,8 +843,18 @@ class TextEditorViewModel @Inject constructor(
     private fun monitorAccountDetail() {
         monitorAccountDetailUseCase()
             .onEach { accountDetail ->
+                val accountType = accountDetail.levelDetail?.accountType
+                val businessStatus =
+                    if (accountType?.isBusinessAccount == true) {
+                        getBusinessStatusUseCase()
+                    } else null
+
+                val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
                 _uiState.update {
-                    it.copy(accountType = accountDetail.levelDetail?.accountType)
+                    it.copy(
+                        accountType = accountDetail.levelDetail?.accountType,
+                        isBusinessAccountExpired = isBusinessAccountExpired,
+                    )
                 }
             }
             .launchIn(viewModelScope)

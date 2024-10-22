@@ -11,10 +11,12 @@ import mega.privacy.android.domain.entity.AccountType
  * @property accountType the account type
  * @property isHiddenNodesOnboarded if the user has been onboarded with hidden nodes
  * @property isNodeInBackups if the node is in backups
+ * @property isBusinessAccountExpired if the business account is expired
  */
 data class TextEditorViewState(
     val transferEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean = false,
     val isNodeInBackups: Boolean = false,
+    val isBusinessAccountExpired: Boolean = false,
 )

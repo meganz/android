@@ -57,6 +57,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import mega.privacy.android.app.TEST_USER_ACCOUNT
 import mega.privacy.android.app.extensions.asHotFlow
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.shared.sync.domain.IsSyncFeatureEnabledUseCase
 import java.util.stream.Stream
 
@@ -93,6 +94,7 @@ class SettingsViewModelTest {
     private val isSyncFeatureEnabledUseCase = mock<IsSyncFeatureEnabledUseCase> {
         onBlocking { invoke() }.thenReturn(true)
     }
+    private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -181,7 +183,8 @@ class SettingsViewModelTest {
             setShowHiddenItemsUseCase = mock(),
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             setAudioBackgroundPlayEnabledUseCase = setAudioBackgroundPlayEnabledUseCase,
-            isSyncFeatureEnabledUseCase = isSyncFeatureEnabledUseCase
+            isSyncFeatureEnabledUseCase = isSyncFeatureEnabledUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 

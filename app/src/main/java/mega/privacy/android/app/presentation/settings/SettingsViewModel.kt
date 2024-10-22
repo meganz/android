@@ -23,6 +23,7 @@ import mega.privacy.android.app.presentation.settings.model.SettingsState
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
@@ -80,6 +81,7 @@ class SettingsViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val setAudioBackgroundPlayEnabledUseCase: SetAudioBackgroundPlayEnabledUseCase,
     private val isSyncFeatureEnabledUseCase: IsSyncFeatureEnabledUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
@@ -335,4 +337,6 @@ class SettingsViewModel @Inject constructor(
             setAudioBackgroundPlayEnabledUseCase(isEnable)
         }
     }
+
+    suspend fun getBusinessStatus() = getBusinessStatusUseCase()
 }

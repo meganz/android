@@ -526,10 +526,11 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
                     val isNotInShare = !isInSharedItems && !isInShare
                     val isNodeInBackups = viewModel.uiState.value.isNodeInBackups
+                    val isBusinessAccountExpired = viewModel.uiState.value.isBusinessAccountExpired
 
                     val shouldShowHideNode =
                         isHiddenNodesEnabled
-                                && (!isPaidAccount || (node != null
+                                && (!isPaidAccount || isBusinessAccountExpired || (node != null
                                 && isNotInShare
                                 && !node.isMarkedSensitive
                                 && !isSensitiveInherited
@@ -542,6 +543,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                             && node.isMarkedSensitive
                             && !isSensitiveInherited
                             && isPaidAccount
+                            && !isBusinessAccountExpired
                             && !isNodeInBackups
 
                     menu.findItem(R.id.action_hide)?.isVisible = shouldShowHideNode
@@ -1115,11 +1117,16 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     }
 
     private fun handleHideNodeClick(handle: Long) {
-        val (isPaid, isHiddenNodesOnboarded) = with(viewModel.uiState.value) {
-            (this.accountType?.isPaid ?: false) to this.isHiddenNodesOnboarded
+        var isPaid: Boolean
+        var isHiddenNodesOnboarded: Boolean
+        var isBusinessAccountExpired: Boolean
+        with(viewModel.uiState.value) {
+            isPaid = this.accountType?.isPaid ?: false
+            isHiddenNodesOnboarded = this.isHiddenNodesOnboarded
+            isBusinessAccountExpired = this.isBusinessAccountExpired
         }
 
-        if (!isPaid) {
+        if (!isPaid || isBusinessAccountExpired) {
             val intent = HiddenNodesOnboardingActivity.createScreen(
                 context = this,
                 isOnboarding = false,

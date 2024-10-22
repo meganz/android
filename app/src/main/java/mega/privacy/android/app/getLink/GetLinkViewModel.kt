@@ -10,6 +10,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -20,9 +22,12 @@ import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCase
@@ -54,6 +59,8 @@ class GetLinkViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val hasSensitiveDescendantUseCase: HasSensitiveDescendantUseCase,
     private val hasSensitiveInheritedUseCase: HasSensitiveInheritedUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     sendTextMessageUseCase: SendTextMessageUseCase,
 ) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
@@ -97,6 +104,10 @@ class GetLinkViewModel @Inject constructor(
     fun getLinkWithPassword(): String? = state.value.linkWithPassword
 
     fun isInitialized(): Boolean = isInitialized
+
+    init {
+        monitorAccountDetail()
+    }
 
     /**
      * Initializes the node and all the available info.
@@ -433,5 +444,25 @@ class GetLinkViewModel @Inject constructor(
 
     fun clearSensitiveItemCheck() {
         _hasSensitiveItems.value = null
+    }
+
+    private fun monitorAccountDetail() {
+        monitorAccountDetailUseCase()
+            .onEach { accountDetail ->
+                val accountType = accountDetail.levelDetail?.accountType
+                val businessStatus =
+                    if (accountType?.isBusinessAccount == true) {
+                        getBusinessStatusUseCase()
+                    } else null
+
+                val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+                _state.update {
+                    it.copy(
+                        accountType = accountDetail.levelDetail?.accountType,
+                        isBusinessAccountExpired = isBusinessAccountExpired,
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
     }
 }
