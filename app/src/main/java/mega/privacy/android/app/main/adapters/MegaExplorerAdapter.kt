@@ -22,6 +22,9 @@ import androidx.core.view.setMargins
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.dispose
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
@@ -49,11 +52,12 @@ import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo
 import mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon
 import mega.privacy.android.app.utils.MegaNodeUtil.getNumberOfFolders
-import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.TimeUtils.getVideoDuration
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.scaleWidthPx
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -146,6 +150,7 @@ class MegaExplorerAdapter(
                     }
                 }
         }
+
         ITEM_VIEW_TYPE_GRID -> {
             Timber.d("onCreateViewHolder grid")
             ItemFileExplorerGridBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -156,6 +161,7 @@ class MegaExplorerAdapter(
                     }
                 }
         }
+
         else -> {
             ViewHolderSortBy(
                 SortByHeaderBinding.inflate(
@@ -173,6 +179,7 @@ class MegaExplorerAdapter(
             ITEM_VIEW_TYPE_LIST -> getItem(position)?.let { node ->
                 (holder as ViewHolderListExplorer).bind(position, node)
             }
+
             ITEM_VIEW_TYPE_GRID -> (holder as ViewHolderGridExplorer).bind(
                 position,
                 getItem(position)
@@ -552,7 +559,7 @@ class MegaExplorerAdapter(
                 imageView.alpha = 1.0f
 
                 binding.fileListTakenDown.isVisible = node.isTakenDown
-
+                imageView.dispose()
                 if (node.isFolder) {
                     setImageParams(imageView, ICON_SIZE_DP, ICON_MARGIN_DP)
                     itemView.setOnClickListener(::clickItem)
@@ -632,41 +639,22 @@ class MegaExplorerAdapter(
                         imageView.alpha = 0.4f
                     }
 
-                    var thumbnail = ThumbnailUtils.getThumbnailFromCache(node)
-                        ?: ThumbnailUtils.getThumbnailFromFolder(node, context)
-                    if (thumbnail == null) {
-                        runCatching {
-                            if (node.hasThumbnail()) {
-                                thumbnail = ThumbnailUtils.getThumbnailFromMegaExplorer(
-                                    node,
-                                    context,
-                                    this@ViewHolderListExplorer,
-                                    megaApi,
-                                    this@MegaExplorerAdapter
+                    if (node.hasThumbnail()) {
+                        imageView.load(
+                            data = ThumbnailRequest(id = NodeId(node.handle)),
+                        ) {
+                            crossfade(false)
+                            transformations(
+                                RoundedCornersTransformation(
+                                    dp2px(THUMB_CORNER_RADIUS_DP).toFloat()
                                 )
-                            } else {
-                                ThumbnailUtils.createThumbnailExplorer(
-                                    context,
-                                    node,
-                                    this@ViewHolderListExplorer,
-                                    megaApi,
-                                    this@MegaExplorerAdapter
-                                )
-                            }
-                        }.onFailure {
-                            Timber.e(it)
-                        }
-                    }
-
-                    thumbnail?.let {
-                        setImageParams(imageView, THUMB_SIZE_DP, THUMB_MARGIN_DP)
-                        imageView.setImageBitmap(
-                            ThumbnailUtils.getRoundedBitmap(
-                                context,
-                                it,
-                                dp2px(THUMB_CORNER_RADIUS_DP)
                             )
-                        )
+                            listener(
+                                onSuccess = { _, _ ->
+                                    setImageParams(imageView, THUMB_SIZE_DP, THUMB_MARGIN_DP)
+                                },
+                            )
+                        }
                     }
                 }
             }
@@ -720,6 +708,7 @@ class MegaExplorerAdapter(
             document = node.handle
             binding.fileExplorerGridLayout.isVisible = true
 
+            fileThumbnail.dispose()
             if (node.isFolder) {
                 binding.fileExplorerGridFolderLayout.isVisible = true
                 binding.fileExplorerGridFileLayout.isVisible = false
@@ -766,50 +755,28 @@ class MegaExplorerAdapter(
                     binding.fileExplorerGridFileVideoinfoLayout.isVisible = false
                 }
 
-                var thumbnail =
-                    ThumbnailUtils.getThumbnailFromCache(node)
-                        ?: ThumbnailUtils.getThumbnailFromFolder(
-                            node,
-                            context
-                        )
-                if (thumbnail == null) {
-                    runCatching {
-                        if (node.hasThumbnail()) {
-                            thumbnail =
-                                ThumbnailUtils.getThumbnailFromMegaExplorer(
-                                    node,
-                                    context,
-                                    this@ViewHolderGridExplorer,
-                                    megaApi,
-                                    this@MegaExplorerAdapter
-                                )
-                        } else {
-                            ThumbnailUtils.createThumbnailExplorer(
-                                context,
-                                node,
-                                this@ViewHolderGridExplorer,
-                                megaApi,
-                                this@MegaExplorerAdapter
-                            )
-                        }
-                    }.onFailure {
-                        Timber.e(it)
-                    }
-                }
-
-                thumbnail?.let {
-                    fileThumbnail.setImageBitmap(
-                        ThumbnailUtils.getRoundedRectBitmap(
-                            context,
-                            thumbnail,
-                            2
-                        )
-                    )
+                if (node.hasThumbnail()) {
                     fileThumbnail.isVisible = true
-                    fileIcon.isVisible = false
-                } ?: let {
-                    fileThumbnail.isVisible = false
-                    fileIcon.isVisible = true
+                    fileThumbnail.load(
+                        data = ThumbnailRequest(id = NodeId(node.handle)),
+                    ) {
+                        crossfade(false)
+                        transformations(
+                            RoundedCornersTransformation(
+                                dp2px(THUMB_CORNER_RADIUS_DP).toFloat()
+                            )
+                        )
+                        listener(
+                            onSuccess = { _, _ ->
+                                fileThumbnail.isVisible = true
+                                fileIcon.isVisible = false
+                            },
+                            onError = { _, _ ->
+                                fileThumbnail.isVisible = false
+                                fileIcon.isVisible = true
+                            }
+                        )
+                    }
                 }
 
                 if (selectFile) {
