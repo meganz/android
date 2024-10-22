@@ -61,6 +61,7 @@ import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToD
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.DeleteAllPendingTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingDownloadsForNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.MonitorNotResolvedPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWithWorkerUseCase
@@ -136,6 +137,9 @@ class StartTransfersComponentViewModelTest {
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
     private val parentNode: TypedFolderNode = mock()
+    private val insertPendingDownloadsForNodesUseCase =
+        mock<InsertPendingDownloadsForNodesUseCase>()
+
     private val startDownloadEvent = TransferTriggerEvent.StartDownloadNode(nodes)
     private val startUploadFilesEvent =
         TransferTriggerEvent.StartUpload.Files(mapOf(DESTINATION to null), parentId)
@@ -191,6 +195,7 @@ class StartTransfersComponentViewModelTest {
             deleteAllPendingTransfersUseCase = deleteAllPendingTransfersUseCase,
             monitorNotResolvedPendingTransfersUseCase = monitorNotResolvedPendingTransfersUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            insertPendingDownloadsForNodesUseCase = insertPendingDownloadsForNodesUseCase
         )
     }
 
@@ -229,6 +234,8 @@ class StartTransfersComponentViewModelTest {
             startDownloadsWorkerAndWaitUntilIsStartedUseCase,
             deleteAllPendingTransfersUseCase,
             monitorNotResolvedPendingTransfersUseCase,
+            insertPendingDownloadsForNodesUseCase,
+            getFeatureFlagValueUseCase,
         )
         initialStub()
     }
@@ -908,6 +915,20 @@ class StartTransfersComponentViewModelTest {
                 underTest.startTransfer(triggerEvent)
 
                 verify(deleteAllPendingTransfersUseCase)()
+            }
+
+        @Test
+        fun `test that insertPendingDownloadsForNodesUseCase is invoked when a download starts`() =
+            runTest {
+                commonStub()
+
+                underTest.startTransfer(startDownloadEvent)
+
+                verify(insertPendingDownloadsForNodesUseCase)(
+                    startDownloadEvent.nodes,
+                    UriPath(DESTINATION),
+                    false,
+                )
             }
     }
 

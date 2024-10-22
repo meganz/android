@@ -66,6 +66,7 @@ import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToD
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.DeleteAllPendingTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingDownloadsForNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.MonitorNotResolvedPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWithWorkerUseCase
@@ -111,6 +112,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val deleteAllPendingTransfersUseCase: DeleteAllPendingTransfersUseCase,
     private val monitorNotResolvedPendingTransfersUseCase: MonitorNotResolvedPendingTransfersUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val insertPendingDownloadsForNodesUseCase: InsertPendingDownloadsForNodesUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -387,7 +389,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             if (uri.isNullOrBlank()) {
                 throw NullPointerException("path not found!")
             }
-            //TRAN 398 insert pending downloads
+            insertPendingDownloadsForNodesUseCase(nodes, UriPath(uri), isHighPriority)
             monitorPendingDownloadsUntilProcessed(transferTriggerEvent)
             startDownloadsWorkerAndWaitUntilIsStartedUseCase()
         }.onFailure {
@@ -457,14 +459,16 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             val lastPendingTransfers =
                 monitorNotResolvedPendingTransfersUseCase(TransferType.DOWNLOAD).onEach { pendingTransfers ->
                     Timber.d("Pending transfers to process: ${pendingTransfers.size}")
-                    _uiState.updateJobInProgress(
-                        StartTransferJobInProgress.ScanningTransfers(
-                            stage = pendingTransfers.minOf { it.scanningFoldersData.stage },
-                            fileCount = pendingTransfers.sumOf { it.scanningFoldersData.fileCount },
-                            folderCount = pendingTransfers.sumOf { it.scanningFoldersData.folderCount },
-                            createdFolderCount = pendingTransfers.sumOf { it.scanningFoldersData.createdFolderCount },
+                    if (pendingTransfers.isNotEmpty()) {
+                        _uiState.updateJobInProgress(
+                            StartTransferJobInProgress.ScanningTransfers(
+                                stage = pendingTransfers.minOf { it.scanningFoldersData.stage },
+                                fileCount = pendingTransfers.sumOf { it.scanningFoldersData.fileCount },
+                                folderCount = pendingTransfers.sumOf { it.scanningFoldersData.folderCount },
+                                createdFolderCount = pendingTransfers.sumOf { it.scanningFoldersData.createdFolderCount },
+                            )
                         )
-                    )
+                    }
                 }
                     .catch { error = it }
                     .lastOrNull()

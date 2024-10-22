@@ -11,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
@@ -90,17 +91,14 @@ class DownloadsWorker @AssistedInject constructor(
             getPendingTransfersByTypeUseCase(type),
         ) { monitorOngoingActiveTransfersResult, pendingTransfersNotSend ->
             monitorOngoingActiveTransfersResult to pendingTransfersNotSend.size
-        }.transformWhile { (ongoingActiveTransfersResult, notSendPendingTransfers) ->
-            emit(ongoingActiveTransfersResult)
-            Timber.d("Download progress emitted: $notSendPendingTransfers ${ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers()}")
-            //keep monitoring if and only if there are pending transfers or transfers in progress
-            val keepMonitoring =
-                notSendPendingTransfers > 0 || (ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers() && !ongoingActiveTransfersResult.transfersOverQuota)
-            if (!keepMonitoring) {
-                Timber.d("DownloadWorker keep monitoring false due to no more transfers to start and all finished: $notSendPendingTransfers, ${ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers()}")
-            }
-            return@transformWhile keepMonitoring
         }
+            .distinctUntilChanged()
+            .transformWhile { (ongoingActiveTransfersResult, notSendPendingTransfers) ->
+                emit(ongoingActiveTransfersResult)
+                Timber.d("Download progress emitted: $notSendPendingTransfers ${ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers()}")
+                //keep monitoring if and only if there are pending transfers or transfers in progress
+                return@transformWhile notSendPendingTransfers > 0 || (ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers() && !ongoingActiveTransfersResult.transfersOverQuota)
+            }
             .catch {
                 Timber.e(it)
             }

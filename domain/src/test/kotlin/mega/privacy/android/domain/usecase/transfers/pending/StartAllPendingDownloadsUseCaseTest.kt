@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
@@ -279,6 +280,39 @@ class StartAllPendingDownloadsUseCaseTest {
                 pendingTransfer,
                 size,
                 exception,
+            )
+        }
+
+    @Test
+    fun `test that pending transfers state is updated to ErrorStarting and failed completed transfer is added when there is an exception collecting the pending transfers`() =
+        runTest {
+            val pendingTransfer = mock<PendingTransfer>()
+            val pendingTransfers = listOf(pendingTransfer)
+            val exception = RuntimeException()
+            stubNotSentPendingTransfers(
+                pendingTransfers,
+                pendingTransfers,
+                emptyList()
+            )
+            whenever(
+                updatePendingTransferStateUseCase(
+                    pendingTransfers,
+                    PendingTransferState.SdkScanning
+                )
+            ).doThrow(exception)
+
+            underTest().test {
+                awaitComplete()
+            }
+
+            verify(updatePendingTransferStateUseCase)(
+                pendingTransfers,
+                PendingTransferState.ErrorStarting
+            )
+            verify(transferRepository).addCompletedTransferFromFailedPendingTransfer(
+                eq(pendingTransfer),
+                eq(0),
+                any(),
             )
         }
 

@@ -4,6 +4,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -30,8 +31,9 @@ class MonitorNotResolvedPendingTransfersUseCase @Inject constructor(
 
         return channelFlow {
             getPendingTransfersByTypeUseCase(transferType)
+                .distinctUntilChanged()
                 .transformWhile { pendingTransfers ->
-                    val notResolved = pendingTransfers.filter { it.notResolved() }
+                    val notResolved = pendingTransfers.filterNot { it.resolved() }
                     emit(notResolved)
                     if (waitJob == null && isWaitingForAlreadyStarted(pendingTransfers)) {
                         // If all nodes are scanned, wait a bit for a better UX message when there are already downloaded/uploaded files. Close it if it takes long.

@@ -4,6 +4,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -42,6 +44,7 @@ class StartAllPendingDownloadsUseCase @Inject constructor(
                 PendingTransferState.NotSentToSdk,
             )
                 .conflate()
+                .distinctUntilChanged()
                 .collect { pendingTransfers ->
                     updatePendingTransferStateUseCase(
                         pendingTransfers,
@@ -100,6 +103,13 @@ class StartAllPendingDownloadsUseCase @Inject constructor(
                         }
                     }
                 }
+        }.catch { e ->
+            getPendingTransfersByTypeAndStateUseCase(
+                TransferType.DOWNLOAD,
+                PendingTransferState.NotSentToSdk,
+            ).firstOrNull()?.forEach {
+                errorOnStartingPendingTransfer(it, null, e)
+            }
         }
 
     private suspend fun errorOnStartingPendingTransfer(
