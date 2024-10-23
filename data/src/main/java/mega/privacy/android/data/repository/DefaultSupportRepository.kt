@@ -32,10 +32,12 @@ internal class DefaultSupportRepository @Inject constructor(
 ) : SupportRepository {
     override suspend fun logTicket(ticketContent: String) =
         withContext(ioDispatcher) {
+            Timber.d("SupportRepository: logTicket called")
             suspendCancellableCoroutine { continuation ->
                 val listener = OptionalMegaRequestListenerInterface(
                     onRequestFinish = { _, error ->
                         if (error.errorCode == MegaError.API_OK) {
+                            Timber.d("SupportRepository: logTicket success")
                             continuation.resumeWith(Result.success(Unit))
                         } else {
                             continuation.failWithError(error, "logTicket")
@@ -47,6 +49,7 @@ internal class DefaultSupportRepository @Inject constructor(
         }
 
     override fun uploadFile(file: File): Flow<Float> = callbackFlow {
+        Timber.d("SupportRepository: uploadFile called")
         var transfer: MegaTransfer? = null
         val callback = uploadFileInterface(channel) { transfer = it }
 

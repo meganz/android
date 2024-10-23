@@ -116,8 +116,10 @@ class ReportIssueViewModel @Inject constructor(
      *
      */
     fun submit() {
+        Timber.d("Submit called")
         if (isConnected.value) {
             if (uiState.value.description.length < MINIMUM_CHARACTERS) {
+                Timber.d("Submit: minimum characters ${uiState.value.description.length} is less than $MINIMUM_CHARACTERS")
                 _uiState.update {
                     it.copy(
                         error = sharedR.string.report_issue_error_minimum_characters
@@ -138,11 +140,15 @@ class ReportIssueViewModel @Inject constructor(
                                 _uiState.update { it.copy(uploadProgress = progress.floatValue) }
                             }
                     } catch (exception: Throwable) {
+                        Timber.e(exception, "Submit error")
                         onSubmitCompleted(exception)
                     }
                 }
+            } else {
+                Timber.w("RSubmit: Attempting to submit an issue when already submitting")
             }
         } else {
+            Timber.d("Submit: no internet connection")
             _uiState.update { it.copy(error = R.string.check_internet_connection_error) }
         }
     }
@@ -179,6 +185,7 @@ class ReportIssueViewModel @Inject constructor(
      *
      */
     fun cancelUpload() {
+        Timber.d("CancelUpload called")
         submitReportJob?.cancel()
     }
 

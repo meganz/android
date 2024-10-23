@@ -118,8 +118,8 @@ internal class TimberLoggingRepository @Inject constructor(
         withContext(ioDispatcher) { chatLogger.writeLogEntry(logMessage) }
 
     override suspend fun compressLogs(): File = withContext(ioDispatcher) {
+        Timber.d("LoggingRepository: compressLogs called")
         val loggingDirectoryPath = logFileDirectory.get().absolutePath
-        require(loggingDirectoryPath != null) { "Logging configuration file missing or logging directory not configured" }
         val sourceFolder = File(loggingDirectoryPath).takeIf { it.exists() }
             ?: throw IllegalStateException("Logging directory not found")
         createEmptyFile().apply {

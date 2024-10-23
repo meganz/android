@@ -26,6 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -35,6 +36,7 @@ import mega.privacy.android.app.presentation.settings.reportissue.view.ReportIss
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -53,6 +55,7 @@ class ReportIssueFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = ComposeView(requireContext()).apply {
+        Timber.d("ReportIssueFragment: onCreateView")
         setContent {
             val themeMode by getThemeMode()
                 .collectAsState(initial = ThemeMode.System)
@@ -100,6 +103,9 @@ class ReportIssueFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.uiState
+                    .onEach {
+                        Timber.d("ReportIssueFragment: uiState: $it")
+                    }
                     .distinctUntilChanged { old, new -> old.canSubmit == new.canSubmit && old.result == new.result }
                     .collect { state ->
                         if (state.result != null) {
