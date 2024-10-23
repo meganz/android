@@ -761,9 +761,9 @@
     <!--Success message displayed in the Login screen after the account has been activated-->
     <string name="login_screen_account_confirmed_success_message">Contul tău a fost activat. Te rugăm să te autentifici.</string>
     <!-- Title in the files permission screen -->
-    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <string name="files_permission_screen_title">Permiteți MEGA să acceseze fișierele dispozitivului</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
+    <string name="files_permission_screen_message">Permițând MEGA accesul la fișierele dvs., puteți încărca în MEGA fără a crea copii temporare, economisind spațiu pe dispozitiv și permițând încărcări mai rapide.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">Nu afișa din nou</string>
     <!-- Title of the dialog to confirm stop a sync -->
@@ -777,7 +777,7 @@
     <!-- Title of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_title">Oprește backupul</string>
     <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_message">This will stop the sync process between the two folders. A copy will be created and saved to your Cloud drive.</string>
+    <string name="sync_stop_backup_confirm_dialog_message">Aceasta va opri procesul de sincronizare între cele două foldere. O copie va fi creată și salvată pe Unitatea cloud.</string>
     <!-- Label for the button to stop a backup -->
     <string name="sync_stop_backup_button">Oprește backupul</string>
     <!-- Snackbar message to indicate that backup has been stopped -->
@@ -788,4 +788,12 @@
     <string name="sync_list_sync_state_up_to_date">La zi</string>
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favorite</string>
+    <!-- Title of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_title">Nu sunt configurate conexiuni</string>
+    <!-- Message of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_message">Sincronizați sau faceți o copie de rezervă a unui folder de pe dispozitiv cu un folder de pe MEGA</string>
+    <!-- Message of the synced folder list empty state for free accounts -->
+    <string name="device_center_sync_backup_list_empty_state_message_free_account">Treceți la un cont premium pentru a vă menține informațiile importante în siguranță și actualizate cu sincronizare și backup</string>
+    <!-- Synced folder list empty state "See upgrade options" button label -->
+    <string name="device_center_sync_backup_see_upgrade_options_button_label">Consultați opțiunile de upgrade</string>
 </resources>
