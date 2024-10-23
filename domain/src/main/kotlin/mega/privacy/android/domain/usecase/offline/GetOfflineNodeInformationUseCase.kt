@@ -8,8 +8,8 @@ import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.node.GetNestedParentFoldersUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
 import mega.privacy.android.domain.usecase.node.joinAsPath
 import javax.inject.Inject
 
@@ -32,7 +32,7 @@ class GetOfflineNodeInformationUseCase @Inject constructor(
     /**
      * Invoke the use case
      */
-    suspend operator fun invoke(node: Node): OfflineNodeInformation {
+    suspend operator fun invoke(node: Node, originalName: String? = null): OfflineNodeInformation {
         var parents = getNestedParentFoldersUseCase(node)
         val isIncomingShareId = (
                 node.takeIf { it.isIncomingShare }
@@ -45,13 +45,14 @@ class GetOfflineNodeInformationUseCase @Inject constructor(
             parents = parents.drop(1)
         }
         val path = parents.joinAsPath()
+        val name = originalName ?: node.name
 
         return when {
             isInBackups -> {
                 BackupsOfflineNodeInformation(
                     id = -1,
                     path = path,
-                    name = node.name,
+                    name = name,
                     handle = node.id.longValue.toString(),
                     isFolder = node is FolderNode,
                     lastModifiedTime = System.currentTimeMillis(),
@@ -63,7 +64,7 @@ class GetOfflineNodeInformationUseCase @Inject constructor(
                 IncomingShareOfflineNodeInformation(
                     id = -1,
                     path = path,
-                    name = node.name,
+                    name = name,
                     handle = node.id.longValue.toString(),
                     isFolder = node is FolderNode,
                     incomingHandle = isIncomingShareId.longValue.toString(),
@@ -76,7 +77,7 @@ class GetOfflineNodeInformationUseCase @Inject constructor(
                 OtherOfflineNodeInformation(
                     id = -1,
                     path = path,
-                    name = node.name,
+                    name = name,
                     handle = node.id.longValue.toString(),
                     isFolder = node is FolderNode,
                     lastModifiedTime = System.currentTimeMillis(),

@@ -61,7 +61,7 @@ class HandleAvailableOfflineEventUseCaseTest {
 
             underTest(event)
 
-            verify(saveOfflineNodeInformationUseCase).invoke(NodeId(nodeId))
+            verify(saveOfflineNodeInformationUseCase).invoke(NodeId(nodeId), name)
         }
 
     @Test
@@ -81,6 +81,7 @@ class HandleAvailableOfflineEventUseCaseTest {
     private fun mockTransfer() = mock<Transfer> {
         on { it.nodeHandle } doReturn nodeId
         on { it.transferType } doReturn TransferType.DOWNLOAD
+        on { it.fileName } doReturn name
     }
 
     @Test
@@ -152,5 +153,6 @@ class HandleAvailableOfflineEventUseCaseTest {
     }
 
     private val nodeId = 1432L
+    private val name = "name"
 
 }

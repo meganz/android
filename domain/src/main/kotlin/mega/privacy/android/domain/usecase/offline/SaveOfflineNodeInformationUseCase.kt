@@ -20,7 +20,7 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
      * invoke the use case
      * @param nodeId [NodeId] of the node
      */
-    suspend operator fun invoke(nodeId: NodeId) {
+    suspend operator fun invoke(nodeId: NodeId, originalName: String) {
         //we don't want to save backup parent node (Vault)
         val backupRootNodeId = monitorBackupFolder().firstOrNull()?.getOrNull() ?: NodeId(-1L)
         val driveRootNode = nodeRepository.getRootNode()?.id ?: NodeId(-1L)
@@ -30,6 +30,7 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
                 currentNode = node,
                 driveRootNodeId = driveRootNode,
                 backupRootNodeId = backupRootNodeId,
+                originalName = originalName,
             )
         }
     }
@@ -41,16 +42,18 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
      * @param currentNode the [NodeId] of the node we want to save
      * @param driveRootNodeId this node won't be saved as its children appear as root nodes in offline
      * @param backupRootNodeId this node needs to be saved, but not its parent ("Vault")
+     * @param originalName The original name of the node we want to save
      */
     private suspend fun saveNodeAndItsParentsRecursively(
         currentNode: Node,
         driveRootNodeId: NodeId,
         backupRootNodeId: NodeId,
+        originalName: String? = null,
     ): Long? {
         if (currentNode.id == driveRootNodeId) return null
         val offlineNodeInformation = nodeRepository.getOfflineNodeInformation(currentNode.id)
         return offlineNodeInformation?.id?.toLong() ?: nodeRepository.saveOfflineNodeInformation(
-            getOfflineNodeInformationUseCase(currentNode),
+            getOfflineNodeInformationUseCase(currentNode, originalName),
             getParentOfflineInfoId(currentNode, backupRootNodeId, driveRootNodeId)
         )
     }

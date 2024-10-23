@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase.offline
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FileNode
@@ -22,7 +21,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class SaveOfflineNodeInformationUseCaseTest {
 
@@ -36,6 +34,8 @@ internal class SaveOfflineNodeInformationUseCaseTest {
     private val parentParentOfflineNodeInformation = mock<OtherOfflineNodeInformation>()
 
     private lateinit var underTest: SaveOfflineNodeInformationUseCase
+
+    private val originalName = "originalName"
 
     @BeforeAll
     fun setup() {
@@ -84,7 +84,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
 
         whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(mock<OtherOfflineNodeInformation>())
 
-        underTest(nodeId)
+        underTest(nodeId, originalName)
         verify(nodeRepository, times(0)).saveOfflineNodeInformation(anyOrNull(), anyOrNull())
     }
 
@@ -95,7 +95,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
 
         whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
 
-        underTest(nodeId)
+        underTest(nodeId, originalName)
         verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, null)
     }
 
@@ -107,7 +107,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
 
         whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
 
-        underTest(nodeId)
+        underTest(nodeId, originalName)
         verify(nodeRepository).saveOfflineNodeInformation(
             nodeOfflineInformation,
             nodeParentOfflineInformationId
@@ -127,7 +127,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
         whenever(nodeRepository.getRootNode()).thenReturn(parent)
 
-        underTest(nodeId)
+        underTest(nodeId, originalName)
         verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, null)
         verify(nodeRepository, times(0)).saveOfflineNodeInformation(parentOfflineInformation, null)
     }
@@ -141,7 +141,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
         whenever(monitorBackupFolder()).thenReturn(flowOf(Result.success(backupId)))
 
-        underTest(nodeId)
+        underTest(nodeId, originalName)
         verify(nodeRepository).saveOfflineNodeInformation(
             nodeOfflineInformation,
             nodeParentOfflineInformationId
@@ -178,12 +178,14 @@ internal class SaveOfflineNodeInformationUseCaseTest {
 
     private fun stubNodeOfflineInfo() = runTest {
         whenever(nodeOfflineInformation.id).thenReturn(nodeOfflineInformationId.toInt())
-        whenever(getOfflineNodeInformationUseCase(node)).thenReturn(nodeOfflineInformation)
+        whenever(getOfflineNodeInformationUseCase(node, originalName))
+            .thenReturn(nodeOfflineInformation)
     }
 
     private fun stubParentOfflineInfo() = runTest {
         whenever(parentOfflineInformation.id).thenReturn(nodeParentOfflineInformationId.toInt())
-        whenever(getOfflineNodeInformationUseCase(parent)).thenReturn(parentOfflineInformation)
+        whenever(getOfflineNodeInformationUseCase(parent))
+            .thenReturn(parentOfflineInformation)
     }
 
     companion object {

@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.offline
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
@@ -15,7 +14,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import java.io.File
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetOfflinePathForNodeUseCaseTest {
     private lateinit var underTest: GetOfflinePathForNodeUseCase
