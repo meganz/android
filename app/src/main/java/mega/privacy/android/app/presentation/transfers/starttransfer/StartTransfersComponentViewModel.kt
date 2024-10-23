@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.onCompletion
@@ -67,7 +68,7 @@ import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseC
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.DeleteAllPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingDownloadsForNodesUseCase
-import mega.privacy.android.domain.usecase.transfers.pending.MonitorNotResolvedPendingTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.pending.MonitorPendingTransfersUntilResolvedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWithWorkerUseCase
 import timber.log.Timber
@@ -110,7 +111,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val setRequestFilesPermissionDeniedUseCase: SetRequestFilesPermissionDeniedUseCase,
     private val startDownloadsWorkerAndWaitUntilIsStartedUseCase: StartDownloadsWorkerAndWaitUntilIsStartedUseCase,
     private val deleteAllPendingTransfersUseCase: DeleteAllPendingTransfersUseCase,
-    private val monitorNotResolvedPendingTransfersUseCase: MonitorNotResolvedPendingTransfersUseCase,
+    private val monitorPendingTransfersUntilResolvedUseCase: MonitorPendingTransfersUntilResolvedUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val insertPendingDownloadsForNodesUseCase: InsertPendingDownloadsForNodesUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -457,7 +458,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         viewModelScope.launch {
             var error: Throwable? = null
             val lastPendingTransfers =
-                monitorNotResolvedPendingTransfersUseCase(TransferType.DOWNLOAD).onEach { pendingTransfers ->
+                monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD).onEach { pendingTransfers ->
                     Timber.d("Pending transfers to process: ${pendingTransfers.size}")
                     if (pendingTransfers.isNotEmpty()) {
                         _uiState.updateJobInProgress(
@@ -471,6 +472,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     }
                 }
                     .catch { error = it }
+                    .filter { it.isNotEmpty() }
                     .lastOrNull()
 
             Timber.d("Scanning finished")

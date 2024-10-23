@@ -62,7 +62,7 @@ import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseC
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.DeleteAllPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingDownloadsForNodesUseCase
-import mega.privacy.android.domain.usecase.transfers.pending.MonitorNotResolvedPendingTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.pending.MonitorPendingTransfersUntilResolvedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.GetCurrentUploadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWithWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -131,8 +131,8 @@ class StartTransfersComponentViewModelTest {
     private val startDownloadsWorkerAndWaitUntilIsStartedUseCase =
         mock<StartDownloadsWorkerAndWaitUntilIsStartedUseCase>()
     private val deleteAllPendingTransfersUseCase = mock<DeleteAllPendingTransfersUseCase>()
-    private val monitorNotResolvedPendingTransfersUseCase =
-        mock<MonitorNotResolvedPendingTransfersUseCase>()
+    private val monitorPendingTransfersUntilResolvedUseCase =
+        mock<MonitorPendingTransfersUntilResolvedUseCase>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -193,7 +193,7 @@ class StartTransfersComponentViewModelTest {
             setRequestFilesPermissionDeniedUseCase = setRequestFilesPermissionDeniedUseCase,
             startDownloadsWorkerAndWaitUntilIsStartedUseCase = startDownloadsWorkerAndWaitUntilIsStartedUseCase,
             deleteAllPendingTransfersUseCase = deleteAllPendingTransfersUseCase,
-            monitorNotResolvedPendingTransfersUseCase = monitorNotResolvedPendingTransfersUseCase,
+            monitorPendingTransfersUntilResolvedUseCase = monitorPendingTransfersUntilResolvedUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             insertPendingDownloadsForNodesUseCase = insertPendingDownloadsForNodesUseCase
         )
@@ -233,7 +233,7 @@ class StartTransfersComponentViewModelTest {
             setRequestFilesPermissionDeniedUseCase,
             startDownloadsWorkerAndWaitUntilIsStartedUseCase,
             deleteAllPendingTransfersUseCase,
-            monitorNotResolvedPendingTransfersUseCase,
+            monitorPendingTransfersUntilResolvedUseCase,
             insertPendingDownloadsForNodesUseCase,
             getFeatureFlagValueUseCase,
         )
@@ -852,7 +852,7 @@ class StartTransfersComponentViewModelTest {
                     })
                 }
 
-                whenever(monitorNotResolvedPendingTransfersUseCase(TransferType.DOWNLOAD)) doReturn flow {
+                whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)) doReturn flow {
                     pendingTransfers.forEach {
                         emit(it)
                         yield()
@@ -887,7 +887,7 @@ class StartTransfersComponentViewModelTest {
                     on { this.startedFiles } doReturn 1
                 }
                 val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
-                whenever(monitorNotResolvedPendingTransfersUseCase(TransferType.DOWNLOAD)) doReturn
+                whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)) doReturn
                         flowOf(listOf(pendingTransfer))
 
                 underTest.startTransfer(triggerEvent)
@@ -909,7 +909,7 @@ class StartTransfersComponentViewModelTest {
                     on { this.scanningFoldersData } doReturn scanningFoldersData
                 }
                 val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
-                whenever(monitorNotResolvedPendingTransfersUseCase(TransferType.DOWNLOAD)) doReturn
+                whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)) doReturn
                         flowOf(listOf(pendingTransfer))
 
                 underTest.startTransfer(triggerEvent)

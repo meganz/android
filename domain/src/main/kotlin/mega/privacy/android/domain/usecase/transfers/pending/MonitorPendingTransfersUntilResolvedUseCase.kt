@@ -14,13 +14,13 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * Use case to monitor the pending transfers that are not yet resolved, so they still need to be started or the SDK is still scanning them
+ * Use case to monitor the pending transfers while there are not yet resolved pending transfers, so they still need to be started or the SDK is still scanning them
  *
  * Once all the transfers are started and scanned by the SDK it will wait a maximum of 400 milliseconds for first update events,
  * to try to give a better update of transfers actually started or cancelled because they already exists.
  * In that way the message shown to the user can be more accurate but without blocking it too much
  */
-class MonitorNotResolvedPendingTransfersUseCase @Inject constructor(
+class MonitorPendingTransfersUntilResolvedUseCase @Inject constructor(
     private val getPendingTransfersByTypeUseCase: GetPendingTransfersByTypeUseCase,
 ) {
     /**
@@ -34,7 +34,7 @@ class MonitorNotResolvedPendingTransfersUseCase @Inject constructor(
                 .distinctUntilChanged()
                 .transformWhile { pendingTransfers ->
                     val notResolved = pendingTransfers.filterNot { it.resolved() }
-                    emit(notResolved)
+                    emit(pendingTransfers)
                     if (waitJob == null && isWaitingForAlreadyStarted(pendingTransfers)) {
                         // If all nodes are scanned, wait a bit for a better UX message when there are already downloaded/uploaded files. Close it if it takes long.
                         waitJob = launch {

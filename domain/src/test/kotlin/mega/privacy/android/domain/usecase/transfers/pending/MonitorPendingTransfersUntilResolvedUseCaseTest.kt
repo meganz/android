@@ -26,14 +26,14 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MonitorNotResolvedPendingTransfersUseCaseTest {
-    private lateinit var underTest: MonitorNotResolvedPendingTransfersUseCase
+class MonitorPendingTransfersUntilResolvedUseCaseTest {
+    private lateinit var underTest: MonitorPendingTransfersUntilResolvedUseCase
 
     private val getPendingTransfersByTypeUseCase = mock<GetPendingTransfersByTypeUseCase>()
 
     @BeforeAll
     fun setup() {
-        underTest = MonitorNotResolvedPendingTransfersUseCase(getPendingTransfersByTypeUseCase)
+        underTest = MonitorPendingTransfersUntilResolvedUseCase(getPendingTransfersByTypeUseCase)
     }
 
     @BeforeEach
@@ -57,8 +57,8 @@ class MonitorNotResolvedPendingTransfersUseCaseTest {
                     flowOf(list1, list2)
 
             underTest(type).test {
-                assertThat(awaitItem()).hasSize(list1.count { it.notResolved() })
-                assertThat(awaitItem()).hasSize(list2.count { it.notResolved() })
+                assertThat(awaitItem()).hasSize(list1.size)
+                assertThat(awaitItem()).hasSize(list2.size)
                 awaitComplete()
             }
         }
@@ -104,7 +104,7 @@ class MonitorNotResolvedPendingTransfersUseCaseTest {
                     }
             underTest(type).test {
                 assertThat(awaitItem()).hasSize(1)
-                assertThat(awaitItem()).hasSize(0)
+                assertThat(awaitItem()).hasSize(1)
                 awaitComplete()
             }
         }
