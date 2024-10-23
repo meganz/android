@@ -6,6 +6,7 @@ package mega.privacy.android.app.presentation.upload
  * @property filePath Path of the file
  * @property originalFileName Name of the file
  * @property fileIcon Icon of the file
+ * @property fileName Name of the file
  * @property error Error message for the file name if any
  * @property fileIcon Icon of the file
  * @property isUrl True if the file is an URL, false otherwise

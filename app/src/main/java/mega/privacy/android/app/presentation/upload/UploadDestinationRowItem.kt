@@ -12,7 +12,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
@@ -21,6 +20,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -37,7 +38,7 @@ fun UploadDestinationRowItem(
     isEditMode: Boolean = false,
 ) {
     val focusManager = LocalFocusManager.current
-    LaunchedEffect(importUiItem.filePath) {
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
         focusManager.clearFocus()
     }
     Row(
