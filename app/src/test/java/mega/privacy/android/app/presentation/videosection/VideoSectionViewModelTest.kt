@@ -306,13 +306,13 @@ class VideoSectionViewModelTest {
     fun `test that state is correctly updated when monitorOfflineNodeUpdatesUseCase is triggered`() =
         runTest {
             val testHandle = 1L
-            val userPlaylists: List<VideoPlaylist> = (1..3L).map {
-                mock<UserVideoPlaylist>()
+            val userPlaylists: List<UserVideoPlaylist> = (1..3L).map {
+                initUserVideoPlaylist(it)
             }
             val favouriteVideos = (testHandle..3L).map {
                 initTypedVideoNode(it)
             }
-            val favouritesPlaylist: VideoPlaylist = mock<FavouritesVideoPlaylist> {
+            val favouritesPlaylist: FavouritesVideoPlaylist = mock<FavouritesVideoPlaylist> {
                 on { videos }.thenReturn(favouriteVideos)
             }
             val offlineUpdates = listOf(
@@ -330,6 +330,12 @@ class VideoSectionViewModelTest {
                     }
                 )
             }
+            userPlaylists.onEach { playlist ->
+                whenever(playlist.copy(videos = emptyList())).thenReturn(playlist)
+            }
+            whenever(favouritesPlaylist.copy(videos = favouritesPlaylist.videos)).thenReturn(
+                favouritesPlaylist
+            )
             whenever(getVideoPlaylistsUseCase())
                 .thenReturn(listOf(favouritesPlaylist))
                 .thenReturn(videoPlaylists)
@@ -361,13 +367,13 @@ class VideoSectionViewModelTest {
     fun `test that state is correctly updated when monitorNodeUpdatesUseCase is triggered`() =
         runTest {
             val testHandle = 1L
-            val userPlaylists: List<VideoPlaylist> = (1..3L).map {
-                mock<UserVideoPlaylist>()
+            val userPlaylists: List<UserVideoPlaylist> = (1..3L).map {
+                initUserVideoPlaylist(it)
             }
             val favouriteVideos = (testHandle..3L).map {
                 initTypedVideoNode(it)
             }
-            val favouritesPlaylist: VideoPlaylist = mock<FavouritesVideoPlaylist> {
+            val favouritesPlaylist: FavouritesVideoPlaylist = mock<FavouritesVideoPlaylist> {
                 on { videos }.thenReturn(favouriteVideos)
             }
             val testNode = mock<FileNode> {
@@ -388,6 +394,12 @@ class VideoSectionViewModelTest {
             whenever(getVideoPlaylistsUseCase())
                 .thenReturn(listOf(favouritesPlaylist))
                 .thenReturn(videoPlaylists)
+            userPlaylists.onEach { playlist ->
+                whenever(playlist.copy(videos = emptyList())).thenReturn(playlist)
+            }
+            whenever(favouritesPlaylist.copy(videos = favouritesPlaylist.videos)).thenReturn(
+                favouritesPlaylist
+            )
             videoPlaylists.forEachIndexed { index, playlist ->
                 whenever(videoPlaylistUIEntityMapper(playlist)).thenReturn(playlistEntities[index])
             }
@@ -410,13 +422,13 @@ class VideoSectionViewModelTest {
     fun `test that state is correctly updated when monitorNodeUpdatesUseCase when NodeChanges is Favourite`() =
         runTest {
             val testHandle = 1L
-            val userPlaylists: List<VideoPlaylist> = (1..3L).map {
-                mock<UserVideoPlaylist>()
+            val userPlaylists: List<UserVideoPlaylist> = (1..3L).map {
+                initUserVideoPlaylist(it)
             }
             val favouriteVideos = (testHandle..3L).map {
                 initTypedVideoNode(it)
             }
-            val favouritesPlaylist: VideoPlaylist = mock<FavouritesVideoPlaylist> {
+            val favouritesPlaylist: FavouritesVideoPlaylist = mock<FavouritesVideoPlaylist> {
                 on { videos }.thenReturn(favouriteVideos)
             }
             val testNode = mock<FileNode> {
@@ -433,6 +445,12 @@ class VideoSectionViewModelTest {
                     }
                 )
             }
+            userPlaylists.onEach { playlist ->
+                whenever(playlist.copy(videos = emptyList())).thenReturn(playlist)
+            }
+            whenever(favouritesPlaylist.copy(videos = favouritesPlaylist.videos)).thenReturn(
+                favouritesPlaylist
+            )
             whenever(getVideoPlaylistsUseCase())
                 .thenReturn(listOf(favouritesPlaylist))
                 .thenReturn(videoPlaylists)
@@ -575,11 +593,21 @@ class VideoSectionViewModelTest {
     }
 
     private suspend fun initVideoPlaylistsReturned() {
-        val userVideoPlaylists = (1..2).map {
-            mock<UserVideoPlaylist>()
+        val userVideoPlaylists = (1..2L).map {
+            initUserVideoPlaylist(it)
         }
+        userVideoPlaylists.onEach { playlist ->
+            whenever(playlist.copy(videos = emptyList())).thenReturn(playlist)
+        }
+
         whenever(getVideoPlaylistsUseCase()).thenReturn(userVideoPlaylists)
         whenever(videoPlaylistUIEntityMapper(any())).thenReturn(videoPlaylistUIEntity)
+    }
+
+    private fun initUserVideoPlaylist(handle: Long) = mock<UserVideoPlaylist> {
+        on { id }.thenReturn(NodeId(handle))
+        on { title }.thenReturn("playlist")
+        on { totalDuration }.thenReturn(100.seconds)
     }
 
     @Test
@@ -663,6 +691,8 @@ class VideoSectionViewModelTest {
             mock<VideoPlaylistUIEntity> { on { title }.thenReturn(testTitle) }
         val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> { on { title }.thenReturn("title") }
 
+        whenever(expectedVideoPlaylist.copy(videos = emptyList())).thenReturn(expectedVideoPlaylist)
+        whenever(videoPlaylist.copy(videos = emptyList())).thenReturn(videoPlaylist)
         whenever(getVideoPlaylistsUseCase()).thenReturn(
             listOf(
                 expectedVideoPlaylist,
@@ -798,6 +828,7 @@ class VideoSectionViewModelTest {
                 on { id }.thenReturn(NodeId(0L))
             }
 
+            whenever(videoPlaylist.copy(videos = emptyList())).thenReturn(videoPlaylist)
             whenever(addVideosToPlaylistUseCase(testPlaylistID, testVideoIDs)).thenReturn(
                 testVideoIDs.size
             )
@@ -834,6 +865,7 @@ class VideoSectionViewModelTest {
                 on { id }.thenReturn(NodeId(0L))
             }
 
+            whenever(videoPlaylist.copy(videos = emptyList())).thenReturn(videoPlaylist)
             whenever(
                 removeVideosFromPlaylistUseCase(
                     testPlaylistID,
@@ -1270,6 +1302,7 @@ class VideoSectionViewModelTest {
             on { id }.thenReturn(NodeId(1L))
             on { title }.thenReturn("title")
         }
+        whenever(videoPlaylist.copy(videos = videoPlaylist.videos)).thenReturn(videoPlaylist)
         whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(videoPlaylist))
         whenever(videoPlaylistUIEntityMapper(videoPlaylist)).thenReturn(videoPlaylistUIEntity)
 
@@ -1363,6 +1396,7 @@ class VideoSectionViewModelTest {
             }
 
             whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(videoPlaylist))
+            whenever(videoPlaylist.copy(videos = videoPlaylist.videos)).thenReturn(videoPlaylist)
             whenever(videoPlaylistUIEntityMapper(videoPlaylist)).thenReturn(videoPlaylistUIEntity)
 
             initUnderTest()
@@ -1398,6 +1432,7 @@ class VideoSectionViewModelTest {
             }
 
             whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(videoPlaylist))
+            whenever(videoPlaylist.copy(videos = videoPlaylist.videos)).thenReturn(videoPlaylist)
             whenever(videoPlaylistUIEntityMapper(videoPlaylist)).thenReturn(videoPlaylistUIEntity)
 
             initUnderTest()
@@ -1467,7 +1502,7 @@ class VideoSectionViewModelTest {
             underTest.state.drop(2).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
-
+                skipItems(1)
                 underTest.onItemLongClicked(expectedVideo, 0)
                 assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(1)
 
@@ -1496,7 +1531,7 @@ class VideoSectionViewModelTest {
             underTest.state.drop(2).test {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
-
+                skipItems(1)
                 underTest.onItemLongClicked(expectedVideo, 0)
                 assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(1)
                 val actual = awaitItem()

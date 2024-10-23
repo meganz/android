@@ -207,6 +207,11 @@ class VideoSectionViewModel @Inject constructor(
                     isPendingRefresh = true
                 )
             }
+            if (_state.value.currentVideoPlaylist != null) {
+                refreshVideoPlaylistsWithUpdateCurrentVideoPlaylist()
+            } else {
+                loadVideoPlaylists()
+            }
         }.catch { Timber.e(it) }
             .launchIn(viewModelScope)
     }
@@ -255,9 +260,9 @@ class VideoSectionViewModel @Inject constructor(
 
     private fun loadVideoPlaylists() {
         viewModelScope.launch(defaultDispatcher) {
-            val videoPlaylists =
-                getVideoPlaylists().updateOriginalPlaylistEntities()
-                    .filterVideoPlaylistsBySearchQuery()
+            val videoPlaylists = getVideoPlaylists()
+                .updateOriginalPlaylistEntities()
+                .filterVideoPlaylistsBySearchQuery()
             _state.update {
                 it.copy(
                     videoPlaylists = videoPlaylists,
@@ -269,7 +274,19 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     private suspend fun getVideoPlaylists() =
-        getVideoPlaylistsUseCase().updateOriginalPlaylistData().map { videoPlaylist ->
+        getVideoPlaylistsUseCase().map { playlist ->
+            val filteredVideos = playlist.videos?.filterNonSensitiveItems(
+                showHiddenItems = showHiddenItems,
+                isPaid = _state.value.accountType?.isPaid,
+                isBusinessAccountExpired = _state.value.isBusinessAccountExpired
+            )
+            when (playlist) {
+                is FavouritesVideoPlaylist -> playlist.copy(videos = filteredVideos)
+                is UserVideoPlaylist -> playlist.copy(videos = filteredVideos)
+                else -> playlist
+            }
+
+        }.updateOriginalPlaylistData().map { videoPlaylist ->
             videoPlaylistUIEntityMapper(videoPlaylist)
         }
 
@@ -295,12 +312,8 @@ class VideoSectionViewModel @Inject constructor(
     private fun setPendingRefreshNodes() = _state.update { it.copy(isPendingRefresh = true) }
 
     internal fun refreshNodes() = viewModelScope.launch(defaultDispatcher) {
-        val videoList = filterNonSensitiveItems(
-            items = getVideoUIEntityList(),
-            showHiddenItems = this@VideoSectionViewModel.showHiddenItems,
-            isPaid = _state.value.accountType?.isPaid,
-            isBusinessAccountExpired = _state.value.isBusinessAccountExpired
-        ).filterVideosByDuration()
+        val videoList = getVideoUIEntityList()
+            .filterVideosByDuration()
             .filterVideosByLocation()
             .updateOriginalEntities()
             .filterVideosBySearchQuery()
@@ -317,7 +330,11 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     private suspend fun getVideoUIEntityList() =
-        getAllVideosUseCase().updateOriginalData().map { videoUIEntityMapper(it) }
+        getAllVideosUseCase().filterNonSensitiveItems(
+            showHiddenItems = this@VideoSectionViewModel.showHiddenItems,
+            isPaid = _state.value.accountType?.isPaid,
+            isBusinessAccountExpired = _state.value.isBusinessAccountExpired
+        ).updateOriginalData().map { videoUIEntityMapper(it) }
 
     private fun List<TypedVideoNode>.updateOriginalData() = also { data ->
         if (originalData.isNotEmpty()) {
@@ -1020,19 +1037,15 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    private suspend fun filterNonSensitiveItems(
-        items: List<VideoUIEntity>,
+    private suspend fun List<TypedVideoNode>.filterNonSensitiveItems(
         showHiddenItems: Boolean?,
         isPaid: Boolean?,
         isBusinessAccountExpired: Boolean,
     ) = withContext(defaultDispatcher) {
-        showHiddenItems ?: return@withContext items
-        isPaid ?: return@withContext items
-
-        return@withContext if (showHiddenItems || !isPaid || isBusinessAccountExpired) {
-            items
+        if (showHiddenItems == null || isPaid == null || showHiddenItems || !isPaid || isBusinessAccountExpired) {
+            this@filterNonSensitiveItems
         } else {
-            items.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
+            this@filterNonSensitiveItems.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
         }
     }
 

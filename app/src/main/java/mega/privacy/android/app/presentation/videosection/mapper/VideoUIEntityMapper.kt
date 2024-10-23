@@ -28,6 +28,7 @@ class VideoUIEntityMapper @Inject constructor() {
         isMarkedSensitive = typedVideoNode.isMarkedSensitive,
         isSensitiveInherited = typedVideoNode.isSensitiveInherited,
         watchedDate = typedVideoNode.watchedTimestamp,
-        collectionTitle = typedVideoNode.collectionTitle
+        collectionTitle = typedVideoNode.collectionTitle,
+        hasThumbnail = typedVideoNode.hasThumbnail,
     )
 }

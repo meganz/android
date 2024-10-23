@@ -25,6 +25,7 @@ import kotlin.time.Duration
  * @property isSensitiveInherited the video if is sensitive inherited
  * @property watchedDate the video's watched date
  * @property collectionTitle the collection title of the video
+ * @property hasThumbnail the video if has thumbnail
  */
 data class VideoUIEntity(
     val id: NodeId,
@@ -42,5 +43,6 @@ data class VideoUIEntity(
     val isMarkedSensitive: Boolean = false,
     val isSensitiveInherited: Boolean = false,
     val watchedDate: Long = 0,
-    val collectionTitle: String? = null
+    val collectionTitle: String? = null,
+    val hasThumbnail: Boolean = true,
 )
