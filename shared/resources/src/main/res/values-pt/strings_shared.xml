@@ -763,7 +763,7 @@
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">Permitir que o MEGA acesse todos os arquivos</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
+    <string name="files_permission_screen_message">Ao permitir o acesso do MEGA aos seus arquivos, você pode fazer o upload para o MEGA sem criar cópias temporárias, economizando espaço no seu dispositivo e permitindo uploads mais rápidos.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">Não mostrar novamente</string>
     <!-- Title of the dialog to confirm stop a sync -->
@@ -788,4 +788,12 @@
     <string name="sync_list_sync_state_up_to_date">Atualizado</string>
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favoritos</string>
+    <!-- Title of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_title">Não há conexões configuradas</string>
+    <!-- Message of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_message">Sincronize ou faça backup de uma pasta no seu dispositivo com uma pasta no MEGA.</string>
+    <!-- Message of the synced folder list empty state for free accounts -->
+    <string name="device_center_sync_backup_list_empty_state_message_free_account">Faça o upgrade a um plano pago para manter os seus dados importante seguros e atualizados com sincronização e backup</string>
+    <!-- Synced folder list empty state "See upgrade options" button label -->
+    <string name="device_center_sync_backup_see_upgrade_options_button_label">Veja as opções de upgrade</string>
 </resources>

@@ -764,4 +764,12 @@
     <string name="sync_list_sync_state_up_to_date">Đã cập nhật</string>
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Ưa thích</string>
+    <!-- Title of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_title">No connections are set up</string>
+    <!-- Message of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_message">Sync or back up a folder on your device with a folder on MEGA</string>
+    <!-- Message of the synced folder list empty state for free accounts -->
+    <string name="device_center_sync_backup_list_empty_state_message_free_account">Upgrade to a premium account to keep your important information safe and up-to-date with sync and backup</string>
+    <!-- Synced folder list empty state "See upgrade options" button label -->
+    <string name="device_center_sync_backup_see_upgrade_options_button_label">See upgrade options</string>
 </resources>

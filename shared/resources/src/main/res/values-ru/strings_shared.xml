@@ -800,4 +800,12 @@
     <string name="sync_list_sync_state_up_to_date">Синхронизировано</string>
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Избранное</string>
+    <!-- Title of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_title">Операции не настроены</string>
+    <!-- Message of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_message">Синхронизируйте или создайте резервную копию папки на устройстве с папкой в MEGA</string>
+    <!-- Message of the synced folder list empty state for free accounts -->
+    <string name="device_center_sync_backup_list_empty_state_message_free_account">Перейдите на премиум-аккаунт, чтобы обеспечить безопасность и актуальность важной информации с помощью синхронизации и резервного копирования</string>
+    <!-- Synced folder list empty state "See upgrade options" button label -->
+    <string name="device_center_sync_backup_see_upgrade_options_button_label">Посмотреть варианты</string>
 </resources>

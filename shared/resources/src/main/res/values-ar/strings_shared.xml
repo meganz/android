@@ -793,27 +793,27 @@
     <!-- Message of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
     <string name="sync_backup_access_storage_permission_dialog_message">لنسخ ملفاتك احتياطيًا، تحتاج ميغا MEGA إلى الوصول إلى الملفات والمجلدات الموجودة على جهازك. بياناتك آمنة دائمًا معنا.</string>
     <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
-    <string name="sync_add_new_backup_storage_permission_banner">MEGA needs access to your device storage in order to back up your local folder. [U]Tap to grant access[/U]</string>
+    <string name="sync_add_new_backup_storage_permission_banner">تحتاج ميغا MEGA إلى الوصول إلى مساحة تخزين جهازك من أجل نسخ المجلد المحلي احتياطيًا. [U] انقر لمنح إذن الوصول [/U]</string>
     <!--Success message displayed in the Login screen after the account has been activated-->
     <string name="login_screen_account_confirmed_success_message">تم تفعيل حسابك بالفعل. يُرجى تسجيل الدخول.</string>
     <!-- Title in the files permission screen -->
-    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <string name="files_permission_screen_title">السماح لميغا MEGA بالوصول إلى ملفات جهازك</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
+    <string name="files_permission_screen_message">من خلال السماح لميغا MEGA بالوصول إلى ملفاتك يمكنك الترفيع إلى ميغا MEGA دون إنشاء نسخ مؤقتة وتوفير مساحة على جهازك وتمكين الترفيع بشكل أسرع.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">لا تُظهر هذا مرة أخرى</string>
     <!-- Title of the dialog to confirm stop a sync -->
     <string name="sync_stop_sync_confirm_dialog_title">إيقاف المزامنة؟</string>
     <!-- Message of the dialog to confirm stop a sync -->
-    <string name="sync_stop_sync_confirm_dialog_message">This will stop the sync process between the two folders but won’t remove the folders.</string>
+    <string name="sync_stop_sync_confirm_dialog_message">سيؤدي هذا إلى إيقاف عملية المزامنة بين المجلدين ولكنه لن يزيل المجلدات.</string>
     <!-- Label for the button to stop a sync -->
     <string name="sync_stop_sync_button">أوقف المزامنة</string>
     <!-- Snackbar message to indicate that sync has been stopped -->
-    <string name="sync_snackbar_message_confirm_sync_stopped">Sync stopped</string>
+    <string name="sync_snackbar_message_confirm_sync_stopped">تم إيقاف المزامنة</string>
     <!-- Title of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_title">أوقف النسخ الاحتياطي</string>
     <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_message">This will stop the sync process between the two folders. A copy will be created and saved to your Cloud drive.</string>
+    <string name="sync_stop_backup_confirm_dialog_message">سيؤدي هذا إلى إيقاف عملية المزامنة بين المجلدين. سيتم إنشاء نسخة وحفظها على السواقة السحابية الخاصة بك.</string>
     <!-- Label for the button to stop a backup -->
     <string name="sync_stop_backup_button">أوقف النسخ الاحتياطي</string>
     <!-- Snackbar message to indicate that backup has been stopped -->
@@ -824,4 +824,12 @@
     <string name="sync_list_sync_state_up_to_date">لا يوجد تحديثات</string>
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">المفضلة</string>
+    <!-- Title of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_title">No connections are set up</string>
+    <!-- Message of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_message">Sync or back up a folder on your device with a folder on MEGA</string>
+    <!-- Message of the synced folder list empty state for free accounts -->
+    <string name="device_center_sync_backup_list_empty_state_message_free_account">Upgrade to a premium account to keep your important information safe and up-to-date with sync and backup</string>
+    <!-- Synced folder list empty state "See upgrade options" button label -->
+    <string name="device_center_sync_backup_see_upgrade_options_button_label">See upgrade options</string>
 </resources>

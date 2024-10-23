@@ -773,9 +773,9 @@
     <!--Success message displayed in the Login screen after the account has been activated-->
     <string name="login_screen_account_confirmed_success_message">Twoje konto zostało aktywowane. Proszę się zalogować.</string>
     <!-- Title in the files permission screen -->
-    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <string name="files_permission_screen_title">Zezwalaj MEGA na dostęp do plików urządzenia</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
+    <string name="files_permission_screen_message">Zezwalając na dostęp MEGA do plików, możesz wgrywać je do MEGA bez tworzenia kopii tymczasowych, oszczędzając miejsce na urządzeniu i umożliwiając szybsze wgrywanie.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">Nie pokazuj tego więcej</string>
     <!-- Title of the dialog to confirm stop a sync -->
@@ -789,7 +789,7 @@
     <!-- Title of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_title">Zatrzymaj tworzenie kopii</string>
     <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_message">This will stop the sync process between the two folders. A copy will be created and saved to your Cloud drive.</string>
+    <string name="sync_stop_backup_confirm_dialog_message">Spowoduje to zatrzymanie procesu synchronizacji między dwoma katalogami. Kopia zostanie utworzona i zapisana na Dysku w chmurze.</string>
     <!-- Label for the button to stop a backup -->
     <string name="sync_stop_backup_button">Zatrzymaj tworzenie kopii</string>
     <!-- Snackbar message to indicate that backup has been stopped -->
@@ -800,4 +800,12 @@
     <string name="sync_list_sync_state_up_to_date">Aktualne</string>
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Ulubione</string>
+    <!-- Title of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_title">Żadne połączenia nie są skonfigurowane</string>
+    <!-- Message of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_message">Synchronizuj lub utwórz kopię zapasową folderu na urządzeniu z katalog w MEGA</string>
+    <!-- Message of the synced folder list empty state for free accounts -->
+    <string name="device_center_sync_backup_list_empty_state_message_free_account">Uaktualnij konto premium, aby zapewnić bezpieczeństwo i aktualizację ważnych informacji dzięki synchronizacji i kopii zapasowej</string>
+    <!-- Synced folder list empty state "See upgrade options" button label -->
+    <string name="device_center_sync_backup_see_upgrade_options_button_label">Zobacz dostępne opcje</string>
 </resources>

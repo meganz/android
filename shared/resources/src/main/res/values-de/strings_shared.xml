@@ -751,7 +751,7 @@
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">Erlauben Sie MEGA den Zugriff auf die Dateien auf Ihrem Gerät</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
+    <string name="files_permission_screen_message">Wenn Sie MEGA Zugriff auf Ihre Dateien gewähren, können Sie diese auf MEGA hochladen, ohne temporäre Kopien zu erstellen. Das spart Platz auf Ihrem Gerät und ermöglicht schnellere Uploads.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">Nicht mehr anzeigen</string>
     <!-- Title of the dialog to confirm stop a sync -->
@@ -776,4 +776,12 @@
     <string name="sync_list_sync_state_up_to_date">Vollständig synchronisiert</string>
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favoriten</string>
+    <!-- Title of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_title">Keine Verbindungen eingerichtet</string>
+    <!-- Message of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_message">Synchronisieren Sie Ordner auf Ihrem Gerät mit Ordnern auf MEGA</string>
+    <!-- Message of the synced folder list empty state for free accounts -->
+    <string name="device_center_sync_backup_list_empty_state_message_free_account">Upgraden Sie auf einen Premium-Account, um durch Backups und Synchronisierungen Ihre wichtigen Daten zu schützen und aktuell zu halten</string>
+    <!-- Synced folder list empty state "See upgrade options" button label -->
+    <string name="device_center_sync_backup_see_upgrade_options_button_label">Zu den Upgrade-Optionen</string>
 </resources>

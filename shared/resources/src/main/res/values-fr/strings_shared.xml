@@ -761,23 +761,23 @@
     <!--Success message displayed in the Login screen after the account has been activated-->
     <string name="login_screen_account_confirmed_success_message">Votre compte a été activé. Veuillez vous connecter.</string>
     <!-- Title in the files permission screen -->
-    <string name="files_permission_screen_title">Allow MEGA to access your device’s files</string>
+    <string name="files_permission_screen_title">Autorisez MEGA à accéder aux fichiers de votre appareil</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
+    <string name="files_permission_screen_message">En permettant à MEGA d\’accéder à vos fichiers, vous pouvez les télécharger sur MEGA sans créer de copies temporaires, ce qui permet d\’économiser de l\’espace sur votre appareil et de permettre des téléchargements plus rapides.</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">Ne plus afficher</string>
     <!-- Title of the dialog to confirm stop a sync -->
     <string name="sync_stop_sync_confirm_dialog_title">Arrêter la synchronisation&#160;?</string>
     <!-- Message of the dialog to confirm stop a sync -->
-    <string name="sync_stop_sync_confirm_dialog_message">This will stop the sync process between the two folders but won’t remove the folders.</string>
+    <string name="sync_stop_sync_confirm_dialog_message">Cela arrêtera le processus de synchronisation entre les deux dossiers mais ne supprimera pas les dossiers.</string>
     <!-- Label for the button to stop a sync -->
     <string name="sync_stop_sync_button">Arrêter la synchronisation</string>
     <!-- Snackbar message to indicate that sync has been stopped -->
-    <string name="sync_snackbar_message_confirm_sync_stopped">Sync stopped</string>
+    <string name="sync_snackbar_message_confirm_sync_stopped">Synchronisation arrêtée</string>
     <!-- Title of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_title">Arrêter la sauvegarde</string>
     <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_message">This will stop the sync process between the two folders. A copy will be created and saved to your Cloud drive.</string>
+    <string name="sync_stop_backup_confirm_dialog_message">Cela arrêtera le processus de synchronisation entre les deux dossiers. Une copie sera créée et enregistrée sur votre Disque nuagique.</string>
     <!-- Label for the button to stop a backup -->
     <string name="sync_stop_backup_button">Arrêter la sauvegarde</string>
     <!-- Snackbar message to indicate that backup has been stopped -->
@@ -788,4 +788,12 @@
     <string name="sync_list_sync_state_up_to_date">À jour</string>
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favoris</string>
+    <!-- Title of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_title">Aucune connexion n\’est configurée</string>
+    <!-- Message of the synced folder list empty state -->
+    <string name="device_center_sync_backup_list_empty_state_message">Synchronisez ou sauvegardez un dossier sur votre appareil avec un dossier sur MEGA</string>
+    <!-- Message of the synced folder list empty state for free accounts -->
+    <string name="device_center_sync_backup_list_empty_state_message_free_account">Passez à un compte premium pour protéger et mettre à jour vos renseignements importants grâce à la synchronisation et à la sauvegarde</string>
+    <!-- Synced folder list empty state "See upgrade options" button label -->
+    <string name="device_center_sync_backup_see_upgrade_options_button_label">Voir les options de mise à niveau</string>
 </resources>
