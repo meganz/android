@@ -109,6 +109,14 @@ android {
             initWith(getByName("debug"))
             isDebuggable = true
             matchingFallbacks += listOf("debug", "release")
+            if (isServerBuild()) {
+                isMinifyEnabled = true
+                isShrinkResources = true
+                proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+                )
+            }
             applicationIdSuffix = ".qa"
             buildConfigField("String", "ENVIRONMENT", "\"MEGAEnv/QA\"")
             buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
