@@ -530,18 +530,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         var isClosedChat = true
 
         /**
-         * Is enabled geo location
-         *
-         * @deprecated
-         */
-        @JvmStatic
-        @Deprecated(
-            "Global usage is deprecated",
-            ReplaceWith("IsGeolocationEnabledUseCase")
-        )
-        var isEnabledGeoLocation = false
-
-        /**
          * Url confirmation link
          */
         @JvmStatic

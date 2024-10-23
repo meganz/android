@@ -1511,7 +1511,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
             userInfoViewModel.getUserInfo()
             preloadPayment()
-            megaApi.isGeolocationEnabled(this)
             if (savedInstanceState == null) {
                 // Check the consistency of the offline nodes in the database and sync files
                 viewModel.startOfflineSyncWorker()
@@ -6644,18 +6643,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     Timber.d("MK exported - USER_ATTR_PWD_REMINDER finished")
                     if (e.errorCode == MegaError.API_OK || e.errorCode == MegaError.API_ENOENT) {
                         Timber.d("New value of attribute USER_ATTR_PWD_REMINDER: %s", request.text)
-                    }
-                }
-            }
-
-            MegaRequest.TYPE_GET_ATTR_USER -> {
-                if (request.paramType == MegaApiJava.USER_ATTR_GEOLOCATION) {
-                    if (e.errorCode == MegaError.API_OK) {
-                        Timber.d("Attribute USER_ATTR_GEOLOCATION enabled")
-                        MegaApplication.isEnabledGeoLocation = true
-                    } else {
-                        Timber.d("Attribute USER_ATTR_GEOLOCATION disabled")
-                        MegaApplication.isEnabledGeoLocation = false
                     }
                 }
             }
