@@ -28,5 +28,6 @@ enum class RegexPatternType {
     WEB_SESSION_LINK,
     BUSINESS_INVITE_LINK,
     ALBUM_LINK,
-    UPGRADE_PAGE_LINK
+    UPGRADE_PAGE_LINK,
+    UPGRADE_LINK
 }

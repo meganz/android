@@ -6,7 +6,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
@@ -15,11 +19,15 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OpenLinkViewModelTest {
@@ -30,6 +38,9 @@ class OpenLinkViewModelTest {
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase = mock()
     private val logoutUseCase: LogoutUseCase = mock()
     private val querySignupLinkUseCase: QuerySignupLinkUseCase = mock()
+    private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase = mock()
+    private val getRootNodeUseCase: GetRootNodeUseCase = mock()
+    private val decodeLinkUseCase: DecodeLinkUseCase = mock()
     private val applicationScope = CoroutineScope(extension.testDispatcher)
 
     @BeforeEach
@@ -39,9 +50,78 @@ class OpenLinkViewModelTest {
             clearEphemeralCredentialsUseCase = clearEphemeralCredentialsUseCase,
             logoutUseCase = logoutUseCase,
             querySignupLinkUseCase = querySignupLinkUseCase,
+            getAccountCredentials = getAccountCredentialsUseCase,
+            getRootNodeUseCase = getRootNodeUseCase,
+            decodeLinkUseCase = decodeLinkUseCase,
             applicationScope = applicationScope
         )
     }
+
+    private fun provideParameters(): Stream<Arguments> = Stream.of(
+        Arguments.of(
+            UserCredentials(
+                email = randomString(),
+                session = randomString(),
+                firstName = randomString(),
+                lastName = randomString(),
+                myHandle = randomString()
+            ),
+            true
+        ),
+        Arguments.of(
+            null,
+            false
+        ),
+    )
+
+    @MethodSource("provideParameters")
+    @ParameterizedTest(name = "when getAccountCredentialsUseCase returns {0} then isLoggedIn is {1}")
+    fun `test that the isLoggedIn state is successfully updated when getAccountCredentialsUseCase returns the expected value`(
+        userCredentials: UserCredentials?,
+        expected: Boolean,
+    ) =
+        runTest {
+            // Given
+            val url = randomLink()
+            val decodedLink = "decodedLink"
+
+            whenever(decodeLinkUseCase(url)).thenReturn(decodedLink)
+            whenever(getAccountCredentialsUseCase()).thenReturn(userCredentials)
+            whenever(getRootNodeUseCase()).thenReturn(mock())
+            // When
+            underTest.decodeUrl(url)
+
+            // Then
+            underTest.state.test {
+                assertThat(expectMostRecentItem().isLoggedIn).isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that the decoded url state is updated when successfully decoding the url`() =
+        runTest {
+            // Given
+            val url = randomLink()
+            val decodedLink = "decodedLink"
+            val userCredentials = UserCredentials(
+                email = randomString(),
+                session = randomString(),
+                firstName = randomString(),
+                lastName = randomString(),
+                myHandle = randomString()
+            )
+
+            whenever(decodeLinkUseCase(url)).thenReturn(decodedLink)
+            whenever(getAccountCredentialsUseCase()).thenReturn(userCredentials)
+            whenever(getRootNodeUseCase()).thenReturn(mock())
+            // When
+            underTest.decodeUrl(url)
+
+            // Then
+            underTest.state.test {
+                assertThat(expectMostRecentItem().decodedUrl).isEqualTo(decodedLink)
+            }
+        }
 
     @Test
     fun `test that account invitation email state is updated when successfully create account invitation email with a link`() =
@@ -122,7 +202,7 @@ class OpenLinkViewModelTest {
 
             // Then
             underTest.state.test {
-                assertThat(expectMostRecentItem().isLoggedOut).isTrue()
+                assertThat(expectMostRecentItem().isLogoutCompleted).isTrue()
                 assertThat(MegaApplication.urlConfirmationLink).isEqualTo(null)
             }
         }
@@ -142,7 +222,7 @@ class OpenLinkViewModelTest {
 
             // Then
             underTest.state.test {
-                assertThat(expectMostRecentItem().isLoggedOut).isFalse()
+                assertThat(expectMostRecentItem().isLogoutCompleted).isFalse()
                 assertThat(MegaApplication.urlConfirmationLink).isEqualTo(confirmationLink)
             }
         }
@@ -154,7 +234,10 @@ class OpenLinkViewModelTest {
             localLogoutAppUseCase,
             clearEphemeralCredentialsUseCase,
             logoutUseCase,
-            querySignupLinkUseCase
+            querySignupLinkUseCase,
+            getAccountCredentialsUseCase,
+            getRootNodeUseCase,
+            decodeLinkUseCase
         )
     }
 

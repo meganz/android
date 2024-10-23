@@ -13,7 +13,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.OpenPasswordLinkActivity
 import mega.privacy.android.app.R
@@ -31,7 +30,6 @@ import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
 import mega.privacy.android.app.utils.CallUtil.showConfirmationInACall
@@ -81,7 +79,6 @@ import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.Constants.WEB_SESSION_LINK_REGEXS
 import mega.privacy.android.app.utils.LinksUtil.requiresTransferSession
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.Util.decodeURL
 import mega.privacy.android.app.utils.Util.matchRegexs
 import mega.privacy.android.app.utils.isURLSanitized
 import mega.privacy.android.domain.entity.RegexPatternType
@@ -139,16 +136,12 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
     lateinit var getCurrentUserEmail: GetCurrentUserEmail
 
     private var urlConfirmationLink: String? = null
-
-    private var isLoggedIn = false
-    private var needsRefreshSession = false
-
     private var url: String? = null
+
     private val viewModel by viewModels<OpenLinkViewModel>()
     private val binding: ActivityOpenLinkBinding by lazy(LazyThreadSafetyMode.NONE) {
         ActivityOpenLinkBinding.inflate(layoutInflater)
     }
-    private var isCrossAccountMatch: Boolean = false
 
     /**
      * onCreate
@@ -158,22 +151,31 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
         super.onCreate(savedInstanceState)
         url = intent.dataString
         Timber.d("Original url: $url")
-
         setContentView(binding.root)
-
         binding.openLinkError.isVisible = false
         binding.containerAcceptButton.isVisible = false
         binding.containerAcceptButton.setOnClickListener {
             finish()
         }
 
-        url = decodeURL(url)
-        val credentials = runBlocking { runCatching { getAccountCredentialsUseCase() }.getOrNull() }
-        isLoggedIn = megaApi.isLoggedIn != 0 && credentials != null
-        needsRefreshSession = megaApi.rootNode == null
+        collectFlow(viewModel.state) { openLinkState: OpenLinkState ->
+            with(openLinkState) {
+                url = decodedUrl
+                isLoggedIn?.let {
+                    handleUrlRedirection(isLoggedIn, needsRefreshSession = needsRefreshSession)
+                }
+                if (isLogoutCompleted) {
+                    handleLoggedOutState()
+                    handleAccountInvitationEmailState(accountInvitationEmail)
+                }
+            }
+        }
+        url?.let {
+            viewModel.decodeUrl(it)
+        }
+    }
 
-        collectFlows()
-
+    private fun handleUrlRedirection(isLoggedIn: Boolean, needsRefreshSession: Boolean) {
         when {
             // If is not a MEGA link, is not a supported link
             !url.isURLSanitized() -> {
@@ -474,16 +476,17 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     setError(getString(R.string.alert_not_logged_in))
                 }
             }
-
-            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_PAGE_LINK -> {
+            //Upgrade Account link
+            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_PAGE_LINK
+                    || getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_LINK -> {
                 lifecycleScope.launch {
-                    startActivity(
-                        Intent(
-                            this@OpenLinkActivity,
-                            UpgradeAccountActivity::class.java
-                        )
-                    )
-                    finish()
+                    if (isLoggedIn) {
+                        navigateToUpgradeAccount()
+                        finish()
+                    } else {
+                        Timber.w("Not logged in")
+                        setError(getString(R.string.alert_not_logged_in))
+                    }
                 }
             }
 
@@ -492,7 +495,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     deeplinkHandler.process(this, url.toString())
                     finish()
                 } else {
-                    Timber.w("Not logged")
+                    Timber.w("Not logged in")
                     setError(getString(R.string.alert_not_logged_in))
                 }
             }
@@ -507,24 +510,12 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
-    private fun collectFlows() {
-        collectFlow(viewModel.state) { openLinkState: OpenLinkState ->
-            with(openLinkState) {
-                handleLoggedOutState(isLoggedOut)
-
-                handleAccountInvitationEmailState(accountInvitationEmail)
-            }
-        }
-    }
-
     /**
      * Handle the isLoggedOut state from [OpenLinkState]
      *
      * Navigates to [LoginActivity] if the user logged out
      */
-    private fun handleLoggedOutState(isLoggedOut: Boolean) {
-        if (!isLoggedOut) return
-
+    private fun handleLoggedOutState() {
         startActivity(
             Intent(this@OpenLinkActivity, LoginActivity::class.java)
                 .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)

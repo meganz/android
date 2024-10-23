@@ -11,7 +11,6 @@ import static mega.privacy.android.app.utils.ChatUtil.converterShortCodes;
 import static mega.privacy.android.app.utils.Constants.ACTION_TAKE_PICTURE;
 import static mega.privacy.android.app.utils.Constants.ACTION_TAKE_PROFILE_PICTURE;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
-import static mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.TAKE_PHOTO_CODE;
 import static mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE;
@@ -24,15 +23,12 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -49,11 +45,6 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
@@ -71,7 +62,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -82,16 +72,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
@@ -116,19 +100,12 @@ import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
 public class Util {
 
     public static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd HH.mm.ss";
     public static float dpWidthAbs = 360;
-    public static float dpHeightAbs = 592;
-
-    public static double percScreenLogin = 0.596283784; //The dimension of the grey zone (Login and Tour)
-
-    // Debug flag to enable logging and some other things
-    public static boolean DEBUG = false;
 
     public static HashMap<String, String> countryCodeDisplay;
 
@@ -141,17 +118,6 @@ public class Util {
      * Language tag for simplified Chinese.
      */
     private static final String HANS = "Hans";
-
-    public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
-        String nodeFingerprint = node.getFingerprint();
-        String nodeOriginalFingerprint = node.getOriginalFingerprint();
-
-        String fileFingerprint = megaApi.getFingerprint(localPath);
-        if (fileFingerprint != null) {
-            return fileFingerprint.equals(nodeFingerprint) || fileFingerprint.equals(nodeOriginalFingerprint);
-        }
-        return false;
-    }
 
     /*
      * Build error dialog
@@ -265,26 +231,6 @@ public class Util {
         return src;
     }
 
-    public static String getExternalCardPath() {
-
-        String secStore = System.getenv("SECONDARY_STORAGE");
-        if (secStore == null) {
-            return null;
-        } else {
-            if (secStore.compareTo("") == 0) {
-                return null;
-            }
-            Timber.d("secStore: %s", secStore);
-            File path = new File(secStore);
-            Timber.d("getFreeSize: %s", path.getUsableSpace());
-            if (path.getUsableSpace() > 0) {
-                return path.getAbsolutePath();
-            }
-        }
-
-        return null;
-    }
-
     public static String getNumberItemChildren(File file, Context context) {
         File[] list = file.listFiles();
         int count = 0;
@@ -293,55 +239,6 @@ public class Util {
         }
 
         return context.getResources().getQuantityString(R.plurals.general_num_items, count, count);
-    }
-
-    public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
-
-        Matrix matrix = new Matrix();
-        switch (orientation) {
-            case ExifInterface.ORIENTATION_NORMAL:
-                return bitmap;
-            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
-                matrix.setScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                matrix.setRotate(180);
-                break;
-            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
-                matrix.setRotate(180);
-                matrix.postScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_TRANSPOSE:
-                matrix.setRotate(90);
-                matrix.postScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                matrix.setRotate(90);
-                break;
-            case ExifInterface.ORIENTATION_TRANSVERSE:
-                matrix.setRotate(-90);
-                matrix.postScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                matrix.setRotate(-90);
-                break;
-            default:
-                return bitmap;
-        }
-
-        try {
-            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            if (bitmap != null && !bitmap.isRecycled()) {
-                bitmap.recycle();
-                bitmap = null;
-                System.gc();
-            }
-            return bmRotated;
-        } catch (Exception e) {
-            Timber.e(e, "Exception creating rotated bitmap");
-            e.printStackTrace();
-            return null;
-        }
     }
 
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -424,16 +321,6 @@ public class Util {
         return scale;
     }
 
-    public static float getScaleH(DisplayMetrics outMetrics, float density) {
-
-        float scale = 0;
-
-        float dpHeight = outMetrics.heightPixels / density;
-        scale = dpHeight / dpHeightAbs;
-
-        return scale;
-    }
-
     /**
      * Convert dp to px.
      *
@@ -471,40 +358,6 @@ public class Util {
         cipher.init(Cipher.DECRYPT_MODE, skeySpec);
         byte[] decrypted = cipher.doFinal(encrypted);
         return decrypted;
-    }
-
-    /**
-     * Checks if device is on WiFi.
-     */
-    public static boolean isOnWifi(Context context) {
-        return isOnNetwork(context, ConnectivityManager.TYPE_WIFI);
-    }
-
-    /**
-     * Checks if device is on Mobile Data.
-     */
-    public static boolean isOnMobileData(Context context) {
-        return isOnNetwork(context, ConnectivityManager.TYPE_MOBILE);
-    }
-
-    /**
-     * Checks if device is on specific network.
-     *
-     * @param networkType The type of network,
-     * @return True if device is on specified network, false otherwise.
-     * @see ConnectivityManager to check the available network types available.
-     */
-    private static boolean isOnNetwork(Context context, int networkType) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getApplicationContext()
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo networkInfo = null;
-
-        if (connectivityManager != null) {
-            networkInfo = connectivityManager.getNetworkInfo(networkType);
-        }
-
-        return networkInfo != null && networkInfo.isConnected();
     }
 
     /**
@@ -637,35 +490,9 @@ public class Util {
         view.setAlpha(alpha);
     }
 
-    /*
-     * Make part of the string bold
-     */
-    public static SpannableStringBuilder makeBold(String text, String boldText) {
-        SpannableStringBuilder sb = new SpannableStringBuilder(text);
-        StyleSpan bss = new StyleSpan(android.graphics.Typeface.BOLD);
-        sb.setSpan(bss, text.length() - boldText.length(), text.length(),
-                Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        return sb;
-    }
-
     public static String getPhotoSyncName(long timeStamp, String fileName) {
         DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.getDefault());
         return sdf.format(new Date(timeStamp)) + fileName.substring(fileName.lastIndexOf('.'));
-    }
-
-    public static int getNumberOfNodes(MegaNode parent, MegaApiAndroid megaApi) {
-        int numberOfNodes = 0;
-
-        ArrayList<MegaNode> children = megaApi.getChildren(parent);
-        for (int i = 0; i < children.size(); i++) {
-            if (children.get(i).isFile()) {
-                numberOfNodes++;
-            } else {
-                numberOfNodes = numberOfNodes + getNumberOfNodes(children.get(i), megaApi);
-            }
-        }
-
-        return numberOfNodes;
     }
 
     public static String getLocalIpAddress(Context context) {
@@ -745,16 +572,6 @@ public class Util {
             builder.setOnDismissListener(listener);
         }
         return builder.show();
-    }
-
-
-    public static int getVersion(Context context) {
-        try {
-            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-            return pInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            return 0;
-        }
     }
 
     public static long calculateTimestamp(String time) {
@@ -838,27 +655,6 @@ public class Util {
         activity.getBaseContext().getResources().updateConfiguration(configuration, metrics);
     }
 
-    //reduce font size for scale mode to prevent title and subtitle overlap
-    public static SpannableString adjustForLargeFont(String original) {
-        Context context = MegaApplication.getInstance().getApplicationContext();
-        float scale = context.getResources().getConfiguration().fontScale;
-        if (scale > 1) {
-            scale = (float) 0.9;
-        }
-        SpannableString spannableString = new SpannableString(original);
-        spannableString.setSpan(new RelativeSizeSpan(scale), 0, original.length(), 0);
-        return spannableString;
-    }
-
-    public static Drawable mutateIcon(Context context, int idDrawable, int idColor) {
-
-        Drawable icon = ContextCompat.getDrawable(context, idDrawable);
-        icon = icon.mutate();
-        icon.setColorFilter(ContextCompat.getColor(context, idColor), PorterDuff.Mode.MULTIPLY);
-
-        return icon;
-    }
-
     public static Drawable mutateIconSecondary(Context context, int idDrawable, int idColor) {
         Drawable icon = ContextCompat.getDrawable(context, idDrawable);
         icon = icon.mutate();
@@ -904,24 +700,6 @@ public class Util {
         return DbHandlerModuleKt.getDbHandler().getPreferences();
     }
 
-    /**
-     * Checks if should ask for download location.
-     *
-     * @return True if should ask for download location, false otherwise.
-     */
-    public static boolean askMe() {
-
-        MegaPreferences prefs = DbHandlerModuleKt.getDbHandler().getPreferences();
-
-        if (prefs != null && prefs.getStorageAskAlways() != null
-                && !Boolean.parseBoolean(prefs.getStorageAskAlways())
-                && prefs.getStorageDownloadLocation() != null) {
-            return TextUtil.isTextEmpty(prefs.getStorageDownloadLocation());
-        }
-
-        return true;
-    }
-
     public static void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         //Find the currently focused view, so we can grab the correct window token from it.
@@ -931,17 +709,6 @@ public class Util {
             view = new View(activity);
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
-    /**
-     * Method to display a NOT_SPACE_SNACKBAR_TYPE Snackbar
-     * <p>
-     * Use this method only from controllers or services or when ut does not know what the context is.
-     *
-     * @param context Class where the Snackbar has to be shown
-     */
-    public static void showNotEnoughSpaceSnackbar(Context context) {
-        showSnackbar(context, NOT_SPACE_SNACKBAR_TYPE, null, INVALID_HANDLE);
     }
 
     /**
@@ -1116,56 +883,6 @@ public class Util {
 
     }
 
-    /**
-     * This method decodes a url and formats it before its treatment
-     * Use [DecodeLinkUseCase] instead.
-     *
-     * @param url the passed url to be decoded
-     */
-    @Deprecated
-    public static String decodeURL(String url) {
-        try {
-            url = URLDecoder.decode(url, "UTF-8");
-        } catch (Exception e) {
-            Timber.d("Exception decoding url: %s", url);
-            e.printStackTrace();
-        }
-
-        url = url.replace(' ', '+');
-
-        if (url.startsWith("mega://")) {
-            url = url.replaceFirst("mega://", "https://mega.nz/");
-        } else if (url.startsWith("mega.")) {
-            url = url.replaceFirst("mega.", "https://mega.");
-        }
-
-        if (url.startsWith("https://www.mega.co.nz")) {
-            url = url.replaceFirst("https://www.mega.co.nz", "https://mega.co.nz");
-        }
-
-        if (url.startsWith("https://www.mega.nz")) {
-            url = url.replaceFirst("https://www.mega.nz", "https://mega.nz");
-        }
-
-        if (url.endsWith("/")) {
-            url = url.substring(0, url.length() - 1);
-        }
-
-        Timber.d("URL decoded: %s", url);
-        return url;
-    }
-
-    /**
-     * Convert color integer to corresponding string in hex format.
-     *
-     * @param color An integer which represents a color.
-     * @return The color string in hex format, e.g., #FFABCDEF.
-     */
-    public static String getHexValue(int color) {
-        return String.format("#%06X", 0xFFFFFF & color);
-    }
-
-
     public static void showKeyboardDelayed(final View view) {
         if (view == null) return;
 
@@ -1255,17 +972,6 @@ public class Util {
         }
     }
 
-    public static boolean isFastDoubleClick() {
-        long time = System.currentTimeMillis();
-        long timeD = time - lastClickTime;
-        if (0 <= timeD && timeD < 500) {
-            return true;
-        }
-
-        lastClickTime = time;
-        return false;
-    }
-
     /**
      * Changes the elevation of the the ActionBar passed as parameter.
      *
@@ -1295,11 +1001,6 @@ public class Util {
             throws Resources.NotFoundException {
         return DrawableCompat.wrap(ResourcesCompat.getDrawable(context.getResources(),
                 resId, null));
-    }
-
-    public static LocalDate fromEpoch(long seconds) {
-        return LocalDate.from(
-                LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
     }
 
     /**
@@ -1369,21 +1070,5 @@ public class Util {
      */
     public static int getCurrentOrientation() {
         return MegaApplication.getInstance().getApplicationContext().getResources().getConfiguration().orientation;
-    }
-
-    /**
-     * Convert ArrayList type of handleList to Array
-     *
-     * @param handleList handle list of the nodes
-     * @return new Array
-     */
-    public static long[] getHandleArray(ArrayList<Long> handleList) {
-        if (handleList == null) return new long[0];
-
-        long[] handles = new long[handleList.size()];
-        for (int i = 0; i < handleList.size(); i++) {
-            handles[i] = handleList.get(i);
-        }
-        return handles;
     }
 }

@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.RegexPatternType.PENDING_CONTACTS_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.RESET_PASSWORD_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.RESTRICTED
 import mega.privacy.android.domain.entity.RegexPatternType.REVERT_CHANGE_PASSWORD_LINK
+import mega.privacy.android.domain.entity.RegexPatternType.UPGRADE_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.UPGRADE_PAGE_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.VERIFY_CHANGE_MAIL_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.WEB_SESSION_LINK
@@ -71,6 +72,7 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             isUrlMatchesRegexUseCase(url, WEB_SESSION_LINK_REGEX) -> WEB_SESSION_LINK
             isUrlMatchesRegexUseCase(url, BUSINESS_INVITE_LINK_REGEX) -> BUSINESS_INVITE_LINK
             isUrlMatchesRegexUseCase(url, UPGRADE_PAGE_LINK_REGEX) -> UPGRADE_PAGE_LINK
+            isUrlMatchesRegexUseCase(url, UPGRADE_LINK_REGEX) -> UPGRADE_LINK
             else -> RESTRICTED
         }
 
@@ -306,6 +308,14 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          */
         private val UPGRADE_PAGE_LINK_REGEX = arrayOf(
             "^https:\\/\\/mega(?:\\.co\\.nz|\\.nz)\\/pro[/?]?([^.]?)+$",
+        )
+
+        /**
+         * Regex for UPGRADE_LINK
+         */
+        private val UPGRADE_LINK_REGEX = arrayOf(
+            "^https://mega\\.nz/upgrade.+\$",
+            "^https://mega\\.nz/upgrade"
         )
     }
 }

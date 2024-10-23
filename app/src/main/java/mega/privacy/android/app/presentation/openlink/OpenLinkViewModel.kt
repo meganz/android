@@ -11,7 +11,10 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
@@ -27,6 +30,9 @@ class OpenLinkViewModel @Inject constructor(
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val querySignupLinkUseCase: QuerySignupLinkUseCase,
+    private val getAccountCredentials: GetAccountCredentialsUseCase,
+    private val getRootNodeUseCase: GetRootNodeUseCase,
+    private val decodeLinkUseCase: DecodeLinkUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -38,6 +44,29 @@ class OpenLinkViewModel @Inject constructor(
      * Flow of [OpenLinkState]
      */
     val state = _state.asStateFlow()
+
+    /**
+     * decodes the url and updates the state
+     * @param url url to decode
+     */
+    fun decodeUrl(url: String) {
+        viewModelScope.launch {
+            runCatching {
+                val accountCredentials = getAccountCredentials()
+                val needToRefresh = getRootNodeUseCase() == null
+                val decodedUrl = decodeLinkUseCase(url)
+                _state.update {
+                    it.copy(
+                        decodedUrl = decodedUrl,
+                        isLoggedIn = accountCredentials != null,
+                        needsRefreshSession = needToRefresh
+                    )
+                }
+            }.onFailure { error ->
+                Timber.d("Error on decode url $error")
+            }
+        }
+    }
 
     /**
      * logout confirmed
@@ -53,7 +82,7 @@ class OpenLinkViewModel @Inject constructor(
                     localLogoutAppUseCase()
                 }.onSuccess {
                     MegaApplication.urlConfirmationLink = null
-                    _state.update { it.copy(isLoggedOut = true) }
+                    _state.update { it.copy(isLogoutCompleted = true) }
                 }.onFailure {
                     Timber.d("Logout confirmation failed : ${it.message}")
                 }

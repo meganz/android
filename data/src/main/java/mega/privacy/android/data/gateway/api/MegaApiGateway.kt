@@ -2000,7 +2000,8 @@ interface MegaApiGateway {
 
     /**
      * Is User Logged In
-     *
+     * NOTE: Executing a fastLogin while fetching the isLoggedIn can return 0, make sure to call
+     * this method after the fastLogin has finished
      * @return 0 if not logged in, Otherwise a number > 0
      */
     fun isUserLoggedIn(): Int
