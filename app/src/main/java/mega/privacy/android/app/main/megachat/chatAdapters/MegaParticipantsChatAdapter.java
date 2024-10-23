@@ -429,7 +429,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                         }
                     }
 
-                    if (getChat().isPublic() && getChat().getOwnPrivilege() >= MegaChatRoom.PRIV_RO) {
+                    if (getChat().isPublic() && getChat().getOwnPrivilege() > MegaChatRoom.PRIV_RO) {
                         holderHeader.chatLinkLayout.setVisibility(View.VISIBLE);
                         holderHeader.chatLinkLayout.setOnClickListener(this);
                         holderHeader.chatLinkSeparator.setVisibility(View.VISIBLE);
