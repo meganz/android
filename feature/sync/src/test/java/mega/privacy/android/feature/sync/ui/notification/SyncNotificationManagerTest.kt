@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.feature.sync.domain.entity.NotificationDetails
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.CreateSyncNotificationIdUseCase
@@ -44,8 +45,7 @@ internal class SyncNotificationManagerTest {
                 title = "Notification title",
                 text = "Notification text",
                 syncNotificationType = SyncNotificationType.STALLED_ISSUE,
-                path = "Path",
-                errorCode = null
+                notificationDetails = NotificationDetails(path = "Path", errorCode = null)
             )
             val notification: Notification = mock()
             whenever(syncNotificationMapper(context, notificationMessage)).thenReturn(notification)

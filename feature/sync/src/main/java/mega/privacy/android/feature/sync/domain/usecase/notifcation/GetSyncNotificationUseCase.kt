@@ -1,8 +1,13 @@
 package mega.privacy.android.feature.sync.domain.usecase.notifcation
 
+import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.ERROR
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.BATTERY_LOW
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.STALLED_ISSUE
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.NOT_CONNECTED_TO_WIFI
 import mega.privacy.android.feature.sync.domain.repository.SyncNotificationRepository
 import javax.inject.Inject
 
@@ -29,46 +34,107 @@ class GetSyncNotificationUseCase @Inject constructor(
         val isNetworkConstraintRespected = isSyncOnlyByWifi && isUserOnWifi || !isSyncOnlyByWifi
 
         return when {
-            isSyncNotificationDisplayed -> null
-            isBatteryLow -> getBatteryLowNotification()
-            !isNetworkConstraintRespected -> getNetworkConstraintNotification()
-            syncs.any { it.syncError != null } -> getSyncErrorsNotification(syncs)
-            stalledIssues.isNotEmpty() -> getStalledIssuesNotification(stalledIssues)
-            else -> null
+            isSyncNotificationDisplayed -> {
+                null
+            }
+
+            isBatteryLow -> {
+                getBatteryLowNotification()
+            }
+
+            !isNetworkConstraintRespected -> {
+                resetBatteryLowNotification()
+                getNetworkConstraintNotification()
+            }
+
+            syncs.any { it.syncError != SyncError.NO_SYNC_ERROR } -> {
+                resetBatteryLowNotification()
+                resetNetworkConstraintNotification()
+                getSyncErrorsNotification(syncs)
+            }
+
+            stalledIssues.isNotEmpty() -> {
+                resetBatteryLowNotification()
+                resetNetworkConstraintNotification()
+                resetSyncErrorsNotification()
+                getStalledIssuesNotification(stalledIssues)
+            }
+
+            else -> {
+                resetBatteryLowNotification()
+                resetNetworkConstraintNotification()
+                resetSyncErrorsNotification()
+                resetSyncStalledIssuesNotification()
+                null
+            }
         }
     }
 
-    private suspend fun getBatteryLowNotification(): SyncNotificationMessage? {
-        return if (!syncNotificationRepository.isBatteryLowNotificationShown()) {
-            syncNotificationRepository.setBatteryLowNotificationShown(true)
+    private suspend fun resetBatteryLowNotification() {
+        syncNotificationRepository.deleteDisplayedNotificationByType(BATTERY_LOW)
+    }
+
+    private suspend fun resetNetworkConstraintNotification() {
+        syncNotificationRepository.deleteDisplayedNotificationByType(NOT_CONNECTED_TO_WIFI)
+    }
+
+    private suspend fun resetSyncErrorsNotification() {
+        syncNotificationRepository.deleteDisplayedNotificationByType(ERROR)
+    }
+
+    private suspend fun resetSyncStalledIssuesNotification() {
+        syncNotificationRepository.deleteDisplayedNotificationByType(STALLED_ISSUE)
+
+    }
+
+    private suspend fun getBatteryLowNotification(): SyncNotificationMessage? =
+        if (syncNotificationRepository.getDisplayedNotificationsByType(BATTERY_LOW).isEmpty()) {
             syncNotificationRepository.getBatteryLowNotification()
         } else {
             null
         }
-    }
 
-    private suspend fun getNetworkConstraintNotification(): SyncNotificationMessage? {
-        return if (!syncNotificationRepository.isUserNotOnWifiNotificationShown()) {
-            syncNotificationRepository.setUserNotOnWifiNotificationShown(true)
+    private suspend fun getNetworkConstraintNotification(): SyncNotificationMessage? =
+        if (syncNotificationRepository.getDisplayedNotificationsByType(NOT_CONNECTED_TO_WIFI)
+                .isEmpty()
+        ) {
             syncNotificationRepository.getUserNotOnWifiNotification()
         } else {
             null
         }
-    }
 
     private suspend fun getSyncErrorsNotification(syncs: List<FolderPair>): SyncNotificationMessage? {
-        return if (!syncNotificationRepository.isSyncErrorsNotificationShown(syncs)) {
-            syncNotificationRepository.setSyncErrorsNotificationShown(syncs, shown = true)
-            syncNotificationRepository.getSyncErrorsNotification()
+        val shownSyncErrors = syncNotificationRepository.getDisplayedNotificationsByType(ERROR)
+        val newSyncErrors = syncs.filter { sync ->
+            shownSyncErrors.none {
+                it.notificationDetails.path.equals(
+                    sync.localFolderPath, ignoreCase = true
+                )
+            }
+        }
+        return if (newSyncErrors.isNotEmpty()) {
+            syncNotificationRepository.getSyncErrorsNotification(newSyncErrors)
         } else {
             null
         }
     }
 
     private suspend fun getStalledIssuesNotification(stalledIssues: List<StalledIssue>): SyncNotificationMessage? {
-        return if (!syncNotificationRepository.isSyncStalledIssuesNotificationShown(stalledIssues)) {
-            syncNotificationRepository.setSyncStalledIssuesNotificationShown(stalledIssues, true)
-            syncNotificationRepository.getSyncStalledIssuesNotification()
+        val shownStalledIssues =
+            syncNotificationRepository.getDisplayedNotificationsByType(STALLED_ISSUE)
+        val newStalledIssues = stalledIssues.filter { stalledIssue ->
+            shownStalledIssues.none { shownStalledIssue ->
+                shownStalledIssue.notificationDetails.path.equals(
+                    stalledIssue.localPaths.firstOrNull(),
+                    ignoreCase = true
+                ) || shownStalledIssue.notificationDetails.path.equals(
+                    stalledIssue.nodeNames.firstOrNull(),
+                    ignoreCase = true
+                )
+            }
+        }
+        return if (newStalledIssues.isNotEmpty()) {
+            syncNotificationRepository.getSyncStalledIssuesNotification(newStalledIssues)
         } else {
             null
         }

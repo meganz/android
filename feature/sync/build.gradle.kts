@@ -11,6 +11,7 @@ plugins {
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.de.mannodermaus.android.junit5)
     id("kotlin-android")
+    kotlin("plugin.serialization") version "1.9.21"
 }
 
 android {
@@ -60,6 +61,7 @@ dependencies {
     implementation(androidx.work.ktx)
     implementation(androidx.hilt.work)
     implementation(lib.compose.state.events)
+    implementation(lib.kotlin.serialisation)
     implementation(google.guava)
 
     testImplementation(testlib.bundles.ui.test)

@@ -5,13 +5,26 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.SyncShownNotificationEntity
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.sync.SyncError
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.data.gateway.notification.SyncNotificationGateway
 import mega.privacy.android.feature.sync.data.mapper.notification.GenericErrorToNotificationMessageMapper
 import mega.privacy.android.feature.sync.data.mapper.notification.StalledIssuesToNotificationMessageMapper
+import mega.privacy.android.feature.sync.data.mapper.notification.SyncShownNotificationEntityToSyncNotificationMessageMapper
+import mega.privacy.android.feature.sync.domain.entity.FolderPair
+import mega.privacy.android.feature.sync.domain.entity.NotificationDetails
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.StallIssueType
+import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
+import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -27,12 +40,15 @@ internal class SyncNotificationRepositoryImplTest {
     private val genericErrorToNotificationMessageMapper: GenericErrorToNotificationMessageMapper =
         mock()
     private val scheduler = TestCoroutineScheduler()
+    private val dbEntityToDomainMapper: SyncShownNotificationEntityToSyncNotificationMessageMapper =
+        mock()
     private val unconfinedTestDispatcher = UnconfinedTestDispatcher(scheduler)
 
     private val underTest = SyncNotificationRepositoryImpl(
         syncNotificationGateway = syncNotificationGateway,
         stalledIssuesToNotificationMessageMapper = stalledIssuesToNotificationMessageMapper,
         genericErrorToNotificationMessageMapper = genericErrorToNotificationMessageMapper,
+        dbEntityToDomainMapper,
         ioDispatcher = unconfinedTestDispatcher
     )
 
@@ -45,37 +61,72 @@ internal class SyncNotificationRepositoryImplTest {
         )
     }
 
-    @Test
-    fun `test that isBatteryLowNotificationShown returns true if battery low was shown`() =
+    @ParameterizedTest
+    @EnumSource(SyncNotificationType::class)
+    fun `test that getDisplayedNotificationsByType returns notification with correct type`(
+        notificationType: SyncNotificationType,
+    ) =
         runTest {
-            whenever(syncNotificationGateway.getNotificationByType("BATTERY_LOW")).thenReturn(
-                listOf(
-                    mock()
-                )
+            val notificationEntities = listOf(
+                SyncShownNotificationEntity(notificationType = notificationType.name)
+            )
+            val notificationMessage = SyncNotificationMessage(
+                title = "Notification title",
+                text = "Notification text",
+                syncNotificationType = notificationType,
+                notificationDetails = NotificationDetails(path = "Path", errorCode = 0)
+            )
+            whenever(syncNotificationGateway.getNotificationByType(notificationType.name)).thenReturn(
+                notificationEntities
+            )
+            whenever(dbEntityToDomainMapper(notificationEntities.first())).thenReturn(
+                notificationMessage
             )
 
-            val result = underTest.isBatteryLowNotificationShown()
+            val result = underTest.getDisplayedNotificationsByType(notificationType)
 
-            assertThat(result).isTrue()
+            assertThat(result.first()).isEqualTo(notificationMessage)
         }
 
-    @Test
-    fun `test that isBatteryLowNotificationShown returns false if battery low was not shown`() =
+    @ParameterizedTest
+    @EnumSource(SyncNotificationType::class)
+    fun `test that setDisplayedNotification sets notification with correct type`() =
         runTest {
-            whenever(syncNotificationGateway.getNotificationByType("BATTERY_LOW")).thenReturn(
-                emptyList()
+            val notificationMessage = SyncNotificationMessage(
+                title = "Notification title",
+                text = "Notification text",
+                syncNotificationType = SyncNotificationType.STALLED_ISSUE,
+                notificationDetails = NotificationDetails(path = "Path", errorCode = null)
+            )
+            val notificationEntity =
+                SyncShownNotificationEntity(notificationType = notificationMessage.syncNotificationType.name)
+            whenever(dbEntityToDomainMapper(notificationMessage)).thenReturn(
+                notificationEntity
             )
 
-            val result = underTest.isBatteryLowNotificationShown()
+            underTest.setDisplayedNotification(notificationMessage)
 
-            assertThat(result).isFalse()
+            verify(syncNotificationGateway).setNotificationShown(notificationEntity)
+        }
+
+    @ParameterizedTest
+    @EnumSource(SyncNotificationType::class)
+    fun `test that deleteDisplayedNotificationByType deletes notification with correct type`(
+        notificationType: SyncNotificationType,
+    ) =
+        runTest {
+            underTest.deleteDisplayedNotificationByType(notificationType)
+
+            verify(syncNotificationGateway).deleteNotificationByType(notificationType.name)
         }
 
     @Test
     fun `test that getBatteryLowNotification returns a generic error notification message`() =
         runTest {
             val notificationMessage: SyncNotificationMessage = mock()
-            whenever(genericErrorToNotificationMessageMapper()).thenReturn(notificationMessage)
+            whenever(genericErrorToNotificationMessageMapper(SyncNotificationType.BATTERY_LOW)).thenReturn(
+                notificationMessage
+            )
 
             val result = underTest.getBatteryLowNotification()
 
@@ -83,52 +134,12 @@ internal class SyncNotificationRepositoryImplTest {
         }
 
     @Test
-    fun `test that setBatteryLowNotificationShown sets the notification as shown`() = runTest {
-        underTest.setBatteryLowNotificationShown(true)
-
-        verify(syncNotificationGateway).setNotificationShown(
-            SyncShownNotificationEntity(notificationType = "BATTERY_LOW")
-        )
-    }
-
-    @Test
-    fun `test that setBatteryLowNotificationShown sets the notification as not shown`() = runTest {
-        underTest.setBatteryLowNotificationShown(false)
-
-        verify(syncNotificationGateway).deleteNotificationByType("BATTERY_LOW")
-    }
-
-    @Test
-    fun `test that isUserNotOnWifiNotificationShown returns true if user not on wifi notification was shown`() =
-        runTest {
-            whenever(syncNotificationGateway.getNotificationByType("NOT_CONNECTED_TO_WIFI")).thenReturn(
-                listOf(
-                    mock()
-                )
-            )
-
-            val result = underTest.isUserNotOnWifiNotificationShown()
-
-            assertThat(result).isTrue()
-        }
-
-    @Test
-    fun `test that isUserNotOnWifiNotificationShown returns false if user not on wifi notification was not shown`() =
-        runTest {
-            whenever(syncNotificationGateway.getNotificationByType("NOT_CONNECTED_TO_WIFI")).thenReturn(
-                emptyList()
-            )
-
-            val result = underTest.isUserNotOnWifiNotificationShown()
-
-            assertThat(result).isFalse()
-        }
-
-    @Test
     fun `test that getUserNotOnWifiNotificationShown returns a generic error notification message`() =
         runTest {
             val notificationMessage: SyncNotificationMessage = mock()
-            whenever(genericErrorToNotificationMessageMapper()).thenReturn(notificationMessage)
+            whenever(genericErrorToNotificationMessageMapper(SyncNotificationType.NOT_CONNECTED_TO_WIFI)).thenReturn(
+                notificationMessage
+            )
 
             val result = underTest.getUserNotOnWifiNotification()
 
@@ -136,128 +147,62 @@ internal class SyncNotificationRepositoryImplTest {
         }
 
     @Test
-    fun `test that setUserNotOnWifiNotificationShown sets the notification as shown`() = runTest {
-        underTest.setUserNotOnWifiNotificationShown(true)
-
-        verify(syncNotificationGateway).setNotificationShown(
-            SyncShownNotificationEntity(notificationType = "NOT_CONNECTED_TO_WIFI")
-        )
-    }
-
-    @Test
-    fun `test that setUserNotOnWifiNotificationShown sets the notification as not shown`() =
-        runTest {
-            underTest.setUserNotOnWifiNotificationShown(false)
-
-            verify(syncNotificationGateway).deleteNotificationByType("NOT_CONNECTED_TO_WIFI")
-        }
-
-    @Test
-    fun `test that isSyncErrorsNotificationShown returns true if error notification was shown`() =
-        runTest {
-            whenever(syncNotificationGateway.getNotificationByType("ERROR")).thenReturn(
-                listOf(
-                    mock()
-                )
-            )
-
-            val result = underTest.isSyncErrorsNotificationShown(emptyList())
-
-            assertThat(result).isTrue()
-        }
-
-    @Test
-    fun `test that isSyncErrorsNotificationShown returns false if error notification was not shown`() =
-        runTest {
-            whenever(syncNotificationGateway.getNotificationByType("ERROR")).thenReturn(
-                emptyList()
-            )
-
-            val result = underTest.isSyncErrorsNotificationShown(emptyList())
-
-            assertThat(result).isFalse()
-        }
-
-    @Test
     fun `test that getSyncErrorsNotification returns a generic error notification message`() =
         runTest {
-            val notificationMessage: SyncNotificationMessage = mock()
-            whenever(genericErrorToNotificationMessageMapper()).thenReturn(notificationMessage)
-
-            val result = underTest.getSyncErrorsNotification()
-
-            assertThat(result).isEqualTo(notificationMessage)
-        }
-
-    @Test
-    fun `test that setSyncErrorsNotificationShown sets the notification as shown`() = runTest {
-        underTest.setSyncErrorsNotificationShown(listOf(mock()), shown = true)
-
-        verify(syncNotificationGateway).setNotificationShown(
-            SyncShownNotificationEntity(notificationType = "ERROR")
-        )
-    }
-
-    @Test
-    fun `test that setSyncErrorsNotificationShown sets the notification as not shown`() =
-        runTest {
-            underTest.setSyncErrorsNotificationShown(emptyList(), shown = false)
-
-            verify(syncNotificationGateway).deleteNotificationByType("ERROR")
-        }
-
-    @Test
-    fun `test that isSyncStalledIssuesNotificationShown returns true if stalled issue notification was shown`() =
-        runTest {
-            whenever(syncNotificationGateway.getNotificationByType("STALLED_ISSUE")).thenReturn(
-                listOf(
-                    mock()
+            val notificationMessage = SyncNotificationMessage(
+                title = "Notification title",
+                text = "Notification text",
+                syncNotificationType = SyncNotificationType.ERROR,
+                notificationDetails = NotificationDetails(path = "somePath", errorCode = 1)
+            )
+            val syncs = listOf(
+                FolderPair(
+                    id = 1,
+                    syncType = SyncType.TYPE_TWOWAY,
+                    pairName = "someName",
+                    localFolderPath = "somePath",
+                    remoteFolder = RemoteFolder(id = 1, name = "someName"),
+                    syncStatus = SyncStatus.SYNCED,
+                    syncError = SyncError.UNKNOWN_ERROR
                 )
             )
-
-            val result = underTest.isSyncStalledIssuesNotificationShown(emptyList())
-
-            assertThat(result).isTrue()
-        }
-
-    @Test
-    fun `test that isSyncStalledIssuesNotificationShown returns false if stalled issue notification was not shown`() =
-        runTest {
-            whenever(syncNotificationGateway.getNotificationByType("STALLED_ISSUE")).thenReturn(
-                emptyList()
+            whenever(
+                genericErrorToNotificationMessageMapper(
+                    SyncNotificationType.ERROR,
+                    errorCode = 1,
+                    issuePath = "somePath"
+                )
+            ).thenReturn(
+                notificationMessage
             )
 
-            val result = underTest.isSyncStalledIssuesNotificationShown(emptyList())
+            val result = underTest.getSyncErrorsNotification(syncs)
 
-            assertThat(result).isFalse()
+            assertThat(result).isEqualTo(notificationMessage)
         }
 
     @Test
     fun `test that getSyncStalledIssuesNotification returns a stalled issue error notification message`() =
         runTest {
             val notificationMessage: SyncNotificationMessage = mock()
-            whenever(stalledIssuesToNotificationMessageMapper()).thenReturn(notificationMessage)
+            val stalledIssues = listOf(
+                StalledIssue(
+                    syncId = 1,
+                    nodeIds = listOf(NodeId(1)),
+                    issueType = StallIssueType.FileIssue,
+                    conflictName = "someConflict",
+                    localPaths = listOf("somePath"),
+                    nodeNames = listOf("someNode")
+                )
+            )
+            whenever(
+                stalledIssuesToNotificationMessageMapper(
+                    stalledIssues.first().localPaths.first()
+                )
+            ).thenReturn(notificationMessage)
 
-            val result = underTest.getSyncStalledIssuesNotification()
+            val result = underTest.getSyncStalledIssuesNotification(stalledIssues)
 
             assertThat(result).isEqualTo(notificationMessage)
-        }
-
-    @Test
-    fun `test that setSyncStalledIssuesNotificationShown sets the notification as shown`() =
-        runTest {
-            underTest.setSyncStalledIssuesNotificationShown(listOf(mock()), shown = true)
-
-            verify(syncNotificationGateway).setNotificationShown(
-                SyncShownNotificationEntity(notificationType = "STALLED_ISSUE")
-            )
-        }
-
-    @Test
-    fun `test that setSyncStalledIssuesNotificationShown sets the notification as not shown`() =
-        runTest {
-            underTest.setSyncStalledIssuesNotificationShown(emptyList(), shown = false)
-
-            verify(syncNotificationGateway).deleteNotificationByType("STALLED_ISSUE")
         }
 }
