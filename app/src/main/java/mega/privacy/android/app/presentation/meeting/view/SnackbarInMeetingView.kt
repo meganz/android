@@ -60,7 +60,11 @@ fun SnackbarInMeetingView(
                 when (result) {
                     SnackbarResult.ActionPerformed -> {
                         when {
-                            uiState.showLowerHandButtonInSnackbar -> inMeetingViewModel.lowerHandToStopSpeak()
+                            uiState.showLowerHandButtonInSnackbar -> {
+                                meetingActivityViewModel.onHandRaisedSnackbarMsgConsumed()
+                                inMeetingViewModel.lowerHandToStopSpeak()
+                            }
+
                             else -> meetingActivityViewModel.showParticipantsList(shouldBeShown = true)
                         }
                     }
