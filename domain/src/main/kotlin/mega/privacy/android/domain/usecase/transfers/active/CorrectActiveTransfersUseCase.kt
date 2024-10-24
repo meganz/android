@@ -42,7 +42,8 @@ class CorrectActiveTransfersUseCase @Inject constructor(
                 it.tag
             }
         if (notInProgressActiveTransfersTags.isNotEmpty()) {
-            transferRepository.setActiveTransferAsFinishedByTag(notInProgressActiveTransfersTags)
+            //we are not sure if they have been cancelled or not, but at this point it has more sense to don't show the completed status in transfer widget, so it's better to just finish it as cancelled
+            transferRepository.setActiveTransferAsCancelledByTag(notInProgressActiveTransfersTags)
             transferRepository.removeInProgressTransfers(notInProgressActiveTransfersTags.toSet())
         }
 

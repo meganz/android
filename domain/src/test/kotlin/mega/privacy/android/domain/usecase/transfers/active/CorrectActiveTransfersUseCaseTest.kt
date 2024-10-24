@@ -66,7 +66,7 @@ internal class CorrectActiveTransfersUseCaseTest {
     private fun subSetActiveTransfers() = mockedActiveTransfers.filter { it.tag.mod(3) == 0 }
 
     @Test
-    fun `test that active transfers not finished and not in progress are set as finished`() =
+    fun `test that active transfers not finished and not in progress are set as cancelled`() =
         runTest {
             stubActiveTransfers(false)
             stubTransfers()
@@ -78,11 +78,11 @@ internal class CorrectActiveTransfersUseCaseTest {
                 mockedActiveTransfers.map { it.tag } - inProgress.map { it.tag }.toSet()
             Truth.assertThat(expected).isNotEmpty()
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository).setActiveTransferAsFinishedByTag(expected)
+            verify(transferRepository).setActiveTransferAsCancelledByTag(expected)
         }
 
     @Test
-    fun `test that active transfers finished and not in progress are not set as finished`() =
+    fun `test that active transfers finished and not in progress are not set as cancelled`() =
         runTest {
             stubActiveTransfers(true)
             stubTransfers()
@@ -91,7 +91,7 @@ internal class CorrectActiveTransfersUseCaseTest {
                 .thenReturn(mockedActiveTransfers)
             whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository, never()).setActiveTransferAsFinishedByTag(anyOrNull())
+            verify(transferRepository, never()).setActiveTransferAsCancelledByTag(anyOrNull())
         }
 
     @Test

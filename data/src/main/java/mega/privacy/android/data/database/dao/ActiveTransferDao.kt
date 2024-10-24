@@ -49,6 +49,6 @@ internal interface ActiveTransferDao {
     @Query("DELETE FROM active_transfers")
     suspend fun deleteAllActiveTransfers()
 
-    @Query("UPDATE active_transfers SET is_finished = 1 WHERE tag IN (:tags)")
-    suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>)
+    @Query("UPDATE active_transfers SET is_finished = 1, is_cancelled = 1 WHERE tag IN (:tags)")
+    suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>)
 }

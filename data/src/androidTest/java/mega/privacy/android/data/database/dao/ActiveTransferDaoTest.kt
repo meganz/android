@@ -132,17 +132,18 @@ class ActiveTransferDaoTest {
     }
 
     @Test
-    fun test_that_setActiveTransferAsFinishedByTag_set_as_finished_all_transfers_with_given_tags() =
+    fun test_that_setActiveTransferAsCancelledByTag_set_as_finished_and_cancelled_all_transfers_with_given_tags() =
         runTest {
             TransferType.entries.forEach { type ->
                 val initial = activeTransferDao.getCurrentActiveTransfersByType(type)
                 val toFinish = initial.take(initial.size / 2).filter { !it.isFinished }
                 assertThat(initial).isNotEmpty()
                 assertThat(toFinish).isNotEmpty()
-                activeTransferDao.setActiveTransferAsFinishedByTag(toFinish.map { it.tag })
+                activeTransferDao.setActiveTransferAsCancelledByTag(toFinish.map { it.tag })
                 val actual = activeTransferDao.getCurrentActiveTransfersByType(type)
                 toFinish.forEach { finished ->
                     assertThat(actual.first { it.tag == finished.tag }.isFinished).isTrue()
+                    assertThat(actual.first { it.tag == finished.tag }.isCancelled).isTrue()
                 }
             }
         }

@@ -223,9 +223,9 @@ interface MegaLocalRoomGateway {
     suspend fun deleteAllActiveTransfers()
 
     /**
-     * Delete an active transfer by its tag
+     * Set an active transfer as finished cancelled by its tag
      */
-    suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>)
+    suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>)
 
     /**
      * Get all sd transfers

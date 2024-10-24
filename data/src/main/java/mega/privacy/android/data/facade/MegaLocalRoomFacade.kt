@@ -261,8 +261,8 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun deleteAllActiveTransfers() =
         activeTransferDao.get().deleteAllActiveTransfers()
 
-    override suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>) =
-        activeTransferDao.get().setActiveTransferAsFinishedByTag(tags)
+    override suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>) =
+        activeTransferDao.get().setActiveTransferAsCancelledByTag(tags)
 
     override suspend fun getAllSdTransfers(): List<SdTransfer> {
         val entities = sdTransferDao.get().getAllSdTransfers().first()

@@ -360,9 +360,9 @@ interface TransferRepository {
     suspend fun deleteAllActiveTransfers()
 
     /**
-     * Set an active transfer as finished by its tag
+     * Set an active transfer as finished cancelled by its tag
      */
-    suspend fun setActiveTransferAsFinishedByTag(tags: List<Int>)
+    suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>)
 
     /**
      * Get active transfer totals by type
