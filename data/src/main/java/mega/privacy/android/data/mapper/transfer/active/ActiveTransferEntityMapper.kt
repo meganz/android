@@ -14,6 +14,7 @@ internal class ActiveTransferEntityMapper @Inject constructor() {
             isFolderTransfer = isFolderTransfer,
             isPaused = isPaused,
             isAlreadyTransferred = isAlreadyTransferred,
+            isCancelled = isCancelled,
         )
     }
 }

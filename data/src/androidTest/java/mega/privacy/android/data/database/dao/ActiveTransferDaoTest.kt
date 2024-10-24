@@ -31,6 +31,7 @@ class ActiveTransferDaoTest {
                 isPaused = false,
                 isFolderTransfer = false,
                 isAlreadyTransferred = false,
+                isCancelled = true,
             )
         }
     }
@@ -61,6 +62,7 @@ class ActiveTransferDaoTest {
             isFolderTransfer = false,
             isPaused = false,
             isAlreadyTransferred = false,
+            isCancelled = true,
         )
         activeTransferDao.insertOrUpdateActiveTransfer(newEntity)
         val actual = activeTransferDao.getActiveTransferByTag(newEntity.tag)

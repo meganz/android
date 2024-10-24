@@ -24,4 +24,9 @@ interface ActiveTransfer : TypedTransfer {
      * True if the transfer finished without actually transferring bytes because it was already transferred
      */
     val isAlreadyTransferred: Boolean
+
+    /**
+     * True if the transfer finished because it was cancelled before ending
+     */
+    val isCancelled: Boolean
 }

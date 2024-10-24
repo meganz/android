@@ -127,7 +127,8 @@ class ActiveTransferTotalsMapperTest {
             isFinished = tag.rem(5) == 0,
             isFolderTransfer = tag.rem(8) == 0,
             isPaused = false,
-            isAlreadyTransferred = tag.rem(9) == 0
+            isAlreadyTransferred = tag.rem(9) == 0,
+            isCancelled = tag.rem(7) == 0,
         )
     }
 }

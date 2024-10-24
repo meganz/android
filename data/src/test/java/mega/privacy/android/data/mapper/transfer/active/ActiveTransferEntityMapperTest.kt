@@ -12,7 +12,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ActiveTransferEntityMapperTest {
     private lateinit var underTest: ActiveTransferEntityMapper
@@ -37,27 +36,31 @@ class ActiveTransferEntityMapperTest {
             listOf(true, false).flatMap { isFinished ->
                 listOf(true, false).flatMap { isFolder ->
                     listOf(true, false).flatMap { isPaused ->
-                        listOf(true, false).map { isAlreadyDownloaded ->
-                            Arguments.of(
-                                ActiveTransferTestImpl(
-                                    tag = TAG,
-                                    transferType = transferType,
-                                    totalBytes = TOTAL,
-                                    isFinished = isFinished,
-                                    isFolderTransfer = isFolder,
-                                    isPaused = isPaused,
-                                    isAlreadyTransferred = isAlreadyDownloaded,
-                                ),
-                                ActiveTransferEntity(
-                                    tag = TAG,
-                                    transferType = transferType,
-                                    totalBytes = TOTAL,
-                                    isFinished = isFinished,
-                                    isFolderTransfer = isFolder,
-                                    isPaused = isPaused,
-                                    isAlreadyTransferred = isAlreadyDownloaded,
+                        listOf(true, false).flatMap { isAlreadyDownloaded ->
+                            listOf(true, false).map { isCancelled ->
+                                Arguments.of(
+                                    ActiveTransferTestImpl(
+                                        tag = TAG,
+                                        transferType = transferType,
+                                        totalBytes = TOTAL,
+                                        isFinished = isFinished,
+                                        isFolderTransfer = isFolder,
+                                        isPaused = isPaused,
+                                        isAlreadyTransferred = isAlreadyDownloaded,
+                                        isCancelled = isCancelled,
+                                    ),
+                                    ActiveTransferEntity(
+                                        tag = TAG,
+                                        transferType = transferType,
+                                        totalBytes = TOTAL,
+                                        isFinished = isFinished,
+                                        isFolderTransfer = isFolder,
+                                        isPaused = isPaused,
+                                        isAlreadyTransferred = isAlreadyDownloaded,
+                                        isCancelled = isCancelled
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
                 }
@@ -83,5 +86,6 @@ class ActiveTransferEntityMapperTest {
         override val isFolderTransfer: Boolean,
         override val isPaused: Boolean,
         override val isAlreadyTransferred: Boolean,
+        override val isCancelled: Boolean,
     ) : ActiveTransfer
 }

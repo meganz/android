@@ -79,6 +79,9 @@ data class Transfer(
     override val isAlreadyTransferred =
         isFinished && transferredBytes == 0L && state != TransferState.STATE_FAILED && state != TransferState.STATE_CANCELLED
 
+    override val isCancelled =
+        state == TransferState.STATE_CANCELLED
+
     /**
      * true if represents a transfer initiated by the app false if the transfer was initiated by the sdk for children nodes of a folder transfer
      */
