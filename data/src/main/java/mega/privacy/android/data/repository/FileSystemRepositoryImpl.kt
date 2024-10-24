@@ -670,4 +670,18 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             Timber.d("getFileFromUri uri: $uri, file path: $it")
         }
     }
+
+    override suspend fun renameFileAndDeleteOriginal(
+        originalUriPath: UriPath,
+        newFilename: String,
+    ): File = withContext(ioDispatcher) {
+        // Create new File with the new Filename
+        val oldFile = File(originalUriPath.value)
+        val newFile = File(oldFile.parentFile, newFilename)
+
+        // Rename File and delete the old File
+        if (fileGateway.renameFile(oldFile, newFilename)) fileGateway.deleteFile(oldFile)
+
+        newFile
+    }
 }

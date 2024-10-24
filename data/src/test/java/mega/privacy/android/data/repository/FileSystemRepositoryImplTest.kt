@@ -640,4 +640,50 @@ internal class FileSystemRepositoryImplTest {
             underTest.isPathInsecure(path)
             verify(fileGateway).isPathInsecure(path)
         }
+
+    @Test
+    fun `test that a duplicate of the old file is returned because of an error renaming the old file`() =
+        runTest {
+            val originalUriPath = UriPath("test/uri/path")
+            val newFilename = "newFilename"
+            val oldFile = File(originalUriPath.value)
+            val newFile = File(oldFile.parentFile, newFilename)
+
+            whenever(
+                fileGateway.renameFile(
+                    oldFile = oldFile,
+                    newName = newFilename,
+                )
+            ).thenReturn(false)
+
+            val result = underTest.renameFileAndDeleteOriginal(
+                originalUriPath = originalUriPath,
+                newFilename = newFilename,
+            )
+
+            verify(fileGateway, times(0)).deleteFile(oldFile)
+            assertThat(result).isEqualTo(newFile)
+        }
+
+    @Test
+    fun `test that the renamed file is returned and the old file is deleted`() = runTest {
+        val originalUriPath = UriPath("test/uri/path")
+        val newFilename = "newFilename"
+        val oldFile = File(originalUriPath.value)
+        val newFile = File(oldFile.parentFile, newFilename)
+        whenever(
+            fileGateway.renameFile(
+                oldFile = oldFile,
+                newName = newFilename,
+            )
+        ).thenReturn(true)
+        whenever(fileGateway.deleteFile(oldFile)).thenReturn(true)
+
+        val result = underTest.renameFileAndDeleteOriginal(
+            originalUriPath = originalUriPath,
+            newFilename = newFilename,
+        )
+
+        assertThat(result).isEqualTo(newFile)
+    }
 }

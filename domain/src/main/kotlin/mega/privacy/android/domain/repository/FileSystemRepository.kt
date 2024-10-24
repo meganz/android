@@ -510,4 +510,18 @@ interface FileSystemRepository {
      * @return
      */
     suspend fun getFileFromUri(uri: UriPath): File?
+
+    /**
+     * Given the original File's Uri path, this creates a new File with the specified Filename and
+     * deletes the original File
+     *
+     * @param originalUriPath The original File's Uri path
+     * @param newFilename The File name to use for the new File
+     *
+     * @return The renamed File
+     */
+    suspend fun renameFileAndDeleteOriginal(
+        originalUriPath: UriPath,
+        newFilename: String,
+    ): File
 }
