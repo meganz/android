@@ -14,7 +14,6 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.AreAllTransfersPausedUseCase
 import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import org.junit.jupiter.api.BeforeAll
@@ -36,7 +35,6 @@ class TransfersManagementViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
-    private val areAllTransfersPausedUseCase = mock<AreAllTransfersPausedUseCase>()
     private val transfersInfoMapper = mock<TransfersInfoMapper>()
     private val transfersManagement = mock<TransfersManagement>()
 
@@ -66,7 +64,6 @@ class TransfersManagementViewModelTest {
     @BeforeEach
     fun resetMocks() = runTest {
         reset(
-            areAllTransfersPausedUseCase,
             transfersInfoMapper,
             transfersManagement,
             monitorConnectivityUseCase,
@@ -130,7 +127,6 @@ class TransfersManagementViewModelTest {
         }
 
     private suspend fun commonStub() {
-        whenever(areAllTransfersPausedUseCase()) doReturn false
         whenever(transfersManagement.getAreFailedTransfers()) doReturn false
         whenever(transfersManagement.shouldShowNetworkWarning) doReturn false
         whenever(monitorConnectivityUseCase()) doReturn monitorConnectivityUseCaseFlow
