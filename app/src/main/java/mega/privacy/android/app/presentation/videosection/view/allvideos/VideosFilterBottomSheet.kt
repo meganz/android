@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.videosection.view.allvideos
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
@@ -20,8 +22,8 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.SettingsItemW
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -37,7 +39,7 @@ internal fun VideosFilterBottomSheet(
         modifier = modifier,
         modalSheetState = modalSheetState,
         sheetBody = {
-            Column {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 MegaText(
                     modifier = Modifier.padding(16.dp),
                     text = title,
