@@ -213,20 +213,18 @@ internal fun FileInfoContent(
             }
 
             //description
-            if (nodeDescriptionEnabled) {
-                FileInfoDescriptionField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    descriptionText = descriptionText,
-                    labelId = sharedR.string.file_info_information_description_label,
-                    placeholder = if (isDescriptionEnabled()) stringResource(id = sharedR.string.file_info_information_description_placeholder) else stringResource(
-                        id = sharedR.string.file_info_information_no_description_placeholder
-                    ),
-                    isEditable = isDescriptionEnabled(),
-                    onConfirmDescription = onSetDescriptionClick,
-                )
-            }
+            FileInfoDescriptionField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                descriptionText = descriptionText,
+                labelId = sharedR.string.file_info_information_description_label,
+                placeholder = if (isDescriptionEnabled()) stringResource(id = sharedR.string.file_info_information_description_placeholder) else stringResource(
+                    id = sharedR.string.file_info_information_no_description_placeholder
+                ),
+                isEditable = isDescriptionEnabled(),
+                onConfirmDescription = onSetDescriptionClick,
+            )
 
             //tags
             if (canEnableTags()) {

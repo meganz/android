@@ -111,14 +111,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     MeetingNotificationSettings("Enable Meeting notification settings", false),
 
     /**
-     * To enable the new add and manage description feature to node
-     */
-    NodeWithDescription(
-        "Enable node with description",
-        true
-    ),
-
-    /**
      * To enable search by node description
      */
     SearchWithDescription(
