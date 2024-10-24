@@ -22,7 +22,7 @@ class TransfersInfoMapper @Inject constructor() {
         isStorageOverQuota: Boolean,
     ): TransfersInfo {
         if (numPendingUploads + numPendingDownloadsNonBackground <= 0) {
-            return TransfersInfo(TransfersStatus.NotTransferring)
+            return TransfersInfo(TransfersStatus.Completed)
         }
         val pendingDownloads = numPendingDownloadsNonBackground > 0
         val pendingUploads = numPendingUploads > 0

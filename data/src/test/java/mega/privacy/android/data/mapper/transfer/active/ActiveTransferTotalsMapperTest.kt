@@ -114,8 +114,17 @@ class ActiveTransferTotalsMapperTest {
 
     @ParameterizedTest(name = "Transfer Type {0}")
     @EnumSource(TransferType::class)
+    fun `test that mapper returns correct totalCancelled`(transferType: TransferType) {
+        val entities = createEntities(transferType)
+        val expected = entities.count { it.isCancelled }
+        val actual = underTest(transferType, entities, emptyMap())
+        assertThat(actual.totalCancelled).isEqualTo(expected)
+    }
+
+    @ParameterizedTest(name = "Transfer Type {0}")
+    @EnumSource(TransferType::class)
     fun `test that mapper returns empty entity when empty list is mapped`(transferType: TransferType) {
-        val expected = ActiveTransferTotals(transferType, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        val expected = ActiveTransferTotals(transferType, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
         assertThat(underTest(transferType, emptyList(), emptyMap())).isEqualTo(expected)
     }
 

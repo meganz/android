@@ -174,7 +174,7 @@ internal class TransferPageFragment : Fragment() {
         ) { showCompleted: Boolean -> updateTransfersTab(showCompleted) }
 
         viewLifecycleOwner.collectFlow(transfersManagementViewModel.state) {
-            if (it.transfersInfo.status == TransfersStatus.NotTransferring) {
+            if (it.transfersInfo.status == TransfersStatus.Completed) {
                 pauseTransfersMenuIcon?.isVisible = false
                 playTransfersMenuIcon?.isVisible = false
                 cancelAllTransfersMenuItem?.isVisible = false

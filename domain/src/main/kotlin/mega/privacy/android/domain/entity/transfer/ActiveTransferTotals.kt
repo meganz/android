@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.Progress
  * @param totalBytes total bytes of all transfers of this type
  * @param transferredBytes total bytes already transferred of active transfers of this type
  * @param totalAlreadyTransferredFiles files not downloaded because already downloaded
+ * @param totalCancelled files canceled before transfer has completed
  */
 data class ActiveTransferTotals(
     val transfersType: TransferType,
@@ -27,6 +28,7 @@ data class ActiveTransferTotals(
     val totalBytes: Long,
     val transferredBytes: Long,
     val totalAlreadyTransferredFiles: Int,
+    val totalCancelled: Int,
 ) {
     /**
      * @return true if there are ongoing transfers, false if all transfers are finished or there are no active transfers to transfer

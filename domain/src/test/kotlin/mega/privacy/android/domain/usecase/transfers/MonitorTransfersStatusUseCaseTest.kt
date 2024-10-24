@@ -94,6 +94,25 @@ internal class MonitorTransfersStatusUseCaseTest {
         }
 
     @Test
+    fun `test that a new status with pause set to false is emitted when there are no ongoing transfers`() =
+        runTest {
+            val flowsMap = stubActiveTransfersFlows(paused = true)
+            val expected = TransfersStatusInfo(paused = false)
+
+            underTest().test {
+                flowsMap.values.forEach { flow ->
+                    assertThat(awaitItem().paused).isTrue() // check initial is paused to validate the test is doing its job
+                    flow.update {
+                        it.copy(activeTransferTotals = it.activeTransferTotals.copy(totalTransfers = 0))
+                    }
+                }
+                val actual = awaitItem()
+
+                assertThat(actual).isEqualTo(expected)
+            }
+        }
+
+    @Test
     fun `test that a new status with pause set to true is emitted when a all transfer types are paused`() =
         runTest {
             val flowsMap = stubActiveTransfersFlows()
@@ -137,5 +156,6 @@ internal class MonitorTransfersStatusUseCaseTest {
         totalBytes = 0L,
         transferredBytes = 0L,
         totalAlreadyTransferredFiles = 0,
+        totalCancelled = 0,
     )
 }

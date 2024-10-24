@@ -52,7 +52,7 @@ class TransfersWidgetViewTest {
     fun `test that when completed is true the completed icon is shown`() {
         composeTestRule.setContent {
             TransfersWidgetView(
-                TransfersInfo(TransfersStatus.NotTransferring, 10, 5, true),
+                TransfersInfo(TransfersStatus.Completed, 10, 5, true),
                 completed = true
             ) {}
         }
@@ -97,7 +97,7 @@ class TransfersWidgetViewTest {
     fun `test that transfer widget animated is not shown when visibility is set to false`() {
         composeTestRule.setContent {
             TransfersWidgetViewAnimated(
-                TransfersInfo(TransfersStatus.NotTransferring, 10, 5, false),
+                TransfersInfo(TransfersStatus.Completed, 10, 5, false),
                 onClick = {},
             )
         }
@@ -106,7 +106,7 @@ class TransfersWidgetViewTest {
     }
 
     @Test
-    fun `test that completed is shown for a while and then hide when status changes to NotTransferring from Transferring`() =
+    fun `test that completed is shown for a while and then hide when status changes to Completed from Transferring`() =
         runTest {
             var transfersInfo by mutableStateOf(TransfersInfo(TransfersStatus.Transferring))
 
@@ -120,7 +120,7 @@ class TransfersWidgetViewTest {
             composeTestRule.onNodeWithTag(TAG_TRANSFERS_WIDGET, useUnmergedTree = true)
                 .assertIsDisplayed()
 
-            transfersInfo = TransfersInfo(TransfersStatus.NotTransferring)
+            transfersInfo = TransfersInfo(TransfersStatus.Completed)
             composeTestRule.waitForIdle()
 
             //completed is now visible
@@ -135,6 +135,54 @@ class TransfersWidgetViewTest {
             //not visible after 1 more second (4.5 seconds in total)
             composeTestRule.mainClock.advanceTimeBy(1.seconds.inWholeMilliseconds)
             composeTestRule.onNodeWithTag(TAG_TRANSFERS_WIDGET, useUnmergedTree = true)
+                .assertDoesNotExist()
+        }
+
+    @Test
+    fun `test that completed is not shown when status changes to Cancelled`() =
+        runTest {
+            var transfersInfo by mutableStateOf(TransfersInfo(TransfersStatus.Transferring))
+
+            composeTestRule.setContent {
+                TransfersWidgetViewAnimated(
+                    transfersInfo = transfersInfo,
+                    onClick = {}
+                )
+            }
+
+            composeTestRule.onNodeWithTag(TAG_TRANSFERS_WIDGET, useUnmergedTree = true)
+                .assertIsDisplayed()
+
+            transfersInfo = TransfersInfo(TransfersStatus.Cancelled)
+            composeTestRule.waitForIdle()
+
+            //completed is not visible
+            composeTestRule.onNodeWithTag(TAG_STATUS_ICON, useUnmergedTree = true)
+                .assertDoesNotExist()
+        }
+
+    @Test
+    fun `test that completed is not shown when status changes to Completed from Cancelled`() =
+        runTest {
+            var transfersInfo by mutableStateOf(TransfersInfo(TransfersStatus.Transferring))
+
+            composeTestRule.setContent {
+                TransfersWidgetViewAnimated(
+                    transfersInfo = transfersInfo,
+                    onClick = {}
+                )
+            }
+
+            composeTestRule.onNodeWithTag(TAG_TRANSFERS_WIDGET, useUnmergedTree = true)
+                .assertIsDisplayed()
+
+            transfersInfo = TransfersInfo(TransfersStatus.Cancelled)
+            composeTestRule.waitForIdle()
+            transfersInfo = TransfersInfo(TransfersStatus.Completed)
+            composeTestRule.waitForIdle()
+
+            //completed is not visible
+            composeTestRule.onNodeWithTag(TAG_STATUS_ICON, useUnmergedTree = true)
                 .assertDoesNotExist()
         }
 

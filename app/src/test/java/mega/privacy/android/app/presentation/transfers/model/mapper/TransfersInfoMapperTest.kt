@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.model.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -61,7 +60,7 @@ class TransfersInfoMapperTest {
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
             )
-            assertThat(result.status).isEqualTo(TransfersStatus.NotTransferring)
+            assertThat(result.status).isEqualTo(TransfersStatus.Completed)
         }
 
         @Test

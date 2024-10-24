@@ -10,6 +10,7 @@ package mega.privacy.android.domain.entity
  * @property paused
  * @property transferOverQuota
  * @property storageOverQuota
+ * @property cancelled
  */
 data class TransfersStatusInfo(
     val totalSizeToTransfer: Long = 0,
@@ -19,4 +20,5 @@ data class TransfersStatusInfo(
     val paused: Boolean = false,
     val transferOverQuota: Boolean = false,
     val storageOverQuota: Boolean = false,
+    val cancelled: Int = 0,
 )

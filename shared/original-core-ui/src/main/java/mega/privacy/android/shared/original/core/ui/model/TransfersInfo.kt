@@ -10,7 +10,7 @@ package mega.privacy.android.shared.original.core.ui.model
  * @property uploading                          true if there are transfers uploading, false if not (downloading)
  */
 data class TransfersInfo(
-    val status: TransfersStatus = TransfersStatus.NotTransferring,
+    val status: TransfersStatus = TransfersStatus.Completed,
     val totalSizeAlreadyTransferred: Long = 0L,
     val totalSizeToTransfer: Long = 0L,
     val uploading: Boolean = false,
@@ -53,5 +53,16 @@ enum class TransfersStatus {
     /**
      * Currently not transferring
      */
-    NotTransferring
+    Completed,
+
+    /**
+     * Last transfers have been cancelled. This state can be temporary and turn to Completed.
+     */
+    Cancelled,
+    ;
+
+    /**
+     * Transfers have finished, either [Completed] or [Cancelled]
+     */
+    fun hasFinished() = this == Completed || this == Cancelled
 }

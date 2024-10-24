@@ -34,12 +34,14 @@ class MonitorTransfersStatusUseCase @Inject constructor(
                     .filter { it.activeTransferTotals.transfersType.isDownloadType() }
                     .sumOf { it.activeTransferTotals.pendingFileTransfers },
                 paused = monitorOngoingActiveTransfersResults
-                    .filter { it.activeTransferTotals.hasOngoingTransfers() }
-                    .all { it.paused },
+                    .filter { it.activeTransferTotals.hasOngoingTransfers() }.let {
+                        it.isNotEmpty() && it.all { it.paused }
+                    },
                 transferOverQuota =
                 monitorOngoingActiveTransfersResults.any { it.transfersOverQuota },
                 storageOverQuota =
                 monitorOngoingActiveTransfersResults.any { it.storageOverQuota },
+                cancelled = monitorOngoingActiveTransfersResults.sumOf { it.activeTransferTotals.totalCancelled }
             )
         }
 

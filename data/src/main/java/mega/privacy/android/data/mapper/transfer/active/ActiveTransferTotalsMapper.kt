@@ -30,6 +30,7 @@ internal class ActiveTransferTotalsMapper @Inject constructor() {
                 if (it.isFinished) it.totalBytes else transferredBytes[it.tag] ?: 0L
             },
             totalAlreadyTransferredFiles = onlyFiles.count { it.isAlreadyTransferred },
+            totalCancelled = list.count{it.isCancelled},
         )
     }
 }

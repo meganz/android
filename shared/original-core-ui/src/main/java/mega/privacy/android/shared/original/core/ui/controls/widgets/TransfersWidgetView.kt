@@ -93,10 +93,10 @@ fun TransfersWidgetViewAnimated(
     onClick: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    var previousStatus by remember { mutableStateOf(TransfersStatus.NotTransferring) }
+    var previousStatus by remember { mutableStateOf(TransfersStatus.Completed) }
     var justCompleted by remember(transfersInfo.status) {
         mutableStateOf(
-            transfersInfo.status == TransfersStatus.NotTransferring
+            transfersInfo.status == TransfersStatus.Completed
                     && previousStatus == TransfersStatus.Transferring
         )
     }
@@ -114,7 +114,7 @@ fun TransfersWidgetViewAnimated(
     }
 
     AnimatedVisibility(
-        visible = transfersInfo.status != TransfersStatus.NotTransferring || justCompleted,
+        visible = !transfersInfo.status.hasFinished() || justCompleted,
         enter = scaleIn(animationSpecs, initialScale = animationScale) + fadeIn(animationSpecs),
         exit = scaleOut(animationSpecs, targetScale = animationScale) + fadeOut(animationSpecs),
         modifier = modifier,
@@ -293,7 +293,7 @@ private class TransfersWidgetPreviewProvider :
                 uploading = true
             ) to false,
             TransfersInfo(
-                status = TransfersStatus.NotTransferring,
+                status = TransfersStatus.Completed,
                 totalSizeAlreadyTransferred = 10,
                 totalSizeToTransfer = 10,
                 uploading = false
