@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
@@ -34,7 +35,6 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefau
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -50,7 +50,8 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
  * @param onScanDestinationSelected Lambda when a new Scan Destination is selected
  * @param onScanFileTypeSelected Lambda when a new Scan File Type is selected
  * @param onSnackbarMessageConsumed Lambda when the Snackbar has been shown with the specific message
- * @param onUploadScansStarted Lambda to indicate that the scanned document/s should begin uploading
+ * @param onUploadScansStarted Lambda to indicate that the scanned document/s (through the provided
+ * Uri) should begin uploading
  * @param onUploadScansEventConsumed Lambda when the State Event to upload the scanned document/s has
  * been triggered
  */
@@ -64,7 +65,7 @@ internal fun SaveScannedDocumentsView(
     onScanDestinationSelected: (ScanDestination) -> Unit,
     onScanFileTypeSelected: (ScanFileType) -> Unit,
     onSnackbarMessageConsumed: () -> Unit,
-    onUploadScansStarted: () -> Unit,
+    onUploadScansStarted: (Uri) -> Unit,
     onUploadScansEventConsumed: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -90,7 +91,9 @@ internal fun SaveScannedDocumentsView(
     EventEffect(
         event = uiState.uploadScansEvent,
         onConsumed = { onUploadScansEventConsumed() },
-        action = onUploadScansStarted,
+        action = { uriToUpload ->
+            onUploadScansStarted(uriToUpload)
+        },
     )
 
     MegaScaffold(
@@ -141,6 +144,7 @@ internal fun SaveScannedDocumentsView(
                     )
                 }
                 SaveScannedDocumentsDestinationGroup(
+                    originatedFromChat = uiState.originatedFromChat,
                     selectedScanDestination = uiState.scanDestination,
                     onScanDestinationSelected = onScanDestinationSelected,
                 )
@@ -169,14 +173,16 @@ internal fun SaveScannedDocumentsView(
 @CombinedThemePreviews
 @Composable
 private fun SaveScannedDocumentsViewPreview(
-    @PreviewParameter(BooleanProvider::class) canSelectScanFileType: Boolean,
+    @PreviewParameter(SaveScannedDocumentsViewPreviewParameterProvider::class) saveScannedDocumentsViewPreviewParameter: SaveScannedDocumentsViewPreviewParameter,
 ) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SaveScannedDocumentsView(
             uiState = SaveScannedDocumentsUiState(
+                originatedFromChat = saveScannedDocumentsViewPreviewParameter.originatedFromChat,
                 filename = "PDF",
-                scanFileType = ScanFileType.Pdf,
-                soloImageUri = Uri.parse("image.jpg")
+                scanDestination = saveScannedDocumentsViewPreviewParameter.scanDestination,
+                scanFileType = saveScannedDocumentsViewPreviewParameter.scanFileType,
+                soloImageUri = saveScannedDocumentsViewPreviewParameter.soloImageUri,
             ),
             onFilenameChanged = {},
             onFilenameConfirmed = {},
@@ -189,6 +195,48 @@ private fun SaveScannedDocumentsViewPreview(
         )
     }
 }
+
+private class SaveScannedDocumentsViewPreviewParameterProvider :
+    PreviewParameterProvider<SaveScannedDocumentsViewPreviewParameter> {
+    override val values: Sequence<SaveScannedDocumentsViewPreviewParameter>
+        get() = sequenceOf(
+            // Document Scanning is accessed anywhere other than Chat and there is only one scan
+            SaveScannedDocumentsViewPreviewParameter(
+                originatedFromChat = false,
+                scanDestination = ScanDestination.CloudDrive,
+                scanFileType = ScanFileType.Pdf,
+                soloImageUri = Uri.parse("image.jpg"),
+            ),
+            // Document Scanning is accessed anywhere other than Chat and there is more than one scan
+            SaveScannedDocumentsViewPreviewParameter(
+                originatedFromChat = false,
+                scanDestination = ScanDestination.CloudDrive,
+                scanFileType = ScanFileType.Pdf,
+                soloImageUri = null,
+            ),
+            // Document Scanning is accessed from Chat and there is only one scan
+            SaveScannedDocumentsViewPreviewParameter(
+                originatedFromChat = true,
+                scanDestination = ScanDestination.Chat,
+                scanFileType = ScanFileType.Pdf,
+                soloImageUri = Uri.parse("image.jpg"),
+            ),
+            // Document Scanning is accessed from Chat and there is more than one scan
+            SaveScannedDocumentsViewPreviewParameter(
+                originatedFromChat = true,
+                scanDestination = ScanDestination.Chat,
+                scanFileType = ScanFileType.Pdf,
+                soloImageUri = null,
+            ),
+        )
+}
+
+private data class SaveScannedDocumentsViewPreviewParameter(
+    val originatedFromChat: Boolean,
+    val scanDestination: ScanDestination,
+    val scanFileType: ScanFileType,
+    val soloImageUri: Uri?,
+)
 
 internal const val SAVE_SCANNED_DOCUMENTS_TOOLBAR = "save_scanned_documents_view:mega_app_bar"
 internal const val SAVE_SCANNED_DOCUMENTS_FILE_NAME_DIVIDER =

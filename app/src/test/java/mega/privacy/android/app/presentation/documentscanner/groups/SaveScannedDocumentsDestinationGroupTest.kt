@@ -22,9 +22,10 @@ internal class SaveScannedDocumentsDestinationGroupTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `test that the ui components are displayed`() {
+    fun `test that the static ui components are displayed`() {
         composeTestRule.setContent {
             SaveScannedDocumentsDestinationGroup(
+                originatedFromChat = false,
                 selectedScanDestination = ScanDestination.CloudDrive,
                 onScanDestinationSelected = {},
             )
@@ -32,6 +33,34 @@ internal class SaveScannedDocumentsDestinationGroupTest {
 
         composeTestRule.onNodeWithTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_HEADER)
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that only the chat chip is displayed if document scanning is accessed from chat`() {
+        composeTestRule.setContent {
+            SaveScannedDocumentsDestinationGroup(
+                originatedFromChat = true,
+                selectedScanDestination = ScanDestination.Chat,
+                onScanDestinationSelected = {},
+            )
+        }
+
+        composeTestRule.onNodeWithTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_CHIP_CLOUD_DRIVE)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_CHIP_CHAT)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that both cloud drive and chat chips are displayed if document scanning is accessed anywhere other than chat`() {
+        composeTestRule.setContent {
+            SaveScannedDocumentsDestinationGroup(
+                originatedFromChat = false,
+                selectedScanDestination = ScanDestination.CloudDrive,
+                onScanDestinationSelected = {},
+            )
+        }
+
         composeTestRule.onNodeWithTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_CHIP_CLOUD_DRIVE)
             .assertIsDisplayed()
         composeTestRule.onNodeWithTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_CHIP_CHAT)
@@ -43,6 +72,7 @@ internal class SaveScannedDocumentsDestinationGroupTest {
         val onScanDestinationSelected = mock<(ScanDestination) -> Unit>()
         composeTestRule.setContent {
             SaveScannedDocumentsDestinationGroup(
+                originatedFromChat = false,
                 selectedScanDestination = ScanDestination.CloudDrive,
                 onScanDestinationSelected = onScanDestinationSelected,
             )
@@ -59,6 +89,7 @@ internal class SaveScannedDocumentsDestinationGroupTest {
         val onScanDestinationSelected = mock<(ScanDestination) -> Unit>()
         composeTestRule.setContent {
             SaveScannedDocumentsDestinationGroup(
+                originatedFromChat = false,
                 selectedScanDestination = ScanDestination.Chat,
                 onScanDestinationSelected = onScanDestinationSelected,
             )

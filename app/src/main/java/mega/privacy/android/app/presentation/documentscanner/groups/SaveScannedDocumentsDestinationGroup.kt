@@ -27,12 +27,14 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 /**
  * A Composable Group allowing Users to select where to save the Scanned Document/s
  *
+ * @param originatedFromChat true if the Document Scanner was accessed from Chat
  * @param selectedScanDestination The previously selected Scan Destination
  * @param onScanDestinationSelected Lambda when a new Scan Destination is selected
  * @param modifier the default Modifier
  */
 @Composable
 internal fun SaveScannedDocumentsDestinationGroup(
+    originatedFromChat: Boolean,
     selectedScanDestination: ScanDestination,
     onScanDestinationSelected: (ScanDestination) -> Unit,
     modifier: Modifier = Modifier,
@@ -60,15 +62,17 @@ internal fun SaveScannedDocumentsDestinationGroup(
                 ),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            MegaChip(
-                modifier = Modifier.testTag(
-                    SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_CHIP_CLOUD_DRIVE
-                ),
-                selected = selectedScanDestination == ScanDestination.CloudDrive,
-                style = RoundedChipStyle,
-                text = stringResource(SharedR.string.video_section_videos_location_option_cloud_drive),
-                onClick = { onScanDestinationSelected(ScanDestination.CloudDrive) },
-            )
+            if (!originatedFromChat) {
+                MegaChip(
+                    modifier = Modifier.testTag(
+                        SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_CHIP_CLOUD_DRIVE
+                    ),
+                    selected = selectedScanDestination == ScanDestination.CloudDrive,
+                    style = RoundedChipStyle,
+                    text = stringResource(SharedR.string.video_section_videos_location_option_cloud_drive),
+                    onClick = { onScanDestinationSelected(ScanDestination.CloudDrive) },
+                )
+            }
             MegaChip(
                 modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_CHIP_CHAT),
                 selected = selectedScanDestination == ScanDestination.Chat,
@@ -86,20 +90,43 @@ internal fun SaveScannedDocumentsDestinationGroup(
 @CombinedThemePreviews
 @Composable
 private fun SaveScannedDocumentsDestinationGroupPreview(
-    @PreviewParameter(ScanDestinationParameterProvider::class) scanDestination: ScanDestination,
+    @PreviewParameter(ScanDestinationPreviewParameterProvider::class) scanDestinationPreviewParameter: ScanDestinationPreviewParameter,
 ) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SaveScannedDocumentsDestinationGroup(
-            selectedScanDestination = scanDestination,
+            originatedFromChat = scanDestinationPreviewParameter.originatedFromChat,
+            selectedScanDestination = scanDestinationPreviewParameter.selectedScanDestination,
             onScanDestinationSelected = {},
         )
     }
 }
 
-private class ScanDestinationParameterProvider : PreviewParameterProvider<ScanDestination> {
-    override val values: Sequence<ScanDestination>
-        get() = ScanDestination.entries.asSequence()
+private class ScanDestinationPreviewParameterProvider :
+    PreviewParameterProvider<ScanDestinationPreviewParameter> {
+    override val values: Sequence<ScanDestinationPreviewParameter>
+        get() = sequenceOf(
+            // Document Scanning is accessed anywhere other than Chat and the Scan Destination is Cloud Drive
+            ScanDestinationPreviewParameter(
+                originatedFromChat = false,
+                selectedScanDestination = ScanDestination.CloudDrive,
+            ),
+            // Document Scanning is accessed anywhere other than Chat and the Scan Destination is Chat
+            ScanDestinationPreviewParameter(
+                originatedFromChat = false,
+                selectedScanDestination = ScanDestination.Chat,
+            ),
+            // Document Scanning is accessed from Chat and the Scan Destination is Chat by default
+            ScanDestinationPreviewParameter(
+                originatedFromChat = true,
+                selectedScanDestination = ScanDestination.Chat,
+            ),
+        )
 }
+
+private data class ScanDestinationPreviewParameter(
+    val originatedFromChat: Boolean,
+    val selectedScanDestination: ScanDestination,
+)
 
 internal const val SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_HEADER =
     "save_scanned_documents_destination_group:mega_text_header"

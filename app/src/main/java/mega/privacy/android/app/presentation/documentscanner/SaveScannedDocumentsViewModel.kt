@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.documentscanner
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,7 +18,10 @@ import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDo
 import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsUiState
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.documentscanner.IsScanFilenameValidUseCase
+import mega.privacy.android.domain.usecase.file.RenameFileAndDeleteOriginalUseCase
+import timber.log.Timber
 import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
@@ -26,11 +30,14 @@ import javax.inject.Inject
  * The [ViewModel] for Save Scanned Documents
  *
  * @property isScanFilenameValidUseCase Checks whether the filename of the scanned Document/s is valid
+ * @property renameFileAndDeleteOriginalUseCase Renames the original File, deletes it and returns
+ * the renamed File
  * @property savedStateHandle The Saved State Handle
  */
 @HiltViewModel
 internal class SaveScannedDocumentsViewModel @Inject constructor(
     private val isScanFilenameValidUseCase: IsScanFilenameValidUseCase,
+    private val renameFileAndDeleteOriginalUseCase: RenameFileAndDeleteOriginalUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -45,6 +52,10 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 savedStateHandle.getStateFlow(
+                    key = SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT,
+                    initialValue = false,
+                ),
+                savedStateHandle.getStateFlow(
                     key = SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE,
                     initialValue = -1L,
                 ),
@@ -56,9 +67,10 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
                     key = SaveScannedDocumentsActivity.EXTRA_SCAN_SOLO_IMAGE_URI,
                     initialValue = null,
                 ),
-            ) { cloudDriveParentHandle: Long, pdfUri: Uri?, soloImageUri: Uri? ->
+            ) { originatedFromChat: Boolean, cloudDriveParentHandle: Long, pdfUri: Uri?, soloImageUri: Uri? ->
                 { state: SaveScannedDocumentsUiState ->
                     state.copy(
+                        originatedFromChat = originatedFromChat,
                         cloudDriveParentHandle = cloudDriveParentHandle,
                         filename = String.format(
                             Locale.getDefault(),
@@ -66,6 +78,11 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
                             Calendar.getInstance(),
                         ),
                         pdfUri = pdfUri,
+                        scanDestination = if (originatedFromChat) {
+                            ScanDestination.Chat
+                        } else {
+                            ScanDestination.CloudDrive
+                        },
                         soloImageUri = soloImageUri,
                     )
                 }
@@ -118,7 +135,32 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
      */
     fun onSaveButtonClicked() {
         if (isConfirmedFilenameValid()) {
-            _uiState.update { it.copy(uploadScansEvent = triggered) }
+            val uiState = _uiState.value
+            val uriToUpload = when (uiState.scanFileType) {
+                ScanFileType.Pdf -> uiState.pdfUri
+                ScanFileType.Jpg -> uiState.soloImageUri
+            }
+            uriToUpload?.let { nonNullUri ->
+                val uriPath = nonNullUri.path
+                uriPath?.let { nonNullUriPath ->
+                    viewModelScope.launch {
+                        runCatching {
+                            renameFileAndDeleteOriginalUseCase(
+                                originalUriPath = UriPath(nonNullUriPath),
+                                newFilename = uiState.actualFilename,
+                            )
+                        }.onSuccess { renamedFile ->
+                            _uiState.update { it.copy(uploadScansEvent = triggered(renamedFile.toUri())) }
+                        }.onFailure { exception ->
+                            Timber.e("Unable to upload the scan/s due to a renaming issue:\n ${exception.printStackTrace()}")
+                        }
+                    }
+                } ?: run {
+                    Timber.e("Unable to upload the scan/s as the Uri path is missing")
+                }
+            } ?: run {
+                Timber.e("Unable to upload the scan/s as the Uri is missing")
+            }
         }
     }
 
@@ -176,7 +218,7 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
      * Notifies the UI State that the upload scans event has been triggered
      */
     fun onUploadScansEventConsumed() {
-        _uiState.update { it.copy(uploadScansEvent = consumed) }
+        _uiState.update { it.copy(uploadScansEvent = consumed()) }
     }
 
     companion object {

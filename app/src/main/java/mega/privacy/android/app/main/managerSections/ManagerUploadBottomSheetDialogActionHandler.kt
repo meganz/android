@@ -175,6 +175,7 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
                         val intent = Intent(
                             managerActivity, SaveScannedDocumentsActivity::class.java
                         ).apply {
+                            putExtra(SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT, false)
                             putExtra(
                                 SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE,
                                 parentNodeManager.currentParentHandle,
@@ -186,9 +187,13 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
                             )
                         }
                         managerActivity.startActivity(intent)
-                    } ?: Timber.e("The PDF file could not be retrieved after scanning")
+                    } ?: run {
+                        Timber.e("The PDF file could not be retrieved from Cloud Drive after scanning")
+                    }
                 }
             }
+        } else {
+            Timber.e("The ML Document Kit Scan result could not be retrieved from Cloud Drive")
         }
     }
 
@@ -259,7 +264,10 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
                     )
                 }
                 .addOnFailureListener { exception ->
-                    Timber.e("An error occurred when attempting to initialize the ML Kit Document Scanner: $exception")
+                    Timber.e(
+                        exception,
+                        "An error occurred when attempting to initialize the ML Kit Document Scanner from Cloud Drive",
+                    )
                 }
         }
     }

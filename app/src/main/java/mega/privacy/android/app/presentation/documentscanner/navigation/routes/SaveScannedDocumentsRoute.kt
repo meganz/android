@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.documentscanner.navigation.routes
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -10,12 +11,13 @@ import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocument
  * A Route Composable to the main Save Scanned Documents screen
  *
  * @param viewModel The ViewModel responsible for all business logic
- * @param onUploadScansStarted Lambda to indicate that the scanned document/s should begin uploading
+ * @param onUploadScansStarted Lambda to indicate that the scanned document/s (through the provided
+ * Uri) should begin uploading
  */
 @Composable
 internal fun SaveScannedDocumentsRoute(
     viewModel: SaveScannedDocumentsViewModel,
-    onUploadScansStarted: () -> Unit,
+    onUploadScansStarted: (Uri) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     SaveScannedDocumentsView(

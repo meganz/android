@@ -242,6 +242,10 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                                 SaveScannedDocumentsActivity::class.java,
                             ).apply {
                                 putExtra(
+                                    SaveScannedDocumentsActivity.EXTRA_ORIGINATED_FROM_CHAT,
+                                    false,
+                                )
+                                putExtra(
                                     SaveScannedDocumentsActivity.EXTRA_CLOUD_DRIVE_PARENT_HANDLE,
                                     getParentHandle(),
                                 )
@@ -252,9 +256,13 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                                 )
                             }
                             this@ContactFileListActivity.startActivity(intent)
-                        } ?: Timber.e("The PDF file could not be retrieved after scanning")
+                        } ?: run {
+                            Timber.e("The PDF file could not be retrieved from Contact File List after scanning")
+                        }
                     }
                 }
+            } else {
+                Timber.e("The ML Document Kit Scan result could not be retrieved from Contact File List")
             }
         }
 
@@ -562,7 +570,10 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                     newScanDocumentLauncher.launch(IntentSenderRequest.Builder(it).build())
                 }
                 .addOnFailureListener { exception ->
-                    Timber.e("An error occurred when attempting to initialize the ML Kit Document Scanner: $exception")
+                    Timber.e(
+                        exception,
+                        "An error occurred when attempting to initialize the ML Kit Document Scanner from Contact File List",
+                    )
                 }
         }
     }

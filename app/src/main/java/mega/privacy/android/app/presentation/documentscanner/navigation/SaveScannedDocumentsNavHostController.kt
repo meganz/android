@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.documentscanner.navigation
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -13,14 +14,15 @@ import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocument
  * @param modifier The [Modifier]
  * @param navHostController The [NavHostController] of the feature
  * @param viewModel The ViewModel responsible for all business logic
- * @param onUploadScansStarted Lambda to indicate that the scanned document/s should begin uploading
+ * @param onUploadScansStarted Lambda to indicate that the scanned document/s (through the provided
+ * Uri) should begin uploading
  */
 @Composable
 internal fun SaveScannedDocumentsNavHostController(
     modifier: Modifier,
     navHostController: NavHostController,
     viewModel: SaveScannedDocumentsViewModel = hiltViewModel(),
-    onUploadScansStarted: () -> Unit,
+    onUploadScansStarted: (Uri) -> Unit,
 ) {
     NavHost(
         modifier = modifier,

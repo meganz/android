@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.documentscanner
 
+import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.rememberScaffoldState
@@ -13,12 +14,13 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
  * A Composable holding all Save Scanned Documents screens using the Navigation Controller
  *
  * @param viewModel The ViewModel responsible for all business logic
- * @param onUploadScansStarted Lambda to indicate that the scanned document/s should begin uploading
+ * @param onUploadScansStarted Lambda to indicate that the scanned document/s (through the provided
+ * Uri) should begin uploading
  */
 @Composable
 internal fun SaveScannedDocumentsScreen(
     viewModel: SaveScannedDocumentsViewModel,
-    onUploadScansStarted: () -> Unit,
+    onUploadScansStarted: (Uri) -> Unit,
 ) {
     val navHostController = rememberNavController()
 
