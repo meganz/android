@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -69,7 +70,7 @@ import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
-import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
@@ -146,7 +147,7 @@ class FileInfoViewModel @Inject constructor(
     private val monitorOfflineFileAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
-    private val getAccountTypeUseCase: GetAccountTypeUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isBusinessAccountActive: IsBusinessAccountActive,
     private val getImageNodeByNodeId: GetImageNodeByIdUseCase,
     @IoDispatcher private val iODispatcher: CoroutineDispatcher,
@@ -193,23 +194,24 @@ class FileInfoViewModel @Inject constructor(
     }
 
     private fun checkAccountStatus() = viewModelScope.launch {
-        runCatching {
-            getAccountTypeUseCase()
-        }.onSuccess { result ->
-            if (result == AccountType.BUSINESS) {
-                runCatching {
-                    isBusinessAccountActive()
-                }.onSuccess { isBusinessAccountActive ->
-                    _uiState.update { it.copy(isBusinessAccountActive = isBusinessAccountActive) }
-                }.onFailure {
-                    Timber.e("Get isBusinessAccountActive failed with error: $it")
+        monitorAccountDetailUseCase()
+            .catch {
+                Timber.e("Monitor account detail failed $it")
+            }.collect { accountDetail ->
+                val accountType = accountDetail.levelDetail?.accountType
+                if (accountType == AccountType.PRO_FLEXI || accountType == AccountType.BUSINESS) {
+                    runCatching {
+                        isBusinessAccountActive()
+                    }.onSuccess { isBusinessAccountActive ->
+                        _uiState.update { it.copy(isBusinessAccountActive = isBusinessAccountActive) }
+                    }.onFailure {
+                        Timber.e("Get isBusinessAccountActive failed with error: $it")
+                    }
+                } else {
+                    _uiState.update { it.copy(isProAccount = accountType != AccountType.FREE) }
                 }
-            } else {
-                _uiState.update { it.copy(isProAccount = result != AccountType.FREE) }
             }
-        }.onFailure {
-            Timber.e("Get getAccountType failed with error: $it")
-        }
+
     }
 
     private fun checkTagsFeatureFlag() = viewModelScope.launch {
@@ -1081,6 +1083,9 @@ class FileInfoViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Get address from latitude and longitude
+     */
     suspend fun getAddress(
         context: Context,
         latitude: Double,

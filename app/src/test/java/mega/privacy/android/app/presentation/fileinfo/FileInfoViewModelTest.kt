@@ -27,12 +27,18 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.SubscriptionStatus
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.account.AccountSessionDetail
+import mega.privacy.android.domain.entity.account.AccountTransferDetail
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -58,7 +64,7 @@ import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
-import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
@@ -146,10 +152,10 @@ internal class FileInfoViewModelTest {
     private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val isMediaUploadsEnabledUseCase = mock<IsMediaUploadsEnabledUseCase>()
-    private val getAccountTypeUseCase = mock<GetAccountTypeUseCase>()
     private val isBusinessAccountActive = mock<IsBusinessAccountActive>()
     private val monitorOfflineFileAvailabilityUseCase =
         mock<MonitorOfflineFileAvailabilityUseCase>()
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
     private val checkNodesNameCollisionWithActionUseCase =
         mock<CheckNodesNameCollisionWithActionUseCase>()
@@ -209,8 +215,8 @@ internal class FileInfoViewModelTest {
             getContactVerificationWarningUseCase,
             typedFileNode,
             previewFile,
-            getAccountTypeUseCase,
             isBusinessAccountActive,
+            monitorAccountDetailUseCase,
         )
     }
 
@@ -253,7 +259,7 @@ internal class FileInfoViewModelTest {
             isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
             monitorOfflineFileAvailabilityUseCase = monitorOfflineFileAvailabilityUseCase,
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
-            getAccountTypeUseCase = getAccountTypeUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
             getImageNodeByNodeId = getImageNodeByIdUseCase,
             isBusinessAccountActive = isBusinessAccountActive,
@@ -269,7 +275,7 @@ internal class FileInfoViewModelTest {
         whenever(isNodeInBackupsUseCase(NODE_HANDLE)).thenReturn(false)
         whenever(isNodeInRubbishBinUseCase(NodeId(NODE_HANDLE))).thenReturn(false)
         whenever(previewFile.exists()).thenReturn(true)
-        whenever(previewFile.toURI()).thenReturn(URI.create(previewUri))
+        whenever(previewFile.toURI()).thenReturn(URI.create(PREVIEW_URI))
         whenever(getNodeByIdUseCase.invoke(nodeId)).thenReturn(typedFileNode)
         whenever(megaNodeRepository.getNodeByHandle(node.handle)).thenReturn(node)
         whenever(getNodeVersionsByHandleUseCase(nodeId)).thenReturn(null)
@@ -277,8 +283,8 @@ internal class FileInfoViewModelTest {
         whenever(monitorChildrenUpdates.invoke(nodeId)).thenReturn(emptyFlow())
         whenever(monitorChatOnlineStatusUseCase.invoke()).thenReturn(emptyFlow())
         whenever(monitorContactUpdates.invoke()).thenReturn(emptyFlow())
-        whenever(fileUtilWrapper.getFileIfExists(null, thumbUri))
-            .thenReturn(File(null as File?, thumbUri))
+        whenever(fileUtilWrapper.getFileIfExists(null, THUMB_URI))
+            .thenReturn(File(null as File?, THUMB_URI))
         whenever(typedFileNode.name).thenReturn("File name")
         whenever(typedFileNode.id).thenReturn(nodeId)
         whenever(getNodeAccessPermission.invoke(nodeId)).thenReturn(AccessPermission.READ)
@@ -704,7 +710,7 @@ internal class FileInfoViewModelTest {
         underTest.setNode(node.handle, true)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
             val state = awaitItem()
-            assertThat(state).isEqualTo(previewUri)
+            assertThat(state).isEqualTo(PREVIEW_URI)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -728,11 +734,11 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test thumbnail is assigned when node is updated and there are no preview`() = runTest {
         whenever(typedFileNode.hasPreview).thenReturn(false)
-        whenever(typedFileNode.thumbnailPath).thenReturn(thumbUri)
+        whenever(typedFileNode.thumbnailPath).thenReturn(THUMB_URI)
         underTest.setNode(node.handle, true)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
             val state = awaitItem()
-            assertThat(state).isEqualTo("file:$thumbUri")
+            assertThat(state).isEqualTo("file:$THUMB_URI")
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -740,12 +746,12 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test preview has priority over thumbnail`() = runTest {
         whenever(getPreviewUseCase.invoke(typedFileNode)).thenReturn(previewFile)
-        whenever(typedFileNode.thumbnailPath).thenReturn(thumbUri)
+        whenever(typedFileNode.thumbnailPath).thenReturn(THUMB_URI)
         whenever(typedFileNode.hasPreview).thenReturn(true)
         underTest.setNode(node.handle, true)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
             val state = awaitItem()
-            assertThat(state).isEqualTo(previewUri)
+            assertThat(state).isEqualTo(PREVIEW_URI)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1047,9 +1053,29 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test that isProAccount is invoked when view model is initialized`() = runTest {
-        whenever(getAccountTypeUseCase()).thenReturn(AccountType.PRO_I)
+        whenever(monitorAccountDetailUseCase()).thenReturn(
+            flowOf(
+                AccountDetail(
+                    sessionDetail = AccountSessionDetail(123456L, 54657L),
+                    storageDetail = null,
+                    levelDetail = AccountLevelDetail(
+                        subscriptionStatus = SubscriptionStatus.VALID,
+                        subscriptionRenewTime = 123456L,
+                        accountSubscriptionCycle = AccountSubscriptionCycle.MONTHLY,
+                        accountType = AccountType.PRO_II,
+                        accountPlanDetail = null,
+                        proExpirationTime = 123456,
+                        accountSubscriptionDetailList = emptyList()
+                    ),
+                    transferDetail = AccountTransferDetail(
+                        usedTransfer = 1000L,
+                        totalTransfer = 2000L
+                    )
+                )
+            )
+        )
         underTest.setNode(node.handle, true)
-        verify(getAccountTypeUseCase).invoke()
+        verify(monitorAccountDetailUseCase).invoke()
     }
 
     private fun mockMonitorStorageStateEvent(state: StorageState) {
@@ -1268,32 +1294,32 @@ internal class FileInfoViewModelTest {
         whenever(deleteNodeByHandleUseCase.invoke(nodeId)).thenThrow(RuntimeException("fake exception"))
     }
 
-    private suspend fun testProgressIsSetWhileCopyingAndUnset() =
+    private fun testProgressIsSetWhileCopyingAndUnset() =
         testProgressSetAndUnset(FileInfoJobInProgressState.Copying) {
             underTest.copyNodeCheckingCollisions(parentId)
         }
 
-    private suspend fun testProgressIsSetWhileMovingAndUnset() =
+    private fun testProgressIsSetWhileMovingAndUnset() =
         testProgressSetAndUnset(FileInfoJobInProgressState.Moving) {
             underTest.moveNodeCheckingCollisions(parentId)
         }
 
-    private suspend fun testProgressIsSetWhileMovingToRubbishBinAndUnset() =
+    private fun testProgressIsSetWhileMovingToRubbishBinAndUnset() =
         testProgressSetAndUnset(FileInfoJobInProgressState.MovingToRubbish) {
             underTest.removeNode()
         }
 
-    private suspend fun testProgressIsSetWhileDeletingAndUnset() =
+    private fun testProgressIsSetWhileDeletingAndUnset() =
         testProgressSetAndUnset(FileInfoJobInProgressState.Deleting) {
             underTest.removeNode()
         }
 
-    private suspend fun testProgressIsSetWhileDeletingVersionsAndUnset() =
+    private fun testProgressIsSetWhileDeletingVersionsAndUnset() =
         testProgressSetAndUnset(FileInfoJobInProgressState.DeletingVersions) {
             underTest.deleteHistoryVersions()
         }
 
-    private suspend fun testProgressSetAndUnset(
+    private fun testProgressSetAndUnset(
         progress: FileInfoJobInProgressState,
         block: () -> Unit,
     ) = runTest {
@@ -1327,7 +1353,7 @@ internal class FileInfoViewModelTest {
         private const val PARENT_NODE_HANDLE = 12L
         private val nodeId = NodeId(NODE_HANDLE)
         private val parentId = NodeId(PARENT_NODE_HANDLE)
-        private const val thumbUri = "/thumb"
-        private const val previewUri = "/preview"
+        private const val THUMB_URI = "/thumb"
+        private const val PREVIEW_URI = "/preview"
     }
 }
