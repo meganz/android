@@ -765,11 +765,11 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">收藏</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">No connections are set up</string>
+    <string name="device_center_sync_backup_list_empty_state_title">沒有設定連線</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_message">Sync or back up a folder on your device with a folder on MEGA</string>
+    <string name="device_center_sync_backup_list_empty_state_message">將裝置上的資料夾與MEGA上的資料夾同步或備份</string>
     <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_backup_list_empty_state_message_free_account">Upgrade to a premium account to keep your important information safe and up-to-date with sync and backup</string>
+    <string name="device_center_sync_backup_list_empty_state_message_free_account">升級為高級帳戶，透過同步和備份來保護您的重要資訊並維持在最新狀態</string>
     <!-- Synced folder list empty state "See upgrade options" button label -->
-    <string name="device_center_sync_backup_see_upgrade_options_button_label">See upgrade options</string>
+    <string name="device_center_sync_backup_see_upgrade_options_button_label">檢視升級選項</string>
 </resources>
