@@ -69,7 +69,7 @@ fun FileInfoTagsView(
                 }
             }
     ) {
-        if (isBusinessAccountActive == false) {
+        if (tags.isEmpty() && isBusinessAccountActive == false) {
             MegaText(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 text = stringResource(id = sharedR.string.file_info_information_tags_label),
