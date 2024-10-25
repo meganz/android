@@ -2,8 +2,6 @@ package mega.privacy.android.app.main.adapters;
 
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo;
-import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache;
-import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromFolder;
 import static mega.privacy.android.app.utils.Util.isOnline;
 
 import android.app.Activity;
@@ -32,12 +30,17 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 import java.util.ArrayList;
 import java.util.List;
 
+import coil.Coil;
+import coil.request.ImageRequest;
+import coil.request.SuccessResult;
+import coil.transform.RoundedCornersTransformation;
+import coil.util.CoilUtils;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.main.VersionsFileActivity;
-import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -227,6 +230,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
     /**
      * Retrieves the selected Node Versions
+     *
      * @return a Pair containing the List of selected Node Versions and whether the current Version
      * has been selected or not
      */
@@ -355,92 +359,32 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
             holder.imageView.setLayoutParams(paramsLarge);
 
             Timber.d("Check the thumb");
-
+            CoilUtils.dispose(holder.imageView);
             if (node.hasThumbnail()) {
                 Timber.d("Node has thumbnail");
-
-                thumb = getThumbnailFromCache(node);
-                if (thumb != null) {
-                    RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                    params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                    params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                    int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
-                    int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-                    params1.setMargins(left, 0, right, 0);
-
-                    holder.imageView.setLayoutParams(params1);
-                    holder.imageView.setImageBitmap(thumb);
-
-                } else {
-                    thumb = getThumbnailFromFolder(node, context);
-                    if (thumb != null) {
-                        RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                        params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                        params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                        int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
-                        int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-                        params1.setMargins(left, 0, right, 0);
-
-                        holder.imageView.setLayoutParams(params1);
-                        holder.imageView.setImageBitmap(thumb);
-
-                    } else {
-                        try {
-                            thumb = ThumbnailUtils.getThumbnailFromMegaList(node, context, holder, megaApi, this);
-                        } catch (Exception e) {
-                        } // Too many AsyncTasks
-
-                        if (thumb != null) {
-                            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                            params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                            params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                            int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
-                            int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-                            params1.setMargins(left, 0, right, 0);
-
-                            holder.imageView.setLayoutParams(params1);
-                            holder.imageView.setImageBitmap(thumb);
-                        }
-                    }
-                }
+                Coil.imageLoader(context).enqueue(
+                        new ImageRequest.Builder(context)
+                                .placeholder(MimeTypeList.typeForName(node.getName()).getIconResourceId())
+                                .data(ThumbnailRequest.fromHandle(node.getHandle()))
+                                .target(holder.imageView)
+                                .transformations(new RoundedCornersTransformation(context.getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
+                                .listener(new ImageRequest.Listener() {
+                                    @Override
+                                    public void onSuccess(@NonNull ImageRequest request, @NonNull SuccessResult result) {
+                                        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+                                        params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                                        params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                                        int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
+                                        int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+                                        params.setMargins(left, 0, right, 0);
+                                        holder.imageView.setLayoutParams(params);
+                                    }
+                                })
+                                .build()
+                );
             } else {
                 Timber.d("Node NOT thumbnail");
-                thumb = getThumbnailFromCache(node);
-                if (thumb != null) {
-                    RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                    params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                    params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                    int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
-                    int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-                    params1.setMargins(left, 0, right, 0);
-
-                    holder.imageView.setLayoutParams(params1);
-                    holder.imageView.setImageBitmap(thumb);
-
-
-                } else {
-                    thumb = getThumbnailFromFolder(node, context);
-                    if (thumb != null) {
-                        RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                        params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                        params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                        int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
-                        int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-                        params1.setMargins(left, 0, right, 0);
-
-                        holder.imageView.setLayoutParams(params1);
-                        holder.imageView.setImageBitmap(thumb);
-
-                    } else {
-                        holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                        holder.imageView.setLayoutParams(paramsLarge);
-
-                        try {
-                            ThumbnailUtils.createThumbnailList(context, node, holder, megaApi, this);
-                        } catch (Exception e) {
-                        } // Too many AsyncTasks
-                    }
-                }
+                holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
             }
         } else {
             Timber.d("Multiselection ON");
@@ -453,94 +397,32 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
                 Timber.d("Check the thumb");
                 holder.imageView.setLayoutParams(paramsLarge);
 
+                CoilUtils.dispose(holder.imageView);
                 if (node.hasThumbnail()) {
                     Timber.d("Node has thumbnail");
-
-                    thumb = getThumbnailFromCache(node);
-                    if (thumb != null) {
-                        RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                        params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                        params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                        int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
-                        int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-                        params1.setMargins(left, 0, right, 0);
-
-                        holder.imageView.setLayoutParams(params1);
-                        holder.imageView.setImageBitmap(thumb);
-
-                    } else {
-                        thumb = getThumbnailFromFolder(node, context);
-                        if (thumb != null) {
-                            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                            params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                            params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                            int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
-                            int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-                            params1.setMargins(left, 0, right, 0);
-
-                            holder.imageView.setLayoutParams(params1);
-                            holder.imageView.setImageBitmap(thumb);
-
-                        } else {
-                            try {
-                                thumb = ThumbnailUtils.getThumbnailFromMegaList(node, context, holder, megaApi, this);
-                            } catch (Exception e) {
-                            } // Too many AsyncTasks
-
-                            if (thumb != null) {
-                                RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                                params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                                params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                                int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
-                                int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-                                params1.setMargins(left, 0, right, 0);
-
-                                holder.imageView.setLayoutParams(params1);
-                                holder.imageView.setImageBitmap(thumb);
-                            }
-                        }
-                    }
+                    Coil.imageLoader(context).enqueue(
+                            new ImageRequest.Builder(context)
+                                    .placeholder(MimeTypeList.typeForName(node.getName()).getIconResourceId())
+                                    .data(ThumbnailRequest.fromHandle(node.getHandle()))
+                                    .target(holder.imageView)
+                                    .transformations(new RoundedCornersTransformation(context.getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
+                                    .listener(new ImageRequest.Listener() {
+                                        @Override
+                                        public void onSuccess(@NonNull ImageRequest request, @NonNull SuccessResult result) {
+                                            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+                                            params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                                            params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                                            int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
+                                            int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+                                            params.setMargins(left, 0, right, 0);
+                                            holder.imageView.setLayoutParams(params);
+                                        }
+                                    })
+                                    .build()
+                    );
                 } else {
                     Timber.d("Node NOT thumbnail");
-
-                    thumb = getThumbnailFromCache(node);
-                    if (thumb != null) {
-                        RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                        params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                        params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                        int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
-                        int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-                        params1.setMargins(left, 0, right, 0);
-
-                        holder.imageView.setLayoutParams(params1);
-                        holder.imageView.setImageBitmap(thumb);
-
-                    } else {
-                        thumb = getThumbnailFromFolder(node, context);
-                        if (thumb != null) {
-                            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                            params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                            params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                            int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18, context.getResources().getDisplayMetrics());
-                            int right = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
-                            params1.setMargins(left, 0, right, 0);
-
-                            holder.imageView.setLayoutParams(params1);
-                            holder.imageView.setImageBitmap(thumb);
-
-                        } else {
-                            Timber.d("NOT thumbnail");
-                            holder.imageView.setLayoutParams(paramsLarge);
-                            holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-
-                            if (MimeTypeList.typeForName(node.getName()).isImage()) {
-                                try {
-                                    ThumbnailUtils.createThumbnailList(context, node, holder, megaApi, this);
-                                } catch (Exception e) {
-                                }
-                            }
-                        }
-                    }
+                    holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                 }
             }
         }
