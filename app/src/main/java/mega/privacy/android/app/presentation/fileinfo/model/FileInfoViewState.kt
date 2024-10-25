@@ -11,7 +11,6 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.shared.original.core.ui.utils.textcomparator.AlphanumericComparator
 
 /**
  * Represents the view state of the File info screen
@@ -126,7 +125,7 @@ internal data class FileInfoViewState(
         modificationTime = (typedNode as? TypedFileNode)?.modificationTime,
         descriptionText = typedNode.description.orEmpty(),
         hasPreview = (typedNode as? TypedFileNode)?.hasPreview == true,
-        tags = typedNode.tags.orEmpty().sortedWith(AlphanumericComparator()),
+        tags = typedNode.tags.orEmpty(),
     )
 
 
