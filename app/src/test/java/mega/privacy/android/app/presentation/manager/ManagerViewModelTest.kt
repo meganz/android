@@ -34,6 +34,7 @@ import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDoc
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.CameraUploadsFolderDestinationUpdate
@@ -99,6 +100,7 @@ import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
@@ -146,6 +148,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -342,6 +345,9 @@ class ManagerViewModelTest {
     private val createFolderNodeUseCase: CreateFolderNodeUseCase = mock()
     private val monitorChatListItemUpdates = MutableSharedFlow<ChatListItem>()
 
+    private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase = mock()
+    private val versionHistoryRemoveMessageMapper: VersionHistoryRemoveMessageMapper = mock()
+
 
     private fun initViewModel() {
         underTest = ManagerViewModel(
@@ -428,7 +434,9 @@ class ManagerViewModelTest {
             filePrepareUseCase = filePrepareUseCase,
             scannerHandler = scannerHandler,
             createFolderNodeUseCase = createFolderNodeUseCase,
-            monitorChatListItemUpdates = { monitorChatListItemUpdates }
+            monitorChatListItemUpdates = { monitorChatListItemUpdates },
+            deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
+            versionHistoryRemoveMessageMapper = versionHistoryRemoveMessageMapper
         )
     }
 
@@ -481,7 +489,9 @@ class ManagerViewModelTest {
             startOfflineSyncWorkerUseCase,
             filePrepareUseCase,
             scannerHandler,
-            createFolderNodeUseCase
+            createFolderNodeUseCase,
+            deleteNodeVersionsUseCase,
+            versionHistoryRemoveMessageMapper
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
@@ -1579,6 +1589,15 @@ class ManagerViewModelTest {
         val folderName = "folderName"
         underTest.createFolder(parentHandle, folderName)
         verify(createFolderNodeUseCase).invoke(folderName, NodeId(parentHandle))
+    }
+
+    @Test
+    fun `test that delete version history invokes the use case`() = runTest {
+        val nodeHandle = 123L
+        whenever(deleteNodeVersionsUseCase.invoke(NodeId(nodeHandle))).thenReturn(Unit)
+        underTest.deleteVersionHistory(nodeHandle)
+        verify(deleteNodeVersionsUseCase).invoke(NodeId(nodeHandle))
+        verify(versionHistoryRemoveMessageMapper).invoke(anyOrNull())
     }
 
     companion object {

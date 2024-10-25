@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.filenode
 
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
+import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
 
@@ -18,17 +19,17 @@ class DeleteNodeVersionsUseCase @Inject constructor(private val nodeRepository: 
         val versions = nodeRepository.getNodeHistoryVersions(nodeToDeleteVersions)
         val versionsToRemove = versions.drop(1)
 
-        val numErrorsDeleting = versionsToRemove.mapNotNull { versionToRemove ->
+        val numErrorsDeleting = versionsToRemove.mapAsync { versionToRemove ->
             runCatching {
                 nodeRepository.deleteNodeVersionByHandle(versionToRemove.id)
-            }.exceptionOrNull()
-        }.size
+            }
+        }.count { it.isFailure }
+
         if (numErrorsDeleting > 0) {
             throw VersionsNotDeletedException(
                 versionsToRemove.size,
                 numErrorsDeleting
             )
-
         }
     }
 }

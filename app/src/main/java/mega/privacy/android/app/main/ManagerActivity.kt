@@ -113,6 +113,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
@@ -417,6 +418,16 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
+    val versionsActivityLauncher =
+        registerForActivityResult(VersionsFileActivityContract()) { result ->
+            result?.let {
+                lifecycleScope.launch {
+                    val message = viewModel.deleteVersionHistory(it)
+                    showSnackbar(SNACKBAR_TYPE, message, -1)
+                }
+            }
+        }
+
     /**
      * Application Theme Mode
      */
@@ -634,10 +645,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private var backupNodeType = 0
     private var backupActionType = 0
 
-    // Version removed
-    private var versionsToRemove = 0
-    private var versionsRemoved = 0
-    private var errorVersionRemove = 0
     private var viewInFolderNode: MegaNode? = null
 
     private var showDialogStorageStatusJob: Job? = null
@@ -6260,34 +6267,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
             }
 
-            requestCode == Constants.REQUEST_CODE_DELETE_VERSIONS_HISTORY && resultCode == Activity.RESULT_OK -> {
-                if (!viewModel.isConnected) {
-                    Util.showErrorAlertDialog(
-                        getString(R.string.error_server_connection_problem),
-                        false,
-                        this
-                    )
-                    return
-                }
-                if (intent?.getBooleanExtra(
-                        VersionsFileActivity.KEY_DELETE_VERSION_HISTORY,
-                        false
-                    ) == true
-                ) {
-                    val node = megaApi.getNodeByHandle(
-                        intent.getLongExtra(
-                            VersionsFileActivity.KEY_DELETE_NODE_HANDLE,
-                            0
-                        )
-                    )
-                    val versions: ArrayList<MegaNode> = megaApi.getVersions(node)
-                    versionsToRemove = versions.size - 1
-                    for (i in 1 until versions.size) {
-                        megaApi.removeVersion(versions[i], this)
-                    }
-                }
-            }
-
             else -> {
                 Timber.w("No request code processed")
                 super.onActivityResult(requestCode, resultCode, intent)
@@ -6808,59 +6787,22 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
 
             MegaRequest.TYPE_REMOVE -> {
-                if (versionsToRemove > 0) {
-                    Timber.d("Remove request finished")
-                    if (e.errorCode == MegaError.API_OK) {
-                        versionsRemoved++
-                    } else {
-                        errorVersionRemove++
+                Timber.d("Remove request finished")
+                when (e.errorCode) {
+                    MegaError.API_OK -> {
+                        finish()
                     }
-                    if (versionsRemoved + errorVersionRemove == versionsToRemove) {
-                        if (versionsRemoved == versionsToRemove) {
-                            showSnackbar(
-                                Constants.SNACKBAR_TYPE,
-                                getString(R.string.version_history_deleted),
-                                -1
-                            )
-                        } else {
-                            showSnackbar(
-                                Constants.SNACKBAR_TYPE,
-                                getString(R.string.version_history_deleted_erroneously)
-                                        + "\n" + resources.getQuantityString(
-                                    R.plurals.versions_deleted_succesfully,
-                                    versionsRemoved,
-                                    versionsRemoved
-                                )
-                                        + "\n" + resources.getQuantityString(
-                                    R.plurals.versions_not_deleted,
-                                    errorVersionRemove,
-                                    errorVersionRemove
-                                ),
-                                MEGACHAT_INVALID_HANDLE
-                            )
-                        }
-                        versionsToRemove = 0
-                        versionsRemoved = 0
-                        errorVersionRemove = 0
+
+                    MegaError.API_EMASTERONLY -> {
+                        showSnackbar(Constants.SNACKBAR_TYPE, e.errorString, -1)
                     }
-                } else {
-                    Timber.d("Remove request finished")
-                    when (e.errorCode) {
-                        MegaError.API_OK -> {
-                            finish()
-                        }
 
-                        MegaError.API_EMASTERONLY -> {
-                            showSnackbar(Constants.SNACKBAR_TYPE, e.errorString, -1)
-                        }
-
-                        else -> {
-                            showSnackbar(
-                                Constants.SNACKBAR_TYPE,
-                                getString(R.string.context_no_removed),
-                                -1
-                            )
-                        }
+                    else -> {
+                        showSnackbar(
+                            Constants.SNACKBAR_TYPE,
+                            getString(R.string.context_no_removed),
+                            -1
+                        )
                     }
                 }
             }

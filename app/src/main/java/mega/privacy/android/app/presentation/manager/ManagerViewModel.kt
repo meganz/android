@@ -35,6 +35,7 @@ import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
 import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
@@ -90,6 +91,7 @@ import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorDevicePowerConnectionStateUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
@@ -125,7 +127,6 @@ import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
-import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -271,6 +272,8 @@ class ManagerViewModel @Inject constructor(
     private val scannerHandler: ScannerHandler,
     private val createFolderNodeUseCase: CreateFolderNodeUseCase,
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
+    private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase,
+    private val versionHistoryRemoveMessageMapper: VersionHistoryRemoveMessageMapper,
 ) : ViewModel() {
 
     /**
@@ -1428,6 +1431,16 @@ class ManagerViewModel @Inject constructor(
         parentNodeId = NodeId(parentId).takeIf { it.longValue != INVALID_HANDLE },
         name = folderName,
     )
+
+    /**
+     * Delete version history of selected node
+     */
+    suspend fun deleteVersionHistory(it: Long): String {
+        val result = runCatching {
+            deleteNodeVersionsUseCase(NodeId(it))
+        }
+        return versionHistoryRemoveMessageMapper(result.exceptionOrNull())
+    }
 
     internal companion object {
         internal const val IS_FIRST_LOGIN_KEY = "EXTRA_FIRST_LOGIN"

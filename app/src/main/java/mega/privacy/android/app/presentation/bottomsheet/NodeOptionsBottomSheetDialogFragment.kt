@@ -42,7 +42,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.VersionsFileActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
@@ -1454,12 +1453,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun onVersionsClicked(node: MegaNode) {
-        val version = Intent(activity, VersionsFileActivity::class.java)
-        version.putExtra(Constants.HANDLE, node.handle)
-        requireActivity().startActivityForResult(
-            version,
-            Constants.REQUEST_CODE_DELETE_VERSIONS_HISTORY
-        )
+        (activity as? ManagerActivity)?.versionsActivityLauncher?.launch(node.handle)
         setStateBottomSheetBehaviorHidden()
     }
 
