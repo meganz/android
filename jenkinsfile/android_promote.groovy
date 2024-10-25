@@ -157,14 +157,15 @@ pipeline {
                     String jenkinsLog = common.uploadFileToArtifactory("android_promote", CONSOLE_LOG_FILE)
                     String buildLog = "Build Log: <${jenkinsLog}|${CONSOLE_LOG_FILE}>"
                     String track = params.TRACK.toLowerCase()
-                    String version = params.VERSION
-                    String versionName = extractVersionName(version)
+                    String versionName = extractVersionName(params.VERSION)
+                    String versionCode = extractVersionCode(params.VERSION)
+                    String fullVersion = "v$versionName($versionCode)"
                     String percentage = params.PERCENTAGE
                     String message = "${buildLog}\n"
                     if (isHaltRollout(percentage)) {
-                        message += "Hi <!subteam^S02B2PB5SG7>, halting the $track rollout for v${version} has failed, please check."
+                        message += "Hi <!subteam^S02B2PB5SG7>, halting the $track rollout for $fullVersion has failed, please check."
                     } else {
-                        message += "Hi <!subteam^S02B2PB5SG7>, the promotion to $track has failed for v${version} at ${percentage}% rollout, please check."
+                        message += "Hi <!subteam^S02B2PB5SG7>, the promotion to $track has failed for $fullVersion at ${percentage}% rollout, please check."
                     }
 
                     def slackChannelId = common.fetchSlackChannelIdsByReleaseVersion(versionName)[0]
@@ -180,8 +181,9 @@ pipeline {
         success {
             script {
                 String track = params.TRACK.toLowerCase()
-                String version = params.VERSION
-                String versionName = extractVersionName(version)
+                String versionName = extractVersionName(params.VERSION)
+                String versionCode = extractVersionCode(params.VERSION)
+                String fullVersion = "v$versionName($versionCode)"
                 String percentage = params.PERCENTAGE
                 String packageLink = ""
                 withCredentials([string(credentialsId: 'JIRA_BASE_URL', variable: 'JIRA_BASE_URL')]) {
@@ -191,9 +193,9 @@ pipeline {
 
                 String message = ""
                 if (isHaltRollout(percentage)) {
-                    message = "The Android team has halted the $track roll out process in Google Play for v$version."
+                    message = "The Android team has halted the $track roll out process in Google Play for $fullVersion."
                 } else {
-                    message = "The Android team has started the $track roll out process in Google Play for v$version. It is now being offered to ${percentage}% of $track $userType.\n" +
+                    message = "The Android team has started the $track roll out process in Google Play for $fullVersion. It is now being offered to ${percentage}% of $track $userType.\n" +
                             "Here is the <$packageLink|v$versionName> Jira Release Package."
                 }
 
