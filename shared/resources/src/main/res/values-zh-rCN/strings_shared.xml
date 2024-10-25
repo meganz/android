@@ -739,7 +739,7 @@
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">允许MEGA访问您设备的文件</string>
     <!-- Context message in the files permission screen -->
-    <string name="files_permission_screen_message">By allowing MEGA access to your files, you can upload to MEGA without creating temporary copies, saving space on your device and enabling faster uploads.</string>
+    <string name="files_permission_screen_message">通过允许MEGA访问您的文件，您无需创建临时副本即可上传到MEGA，从而节省设备空间并加快上传速度。</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_do_not_show_again_button">不再显示此信息</string>
     <!-- Title of the dialog to confirm stop a sync -->
@@ -765,11 +765,11 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">收藏</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">No connections are set up</string>
+    <string name="device_center_sync_backup_list_empty_state_title">未设置连接</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_message">Sync or back up a folder on your device with a folder on MEGA</string>
+    <string name="device_center_sync_backup_list_empty_state_message">将设备上的文件夹与MEGA上的文件夹同步或备份</string>
     <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_backup_list_empty_state_message_free_account">Upgrade to a premium account to keep your important information safe and up-to-date with sync and backup</string>
+    <string name="device_center_sync_backup_list_empty_state_message_free_account">升级到高级帐户，通过同步和备份，确保您的重要信息安全并保持最新状态</string>
     <!-- Synced folder list empty state "See upgrade options" button label -->
-    <string name="device_center_sync_backup_see_upgrade_options_button_label">See upgrade options</string>
+    <string name="device_center_sync_backup_see_upgrade_options_button_label">查看升级选项</string>
 </resources>
