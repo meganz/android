@@ -340,7 +340,14 @@ internal fun ChatRoomItemView(
         )
 
         IconButton(
-            onClick = { onItemMoreClick(item) },
+            onClick = {
+                if (isSelectionEnabled) {
+                    hapticFeedback.performHapticFeedback(LongPress)
+                    onItemSelected(item.chatId)
+                } else {
+                    onItemMoreClick(item)
+                }
+            },
             modifier = Modifier
                 .testTag("chat_room_item:more_button")
                 .size(24.dp)

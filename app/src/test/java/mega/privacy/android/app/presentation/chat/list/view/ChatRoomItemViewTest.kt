@@ -66,7 +66,26 @@ class ChatRoomItemViewTest {
     }
 
     @Test
-    fun `test that onItemMoreClick is called when more button is clicked`() {
+    fun `test that onItemSelected is called when more button is clicked and is selected mode`() {
+        composeTestRule.setContent {
+            ChatRoomItemView(
+                item = individualChatRoomItem,
+                isSelected = false,
+                isSelectionEnabled = true,
+                onItemClick = onItemClick,
+                onItemMoreClick = onItemMoreClick,
+                onItemSelected = onItemSelected,
+            )
+        }
+
+        composeTestRule.onNodeWithTag("chat_room_item:more_button").performClick()
+
+        verify(onItemSelected).invoke(individualChatRoomItem.chatId)
+
+    }
+
+    @Test
+    fun `test that onItemMoreClick  is called when more button is clicked and is not selected mode`() {
         composeTestRule.setContent {
             ChatRoomItemView(
                 item = individualChatRoomItem,
@@ -81,6 +100,7 @@ class ChatRoomItemViewTest {
         composeTestRule.onNodeWithTag("chat_room_item:more_button").performClick()
 
         verify(onItemMoreClick).invoke(individualChatRoomItem)
+
     }
 
     @Test
