@@ -23,10 +23,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -64,14 +60,13 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_800
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import nz.mega.sdk.MegaNode
 
@@ -109,19 +104,18 @@ fun VideoPlaylistDetailView(
     val items = playlist?.videos ?: emptyList()
     val lazyListState = rememberLazyListState()
 
-    val isInFirstItem by remember {
+    val isNotInFirstItem by remember {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex != 0
+            lazyListState.firstVisibleItemScrollOffset > 0
         }
     }
     var playlistTitle by rememberSaveable { mutableStateOf("") }
 
-    LaunchedEffect(isInFirstItem) {
-        playlistTitle = if (isInFirstItem) playlist?.title ?: "" else ""
+    LaunchedEffect(isNotInFirstItem) {
+        playlistTitle = if (isNotInFirstItem) playlist?.title ?: "" else ""
     }
 
-    val snackBarHostState = remember { SnackbarHostState() }
-    val isLight = MaterialTheme.colors.isLight
+    val scaffoldState = rememberScaffoldState()
 
     val coroutineScope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState(
@@ -142,7 +136,7 @@ fun VideoPlaylistDetailView(
                 playlist?.title
             )
             coroutineScope.launch {
-                snackBarHostState.showAutoDurationSnackbar(message)
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(message)
             }
             addedMessageShown()
         }
@@ -167,7 +161,7 @@ fun VideoPlaylistDetailView(
                 playlist?.title
             )
             coroutineScope.launch {
-                snackBarHostState.showAutoDurationSnackbar(message)
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(message)
             }
             removedMessageShown()
         }
@@ -187,9 +181,10 @@ fun VideoPlaylistDetailView(
         }
     }
 
-    Scaffold(
+    MegaScaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
-        scaffoldState = rememberScaffoldState(),
+        scaffoldState = scaffoldState,
+        scrollableContentState = lazyListState,
         topBar = {
             VideoPlaylistDetailTopBar(
                 title = playlistTitle,
@@ -213,17 +208,6 @@ fun VideoPlaylistDetailView(
                 },
                 onBackPressed = onBackPressed,
                 isSystemVideoPlaylist = playlist?.isSystemVideoPlayer == true
-            )
-        },
-        snackbarHost = {
-            SnackbarHost(
-                hostState = snackBarHostState,
-                snackbar = { data ->
-                    Snackbar(
-                        snackbarData = data,
-                        backgroundColor = black.takeIf { isLight } ?: white,
-                    )
-                }
             )
         },
         floatingActionButton = {
@@ -390,10 +374,12 @@ internal fun VideoPlaylistEmptyView(
             modifier = Modifier.padding(16.dp),
             onPlayAllClicked = onPlayAllClicked
         )
-        MegaDivider(
-            dividerType = DividerType.Centered,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+        if (numberOfVideos != null && numberOfVideos != 0) {
+            MegaDivider(
+                dividerType = DividerType.Centered,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
         LegacyMegaEmptyViewWithImage(
             modifier = Modifier.fillMaxSize(),
             text = stringResource(id = sharedR.string.video_section_playlist_detail_empty_hint_videos),
@@ -431,20 +417,26 @@ internal fun VideoPlaylistHeaderView(
 
             VideoPlaylistInfoView(
                 title = title ?: "",
-                totalDuration = totalDuration ?: "00:00:00",
+                totalDuration = if (totalDuration.isNullOrEmpty()) {
+                    "00:00:00"
+                } else {
+                    totalDuration
+                },
                 numberOfVideos = numberOfVideos ?: 0,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp)
             )
         }
-        PlayAllButtonView(
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(top = 16.dp)
-                .clickable { onPlayAllClicked() }
-                .testTag(DETAIL_PLAY_ALL_BUTTON_TEST_TAG)
-        )
+        if (numberOfVideos != null && numberOfVideos != 0) {
+            PlayAllButtonView(
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(top = 16.dp)
+                    .clickable { onPlayAllClicked() }
+                    .testTag(DETAIL_PLAY_ALL_BUTTON_TEST_TAG)
+            )
+        }
     }
 }
 

@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.videosection.view.playlist
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.AppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -47,7 +46,6 @@ internal fun VideoPlaylistDetailTopBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag(VIDEO_PLAYLIST_DETAIL_SELECTED_MODE_TOP_BAR_TEST_TAG),
-            elevation = AppBarDefaults.TopAppBarElevation,
             onNavigationPressed = onBackPressed
         )
     } else {

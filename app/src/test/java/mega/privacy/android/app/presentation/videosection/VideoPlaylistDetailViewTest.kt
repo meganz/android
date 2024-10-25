@@ -249,4 +249,26 @@ class VideoPlaylistDetailViewTest {
         DETAIL_PLAY_ALL_BUTTON_TEST_TAG.performClick()
         verify(onPlayAllClicked).invoke()
     }
+
+    @Test
+    fun `teat that UI is display as expected when the playlist is empty`() {
+        val expectedTitle = "new playlist"
+        val expectedTotalDuration = "00:00:00"
+        val playlist = VideoPlaylistUIEntity(
+            id = NodeId(1L),
+            title = expectedTitle,
+            cover = null,
+            creationTime = 0,
+            modificationTime = 0,
+            thumbnailList = null,
+            numberOfVideos = 0,
+            totalDuration = "",
+            videos = emptyList()
+        )
+        setComposeContent(playlist = playlist)
+
+        DETAIL_PLAY_ALL_BUTTON_TEST_TAG.assertIsNotDisplayed()
+        PLAYLIST_TOTAL_DURATION_TEST_TAG.assertIsDisplayed()
+        PLAYLIST_TOTAL_DURATION_TEST_TAG.assertTextEquals(expectedTotalDuration)
+    }
 }
