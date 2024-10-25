@@ -100,13 +100,16 @@ class HideBottomSheetMenuItem @Inject constructor(
 
         if (isNodeInRubbish || accessPermission != AccessPermission.OWNER || node.isTakenDown || isInBackups)
             return false
+
+        if (!isHidingActionAllowedUseCase(node.id))
+            return false
         this.isPaid =
             monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
         this.isBusinessAccountExpired = getBusinessStatusUseCase() == BusinessAccountStatus.Expired
         if (!isPaid || isBusinessAccountExpired)
             return true
 
-        return isHidingActionAllowedUseCase(node.id) && !node.isMarkedSensitive && !node.isSensitiveInherited
+        return !node.isMarkedSensitive && !node.isSensitiveInherited
     }
 
     override fun getOnClickFunction(

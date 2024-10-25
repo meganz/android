@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.model
 
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
@@ -11,6 +12,8 @@ import mega.privacy.android.domain.entity.call.ChatCallStatus
  * @property enabledFeatureFlags Set of enabled feature flags
  * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
  * @property currentChatCall                            [ChatCall]
+ * @property accountType                                The account type
+ * @property isBusinessAccountExpired                    True, if the business account is expired. False, otherwise.
  */
 data class AddContactState(
     val chatId: Long? = null,
@@ -18,6 +21,8 @@ data class AddContactState(
     val enabledFeatureFlags: Set<Feature> = emptySet(),
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
     val currentChatCall: ChatCall? = null,
+    val accountType: AccountType? = null,
+    val isBusinessAccountExpired: Boolean = false,
 ) {
 
     /**

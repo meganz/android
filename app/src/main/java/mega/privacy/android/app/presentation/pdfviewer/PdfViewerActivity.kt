@@ -1212,14 +1212,11 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             !isInSharedItems && !isInShare
         val isNodeInBackups = viewModel.uiState.value.isNodeInBackups
 
-        val shouldShowHideNode =
-            isHiddenNodesEnabled
-                    && (!isPaidAccount || isBusinessAccountExpired || (node != null
-                    && isNotInShare
-                    && !node.isMarkedSensitive
-                    && !isSensitiveInherited
-                    && !isNodeInBackups)
-                    )
+        val shouldShowHideNode = when {
+            !isHiddenNodesEnabled || isInShare || isInSharedItems || isNodeInBackups -> false
+            isPaidAccount && !isBusinessAccountExpired && ((node != null && node.isMarkedSensitive) || isSensitiveInherited) -> false
+            else -> true
+        }
 
         val shouldShowUnhideNode = node != null
                 && isHiddenNodesEnabled

@@ -4,7 +4,6 @@ import android.view.MenuItem
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.CheckAccessErrorExtended
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -87,19 +86,6 @@ class GetOptionsForToolbarMapper @Inject constructor(
         var mediaCounter = 0
         var showDispute = false
         var showLeaveShare = false
-        var showHide = false
-        var showUnhide = false
-
-        if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
-            if (selectedNodeHandleList.map { getNodeByHandle(it) }.all {
-                    it?.isMarkedSensitive == true
-                }
-            ) {
-                showUnhide = true
-            } else {
-                showHide = true
-            }
-        }
 
         selectedNodeHandleList.forEach { handle ->
             getNodeByIdUseCase(NodeId(handle))?.let { node ->
@@ -112,8 +98,6 @@ class GetOptionsForToolbarMapper @Inject constructor(
                     }
                     if (node.isIncomingShare) {
                         showLeaveShare = true
-                        showHide = false
-                        showUnhide = false
                     }
                     if (node is FileNode) {
                         val nodeMime = MimeTypeList.typeForName(
@@ -141,8 +125,8 @@ class GetOptionsForToolbarMapper @Inject constructor(
                     }
                 }
 
-                control.hide().setVisible(showHide).showAsAction = MenuItem.SHOW_AS_ACTION_NEVER
-                control.unhide().setVisible(showUnhide).showAsAction = MenuItem.SHOW_AS_ACTION_NEVER
+                control.hide().setVisible(false).showAsAction = MenuItem.SHOW_AS_ACTION_NEVER
+                control.unhide().setVisible(false).showAsAction = MenuItem.SHOW_AS_ACTION_NEVER
 
                 if (showSendToChat) {
                     control.sendToChat().setVisible(true).showAsAction =

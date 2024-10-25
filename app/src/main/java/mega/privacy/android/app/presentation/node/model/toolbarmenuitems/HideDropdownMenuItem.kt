@@ -50,14 +50,14 @@ class HideDropdownMenuItem @Inject constructor(
             return false
         }
 
+        if (selectedNodes.any { !isHidingActionAllowedUseCase(it.id) }) {
+            return false
+        }
+
         isPaid = monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
         isBusinessAccountExpired = getBusinessStatusUseCase() == BusinessAccountStatus.Expired
         if (!isPaid || isBusinessAccountExpired) {
             return true
-        }
-
-        if (selectedNodes.any { !isHidingActionAllowedUseCase(it.id) }) {
-            return false
         }
 
         return selectedNodes.any { !it.isMarkedSensitive } && selectedNodes.none { it.isSensitiveInherited }

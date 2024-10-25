@@ -546,7 +546,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             setupToolbarColors()
             when (dest.id) {
                 R.id.audio_main_player,
-                -> {
+                    -> {
                     if (dest.id == R.id.audio_main_player) {
                         supportActionBar?.title = ""
                     }
@@ -650,7 +650,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             R.id.move,
             R.id.copy,
             R.id.move_to_trash,
-            -> {
+                -> {
                 viewModel.updateMenuClickEventFlow(
                     menuId = item.itemId,
                     adapterType = adapterType,
@@ -964,14 +964,11 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                     val isNodeInBackup = megaApi.isInInbox(node)
 
 
-                                    val shouldShowHideNode = isHiddenNodesEnabled
-                                            && (!isPaidAccount
-                                            || isBusinessAccountExpired
-                                            || (!isInSharedItems
-                                            && !isRootParentInShare
-                                            && !isNodeInBackup
-                                            && !node.isMarkedSensitive
-                                            && !isSensitiveInherited))
+                                    val shouldShowHideNode = when {
+                                        !isHiddenNodesEnabled || isInSharedItems || isRootParentInShare || isNodeInBackup -> false
+                                        isPaidAccount && !isBusinessAccountExpired && (node.isMarkedSensitive || isSensitiveInherited) -> false
+                                        else -> true
+                                    }
 
                                     val shouldShowUnhideNode = isHiddenNodesEnabled
                                             && !isInSharedItems
@@ -989,14 +986,14 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                         MegaShare.ACCESS_READWRITE,
                                         MegaShare.ACCESS_READ,
                                         MegaShare.ACCESS_UNKNOWN,
-                                        -> {
+                                            -> {
                                             menu.findItem(R.id.rename).isVisible = false
                                             menu.findItem(R.id.move).isVisible = false
                                         }
 
                                         MegaShare.ACCESS_FULL,
                                         MegaShare.ACCESS_OWNER,
-                                        -> {
+                                            -> {
                                             menu.findItem(R.id.rename).isVisible = true
                                             menu.findItem(R.id.move).isVisible = true
                                         }

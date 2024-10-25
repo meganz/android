@@ -1061,7 +1061,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
             R.id.move,
             R.id.copy,
             R.id.move_to_trash,
-            -> {
+                -> {
                 if (item.itemId == R.id.properties && adapterType != OFFLINE_ADAPTER) {
                     val node = megaApi.getNodeByHandle(playingHandle)
                     if (node == null) {
@@ -1188,14 +1188,11 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                                 viewModel.state.value.isBusinessAccountExpired
                             val isNodeInBackup = megaApi.isInInbox(node)
 
-                            val shouldShowHideNode = isHiddenNodesEnabled
-                                    && (!isPaidAccount
-                                    || isBusinessAccountExpired
-                                    || (!isInSharedItems
-                                    && !isRootParentInShare
-                                    && !isNodeInBackup
-                                    && !node.isMarkedSensitive
-                                    && !isSensitiveInherited))
+                            val shouldShowHideNode = when {
+                                !isHiddenNodesEnabled || isInSharedItems || isRootParentInShare || isNodeInBackup -> false
+                                isPaidAccount && !isBusinessAccountExpired && (node.isMarkedSensitive || isSensitiveInherited) -> false
+                                else -> true
+                            }
 
                             val shouldShowUnhideNode = isHiddenNodesEnabled
                                     && !isInSharedItems
@@ -1248,15 +1245,11 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                                 viewModel.state.value.isBusinessAccountExpired
                             val isNodeInBackup = megaApi.isInInbox(node)
 
-
-                            val shouldShowHideNode = isHiddenNodesEnabled
-                                    && (!isPaidAccount
-                                    || isBusinessAccountExpired
-                                    || (!isInSharedItems
-                                    && !isRootParentInShare
-                                    && !isNodeInBackup
-                                    && !node.isMarkedSensitive
-                                    && !isSensitiveInherited))
+                            val shouldShowHideNode = when {
+                                !isHiddenNodesEnabled || isInSharedItems || isRootParentInShare || isNodeInBackup -> false
+                                isPaidAccount && !isBusinessAccountExpired && (node.isMarkedSensitive || isSensitiveInherited) -> false
+                                else -> true
+                            }
 
                             val shouldShowUnhideNode = isHiddenNodesEnabled
                                     && !isInSharedItems
@@ -1301,7 +1294,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                                 MegaShare.ACCESS_READWRITE,
                                 MegaShare.ACCESS_READ,
                                 MegaShare.ACCESS_UNKNOWN,
-                                -> {
+                                    -> {
                                     menu.findItem(R.id.rename).isVisible = false
                                     menu.findItem(R.id.move).isVisible = false
                                     menu.findItem(R.id.hide).isVisible = false
@@ -1310,7 +1303,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
 
                                 MegaShare.ACCESS_FULL,
                                 MegaShare.ACCESS_OWNER,
-                                -> {
+                                    -> {
                                     menu.findItem(R.id.rename).isVisible = true
                                     menu.findItem(R.id.move).isVisible = true
                                 }

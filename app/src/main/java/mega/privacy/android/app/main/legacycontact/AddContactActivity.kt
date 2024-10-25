@@ -1016,8 +1016,10 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
             viewModel.sensitiveItemsCountFlow,
             Lifecycle.State.STARTED
         ) { type: Int? ->
+            val isPaid = viewModel.state.value.accountType?.isPaid ?: false
+            val isBusinessAccountExpired = viewModel.state.value.isBusinessAccountExpired
             if (type != null) {
-                if (type == 0) {
+                if (type == 0 || !isPaid || isBusinessAccountExpired) {
                     initialize(savedInstanceState)
                 } else {
                     showSharingSensitiveItemsWarningDialog(savedInstanceState, type)

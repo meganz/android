@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -99,6 +100,7 @@ class NodeActionsViewModelTest {
         on { id } doReturn NodeId(123)
     }
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
 
     private fun initViewModel() {
         viewModel = NodeActionsViewModel(
@@ -123,6 +125,7 @@ class NodeActionsViewModelTest {
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }
 

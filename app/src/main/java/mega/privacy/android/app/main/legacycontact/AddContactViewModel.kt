@@ -8,18 +8,23 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.model.AddContactState
 import mega.privacy.android.app.presentation.extensions.isOutShare
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -42,6 +47,8 @@ class AddContactViewModel @Inject constructor(
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val hasSensitiveDescendantUseCase: HasSensitiveDescendantUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddContactState())
@@ -57,6 +64,7 @@ class AddContactViewModel @Inject constructor(
     private var monitorChatCallJob: Job? = null
 
     init {
+        monitorAccountDetail()
         getApiFeatureFlag()
         getContactFeatureEnabled()
     }
@@ -180,5 +188,25 @@ class AddContactViewModel @Inject constructor(
 
     fun clearSensitiveItemsCheck() {
         _sensitiveItemsCount.value = null
+    }
+
+    private fun monitorAccountDetail() {
+        monitorAccountDetailUseCase()
+            .onEach { accountDetail ->
+                val accountType = accountDetail.levelDetail?.accountType
+                val businessStatus =
+                    if (accountType?.isBusinessAccount == true) {
+                        getBusinessStatusUseCase()
+                    } else null
+
+                val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+                _state.update {
+                    it.copy(
+                        accountType = accountDetail.levelDetail?.accountType,
+                        isBusinessAccountExpired = isBusinessAccountExpired,
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
     }
 }

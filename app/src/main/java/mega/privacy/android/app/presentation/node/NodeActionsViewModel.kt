@@ -27,6 +27,7 @@ import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -37,6 +38,7 @@ import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -96,6 +98,7 @@ class NodeActionsViewModel @Inject constructor(
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
@@ -502,6 +505,15 @@ class NodeActionsViewModel @Inject constructor(
         }
     }
 
-    suspend fun isOnboarding() =
-        monitorAccountDetailUseCase().first().levelDetail?.accountType?.isPaid ?: false
+    suspend fun isOnboarding(): Boolean {
+        val accountType =
+            monitorAccountDetailUseCase().first().levelDetail?.accountType
+        val isPaid = accountType?.isPaid ?: false
+        val businessStatus =
+            if (isPaid && accountType?.isBusinessAccount == true) {
+                getBusinessStatusUseCase()
+            } else null
+        val isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired
+        return isPaid && !isBusinessAccountExpired
+    }
 }
