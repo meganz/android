@@ -40,7 +40,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -998,6 +997,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.shouldShowSwapCamera }
+            .distinctUntilChanged()) {
+            swapCameraMenuItem?.apply {
+                isVisible = it
+            }
+        }
+
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.call?.status }
             .distinctUntilChanged()) { callStatus ->
             callStatus?.let { status ->
@@ -1096,7 +1102,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .distinctUntilChanged()) {
             it?.let { isOnHold ->
                 isCallOnHold(isOnHold)
-                checkSwapCameraMenuItemVisibility()
             }
         }
 
@@ -1869,7 +1874,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private fun checkMenuItemsVisibility() {
         checkGridSpeakerViewMenuItemVisibility()
-        checkSwapCameraMenuItemVisibility()
     }
 
     /**
@@ -2221,17 +2225,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         speakerViewMenuItem = menu.findItem(R.id.speaker_view)
         gridViewMenuItem = menu.findItem(R.id.grid_view)
         swapCameraMenuItem = menu.findItem(R.id.swap_camera)
-
+        swapCameraMenuItem?.isVisible = inMeetingViewModel.state.value.shouldShowSwapCamera
         checkMenuItemsVisibility()
-    }
-
-    /**
-     * Method to show or hide the button of swap camera
-     */
-    private fun checkSwapCameraMenuItemVisibility() {
-        swapCameraMenuItem?.let {
-            it.isVisible = inMeetingViewModel.isNecessaryToShowSwapCameraOption()
-        }
     }
 
     /**
@@ -2544,7 +2539,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         bottomFloatingPanelViewHolder?.updateCamIcon(isCamOn)
         updateParticipantsBottomPanel()
-        checkSwapCameraMenuItemVisibility()
         controlVideoLocalOneToOneCall(isCamOn)
     }
 

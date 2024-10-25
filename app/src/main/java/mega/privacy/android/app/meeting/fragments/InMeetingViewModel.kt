@@ -1684,16 +1684,6 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Method for determining whether to display the camera switching icon.
-     *
-     * @return True, if it is. False, if not.
-     */
-    fun isNecessaryToShowSwapCameraOption(): Boolean =
-        state.value.call?.let { it.status != ChatCallStatus.Connecting && it.hasLocalVideo && !it.isOnHold }
-            ?: run { false }
-
-
-    /**
      * Get my own privileges in the chat
      *
      * @return the privileges

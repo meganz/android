@@ -206,6 +206,17 @@ data class InMeetingUiState(
             isCallOnHold == null || isCallOnHold == false -> CallOnHoldType.PutCallOnHold
             else -> CallOnHoldType.ResumeCall
         }
+
+    /**
+     * Display the camera switching icon.
+     *
+     * @return True, if it is. False, if not.
+     */
+    val shouldShowSwapCamera
+        get(): Boolean =
+            call?.let { it.status != ChatCallStatus.Connecting && hasLocalVideo && isCallOnHold == false }
+                ?: run { false }
+
 }
 
 /**
