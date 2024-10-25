@@ -35,11 +35,12 @@ class GetVideoPlaylistsUseCase @Inject constructor(
         val userVideoPlaylist = when (getCloudSortOrder()) {
             SortOrder.ORDER_DEFAULT_ASC,
             SortOrder.ORDER_LABEL_DESC,
+            SortOrder.ORDER_LABEL_ASC,
             SortOrder.ORDER_FAV_DESC,
             SortOrder.ORDER_FAV_ASC,
             SortOrder.ORDER_SIZE_DESC,
             SortOrder.ORDER_SIZE_ASC,
-            -> {
+                -> {
                 playlists.filterIsInstance<UserVideoPlaylist>().sortedBy { it.title }
             }
 
@@ -59,7 +60,7 @@ class GetVideoPlaylistsUseCase @Inject constructor(
                     .sortedByDescending { it.creationTime }
             }
 
-            else -> playlists
+            else -> playlists.filterIsInstance<UserVideoPlaylist>()
         }
         return systemVideoPlaylist + userVideoPlaylist
     }
