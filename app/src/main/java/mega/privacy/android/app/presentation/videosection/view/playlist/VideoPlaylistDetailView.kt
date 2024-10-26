@@ -228,8 +228,8 @@ fun VideoPlaylistDetailView(
         },
         floatingActionButton = {
             CreateVideoPlaylistFabButton(
-                showFabButton = scrollNotInProgress,
-                onCreateVideoPlaylistClick = onAddElementsClicked
+                showFabButton = scrollNotInProgress && playlist?.isSystemVideoPlayer == false,
+                onCreateVideoPlaylistClick = onAddElementsClicked,
             )
         }
     ) { paddingValue ->
