@@ -9,10 +9,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.R
-import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
 import mega.privacy.android.data.mapper.environment.DevicePowerConnectionStateMapper
 import mega.privacy.android.data.mapper.environment.ThermalStateMapper
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
@@ -40,8 +38,6 @@ internal class EnvironmentRepositoryImplTest {
     private val context = mock<Context>()
 
     private val megaApiGateway = mock<MegaApiGateway>()
-    private val appInfoGateway = mock<AppInfoGateway>()
-    private val appInfoPreferencesGateway = mock<AppInfoPreferencesGateway>()
     private val applicationIpAddressWrapper = mock<ApplicationIpAddressWrapper>()
     private val thermalStateMapper = mock<ThermalStateMapper>()
     private val devicePowerConnectionStateMapper = mock<DevicePowerConnectionStateMapper>()
@@ -53,8 +49,6 @@ internal class EnvironmentRepositoryImplTest {
             context = context,
             megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
-            appInfoGateway = appInfoGateway,
-            appInfoPreferencesGateway = appInfoPreferencesGateway,
             applicationIpAddressWrapper = applicationIpAddressWrapper,
             thermalStateMapper = thermalStateMapper,
             devicePowerConnectionStateMapper = devicePowerConnectionStateMapper,
@@ -67,8 +61,6 @@ internal class EnvironmentRepositoryImplTest {
             deviceGateway,
             context,
             megaApiGateway,
-            appInfoGateway,
-            appInfoPreferencesGateway,
             applicationIpAddressWrapper,
             thermalStateMapper,
             devicePowerConnectionStateMapper,

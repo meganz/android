@@ -589,9 +589,6 @@
                 android:name="mega.privacy.android.app.initializer.LoggerInitializer"
                 android:value="androidx.startup" />
             <meta-data
-                android:name="mega.privacy.android.app.initializer.CheckAppUpgradeInitializer"
-                android:value="androidx.startup" />
-            <meta-data
                 android:name="mega.privacy.android.app.initializer.SetupMegaApiInitializer"
                 android:value="androidx.startup" />
             <meta-data

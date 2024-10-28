@@ -7,14 +7,11 @@ import android.os.Build
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.R
-import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
 import mega.privacy.android.data.mapper.environment.DevicePowerConnectionStateMapper
 import mega.privacy.android.data.mapper.environment.ThermalStateMapper
 import mega.privacy.android.data.model.protobuf.TombstoneProtos
@@ -36,8 +33,6 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val appInfoGateway: AppInfoGateway,
-    private val appInfoPreferencesGateway: AppInfoPreferencesGateway,
     private val applicationIpAddressWrapper: ApplicationIpAddressWrapper,
     private val thermalStateMapper: ThermalStateMapper,
     private val devicePowerConnectionStateMapper: DevicePowerConnectionStateMapper,
@@ -62,17 +57,6 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
             appVersion = context.getString(R.string.app_version),
             sdkVersion = megaApiGateway.getSdkVersion(),
         )
-    }
-
-    override suspend fun getLastSavedVersionCode() =
-        withContext(ioDispatcher) { appInfoPreferencesGateway.monitorLastVersionCode().first() }
-
-    override suspend fun getInstalledVersionCode() = withContext(ioDispatcher) {
-        appInfoGateway.getAppVersionCode()
-    }
-
-    override suspend fun saveVersionCode(newVersionCode: Int) {
-        withContext(ioDispatcher) { appInfoPreferencesGateway.setLastVersionCode(newVersionCode) }
     }
 
     override suspend fun getDeviceSdkVersionInt() =

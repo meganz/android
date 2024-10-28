@@ -33,7 +33,6 @@ import mega.privacy.android.data.facade.chat.ChatStorageFacade
 import mega.privacy.android.data.gateway.AdsGateway
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.AssetsGateway
 import mega.privacy.android.data.gateway.BillingGateway
 import mega.privacy.android.data.gateway.CacheFolderGateway
@@ -41,7 +40,6 @@ import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CacheGatewayImpl
 import mega.privacy.android.data.gateway.CameraUploadsMediaGateway
 import mega.privacy.android.data.gateway.ClipboardGateway
-import mega.privacy.android.data.gateway.DefaultAppInfoGateway
 import mega.privacy.android.data.gateway.DefaultStreamingGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
@@ -69,7 +67,6 @@ import mega.privacy.android.data.gateway.chat.ChatStorageGateway
 import mega.privacy.android.data.gateway.contact.ContactGateway
 import mega.privacy.android.data.gateway.contact.ContactGatewayImpl
 import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
-import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
@@ -87,7 +84,6 @@ import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.gateway.psa.PsaPreferenceGateway
 import mega.privacy.android.data.gateway.security.PasscodeStoreGateway
 import mega.privacy.android.data.preferences.AccountPreferencesDataStore
-import mega.privacy.android.data.preferences.AppInfoPreferencesDatastore
 import mega.privacy.android.data.preferences.AppPreferencesDatastore
 import mega.privacy.android.data.preferences.CallsPreferencesDataStore
 import mega.privacy.android.data.preferences.CameraUploadsSettingsPreferenceDataStore
@@ -123,10 +119,6 @@ internal abstract class GatewayModule {
     abstract fun bindDeviceGateway(implementation: AndroidDeviceGateway): DeviceGateway
 
     @Binds
-    @Singleton
-    abstract fun bindAppInfoGateway(implementation: DefaultAppInfoGateway): AppInfoGateway
-
-    @Binds
     abstract fun bindFileAttributeGateway(implementation: FileAttributeFacade): FileAttributeGateway
 
     @Binds
@@ -152,9 +144,6 @@ internal abstract class GatewayModule {
 
     @Binds
     abstract fun bindAppPreferencesGateway(implementation: AppPreferencesDatastore): AppPreferencesGateway
-
-    @Binds
-    abstract fun bindAppInfoPreferencesGateway(implementation: AppInfoPreferencesDatastore): AppInfoPreferencesGateway
 
     @Binds
     abstract fun bindFeatureFlagPreferencesGateway(implementation: FeatureFlagPreferencesDataStore): FeatureFlagPreferencesGateway
