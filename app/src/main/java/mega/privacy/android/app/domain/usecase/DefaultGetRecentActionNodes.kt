@@ -24,7 +24,6 @@ import javax.inject.Inject
  * Transform a [MegaNodeList] into a list of [NodeItem]
  */
 class DefaultGetRecentActionNodes @Inject constructor(
-    private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getNodeByHandle: GetNodeByHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
@@ -69,7 +68,6 @@ class DefaultGetRecentActionNodes @Inject constructor(
             }
             NodeItem(
                 node = megaNode,
-                thumbnail = getThumbnailUseCase(node.id.longValue),
                 index = -1,
                 isVideo = node.type is VideoFileTypeInfo,
                 modifiedDate = node.modificationTime.toString(),

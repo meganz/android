@@ -5,11 +5,6 @@ import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.FileUtil.isAudioOrVideo;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.ThumbnailUtils.createThumbnailList;
-import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder;
-import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache;
-import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromFolder;
-import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromMegaList;
 import static mega.privacy.android.app.utils.TimeUtils.formatTime;
 import static mega.privacy.android.app.utils.TimeUtils.getVideoDuration;
 import static mega.privacy.android.app.utils.Util.dp2px;
@@ -20,7 +15,6 @@ import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,24 +25,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.controller.AbstractDraweeController;
-import com.facebook.drawee.generic.RoundingParams;
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.postprocessors.BlurPostProcessor;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
-
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import coil.Coil;
+import coil.transform.RoundedCornersTransformation;
+import coil.util.CoilUtils;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -57,6 +44,7 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.homepage.NodeItem;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
@@ -93,7 +81,7 @@ public class RecentActionBucketAdapter
         private LinearLayout multipleBucketLayout;
         private long document;
         private RelativeLayout mediaView;
-        private SimpleDraweeView thumbnailMedia;
+        private ImageView thumbnailMedia;
         private RelativeLayout videoLayout;
         private TextView videoDuration;
         private RelativeLayout listView;
@@ -201,27 +189,6 @@ public class RecentActionBucketAdapter
         if (megaNode == null) return;
         holder.document = megaNode.getHandle();
 
-        Bitmap thumbnail = getThumbnailFromCache(megaNode);
-        if (thumbnail == null) {
-            thumbnail = getThumbnailFromFolder(megaNode, context);
-            if (thumbnail == null) {
-                try {
-                    if (megaNode.hasThumbnail() || isMedia) {
-                        thumbnail = getThumbnailFromMegaList(megaNode, context, holder, megaApi, this);
-                    } else {
-                        createThumbnailList(context, megaNode, holder, megaApi, this);
-                    }
-                } catch (Exception e) {
-                    Timber.e(e, "Error getting or creating megaNode thumbnail");
-                }
-            }
-        } else if (node.getThumbnail() == null && (megaNode.hasThumbnail() || isMedia)) {
-            File thumbnailFile = new File(getThumbFolder(context), megaNode.getBase64Handle() + ".jpg");
-            if (thumbnailFile.exists()) {
-                node.setThumbnail(thumbnailFile);
-            }
-        }
-
         if (isMedia) {
             holder.mediaView.setVisibility(View.VISIBLE);
             holder.mediaView.setAlpha(node.isSensitive() && !isIncomingShare ? 0.5f : 1f);
@@ -238,6 +205,7 @@ public class RecentActionBucketAdapter
             }
 
             holder.thumbnailMedia.setVisibility(View.VISIBLE);
+            CoilUtils.dispose(holder.thumbnailMedia);
 
             int size;
             if (isScreenInPortrait(context)) {
@@ -250,17 +218,15 @@ public class RecentActionBucketAdapter
             holder.thumbnailMedia.getLayoutParams().width = size;
             holder.thumbnailMedia.getLayoutParams().height = size;
 
-            if (node.getThumbnail() != null) {
-                ImageRequestBuilder builder = ImageRequestBuilder.newBuilderWithSource(Uri.fromFile(node.getThumbnail()));
-                if (node.isSensitive() && !isIncomingShare) {
-                    builder.setPostprocessor(new BlurPostProcessor(20, context));
-                }
-                ImageRequest request = builder.build();
-                AbstractDraweeController controller = Fresco.newDraweeControllerBuilder()
-                        .setImageRequest(request)
-                        .setOldController(holder.thumbnailMedia.getController())
-                        .build();
-                holder.thumbnailMedia.setController(controller);
+            if (megaNode.hasThumbnail()) {
+                Coil.imageLoader(context).enqueue(
+                        new coil.request.ImageRequest.Builder(context)
+                                .placeholder(MimeTypeList.typeForName(megaNode.getName()).getIconResourceId())
+                                .data(ThumbnailRequest.fromHandle(megaNode.getHandle()))
+                                .target(holder.thumbnailMedia)
+                                .transformations(new RoundedCornersTransformation(context.getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
+                                .build()
+                );
             } else {
                 holder.thumbnailMedia.setImageResource(
                         MimeTypeList.typeForName(megaNode.getName()).getIconResourceId()
@@ -269,21 +235,8 @@ public class RecentActionBucketAdapter
 
             if (node.getSelected()) {
                 holder.selectedIcon.setVisibility(View.VISIBLE);
-                holder.thumbnailMedia.getHierarchy().setRoundingParams(
-                        RoundingParams.fromCornersRadius((float) context.getResources().getDimensionPixelSize(
-                                R.dimen.cu_fragment_selected_round_corner_radius
-                        ))
-                );
-                holder.thumbnailMedia.setBackground(ContextCompat.getDrawable(
-                        holder.thumbnailMedia.getContext(),
-                        R.drawable.background_item_grid_selected
-                ));
             } else {
                 holder.selectedIcon.setVisibility(View.GONE);
-                holder.thumbnailMedia.getHierarchy().setRoundingParams(
-                        RoundingParams.fromCornersRadius(0f)
-                );
-                holder.thumbnailMedia.setBackground(null);
             }
         } else {
             holder.mediaView.setVisibility(View.GONE);
@@ -293,6 +246,7 @@ public class RecentActionBucketAdapter
             holder.infoText.setText(getSizeString(megaNode.getSize(), context) + " · " + formatTime(megaNode.getCreationTime()));
 
             holder.thumbnailList.setVisibility(View.VISIBLE);
+            CoilUtils.dispose(holder.thumbnailList);
 
             if (megaNode.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
                 Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(megaNode.getLabel(), holder.itemView.getResources());
@@ -304,25 +258,22 @@ public class RecentActionBucketAdapter
 
             holder.imgFavourite.setVisibility(megaNode.isFavourite() ? View.VISIBLE : View.GONE);
 
-            if (thumbnail != null) {
-                holder.setImageThumbnail(thumbnail);
-            } else {
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.thumbnailList.getLayoutParams();
-                params.width = params.height = dp2px(ITEM_WIDTH, outMetrics);
-                int margin = dp2px(ITEM_MARGIN, outMetrics);
-                params.setMargins(margin, margin, margin, 0);
-                holder.thumbnailList.setLayoutParams(params);
-                holder.thumbnailList.setImageResource(MimeTypeList.typeForName(megaNode.getName()).getIconResourceId());
-            }
-
             if (node.getSelected()) {
                 holder.thumbnailList.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
             } else {
                 holder.thumbnailList.setImageDrawable(null);
+
                 int placeHolderRes = MimeTypeList.typeForName(node.getNode().getName()).getIconResourceId();
 
-                if (thumbnail != null) {
-                    holder.thumbnailList.setImageURI(Uri.fromFile(node.getThumbnail()));
+                if (megaNode.hasThumbnail()) {
+                    Coil.imageLoader(context).enqueue(
+                            new coil.request.ImageRequest.Builder(context)
+                                    .placeholder(placeHolderRes)
+                                    .data(ThumbnailRequest.fromHandle(megaNode.getHandle()))
+                                    .target(holder.thumbnailList)
+                                    .transformations(new RoundedCornersTransformation(context.getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
+                                    .build()
+                    );
                 } else {
                     int imgResource;
                     if (megaNode.isFolder()) {
