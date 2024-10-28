@@ -7364,7 +7364,13 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             MegaTransfer.TYPE_UPLOAD -> {
                 megaApi.getNodeByHandle(transfer.handle)
-                    ?.let { viewNodeInFolder(it) }
+                    ?.let { viewNodeInFolder(it) }?: run {
+                    showSnackbar(
+                        SNACKBAR_TYPE,
+                        getString(R.string.warning_node_not_exists_in_cloud),
+                        MEGACHAT_INVALID_HANDLE
+                    )
+                }
             }
 
             else -> {
