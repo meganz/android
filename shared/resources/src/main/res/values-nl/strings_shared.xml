@@ -777,11 +777,11 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favorieten</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">No connections are set up</string>
+    <string name="device_center_sync_backup_list_empty_state_title">Er zijn geen verbindingen ingesteld</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_message">Sync or back up a folder on your device with a folder on MEGA</string>
+    <string name="device_center_sync_backup_list_empty_state_message">Een map op uw apparaat synchroniseren of er een back-up van maken met een map op MEGA</string>
     <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_backup_list_empty_state_message_free_account">Upgrade to a premium account to keep your important information safe and up-to-date with sync and backup</string>
+    <string name="device_center_sync_backup_list_empty_state_message_free_account">Upgrade naar een premium account om uw belangrijke informatie veilig en up-to-date te houden met synchronisatie en backup</string>
     <!-- Synced folder list empty state "See upgrade options" button label -->
-    <string name="device_center_sync_backup_see_upgrade_options_button_label">See upgrade options</string>
+    <string name="device_center_sync_backup_see_upgrade_options_button_label">Bekijk de opties voor upgraden</string>
 </resources>
