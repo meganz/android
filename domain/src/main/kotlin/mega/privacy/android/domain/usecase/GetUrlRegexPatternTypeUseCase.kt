@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.RegexPatternType.CHAT_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.CONFIRMATION_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.CONTACT_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.EMAIL_VERIFY_LINK
+import mega.privacy.android.domain.entity.RegexPatternType.ENABLE_CAMERA_UPLOADS_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.EXPORT_MASTER_KEY_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.FILE_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.FOLDER_LINK
@@ -73,6 +74,11 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             isUrlMatchesRegexUseCase(url, BUSINESS_INVITE_LINK_REGEX) -> BUSINESS_INVITE_LINK
             isUrlMatchesRegexUseCase(url, UPGRADE_PAGE_LINK_REGEX) -> UPGRADE_PAGE_LINK
             isUrlMatchesRegexUseCase(url, UPGRADE_LINK_REGEX) -> UPGRADE_LINK
+            isUrlMatchesRegexUseCase(
+                url,
+                ENABLE_CAMERA_UPLOADS_LINK_REGEX
+            ) -> ENABLE_CAMERA_UPLOADS_LINK
+
             else -> RESTRICTED
         }
 
@@ -316,6 +322,13 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
         private val UPGRADE_LINK_REGEX = arrayOf(
             "^https://mega\\.nz/upgrade.+\$",
             "^https://mega\\.nz/upgrade"
+        )
+
+        /**
+         * This Regex Pattern checks for the existence of 'camera uploads' link in MEGA Url
+         */
+        private val ENABLE_CAMERA_UPLOADS_LINK_REGEX = arrayOf(
+            "^https://mega\\.nz/settings/camera$"
         )
     }
 }
