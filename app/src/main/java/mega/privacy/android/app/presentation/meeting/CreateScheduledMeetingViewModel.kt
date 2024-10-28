@@ -762,8 +762,11 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                                 }
 
                                 Timber.d("Scheduled meeting created, open scheduled meeting info with chat id $id")
-                                _state.update { state ->
-                                    state.copy(chatIdToOpenInfoScreen = id)
+                                _state.update {
+                                    it.copy(
+                                        finish = true,
+                                        chatIdToOpenInfoScreen = id
+                                    )
                                 }
                             }
 
@@ -802,13 +805,6 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 enabledWaitingRoomOption = newValueForWaitingRoomOption,
             )
         }
-
-    /**
-     * Sets chatIdToOpenInfoScreen as consumed.
-     */
-    fun setOnOpenInfoConsumed() = _state.update { state ->
-        state.copy(chatIdToOpenInfoScreen = null)
-    }
 
     /**
      * Get chat room updates

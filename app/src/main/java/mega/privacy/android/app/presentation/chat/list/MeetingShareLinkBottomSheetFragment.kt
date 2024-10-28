@@ -12,6 +12,8 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.chat.list.view.MeetingLinkView
@@ -70,6 +72,15 @@ class MeetingShareLinkBottomSheetFragment : BottomSheetDialogFragment() {
                         dismissAllowingStateLoss()
                     },
                 )
+            }
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        dialog?.setOnShowListener {
+            (it as? BottomSheetDialog)?.apply {
+                behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
     }

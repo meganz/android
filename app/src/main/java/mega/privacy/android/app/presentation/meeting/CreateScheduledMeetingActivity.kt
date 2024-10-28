@@ -136,12 +136,6 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                 finishCreateScheduledMeeting(RESULT_OK)
             }
 
-            chatIdToOpenInfoScreen?.let {
-                viewModel.setOnOpenInfoConsumed()
-                Timber.d("Open Scheduled meeting info screen")
-                openScheduledMeetingInfo(it)
-            }
-
             openAddContact?.let { shouldOpen ->
                 if (shouldOpen) {
                     viewModel.setOnOpenAddContactConsumed()
@@ -181,15 +175,14 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
             Intent().apply {
                 putExtra(
                     CHAT_ID,
-                    scheduledMeetingManagementViewModel.state.value.chatId
+                    viewModel.state.value.chatIdToOpenInfoScreen
                 )
-                Timber.d("Chat id ${scheduledMeetingManagementViewModel.state.value.chatId}")
+                Timber.d("Chat id ${viewModel.state.value.chatIdToOpenInfoScreen}")
                 putExtra(MEETING_TITLE_TAG, viewModel.state.value.meetingTitle)
                 Timber.d("Meeting title ${viewModel.state.value.meetingTitle}")
                 putExtra(
                     MEETING_LINK_CREATED_TAG,
-                    viewModel.state.value.meetingLink?.isNotBlank()
-                        ?: false
+                    viewModel.state.value.meetingLink?.isNotBlank() == true
                 )
                 putExtra(
                     MEETING_LINK_TAG,

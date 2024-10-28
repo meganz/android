@@ -160,7 +160,7 @@ class ChatTabsFragment : Fragment() {
                 val isLinkCreated = result.data?.getBooleanExtra(
                     CreateScheduledMeetingActivity.MEETING_LINK_CREATED_TAG,
                     false
-                ) ?: false
+                ) == true
                 if (isLinkCreated) {
                     // show bottom sheet dialog
                     val chatId = result.data?.getLongExtra(
