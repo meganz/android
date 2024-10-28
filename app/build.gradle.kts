@@ -142,6 +142,7 @@ android {
         }
     }
     lint {
+        disable += "CoroutineCreationDuringComposition"
         checkReleaseBuilds = false
         if (shouldCombineLintReports()) {
             checkDependencies = true

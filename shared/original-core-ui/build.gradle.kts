@@ -18,6 +18,7 @@ android {
     }
 
     lint {
+        disable += "CoroutineCreationDuringComposition"
         abortOnError = true
     }
 

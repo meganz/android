@@ -23,6 +23,9 @@
 .idea/deploymentTargetDropDown.xml
 .idea/shelf/*
 */.idea/copilot/
+.idea/migrations.xml
+.idea/caches/
+.idea/runConfigurations.xml
 
 # Sensitive or high-churn files:
 .idea/dataSources.ids

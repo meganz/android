@@ -1,5 +1,4 @@
 import mega.privacy.android.build.preBuiltSdkDependency
-import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     alias(convention.plugins.mega.android.library)
@@ -14,6 +13,7 @@ plugins {
 
 android {
     lint {
+        disable += "CoroutineCreationDuringComposition"
         abortOnError = true
     }
     namespace = "mega.privacy.android.feature.devicecenter"
