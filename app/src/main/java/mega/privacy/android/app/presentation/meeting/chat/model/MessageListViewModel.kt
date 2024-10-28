@@ -146,6 +146,15 @@ class MessageListViewModel @Inject constructor(
                         }
                         setMessageSeen(it.message.messageId)
                     } else if (it is MessageUpdate) {
+                        if (it.message.isDeleted
+                            && it.message.timestamp >= (lastNotSeenMessage?.time ?: Long.MAX_VALUE)
+                        ) {
+                            _state.update { state ->
+                                state.copy(
+                                    extraUnreadCount = state.extraUnreadCount - 1
+                                )
+                            }
+                        }
                         if (it.message.type == ChatMessageType.TRUNCATE) {
                             lastNotSeenMessage = null
                             hideUnreadCount = true
