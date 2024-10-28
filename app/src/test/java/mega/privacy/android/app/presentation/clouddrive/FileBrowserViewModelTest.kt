@@ -7,7 +7,6 @@ import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -15,8 +14,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
@@ -28,10 +29,8 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.Node
@@ -48,9 +47,10 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.GetCurrentStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
@@ -77,6 +77,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -125,9 +126,11 @@ class FileBrowserViewModelTest {
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val accountDetailFakeFlow = MutableSharedFlow<AccountDetail>()
     private val shouldEnterMediaDiscoveryModeUseCase = mock<ShouldEnterMediaDiscoveryModeUseCase>()
-    private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
+    private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+    private val getCurrentStorageStateUseCase = mock<GetCurrentStorageStateUseCase>()
+    private val storageCapacityMapper = mock<StorageCapacityMapper>()
 
     @BeforeEach
     fun setUp() {
@@ -163,9 +166,10 @@ class FileBrowserViewModelTest {
             isHidingActionAllowedUseCase = isHidingActionAllowedUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             shouldEnterMediaDiscoveryModeUseCase = shouldEnterMediaDiscoveryModeUseCase,
-            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            monitorStorageStateUseCase = monitorStorageStateUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            storageCapacityMapper = storageCapacityMapper
         )
     }
 
@@ -185,9 +189,6 @@ class FileBrowserViewModelTest {
             StorageState.Change,
             StorageOverQuotaCapacity.DEFAULT
         ), Arguments.of(
-            StorageState.Change,
-            StorageOverQuotaCapacity.DEFAULT
-        ), Arguments.of(
             StorageState.Unknown,
             StorageOverQuotaCapacity.DEFAULT
         ), Arguments.of(
@@ -199,30 +200,35 @@ class FileBrowserViewModelTest {
 
     @ParameterizedTest(name = "when storage state is: {0} then storageCapacity is: {1}")
     @MethodSource("provideStorageStateParameters")
-    fun `test that storageCapacity is updated correctly when monitorStorageStateEventUseCase is invoked`(
+    fun `test that storageCapacity is updated correctly when monitorStorageStateUseCase is invoked`(
         storageState: StorageState,
-        storageOverQuotaCapacity: StorageOverQuotaCapacity?,
+        storageOverQuotaCapacity: StorageOverQuotaCapacity,
     ) = runTest {
-        val storageStateEvent = StorageStateEvent(
-            handle = 1L,
-            eventString = "",
-            number = 1L,
-            text = "",
-            type = EventType.Storage,
-            storageState = storageState
-        )
         runBlocking {
             stubCommon()
-            whenever(monitorStorageStateEventUseCase()).thenReturn(
-                MutableStateFlow(
-                    storageStateEvent
+            getFeatureFlagValueUseCase.stub {
+                onBlocking { invoke(AppFeatures.FullStorageOverQuotaBanner) }.thenReturn(true)
+                onBlocking { invoke(AppFeatures.AlmostFullStorageOverQuotaBanner) }.thenReturn(true)
+            }
+            whenever(monitorStorageStateUseCase()).thenReturn(
+                storageState.asHotFlow()
+            )
+            whenever(getCurrentStorageStateUseCase()).thenReturn(
+                storageState
+            )
+            whenever(
+                storageCapacityMapper(
+                    storageState = storageState,
+                    isFullStorageOverQuotaBannerEnabled = true,
+                    isAlmostFullStorageQuotaBannerEnabled = true
                 )
+            ).thenReturn(
+                storageOverQuotaCapacity
             )
         }
         initViewModel()
-        advanceUntilIdle()
-        underTest.state.test {
-            assertThat(awaitItem().storageCapacity).isEqualTo(storageOverQuotaCapacity)
+        underTest.state.map { it.storageCapacity }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isEqualTo(storageOverQuotaCapacity)
         }
     }
 
@@ -703,17 +709,18 @@ class FileBrowserViewModelTest {
         whenever(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)).thenReturn(
             true
         )
-        whenever(monitorStorageStateEventUseCase()).thenReturn(
-            MutableStateFlow(
-                StorageStateEvent(
-                    handle = 1L,
-                    eventString = "",
-                    number = 1L,
-                    text = "",
-                    type = EventType.Storage,
-                    storageState = StorageState.Red
-                )
+        whenever(monitorStorageStateUseCase()).thenReturn(
+            StorageState.Green.asHotFlow()
+        )
+        getCurrentStorageStateUseCase.stub { onBlocking { invoke() }.thenReturn(StorageState.Green) }
+        whenever(
+            storageCapacityMapper(
+                storageState = any(),
+                isFullStorageOverQuotaBannerEnabled = any(),
+                isAlmostFullStorageQuotaBannerEnabled = any(),
             )
+        ).thenReturn(
+            StorageOverQuotaCapacity.DEFAULT
         )
     }
 
@@ -734,8 +741,10 @@ class FileBrowserViewModelTest {
             fileDurationMapper,
             monitorOfflineNodeUpdatesUseCase,
             monitorConnectivityUseCase,
-            monitorStorageStateEventUseCase,
-            getFeatureFlagValueUseCase
+            monitorStorageStateUseCase,
+            getFeatureFlagValueUseCase,
+            getCurrentStorageStateUseCase,
+            storageCapacityMapper,
         )
     }
 }

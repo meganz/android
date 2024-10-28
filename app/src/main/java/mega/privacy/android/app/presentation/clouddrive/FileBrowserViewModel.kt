@@ -11,8 +11,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -23,11 +25,9 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
-import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
-import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.ALMOST_FULL
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.DEFAULT
-import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.FULL
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
@@ -35,7 +35,6 @@ import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMa
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.account.AccountStorageDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -53,7 +52,7 @@ import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
@@ -117,9 +116,10 @@ class FileBrowserViewModel @Inject constructor(
     private val isHidingActionAllowedUseCase: IsHidingActionAllowedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val shouldEnterMediaDiscoveryModeUseCase: ShouldEnterMediaDiscoveryModeUseCase,
-    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val storageCapacityMapper: StorageCapacityMapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -135,10 +135,6 @@ class FileBrowserViewModel @Inject constructor(
     private val handleStack = Stack<Long>()
 
     private var showHiddenItems: Boolean = true
-
-    private var cachedAccountStorageDetails: AccountStorageDetail? = null
-
-    private var isFullStorageOverQuotaBannerEnabled = false
 
     init {
         refreshNodes()
@@ -162,26 +158,22 @@ class FileBrowserViewModel @Inject constructor(
      */
     private fun monitorStorageOverQuotaCapacity() {
         viewModelScope.launch {
-            monitorStorageStateEventUseCase()
-                .collectLatest { storageStateEvent ->
-                    runCatching {
-                        val isAlmostFullStorageQuotaBannerEnabled =
-                            getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)
-                        isFullStorageOverQuotaBannerEnabled =
-                            getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)
-                        val storageCapacity = when (storageStateEvent.storageState) {
-                            StorageState.Red -> if (isFullStorageOverQuotaBannerEnabled) FULL else DEFAULT
-                            StorageState.Orange -> if (isAlmostFullStorageQuotaBannerEnabled) ALMOST_FULL else DEFAULT
-                            else -> getCachedStorageCapacity()
-                        }
-                        _state.update {
-                            it.copy(storageCapacity = storageCapacity)
-                        }
-                    }.onFailure { throwable ->
-                        Timber.e(throwable.message)
-                        setStorageCapacityAsDefault()
-                    }
+            combine(
+                flow { emit(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)) },
+                flow { emit(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)) },
+                monitorStorageStateUseCase()
+            )
+            { isFullStorageOverQuotaBannerEnabled: Boolean, isAlmostFullStorageQuotaBannerEnabled: Boolean, storageState: StorageState ->
+                storageCapacityMapper(
+                    storageState,
+                    isFullStorageOverQuotaBannerEnabled,
+                    isAlmostFullStorageQuotaBannerEnabled
+                )
+            }.collectLatest { storageCapacity ->
+                _state.update {
+                    it.copy(storageCapacity = storageCapacity)
                 }
+            }
         }
     }
 
@@ -843,8 +835,6 @@ class FileBrowserViewModel @Inject constructor(
     private fun monitorAccountDetail() {
         monitorAccountDetailUseCase()
             .onEach { accountDetail ->
-                cachedAccountStorageDetails = accountDetail.storageDetail
-                _state.update { it.copy(storageCapacity = getCachedStorageCapacity()) }
                 if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
                     val accountType = accountDetail.levelDetail?.accountType
                     val businessStatus =
@@ -866,19 +856,6 @@ class FileBrowserViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope)
-    }
-
-    /**
-     *  Get cached storage capacity based on [cachedAccountStorageDetails]
-     */
-    private fun getCachedStorageCapacity(): StorageOverQuotaCapacity {
-        return if (isFullStorageOverQuotaBannerEnabled) {
-            cachedAccountStorageDetails?.let {
-                if (it.usedPercentage >= 100) FULL else DEFAULT
-            } ?: DEFAULT
-        } else {
-            DEFAULT
-        }
     }
 
     private fun monitorShowHiddenItems() {

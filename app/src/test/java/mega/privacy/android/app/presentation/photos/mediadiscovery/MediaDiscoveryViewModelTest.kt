@@ -8,9 +8,11 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -18,16 +20,16 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
+import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeContentUri
@@ -45,8 +47,9 @@ import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.GetCurrentStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
@@ -73,6 +76,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -113,7 +117,7 @@ class MediaDiscoveryViewModelTest {
     private val getPublicChildNodeFromIdUseCase = mock<GetPublicChildNodeFromIdUseCase>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
-    private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
+    private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -126,6 +130,8 @@ class MediaDiscoveryViewModelTest {
     }
     private val getNodeContentUriByHandleUseCase = mock<GetNodeContentUriByHandleUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+    private val getCurrentStorageStateUseCase = mock<GetCurrentStorageStateUseCase>()
+    private val storageCapacityMapper = mock<StorageCapacityMapper>()
 
     @BeforeAll
     fun setup() {
@@ -166,69 +172,72 @@ class MediaDiscoveryViewModelTest {
             defaultDispatcher = UnconfinedTestDispatcher(),
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
-            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            monitorStorageStateUseCase = monitorStorageStateUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            storageCapacityMapper = storageCapacityMapper
         )
     }
 
-    private fun commonStub() = runTest {
-        whenever(getCameraSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
-        whenever(monitorMediaDiscoveryView()).thenReturn(emptyFlow())
-        whenever(monitorShowHiddenItemsUseCase()).thenReturn(emptyFlow())
-        whenever(monitorAccountDetailUseCase()).thenReturn(emptyFlow())
+    private fun commonStub() {
+        getCameraSortOrder.stub { onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC) }
+        whenever(monitorConnectivityUseCase()).thenReturn(flow { awaitCancellation() })
+        whenever(monitorMediaDiscoveryView()).thenReturn(flow { awaitCancellation() })
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flow { awaitCancellation() })
+        whenever(monitorAccountDetailUseCase()).thenReturn(flow { awaitCancellation() })
         whenever(savedStateHandle.get<Long>(any())) doReturn (null)
         whenever(savedStateHandle.get<Boolean>(any())) doReturn (null)
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)).thenReturn(true)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)).thenReturn(
-            true
+        getFeatureFlagValueUseCase.stub { onBlocking { invoke(any()) }.thenReturn(false) }
+        whenever(monitorStorageStateUseCase()).thenReturn(
+            StorageState.Green.asHotFlow()
         )
-        whenever(monitorStorageStateEventUseCase()).thenReturn(
-            MutableStateFlow(
-                StorageStateEvent(
-                    handle = 1L,
-                    eventString = "",
-                    number = 1L,
-                    text = "",
-                    type = EventType.Storage,
-                    storageState = StorageState.Red
-                )
+        getCurrentStorageStateUseCase.stub { onBlocking { invoke() }.thenReturn(StorageState.Green) }
+        whenever(
+            storageCapacityMapper(
+                storageState = any(),
+                isFullStorageOverQuotaBannerEnabled = any(),
+                isAlmostFullStorageQuotaBannerEnabled = any(),
             )
+        ).thenReturn(
+            StorageOverQuotaCapacity.DEFAULT
         )
     }
 
     @BeforeEach
-    fun resetMocks() = reset(
-        getNodeListByIds,
-        savedStateHandle,
-        getPhotosByFolderIdUseCase,
-        getCameraSortOrder,
-        setCameraSortOrder,
-        monitorMediaDiscoveryView,
-        setMediaDiscoveryView,
-        getNodeByHandle,
-        getFingerprintUseCase,
-        megaApiHttpServerIsRunningUseCase,
-        megaApiHttpServerStartUseCase,
-        getFileUrlByNodeHandleUseCase,
-        getLocalFolderLinkFromMegaApiUseCase,
-        monitorConnectivityUseCase,
-        checkNodesNameCollisionWithActionUseCase,
-        copyRequestMessageMapper,
-        hasCredentialsUseCase,
-        getPublicNodeListByIds,
-        setViewType,
-        monitorSubFolderMediaDiscoverySettingsUseCase,
-        getFeatureFlagValueUseCase,
-        isNodeInRubbishBinUseCase,
-        getNodeByIdUseCase,
-        getPublicChildNodeFromIdUseCase,
-        monitorAccountDetailUseCase,
-        monitorShowHiddenItemsUseCase,
-        getNodeContentUriByHandleUseCase,
-        monitorStorageStateEventUseCase
-    )
+    fun resetMocks() {
+        reset(
+            getNodeListByIds,
+            savedStateHandle,
+            getPhotosByFolderIdUseCase,
+            getCameraSortOrder,
+            setCameraSortOrder,
+            monitorMediaDiscoveryView,
+            setMediaDiscoveryView,
+            getNodeByHandle,
+            getFingerprintUseCase,
+            megaApiHttpServerIsRunningUseCase,
+            megaApiHttpServerStartUseCase,
+            getFileUrlByNodeHandleUseCase,
+            getLocalFolderLinkFromMegaApiUseCase,
+            monitorConnectivityUseCase,
+            checkNodesNameCollisionWithActionUseCase,
+            copyRequestMessageMapper,
+            hasCredentialsUseCase,
+            getPublicNodeListByIds,
+            setViewType,
+            monitorSubFolderMediaDiscoverySettingsUseCase,
+            getFeatureFlagValueUseCase,
+            isNodeInRubbishBinUseCase,
+            getNodeByIdUseCase,
+            getPublicChildNodeFromIdUseCase,
+            monitorAccountDetailUseCase,
+            monitorShowHiddenItemsUseCase,
+            getNodeContentUriByHandleUseCase,
+            monitorStorageStateUseCase,
+            getCurrentStorageStateUseCase,
+            storageCapacityMapper,
+        )
+        commonStub()
+    }
 
     private fun provideStorageStateParameters(): Stream<Arguments> = Stream.of(
         Arguments.of(
@@ -247,9 +256,6 @@ class MediaDiscoveryViewModelTest {
             StorageState.Change,
             StorageOverQuotaCapacity.DEFAULT
         ), Arguments.of(
-            StorageState.Change,
-            StorageOverQuotaCapacity.DEFAULT
-        ), Arguments.of(
             StorageState.Unknown,
             StorageOverQuotaCapacity.DEFAULT
         ), Arguments.of(
@@ -257,37 +263,6 @@ class MediaDiscoveryViewModelTest {
             StorageOverQuotaCapacity.DEFAULT
         )
     )
-
-
-    @ParameterizedTest(name = "when storage state is: {0} then storageCapacity is: {1}")
-    @MethodSource("provideStorageStateParameters")
-    fun `test that storageCapacity is updated correctly when monitorStorageStateEventUseCase is invoked`(
-        storageState: StorageState,
-        storageOverQuotaCapacity: StorageOverQuotaCapacity?,
-    ) = runTest {
-        val storageStateEvent = StorageStateEvent(
-            handle = 1L,
-            eventString = "",
-            number = 1L,
-            text = "",
-            type = EventType.Storage,
-            storageState = storageState
-        )
-        runBlocking {
-            commonStub()
-            whenever(monitorStorageStateEventUseCase()).thenReturn(
-                MutableStateFlow(
-                    storageStateEvent
-                )
-            )
-        }
-        initViewModel()
-        advanceUntilIdle()
-        underTest.state.test {
-            assertThat(awaitItem().storageCapacity).isEqualTo(storageOverQuotaCapacity)
-        }
-    }
-
 
     @Test
     fun `test that start download node event is launched with correct value when on save to device is invoked with download worker feature flag is enabled`() =
@@ -445,6 +420,11 @@ class MediaDiscoveryViewModelTest {
     fun `test that filterNonSensitivePhotos return non-sensitive photos when showHiddenItems is false and isPaid`() =
         runTest {
             commonStub()
+            getFeatureFlagValueUseCase.stub {
+                onBlocking { invoke(AppFeatures.HiddenNodes) }.thenReturn(
+                    true
+                )
+            }
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
             initViewModel()
             val nonSensitivePhoto = createNonSensitivePhoto()
@@ -583,4 +563,36 @@ class MediaDiscoveryViewModelTest {
             assertThat(actual).isEqualTo(expectedContentUri)
             verify(getNodeContentUriByHandleUseCase).invoke(paramHandle)
         }
+
+    @ParameterizedTest(name = "when storage state is: {0} then storageCapacity is: {1}")
+    @MethodSource("provideStorageStateParameters")
+    fun `test that storageCapacity is updated correctly when getCurrentStorageStateUseCase is invoked`(
+        storageState: StorageState,
+        storageOverQuotaCapacity: StorageOverQuotaCapacity,
+    ) = runTest {
+        commonStub()
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(AppFeatures.FullStorageOverQuotaBanner) }.thenReturn(true)
+            onBlocking { invoke(AppFeatures.AlmostFullStorageOverQuotaBanner) }.thenReturn(true)
+        }
+        whenever((monitorStorageStateUseCase())).thenReturn(
+            storageState.asHotFlow()
+        )
+        whenever(getCurrentStorageStateUseCase()).thenReturn(
+            storageState
+        )
+        whenever(
+            storageCapacityMapper(
+                storageState = storageState,
+                isFullStorageOverQuotaBannerEnabled = true,
+                isAlmostFullStorageQuotaBannerEnabled = true
+            )
+        ).thenReturn(
+            storageOverQuotaCapacity
+        )
+        initViewModel()
+        underTest.state.map { it.storageCapacity }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isEqualTo(storageOverQuotaCapacity)
+        }
+    }
 }

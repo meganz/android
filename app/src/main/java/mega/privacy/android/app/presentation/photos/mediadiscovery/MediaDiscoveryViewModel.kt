@@ -15,7 +15,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -25,10 +27,8 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
-import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.ALMOST_FULL
+import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.DEFAULT
-import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.FULL
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID
@@ -50,7 +50,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.account.AccountStorageDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -70,7 +69,7 @@ import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
@@ -123,8 +122,9 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
-    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val storageCapacityMapper: StorageCapacityMapper,
     @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -140,9 +140,6 @@ class MediaDiscoveryViewModel @Inject constructor(
     private var fromFolderLink: Boolean? = null
     internal var showHiddenItems: Boolean? = null
 
-    private var cachedAccountStorageDetails: AccountStorageDetail? = null
-    private var isFullStorageOverQuotaBannerEnabled = false
-
     init {
         fromFolderLink =
             savedStateHandle.get<Boolean>(MediaDiscoveryActivity.INTENT_KEY_FROM_FOLDER_LINK)
@@ -156,26 +153,22 @@ class MediaDiscoveryViewModel @Inject constructor(
 
     private fun monitorStorageOverQuotaCapacity() {
         viewModelScope.launch {
-            monitorStorageStateEventUseCase()
-                .collectLatest { storageStateEvent ->
-                    runCatching {
-                        val isAlmostFullStorageQuotaBannerEnabled =
-                            getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)
-                        isFullStorageOverQuotaBannerEnabled =
-                            getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)
-                        val storageCapacity = when (storageStateEvent.storageState) {
-                            StorageState.Red -> if (isFullStorageOverQuotaBannerEnabled) FULL else DEFAULT
-                            StorageState.Orange -> if (isAlmostFullStorageQuotaBannerEnabled) ALMOST_FULL else DEFAULT
-                            else -> getCachedStorageCapacity()
-                        }
-                        _state.update {
-                            it.copy(storageCapacity = storageCapacity)
-                        }
-                    }.onFailure { throwable ->
-                        Timber.e(throwable.message)
-                        setStorageCapacityAsDefault()
-                    }
+            combine(
+                flow { emit(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)) },
+                flow { emit(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)) },
+                monitorStorageStateUseCase()
+            )
+            { isFullStorageOverQuotaBannerEnabled: Boolean, isAlmostFullStorageQuotaBannerEnabled: Boolean, storageState: StorageState ->
+                storageCapacityMapper(
+                    storageState,
+                    isFullStorageOverQuotaBannerEnabled,
+                    isAlmostFullStorageQuotaBannerEnabled
+                )
+            }.collectLatest { storageCapacity ->
+                _state.update {
+                    it.copy(storageCapacity = storageCapacity)
                 }
+            }
         }
     }
 
@@ -205,7 +198,6 @@ class MediaDiscoveryViewModel @Inject constructor(
     internal fun monitorAccountDetail(loadPhotosDone: Boolean, sourcePhotos: List<Photo>) =
         monitorAccountDetailUseCase()
             .onEach { accountDetail ->
-                cachedAccountStorageDetails = accountDetail.storageDetail
                 val accountType = accountDetail.levelDetail?.accountType
                 val businessStatus =
                     if (accountType?.isBusinessAccount == true) {
@@ -217,7 +209,6 @@ class MediaDiscoveryViewModel @Inject constructor(
                         accountType = accountType,
                         isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
                         hiddenNodeEnabled = true,
-                        storageCapacity = getCachedStorageCapacity()
                     )
                 }
 
@@ -241,19 +232,6 @@ class MediaDiscoveryViewModel @Inject constructor(
                         it.copy(isConnectedToNetwork = isConnected)
                     }
                 }
-        }
-    }
-
-    /**
-     *  Get cached storage capacity based on [cachedAccountStorageDetails]
-     */
-    private fun getCachedStorageCapacity(): StorageOverQuotaCapacity {
-        return if (isFullStorageOverQuotaBannerEnabled) {
-            cachedAccountStorageDetails?.let {
-                if (it.usedPercentage >= 100) FULL else DEFAULT
-            } ?: DEFAULT
-        } else {
-            DEFAULT
         }
     }
 
