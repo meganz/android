@@ -1561,4 +1561,6 @@ internal class MegaApiFacade @Inject constructor(
             listener
         )
     }
+
+    override fun enableRequestStatusMonitor() = megaApi.enableRequestStatusMonitor()
 }

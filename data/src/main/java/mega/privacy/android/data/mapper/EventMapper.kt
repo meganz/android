@@ -51,5 +51,6 @@ private fun mapType(type: Int): EventType = when (type) {
     MegaEvent.EVENT_BUSINESS_STATUS -> EventType.BusinessStatus
     MegaEvent.EVENT_KEY_MODIFIED -> EventType.KeyModified
     MegaEvent.EVENT_MISC_FLAGS_READY -> EventType.MiscFlagsReady
+    MegaEvent.EVENT_REQSTAT_PROGRESS -> EventType.RequestStatusProgress
     else -> EventType.Unknown
 }

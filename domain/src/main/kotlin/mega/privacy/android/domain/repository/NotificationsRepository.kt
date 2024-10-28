@@ -18,6 +18,11 @@ interface NotificationsRepository {
     fun monitorUserAlerts(): Flow<List<UserAlert>>
 
     /**
+     * Enable request status monitor to receive REQSTAT_PROGRESS events
+     */
+    suspend fun enableRequestStatusMonitor()
+
+    /**
      * Monitor events
      *
      * @return a flow of global [Event]

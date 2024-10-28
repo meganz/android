@@ -91,11 +91,16 @@ internal class DefaultNotificationsRepository @Inject constructor(
             }
         }.flowOn(dispatcher)
 
+    override suspend fun enableRequestStatusMonitor() = withContext(dispatcher) {
+        megaApiGateway.enableRequestStatusMonitor()
+    }
+
     override fun monitorEvent(): Flow<Event> = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnEvent>()
         .mapNotNull { (event) ->
             event?.let { eventMapper(it) }
         }
+        .flowOn(dispatcher)
 
     override suspend fun getUserAlerts(): List<UserAlert> =
         withContext(dispatcher) {

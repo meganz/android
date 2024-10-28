@@ -66,6 +66,11 @@ enum class EventType {
     MiscFlagsReady,
 
     /**
+     * RequestStatusProgress
+     */
+    RequestStatusProgress,
+
+    /**
      * Other unknown even types
      */
     Unknown,

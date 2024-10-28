@@ -3597,4 +3597,9 @@ interface MegaApiGateway {
         backupDestination: NodeId,
         listener: MegaRequestListenerInterface?,
     )
+
+    /**
+     * Enable request status monitor to receive EVENT_REQSTAT_PROGRESS events
+     */
+    fun enableRequestStatusMonitor()
 }
