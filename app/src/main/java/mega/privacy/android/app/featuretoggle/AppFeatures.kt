@@ -16,6 +16,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * New contact request screen
+     */
+    NewContactRequestScreen(
+        "Enable new contact request screen",
+        false
+    ),
+
+    /**
      * Enable video recently watched feature
      */
     VideoRecentlyWatched(
