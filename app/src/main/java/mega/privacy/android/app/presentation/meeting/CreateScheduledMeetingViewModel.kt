@@ -782,7 +782,12 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                                 if (state.value.initialWaitingRoomOption != state.value.enabledWaitingRoomOption) {
                                     setWaitingRoom(id, state.value.enabledWaitingRoomOption)
                                 } else {
-                                    _state.update { it.copy(finish = true) }
+                                    _state.update {
+                                        it.copy(
+                                            finish = true,
+                                            chatIdToOpenInfoScreen = id
+                                        )
+                                    }
                                 }
                             }
                         }
