@@ -27,8 +27,6 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.drawee.generic.RoundingParams
-import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -497,13 +495,8 @@ class RecentActionBucketFragment : Fragment() {
                         thumbnail
                     } else {
                         val thumbnail =
-                            itemView.findViewById<SimpleDraweeView>(R.id.thumbnail_media)
+                            itemView.findViewById<ImageView>(R.id.thumbnail_media)
 
-                        thumbnail.hierarchy.roundingParams = RoundingParams.fromCornersRadius(
-                            requireContext().resources.getDimensionPixelSize(
-                                R.dimen.cu_fragment_selected_round_corner_radius
-                            ).toFloat()
-                        )
                         thumbnail.background =
                             ContextCompat.getDrawable(
                                 requireContext(), R.drawable.background_item_grid_selected
