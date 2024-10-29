@@ -42,7 +42,7 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
     navigateToMeeting: (Long, Boolean, Boolean) -> Unit,
     navigateToWaitingRoom: (Long) -> Unit,
     onBackPress: () -> Unit,
-    onCameraPermissionDenied : () -> Unit,
+    onCameraPermissionDenied: () -> Unit,
 ) {
     navigation(
         startDestination = ConversationRoute,
@@ -170,6 +170,8 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
         endCallForAllDialog(navController)
 
         chatLocationDialog(navController)
+
+        documentScanningErrorDialog(navController)
 
         joinCallDialog(navController)
 

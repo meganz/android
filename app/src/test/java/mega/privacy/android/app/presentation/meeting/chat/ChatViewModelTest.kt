@@ -6,6 +6,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
@@ -20,12 +22,16 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.AnalyticsTestExtension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
+import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
@@ -36,6 +42,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ForwardMessagesT
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -153,6 +160,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
@@ -173,13 +181,14 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
-import mega.privacy.android.app.AnalyticsTestExtension
 import java.io.File
 import java.util.stream.Stream
 
+/**
+ * Test class for [ChatViewModel]
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-
 internal class ChatViewModelTest {
 
     private val chatId = 123L
@@ -313,6 +322,7 @@ internal class ChatViewModelTest {
     private val broadcastUpgradeDialogClosedUseCase = mock<BroadcastUpgradeDialogClosedUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val pauseTransfersQueueUseCase = mock<PauseTransfersQueueUseCase>()
+    private val scannerHandler = mock<ScannerHandler>()
 
     @BeforeEach
     fun resetMocks() {
@@ -379,7 +389,8 @@ internal class ChatViewModelTest {
             getUsersCallLimitRemindersUseCase,
             broadcastUpgradeDialogClosedUseCase,
             areTransfersPausedUseCase,
-            pauseTransfersQueueUseCase
+            pauseTransfersQueueUseCase,
+            scannerHandler,
         )
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -503,6 +514,7 @@ internal class ChatViewModelTest {
             areTransfersPausedUseCase = areTransfersPausedUseCase,
             pauseTransfersQueueUseCase = pauseTransfersQueueUseCase,
             actionFactories = setOf(),
+            scannerHandler = scannerHandler,
         )
     }
 
@@ -3079,7 +3091,7 @@ internal class ChatViewModelTest {
     @ParameterizedTest(name = " when use case returns {0}")
     @ValueSource(booleans = [true, false])
     fun `test that are transfers paused returns correctly`(
-        areTransfersPaused: Boolean
+        areTransfersPaused: Boolean,
     ) = runTest {
         whenever(areTransfersPausedUseCase()).thenReturn(areTransfersPaused)
 
@@ -3093,6 +3105,90 @@ internal class ChatViewModelTest {
         verify(pauseTransfersQueueUseCase).invoke(false)
     }
 
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class DocumentScannerTests {
+
+        @BeforeEach
+        fun setUp() {
+            initTestClass()
+        }
+
+        @Test
+        fun `test that the old document scanner is used for scanning documents`() =
+            verifyHandleScanDocumentResult(HandleScanDocumentResult.UseLegacyImplementation)
+
+        @Test
+        fun `test that the new ML document kit scanner is initialized and used for scanning documents`() =
+            verifyHandleScanDocumentResult(HandleScanDocumentResult.UseNewImplementation(mock()))
+
+        private fun verifyHandleScanDocumentResult(handleScanDocumentResult: HandleScanDocumentResult) =
+            runTest {
+                whenever(scannerHandler.handleScanDocument()).thenReturn(handleScanDocumentResult)
+
+                underTest.onAttachScan()
+
+                underTest.state.test {
+                    assertThat(awaitItem().handleScanDocumentResult).isEqualTo(
+                        triggered(handleScanDocumentResult)
+                    )
+                }
+            }
+
+        @Test
+        fun `test that an insufficient RAM to launch error is returned when initializing the ML document kit scanner with low device RAM`() =
+            runTest {
+                whenever(scannerHandler.handleScanDocument()).thenAnswer {
+                    throw InsufficientRAMToLaunchDocumentScanner()
+                }
+
+                assertDoesNotThrow { underTest.onAttachScan() }
+
+                underTest.state.test {
+                    assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.InsufficientRAM)
+                }
+            }
+
+        @Test
+        fun `test that a generic error is returned when initializing the ML document kit scanner results in an error`() =
+            runTest {
+                whenever(scannerHandler.handleScanDocument()).thenThrow(RuntimeException())
+
+                assertDoesNotThrow { underTest.onAttachScan() }
+
+                underTest.state.test {
+                    assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.GenericError)
+                }
+            }
+
+        @Test
+        fun `test that a generic error is returned when opening the ML document kit scanner results in an error`() =
+            runTest {
+                underTest.onNewDocumentScannerFailedToOpen()
+
+                underTest.state.test {
+                    assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.GenericError)
+                }
+            }
+
+        @Test
+        fun `test that the handle scan document result is reset`() = runTest {
+            underTest.onHandleScanDocumentResultConsumed()
+
+            underTest.state.test {
+                assertThat(awaitItem().handleScanDocumentResult).isEqualTo(consumed())
+            }
+        }
+
+        @Test
+        fun `test that the document scanning error is reset`() = runTest {
+            underTest.onDocumentScanningErrorConsumed()
+
+            underTest.state.test {
+                assertThat(awaitItem().documentScanningError).isNull()
+            }
+        }
+    }
 
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown

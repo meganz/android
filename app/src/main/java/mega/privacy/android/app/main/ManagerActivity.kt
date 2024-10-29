@@ -2151,6 +2151,13 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     /**
+     * When the system fails to open the ML Document Kit Scanner, display a generic error message
+     */
+    fun onNewDocumentScannerFailedToOpen() {
+        viewModel.onNewDocumentScannerFailedToOpen()
+    }
+
+    /**
      * Open meeting
      */
     private fun launchCallScreen() {

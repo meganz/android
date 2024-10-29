@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
 import android.net.Uri
 import androidx.activity.ComponentActivity
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
@@ -16,17 +15,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryState
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryViewModel
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbarBottomSheet
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_CONTACT
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_FILE
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_GALLERY
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_GIF
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_LOCATION
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_SCAN
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_GALLERY_LIST
+import mega.privacy.android.core.test.AnalyticsTestRule
+import mega.privacy.mobile.analytics.event.ChatConversationContactMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationFileMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationGIFMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationGalleryMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationLocationMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationScanMenuItemEvent
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -35,11 +30,12 @@ import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.core.test.AnalyticsTestRule
 
-@OptIn(ExperimentalMaterialApi::class)
+/**
+ * Test class for [ChatToolbarBottomSheetTest]
+ */
 @RunWith(AndroidJUnit4::class)
-class ChatToolbarBottomSheetTest {
+internal class ChatToolbarBottomSheetTest {
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
     private val analyticsRule = AnalyticsTestRule()
 
@@ -47,8 +43,8 @@ class ChatToolbarBottomSheetTest {
     val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private val onAttachFileClicked: (List<Uri>) -> Unit = mock()
-    private val onAttachContactClicked: () -> Unit = mock()
     private val onPickLocation: () -> Unit = mock()
+    private val onAttachScan: () -> Unit = mock()
 
     private val chatGalleryViewModel = mock<ChatGalleryViewModel> {
         on { state } doReturn MutableStateFlow(ChatGalleryState())
@@ -62,7 +58,7 @@ class ChatToolbarBottomSheetTest {
     }
 
     @Test
-    fun `test that gallery list shows`() {
+    fun `test that gallery list exists`() {
         initComposeRuleContent()
         composeTestRule.onNodeWithTag(TEST_TAG_GALLERY_LIST).assertExists()
     }
@@ -104,11 +100,47 @@ class ChatToolbarBottomSheetTest {
     }
 
     @Test
-    fun `test that location button click is passed to upper caller`() {
+    fun `test that gallery list click records analytics event`() {
+        initComposeRuleContent()
+        composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_GALLERY).performClick()
+        assertThat(analyticsRule.events).contains(ChatConversationGalleryMenuItemEvent)
+    }
+
+    @Test
+    fun `test that location button click records analytics event and is passed to upper caller`() {
         initComposeRuleContent()
         composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_LOCATION).performClick()
         verify(onPickLocation).invoke()
         assertThat(analyticsRule.events).contains(ChatConversationLocationMenuItemEvent)
+    }
+
+    @Test
+    fun `test that file button click records analytics event`() {
+        initComposeRuleContent()
+        composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_FILE).performClick()
+        assertThat(analyticsRule.events).contains(ChatConversationFileMenuItemEvent)
+    }
+
+    @Test
+    fun `test that gif button click records analytics event`() {
+        initComposeRuleContent()
+        composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_GIF).performClick()
+        assertThat(analyticsRule.events).contains(ChatConversationGIFMenuItemEvent)
+    }
+
+    @Test
+    fun `test that scan button click records analytics event and is passed to upper caller`() {
+        initComposeRuleContent()
+        composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_SCAN).performClick()
+        verify(onAttachScan).invoke()
+        assertThat(analyticsRule.events).contains(ChatConversationScanMenuItemEvent)
+    }
+
+    @Test
+    fun `test that contact button click records analytics event`() {
+        initComposeRuleContent()
+        composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_CONTACT).performClick()
+        assertThat(analyticsRule.events).contains(ChatConversationContactMenuItemEvent)
     }
 
     private fun initComposeRuleContent() {
@@ -127,6 +159,7 @@ class ChatToolbarBottomSheetTest {
                     navigateToFileModal = {},
                     onAttachContacts = {},
                     onAttachFiles = onAttachFileClicked,
+                    onAttachScan = onAttachScan,
                 )
             }
         }

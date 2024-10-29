@@ -572,8 +572,9 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                 .addOnFailureListener { exception ->
                     Timber.e(
                         exception,
-                        "An error occurred when attempting to initialize the ML Kit Document Scanner from Contact File List",
+                        "An error occurred when attempting to run the ML Kit Document Scanner from Contact File List",
                     )
+                    viewModel.onNewDocumentScannerFailedToOpen()
                 }
         }
     }

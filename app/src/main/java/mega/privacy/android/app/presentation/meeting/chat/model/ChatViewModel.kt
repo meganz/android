@@ -28,10 +28,13 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.main.megachat.MapsActivity
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.presentation.extensions.isPast
+import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
@@ -41,6 +44,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAc
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.INVALID_LOCATION_MESSAGE_ID
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.ChatArgs
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.service.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -258,6 +262,7 @@ class ChatViewModel @Inject constructor(
     private val broadcastUpgradeDialogClosedUseCase: BroadcastUpgradeDialogClosedUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
+    private val scannerHandler: ScannerHandler,
     actionFactories: Set<@JvmSuppressWildcards (ChatViewModel) -> MessageAction>,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
@@ -1768,6 +1773,52 @@ class ChatViewModel @Inject constructor(
             runCatching { pauseTransfersQueueUseCase(false) }
                 .onFailure { Timber.e(it) }
         }
+    }
+
+    /**
+     * Checks whether the legacy or modern Document Scanner should be used
+     */
+    fun onAttachScan() {
+        viewModelScope.launch {
+            runCatching {
+                scannerHandler.handleScanDocument()
+            }.onSuccess { handleScanDocumentResult ->
+                _state.update {
+                    it.copy(handleScanDocumentResult = triggered(handleScanDocumentResult))
+                }
+            }.onFailure { exception ->
+                _state.update {
+                    it.copy(
+                        documentScanningError = if (exception is InsufficientRAMToLaunchDocumentScanner) {
+                            DocumentScanningError.InsufficientRAM
+                        } else {
+                            DocumentScanningError.GenericError
+                        },
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * When the system fails to open the ML Document Kit Scanner, display a generic error message
+     */
+    fun onNewDocumentScannerFailedToOpen() {
+        _state.update { it.copy(documentScanningError = DocumentScanningError.GenericError) }
+    }
+
+    /**
+     * Resets the value of [ChatUiState.handleScanDocumentResult]
+     */
+    fun onHandleScanDocumentResultConsumed() {
+        _state.update { it.copy(handleScanDocumentResult = consumed()) }
+    }
+
+    /**
+     * Resets the value of [ManagerState.documentScanningError]
+     */
+    fun onDocumentScanningErrorConsumed() {
+        _state.update { it.copy(documentScanningError = null) }
     }
 
     companion object {

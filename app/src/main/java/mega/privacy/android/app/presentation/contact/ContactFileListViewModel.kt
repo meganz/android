@@ -270,6 +270,13 @@ class ContactFileListViewModel @Inject constructor(
     }
 
     /**
+     * When the system fails to open the ML Document Kit Scanner, display a generic error message
+     */
+    fun onNewDocumentScannerFailedToOpen() {
+        _state.update { it.copy(documentScanningError = DocumentScanningError.GenericError) }
+    }
+
+    /**
      * Resets the value of [ContactFileListUiState.handleScanDocumentResult]
      */
     fun onHandleScanDocumentResultConsumed() {

@@ -109,27 +109,28 @@ class ScannerHandlerImpl @Inject constructor(
                 .installModules(moduleInstallRequest)
                 .addOnSuccessListener { moduleResponse ->
                     if (moduleResponse.areModulesAlreadyInstalled()) {
-                        Timber.d("The ML Document Kit Scanner is successfully installed")
+                        Timber.d("The ML Document Kit Scanner is present on the device")
                         continuation.resumeWith(
                             Result.success(
                                 HandleScanDocumentResult.UseNewImplementation(documentScanner)
                             )
                         )
                     } else {
-                        Timber.e("The ML Document Kit Scanner is not installed")
+                        Timber.e("The ML Document Kit Scanner is not present on the device")
                         continuation.resumeWith(Result.failure(DocumentScannerModuleIsNotInstalled()))
                     }
                 }.addOnFailureListener {
-                    Timber.e("An Exception occurred when installing the ML Document Kit Scanner:\n\n ${it.printStackTrace()}")
-                    continuation.resumeWith(
-                        Result.failure(
-                            if (it is MlKitException && it.errorCode == MlKitException.UNSUPPORTED) {
-                                InsufficientRAMToLaunchDocumentScanner()
-                            } else {
-                                UnexpectedErrorInDocumentScanner()
-                            }
-                        )
+                    val exception =
+                        if (it is MlKitException && it.errorCode == MlKitException.UNSUPPORTED) {
+                            InsufficientRAMToLaunchDocumentScanner()
+                        } else {
+                            UnexpectedErrorInDocumentScanner()
+                        }
+                    Timber.e(
+                        exception,
+                        "An Exception occurred when installing the ML Document Kit Scanner",
                     )
+                    continuation.resumeWith(Result.failure(exception))
                 }
         }
 }

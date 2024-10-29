@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.meeting.chat.model
 import androidx.compose.runtime.Composable
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
+import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
@@ -16,7 +18,7 @@ import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 
 /**
- *@property chat [ChatRoom]
+ * @property chat [ChatRoom]
  * @property isChatNotificationMute whether notification is mute
  * @property userChatStatus User chat status if is a 1to1 conversation, null otherwise.
  * @property userLastGreen User chat last green if is a 1to1 conversation and if chat status is different than online, null otherwise.
@@ -56,7 +58,10 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.react
  * @property reactionList List of reactions.
  * @property pendingAction The pending action.
  * @property addingReactionTo The id of the message to which a reaction is being added.
- **/
+ * @property handleScanDocumentResult State Event which decides if the legacy or modern Document
+ * Scanner should be used
+ * @property documentScanningError The specific Error returned when using the modern Document Scanner
+ */
 data class ChatUiState(
     val chat: ChatRoom? = null,
     val isChatNotificationMute: Boolean = false,
@@ -98,6 +103,8 @@ data class ChatUiState(
     val reactionList: List<UIReaction> = emptyList(),
     val pendingAction: (@Composable () -> Unit)? = null,
     val addingReactionTo: Long? = null,
+    val handleScanDocumentResult: StateEventWithContent<HandleScanDocumentResult> = consumed(),
+    val documentScanningError: DocumentScanningError? = null,
 ) {
 
     /**

@@ -1209,7 +1209,7 @@ class ManagerViewModel @Inject constructor(
                     ChatCallStatus.Connecting,
                     ChatCallStatus.Joining,
                     ChatCallStatus.InProgress,
-                        -> ScheduledMeetingStatus.Joined(call.duration)
+                    -> ScheduledMeetingStatus.Joined(call.duration)
 
                     else -> ScheduledMeetingStatus.NotStarted
                 }
@@ -1408,6 +1408,13 @@ class ManagerViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * When the system fails to open the ML Document Kit Scanner, display a generic error message
+     */
+    fun onNewDocumentScannerFailedToOpen() {
+        _state.update { it.copy(documentScanningError = DocumentScanningError.GenericError) }
     }
 
     /**

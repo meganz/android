@@ -266,8 +266,9 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
                 .addOnFailureListener { exception ->
                     Timber.e(
                         exception,
-                        "An error occurred when attempting to initialize the ML Kit Document Scanner from Cloud Drive",
+                        "An error occurred when attempting to run the ML Kit Document Scanner from Cloud Drive",
                     )
+                    managerActivity.onNewDocumentScannerFailedToOpen()
                 }
         }
     }
