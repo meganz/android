@@ -1,9 +1,12 @@
 package mega.privacy.android.domain.usecase.transfers.active
 
+import kotlinx.coroutines.flow.firstOrNull
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.pending.UpdatePendingTransferStateUseCase
 import javax.inject.Inject
 
 /**
@@ -14,6 +17,7 @@ import javax.inject.Inject
 class CorrectActiveTransfersUseCase @Inject constructor(
     private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase,
     private val transferRepository: TransferRepository,
+    private val updatePendingTransferStateUseCase: UpdatePendingTransferStateUseCase,
 ) {
     /**
      * Invoke.
@@ -54,5 +58,39 @@ class CorrectActiveTransfersUseCase @Inject constructor(
 
         transferRepository.updateInProgressTransfers(inProgressNotInActiveTransfers)
         transferRepository.insertOrUpdateActiveTransfers(inProgressNotInActiveTransfers)
+
+        val pendingTransfersWaitingSdkScanning = if (transferType == null) {
+            TransferType.entries.flatMap {
+                transferRepository
+                    .getPendingTransfersByTypeAndState(it, PendingTransferState.SdkScanning)
+                    .firstOrNull() ?: emptyList()
+            }
+        } else {
+            transferRepository.getPendingTransfersByTypeAndState(
+                transferType,
+                PendingTransferState.SdkScanning
+            ).firstOrNull() ?: emptyList()
+        }
+
+        // pending transfers that are waiting the finish of the folder scanning but are not in the sdk. Set them as errors.
+        val notInProgressPendingTransfersWaitingSdkScanning =
+            pendingTransfersWaitingSdkScanning.filter { pendingTransfer ->
+                pendingTransfer.transferTag == null ||
+                        inProgressTransfers.map { it.tag }
+                            .contains(pendingTransfer.transferTag).not()
+            }
+        if (notInProgressPendingTransfersWaitingSdkScanning.isNotEmpty()) {
+            updatePendingTransferStateUseCase(
+                notInProgressPendingTransfersWaitingSdkScanning,
+                PendingTransferState.ErrorStarting
+            )
+            notInProgressPendingTransfersWaitingSdkScanning.forEach {
+                transferRepository.addCompletedTransferFromFailedPendingTransfer(
+                    it,
+                    0L,
+                    UnknownError()
+                )
+            }
+        }
     }
 }
