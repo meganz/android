@@ -8,17 +8,24 @@ import android.widget.Button
 import android.widget.CheckedTextView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -39,6 +46,7 @@ import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.ManageMeetingLinkBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.chat.list.view.MeetingLinkBottomSheet
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_LINK_CREATED_TAG
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_LINK_TAG
@@ -56,6 +64,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_CREATED
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_ID
+import mega.privacy.android.app.utils.ScheduledMeetingDateUtil
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatParticipant
@@ -66,6 +75,7 @@ import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableMeetingLinkButtonEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableOpenInviteButtonEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingShareMeetingLinkButtonEvent
+import mega.privacy.mobile.analytics.event.SendMeetingLinkToChatScheduledMeetingEvent
 import mega.privacy.mobile.analytics.event.WaitingRoomEnableButtonEvent
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
@@ -108,6 +118,37 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             )
         }
     }
+    private val editSchedMeetLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val isLinkCreated = result.data?.getBooleanExtra(
+                    MEETING_LINK_CREATED_TAG,
+                    false
+                ) == true
+                if (isLinkCreated) {
+                    // show bottom sheet dialog
+                    val chatId = result.data?.getLongExtra(
+                        CHAT_ID,
+                        -1L
+                    ) ?: -1L
+                    if (chatId != -1L) {
+                        val link = result.data?.getStringExtra(
+                            MEETING_LINK_TAG
+                        )
+                        val title = result.data?.getStringExtra(
+                            MEETING_TITLE_TAG
+                        ) ?: ""
+                        scheduledMeetingManagementViewModel.setMeetingLink(
+                            chatId,
+                            link,
+                            title
+                        )
+                    }
+                }
+                scheduledMeetingManagementViewModel.scheduledMeetingUpdated()
+                scheduledMeetingManagementViewModel.checkWaitingRoomWarning()
+            }
+        }
 
     private var bottomSheetDialogFragment: BaseBottomSheetDialogFragment? = null
 
@@ -477,6 +518,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         )
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     private fun MainComposeView() {
         val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -484,51 +526,85 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
 
-        OriginalTempTheme(isDark = isDark) {
-            ScheduledMeetingInfoView(
-                state = uiState,
-                managementState = managementState,
-                onButtonClicked = ::onActionTap,
-                onEditClicked = { onEditTap() },
-                onAddParticipantsClicked = { viewModel.onInviteParticipantsTap() },
-                onSeeMoreOrLessClicked = { viewModel.onSeeMoreOrLessTap() },
-                onLeaveGroupClicked = { viewModel.onLeaveGroupTap() },
-                onParticipantClicked = { showParticipantOptionsPanel(it) },
-                onBackPressed = {
-                    Timber.d(
-                        "onBackPressed schedule meeting created ${
-                            intent.getBooleanExtra(
-                                SCHEDULED_MEETING_CREATED,
-                                false
-                            )
-                        }"
-                    )
+        val coroutineScope = rememberCoroutineScope()
+        val modalSheetState = rememberModalBottomSheetState(
+            initialValue = ModalBottomSheetValue.Hidden,
+            skipHalfExpanded = true,
+        )
+        BackHandler(enabled = modalSheetState.isVisible) {
+            coroutineScope.launch { modalSheetState.hide() }
+        }
 
-                    if (intent.getBooleanExtra(SCHEDULED_MEETING_CREATED, false)) {
-                        setResult(
-                            RESULT_OK,
-                            Intent().apply {
-                                putExtra(CHAT_ID, uiState.scheduledMeeting?.chatId)
-                                putExtra(MEETING_TITLE_TAG, uiState.scheduledMeeting?.title)
-                                putExtra(
-                                    MEETING_LINK_CREATED_TAG,
-                                    managementState.meetingLink?.isNotBlank() ?: false
+        EventEffect(
+            managementState.meetingLinkCreated,
+            scheduledMeetingManagementViewModel::onMeetingLinkShareShown
+        ) {
+            coroutineScope.launch {
+                Timber.d("Show MeetingLinkBottomSheet")
+                modalSheetState.show()
+            }
+        }
+
+        OriginalTempTheme(isDark = isDark) {
+            MeetingLinkBottomSheet(
+                modalSheetState = modalSheetState,
+                coroutineScope = coroutineScope,
+                onSendLinkToChat = {
+                    Analytics.tracker.trackEvent(SendMeetingLinkToChatScheduledMeetingEvent)
+                    sendToChatLauncher.launch(
+                        longArrayOf()
+                    )
+                },
+                onShareLink = {
+                    Analytics.tracker.trackEvent(ScheduledMeetingShareMeetingLinkButtonEvent)
+                    showMeetingShareOptions()
+                }
+            ) {
+                ScheduledMeetingInfoView(
+                    state = uiState,
+                    managementState = managementState,
+                    onButtonClicked = ::onActionTap,
+                    onEditClicked = { onEditTap() },
+                    onAddParticipantsClicked = { viewModel.onInviteParticipantsTap() },
+                    onSeeMoreOrLessClicked = { viewModel.onSeeMoreOrLessTap() },
+                    onLeaveGroupClicked = { viewModel.onLeaveGroupTap() },
+                    onParticipantClicked = { showParticipantOptionsPanel(it) },
+                    onBackPressed = {
+                        Timber.d(
+                            "onBackPressed schedule meeting created ${
+                                intent.getBooleanExtra(
+                                    SCHEDULED_MEETING_CREATED,
+                                    false
                                 )
-                                putExtra(MEETING_LINK_TAG, managementState.meetingLink)
-                            }
+                            }"
                         )
-                    }
-                    finish()
-                },
-                onDismiss = { viewModel.dismissDialog() },
-                onLeaveGroupDialog = { viewModel.leaveChat() },
-                onInviteParticipantsDialog = {
-                    openInviteContact()
-                    viewModel.dismissDialog()
-                },
-                onCloseWarningClicked = scheduledMeetingManagementViewModel::closeWaitingRoomWarning,
-                onResetStateSnackbarMessage = viewModel::onSnackbarMessageConsumed,
-            )
+
+                        if (intent.getBooleanExtra(SCHEDULED_MEETING_CREATED, false)) {
+                            setResult(
+                                RESULT_OK,
+                                Intent().apply {
+                                    putExtra(CHAT_ID, uiState.scheduledMeeting?.chatId)
+                                    putExtra(MEETING_TITLE_TAG, uiState.scheduledMeeting?.title)
+                                    putExtra(
+                                        MEETING_LINK_CREATED_TAG,
+                                        managementState.meetingLink?.isNotBlank() ?: false
+                                    )
+                                    putExtra(MEETING_LINK_TAG, managementState.meetingLink)
+                                }
+                            )
+                        }
+                        finish()
+                    },
+                    onDismiss = { viewModel.dismissDialog() },
+                    onLeaveGroupDialog = { viewModel.leaveChat() },
+                    onInviteParticipantsDialog = {
+                        openInviteContact()
+                        viewModel.dismissDialog()
+                    },
+                    onCloseWarningClicked = scheduledMeetingManagementViewModel::closeWaitingRoomWarning,
+                    onResetStateSnackbarMessage = viewModel::onSnackbarMessageConsumed,
+                )
+            }
         }
     }
 
@@ -537,12 +613,12 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      */
     private fun onEditTap() {
         Analytics.tracker.trackEvent(ScheduledMeetingEditMenuToolbarEvent)
-        val intent = Intent(this, CreateScheduledMeetingActivity::class.java).apply {
-            putExtra(CHAT_ID, chatRoomId)
-            addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
-        }
-        startActivity(intent)
-        finish()
+        editSchedMeetLauncher.launch(
+            Intent(
+                this@ScheduledMeetingInfoActivity,
+                CreateScheduledMeetingActivity::class.java
+            ).putExtra(CHAT_ID, chatRoomId)
+        )
     }
 
     /**
@@ -581,6 +657,53 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                 viewModel.setWaitingRoom()
             }
         }
+    }
+
+    private fun showMeetingShareOptions() {
+        val subject = getString(R.string.meetings_sharing_meeting_link_meeting_invite_subject)
+        val message = getString(
+            R.string.meetings_sharing_meeting_link_title,
+            scheduledMeetingManagementViewModel.state.value.myFullName
+        )
+        val meetingName =
+            getString(
+                R.string.meetings_sharing_meeting_link_meeting_name,
+                scheduledMeetingManagementViewModel.state.value.title
+            )
+        val meetingLink =
+            getString(
+                R.string.meetings_sharing_meeting_link_meeting_link,
+                scheduledMeetingManagementViewModel.state.value.meetingLink
+            )
+
+        val body = StringBuilder()
+        body.append("\n")
+            .append(message)
+            .append("\n\n")
+            .append(meetingName)
+
+        scheduledMeetingManagementViewModel.chatScheduledMeeting?.let {
+            val meetingDateAndTime = getString(
+                R.string.meetings_sharing_meeting_link_meeting_date_and_time,
+                ScheduledMeetingDateUtil.getAppropriateStringForScheduledMeetingDate(
+                    this,
+                    scheduledMeetingManagementViewModel.is24HourFormat,
+                    it
+                )
+            )
+            body.append(meetingDateAndTime)
+        }
+
+        body.append("\n")
+            .append(meetingLink)
+
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = Constants.TYPE_TEXT_PLAIN
+            putExtra(Intent.EXTRA_SUBJECT, "\n${subject}")
+            putExtra(Intent.EXTRA_TEXT, body.toString())
+        }
+
+        startActivity(Intent.createChooser(intent, " "))
     }
 
     companion object {

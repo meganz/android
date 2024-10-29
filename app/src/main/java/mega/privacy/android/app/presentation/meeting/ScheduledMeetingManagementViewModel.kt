@@ -759,7 +759,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             ChatCallStatus.Connecting,
             ChatCallStatus.Joining,
             ChatCallStatus.InProgress,
-            -> true
+                -> true
 
             else -> false
         }

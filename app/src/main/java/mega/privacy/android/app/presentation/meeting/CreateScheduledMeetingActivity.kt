@@ -131,7 +131,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
     }
 
     private fun collectFlows() {
-        collectFlow(viewModel.state) { (_, openAddContact, chatIdToOpenInfoScreen, finish) ->
+        collectFlow(viewModel.state) { (_, openAddContact, _, finish) ->
             if (finish) {
                 finishCreateScheduledMeeting(RESULT_OK)
             }

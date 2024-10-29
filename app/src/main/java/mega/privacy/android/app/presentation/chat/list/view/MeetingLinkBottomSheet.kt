@@ -52,9 +52,11 @@ internal fun MeetingLinkBottomSheet(
     onSendLinkToChat: () -> Unit,
     onShareLink: () -> Unit,
     modifier: Modifier = Modifier,
+    content: (@Composable () -> Unit)? = null,
 ) {
     BottomSheet(
         modalSheetState = modalSheetState,
+        content = content,
         sheetBody = {
             MeetingLinkView(modifier = modifier, onSendLinkToChat = {
                 coroutineScope.launch {
