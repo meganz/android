@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.fetcher.MegaAvatarFetcher
 import mega.privacy.android.app.fetcher.MegaAvatarKeyer
 import mega.privacy.android.app.fetcher.MegaThumbnailFetcher
@@ -57,6 +58,7 @@ import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
 import mega.privacy.android.domain.usecase.appstart.AppStartTask
 import mega.privacy.android.domain.usecase.appstart.AppStopTask
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -195,6 +197,12 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     @Inject
     internal lateinit var updateApiServerUseCase: UpdateApiServerUseCase
 
+    /**
+     * [GetFeatureFlagValueUseCase]
+     */
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
     @Inject
     internal lateinit var appStartTasks: Set<@JvmSuppressWildcards AppStartTask>
 
@@ -239,15 +247,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
 
         setupMegaChatApi()
         getMiscFlagsIfNeeded()
-        applicationScope.launch(Dispatchers.IO) {
-            runCatching {
-                // Initialize the Google Mobile Ads SDK on a background thread.
-                MobileAds.initialize(this@MegaApplication) {}
-                Timber.i("MobileAds initialized")
-            }.onFailure {
-                Timber.e(it, "MobileAds initialization failed")
-            }
-        }
+        initialiseAdsIfNeeded()
         applicationScope.launch {
             runCatching { updateApiServerUseCase() }
             // clear the cache files stored in the external cache folder.
@@ -382,6 +382,23 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                 .collectLatest { next: CallSoundType ->
                     soundsController.playSound(next)
                 }
+        }
+    }
+
+    /**
+     * Initialise ads if needed
+     */
+    private fun initialiseAdsIfNeeded() {
+        applicationScope.launch(Dispatchers.IO) {
+            runCatching {
+                val isAdsFeatureEnabled =
+                    getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
+                if (isAdsFeatureEnabled) {
+                    MobileAds.initialize(this@MegaApplication)
+                }
+            }.onFailure {
+                Timber.e(it, "MobileAds initialization failed")
+            }
         }
     }
 
