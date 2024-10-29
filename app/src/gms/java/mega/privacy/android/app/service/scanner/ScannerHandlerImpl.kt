@@ -94,7 +94,7 @@ class ScannerHandlerImpl @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val options = GmsDocumentScannerOptions.Builder()
                 .setGalleryImportAllowed(false)
-                .setPageLimit(10)
+                .setPageLimit(30)
                 .setResultFormats(RESULT_FORMAT_PDF, RESULT_FORMAT_JPEG)
                 .setScannerMode(SCANNER_MODE_FULL)
                 .build()
