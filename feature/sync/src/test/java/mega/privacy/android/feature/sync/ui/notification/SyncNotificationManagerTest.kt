@@ -2,8 +2,10 @@ package mega.privacy.android.feature.sync.ui.notification
 
 import android.app.Notification
 import android.content.Context
+import android.service.notification.StatusBarNotification
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.feature.sync.domain.entity.NotificationDetails
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
@@ -12,6 +14,7 @@ import mega.privacy.android.feature.sync.domain.usecase.notifcation.CreateSyncNo
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -62,5 +65,33 @@ internal class SyncNotificationManagerTest {
         underTest.cancelNotification(notificationId)
 
         verify(notificationManagerCompat).cancel(notificationId)
+    }
+
+    @Test
+    fun `test that sync notification manager returns false if notification is not displayed`() {
+        whenever(notificationManagerCompat.activeNotifications).thenReturn(emptyList())
+
+        val result = underTest.isSyncNotificationDisplayed()
+
+        assertThat(result).isFalse()
+    }
+
+
+    @Test
+    fun `test that sync notification manager returns true if notification is displayed`() {
+        val channelId = SyncNotificationManager.CHANNEL_ID
+        val statusBarNotification: StatusBarNotification = mock()
+        val notification: Notification = mock()
+        whenever(statusBarNotification.notification).thenReturn(notification)
+        whenever(notification.channelId).doReturn(channelId)
+        whenever(notificationManagerCompat.activeNotifications).thenReturn(
+            listOf(
+                statusBarNotification
+            )
+        )
+
+        val result = underTest.isSyncNotificationDisplayed()
+
+        assertThat(result).isTrue()
     }
 }

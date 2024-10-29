@@ -60,6 +60,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -323,7 +324,9 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
+import mega.privacy.android.feature.sync.ui.SyncMonitorState
 import mega.privacy.android.feature.sync.ui.SyncMonitorViewModel
+import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionViewModel
 import mega.privacy.android.navigation.MegaNavigator
@@ -495,6 +498,9 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     @Inject
     @ApplicationScope
     lateinit var applicationScope: CoroutineScope
+
+    @Inject
+    lateinit var syncNotificationManager: SyncNotificationManager
 
     //GET PRO ACCOUNT PANEL
     private lateinit var getProLayout: LinearLayout
@@ -2082,6 +2088,24 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 showOnlineMode()
             } else {
                 showOfflineMode()
+            }
+        }
+
+        this.collectFlow(
+            syncMonitorViewModel.state,
+            Lifecycle.State.CREATED
+        ) { state: SyncMonitorState ->
+            state.displayNotification?.let { notification ->
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    syncMonitorViewModel.onNotificationShown(notification)
+                    if (!syncNotificationManager.isSyncNotificationDisplayed()) {
+                        syncNotificationManager.show(this@ManagerActivity, notification)
+                    }
+                }
             }
         }
 

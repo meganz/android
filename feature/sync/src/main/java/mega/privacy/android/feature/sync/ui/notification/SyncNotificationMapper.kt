@@ -21,7 +21,7 @@ class SyncNotificationMapper @Inject constructor() {
         context: Context,
         syncNotificationMessage: SyncNotificationMessage,
     ): Notification {
-        val androidSyncIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getSyncListRoute()))
+        val androidSyncIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://mega.nz/${getSyncListRoute()}"))
         val pendingIntent = PendingIntent.getActivity(
             context,
             0,

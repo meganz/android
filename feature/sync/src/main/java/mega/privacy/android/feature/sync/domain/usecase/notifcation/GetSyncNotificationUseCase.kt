@@ -24,7 +24,6 @@ class GetSyncNotificationUseCase @Inject constructor(
      * If the sync notification is not required, null is returned
      */
     suspend operator fun invoke(
-        isSyncNotificationDisplayed: Boolean,
         isBatteryLow: Boolean,
         isUserOnWifi: Boolean,
         isSyncOnlyByWifi: Boolean,
@@ -34,10 +33,6 @@ class GetSyncNotificationUseCase @Inject constructor(
         val isNetworkConstraintRespected = isSyncOnlyByWifi && isUserOnWifi || !isSyncOnlyByWifi
 
         return when {
-            isSyncNotificationDisplayed -> {
-                null
-            }
-
             isBatteryLow -> {
                 getBatteryLowNotification()
             }

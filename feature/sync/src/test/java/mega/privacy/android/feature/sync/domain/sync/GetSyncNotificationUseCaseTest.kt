@@ -41,31 +41,8 @@ internal class GetSyncNotificationUseCaseTest {
     }
 
     @Test
-    fun `test that use case returns null when sync notification is currently displayed`() =
-        runTest {
-            val isSyncNotificationCurrentlyDisplayed = true
-            val isBatteryLow = false
-            val isUserOnWifi = true
-            val isSyncOnlyByWifi = true
-            val syncs = emptyList<FolderPair>()
-            val stalledIssues = emptyList<StalledIssue>()
-
-            val result = underTest(
-                isSyncNotificationCurrentlyDisplayed,
-                isBatteryLow,
-                isUserOnWifi,
-                isSyncOnlyByWifi,
-                syncs,
-                stalledIssues
-            )
-
-            assertThat(result).isNull()
-        }
-
-    @Test
     fun `test that use case returns sync notification when battery is low and notification was not shown`() =
         runTest {
-            val isSyncNotificationCurrentlyDisplayed = false
             val isBatteryLow = true
             val isUserOnWifi = true
             val isSyncOnlyByWifi = true
@@ -78,7 +55,6 @@ internal class GetSyncNotificationUseCaseTest {
             whenever(syncNotificationRepository.getBatteryLowNotification()).thenReturn(notification)
 
             val result = underTest(
-                isSyncNotificationCurrentlyDisplayed,
                 isBatteryLow,
                 isUserOnWifi,
                 isSyncOnlyByWifi,
@@ -92,7 +68,6 @@ internal class GetSyncNotificationUseCaseTest {
     @Test
     fun `test that use case returns null when battery is low and notification was shown`() =
         runTest {
-            val isSyncNotificationCurrentlyDisplayed = false
             val isBatteryLow = true
             val isUserOnWifi = true
             val isSyncOnlyByWifi = true
@@ -103,7 +78,6 @@ internal class GetSyncNotificationUseCaseTest {
             )
 
             val result = underTest(
-                isSyncNotificationCurrentlyDisplayed,
                 isBatteryLow,
                 isUserOnWifi,
                 isSyncOnlyByWifi,
@@ -117,7 +91,6 @@ internal class GetSyncNotificationUseCaseTest {
     @Test
     fun `test that use case returns sync notification when user is not on wifi and notification was not shown`() =
         runTest {
-            val isSyncNotificationCurrentlyDisplayed = false
             val isBatteryLow = false
             val isUserOnWifi = false
             val isSyncOnlyByWifi = true
@@ -132,7 +105,6 @@ internal class GetSyncNotificationUseCaseTest {
             )
 
             val result = underTest(
-                isSyncNotificationCurrentlyDisplayed,
                 isBatteryLow,
                 isUserOnWifi,
                 isSyncOnlyByWifi,
@@ -149,7 +121,6 @@ internal class GetSyncNotificationUseCaseTest {
     @Test
     fun `test that use case returns null when user is not on wifi and notification was not shown`() =
         runTest {
-            val isSyncNotificationCurrentlyDisplayed = false
             val isBatteryLow = false
             val isUserOnWifi = false
             val isSyncOnlyByWifi = true
@@ -160,7 +131,6 @@ internal class GetSyncNotificationUseCaseTest {
             )
 
             val result = underTest(
-                isSyncNotificationCurrentlyDisplayed,
                 isBatteryLow,
                 isUserOnWifi,
                 isSyncOnlyByWifi,
@@ -177,7 +147,6 @@ internal class GetSyncNotificationUseCaseTest {
     @Test
     fun `test that use case returns sync notification when sync errors are present and notification was not shown`() =
         runTest {
-            val isSyncNotificationCurrentlyDisplayed = false
             val isBatteryLow = false
             val isUserOnWifi = true
             val isSyncOnlyByWifi = true
@@ -192,7 +161,6 @@ internal class GetSyncNotificationUseCaseTest {
             )
 
             val result = underTest(
-                isSyncNotificationCurrentlyDisplayed,
                 isBatteryLow,
                 isUserOnWifi,
                 isSyncOnlyByWifi,
@@ -212,7 +180,6 @@ internal class GetSyncNotificationUseCaseTest {
     @Test
     fun `test that use case returns null when sync errors are present and notification was shown`() =
         runTest {
-            val isSyncNotificationCurrentlyDisplayed = false
             val isBatteryLow = false
             val isUserOnWifi = true
             val isSyncOnlyByWifi = true
@@ -243,7 +210,6 @@ internal class GetSyncNotificationUseCaseTest {
             )
 
             val result = underTest(
-                isSyncNotificationCurrentlyDisplayed,
                 isBatteryLow,
                 isUserOnWifi,
                 isSyncOnlyByWifi,
@@ -263,7 +229,6 @@ internal class GetSyncNotificationUseCaseTest {
     @Test
     fun `test that use case returns sync notification when sync stalled issues are present and notification was not shown`() =
         runTest {
-            val isSyncNotificationCurrentlyDisplayed = false
             val isBatteryLow = false
             val isUserOnWifi = true
             val isSyncOnlyByWifi = true
@@ -280,7 +245,6 @@ internal class GetSyncNotificationUseCaseTest {
             )
 
             val result = underTest(
-                isSyncNotificationCurrentlyDisplayed,
                 isBatteryLow,
                 isUserOnWifi,
                 isSyncOnlyByWifi,
@@ -303,7 +267,6 @@ internal class GetSyncNotificationUseCaseTest {
     @Test
     fun `test that use case returns null when sync stalled issues are present and notification was shown`() =
         runTest {
-            val isSyncNotificationCurrentlyDisplayed = false
             val isBatteryLow = false
             val isUserOnWifi = true
             val isSyncOnlyByWifi = true
@@ -326,7 +289,6 @@ internal class GetSyncNotificationUseCaseTest {
             )
 
             val result = underTest(
-                isSyncNotificationCurrentlyDisplayed,
                 isBatteryLow,
                 isUserOnWifi,
                 isSyncOnlyByWifi,
@@ -348,7 +310,6 @@ internal class GetSyncNotificationUseCaseTest {
 
     @Test
     fun `test that use case returns null when no sync issues are present`() = runTest {
-        val isSyncNotificationCurrentlyDisplayed = false
         val isBatteryLow = false
         val isUserOnWifi = true
         val isSyncOnlyByWifi = true
@@ -356,7 +317,6 @@ internal class GetSyncNotificationUseCaseTest {
         val stalledIssues = emptyList<StalledIssue>()
 
         val result = underTest(
-            isSyncNotificationCurrentlyDisplayed,
             isBatteryLow,
             isUserOnWifi,
             isSyncOnlyByWifi,

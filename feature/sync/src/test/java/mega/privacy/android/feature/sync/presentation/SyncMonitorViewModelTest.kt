@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.presentation
 
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -12,12 +13,23 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
+import mega.privacy.android.feature.sync.domain.entity.FolderPair
+import mega.privacy.android.feature.sync.domain.entity.NotificationDetails
+import mega.privacy.android.feature.sync.domain.entity.StalledIssue
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
+import mega.privacy.android.feature.sync.domain.usecase.notifcation.GetSyncNotificationUseCase
+import mega.privacy.android.feature.sync.domain.usecase.notifcation.SetSyncNotificationShownUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.RemoveFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.ui.SyncMonitorViewModel
 import mega.privacy.android.shared.sync.domain.IsSyncFeatureEnabledUseCase
@@ -48,6 +60,12 @@ class SyncMonitorViewModelTest {
     private val isSyncFeatureEnabledUseCase: IsSyncFeatureEnabledUseCase = mock {
         on { invoke() }.thenReturn(true)
     }
+    private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase = mock()
+    private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
+    private val setSyncNotificationShownUseCase: SetSyncNotificationShownUseCase = mock()
+    private val getSyncNotificationUseCase: GetSyncNotificationUseCase = mock()
+    private val isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase = mock()
+    private val removeSyncUseCase: RemoveFolderPairUseCase = mock()
 
     private lateinit var underTest: SyncMonitorViewModel
 
@@ -58,6 +76,8 @@ class SyncMonitorViewModelTest {
         whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf())
         whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf())
         whenever(monitorAccountDetailUseCase()).thenReturn(flowOf())
+        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf())
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf())
     }
 
     @AfterEach
@@ -70,6 +90,12 @@ class SyncMonitorViewModelTest {
             monitorBatteryInfoUseCase,
             monitorAccountDetailUseCase,
             pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
+            monitorSyncStalledIssuesUseCase,
+            monitorSyncsUseCase,
+            setSyncNotificationShownUseCase,
+            getSyncNotificationUseCase,
+            isOnWifiNetworkUseCase,
+            removeSyncUseCase
         )
     }
 
@@ -129,6 +155,72 @@ class SyncMonitorViewModelTest {
         )
     }
 
+    @Test
+    fun `test that monitor notifications updates sync state`() = runTest {
+        val batteryInfo = mock<BatteryInfo>()
+        val connectedToInternet = true
+        val syncByWifi = true
+        val isOnWifi = false
+        val isBatteryLow = true
+        val syncs = emptyList<FolderPair>()
+        val stalledIssues = emptyList<StalledIssue>()
+        val notificationMessage = SyncNotificationMessage(
+            title = "Notification title",
+            text = "Notification text",
+            syncNotificationType = SyncNotificationType.BATTERY_LOW,
+            notificationDetails = NotificationDetails(path = "", errorCode = 0)
+        )
+        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(
+            flowOf(stalledIssues)
+        )
+        whenever(monitorSyncsUseCase()).thenReturn(
+            flowOf(syncs)
+        )
+        whenever(monitorConnectivityUseCase()).thenReturn(
+            flowOf(connectedToInternet)
+        )
+        whenever(monitorSyncByWiFiUseCase()).thenReturn(
+            flowOf(syncByWifi)
+        )
+        whenever(monitorBatteryInfoUseCase()).thenReturn(
+            flowOf(batteryInfo)
+        )
+        whenever(isOnWifiNetworkUseCase()).thenReturn(
+            isOnWifi
+        )
+        whenever(
+            getSyncNotificationUseCase(
+                isBatteryLow = isBatteryLow,
+                isUserOnWifi = isOnWifi,
+                isSyncOnlyByWifi = syncByWifi,
+                syncs = syncs,
+                stalledIssues = stalledIssues
+            )
+        ).thenReturn(
+            notificationMessage
+        )
+
+        initViewModel()
+        underTest.startMonitoring()
+
+        assertThat(underTest.state.value.displayNotification).isEqualTo(notificationMessage)
+    }
+
+    @Test
+    fun `test that onNotificationShown removes notification`() = runTest {
+        val notificationMessage = SyncNotificationMessage(
+            title = "Notification title",
+            text = "Notification text",
+            syncNotificationType = SyncNotificationType.BATTERY_LOW,
+            notificationDetails = NotificationDetails(path = "", errorCode = 0)
+        )
+
+        initViewModel()
+        underTest.onNotificationShown(notificationMessage)
+
+        assertThat(underTest.state.value.displayNotification).isNull()
+    }
+
     private fun initViewModel() {
         underTest = SyncMonitorViewModel(
             monitorTransferEventsUseCase,
@@ -138,9 +230,13 @@ class SyncMonitorViewModelTest {
             monitorBatteryInfoUseCase,
             monitorAccountDetailUseCase,
             pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
+            monitorSyncStalledIssuesUseCase,
+            monitorSyncsUseCase,
+            setSyncNotificationShownUseCase,
+            getSyncNotificationUseCase,
+            isOnWifiNetworkUseCase,
             isSyncFeatureEnabledUseCase,
-            mock(),
-            mock()
+            removeSyncUseCase
         )
     }
 }

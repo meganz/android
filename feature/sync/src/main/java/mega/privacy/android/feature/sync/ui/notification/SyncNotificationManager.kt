@@ -34,6 +34,18 @@ class SyncNotificationManager @Inject constructor(
         notificationManagerCompat.cancel(notificationId)
     }
 
+    /**
+     * Check if the sync notification is currently displayed
+     */
+    fun isSyncNotificationDisplayed(): Boolean {
+        notificationManagerCompat.activeNotifications.forEach { notification ->
+            if (notification.notification.channelId == CHANNEL_ID) {
+                return true
+            }
+        }
+        return false
+    }
+
     companion object {
         /**
          * Notification channel ID
