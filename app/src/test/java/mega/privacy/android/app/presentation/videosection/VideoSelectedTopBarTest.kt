@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.videosection
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -52,6 +53,14 @@ class VideoSelectedTopBarTest {
         setComposeContent(isEmpty = true)
 
         composeTestRule.onNodeWithTag(EMPTY_TOP_BAR_TEST_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that ui is displayed correctly when isEmpty is true and searchState is EXPANDED`() {
+        setComposeContent(isEmpty = true, searchState = SearchWidgetState.EXPANDED)
+
+        composeTestRule.onNodeWithTag(SEARCH_TOP_BAR_TEST_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(EMPTY_TOP_BAR_TEST_TAG).assertIsNotDisplayed()
     }
 
     @Test

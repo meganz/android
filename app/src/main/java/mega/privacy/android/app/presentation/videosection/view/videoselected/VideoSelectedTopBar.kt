@@ -34,7 +34,7 @@ internal fun VideoSelectedTopBar(
     onBackPressed: () -> Unit,
 ) {
     when {
-        isEmpty -> MegaAppBar(
+        isEmpty && searchState == SearchWidgetState.COLLAPSED -> MegaAppBar(
             modifier = Modifier.testTag(EMPTY_TOP_BAR_TEST_TAG),
             appBarType = AppBarType.BACK_NAVIGATION,
             title = title,
