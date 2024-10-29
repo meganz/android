@@ -9,8 +9,11 @@ import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
  * @property transfersInfo
  * @property hideTransfersWidget true if transfers widget should be forced to be hidden regardless of whether
  * there are current transfers or not, in transfers screen for instance
+ * @property lastTransfersCancelled flag to indicate that last finished transfers has been cancelled,
+ * so transfer status should be [TransfersStatus.Cancelled] until new transfer events are received
  */
 data class TransferManagementUiState(
     val transfersInfo: TransfersInfo = TransfersInfo(),
     val hideTransfersWidget: Boolean = false,
+    val lastTransfersCancelled: Boolean = false,
 )

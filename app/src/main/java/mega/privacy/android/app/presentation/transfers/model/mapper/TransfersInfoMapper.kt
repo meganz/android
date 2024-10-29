@@ -10,6 +10,8 @@ import javax.inject.Inject
 class TransfersInfoMapper @Inject constructor() {
     /**
      * Maps transfers data to [TransfersInfo] to be used in the presentation layer
+     *
+     * @param lastTransfersCancelled true if all the pending transfers have been cancelled, that is: last time the pending transfers turned 0 was because they were cancelled
      */
     operator fun invoke(
         numPendingUploads: Int,
@@ -20,9 +22,10 @@ class TransfersInfoMapper @Inject constructor() {
         isTransferError: Boolean,
         isTransferOverQuota: Boolean,
         isStorageOverQuota: Boolean,
+        lastTransfersCancelled: Boolean,
     ): TransfersInfo {
         if (numPendingUploads + numPendingDownloadsNonBackground <= 0) {
-            return TransfersInfo(TransfersStatus.Completed)
+            return TransfersInfo(if (lastTransfersCancelled) TransfersStatus.Cancelled else TransfersStatus.Completed)
         }
         val pendingDownloads = numPendingDownloadsNonBackground > 0
         val pendingUploads = numPendingUploads > 0
@@ -41,7 +44,7 @@ class TransfersInfoMapper @Inject constructor() {
             totalSizeAlreadyTransferred = totalSizeTransferred,
             totalSizeToTransfer = totalSizeToTransfer,
             uploading = uploading,
-            status = status
+            status = status,
         )
     }
 }

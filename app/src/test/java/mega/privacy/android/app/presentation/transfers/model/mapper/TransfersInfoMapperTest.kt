@@ -23,6 +23,7 @@ class TransfersInfoMapperTest {
                 isTransferError = false,
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
+                lastTransfersCancelled = false,
             )
             assertThat(result.completedProgress).isEqualTo(0.5f)
         }
@@ -38,6 +39,7 @@ class TransfersInfoMapperTest {
                 isTransferError = false,
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
+                lastTransfersCancelled = false,
             )
             assertThat(result.completedProgress).isEqualTo(0)
         }
@@ -49,7 +51,7 @@ class TransfersInfoMapperTest {
     inner class CorrectStatus {
 
         @Test
-        fun `test that if there are no transfers then returns not transferring status`() {
+        fun `test that Completed status is set when there are no transfers and last transfers cancelled is false`() {
             val result = underTest(
                 numPendingUploads = 0,
                 numPendingDownloadsNonBackground = 0,
@@ -59,8 +61,41 @@ class TransfersInfoMapperTest {
                 isTransferError = false,
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
+                lastTransfersCancelled = false,
             )
             assertThat(result.status).isEqualTo(TransfersStatus.Completed)
+        }
+
+        @Test
+        fun `test that Cancelled status is set when there are no transfers and last transfers cancelled is true`() {
+            val result = underTest(
+                numPendingUploads = 0,
+                numPendingDownloadsNonBackground = 0,
+                totalSizeToTransfer = 10L,
+                totalSizeTransferred = 5L,
+                areTransfersPaused = false,
+                isTransferError = false,
+                isTransferOverQuota = false,
+                isStorageOverQuota = false,
+                lastTransfersCancelled = true,
+            )
+            assertThat(result.status).isEqualTo(TransfersStatus.Cancelled)
+        }
+
+        @Test
+        fun `test that Transferring status is set when last transfers cancelled is true but there are pending transfers`() {
+            val result = underTest(
+                numPendingUploads = 1,
+                numPendingDownloadsNonBackground = 0,
+                totalSizeToTransfer = 10L,
+                totalSizeTransferred = 5L,
+                areTransfersPaused = false,
+                isTransferError = false,
+                isTransferOverQuota = false,
+                isStorageOverQuota = false,
+                lastTransfersCancelled = true,
+            )
+            assertThat(result.status).isEqualTo(TransfersStatus.Transferring)
         }
 
         @Test
@@ -74,6 +109,7 @@ class TransfersInfoMapperTest {
                 isTransferError = true,
                 isTransferOverQuota = true,
                 isStorageOverQuota = true,
+                lastTransfersCancelled = false,
             )
             assertThat(result.status).isEqualTo(TransfersStatus.Paused)
         }
@@ -89,6 +125,7 @@ class TransfersInfoMapperTest {
                 isTransferError = true,
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
+                lastTransfersCancelled = false,
             )
             assertThat(result.status).isEqualTo(TransfersStatus.TransferError)
         }
@@ -104,6 +141,7 @@ class TransfersInfoMapperTest {
                 isTransferError = true,
                 isTransferOverQuota = false,
                 isStorageOverQuota = true,
+                lastTransfersCancelled = false,
             )
             assertThat(result.status).isEqualTo(TransfersStatus.OverQuota)
         }
@@ -119,6 +157,7 @@ class TransfersInfoMapperTest {
                 isTransferError = false,
                 isTransferOverQuota = false,
                 isStorageOverQuota = true,
+                lastTransfersCancelled = false,
             )
             assertThat(result.status).isEqualTo(TransfersStatus.Transferring)
         }
@@ -134,6 +173,7 @@ class TransfersInfoMapperTest {
                 isTransferError = false,
                 isTransferOverQuota = true,
                 isStorageOverQuota = false,
+                lastTransfersCancelled = false,
             )
             assertThat(result.status).isEqualTo(TransfersStatus.OverQuota)
         }
@@ -149,6 +189,7 @@ class TransfersInfoMapperTest {
                 isTransferError = false,
                 isTransferOverQuota = true,
                 isStorageOverQuota = false,
+                lastTransfersCancelled = false,
             )
             assertThat(result.status).isEqualTo(TransfersStatus.Transferring)
         }
@@ -169,6 +210,7 @@ class TransfersInfoMapperTest {
                 isTransferError = false,
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
+                lastTransfersCancelled = false,
             )
             assertThat(result.uploading).isTrue()
         }
@@ -184,6 +226,7 @@ class TransfersInfoMapperTest {
                 isTransferError = false,
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
+                lastTransfersCancelled = false,
             )
             assertThat(result.uploading).isFalse()
         }
@@ -199,6 +242,7 @@ class TransfersInfoMapperTest {
                 isTransferError = false,
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
+                lastTransfersCancelled = false,
             )
             assertThat(result.uploading).isFalse()
         }
@@ -214,6 +258,7 @@ class TransfersInfoMapperTest {
                 isTransferError = false,
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
+                lastTransfersCancelled = false,
             )
             assertThat(result.uploading).isTrue()
         }

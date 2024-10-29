@@ -13,6 +13,7 @@ import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInf
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorLastTransfersHaveBeenCancelledUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
 import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.eq
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -37,16 +39,19 @@ class TransfersManagementViewModelTest {
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val transfersInfoMapper = mock<TransfersInfoMapper>()
     private val transfersManagement = mock<TransfersManagement>()
-
-    private val monitorTransfersSizeFlow = MutableSharedFlow<TransfersStatusInfo>()
+    private val monitorLastTransfersHaveBeenCancelledUseCase =
+        mock<MonitorLastTransfersHaveBeenCancelledUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+
+    private val monitorTransfersStatusFlow = MutableSharedFlow<TransfersStatusInfo>()
     private val monitorConnectivityUseCaseFlow = MutableStateFlow(false)
+    private val monitorLastTransfersHaveBeenCancelledUseCaseFlow = MutableSharedFlow<Unit>()
 
     @BeforeAll
     fun setup() = runTest {
         //this mocks are only used in viewmodel init, so no need to reset
-        val monitorTransfersSize = mock<MonitorTransfersStatusUseCase>()
-        whenever(monitorTransfersSize()) doReturn monitorTransfersSizeFlow
+        val monitorTransfersStatusUseCase = mock<MonitorTransfersStatusUseCase>()
+        whenever(monitorTransfersStatusUseCase()) doReturn monitorTransfersStatusFlow
         commonStub()
 
         underTest = TransfersManagementViewModel(
@@ -56,7 +61,8 @@ class TransfersManagementViewModelTest {
             transfersManagement = transfersManagement,
             ioDispatcher = ioDispatcher,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            monitorTransfersSize = monitorTransfersSize,
+            monitorTransfersStatusUseCase = monitorTransfersStatusUseCase,
+            monitorLastTransfersHaveBeenCancelledUseCase = monitorLastTransfersHaveBeenCancelledUseCase,
             samplePeriod = 0L,
         )
     }
@@ -67,6 +73,7 @@ class TransfersManagementViewModelTest {
             transfersInfoMapper,
             transfersManagement,
             monitorConnectivityUseCase,
+            monitorLastTransfersHaveBeenCancelledUseCase,
         )
         commonStub()
     }
@@ -100,11 +107,12 @@ class TransfersManagementViewModelTest {
                     isTransferError = eq(false),
                     isTransferOverQuota = eq(false),
                     isStorageOverQuota = eq(false),
+                    lastTransfersCancelled = any(),
                 )
             ) doReturn expected
             underTest.state.test {
                 awaitItem() // Skip initial value
-                monitorTransfersSizeFlow.emit(transfersStatusInfo)
+                monitorTransfersStatusFlow.emit(transfersStatusInfo)
                 val actual = awaitItem().transfersInfo
                 assertThat(actual).isEqualTo(expected)
             }
@@ -126,9 +134,31 @@ class TransfersManagementViewModelTest {
             verify(transfersManagement).startNetworkTimer()
         }
 
-    private suspend fun commonStub() {
+    @Test
+    fun `test that lastTransfersCancelled ui state is updated to true when monitorLastTransfersHaveBeenCancelledUseCase emits`() =
+        runTest {
+            assertThat(underTest.state.value.lastTransfersCancelled).isFalse()
+            monitorLastTransfersHaveBeenCancelledUseCaseFlow.emit(Unit)
+            assertThat(underTest.state.value.lastTransfersCancelled).isTrue()
+        }
+
+    private fun commonStub() {
         whenever(transfersManagement.getAreFailedTransfers()) doReturn false
         whenever(transfersManagement.shouldShowNetworkWarning) doReturn false
         whenever(monitorConnectivityUseCase()) doReturn monitorConnectivityUseCaseFlow
+        whenever(monitorLastTransfersHaveBeenCancelledUseCase()) doReturn monitorLastTransfersHaveBeenCancelledUseCaseFlow
+        whenever(
+            transfersInfoMapper(
+                numPendingUploads = any(),
+                numPendingDownloadsNonBackground = any(),
+                totalSizeToTransfer = any(),
+                totalSizeTransferred = any(),
+                areTransfersPaused = any(),
+                isTransferError = any(),
+                isTransferOverQuota = any(),
+                isStorageOverQuota = any(),
+                lastTransfersCancelled = any(),
+            )
+        ) doReturn TransfersInfo()
     }
 }

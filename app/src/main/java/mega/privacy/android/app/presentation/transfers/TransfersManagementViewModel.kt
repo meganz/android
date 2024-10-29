@@ -9,6 +9,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -20,8 +21,11 @@ import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.GetNumPendingTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorLastTransfersHaveBeenCancelledUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.IsCompletedTransfersEmptyUseCase
+import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -41,7 +45,8 @@ class TransfersManagementViewModel @Inject constructor(
     private val transfersManagement: TransfersManagement,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    monitorTransfersSize: MonitorTransfersStatusUseCase,
+    monitorTransfersStatusUseCase: MonitorTransfersStatusUseCase,
+    monitorLastTransfersHaveBeenCancelledUseCase: MonitorLastTransfersHaveBeenCancelledUseCase,
     private val samplePeriod: Long?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransferManagementUiState())
@@ -59,16 +64,25 @@ class TransfersManagementViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(ioDispatcher) {
-            val flow = monitorTransfersSize()
-
             val samplePeriodFinal = samplePeriod ?: DEFAULT_SAMPLE_PERIOD
             if (samplePeriodFinal > 0) {
-                flow.sample(samplePeriodFinal)
+                monitorTransfersStatusUseCase().sample(samplePeriodFinal)
             } else {
-                flow
-            }.collect { transfersInfo ->
-                updateUiState(transfersInfo)
+                monitorTransfersStatusUseCase()
             }
+                .catch { Timber.e(it) }
+                .collect { transfersInfo ->
+                    updateUiState(transfersInfo)
+                }
+        }
+        viewModelScope.launch(ioDispatcher) {
+            monitorLastTransfersHaveBeenCancelledUseCase()
+                .catch { Timber.e(it) }
+                .collect {
+                    _state.update {
+                        it.copy(lastTransfersCancelled = true)
+                    }
+                }
         }
         viewModelScope.launch(ioDispatcher) {
             online.collect { online ->
@@ -92,18 +106,23 @@ class TransfersManagementViewModel @Inject constructor(
     private fun updateUiState(
         transfersStatusInfo: TransfersStatusInfo,
     ) {
+        val newTransferInfo = transfersInfoMapper(
+            numPendingDownloadsNonBackground = transfersStatusInfo.pendingDownloads,
+            numPendingUploads = transfersStatusInfo.pendingUploads,
+            isTransferError = transfersManagement.shouldShowNetworkWarning || transfersManagement.getAreFailedTransfers(),
+            isTransferOverQuota = transfersStatusInfo.transferOverQuota,
+            isStorageOverQuota = transfersStatusInfo.storageOverQuota,
+            areTransfersPaused = transfersStatusInfo.paused,
+            totalSizeTransferred = transfersStatusInfo.totalSizeTransferred,
+            totalSizeToTransfer = transfersStatusInfo.totalSizeToTransfer,
+            lastTransfersCancelled = _state.value.lastTransfersCancelled,
+        )
+        val newLastTransfersCancelled = _state.value.lastTransfersCancelled
+                && newTransferInfo.status == TransfersStatus.Cancelled // new events can indicate not cancelled anymore (new transfers for instance)
         _state.update {
             it.copy(
-                transfersInfo = transfersInfoMapper(
-                    numPendingDownloadsNonBackground = transfersStatusInfo.pendingDownloads,
-                    numPendingUploads = transfersStatusInfo.pendingUploads,
-                    isTransferError = transfersManagement.shouldShowNetworkWarning || transfersManagement.getAreFailedTransfers(),
-                    isTransferOverQuota = transfersStatusInfo.transferOverQuota,
-                    isStorageOverQuota = transfersStatusInfo.storageOverQuota,
-                    areTransfersPaused = transfersStatusInfo.paused,
-                    totalSizeTransferred = transfersStatusInfo.totalSizeTransferred,
-                    totalSizeToTransfer = transfersStatusInfo.totalSizeToTransfer,
-                )
+                transfersInfo = newTransferInfo,
+                lastTransfersCancelled = newLastTransfersCancelled,
             )
         }
     }
