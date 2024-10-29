@@ -437,7 +437,8 @@ class OutgoingSharesComposeFragment : Fragment() {
         (requireActivity() as ManagerActivity).showNodeOptionsPanel(
             nodeId = nodeUIItem.id,
             mode = NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE,
-            shareData = shareData
+            shareData = shareData,
+            hideHiddenActions = true,
         )
     }
 

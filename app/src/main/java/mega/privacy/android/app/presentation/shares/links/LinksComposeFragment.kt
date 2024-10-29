@@ -315,7 +315,8 @@ class LinksComposeFragment : Fragment() {
     private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem<PublicLinkNode>) {
         (requireActivity() as ManagerActivity).showNodeOptionsPanel(
             nodeId = nodeUIItem.id,
-            mode = NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE
+            mode = NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE,
+            hideHiddenActions = true,
         )
     }
 

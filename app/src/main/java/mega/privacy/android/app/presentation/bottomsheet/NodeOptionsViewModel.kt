@@ -284,5 +284,10 @@ class NodeOptionsViewModel @Inject constructor(
          * Key that holds specific information about a Device Center Node
          */
         const val NODE_DEVICE_CENTER_INFORMATION_KEY = "NODE_DEVICE_CENTER_INFORMATION_KEY"
+
+        /**
+         * Key that holds the value of the Hide Hidden Actions
+         */
+        const val HIDE_HIDDEN_ACTIONS_KEY = "HIDE_HIDDEN_ACTIONS_KEY"
     }
 }

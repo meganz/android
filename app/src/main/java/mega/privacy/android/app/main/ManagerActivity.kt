@@ -3762,7 +3762,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
 
                 R.id.offlineFragmentCompose,
-                -> {
+                    -> {
                     homepageScreen = HomepageScreen.FULLSCREEN_OFFLINE
                     hideAdsView()
                 }
@@ -4860,7 +4860,8 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     getCurrentParentNode(
                         currentParentHandle,
                         Constants.INVALID_VALUE
-                    )
+                    ),
+                    hideHiddenActions = drawerItem == DrawerItem.SHARED_ITEMS
                 )
                 true
             }
@@ -5802,6 +5803,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * @param nodeDeviceCenterInformation An optional [NodeDeviceCenterInformation] which contains
      * specific information of a Device Center Node to be displayed. This is provided when the
      * Bottom Dialog is instantiated from Device Center
+     * @param hideHiddenActions if it is true, then don't show hide/unhide, otherwise show it by logic
      */
     @JvmOverloads
     fun showNodeOptionsPanel(
@@ -5809,6 +5811,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         mode: Int = NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE,
         shareData: ShareData? = null,
         nodeDeviceCenterInformation: NodeDeviceCenterInformation? = null,
+        hideHiddenActions: Boolean = false,
     ) {
         Timber.d("showNodeOptionsPanel")
         if (node == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
@@ -5817,6 +5820,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             shareData = shareData,
             mode = mode,
             nodeDeviceCenterInformation = nodeDeviceCenterInformation,
+            hideHiddenActions = hideHiddenActions,
         )
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }
@@ -5831,12 +5835,14 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * @param nodeDeviceCenterInformation An optional [NodeDeviceCenterInformation] which contains
      * specific information of a Device Center Node to be displayed. This is provided when the
      * Bottom Dialog is instantiated from Device Center
+     * @param hideHiddenActions if it is true, then don't show hide/unhide, otherwise show it by logic
      */
     fun showNodeOptionsPanel(
         nodeId: NodeId?,
         mode: Int = NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE,
         shareData: ShareData? = null,
         nodeDeviceCenterInformation: NodeDeviceCenterInformation? = null,
+        hideHiddenActions: Boolean = false,
     ) {
         Timber.d("showNodeOptionsPanel")
         if (nodeId == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
@@ -5845,6 +5851,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             shareData = shareData,
             mode = mode,
             nodeDeviceCenterInformation = nodeDeviceCenterInformation,
+            hideHiddenActions = hideHiddenActions,
         )
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }

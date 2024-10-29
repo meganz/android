@@ -10,6 +10,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
@@ -169,11 +170,12 @@ class FileBrowserViewModel @Inject constructor(
                     isFullStorageOverQuotaBannerEnabled,
                     isAlmostFullStorageQuotaBannerEnabled
                 )
-            }.collectLatest { storageCapacity ->
-                _state.update {
-                    it.copy(storageCapacity = storageCapacity)
+            }.catch { Timber.e(it) }
+                .collectLatest { storageCapacity ->
+                    _state.update {
+                        it.copy(storageCapacity = storageCapacity)
+                    }
                 }
-            }
         }
     }
 

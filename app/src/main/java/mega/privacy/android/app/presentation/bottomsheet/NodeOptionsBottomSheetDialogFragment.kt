@@ -49,6 +49,7 @@ import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialog
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.showCannotOpenFileDialog
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.HIDE_HIDDEN_ACTIONS_KEY
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.MODE_KEY
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.NODE_DEVICE_CENTER_INFORMATION_KEY
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.NODE_ID_KEY
@@ -126,6 +127,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             ActivityResultContracts.StartActivityForResult(),
             ::handleHiddenNodesOnboardingResult,
         )
+
+    private val hideHiddenActions: Boolean by lazy {
+        arguments?.getBoolean(HIDE_HIDDEN_ACTIONS_KEY) ?: false
+    }
 
     /**
      * onCreateView
@@ -424,7 +429,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionLabel.visibility = if (isTakenDown) View.GONE else View.VISIBLE
                 optionFavourite.visibility = if (isTakenDown) View.GONE else View.VISIBLE
                 optionHideLayout.visibility =
-                    if (isHiddenNodesEnabled && mode != SHARED_ITEMS_MODE
+                    if (isHiddenNodesEnabled
+                        && !hideHiddenActions
+                        && mode != SHARED_ITEMS_MODE
                         && accountType != null
                         && isHiddenNodesOnboarded != null
                         && state.isHidingActionAllowed
@@ -1606,12 +1613,14 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
          * @param mode The Mode used to display what Node actions are available
          * @param nodeDeviceCenterInformation When instantiating the Bottom Dialog from Device
          * Center, this holds specific information of the Device Center Node to be displayed
+         * @param hideHiddenActions if it is true, then don't show hide/unhide, otherwise show it by logic
          */
         fun newInstance(
             nodeId: NodeId,
             shareData: ShareData? = null,
             mode: Int? = null,
             nodeDeviceCenterInformation: NodeDeviceCenterInformation? = null,
+            hideHiddenActions: Boolean = false,
         ): NodeOptionsBottomSheetDialogFragment {
             val fragment = NodeOptionsBottomSheetDialogFragment()
 
@@ -1631,6 +1640,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             nodeDeviceCenterInformation?.let {
                 args.putParcelable(NODE_DEVICE_CENTER_INFORMATION_KEY, it)
             }
+            args.putBoolean(HIDE_HIDDEN_ACTIONS_KEY, hideHiddenActions)
 
             fragment.arguments = args
 

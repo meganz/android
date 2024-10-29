@@ -164,11 +164,12 @@ class MediaDiscoveryViewModel @Inject constructor(
                     isFullStorageOverQuotaBannerEnabled,
                     isAlmostFullStorageQuotaBannerEnabled
                 )
-            }.collectLatest { storageCapacity ->
-                _state.update {
-                    it.copy(storageCapacity = storageCapacity)
+            }.catch { Timber.e(it) }
+                .collectLatest { storageCapacity ->
+                    _state.update {
+                        it.copy(storageCapacity = storageCapacity)
+                    }
                 }
-            }
         }
     }
 
