@@ -108,7 +108,6 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             )
         }
     }
-    private lateinit var editSchedMeetLauncher: ActivityResultLauncher<Intent>
 
     private var bottomSheetDialogFragment: BaseBottomSheetDialogFragment? = null
 
@@ -145,14 +144,6 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                         }
                 } else {
                     Timber.e("Error adding participants")
-                }
-            }
-
-        editSchedMeetLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == RESULT_OK) {
-                    viewModel.scheduledMeetingUpdated()
-                    scheduledMeetingManagementViewModel.checkWaitingRoomWarning()
                 }
             }
     }
@@ -546,12 +537,12 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      */
     private fun onEditTap() {
         Analytics.tracker.trackEvent(ScheduledMeetingEditMenuToolbarEvent)
-        editSchedMeetLauncher.launch(
-            Intent(
-                this@ScheduledMeetingInfoActivity,
-                CreateScheduledMeetingActivity::class.java
-            ).putExtra(CHAT_ID, chatRoomId)
-        )
+        val intent = Intent(this, CreateScheduledMeetingActivity::class.java).apply {
+            putExtra(CHAT_ID, chatRoomId)
+            addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
+        }
+        startActivity(intent)
+        finish()
     }
 
     /**
@@ -568,7 +559,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
 
             ScheduledMeetingInfoAction.ShareMeetingLink,
             ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts,
-            -> {
+                -> {
                 Analytics.tracker.trackEvent(ScheduledMeetingShareMeetingLinkButtonEvent)
                 showGetChatLinkPanel()
             }

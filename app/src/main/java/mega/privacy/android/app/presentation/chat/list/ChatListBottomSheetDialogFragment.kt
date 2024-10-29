@@ -77,7 +77,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
                 val isLinkCreated = result.data?.getBooleanExtra(
                     CreateScheduledMeetingActivity.MEETING_LINK_CREATED_TAG,
                     false
-                ) ?: false
+                ) == true
                 if (isLinkCreated) {
                     // show bottom sheet dialog
                     val chatId = result.data?.getLongExtra(
@@ -173,10 +173,15 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
                 }
 
                 item is MeetingChatRoomItem && item.isPending && item.isActive -> {
-                    Intent(context, ScheduledMeetingInfoActivity::class.java).apply {
-                        putExtra(Constants.CHAT_ID, chatId)
-                        putExtra(Constants.SCHEDULED_MEETING_ID, item.schedId)
-                    }
+                    editSchedMeetLauncher.launch(
+                        Intent(
+                            requireContext(),
+                            ScheduledMeetingInfoActivity::class.java
+                        ).apply {
+                            putExtra(Constants.CHAT_ID, chatId)
+                            putExtra(Constants.SCHEDULED_MEETING_ID, item.schedId)
+                        })
+                    null
                 }
 
                 else -> {
@@ -185,8 +190,10 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
                     }
                 }
             }
-        startActivity(intent)
-        dismissAllowingStateLoss()
+        intent?.let {
+            startActivity(intent)
+            dismissAllowingStateLoss()
+        }
     }
 
     private fun onClearChatClick() {

@@ -283,22 +283,6 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
     }
 
     /**
-     * Open chat room
-     *
-     * @param chatId Chat id.
-     */
-    private fun openScheduledMeetingInfo(chatId: Long) {
-        val intentOpenChat = Intent(this, ScheduledMeetingInfoActivity::class.java).apply {
-            putExtra(CHAT_ID, chatId)
-            putExtra(Constants.SCHEDULED_MEETING_ID, -1)
-            putExtra(Constants.SCHEDULED_MEETING_CREATED, true)
-            addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
-        }
-        startActivity(intentOpenChat)
-        finish()
-    }
-
-    /**
      * Open upgrade account screen
      */
     private fun openUpgradeAccount() {

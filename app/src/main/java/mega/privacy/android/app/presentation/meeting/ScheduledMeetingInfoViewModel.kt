@@ -1125,14 +1125,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         }
 
     /**
-     * Scheduled meeting updated
-     */
-    fun scheduledMeetingUpdated() {
-        triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_edit_scheduled_meeting_success_snackbar))
-        getChat()
-    }
-
-    /**
      * Open send to screen
      */
     fun openSendToChat(shouldOpen: Boolean) {
