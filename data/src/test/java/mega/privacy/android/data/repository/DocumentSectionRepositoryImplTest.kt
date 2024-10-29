@@ -67,6 +67,10 @@ class DocumentSectionRepositoryImplTest {
             on { isFile }.thenReturn(true)
             on { isFolder }.thenReturn(false)
         }
+        val backupNode = mock<MegaNode> {
+            on { isFile }.thenReturn(true)
+            on { isFolder }.thenReturn(false)
+        }
         val fileNode = mock<FileNode>()
         val filter = mock<MegaSearchFilter>()
         val token = mock<MegaCancelToken>()
@@ -85,12 +89,14 @@ class DocumentSectionRepositoryImplTest {
                 sortOrderIntMapper(SortOrder.ORDER_MODIFICATION_DESC),
                 token
             )
-        ).thenReturn(listOf(node, node))
+        ).thenReturn(listOf(backupNode, node))
         whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(null)
         whenever(nodeMapper(megaNode = node, offline = null)).thenReturn(fileNode)
-
+        whenever(megaApiGateway.isInBackups(backupNode)).thenReturn(true)
+        whenever(megaApiGateway.isInBackups(node)).thenReturn(false)
         val actual = underTest.getAllDocuments(SortOrder.ORDER_MODIFICATION_DESC)
         assertThat(actual.isNotEmpty()).isTrue()
-        assertThat(actual.size).isEqualTo(2)
+        assertThat(actual.size).isEqualTo(1)
+        assertThat(actual[0]).isEqualTo(fileNode)
     }
 }

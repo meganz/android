@@ -81,6 +81,11 @@ class AudioSectionRepositoryImplTest {
             on { isFolder }.thenReturn(false)
             on { duration }.thenReturn(100)
         }
+        val backupNode = mock<MegaNode> {
+            on { isFile }.thenReturn(true)
+            on { isFolder }.thenReturn(false)
+            on { duration }.thenReturn(100)
+        }
         val fileNode = mock<FileNode>()
         val filter = mock<MegaSearchFilter>()
         val token = mock<MegaCancelToken>()
@@ -102,7 +107,7 @@ class AudioSectionRepositoryImplTest {
                 sortOrderIntMapper(SortOrder.ORDER_MODIFICATION_DESC),
                 token
             )
-        ).thenReturn(listOf(node, node))
+        ).thenReturn(listOf(backupNode, node))
         whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(null)
         whenever(
             fileNodeMapper(
@@ -112,8 +117,10 @@ class AudioSectionRepositoryImplTest {
             )
         ).thenReturn(fileNode)
         whenever(typedAudioNodeMapper(fileNode, node.duration)).thenReturn(typedVideoNode)
-
+        whenever(megaApiGateway.isInBackups(backupNode)).thenReturn(true)
+        whenever(megaApiGateway.isInBackups(node)).thenReturn(false)
         val actual = underTest.getAllAudios(SortOrder.ORDER_MODIFICATION_DESC)
-        assertThat(actual.size).isEqualTo(2)
+        assertThat(actual.size).isEqualTo(1)
+        assertThat(actual[0]).isEqualTo(typedVideoNode)
     }
 }

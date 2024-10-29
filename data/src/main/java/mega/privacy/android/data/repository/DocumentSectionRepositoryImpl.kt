@@ -41,7 +41,7 @@ internal class DocumentSectionRepositoryImpl @Inject constructor(
                 filter,
                 sortOrderIntMapper(order),
                 megaCancelToken,
-            ).map { megaNode ->
+            ).filter { !megaApiGateway.isInBackups(it) }.map { megaNode ->
                 convertToUnTypedNode(
                     node = megaNode,
                     offline = offlineItems?.get(megaNode.handle.toString())

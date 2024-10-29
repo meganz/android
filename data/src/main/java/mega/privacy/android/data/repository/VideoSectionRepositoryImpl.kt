@@ -95,7 +95,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
             filter,
             sortOrderIntMapper(order),
             megaCancelToken,
-        )
+        ).filter { !megaApiGateway.isInBackups(it) }
     }
 
     private suspend fun getAllOfflineNodeHandle() =

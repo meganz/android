@@ -129,6 +129,11 @@ class VideoSectionRepositoryImplTest {
             on { isFolder }.thenReturn(false)
             on { duration }.thenReturn(100)
         }
+        val backupNode = mock<MegaNode> {
+            on { isFile }.thenReturn(true)
+            on { isFolder }.thenReturn(false)
+            on { duration }.thenReturn(100)
+        }
         val fileNode = mock<FileNode>()
         val filter = mock<MegaSearchFilter>()
         val token = mock<MegaCancelToken>()
@@ -150,7 +155,7 @@ class VideoSectionRepositoryImplTest {
                 sortOrderIntMapper(SortOrder.ORDER_MODIFICATION_DESC),
                 token
             )
-        ).thenReturn(listOf(node, node))
+        ).thenReturn(listOf(node, backupNode))
         whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(null)
         whenever(
             fileNodeMapper(
@@ -159,11 +164,14 @@ class VideoSectionRepositoryImplTest {
                 offline = null
             )
         ).thenReturn(fileNode)
+        whenever(megaApiGateway.isInBackups(backupNode)).thenReturn(true)
+        whenever(megaApiGateway.isInBackups(node)).thenReturn(false)
         whenever(typedVideoNodeMapper(fileNode, node.duration, null)).thenReturn(typedVideoNode)
         initUnderTest()
         val actual = underTest.getAllVideos(SortOrder.ORDER_MODIFICATION_DESC)
         assertThat(actual).isNotEmpty()
-        assertThat(actual.size).isEqualTo(2)
+        assertThat(actual.size).isEqualTo(1)
+        assertThat(actual[0]).isEqualTo(typedVideoNode)
     }
 
     @Test
@@ -713,6 +721,7 @@ class VideoSectionRepositoryImplTest {
             val filter = mock<MegaSearchFilter>()
             val token = mock<MegaCancelToken>()
             whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(megaApiGateway.isInBackups(any())).thenReturn(false)
             whenever(sortOrderIntMapper(SortOrder.ORDER_NONE)).thenReturn(ORDER_DEFAULT_DESC)
             whenever(
                 megaSearchFilterMapper(

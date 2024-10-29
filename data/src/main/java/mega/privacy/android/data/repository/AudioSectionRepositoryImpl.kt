@@ -43,7 +43,7 @@ internal class AudioSectionRepositoryImpl @Inject constructor(
                 filter,
                 sortOrderIntMapper(order),
                 megaCancelToken,
-            ).map { megaNode ->
+            ).filter { !megaApiGateway.isInBackups(it) }.map { megaNode ->
                 typedAudioNodeMapper(
                     fileNode = megaNode.convertToFileNode(
                         offlineItems?.get(megaNode.handle.toString())
