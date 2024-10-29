@@ -37,18 +37,36 @@ class SearchUseCase @Inject constructor(
         nodeSourceType: NodeSourceType,
         searchParameters: SearchParameters,
     ): List<TypedNode> {
-        val (query, searchTarget, searchCategory, modificationDate, creationDate) = searchParameters
+        val (query, searchTarget, searchCategory, modificationDate, creationDate, description, tag) = searchParameters
         val invalidNodeHandle = searchRepository.getInvalidHandle()
         val searchList = when {
+            // Incoming Shares Root (No Search applied)
             query.isEmpty() && parentHandle == invalidNodeHandle && searchTarget == SearchTarget.INCOMING_SHARE -> searchRepository.getInShares()
-            query.isEmpty() && parentHandle == invalidNodeHandle && searchTarget == SearchTarget.OUTGOING_SHARE -> searchRepository.getOutShares()
-            query.isEmpty() && parentHandle == invalidNodeHandle && searchTarget == SearchTarget.LINKS_SHARE -> searchRepository.getPublicLinks()
+
+            // Outgoing Shares Root (No Search applied)
+            query.isEmpty() && description.isNullOrEmpty() && tag.isNullOrEmpty() && parentHandle == invalidNodeHandle && searchTarget == SearchTarget.OUTGOING_SHARE -> searchRepository.getOutShares()
+
+            // Links Shares Root (No Search applied)
+            query.isEmpty() && description.isNullOrEmpty() && tag.isNullOrEmpty() && parentHandle == invalidNodeHandle && searchTarget == SearchTarget.LINKS_SHARE -> searchRepository.getPublicLinks()
+
+            // Outgoing and Links Shares Root (Non Query Search applied)
+            query.isEmpty() && (!description.isNullOrEmpty() || !tag.isNullOrEmpty())
+                    && parentHandle == invalidNodeHandle &&
+                    (searchTarget == SearchTarget.OUTGOING_SHARE || searchTarget == SearchTarget.LINKS_SHARE) ->
+                searchRepository.search(
+                    nodeId = getSearchParentNode(nodeSourceType, parentHandle, invalidNodeHandle),
+                    order = getCloudSortOrder(),
+                    parameters = searchParameters,
+                )
+
+            // General Children (Non Query Search applied)
             query.isEmpty() && searchCategory == SearchCategory.ALL && modificationDate == null && creationDate == null -> searchRepository.getChildren(
                 nodeId = getSearchParentNode(nodeSourceType, parentHandle, invalidNodeHandle),
                 order = getCloudSortOrder(),
                 parameters = searchParameters,
             )
 
+            // General Root (Query Search applied)
             else -> searchRepository.search(
                 nodeId = getSearchParentNode(nodeSourceType, parentHandle, invalidNodeHandle),
                 order = getCloudSortOrder(),

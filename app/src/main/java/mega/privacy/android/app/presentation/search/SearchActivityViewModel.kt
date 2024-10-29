@@ -193,7 +193,9 @@ class SearchActivityViewModel @Inject constructor(
                         description = if (state.value.searchDescriptionEnabled == true) getCurrentQueryWithSearchByTags() else null,
                         tag = if (state.value.searchTagsEnabled == true) getCurrentSearchQuery().removePrefix(
                             "#"
-                        ) else null,
+                        )
+                            .takeIf { nodeSourceType != NodeSourceType.RUBBISH_BIN && nodeSourceType != NodeSourceType.INCOMING_SHARES }
+                        else null
                     )
                 )
             }.onSuccess {
