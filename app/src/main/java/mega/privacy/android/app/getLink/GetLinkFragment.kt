@@ -299,6 +299,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
     override fun onResume() {
         super.onResume()
 
+        viewModel.updateSendDecryptedKeySeparatelyEnabled(binding.decryptedKeySwitch.isChecked)
         updateSendDecryptedKeySeparatelyLayouts()
     }
 
@@ -315,8 +316,8 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      *
      * @param text Text to show as link text.
      */
-    private fun updateLink(text: String) {
-        binding.linkText.text = text
+    private fun updateLink(text: String?) {
+        binding.linkText.text = text.orEmpty()
         val node = viewModel.getNode()
         val alpha = if (node?.isExported == true) ALPHA_VIEW_ENABLED else ALPHA_VIEW_DISABLED
         binding.decryptedKeyLayout.alpha = alpha

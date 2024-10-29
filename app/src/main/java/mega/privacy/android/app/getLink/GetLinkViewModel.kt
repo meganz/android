@@ -65,7 +65,7 @@ class GetLinkViewModel @Inject constructor(
     sendTextMessageUseCase: SendTextMessageUseCase,
 ) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
 
-    private val linkText: MutableLiveData<String> = MutableLiveData()
+    private val linkText: MutableLiveData<String?> = MutableLiveData()
     private val expiryDate: MutableLiveData<String> = MutableLiveData()
     private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
     private val _linkCopied: MutableStateFlow<Pair<String, String>?> = MutableStateFlow(null)
@@ -87,7 +87,7 @@ class GetLinkViewModel @Inject constructor(
     private var isSendDecryptedKeySeparatelyEnabled = false
     private var isInitialized = false
 
-    fun getLink(): LiveData<String> = linkText
+    fun getLink(): LiveData<String?> = linkText
 
     fun getPasswordText(): String? = state.value.password
 
