@@ -18,8 +18,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.ContactItemView
-import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.presentation.extensions.description
+import mega.privacy.android.app.presentation.preview.contactItemForPreviews
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType

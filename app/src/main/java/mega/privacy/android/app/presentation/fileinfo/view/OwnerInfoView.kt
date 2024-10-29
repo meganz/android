@@ -18,14 +18,14 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.ContactAvatarVerified
-import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.presentation.extensions.iconRes
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.app.presentation.preview.contactItemForPreviews
+import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.domain.entity.contacts.ContactItem
 
 /**
  * View to show Node's owner information

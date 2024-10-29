@@ -15,10 +15,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.presentation.contact.view.ContactItemView
-import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_CONTACT_ITEM_SHARED
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_CONTACT_ITEM_SHARED_DOTS
+import mega.privacy.android.app.presentation.preview.contactItemForPreviews
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews

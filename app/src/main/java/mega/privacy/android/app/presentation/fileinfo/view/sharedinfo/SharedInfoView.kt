@@ -25,19 +25,19 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState.Companion.MAX_NUMBER_OF_CONTACTS_IN_LIST
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHARES_HEADER
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHOW_MORE
 import mega.privacy.android.app.presentation.fileinfo.view.paddingStartDefault
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.app.presentation.preview.contactItemForPreviews
+import mega.privacy.android.domain.entity.contacts.ContactPermission
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.domain.entity.contacts.ContactPermission
-import mega.privacy.android.domain.entity.shares.AccessPermission
 
 /**
  * Expandable list of shared contacts

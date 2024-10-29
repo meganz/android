@@ -32,10 +32,10 @@ import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
+import mega.privacy.android.app.presentation.preview.contactItemForPreviews
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactPermission

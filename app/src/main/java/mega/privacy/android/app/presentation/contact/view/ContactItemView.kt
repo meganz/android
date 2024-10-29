@@ -32,12 +32,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.contact.model.ContactAvatar
+import mega.privacy.android.app.presentation.contact.model.ContactStatus
+import mega.privacy.android.app.presentation.contact.model.ContactUiItem
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
+import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.text
-import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.MarqueeText
@@ -58,9 +60,68 @@ import java.util.Locale
  * @param statusOverride to allow change the status text, if null connection status description will be shown
  * @param dividerType divider type to be shown at the bottom of the view, null for no divider
  */
+@Deprecated(
+    message = "Use the ContactItemView function with ContactUiItem parameter",
+    replaceWith = ReplaceWith(
+        expression = "ContactItemView(contactUiItem, onClick, modifier, statusOverride, selected, dividerType)",
+        imports = ["mega.privacy.android.app.presentation.contact.view.ContactItemView"]
+    )
+)
 @Composable
 internal fun ContactItemView(
     contactItem: ContactItem,
+    onClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+    statusOverride: String? = null,
+    selected: Boolean = false,
+    dividerType: DividerType? = DividerType.BigStartPadding,
+) {
+
+    val status =
+        ContactStatus(statusText = if (contactItem.lastSeen != null || contactItem.status != UserChatStatus.Invalid) {
+            val statusText = stringResource(id = contactItem.status.text)
+            if (contactItem.status == UserChatStatus.Online) {
+                statusText
+            } else {
+                getLastSeenString(contactItem.lastSeen) ?: statusText
+            }
+        } else null,
+            iconPainter = painterResource(contactItem.status.iconRes(MaterialTheme.colors.isLight))
+                .takeUnless { contactItem.status == UserChatStatus.Invalid }
+        )
+
+    val uiItem = ContactUiItem(nameOrEmail = with(contactItem) {
+        contactData.alias ?: contactData.fullName ?: email
+    }, contactStatus = status, avatar = contactItem.contactData.avatarUri?.let {
+        ContactAvatar.UriAvatar(
+            uri = it, areCredentialsVerified = contactItem.areCredentialsVerified
+        )
+    } ?: ContactAvatar.InitialsAvatar(
+        firstLetter = contactItem.getAvatarFirstLetter(),
+        defaultAvatarColor = Color(contactItem.defaultAvatarColor?.toColorInt() ?: -1),
+        areCredentialsVerified = contactItem.areCredentialsVerified,
+    ))
+    ContactItemView(
+        contactUiItem = uiItem,
+        onClick = onClick,
+        modifier = modifier,
+        statusOverride = statusOverride,
+        selected = selected,
+        dividerType = dividerType,
+    )
+}
+
+/**
+ * View to show a contactItem with their avatar and connection status
+ * @param contactUiItem that will be shown
+ * @param onClick is invoked when the view is clicked
+ * @param modifier
+ * @param statusOverride to allow change the status text, if null connection status description will be shown
+ * @param dividerType divider type to be shown at the bottom of the view, null for no divider
+ */
+@Composable
+internal fun ContactItemView(
+    contactUiItem: ContactUiItem,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     statusOverride: String? = null,
@@ -82,38 +143,26 @@ internal fun ContactItemView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ContactAvatarVerified(
-                contactItem,
+                contactUiItem.avatar,
                 selected = selected,
                 modifier = Modifier.testTag(CONTACT_ITEM_CONTACT_AVATAR_IMAGE),
             )
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    val contactName = with(contactItem) {
-                        contactData.alias ?: contactData.fullName ?: email
-                    }
-
                     Text(
-                        text = contactName,
+                        text = contactUiItem.nameOrEmail,
                         style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.textColorPrimary),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.testTag(CONTACT_ITEM_CONTACT_NAME_TEXT),
                     )
 
-                    if (contactItem.status != UserChatStatus.Invalid) {
-                        ContactStatusView(status = contactItem.status)
+                    contactUiItem.contactStatus.iconPainter?.let { iconPainter ->
+                        ContactStatusView(iconPainter = iconPainter)
                     }
                 }
 
-                val secondLineText = statusOverride
-                    ?: if (contactItem.lastSeen != null || contactItem.status != UserChatStatus.Invalid) {
-                        val statusText = stringResource(id = contactItem.status.text)
-                        if (contactItem.status == UserChatStatus.Online) {
-                            statusText
-                        } else {
-                            getLastSeenString(contactItem.lastSeen) ?: statusText
-                        }
-                    } else null
+                val secondLineText = statusOverride ?: contactUiItem.contactStatus.statusText
                 secondLineText?.let {
                     MarqueeText(
                         text = secondLineText,
@@ -187,26 +236,52 @@ private fun compareLastSeenWithToday(lastGreen: Calendar): Int {
 }
 
 @Composable
-private fun ContactAvatar(
-    contactItem: ContactItem,
+private fun ContactAvatarView(
+    contactAvatar: ContactAvatar,
     modifier: Modifier = Modifier,
 ) {
-    val avatarUri = contactItem.contactData.avatarUri
+    when (contactAvatar) {
+        is ContactAvatar.UriAvatar -> {
+            UriAvatarView(modifier = modifier, uri = contactAvatar.uri)
+        }
 
-    if (avatarUri != null) {
-        UriAvatarView(modifier = modifier, uri = avatarUri)
-    } else {
-        DefaultAvatarView(
-            modifier = modifier,
-            color = Color(contactItem.defaultAvatarColor?.toColorInt() ?: -1),
-            content = contactItem.getAvatarFirstLetter()
-        )
+        is ContactAvatar.InitialsAvatar -> {
+            DefaultAvatarView(
+                modifier = modifier,
+                color = contactAvatar.defaultAvatarColor,
+                content = contactAvatar.firstLetter,
+            )
+        }
     }
+}
+
+@Deprecated(
+    message = "Use the ContactAvatarVerified function with ContactAvatar parameter",
+    replaceWith = ReplaceWith(
+        expression = "ContactAvatarVerified(contactAvatar, modifier, selected)",
+        imports = ["mega.privacy.android.app.presentation.contact.view.ContactAvatarVerified"]
+    )
+)
+@Composable
+internal fun ContactAvatarVerified(
+    contactItem: ContactItem,
+    modifier: Modifier = Modifier,
+    selected: Boolean = false,
+) {
+    ContactAvatarVerified(
+        ContactAvatar.InitialsAvatar(
+            firstLetter = contactItem.getAvatarFirstLetter(),
+            defaultAvatarColor = Color(contactItem.defaultAvatarColor?.toColorInt() ?: -1),
+            areCredentialsVerified = contactItem.areCredentialsVerified,
+        ),
+        modifier = modifier,
+        selected = selected,
+    )
 }
 
 @Composable
 internal fun ContactAvatarVerified(
-    contactItem: ContactItem,
+    contactAvatar: ContactAvatar,
     modifier: Modifier = Modifier,
     selected: Boolean = false,
 ) {
@@ -216,7 +291,7 @@ internal fun ContactAvatarVerified(
         val avatarModifier = Modifier
             .padding(
                 horizontal = 16.dp,
-                vertical = if (contactItem.areCredentialsVerified) 16.dp else 8.dp
+                vertical = if (contactAvatar.areCredentialsVerified) 16.dp else 8.dp
             )
             .size(40.dp)
         AnimatedContent(
@@ -233,13 +308,13 @@ internal fun ContactAvatarVerified(
                     modifier = avatarModifier,
                 )
             } else {
-                ContactAvatar(
-                    contactItem = contactItem,
+                ContactAvatarView(
+                    contactAvatar = contactAvatar,
                     modifier = avatarModifier.clip(CircleShape),
                 )
             }
         }
-        if (contactItem.areCredentialsVerified) {
+        if (contactAvatar.areCredentialsVerified) {
             Image(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -255,8 +330,22 @@ internal fun ContactAvatarVerified(
 @Composable
 private fun PreviewContactItem() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+
+        val contactUiItem = ContactUiItem(
+            nameOrEmail = "Alias",
+            avatar = ContactAvatar.InitialsAvatar(
+                firstLetter = "A",
+                defaultAvatarColor = Color("blue".toColorInt()),
+                areCredentialsVerified = false
+            ),
+            contactStatus = ContactStatus(
+                iconPainter = painterResource(UserChatStatus.Online.iconRes(MaterialTheme.colors.isLight)),
+                statusText = "Online"
+            )
+        )
+
         ContactItemView(
-            contactItem = contactItemForPreviews,
+            contactUiItem = contactUiItem,
             onClick = {}
         )
     }
@@ -265,17 +354,3 @@ private fun PreviewContactItem() {
 internal const val CONTACT_ITEM_CONTACT_NAME_TEXT = "contact_item:contact_name_text"
 internal const val CONTACT_ITEM_STATUS_TEXT = "contact_item:status_text"
 internal const val CONTACT_ITEM_CONTACT_AVATAR_IMAGE = "contact_item:contact_avatar_image"
-
-internal val contactItemForPreviews get() = contactItemForPreviews(-1)
-internal fun contactItemForPreviews(id: Int) = ContactItem(
-    handle = id.toLong(),
-    email = "email$id@mega.nz",
-    contactData = ContactData("Full name $id", "Alias $id", null),
-    defaultAvatarColor = "blue",
-    visibility = UserVisibility.Visible,
-    timestamp = 2345262L,
-    areCredentialsVerified = false,
-    status = UserChatStatus.Online,
-    lastSeen = null,
-    chatroomId = null,
-)
