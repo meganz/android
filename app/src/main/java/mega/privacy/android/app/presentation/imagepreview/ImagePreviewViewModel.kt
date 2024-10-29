@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
@@ -133,13 +134,20 @@ class ImagePreviewViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+            if (isHiddenNodesActive()) {
                 handleInitFlow()
             } else {
                 monitorImageNodes()
             }
             monitorOfflineNodeUpdates()
         }
+    }
+
+    suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 
     private suspend fun handleInitFlow() {
@@ -277,10 +285,6 @@ class ImagePreviewViewModel @Inject constructor(
         } else {
             imageNodes.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
         }
-    }
-
-    suspend fun isHiddenNodesEnabled(): Boolean {
-        return getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
     }
 
     suspend fun isInfoMenuVisible(imageNode: ImageNode): Boolean {

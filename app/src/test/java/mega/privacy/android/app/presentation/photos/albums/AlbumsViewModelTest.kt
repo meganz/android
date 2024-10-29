@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
@@ -661,7 +662,7 @@ class AlbumsViewModelTest {
     @Test
     fun `test that showHiddenItems and accountDetail are fetched properly`() = runTest {
         // given
-        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.HiddenNodes) }.thenReturn(true)
+        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(true)
         initUnderTest()
         advanceUntilIdle()
 

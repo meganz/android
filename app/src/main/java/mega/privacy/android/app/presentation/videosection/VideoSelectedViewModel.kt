@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.videosection.model.VideoSelectedState
@@ -70,10 +71,17 @@ class VideoSelectedViewModel @Inject constructor(
         refreshNodes()
         checkViewType()
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+            if (isHiddenNodesActive()) {
                 handleHiddenNodesUIFlow()
             }
         }
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 
     private fun handleHiddenNodesUIFlow() {

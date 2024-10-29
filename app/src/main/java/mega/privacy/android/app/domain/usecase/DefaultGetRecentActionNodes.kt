@@ -6,6 +6,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -58,7 +59,7 @@ class DefaultGetRecentActionNodes @Inject constructor(
     private suspend fun createNodeItem(node: TypedFileNode): NodeItem? =
         runCatching {
             val megaNode = getNodeByHandle.invoke(node.id.longValue)
-            val hiddenNodeEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+            val hiddenNodeEnabled = isHiddenNodesActive()
             val shouldApplySensitiveMode = hiddenNodeEnabled && run {
                 val accountType =
                     monitorAccountDetailUseCase().firstOrNull()?.levelDetail?.accountType
@@ -79,4 +80,10 @@ class DefaultGetRecentActionNodes @Inject constructor(
             Timber.e(it)
         }.getOrNull()
 
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
+    }
 }

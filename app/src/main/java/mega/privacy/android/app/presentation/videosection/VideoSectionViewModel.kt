@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
@@ -158,7 +159,7 @@ class VideoSectionViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+            if (isHiddenNodesActive()) {
                 handleHiddenNodesUIFlow()
                 monitorIsHiddenNodesOnboarded()
             }
@@ -185,6 +186,13 @@ class VideoSectionViewModel @Inject constructor(
                 it.convertAndUpdateState()
             }
         }
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 
     private fun handleHiddenNodesUIFlow() {
@@ -1087,7 +1095,7 @@ class VideoSectionViewModel @Inject constructor(
 
         if (_tabState.value.selectedTab == VideoSectionTab.All) {
             val selectedNodes = getSelectedNodes()
-            val isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+            val isHiddenNodesEnabled = isHiddenNodesActive()
             val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
 
             if (isHiddenNodesEnabled) {
@@ -1129,7 +1137,7 @@ class VideoSectionViewModel @Inject constructor(
             val selectedVideos = selectedVideoElementIDs.mapNotNull { elementId ->
                 videos.find { video -> video.elementID == elementId }
             }
-            val isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+            val isHiddenNodesEnabled = isHiddenNodesActive()
             val includeSensitiveInheritedNode = selectedVideos.any { it.isSensitiveInherited }
 
             if (isHiddenNodesEnabled) {

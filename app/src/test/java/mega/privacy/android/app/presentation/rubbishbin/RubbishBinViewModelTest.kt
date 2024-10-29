@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
@@ -432,7 +433,7 @@ class RubbishBinViewModelTest {
     @Test
     fun `test that account type is updated when monitorAccountDetailUseCase emits`() = runTest {
         stubCommon()
-        whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)).thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
         initViewModel()
         val newAccountDetail = AccountDetail(
             levelDetail = AccountLevelDetail(

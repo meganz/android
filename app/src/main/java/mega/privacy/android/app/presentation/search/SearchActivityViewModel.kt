@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.updateItemAt
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.search.mapper.DateFilterOptionStringResMapper
@@ -117,11 +118,18 @@ class SearchActivityViewModel @Inject constructor(
         initializeSearch()
         checkViewType()
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+            if (isHiddenNodesActive()) {
                 monitorAccountDetail()
                 monitorShowHiddenItems()
             }
         }
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 
     private fun checkSearchFlags() {

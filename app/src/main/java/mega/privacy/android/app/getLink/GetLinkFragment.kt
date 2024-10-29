@@ -37,6 +37,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -119,7 +120,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
 
     private fun initialize() {
         viewLifecycleOwner.lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes) && !viewModel.isInitialized()) {
+            if (isHiddenNodesActive() && !viewModel.isInitialized()) {
                 checkSensitiveItems()
             } else {
                 initNode()
@@ -128,6 +129,13 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
                 setupObservers()
             }
         }
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 
     private fun initNode() {

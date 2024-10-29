@@ -35,6 +35,16 @@ enum class ApiFeatures(
         "Enable Google Ads",
         false
     ),
+
+    /**
+     * Enable hidden nodes for internal release
+     */
+    HiddenNodesInternalRelease(
+        experimentName = "hnir",
+        description = "Enable hidden nodes for internal release",
+        defaultValue = false,
+        checkRemote = true,
+    ),
     ;
 
     companion object : FeatureFlagValueProvider {

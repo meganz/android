@@ -15,6 +15,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.extensions.asHotFlow
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
@@ -705,7 +706,7 @@ class FileBrowserViewModelTest {
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
         whenever(shouldEnterMediaDiscoveryModeUseCase(any())).thenReturn(false)
         whenever(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)).thenReturn(true)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)).thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
         whenever(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)).thenReturn(
             true
         )

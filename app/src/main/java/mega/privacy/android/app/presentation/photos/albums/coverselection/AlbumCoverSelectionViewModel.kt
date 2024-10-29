@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
@@ -66,13 +67,20 @@ class AlbumCoverSelectionViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+            if (isHiddenNodesActive()) {
                 fetchShowHiddenItems()
                 fetchAccountDetail()
             }
 
             fetchAlbum()
         }
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 
     private fun fetchAlbum() = savedStateHandle.getStateFlow<Long?>(ALBUM_ID, null)

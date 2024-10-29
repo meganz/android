@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
@@ -49,8 +50,7 @@ internal class DocumentSectionActionModeCallback(
             CloudStorageOptionControlUtil.applyControl(menu, control)
 
             val selectedNodes = documentSectionViewModel.getSelectedNodes()
-            val isHiddenNodesEnabled =
-                managerActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+            val isHiddenNodesEnabled = isHiddenNodesActive()
             val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
 
             if (isHiddenNodesEnabled) {
@@ -163,5 +163,12 @@ internal class DocumentSectionActionModeCallback(
                 documentSectionViewModel.clearAllSelectedDocuments()
             }
         }
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            managerActivity.getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 }

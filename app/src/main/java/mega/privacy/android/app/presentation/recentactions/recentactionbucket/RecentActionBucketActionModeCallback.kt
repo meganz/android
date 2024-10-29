@@ -7,6 +7,7 @@ import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
@@ -71,8 +72,7 @@ class RecentActionBucketActionModeCallback constructor(
 
     private fun handleHiddenNodes(menu: Menu) {
         managerActivity.lifecycleScope.launch {
-            val isHiddenNodesEnabled =
-                managerActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+            val isHiddenNodesEnabled = isHiddenNodesActive()
             val selectedNodes = viewModel.getSelectedNodes()
             val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
 
@@ -180,5 +180,12 @@ class RecentActionBucketActionModeCallback constructor(
         Timber.d("ActionBarCallBack::onDestroyActionMode")
 
         viewModel.clearSelection()
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            managerActivity.getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 }

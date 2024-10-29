@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
@@ -58,8 +59,7 @@ class FavouriteActionModeCallback(
     private fun handleHiddenNodes(menu: Menu) {
         mainActivity.lifecycleScope.launch {
             runCatching {
-                val isHiddenNodesEnabled =
-                    mainActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+                val isHiddenNodesEnabled = isHiddenNodesActive()
                 val selectedNodes =
                     viewModel.getItemsSelected().mapNotNull { it.value.typedNode }
                 val isHidingActionAllowed = selectedNodes.all {
@@ -189,5 +189,12 @@ class FavouriteActionModeCallback(
     override fun onDestroyActionMode(mode: ActionMode?) {
         // When the action mode is finished, clear the selections
         viewModel.clearSelections()
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            mainActivity.getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 }

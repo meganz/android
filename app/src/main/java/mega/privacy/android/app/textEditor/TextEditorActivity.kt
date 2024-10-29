@@ -43,6 +43,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.Scrollable
@@ -186,7 +187,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
         lifecycleScope.launch {
             runCatching {
-                isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+                isHiddenNodesEnabled = isHiddenNodesActive()
                 invalidateOptionsMenu()
             }.onFailure { Timber.e(it) }
         }
@@ -222,6 +223,13 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 renameNode()
             }
         }
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

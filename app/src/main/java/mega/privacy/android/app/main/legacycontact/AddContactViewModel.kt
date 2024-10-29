@@ -156,7 +156,7 @@ class AddContactViewModel @Inject constructor(
     }
 
     fun checkSensitiveItems(handles: List<Long>) = viewModelScope.launch {
-        if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+        if (isHiddenNodesActive()) {
             var sensitiveType = 0
 
             for (handle in handles) {
@@ -184,6 +184,13 @@ class AddContactViewModel @Inject constructor(
         } else {
             _sensitiveItemsCount.value = 0
         }
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 
     fun clearSensitiveItemsCheck() {

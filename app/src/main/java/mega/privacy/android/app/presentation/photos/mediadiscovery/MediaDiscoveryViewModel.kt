@@ -26,6 +26,7 @@ import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.DEFAULT
@@ -173,8 +174,15 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
     }
 
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
+    }
+
     private fun handleHiddenNodes() = viewModelScope.launch {
-        if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes) && fromFolderLink != true) {
+        if (isHiddenNodesActive() && fromFolderLink != true) {
             monitorShowHiddenItems(
                 loadPhotosDone = _state.value.loadPhotosDone,
                 sourcePhotos = _state.value.sourcePhotos,

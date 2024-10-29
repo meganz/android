@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.audiosection.mapper.AudioUiEntityMapper
 import mega.privacy.android.app.presentation.audiosection.model.AudioSectionState
@@ -85,7 +86,7 @@ class AudioSectionViewModel @Inject constructor(
     init {
         checkViewType()
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+            if (isHiddenNodesActive()) {
                 handleHiddenNodesUIFlow()
                 monitorIsHiddenNodesOnboarded()
             } else {
@@ -99,6 +100,13 @@ class AudioSectionViewModel @Inject constructor(
                     }
             }
         }
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 
     private fun handleHiddenNodesUIFlow() {

@@ -141,7 +141,7 @@ internal fun ImagePreviewScreen(
     }
 
     val isHiddenNodesEnabled by produceState(initialValue = false) {
-        value = viewModel.isHiddenNodesEnabled()
+        value = viewModel.isHiddenNodesActive()
     }
 
     val currentImageNodeIndex = viewState.currentImageNodeIndex

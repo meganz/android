@@ -7,6 +7,7 @@ import androidx.appcompat.view.ActionMode
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 
@@ -23,7 +24,7 @@ class MediaDiscoveryActionModeCallback(
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         fragment.lifecycleScope.launch {
-            val isHiddenNodesEnabled = fragment.getFeatureFlagUseCase(AppFeatures.HiddenNodes)
+            val isHiddenNodesEnabled = isHiddenNodesActive()
             val selectedNodes = fragment.mediaDiscoveryViewModel.getSelectedTypedNodes()
             val includeSensitiveInheritedNode = selectedNodes.any { it.isSensitiveInherited }
             menu?.findItem(R.id.cab_menu_share_link)?.let {
@@ -115,5 +116,12 @@ class MediaDiscoveryActionModeCallback(
 
     override fun onDestroyActionMode(mode: ActionMode?) {
         fragment.destroyActionMode()
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            fragment.getFeatureFlagUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 }

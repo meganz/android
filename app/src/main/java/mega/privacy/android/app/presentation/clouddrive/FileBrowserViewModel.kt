@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.extensions.updateItemAt
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
@@ -146,12 +147,19 @@ class FileBrowserViewModel @Inject constructor(
         monitorNodeUpdates()
         monitorAccountDetail()
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+            if (isHiddenNodesActive()) {
                 monitorIsHiddenNodesOnboarded()
                 monitorShowHiddenItems()
             }
         }
         monitorStorageOverQuotaCapacity()
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 
     /**
@@ -837,7 +845,7 @@ class FileBrowserViewModel @Inject constructor(
     private fun monitorAccountDetail() {
         monitorAccountDetailUseCase()
             .onEach { accountDetail ->
-                if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                if (isHiddenNodesActive()) {
                     val accountType = accountDetail.levelDetail?.accountType
                     val businessStatus =
                         if (accountType?.isBusinessAccount == true) {

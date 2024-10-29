@@ -4,6 +4,7 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.node.model.menuaction.HideDropdownMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.HideMenuAction
@@ -44,7 +45,7 @@ class HideDropdownMenuItem @Inject constructor(
         allFileNodes: Boolean,
         resultCount: Int,
     ): Boolean {
-        val isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+        val isHiddenNodesEnabled = isHiddenNodesActive()
 
         if (!isHiddenNodesEnabled || !hasNodeAccessPermission || !noNodeTakenDown || !noNodeInBackups) {
             return false
@@ -83,5 +84,12 @@ class HideDropdownMenuItem @Inject constructor(
             }
         }
         onDismiss()
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 }

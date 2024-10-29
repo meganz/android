@@ -54,6 +54,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityPdfviewerBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -218,6 +219,13 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         super.attachBaseContext(newBase)
     }
 
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
+    }
+
     public override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
         enableEdgeToEdgeAndConsumeInsets()
@@ -233,7 +241,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
         lifecycleScope.launch {
             runCatching {
-                isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+                isHiddenNodesEnabled = isHiddenNodesActive()
                 invalidateOptionsMenu()
             }.onFailure { Timber.e(it) }
         }

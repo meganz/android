@@ -37,6 +37,7 @@ import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.DrawerItem
@@ -148,6 +149,13 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         return contentView
     }
 
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
+    }
+
     /**
      * onViewCreated
      */
@@ -218,7 +226,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         viewLifecycleOwner.collectFlow(
             nodeOptionsViewModel.state.onStart {
-                isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+                isHiddenNodesEnabled = isHiddenNodesActive()
             }, Lifecycle.State.STARTED
         ) { state: NodeBottomSheetUIState ->
 

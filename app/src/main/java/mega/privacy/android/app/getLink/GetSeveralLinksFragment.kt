@@ -24,6 +24,7 @@ import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentGetSeveralLinksBinding
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.getLink.adapter.LinksAdapter
 import mega.privacy.android.app.getLink.data.LinkItem
@@ -93,7 +94,7 @@ class GetSeveralLinksFragment : Fragment() {
 
     private fun initialize() {
         viewLifecycleOwner.lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes) && !viewModel.isInitialized()) {
+            if (isHiddenNodesActive() && !viewModel.isInitialized()) {
                 checkSensitiveItems()
             } else {
                 initNodes()
@@ -102,6 +103,13 @@ class GetSeveralLinksFragment : Fragment() {
                 setupObservers()
             }
         }
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 
     private fun checkSensitiveItems() {

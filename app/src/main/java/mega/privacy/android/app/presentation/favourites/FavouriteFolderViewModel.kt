@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
@@ -158,7 +159,7 @@ class FavouriteFolderViewModel @Inject constructor(
         // Cancel the previous job avoid to repeatedly observed
         currentNodeJob?.cancel()
         currentNodeJob = viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+            if (isHiddenNodesActive()) {
                 handleHiddenNodes(parentHandle = parentHandle)
             } else {
                 getFavouriteFolderInfoUseCase(parentHandle).collectLatest { folderInfo ->
@@ -288,6 +289,13 @@ class FavouriteFolderViewModel @Inject constructor(
 
     internal suspend fun getNodeContentUri(fileNode: TypedFileNode) =
         getNodeContentUriUseCase(fileNode)
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
+    }
 
     companion object {
 

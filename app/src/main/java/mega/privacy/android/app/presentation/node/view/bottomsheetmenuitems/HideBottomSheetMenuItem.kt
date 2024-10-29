@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.node.model.menuaction.HideMenuAction
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -95,7 +96,7 @@ class HideBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         isConnected: Boolean,
     ): Boolean {
-        val isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+        val isHiddenNodesEnabled = isHiddenNodesActive()
         if (!isHiddenNodesEnabled) return false
 
         if (isNodeInRubbish || accessPermission != AccessPermission.OWNER || node.isTakenDown || isInBackups)
@@ -130,6 +131,13 @@ class HideBottomSheetMenuItem @Inject constructor(
             }
         }
         onDismiss()
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 
     override

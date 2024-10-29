@@ -47,6 +47,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
@@ -514,12 +515,19 @@ class FileBrowserComposeFragment : Fragment() {
             return true
         }
 
+        private suspend fun isHiddenNodesActive(): Boolean {
+            val result = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+            }
+            return result.getOrNull() ?: false
+        }
+
         private suspend fun handleHiddeNodes(
             selected: List<Long>,
             nodeList: List<NodeUIItem<TypedNode>>,
             menu: Menu,
         ) {
-            val isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+            val isHiddenNodesEnabled = isHiddenNodesActive()
             if (!isHiddenNodesEnabled) {
                 menu.findItem(R.id.cab_menu_hide)?.isVisible = false
                 menu.findItem(R.id.cab_menu_unhide)?.isVisible = false

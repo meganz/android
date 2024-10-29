@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.node.model.menuaction.HideMenuAction
 import mega.privacy.android.domain.entity.AccountType
@@ -63,7 +64,7 @@ class HideBottomSheetMenuItemTest {
     @Test
     fun `test that shouldDisplay returns false when HiddenNodes feature flag is disabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) doReturn false
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn false
 
             val result = hideBottomSheetMenuItem.shouldDisplay(
                 isNodeInRubbish = false,
@@ -78,7 +79,7 @@ class HideBottomSheetMenuItemTest {
 
     @Test
     fun `test that shouldDisplay returns false when node is in rubbish`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) doReturn true
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn true
 
         val result = hideBottomSheetMenuItem.shouldDisplay(
             isNodeInRubbish = true,
@@ -93,7 +94,7 @@ class HideBottomSheetMenuItemTest {
 
     @Test
     fun `test that shouldDisplay returns false when access permission is not OWNER`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) doReturn true
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn true
 
         val result = hideBottomSheetMenuItem.shouldDisplay(
             isNodeInRubbish = false,
@@ -108,7 +109,7 @@ class HideBottomSheetMenuItemTest {
 
     @Test
     fun `test that shouldDisplay returns true for valid conditions`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) doReturn true
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn true
         whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
         whenever(isHidingActionAllowedUseCase(nodeId)) doReturn true
         val node = mock<TypedNode> {
@@ -128,7 +129,7 @@ class HideBottomSheetMenuItemTest {
 
     @Test
     fun `test that shouldDisplay returns false when node is marked sensitive`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) doReturn true
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn true
         whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
         whenever(isHidingActionAllowedUseCase(nodeId)) doReturn true
         val node = mock<TypedNode> {

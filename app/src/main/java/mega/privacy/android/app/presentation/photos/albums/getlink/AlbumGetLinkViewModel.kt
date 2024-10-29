@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.HAS_SENSITIVE_ELEMENT
@@ -51,7 +52,7 @@ class AlbumGetLinkViewModel @Inject constructor(
 
     fun initialize() = viewModelScope.launch {
         val showCopyright = shouldShowCopyrightUseCase()
-        val hasSensitiveElement = if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+        val hasSensitiveElement = if (isHiddenNodesActive()) {
             savedStateHandle.get<Boolean>(HAS_SENSITIVE_ELEMENT) ?: false
         } else {
             false
@@ -67,6 +68,13 @@ class AlbumGetLinkViewModel @Inject constructor(
                 showSharingSensitiveWarning = hasSensitiveElement,
             )
         }
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 
     fun hideCopyright() {

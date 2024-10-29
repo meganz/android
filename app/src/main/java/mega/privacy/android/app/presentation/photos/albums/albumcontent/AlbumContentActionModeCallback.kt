@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -115,8 +116,7 @@ class AlbumContentActionModeCallback(
             menu.findItem(R.id.cab_menu_select_all)?.isVisible = !isSelectAll()
 
             fragment.lifecycleScope.launch {
-                val isHiddenNodesEnabled =
-                    fragment.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+                val isHiddenNodesEnabled = isHiddenNodesActive()
                 val selectedPhotos = fragment.albumContentViewModel.getSelectedPhotos()
                 val includeSensitiveInheritedNode = selectedPhotos.any { it.isSensitiveInherited }
 
@@ -195,5 +195,12 @@ class AlbumContentActionModeCallback(
         val photos = fragment.albumContentViewModel.state.value.photos
 
         return selectedPhotos.size == photos.size
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            fragment.getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 }

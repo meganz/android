@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -147,7 +148,7 @@ class AlbumCoverSelectionViewModelTest {
             updateAlbumCoverUseCase = updateAlbumCoverUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             getFeatureFlagValueUseCase = mock {
-                onBlocking { invoke(AppFeatures.HiddenNodes) }.thenReturn(true)
+                onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(true)
             },
             monitorShowHiddenItemsUseCase = mock {
                 on { invoke() }.thenReturn(flowOf(true))

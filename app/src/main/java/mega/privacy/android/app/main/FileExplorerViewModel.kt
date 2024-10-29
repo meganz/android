@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.serializable
@@ -130,10 +131,17 @@ class FileExplorerViewModel @Inject constructor(
     val showHiddenItems: Boolean get() = _showHiddenItems
 
     fun init() = viewModelScope.launch {
-        if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+        if (isHiddenNodesActive()) {
             _accountDetail = monitorAccountDetailUseCase().firstOrNull()
             _showHiddenItems = monitorShowHiddenItemsUseCase().firstOrNull() ?: true
         }
+    }
+
+    private suspend fun isHiddenNodesActive(): Boolean {
+        val result = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)
+        }
+        return result.getOrNull() ?: false
     }
 
     /**

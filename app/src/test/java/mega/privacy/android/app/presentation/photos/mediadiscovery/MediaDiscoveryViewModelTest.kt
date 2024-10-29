@@ -21,6 +21,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.extensions.asHotFlow
+import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
@@ -320,7 +321,7 @@ class MediaDiscoveryViewModelTest {
     fun `test that turn on flag HiddenNodes and it is not from folder link then the flow is correct`() =
         runTest {
             commonStub()
-            whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) doReturn true
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn true
             whenever(savedStateHandle.get<Boolean>(MediaDiscoveryActivity.INTENT_KEY_FROM_FOLDER_LINK)) doReturn false
             initViewModel()
             verify(monitorShowHiddenItemsUseCase, times(1)).invoke()
@@ -331,7 +332,7 @@ class MediaDiscoveryViewModelTest {
     fun `test that turn off flag HiddenNodes and it is not from folder link then the flow is correct`() =
         runTest {
             commonStub()
-            whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) doReturn false
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn false
             whenever(savedStateHandle.get<Boolean>(MediaDiscoveryActivity.INTENT_KEY_FROM_FOLDER_LINK)) doReturn false
             initViewModel()
             verifyNoInteractions(monitorShowHiddenItemsUseCase)
@@ -342,7 +343,7 @@ class MediaDiscoveryViewModelTest {
     fun `test that turn on flag HiddenNodes and it is from folder link then the flow is correct`() =
         runTest {
             commonStub()
-            whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) doReturn true
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn true
             whenever(savedStateHandle.get<Boolean>(MediaDiscoveryActivity.INTENT_KEY_FROM_FOLDER_LINK)) doReturn true
             initViewModel()
             verifyNoInteractions(monitorShowHiddenItemsUseCase)
@@ -353,7 +354,7 @@ class MediaDiscoveryViewModelTest {
     fun `test that turn off flag HiddenNodes and it is from folder link then the flow is correct`() =
         runTest {
             commonStub()
-            whenever(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) doReturn false
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)) doReturn false
             whenever(savedStateHandle.get<Boolean>(MediaDiscoveryActivity.INTENT_KEY_FROM_FOLDER_LINK)) doReturn true
             initViewModel()
             verifyNoInteractions(monitorShowHiddenItemsUseCase)
@@ -421,7 +422,7 @@ class MediaDiscoveryViewModelTest {
         runTest {
             commonStub()
             getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(AppFeatures.HiddenNodes) }.thenReturn(
+                onBlocking { invoke(ApiFeatures.HiddenNodesInternalRelease) }.thenReturn(
                     true
                 )
             }
