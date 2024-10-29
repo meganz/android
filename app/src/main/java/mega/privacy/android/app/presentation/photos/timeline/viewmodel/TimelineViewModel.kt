@@ -19,6 +19,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
+import mega.privacy.android.app.presentation.photos.PhotosCache.updatePhotos
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.LocationPreference
 import mega.privacy.android.app.presentation.photos.model.MediaTypePreference
@@ -148,6 +149,13 @@ class TimelineViewModel @Inject constructor(
                 monitorShowHiddenItems()
                 monitorAccountDetail()
                 monitorIsHiddenNodesOnboarded()
+            }
+        }
+
+        updatePhotos(listOf())
+        viewModelScope.launch {
+            _state.collectLatest {
+                updatePhotos(it.photos)
             }
         }
     }

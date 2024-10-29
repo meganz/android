@@ -727,6 +727,10 @@
             android:name=".presentation.tags.TagsActivity"
             android:launchMode="singleTop" />
         <activity android:name=".presentation.settings.passcode.PasscodeSettingsActivity" />
+        <activity
+            android:name=".presentation.photos.search.PhotosSearchActivity"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

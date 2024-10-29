@@ -210,8 +210,9 @@ fun ExpandedSearchAppBar(
     modifier: Modifier = Modifier,
     isHideAfterSearch: Boolean = false,
     windowInsets: WindowInsets = WindowInsets.statusBars,
+    overwriteText: Boolean = false,
 ) {
-    var textFieldValue by remember {
+    var textFieldValue by remember(text.takeIf { overwriteText } ?: Unit) {
         mutableStateOf(
             TextFieldValue(text, TextRange(text.length))
         )

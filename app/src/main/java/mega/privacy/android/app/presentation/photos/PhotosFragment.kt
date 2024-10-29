@@ -44,6 +44,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -63,6 +64,7 @@ import mega.privacy.android.app.presentation.photos.compose.main.PhotosScreen
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.search.PhotosSearchActivity
 import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
@@ -131,6 +133,12 @@ class PhotosFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             timelineViewModel.handleCameraUploadsPermissionsResult()
         }
+
+    private val photosSearchLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handlePhotosSearchResult,
+        )
 
     /**
      * Retrieves the App Theme
@@ -461,6 +469,11 @@ class PhotosFragment : Fragment() {
         this.menu = menu
         handleMenuIcons(isShowing = photosViewModel.state.value.isMenuShowing)
         handleFilterIcons(timelineViewModel.state.value)
+
+        lifecycleScope.launch {
+            menu.findItem(R.id.action_photos_search)?.isVisible =
+                getFeatureFlagUseCase(AppFeatures.SearchInPhotos)
+        }
     }
 
     private fun handleMenuIcons(isShowing: Boolean) {
@@ -555,6 +568,11 @@ class PhotosFragment : Fragment() {
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_photos_search -> {
+                searchPhotos()
+                true
+            }
+
             R.id.action_zoom_in -> { // +
                 handleZoomIn()
                 true
@@ -652,6 +670,12 @@ class PhotosFragment : Fragment() {
                 ?: 0,
         )
         managerActivity.skipToFilterFragment(PhotosFilterFragment())
+    }
+
+    private fun searchPhotos() {
+        val intent = Intent(requireActivity(), PhotosSearchActivity::class.java)
+        photosSearchLauncher.launch(intent)
+        activity?.overridePendingTransition(0, 0)
     }
 
     private val albumPhotosSelectionLauncher: ActivityResultLauncher<Intent> =
@@ -911,6 +935,24 @@ class PhotosFragment : Fragment() {
             )
         Util.showSnackbar(requireActivity(), message)
         tempSelectedNodeHandles = listOf()
+    }
+
+    private fun handlePhotosSearchResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+
+        val type = result.data?.getStringExtra("type") ?: return
+        val id = result.data?.getLongExtra("id", -1L)
+
+        val uiAlbum = if (type != "custom") {
+            albumsViewModel.state.value.findSystemAlbum(type)
+        } else if (id != null && id != -1L) {
+            albumsViewModel.state.value.findUIAlbum(AlbumId(id))
+        } else {
+            null
+        }
+        openAlbum(uiAlbum ?: return)
+
+        photosViewModel.onTabSelected(PhotosTab.Albums)
     }
 
     /**

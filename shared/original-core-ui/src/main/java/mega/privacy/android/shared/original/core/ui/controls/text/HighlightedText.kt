@@ -40,6 +40,7 @@ fun HighlightedText(
     textColor: TextColor = TextColor.Primary,
     highlightColor: Color = teal_300_alpha_020,
     highlightFontWeight: FontWeight = FontWeight.Normal,
+    applyMarqueEffect: Boolean = true,
     maxLines: Int = 1,
     style: TextStyle = LocalTextStyle.current,
     overflow: TextOverflow = TextOverflow.Ellipsis,
@@ -87,7 +88,7 @@ fun HighlightedText(
 
     Text(
         text = annotatedText,
-        modifier = modifier.basicMarquee(),
+        modifier = modifier.then(if (applyMarqueEffect) Modifier.basicMarquee() else Modifier),
         maxLines = maxLines,
         overflow = overflow,
         style = style,

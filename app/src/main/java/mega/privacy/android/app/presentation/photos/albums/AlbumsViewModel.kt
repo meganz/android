@@ -26,6 +26,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.app.presentation.photos.PhotosCache.updateAlbums
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -98,6 +99,11 @@ class AlbumsViewModel @Inject constructor(
                 monitorShowHiddenItems()
                 monitorAccountDetail()
             }
+        }
+
+        updateAlbums(listOf())
+        viewModelScope.launch {
+            _state.collectLatest { updateAlbums(it.albums) }
         }
     }
 

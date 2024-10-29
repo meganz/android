@@ -196,6 +196,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
+     * Search in Photos feature
+     */
+    SearchInPhotos(
+        "Show search in photos entry point in Timeline",
+        false,
+    ),
+
+    /**
      * Start downloads in the worker instead of in the view model
      */
     StartDownloadsInWorker(

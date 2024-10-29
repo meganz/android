@@ -3,6 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_photos_search"
+        android:icon="@drawable/ic_search"
+        android:orderInCategory="70"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_photos_filter"
         android:icon="@drawable/ic_filter"
         android:orderInCategory="75"

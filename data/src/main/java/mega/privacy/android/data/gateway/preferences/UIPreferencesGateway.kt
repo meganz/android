@@ -105,4 +105,15 @@ interface UIPreferencesGateway {
      */
     fun monitorAlmostFullStorageBannerClosingTimestamp(): Flow<Long?>
 
+    /**
+     * Monitor search photos recent queries
+     *
+     * @return the recent queries
+     */
+    fun monitorPhotosRecentQueries(): Flow<List<String>>
+
+    /**
+     * Save recent queries
+     */
+    suspend fun setPhotosRecentQueries(queries: List<String>)
 }
