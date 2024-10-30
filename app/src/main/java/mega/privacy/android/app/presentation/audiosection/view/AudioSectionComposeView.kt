@@ -1,26 +1,22 @@
-package mega.privacy.android.app.presentation.audiosection
+package mega.privacy.android.app.presentation.audiosection.view
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.presentation.audiosection.AudioSectionViewModel
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
+import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
-import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 
 /**
  * The compose view for audio section
@@ -52,21 +48,7 @@ fun AudioSectionComposeView(
     }
     Box(modifier = modifier) {
         when {
-            progressBarShowing -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 20.dp),
-                    contentAlignment = Alignment.TopCenter,
-                    content = {
-                        MegaCircularProgressIndicator(
-                            modifier = Modifier
-                                .size(50.dp),
-                            strokeWidth = 4.dp,
-                        )
-                    },
-                )
-            }
+            progressBarShowing -> LoadingStateView(uiState.currentViewType == ViewType.LIST)
 
             items.isEmpty() -> LegacyMegaEmptyView(
                 modifier = Modifier,

@@ -6,9 +6,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.FloatingActionButton
@@ -22,7 +20,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -30,18 +27,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.documentsection.model.DocumentSectionUiState
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
+import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
@@ -95,22 +91,10 @@ internal fun DocumentSectionComposeView(
     ) { paddingValue ->
         Box(modifier = modifier.padding(paddingValue)) {
             when {
-                progressBarShowing -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 20.dp)
-                            .testTag(DOCUMENT_SECTION_PROGRESS_BAR_TEST_TAG),
-                        contentAlignment = Alignment.TopCenter,
-                        content = {
-                            MegaCircularProgressIndicator(
-                                modifier = Modifier
-                                    .size(50.dp),
-                                strokeWidth = 4.dp,
-                            )
-                        },
-                    )
-                }
+                progressBarShowing -> LoadingStateView(
+                    uiState.currentViewType == ViewType.LIST,
+                    modifier = Modifier.testTag(DOCUMENT_SECTION_LOADING_VIEW_TEST_TAG)
+                )
 
                 items.isEmpty() -> LegacyMegaEmptyView(
                     modifier = Modifier.testTag(DOCUMENT_SECTION_EMPTY_VIEW_TEST_TAG),
@@ -284,7 +268,7 @@ const val DOCUMENT_SECTION_FAB_BUTTON_TEST_TAG = "document_section:button_add_do
 /**
  * Test tag for the progress bar view.
  */
-const val DOCUMENT_SECTION_PROGRESS_BAR_TEST_TAG = "document_section:progress_bar_loading"
+const val DOCUMENT_SECTION_LOADING_VIEW_TEST_TAG = "document_section:loading_view"
 
 /**
  * Test tag for the empty view.

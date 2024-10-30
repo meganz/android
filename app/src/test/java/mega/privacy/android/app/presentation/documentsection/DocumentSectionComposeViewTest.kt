@@ -12,7 +12,7 @@ import mega.privacy.android.app.presentation.documentsection.view.DOCUMENT_SECTI
 import mega.privacy.android.app.presentation.documentsection.view.DOCUMENT_SECTION_FAB_BUTTON_TEST_TAG
 import mega.privacy.android.app.presentation.documentsection.view.DOCUMENT_SECTION_GRID_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.documentsection.view.DOCUMENT_SECTION_LIST_VIEW_TEST_TAG
-import mega.privacy.android.app.presentation.documentsection.view.DOCUMENT_SECTION_PROGRESS_BAR_TEST_TAG
+import mega.privacy.android.app.presentation.documentsection.view.DOCUMENT_SECTION_LOADING_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.documentsection.view.DocumentSectionComposeView
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
@@ -56,7 +56,7 @@ class DocumentSectionComposeViewTest {
     fun `test that progress bar is displayed when loading`() {
         setComposeContent(uiState = DocumentSectionUiState(isLoading = true))
 
-        composeTestRule.onNodeWithTag(DOCUMENT_SECTION_PROGRESS_BAR_TEST_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(DOCUMENT_SECTION_LOADING_VIEW_TEST_TAG).assertIsDisplayed()
     }
 
     @Test

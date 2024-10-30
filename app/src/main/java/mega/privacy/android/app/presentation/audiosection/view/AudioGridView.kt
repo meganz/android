@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.audiosection
+package mega.privacy.android.app.presentation.audiosection.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem

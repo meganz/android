@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.audiosection
+package mega.privacy.android.app.presentation.audiosection.view
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding

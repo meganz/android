@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.audiosection
+package mega.privacy.android.app.presentation.audiosection.view
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
