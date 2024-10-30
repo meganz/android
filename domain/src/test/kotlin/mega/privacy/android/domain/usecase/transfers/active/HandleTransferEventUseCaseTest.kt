@@ -185,7 +185,7 @@ class HandleTransferEventUseCaseTest {
         transferEvent: TransferEvent,
     ) = runTest {
         underTest.invoke(transferEvent)
-        verify(transferRepository).updateTransferredBytes(transferEvent.transfer)
+        verify(transferRepository).updateTransferredBytes(listOf(transferEvent.transfer))
     }
 
     @ParameterizedTest

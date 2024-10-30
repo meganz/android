@@ -1265,7 +1265,7 @@ class DefaultTransfersRepositoryTest {
                     mapOf(transfer.tag to transfer.transferredBytes)
                 },
                 callToTest = {
-                    underTest.updateTransferredBytes(transfer)
+                    underTest.updateTransferredBytes(listOf(transfer))
                 }
             )
         }
@@ -1284,8 +1284,8 @@ class DefaultTransfersRepositoryTest {
                     val transferZero = mock<Transfer>()
                     stubActiveTransfer(transferZero, transferType, transferredBytes = 0L)
 
-                    underTest.updateTransferredBytes(transfer)
-                    underTest.updateTransferredBytes(transferZero)
+                    underTest.updateTransferredBytes(listOf(transfer))
+                    underTest.updateTransferredBytes(listOf(transferZero))
                 }
             )
         }

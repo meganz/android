@@ -347,7 +347,7 @@ interface TransferRepository {
     /**
      * Set or update the transferred bytes counter of this transfer
      */
-    suspend fun updateTransferredBytes(transfer: Transfer)
+    suspend fun updateTransferredBytes(transfers: List<Transfer>)
 
     /**
      * Delete all active transfer of this type

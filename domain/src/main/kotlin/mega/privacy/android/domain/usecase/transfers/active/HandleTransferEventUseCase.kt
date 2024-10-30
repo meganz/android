@@ -115,7 +115,7 @@ class HandleTransferEventUseCase @Inject internal constructor(
         events.filterByType(
             update = true,
             finish = true
-        )?.map { it.transfer }?.forEach {
+        )?.map { it.transfer }?.let {
             transferRepository.updateTransferredBytes(it)
         }
     }

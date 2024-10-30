@@ -127,7 +127,7 @@ internal class DefaultTransfersRepository @Inject constructor(
      * to store current transferred bytes in memory instead of in database
      */
     private val transferredBytesFlows =
-        HashMap<TransferType, MutableStateFlow<Map<Int, Long>>>()
+        HashMap<TransferType, MutableStateFlow<MutableMap<Int, Long>>>()
 
     init {
         //pause transfers if db indicates it should be paused
@@ -539,24 +539,29 @@ internal class DefaultTransfersRepository @Inject constructor(
             megaLocalRoomGateway.insertOrUpdateActiveTransfers(activeTransfers)
         }
 
-    override suspend fun updateTransferredBytes(transfer: Transfer) {
-        if (transfer.transferredBytes == 0L) return
-        transferredBytesFlow(transfer.transferType).update {
-            it + (transfer.tag to transfer.transferredBytes)
+    override suspend fun updateTransferredBytes(transfers: List<Transfer>) =
+        withContext(ioDispatcher) {
+            val grouped = transfers.groupBy { it.transferType }
+            grouped.forEach { (transferType, transfersOfThisType) ->
+                val tagToBytes =
+                    transfersOfThisType.mapNotNull { if (it.transferredBytes == 0L) null else it.tag to it.transferredBytes }
+                transferredBytesFlow(transferType).update { mutableMap ->
+                    mutableMap.also { it.putAll(tagToBytes) }
+                }
+            }
         }
-    }
 
     override suspend fun deleteAllActiveTransfersByType(transferType: TransferType) =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.deleteAllActiveTransfersByType(transferType)
-            transferredBytesFlow(transferType).value = mapOf()
+            transferredBytesFlow(transferType).value = mutableMapOf()
         }
 
     override suspend fun deleteAllActiveTransfers() =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.deleteAllActiveTransfers()
             TransferType.entries.forEach {
-                transferredBytesFlow(it).value = mapOf()
+                transferredBytesFlow(it).value = mutableMapOf()
             }
         }
 
@@ -686,10 +691,10 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
 
     private val transferredBytesFlowMutex = Mutex()
-    private suspend fun transferredBytesFlow(transferType: TransferType): MutableStateFlow<Map<Int, Long>> {
+    private suspend fun transferredBytesFlow(transferType: TransferType): MutableStateFlow<MutableMap<Int, Long>> {
         transferredBytesFlowMutex.withLock {
             return transferredBytesFlows[transferType]
-                ?: MutableStateFlow<Map<Int, Long>>(mapOf()).also {
+                ?: MutableStateFlow<MutableMap<Int, Long>>(mutableMapOf()).also {
                     transferredBytesFlows[transferType] = it
                 }
         }
