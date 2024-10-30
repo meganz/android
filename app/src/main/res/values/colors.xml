@@ -549,6 +549,7 @@
     <color name="color_button_brand">#DD1405</color>
     <color name="color_border_interactive">#DD1405</color>
     <color name="color_icon_secondary">#616366</color>
+    <color name="color_text_primary">#303233</color>
     <color name="color_text_error">#E31B57</color>
     <color name="color_support_error">#E31B57</color>
     <color name="color_primary_400">#FB6361</color>

@@ -2,7 +2,6 @@ package mega.privacy.android.shared.original.core.ui.controls.sheets
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
@@ -24,8 +23,8 @@ fun MegaBottomSheetLayout(
     ModalBottomSheetLayout(
         bottomSheetNavigator = bottomSheetNavigator,
         modifier = modifier,
-        sheetBackgroundColor = MegaOriginalTheme.colors.background.pageBackground,
-        scrimColor = Color.Black.copy(alpha = 0.5f),
+        sheetBackgroundColor = MegaOriginalTheme.colors.background.surface1,
+        scrimColor = MegaOriginalTheme.colors.background.blur,
         content = content
     )
 }

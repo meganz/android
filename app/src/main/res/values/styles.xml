@@ -579,7 +579,7 @@
 
     <style name="BottomSheetOption" parent="BottomSheetOptionWithoutBackground">
         <item name="android:background">?selectableItemBackground</item>
-        <item name="android:textColor">@color/color_icon_secondary</item>
+        <item name="android:textColor">@color/color_text_primary</item>
         <item name="drawableTint">@color/color_icon_secondary</item>
     </style>
 
