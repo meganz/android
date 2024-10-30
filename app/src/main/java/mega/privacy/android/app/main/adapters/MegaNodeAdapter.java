@@ -22,8 +22,6 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.getNumberOfFolders;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownDialog;
 import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
 import static mega.privacy.android.app.utils.TextUtil.getFileInfo;
-import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbAndSetViewForList;
-import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbAndSetViewOrCreateForList;
 import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
 import static mega.privacy.android.app.utils.TimeUtils.getVideoDuration;
 import static mega.privacy.android.app.utils.Util.dp2px;
@@ -36,7 +34,6 @@ import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -69,6 +66,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import coil.Coil;
+import coil.request.ImageRequest;
+import coil.request.SuccessResult;
+import coil.transform.RoundedCornersTransformation;
+import coil.util.CoilUtils;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
@@ -90,11 +92,11 @@ import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetD
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener;
-import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.domain.entity.Contact;
 import mega.privacy.android.domain.entity.ShareData;
 import mega.privacy.android.domain.entity.SortOrder;
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -829,6 +831,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         holder.textViewFileName.setText(node.getName());
         holder.videoInfoLayout.setVisibility(View.GONE);
 
+        CoilUtils.dispose(holder.imageViewThumb);
         if (node.isTakenDown()) {
             holder.textViewFileNameForFile.setTextColor(ContextCompat.getColor(context, R.color.red_800_red_400));
             holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_800_red_400));
@@ -877,43 +880,21 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             }
 
             if (node.hasThumbnail()) {
-                Bitmap temp = ThumbnailUtils.getThumbnailFromCache(node);
-
-                if (temp != null) {
-                    setImageThumbnail(holder, temp);
-                } else {
-                    temp = ThumbnailUtils.getThumbnailFromFolder(node, context);
-
-                    if (temp != null) {
-                        setImageThumbnail(holder, temp);
-                    } else {
-                        try {
-                            temp = ThumbnailUtils.getThumbnailFromMegaGrid(node, context, holder, megaApi, this);
-
-                        } catch (Exception e) {
-                        } // Too many AsyncTasks
-
-                        if (temp != null) {
-                            setImageThumbnail(holder, temp);
-                        }
-                    }
-                }
-            } else {
-                Bitmap temp = ThumbnailUtils.getThumbnailFromCache(node);
-                if (temp != null) {
-                    setImageThumbnail(holder, temp);
-                } else {
-                    temp = ThumbnailUtils.getThumbnailFromFolder(node, context);
-
-                    if (temp != null) {
-                        setImageThumbnail(holder, temp);
-                    } else {
-                        try {
-                            ThumbnailUtils.createThumbnailGrid(context, node, holder, megaApi, this);
-                        } catch (Exception e) {
-                        } // Too many AsyncTasks
-                    }
-                }
+                holder.imageViewThumb.setVisibility(View.VISIBLE);
+                Coil.imageLoader(context).enqueue(
+                        new ImageRequest.Builder(context)
+                                .data(ThumbnailRequest.fromHandle(node.getHandle()))
+                                .target(holder.imageViewThumb)
+                                .crossfade(true)
+                                .transformations(new RoundedCornersTransformation(context.getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
+                                .listener(new ImageRequest.Listener() {
+                                    @Override
+                                    public void onSuccess(@NonNull ImageRequest request, @NonNull SuccessResult result) {
+                                        holder.fileGridIconForFile.setVisibility(View.GONE);
+                                    }
+                                })
+                                .build()
+                );
             }
 
             if (isMultipleSelect()) {
@@ -927,13 +908,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.itemLayout.setBackground(ContextCompat.getDrawable(context,
                     isMultipleSelect() && isItemChecked(position) ? R.drawable.background_item_grid_selected : R.drawable.background_item_grid));
         }
-    }
-
-    private void setImageThumbnail(ViewHolderBrowserGrid holder, Bitmap temp) {
-        Bitmap thumb = ThumbnailUtils.getRoundedRectBitmap(context, temp, 2);
-        holder.fileGridIconForFile.setVisibility(View.GONE);
-        holder.imageViewThumb.setVisibility(View.VISIBLE);
-        holder.imageViewThumb.setImageBitmap(thumb);
     }
 
     private void setFolderGridSelected(ViewHolderBrowserGrid holder, int position) {
@@ -972,7 +946,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             return;
         }
         holder.document = node.getHandle();
-        Bitmap thumb = null;
 
         holder.textViewFileName.setText(node.getName());
         holder.textViewFileSize.setText("");
@@ -1012,6 +985,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
         holder.imageView.setVisibility(View.VISIBLE);
 
+        CoilUtils.dispose(holder.imageView);
         if (node.isFolder()) {
 
             Timber.d("Node is folder");
@@ -1125,35 +1099,29 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 holder.versionsIcon.setVisibility(View.GONE);
             }
 
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+            params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+            params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+            params.setMargins(0, 0, 0, 0);
+            holder.imageView.setLayoutParams(params);
+
             if (!isMultipleSelect()) {
                 Timber.d("Not multiselect");
                 holder.itemLayout.setBackground(null);
-                holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-                params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-                params.setMargins(0, 0, 0, 0);
-                holder.imageView.setLayoutParams(params);
 
                 Timber.d("Check the thumb");
 
                 if (node.hasThumbnail()) {
                     Timber.d("Node has thumbnail");
-                    getThumbAndSetView(holder, node);
+                    loadThumbnail(node, holder.imageView);
                 } else {
                     Timber.d("Node NOT thumbnail");
-                    getThumbAndSetViewOrCreate(holder, node);
+                    holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                 }
                 holder.threeDotsLayout.setVisibility(View.VISIBLE);
             } else {
                 Timber.d("Multiselection ON");
                 if (this.isItemChecked(position)) {
-                    RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                    paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-                    paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-                    paramsMultiselect.setMargins(0, 0, 0, 0);
-                    holder.imageView.setLayoutParams(paramsMultiselect);
                     holder.imageView.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
                 } else {
                     holder.itemLayout.setBackground(null);
@@ -1161,10 +1129,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
                     if (node.hasThumbnail()) {
                         Timber.d("Node has thumbnail");
-                        getThumbAndSetView(holder, node);
+                        loadThumbnail(node, holder.imageView);
                     } else {
                         Timber.d("Node NOT thumbnail");
-                        getThumbAndSetViewOrCreate(holder, node);
+                        holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                     }
                 }
                 holder.threeDotsLayout.setVisibility(View.INVISIBLE);
@@ -1179,12 +1147,28 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
     }
 
-    private void getThumbAndSetView(ViewHolderBrowserList holder, MegaNode node) {
-        getThumbAndSetViewForList(context, node, holder, megaApi, this, holder.imageView);
-    }
+    private void loadThumbnail(MegaNode node, ImageView target) {
+        Coil.imageLoader(context).enqueue(
+                new ImageRequest.Builder(context)
+                        .placeholder(MimeTypeList.typeForName(node.getName()).getIconResourceId())
+                        .data(ThumbnailRequest.fromHandle(node.getHandle()))
+                        .target(target)
+                        .crossfade(true)
+                        .transformations(new RoundedCornersTransformation(context.getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
+                        .listener(new ImageRequest.Listener() {
+                            @Override
+                            public void onSuccess(@NonNull ImageRequest request, @NonNull SuccessResult result) {
+                                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) target.getLayoutParams();
+                                params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                                params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                                int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+                                params.setMargins(left, 0, 0, 0);
 
-    private void getThumbAndSetViewOrCreate(ViewHolderBrowserList holder, MegaNode node) {
-        getThumbAndSetViewOrCreateForList(context, node, holder, megaApi, this, holder.imageView);
+                                target.setLayoutParams(params);
+                            }
+                        })
+                        .build()
+        );
     }
 
     private String getItemNode(int position) {
