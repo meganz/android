@@ -10,5 +10,5 @@ import mega.privacy.android.domain.entity.Progress
  */
 data class FetchNodesUpdate(
     val progress: Progress? = null,
-    val temporaryError: FetchNodesTemporaryError? = null,
+    val temporaryError: TemporaryWaitingError? = null,
 )

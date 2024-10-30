@@ -82,8 +82,8 @@ import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationField
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.account.AccountSession
-import mega.privacy.android.domain.entity.login.FetchNodesTemporaryError
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
+import mega.privacy.android.domain.entity.login.TemporaryWaitingError
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
@@ -435,7 +435,7 @@ private fun LoginInProgress(
                     minLines = 2
                 )
             }
-            Spacer(modifier = Modifier.height(if (isInLandscape) 0.dp else 15.dp))
+            Spacer(modifier = Modifier.height(if (isInLandscape) 0.dp else 20.dp))
         }
     }
 }
@@ -643,7 +643,7 @@ internal class LoginStateProvider : PreviewParameterProvider<LoginState> {
         LoginState(
             fetchNodesUpdate = FetchNodesUpdate(
                 progress = Progress(0.5F),
-                temporaryError = FetchNodesTemporaryError.ConnectivityIssues
+                temporaryError = TemporaryWaitingError.ConnectivityIssues
             ),
         ),
         LoginState(

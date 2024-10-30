@@ -1,9 +1,9 @@
 package mega.privacy.android.domain.entity.login
 
 /**
- * Enum class for defining the possible temporary errors for a fetch nodes.
+ * Enum class for defining the possible temporary errors related to waiting and retry
  */
-enum class FetchNodesTemporaryError {
+enum class TemporaryWaitingError {
 
     /**
      * Connectivity issues.

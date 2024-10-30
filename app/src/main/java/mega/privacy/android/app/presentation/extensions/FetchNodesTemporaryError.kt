@@ -1,12 +1,12 @@
 package mega.privacy.android.app.presentation.extensions
 
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.entity.login.FetchNodesTemporaryError
+import mega.privacy.android.domain.entity.login.TemporaryWaitingError
 
-internal val FetchNodesTemporaryError.messageId: Int
+internal val TemporaryWaitingError.messageId: Int
     get() = when (this) {
-        FetchNodesTemporaryError.ConnectivityIssues -> R.string.login_connectivity_issues
-        FetchNodesTemporaryError.ServerIssues -> R.string.login_servers_busy
-        FetchNodesTemporaryError.APILock -> R.string.login_API_lock
-        FetchNodesTemporaryError.APIRate -> R.string.login_API_rate
+        TemporaryWaitingError.ConnectivityIssues -> R.string.login_connectivity_issues
+        TemporaryWaitingError.ServerIssues -> R.string.login_servers_busy
+        TemporaryWaitingError.APILock -> R.string.login_API_lock
+        TemporaryWaitingError.APIRate -> R.string.login_API_rate
     }

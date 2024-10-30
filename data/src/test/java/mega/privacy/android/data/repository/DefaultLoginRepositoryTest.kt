@@ -18,10 +18,11 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.login.FetchNodesUpdateMapper
+import mega.privacy.android.data.mapper.login.TemporaryWaitingErrorMapper
 import mega.privacy.android.domain.entity.Progress
-import mega.privacy.android.domain.entity.login.FetchNodesTemporaryError
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
+import mega.privacy.android.domain.entity.login.TemporaryWaitingError
 import mega.privacy.android.domain.exception.ChatLoggingOutException
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.ChatNotInitializedUnknownStatus
@@ -65,11 +66,10 @@ class DefaultLoginRepositoryTest {
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val appEventGateway = mock<AppEventGateway>()
     private val fetchNodesUpdateMapper = mock<FetchNodesUpdateMapper>()
+    private val temporaryWaitingErrorMapper = mock<TemporaryWaitingErrorMapper>()
     private val setLogoutFlagWrapper = mock<SetLogoutFlagWrapper>()
     private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
-
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
-
 
     private val email = "test@email.com"
     private val password = "testPassword"
@@ -86,6 +86,7 @@ class DefaultLoginRepositoryTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             appEventGateway = appEventGateway,
             fetchNodesUpdateMapper = fetchNodesUpdateMapper,
+            temporaryWaitingErrorMapper = temporaryWaitingErrorMapper,
             applicationScope = testScope,
             setLogoutFlagWrapper = setLogoutFlagWrapper,
             credentialsPreferencesGateway = { credentialsPreferencesGateway }
@@ -495,6 +496,43 @@ class DefaultLoginRepositoryTest {
         }
 
     @Test
+    fun `test that fast login flow returns LoginResumed when the request is updated`() =
+        runTest {
+            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
+            underTest.fastLoginFlow(session).test {
+                verify(megaApiGateway).fastLogin(any(), listenerCaptor.capture())
+                val listener = listenerCaptor.firstValue
+                listener.onRequestUpdate(mock(), mock())
+                assertThat(awaitItem()).isEqualTo(LoginStatus.LoginResumed)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that fastLogin returns LoginWaiting when onRequestTemporaryError`() =
+        runTest {
+            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
+            val request = mock<MegaRequest>()
+            val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EAGAIN) }
+
+            whenever(megaApiGateway.getWaitingReason()).thenReturn(MegaError.API_EAGAIN)
+            whenever(temporaryWaitingErrorMapper(MegaError.API_EAGAIN)).thenReturn(
+                TemporaryWaitingError.ServerIssues
+            )
+
+            underTest.fastLoginFlow(session).test {
+                verify(megaApiGateway).fastLogin(any(), listenerCaptor.capture())
+                listenerCaptor.firstValue.onRequestTemporaryError(mock(), request, error)
+                val result = awaitItem()
+                assertThat(result).isInstanceOf(LoginStatus.LoginWaiting::class.java)
+                assertThat((result as LoginStatus.LoginWaiting).error).isEqualTo(
+                    TemporaryWaitingError.ServerIssues
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that fast login flow returns LoginLoggedOutFromOtherLocation if the request fails with API_ESID`() =
         runTest {
             whenever(megaApiGateway.fastLogin(any(), any())).thenAnswer {
@@ -607,7 +645,7 @@ class DefaultLoginRepositoryTest {
             val expectedProgress = Progress((350 / 500).toFloat())
             val expectedUpdate = FetchNodesUpdate(expectedProgress, null)
 
-            whenever(fetchNodesUpdateMapper(request, null)).thenReturn(expectedUpdate)
+            whenever(fetchNodesUpdateMapper(request)).thenReturn(expectedUpdate)
 
             underTest.fetchNodesFlow().test {
                 verify(megaApiGateway).fetchNodes(listenerCaptor.capture())
@@ -630,18 +668,20 @@ class DefaultLoginRepositoryTest {
             }
             val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EAGAIN) }
             val expectedProgress = Progress((350 / 500).toFloat())
-            val expectedUpdate =
-                FetchNodesUpdate(expectedProgress, FetchNodesTemporaryError.ServerIssues)
+            val expectedUpdate = FetchNodesUpdate(expectedProgress)
 
-            whenever(fetchNodesUpdateMapper(request, error)).thenReturn(expectedUpdate)
+            whenever(megaApiGateway.getWaitingReason()).thenReturn(MegaError.API_EAGAIN)
+            whenever(temporaryWaitingErrorMapper(MegaError.API_EAGAIN)).thenReturn(
+                TemporaryWaitingError.ServerIssues
+            )
+            whenever(fetchNodesUpdateMapper(request)).thenReturn(expectedUpdate)
 
             underTest.fetchNodesFlow().test {
                 verify(megaApiGateway).fetchNodes(listenerCaptor.capture())
                 listenerCaptor.firstValue.onRequestTemporaryError(mock(), request, error)
-                assertThat(awaitItem()).isEqualTo(expectedUpdate.copy(temporaryError = null))
+                assertThat(awaitItem()).isEqualTo(expectedUpdate)
                 assertThat(expectedUpdate.progress).isEqualTo(expectedProgress)
-                assertThat(expectedUpdate.temporaryError)
-                    .isEqualTo(FetchNodesTemporaryError.ServerIssues)
+                assertThat(awaitItem().temporaryError).isEqualTo(TemporaryWaitingError.ServerIssues)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -654,7 +694,7 @@ class DefaultLoginRepositoryTest {
             val expectedProgress = Progress(1F)
             val expectedUpdate = FetchNodesUpdate(expectedProgress, null)
 
-            whenever(fetchNodesUpdateMapper(null, null)).thenReturn(expectedUpdate)
+            whenever(fetchNodesUpdateMapper(null)).thenReturn(expectedUpdate)
 
             underTest.fetchNodesFlow().test {
                 verify(megaApiGateway).fetchNodes(listenerCaptor.capture())

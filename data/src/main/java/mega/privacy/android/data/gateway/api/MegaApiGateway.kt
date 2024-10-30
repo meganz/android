@@ -41,6 +41,11 @@ import java.io.File
 interface MegaApiGateway {
 
     /**
+     * Get waiting reason for retry
+     */
+    fun getWaitingReason(): Int
+
+    /**
      * Get Invalid Handle
      */
     fun getInvalidHandle(): Long

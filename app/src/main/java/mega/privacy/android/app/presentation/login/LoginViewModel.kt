@@ -642,6 +642,9 @@ class LoginViewModel @Inject constructor(
     ) = when (this) {
         LoginStatus.LoginStarted -> {
             Timber.d("Login started")
+            _state.update {
+                it.copy(loginTemporaryError = null)
+            }
         }
 
         LoginStatus.LoginSucceed -> {
@@ -649,11 +652,15 @@ class LoginViewModel @Inject constructor(
             Timber.d("Login finished")
             if (isFastLogin) {
                 _state.update {
-                    it.copy(isFastLoginInProgress = false)
+                    it.copy(
+                        loginTemporaryError = null,
+                        isFastLoginInProgress = false
+                    )
                 }
             } else {
                 _state.update {
                     it.copy(
+                        loginTemporaryError = null,
                         isLoginInProgress = false,
                         isLoginRequired = false,
                         is2FARequired = false,
@@ -672,12 +679,27 @@ class LoginViewModel @Inject constructor(
             Timber.d("Login cannot start")
             _state.update {
                 it.copy(
+                    loginTemporaryError = null,
                     isLoginInProgress = false,
                     isFastLoginInProgress = false,
                     isLoginRequired = true,
                     is2FAEnabled = false,
                     is2FARequired = false
                 )
+            }
+        }
+
+        is LoginStatus.LoginResumed -> {
+            Timber.d("Login resumed")
+            _state.update {
+                it.copy(loginTemporaryError = null)
+            }
+        }
+
+        is LoginStatus.LoginWaiting -> {
+            Timber.d("Login waiting")
+            _state.update {
+                it.copy(loginTemporaryError = this.error)
             }
         }
     }

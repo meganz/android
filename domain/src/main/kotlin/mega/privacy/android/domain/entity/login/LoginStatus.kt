@@ -3,20 +3,33 @@ package mega.privacy.android.domain.entity.login
 /**
  * Enum class for defining Login possible statuses.
  */
-enum class LoginStatus {
+sealed class LoginStatus {
 
     /**
      * Login cannot start.
      */
-    LoginCannotStart,
+    data object LoginCannotStart : LoginStatus()
 
     /**
      * Login started.
      */
-    LoginStarted,
+    data object LoginStarted : LoginStatus()
+
+    /**
+     * Login resumed.
+     */
+    data object LoginResumed : LoginStatus()
 
     /**
      * Login finished with success.
      */
-    LoginSucceed,
+    data object LoginSucceed : LoginStatus()
+
+    /**
+     * Login responded temporary error with retry
+     * @property error
+     */
+    data class LoginWaiting(
+        val error: TemporaryWaitingError?,
+    ) : LoginStatus()
 }

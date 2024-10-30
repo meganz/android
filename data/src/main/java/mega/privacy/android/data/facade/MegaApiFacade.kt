@@ -69,6 +69,8 @@ internal class MegaApiFacade @Inject constructor(
     @ApplicationScope private val sharingScope: CoroutineScope,
 ) : MegaApiGateway {
 
+    override fun getWaitingReason() = megaApi.isWaiting
+
     override fun getInvalidHandle(): Long = MegaApiAndroid.INVALID_HANDLE
 
     override fun getInvalidBackupType() = MegaApiAndroid.BACKUP_TYPE_INVALID
