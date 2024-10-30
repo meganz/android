@@ -330,7 +330,6 @@ String uploadSymbolFailureMessage(String lineBreak) {
  */
 String uploadSymbolSuccessMessage(String lineBreak) {
     return ":rocket: Firebase Crashlytics symbol uploaded successfully!" +
-            "${lineBreak}Version:\t${readAppVersion1()}" +
             "${lineBreak}Last Commit Msg:\t${lastCommitMessage()}" +
             "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
             "${lineBreak}Source Branch:\t${gitlabSourceBranch}" +
