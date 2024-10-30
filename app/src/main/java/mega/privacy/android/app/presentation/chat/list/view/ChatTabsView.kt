@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.extensions.normalize
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
@@ -201,17 +202,11 @@ fun ChatTabsView(
                 state.searchQuery?.takeIf(String::isNotBlank)?.let { searchQuery ->
                     if (pagerState.currentPage == ChatTab.CHATS.ordinal) {
                         filteredChats = state.chats.filter { item ->
-                            item.title.contains(searchQuery, true) || item.lastMessage?.contains(
-                                searchQuery,
-                                true
-                            ) == true
+                            item.matches(searchQuery)
                         }
                     } else {
                         filteredMeetings = state.meetings.filter { item ->
-                            item.title.contains(searchQuery, true) || item.lastMessage?.contains(
-                                searchQuery,
-                                true
-                            ) == true
+                            item.matches(searchQuery)
                         }
                     }
                 } ?: run {
@@ -221,7 +216,7 @@ fun ChatTabsView(
             }
 
             LaunchedEffect(pagerState.currentPage) {
-                onTabSelected(ChatTab.values()[pagerState.currentPage])
+                onTabSelected(ChatTab.entries[pagerState.currentPage])
             }
 
             EventEffect(
@@ -260,6 +255,12 @@ fun ChatTabsView(
         ForceAppUpdateDialog(onDismiss = onDismissForceAppUpdateDialog)
     }
 }
+
+private fun ChatRoomItem.matches(searchQuery: String): Boolean =
+    title.contains(searchQuery, true)
+            || title.normalize().contains(searchQuery, true)
+            || lastMessage?.contains(searchQuery, true) == true
+            || lastMessage?.normalize()?.contains(searchQuery, true) == true
 
 @Composable
 private fun TabText(titleStringRes: Int, hasUnreadMessages: Boolean) {

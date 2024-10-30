@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.annotation.ColorRes
 import androidx.recyclerview.widget.DiffUtil
+import mega.privacy.android.app.extensions.normalize
 import mega.privacy.android.app.utils.AvatarUtil
 
 /**
@@ -58,10 +59,16 @@ sealed class ContactItem(val id: Long) {
         fun getFirstCharacter(): String =
             AvatarUtil.getFirstLetter(getTitle())
 
+        /**
+         * Checks if any of the fields contains the query string.
+         */
         fun matches(queryString: String): Boolean =
-            fullName?.contains(queryString, true) == true ||
-                    email.contains(queryString, true) ||
-                    alias?.contains(queryString, true) == true
+            fullName?.contains(queryString, true) == true
+                    || fullName?.normalize()?.contains(queryString, true) == true
+                    || email.contains(queryString, true)
+                    || email.normalize().contains(queryString, true)
+                    || alias?.contains(queryString, true) == true
+                    || alias?.normalize()?.contains(queryString, true) == true
     }
 
     /**
