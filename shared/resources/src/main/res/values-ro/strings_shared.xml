@@ -673,7 +673,7 @@
     <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
     <string name="document_scanning_error_type_insufficient_ram">Telefonul nu îndeplinește cerințele minime de memorie pentru a finaliza scanarea</string>
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
-    <string name="document_scanning_error_type_generic_error">Întâmpinăm probleme la scanarea acestui document. Închideți și redeschideți aplicația și încercați din nou.</string>
+    <string name="document_scanning_error_type_generic_error">Avem probleme la deschiderea scanerului de documente. Închideți și redeschideți aplicația și încercați din nou.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">Închide</string>
     <!--Title text to start a meeting from Meeting screen empty view-->

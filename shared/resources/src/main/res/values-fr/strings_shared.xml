@@ -673,7 +673,7 @@
     <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
     <string name="document_scanning_error_type_insufficient_ram">Votre téléphone ne dispose pas de la mémoire minimale requise pour terminer la numérisation</string>
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
-    <string name="document_scanning_error_type_generic_error">Nous ne parvenons pas à numériser ce document. Fermez et rouvrez l’appli, puis réessayez.</string>
+    <string name="document_scanning_error_type_generic_error">Nous ne parvenons pas à ouvrir le scanner de documents. Fermez et ouvrez de nouveau l\’application, puis réessayez.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">Fermer</string>
     <!--Title text to start a meeting from Meeting screen empty view-->

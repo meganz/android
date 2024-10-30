@@ -655,7 +655,7 @@
     <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
     <string name="document_scanning_error_type_insufficient_ram">Your phone doesn’t meet the minimum memory requirements to complete the scan</string>
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
-    <string name="document_scanning_error_type_generic_error">We’re having trouble scanning this document. Please try again.</string>
+    <string name="document_scanning_error_type_generic_error">We\’re having trouble opening the document scanner. Close and re-open the app, and try again.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">Tutup</string>
     <!--Title text to start a meeting from Meeting screen empty view-->

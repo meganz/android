@@ -685,7 +685,7 @@
     <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
     <string name="document_scanning_error_type_insufficient_ram">Ваш телефон не соответствует минимальным требованиям к объёму оперативной памяти для завершения сканирования</string>
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
-    <string name="document_scanning_error_type_generic_error">У нас возникли проблемы со сканированием этого документа. Пожалуйста, попробуйте ещё раз.</string>
+    <string name="document_scanning_error_type_generic_error">Не удаётся открыть сканер документов. Закройте и снова откройте приложение, и повторите попытку.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">Закрыть</string>
     <!--Title text to start a meeting from Meeting screen empty view-->

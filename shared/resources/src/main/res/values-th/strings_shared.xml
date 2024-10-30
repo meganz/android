@@ -649,7 +649,7 @@
     <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
     <string name="document_scanning_error_type_insufficient_ram">โทรศัพท์ของคุณมีหน่วยความจำไม่เพียงพอที่จะทำการสแกน</string>
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
-    <string name="document_scanning_error_type_generic_error">เรากำลังประสบปัญหากับการสแกนเอกสารนี้ กรุณาลองใหม่อีกครั้ง</string>
+    <string name="document_scanning_error_type_generic_error">เรากำลังประสบปัญหาในการเปิดตัวสแกนเอกสาร กรุณาปิดแอปแล้วเปิดใหม่ แล้วลองสแกนอีกครั้ง</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">ปิด</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
