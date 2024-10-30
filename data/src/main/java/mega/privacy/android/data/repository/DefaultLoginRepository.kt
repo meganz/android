@@ -26,6 +26,7 @@ import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGatew
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.SessionTransferURLListenerInterface
 import mega.privacy.android.data.mapper.login.FetchNodesUpdateMapper
+import mega.privacy.android.data.mapper.login.TemporaryWaitingErrorMapper
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.exception.ChatLoggingOutException
@@ -69,9 +70,10 @@ internal class DefaultLoginRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val appEventGateway: AppEventGateway,
     private val fetchNodesUpdateMapper: FetchNodesUpdateMapper,
+    private val temporaryWaitingErrorMapper: TemporaryWaitingErrorMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val setLogoutFlagWrapper: SetLogoutFlagWrapper,
-    private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>
+    private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>,
 ) : LoginRepository {
 
     override suspend fun initMegaChat(session: String) =
@@ -216,67 +218,90 @@ internal class DefaultLoginRepository @Inject constructor(
         }
     }
 
-    private fun loginRequest(loginRequest: (OptionalMegaRequestListenerInterface) -> Unit) =
-        callbackFlow {
-            val listener = OptionalMegaRequestListenerInterface(
-                onRequestStart = { trySend(LoginStatus.LoginStarted) },
-                onRequestFinish = { _, error ->
-                    when (error.errorCode) {
-                        MegaError.API_OK -> {
-                            trySend(LoginStatus.LoginSucceed)
-                            close()
-                        }
-
-                        MegaError.API_ESID -> {
-                            Timber.w("Logged out from other location.")
-                            close(LoginLoggedOutFromOtherLocation())
-                        }
-
-                        MegaError.API_EFAILED, MegaError.API_EEXPIRED -> {
-                            Timber.w("Wrong 2FA code.")
-                            close(LoginWrongMultiFactorAuth())
-                        }
-
-                        MegaError.API_EMFAREQUIRED -> {
-                            Timber.w("Require 2FA.")
-                            close(LoginMultiFactorAuthRequired())
-                        }
-
-                        MegaError.API_ENOENT -> {
-                            Timber.w("Wrong email or password")
-                            close(LoginWrongEmailOrPassword())
-                        }
-
-                        MegaError.API_ETOOMANY -> {
-                            Timber.w("Too many attempts")
-                            close(LoginTooManyAttempts())
-                        }
-
-                        MegaError.API_EINCOMPLETE -> {
-                            Timber.w("Account not validated")
-                            close(LoginRequireValidation())
-                        }
-
-                        MegaError.API_EBLOCKED -> {
-                            Timber.w("Blocked account")
-                            close(LoginBlockedAccount())
-                        }
-
-                        else -> {
-                            Timber.w("MegaRequest.TYPE_LOGIN error $error")
-                            close(LoginUnknownStatus(error.toException("loginRequest")))
+    private fun loginRequest(
+        loginRequest: (OptionalMegaRequestListenerInterface) -> Unit,
+    ) = callbackFlow {
+        var timerJob: Job? = null
+        val listener = OptionalMegaRequestListenerInterface(
+            onRequestStart = { trySend(LoginStatus.LoginStarted) },
+            onRequestTemporaryError = { request, error ->
+                Timber.w("onRequestTemporaryError: %s%d", request.requestString, error.errorCode)
+                if (timerJob?.isActive != true) {
+                    timerJob = applicationScope.launch(ioDispatcher) {
+                        runCatching {
+                            delay(WAITING_ERROR_TIMER)
+                            val temporaryError = megaApiGateway.getWaitingReason().let {
+                                Timber.w("Waiting, retry reason for ${request.requestString}: $it")
+                                temporaryWaitingErrorMapper(it)
+                            }
+                            trySend(LoginStatus.LoginWaiting(temporaryError))
                         }
                     }
                 }
-            )
+            },
+            onRequestUpdate = { request ->
+                Timber.d("onRequestUpdate: ${request.requestString}")
+                timerJob?.cancel()
+                trySend(LoginStatus.LoginResumed)
+            },
+            onRequestFinish = { _, error ->
+                timerJob?.cancel()
+                when (error.errorCode) {
+                    MegaError.API_OK -> {
+                        trySend(LoginStatus.LoginSucceed)
+                        close()
+                    }
 
-            loginRequest.invoke(listener)
-            awaitClose()
-        }.onEach {
-            if (it == LoginStatus.LoginSucceed) {
-                megaApiFolderGateway.setAccountAuth(megaApiGateway.getAccountAuth())
+                    MegaError.API_ESID -> {
+                        Timber.w("Logged out from other location.")
+                        close(LoginLoggedOutFromOtherLocation())
+                    }
+
+                    MegaError.API_EFAILED, MegaError.API_EEXPIRED -> {
+                        Timber.w("Wrong 2FA code.")
+                        close(LoginWrongMultiFactorAuth())
+                    }
+
+                    MegaError.API_EMFAREQUIRED -> {
+                        Timber.w("Require 2FA.")
+                        close(LoginMultiFactorAuthRequired())
+                    }
+
+                    MegaError.API_ENOENT -> {
+                        Timber.w("Wrong email or password")
+                        close(LoginWrongEmailOrPassword())
+                    }
+
+                    MegaError.API_ETOOMANY -> {
+                        Timber.w("Too many attempts")
+                        close(LoginTooManyAttempts())
+                    }
+
+                    MegaError.API_EINCOMPLETE -> {
+                        Timber.w("Account not validated")
+                        close(LoginRequireValidation())
+                    }
+
+                    MegaError.API_EBLOCKED -> {
+                        Timber.w("Blocked account")
+                        close(LoginBlockedAccount())
+                    }
+
+                    else -> {
+                        Timber.w("MegaRequest.TYPE_LOGIN error $error")
+                        close(LoginUnknownStatus(error.toException("loginRequest")))
+                    }
+                }
             }
-        }.flowOn(ioDispatcher)
+        )
+
+        loginRequest.invoke(listener)
+        awaitClose()
+    }.onEach {
+        if (it == LoginStatus.LoginSucceed) {
+            megaApiFolderGateway.setAccountAuth(megaApiGateway.getAccountAuth())
+        }
+    }.flowOn(ioDispatcher)
 
     override fun login(email: String, password: String) =
         loginRequest { megaApiGateway.login(email, password, it) }
@@ -301,23 +326,30 @@ internal class DefaultLoginRepository @Inject constructor(
             onRequestStart = { Timber.d("onRequestStart: Fetch nodes") },
             onRequestUpdate = { request ->
                 timerJob?.cancel()
-                trySend(fetchNodesUpdateMapper(request, null))
+                trySend(fetchNodesUpdateMapper(request))
             },
             onRequestTemporaryError = { request, error ->
                 Timber.w("onRequestTemporaryError: %s%d", request.requestString, error.errorCode)
-                val temporaryError = fetchNodesUpdateMapper(request, error)
-                trySend(temporaryError.copy(temporaryError = null))
-                timerJob = applicationScope.launch {
-                    runCatching {
-                        delay(FETCH_NODES_ERROR_TIMER)
-                        trySend(temporaryError)
+                if (timerJob?.isActive != true) {
+                    val fetchNodesUpdate = fetchNodesUpdateMapper(request)
+                    trySend(fetchNodesUpdate)
+                    timerJob = applicationScope.launch(ioDispatcher) {
+                        runCatching {
+                            delay(WAITING_ERROR_TIMER)
+                            val temporaryError = megaApiGateway.getWaitingReason().let {
+                                Timber.w("Waiting, retry reason for ${request.requestString}: $it")
+                                temporaryWaitingErrorMapper(it)
+                            }
+                            trySend(fetchNodesUpdate.copy(temporaryError = temporaryError))
+                        }
                     }
                 }
             },
             onRequestFinish = { request, error ->
+                timerJob?.cancel()
                 when (error.errorCode) {
                     MegaError.API_OK -> {
-                        trySend(fetchNodesUpdateMapper(null, null))
+                        trySend(fetchNodesUpdateMapper(null))
                         close()
                     }
 
@@ -391,6 +423,6 @@ internal class DefaultLoginRepository @Inject constructor(
         }
 
     companion object {
-        internal const val FETCH_NODES_ERROR_TIMER = 10000L
+        internal const val WAITING_ERROR_TIMER = 10000L
     }
 }

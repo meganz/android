@@ -9,6 +9,7 @@ import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
+import mega.privacy.android.domain.entity.login.TemporaryWaitingError
 import mega.privacy.android.domain.exception.LoginException
 
 
@@ -45,9 +46,10 @@ import mega.privacy.android.domain.exception.LoginException
  * @property isPendingToFinishActivity  True if should finish the activity, false otherwise.
  * @property isPendingToShowFragment    [LoginFragmentType] if pending, null otherwise.
  * @property enabledFlags               Enabled Feature Flags
- * @property isCheckingSignupLink        True if it is checking a signup link, false otherwise.
+ * @property isCheckingSignupLink       True if it is checking a signup link, false otherwise.
  * @property snackbarMessage            Message to show in Snackbar.
  * @property isFastLoginInProgress      True if a fast login is in progress, false otherwise.
+ * @property loginTemporaryError        [TemporaryWaitingError] during login
  */
 data class LoginState(
     val intentState: LoginIntentState? = null,
@@ -83,7 +85,13 @@ data class LoginState(
     val enabledFlags: Set<Feature> = emptySet(),
     val isCheckingSignupLink: Boolean = false,
     val snackbarMessage: StateEventWithContent<Int> = consumed(),
+    val loginTemporaryError: TemporaryWaitingError? = null,
 ) {
+
+    /**
+     * Temporary error during login or fetch nodes
+     */
+    private val temporaryError get() = loginTemporaryError ?: fetchNodesUpdate?.temporaryError
 
     /**
      * Text to show below progress bar
@@ -91,9 +99,10 @@ data class LoginState(
     @StringRes
     val currentStatusText: Int = when {
         isCheckingSignupLink -> R.string.login_querying_signup_link
-        isFastLoginInProgress -> R.string.login_connecting_to_server
-        fetchNodesUpdate?.temporaryError != null -> fetchNodesUpdate.temporaryError?.messageId
+        temporaryError != null -> temporaryError?.messageId
             ?: R.string.login_connecting_to_server
+
+        isFastLoginInProgress -> R.string.login_connecting_to_server
 
         (fetchNodesUpdate?.progress?.floatValue
             ?: 0f) > 0f && isFirstTime -> R.string.login_preparing_filelist

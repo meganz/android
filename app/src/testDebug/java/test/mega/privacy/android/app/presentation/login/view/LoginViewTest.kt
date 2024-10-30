@@ -10,13 +10,9 @@ import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
-import mega.privacy.android.app.presentation.login.view.FETCH_NODES_PROGRESS_TEST_TAG
-import mega.privacy.android.app.presentation.login.view.LoginView
-import mega.privacy.android.app.presentation.login.view.MEGA_LOGO_TEST_TAG
-import mega.privacy.android.app.presentation.login.view.TWO_FA_PROGRESS_TEST_TAG
 import mega.privacy.android.app.presentation.twofactorauthentication.view.TWO_FACTOR_AUTHENTICATION_TEST_TAG
 import mega.privacy.android.domain.entity.Progress
-import mega.privacy.android.domain.entity.login.FetchNodesTemporaryError
+import mega.privacy.android.domain.entity.login.TemporaryWaitingError
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import org.junit.Rule
 import org.junit.Test
@@ -150,7 +146,7 @@ class LoginViewTest {
 
     @Test
     fun `test that temporary error text is shown if fetch nodes update has it`() {
-        val temporaryError = FetchNodesTemporaryError.ConnectivityIssues
+        val temporaryError = TemporaryWaitingError.ConnectivityIssues
         setupRule(LoginState(fetchNodesUpdate = FetchNodesUpdate(temporaryError = temporaryError)))
         composeRule.onNodeWithText(fromId(temporaryError.messageId)).assertExists()
     }
