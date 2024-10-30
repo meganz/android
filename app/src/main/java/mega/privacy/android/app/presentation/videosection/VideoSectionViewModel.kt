@@ -183,7 +183,11 @@ class VideoSectionViewModel @Inject constructor(
 
         viewModelScope.launch {
             monitorVideoRecentlyWatchedUseCase().conflate().collectLatest {
-                it.convertAndUpdateState()
+                it.filterNonSensitiveItems(
+                    showHiddenItems = this@VideoSectionViewModel.showHiddenItems,
+                    isPaid = _state.value.accountType?.isPaid,
+                    isBusinessAccountExpired = _state.value.isBusinessAccountExpired
+                ).convertAndUpdateState()
             }
         }
     }
@@ -1161,7 +1165,11 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     internal fun refreshRecentlyWatchedVideos() = viewModelScope.launch {
-        monitorVideoRecentlyWatchedUseCase().firstOrNull().convertAndUpdateState()
+        monitorVideoRecentlyWatchedUseCase().firstOrNull()?.filterNonSensitiveItems(
+            showHiddenItems = this@VideoSectionViewModel.showHiddenItems,
+            isPaid = _state.value.accountType?.isPaid,
+            isBusinessAccountExpired = _state.value.isBusinessAccountExpired
+        ).convertAndUpdateState()
     }
 
     private fun List<TypedVideoNode>?.convertAndUpdateState() {
