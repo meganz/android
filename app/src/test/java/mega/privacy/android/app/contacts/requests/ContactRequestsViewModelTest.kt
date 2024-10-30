@@ -1,10 +1,10 @@
 package mega.privacy.android.app.contacts.requests
 
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import com.jraska.livedata.test
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
+import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.contacts.requests.mapper.ContactRequestItemMapper
@@ -23,7 +23,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verifyBlocking
-import mega.privacy.android.app.InstantExecutorExtension
 
 @ExtendWith(
     InstantExecutorExtension::class,
@@ -61,7 +60,6 @@ class ContactRequestsViewModelTest {
                     email = if (request.isOutgoing) {
                         request.targetEmail ?: ""
                     } else request.sourceEmail,
-                    avatarUri = Uri.EMPTY,
                     placeholder = placeholder,
                     createdTime = "time",
                     isOutgoing = request.isOutgoing

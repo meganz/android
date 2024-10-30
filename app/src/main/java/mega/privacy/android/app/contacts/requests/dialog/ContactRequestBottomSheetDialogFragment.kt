@@ -7,12 +7,15 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
+import coil.load
+import coil.transform.CircleCropTransformation
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.contacts.requests.ContactRequestsViewModel
 import mega.privacy.android.app.databinding.BottomSheetContactRequestBinding
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
-import mega.privacy.android.app.utils.setImageRequestFromUri
 import mega.privacy.android.domain.entity.contacts.ContactRequestAction
+import mega.privacy.android.domain.entity.user.ContactAvatar
+import mega.privacy.android.domain.entity.user.UserId
 import nz.mega.sdk.MegaApiJava
 
 /**
@@ -61,8 +64,12 @@ class ContactRequestBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
 
             binding.header.txtTitle.text = item.email
             binding.header.txtSubtitle.text = item.createdTime
-            binding.header.imgThumbnail.hierarchy.setPlaceholderImage(item.placeholder)
-            binding.header.imgThumbnail.setImageRequestFromUri(item.avatarUri)
+            binding.header.imgThumbnail.load(
+                data = ContactAvatar(email = item.email, id = UserId(item.handle))
+            ) {
+                transformations(CircleCropTransformation())
+                placeholder(item.placeholder)
+            }
             binding.groupReceived.isVisible = !item.isOutgoing
             binding.groupSent.isVisible = item.isOutgoing
 

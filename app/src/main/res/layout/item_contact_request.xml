@@ -7,14 +7,13 @@
     android:minHeight="72dp"
     android:padding="16dp">
 
-    <com.facebook.drawee.view.SimpleDraweeView
+    <ImageView
         android:id="@+id/img_thumbnail"
         android:layout_width="40dp"
         android:layout_height="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:roundAsCircle="true"
         tools:placeholderImage="@android:drawable/ic_menu_camera" />
 
     <mega.privacy.android.app.components.twemoji.EmojiTextView

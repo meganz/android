@@ -17,6 +17,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.view.TextDrawable
 import mega.privacy.android.domain.entity.user.ContactAvatar
+import mega.privacy.android.domain.usecase.avatar.GetAvatarFileFromEmailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetAvatarFileFromHandleUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
 import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCase
@@ -38,13 +39,19 @@ class MegaAvatarFetcher(
     private val data: ContactAvatar,
     private val options: Options,
     private val getAvatarFileFromHandleUseCase: GetAvatarFileFromHandleUseCase,
+    private val getAvatarFileFromEmailUseCase: GetAvatarFileFromEmailUseCase,
     private val getUserAvatarColorUseCase: GetUserAvatarColorUseCase,
     private val getParticipantFirstNameUseCase: GetParticipantFirstNameUseCase,
 ) : Fetcher {
 
     override suspend fun fetch(): FetchResult {
-        runCatching { getAvatarFileFromHandleUseCase(data.id.id, true) }
-            .onFailure { Timber.e(it, "Error getting avatar file from handle") }
+        runCatching {
+            when (data) {
+                is ContactAvatar.WithEmail -> getAvatarFileFromEmailUseCase(data.email, true)
+                is ContactAvatar.WithId -> getAvatarFileFromHandleUseCase(data.id.id, true)
+            }
+        }
+            .onFailure { Timber.e(it, "Error getting avatar file from handle or email") }
             .getOrNull()?.takeIf { it.length() > 0 }?.let { file ->
                 return SourceResult(
                     source = ImageSource(file = file.toOkioPath()),
@@ -78,9 +85,19 @@ class MegaAvatarFetcher(
         )
     }
 
+    /**
+     * Factory
+     *
+     * @property context
+     * @property getAvatarFileFromHandleUseCase
+     * @property getAvatarFileFromEmailUseCase
+     * @property getUserAvatarColorUseCase
+     * @property getParticipantFirstNameUseCase
+     */
     class Factory @Inject constructor(
         @ApplicationContext private val context: Context,
         private val getAvatarFileFromHandleUseCase: GetAvatarFileFromHandleUseCase,
+        private val getAvatarFileFromEmailUseCase: GetAvatarFileFromEmailUseCase,
         private val getUserAvatarColorUseCase: GetUserAvatarColorUseCase,
         private val getParticipantFirstNameUseCase: GetParticipantFirstNameUseCase,
     ) : Fetcher.Factory<ContactAvatar> {
@@ -97,12 +114,16 @@ class MegaAvatarFetcher(
                 options = options,
                 getAvatarFileFromHandleUseCase = getAvatarFileFromHandleUseCase,
                 getUserAvatarColorUseCase = getUserAvatarColorUseCase,
-                getParticipantFirstNameUseCase = getParticipantFirstNameUseCase
+                getParticipantFirstNameUseCase = getParticipantFirstNameUseCase,
+                getAvatarFileFromEmailUseCase = getAvatarFileFromEmailUseCase,
             )
         }
 
         private fun isApplicable(data: ContactAvatar): Boolean {
-            return data.id.id != 0L
+            return when (data) {
+                is ContactAvatar.WithEmail -> data.email.isNotEmpty()
+                is ContactAvatar.WithId -> data.id.id != 0L
+            }
         }
     }
 }

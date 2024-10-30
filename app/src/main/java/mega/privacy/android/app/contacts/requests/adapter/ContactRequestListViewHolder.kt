@@ -1,9 +1,12 @@
 package mega.privacy.android.app.contacts.requests.adapter
 
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import coil.transform.CircleCropTransformation
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.databinding.ItemContactRequestBinding
-import mega.privacy.android.app.utils.setImageRequestFromUri
+import mega.privacy.android.domain.entity.user.ContactAvatar
+import mega.privacy.android.domain.entity.user.UserId
 
 /**
  * RecyclerView's ViewHolder to show ContactRequestItem.
@@ -15,9 +18,14 @@ class ContactRequestListViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: ContactRequestItem) {
+        println("CR Timing - ViewHolder Bind")
         binding.txtTitle.text = item.email
         binding.txtSubtitle.text = item.createdTime
-        binding.imgThumbnail.hierarchy.setPlaceholderImage(item.placeholder)
-        binding.imgThumbnail.setImageRequestFromUri(item.avatarUri)
+        binding.imgThumbnail.load(
+            data = ContactAvatar(email = item.email, id = UserId(item.handle))
+        ) {
+            transformations(CircleCropTransformation())
+            placeholder(item.placeholder)
+        }
     }
 }

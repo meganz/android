@@ -5,7 +5,6 @@ import android.graphics.drawable.Drawable
 import android.text.format.DateUtils.getRelativeTimeSpanString
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
@@ -39,14 +38,10 @@ internal class ContactRequestItemMapper(
         val email = (if (isOutgoing) targetEmail else sourceEmail) ?: return null
         val userImageColor = avatarRepository.getAvatarColor(handle)
         val placeholder = getImagePlaceholder(email, userImageColor)
-        val userImageUri = runCatching {
-            avatarRepository.getAvatarFile(email)
-        }.getOrNull()?.takeIf { it.exists() }?.toUri()
 
         ContactRequestItem(
             handle = handle,
             email = email,
-            avatarUri = userImageUri,
             placeholder = placeholder,
             createdTime = formatCreationTime(creationTime * 1000).toString(),
             isOutgoing = isOutgoing,
