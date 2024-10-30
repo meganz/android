@@ -112,7 +112,8 @@ pipeline {
 
                         // Send to android slack channel
                         def slackVersionInfo = getSlackBuildVersionInfo(common)
-                        def (slackChannelId, qaSlackChannelId) = common.fetchSlackChannelIdsByReleaseVersion(common.readAppVersion()[0])
+                        def version = common.readAppVersion()[0]
+                        def (slackChannelId, qaSlackChannelId) = common.fetchSlackChannelIdsByReleaseVersion(version)
 
                         if (slackChannelId == "") {
                             def slackResponse = slackSend(channel: "android", message: slackVersionInfo)
@@ -120,7 +121,11 @@ pipeline {
                             // write slackResponse.threadId to local file and upload to slackInfoPath
                             slackChannelId = slackResponse.threadId
                             qaSlackChannelId = qaSlackResponse.threadId
+
                             def slackInfoFileName = "slack_info.txt"
+                            def formattedVersionName = version.split("\\.")[0..1].join(".")
+                            String slackInfoPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/v${formattedVersionName}/${slackInfoFileName}"
+
                             sh """
                                cd ${WORKSPACE}
                                echo ${slackChannelId},${qaSlackChannelId} > ${slackInfoFileName}
