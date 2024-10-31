@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -137,8 +138,10 @@ internal class SyncRepositoryImpl @Inject constructor(
 
     private val _syncStalledIssues by lazy {
         _syncChanges
+            .onEach {
+                delay(SYNC_REFRESH_DELAY)
+            }
             .map { getSyncStalledIssues() }
-            .onStart { emit(getSyncStalledIssues()) }
             .flowOn(ioDispatcher)
             .shareIn(appScope, SharingStarted.Eagerly, replay = 1)
     }
@@ -186,5 +189,16 @@ internal class SyncRepositoryImpl @Inject constructor(
 
     override suspend fun stopSyncWorker() {
         syncWorkManagerGateway.cancelSyncWorkerRequest()
+    }
+
+    private companion object {
+        /**
+         * Delay to ensure two things:
+         * 1. correct stalled issues are loaded on app start (without the delay
+         * we would get empty issues list first before getting the correct one)
+         * 2. Prevent the situation when the SDK is too fast detecting
+         * issues that are later resolved by the following sync loop.
+         */
+        const val SYNC_REFRESH_DELAY = 5000L
     }
 }
