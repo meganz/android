@@ -139,11 +139,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     MaterialToolbar tB;
     NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = this;
 
-    public boolean isList = true;
-
     RelativeLayout container;
-    LinearLayout linearLayoutList;
-    LinearLayout linearLayoutGrid;
     RecyclerView listView;
     LinearLayoutManager mLayoutManager;
     RelativeLayout emptyLayout;
@@ -271,25 +267,12 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         Spanned result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
         emptyTextView.setText(result);
 
-        linearLayoutList = findViewById(R.id.linear_layout_recycler_list);
-        linearLayoutGrid = findViewById(R.id.linear_layout_recycler_grid);
-
-        if (isList) {
-            linearLayoutList.setVisibility(View.VISIBLE);
-            linearLayoutGrid.setVisibility(View.GONE);
-
-            listView = findViewById(R.id.node_history_list_view);
-            listView.addItemDecoration(new SimpleDividerItemDecoration(this));
-            mLayoutManager = new LinearLayoutManager(this);
-            mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-            listView.setLayoutManager(mLayoutManager);
-            listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
-        } else {
-            linearLayoutList.setVisibility(View.GONE);
-            linearLayoutGrid.setVisibility(View.VISIBLE);
-
-            listView = findViewById(R.id.file_grid_view_browser);
-        }
+        listView = findViewById(R.id.node_history_list_view);
+        listView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        listView.setLayoutManager(mLayoutManager);
+        listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 
         listView.setClipToPadding(false);
         listView.setHasFixedSize(true);
@@ -349,14 +332,8 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
                     messages = new ArrayList<>();
 
-                    if (isList) {
-                        if (adapter == null) {
-                            adapter = new NodeAttachmentHistoryAdapter(this, messages, listView, NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST);
-                        }
-                    } else {
-                        if (adapter == null) {
-                            adapter = new NodeAttachmentHistoryAdapter(this, messages, listView, NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_GRID);
-                        }
+                    if (adapter == null) {
+                        adapter = new NodeAttachmentHistoryAdapter(this, messages, listView);
                     }
 
                     listView.setAdapter(adapter);
@@ -1128,7 +1105,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
             if (!messages.isEmpty()) {
                 if (adapter == null) {
-                    adapter = new NodeAttachmentHistoryAdapter(this, messages, listView, NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST);
+                    adapter = new NodeAttachmentHistoryAdapter(this, messages, listView);
                     listView.setLayoutManager(mLayoutManager);
                     listView.addItemDecoration(new SimpleDividerItemDecoration(this));
                     listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -1179,7 +1156,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         //Create adapter
         if (adapter == null) {
             Timber.d("Create adapter");
-            adapter = new NodeAttachmentHistoryAdapter(this, messages, listView, NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST);
+            adapter = new NodeAttachmentHistoryAdapter(this, messages, listView);
             listView.setLayoutManager(mLayoutManager);
             listView.addItemDecoration(new SimpleDividerItemDecoration(this));
             listView.addOnScrollListener(new RecyclerView.OnScrollListener() {

@@ -1,19 +1,12 @@
 package mega.privacy.android.app.main.megachat.chatAdapters;
 
 import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
-import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
-import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbAndSetViewForList;
-import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbAndSetViewOrCreateForList;
 import static mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT;
 import static mega.privacy.android.app.utils.TimeUtils.formatDateAndTime;
-import static mega.privacy.android.app.utils.TimeUtils.getVideoDuration;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -25,45 +18,42 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.core.content.ContextCompat;
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import coil.Coil;
+import coil.request.ImageRequest;
+import coil.request.SuccessResult;
+import coil.transform.RoundedCornersTransformation;
+import coil.util.CoilUtils;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
-import mega.privacy.android.app.utils.ThumbnailUtils;
+import mega.privacy.android.domain.entity.node.thumbnail.ChatThumbnailRequest;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
-public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttachmentHistoryAdapter.ViewHolderBrowser> implements OnClickListener, View.OnLongClickListener {
-
-    public static final int ITEM_VIEW_TYPE_LIST = 0;
-    public static final int ITEM_VIEW_TYPE_GRID = 1;
-
+public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttachmentHistoryAdapter.ViewHolderBrowserList> implements OnClickListener, View.OnLongClickListener {
     Context context;
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
 
     ArrayList<MegaChatMessage> messages;
 
-    Object fragment;
-    long parentHandle = -1;
     DisplayMetrics outMetrics;
 
     private SparseBooleanArray selectedItems;
@@ -73,8 +63,6 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
     boolean multipleSelect;
 
     ChatController cC;
-
-    int adapterType;
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
 
@@ -104,28 +92,6 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         ImageView threeDotsImageView;
     }
 
-    public static class ViewHolderBrowserGrid extends NodeAttachmentHistoryAdapter.ViewHolderBrowser {
-
-        public ViewHolderBrowserGrid(View v) {
-            super(v);
-        }
-
-        public ImageView imageViewThumb;
-        public ImageView imageViewIcon;
-        public RelativeLayout thumbLayout;
-        public ImageView imageViewVideoIcon;
-        public TextView videoDuration;
-        public RelativeLayout videoInfoLayout;
-        public ImageButton imageButtonThreeDots;
-
-        public View fileLayout;
-        public RelativeLayout thumbLayoutForFile;
-        public ImageView fileGridIconForFile;
-        public ImageButton imageButtonThreeDotsForFile;
-        public TextView textViewFileNameForFile;
-        public ImageView fileGridSelected;
-    }
-
     public void toggleAllSelection(int pos) {
         Timber.d("position: %s", pos);
         final int positionToflip = pos;
@@ -139,46 +105,38 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             selectedItems.put(pos, true);
         }
 
-        if (adapterType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST) {
-            Timber.d("Adapter type is LIST");
-            NodeAttachmentHistoryAdapter.ViewHolderBrowserList view = (NodeAttachmentHistoryAdapter.ViewHolderBrowserList) listFragment.findViewHolderForLayoutPosition(pos);
-            if (view != null) {
-                Timber.d("Start animation: %d multiselection state: %s", pos, isMultipleSelect());
-                Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-                flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
+        Timber.d("Adapter type is LIST");
+        ViewHolderBrowserList view = (ViewHolderBrowserList) listFragment.findViewHolderForLayoutPosition(pos);
+        if (view != null) {
+            Timber.d("Start animation: %d multiselection state: %s", pos, isMultipleSelect());
+            Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+            flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
 
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    Timber.d("onAnimationEnd: %s", selectedItems.size());
+                    if (selectedItems.size() <= 0) {
+                        Timber.d("toggleAllSelection: hideMultipleSelect");
+
+                        ((NodeAttachmentHistoryActivity) context).hideMultipleSelect();
                     }
+                    Timber.d("toggleAllSelection: notified item changed");
+                    notifyItemChanged(positionToflip);
+                }
 
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        Timber.d("onAnimationEnd: %s", selectedItems.size());
-                        if (selectedItems.size() <= 0) {
-                            Timber.d("toggleAllSelection: hideMultipleSelect");
+                @Override
+                public void onAnimationRepeat(Animation animation) {
 
-                            ((NodeAttachmentHistoryActivity) context).hideMultipleSelect();
-                        }
-                        Timber.d("toggleAllSelection: notified item changed");
-                        notifyItemChanged(positionToflip);
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-                view.imageView.startAnimation(flipAnimation);
-            } else {
-                Timber.w("NULL view pos: %s", positionToflip);
-                notifyItemChanged(pos);
-            }
+                }
+            });
+            view.imageView.startAnimation(flipAnimation);
         } else {
-            Timber.d("Adapter type is GRID");
-            if (selectedItems.size() <= 0) {
-                ((NodeAttachmentHistoryActivity) context).hideMultipleSelect();
-            }
-            notifyItemChanged(positionToflip);
+            Timber.w("NULL view pos: %s", positionToflip);
+            notifyItemChanged(pos);
         }
     }
 
@@ -193,42 +151,34 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             selectedItems.put(pos, true);
         }
         notifyItemChanged(pos);
-        if (adapterType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST) {
-            Timber.d("Adapter type is LIST");
-            NodeAttachmentHistoryAdapter.ViewHolderBrowserList view = (NodeAttachmentHistoryAdapter.ViewHolderBrowserList) listFragment.findViewHolderForLayoutPosition(pos);
-            if (view != null) {
-                Timber.d("Start animation: %s", pos);
-                Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
-                flipAnimation.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
+        Timber.d("Adapter type is LIST");
+        ViewHolderBrowserList view = (ViewHolderBrowserList) listFragment.findViewHolderForLayoutPosition(pos);
+        if (view != null) {
+            Timber.d("Start animation: %s", pos);
+            Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+            flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
 
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        if (selectedItems.size() <= 0) {
-                            ((NodeAttachmentHistoryActivity) context).hideMultipleSelect();
-                        }
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-
-                view.imageView.startAnimation(flipAnimation);
-
-            } else {
-                Timber.w("View is null - not animation");
-                if (selectedItems.size() <= 0) {
-                    ((NodeAttachmentHistoryActivity) context).hideMultipleSelect();
                 }
-            }
-        } else {
-            Timber.d("Adapter type is GRID");
 
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    if (selectedItems.size() <= 0) {
+                        ((NodeAttachmentHistoryActivity) context).hideMultipleSelect();
+                    }
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            view.imageView.startAnimation(flipAnimation);
+
+        } else {
+            Timber.w("View is null - not animation");
             if (selectedItems.size() <= 0) {
                 ((NodeAttachmentHistoryActivity) context).hideMultipleSelect();
             }
@@ -291,11 +241,10 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         return messages;
     }
 
-    public NodeAttachmentHistoryAdapter(Context _context, ArrayList<MegaChatMessage> _messages, RecyclerView recyclerView, int adapterType) {
+    public NodeAttachmentHistoryAdapter(Context _context, ArrayList<MegaChatMessage> _messages, RecyclerView recyclerView) {
 
         this.context = _context;
         this.messages = _messages;
-        this.adapterType = adapterType;
 
         this.listFragment = recyclerView;
 
@@ -315,221 +264,58 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         notifyDataSetChanged();
     }
 
-    public void setAdapterType(int adapterType) {
-        this.adapterType = adapterType;
-    }
-
-    public int getAdapterType() {
-        return adapterType;
-    }
-
-    public NodeAttachmentHistoryAdapter.ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
+    public NodeAttachmentHistoryAdapter.ViewHolderBrowserList onCreateViewHolder(ViewGroup parent, int viewType) {
         Timber.d("onCreateViewHolder");
         Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        if (viewType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST) {
-            Timber.d("Type: ITEM_VIEW_TYPE_LIST");
+        Timber.d("Type: ITEM_VIEW_TYPE_LIST");
 
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_list, parent, false);
-            ViewHolderBrowserList holderList = new ViewHolderBrowserList(v);
-            holderList.itemLayout = v.findViewById(R.id.file_list_item_layout);
-            holderList.imageView = v.findViewById(R.id.file_list_thumbnail);
-            holderList.savedOffline = v.findViewById(R.id.file_list_saved_offline);
-            holderList.publicLinkImage = v.findViewById(R.id.file_list_public_link);
-            holderList.textViewFileName = v.findViewById(R.id.file_list_filename);
-            holderList.textViewMessageInfo = v.findViewById(R.id.file_list_filesize);
-            holderList.threeDotsLayout = v.findViewById(R.id.file_list_three_dots_layout);
-            holderList.threeDotsImageView = v.findViewById(R.id.file_list_three_dots);
-            holderList.versionsIcon = v.findViewById(R.id.file_list_versions_icon);
-            holderList.textViewMessageInfo.setVisibility(View.VISIBLE);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_list, parent, false);
+        ViewHolderBrowserList holderList = new ViewHolderBrowserList(v);
+        holderList.itemLayout = v.findViewById(R.id.file_list_item_layout);
+        holderList.imageView = v.findViewById(R.id.file_list_thumbnail);
+        holderList.savedOffline = v.findViewById(R.id.file_list_saved_offline);
+        holderList.publicLinkImage = v.findViewById(R.id.file_list_public_link);
+        holderList.textViewFileName = v.findViewById(R.id.file_list_filename);
+        holderList.textViewMessageInfo = v.findViewById(R.id.file_list_filesize);
+        holderList.threeDotsLayout = v.findViewById(R.id.file_list_three_dots_layout);
+        holderList.threeDotsImageView = v.findViewById(R.id.file_list_three_dots);
+        holderList.versionsIcon = v.findViewById(R.id.file_list_versions_icon);
+        holderList.textViewMessageInfo.setVisibility(View.VISIBLE);
 
-            RelativeLayout.LayoutParams paramsThreeDotsIcon = (RelativeLayout.LayoutParams) holderList.threeDotsImageView.getLayoutParams();
-            paramsThreeDotsIcon.leftMargin = scaleWidthPx(8, outMetrics);
-            holderList.threeDotsImageView.setLayoutParams(paramsThreeDotsIcon);
+        RelativeLayout.LayoutParams paramsThreeDotsIcon = (RelativeLayout.LayoutParams) holderList.threeDotsImageView.getLayoutParams();
+        paramsThreeDotsIcon.leftMargin = scaleWidthPx(8, outMetrics);
+        holderList.threeDotsImageView.setLayoutParams(paramsThreeDotsIcon);
 
-            holderList.textViewMessageInfo.setSelected(true);
-            holderList.textViewMessageInfo.setHorizontallyScrolling(true);
-            holderList.textViewMessageInfo.setFocusable(true);
-            holderList.textViewMessageInfo.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-            holderList.textViewMessageInfo.setMarqueeRepeatLimit(-1);
-            holderList.textViewMessageInfo.setSingleLine(true);
-            holderList.textViewMessageInfo.setHorizontallyScrolling(true);
+        holderList.textViewMessageInfo.setSelected(true);
+        holderList.textViewMessageInfo.setHorizontallyScrolling(true);
+        holderList.textViewMessageInfo.setFocusable(true);
+        holderList.textViewMessageInfo.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+        holderList.textViewMessageInfo.setMarqueeRepeatLimit(-1);
+        holderList.textViewMessageInfo.setSingleLine(true);
+        holderList.textViewMessageInfo.setHorizontallyScrolling(true);
 
-            holderList.savedOffline.setVisibility(View.INVISIBLE);
-            holderList.versionsIcon.setVisibility(View.GONE);
-            holderList.publicLinkImage.setVisibility(View.GONE);
+        holderList.savedOffline.setVisibility(View.INVISIBLE);
+        holderList.versionsIcon.setVisibility(View.GONE);
+        holderList.publicLinkImage.setVisibility(View.GONE);
 
-            holderList.itemLayout.setTag(holderList);
-            holderList.itemLayout.setOnClickListener(this);
-            holderList.itemLayout.setOnLongClickListener(this);
+        holderList.itemLayout.setTag(holderList);
+        holderList.itemLayout.setOnClickListener(this);
+        holderList.itemLayout.setOnLongClickListener(this);
 
-            holderList.threeDotsLayout.setTag(holderList);
-            holderList.threeDotsLayout.setOnClickListener(this);
+        holderList.threeDotsLayout.setTag(holderList);
+        holderList.threeDotsLayout.setOnClickListener(this);
 
-            v.setTag(holderList);
-            return holderList;
-        } else if (viewType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_GRID) {
-            Timber.d("Type: ITEM_VIEW_TYPE_GRID");
-
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_grid, parent, false);
-            NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid holderGrid = new NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid(v);
-
-            holderGrid.fileLayout = v.findViewById(R.id.item_file_grid_file);
-            holderGrid.itemLayout = v.findViewById(R.id.file_grid_item_layout);
-            holderGrid.imageViewThumb = v.findViewById(R.id.file_grid_thumbnail);
-            holderGrid.imageViewIcon = v.findViewById(R.id.file_grid_icon);
-            holderGrid.fileGridIconForFile = v.findViewById(R.id.file_grid_icon_for_file);
-            holderGrid.thumbLayout = v.findViewById(R.id.file_grid_thumbnail_layout);
-            holderGrid.thumbLayoutForFile = v.findViewById(R.id.file_grid_thumbnail_layout_for_file);
-            holderGrid.textViewFileName = v.findViewById(R.id.file_grid_filename);
-            holderGrid.textViewFileNameForFile = v.findViewById(R.id.file_grid_filename_for_file);
-            holderGrid.imageButtonThreeDotsForFile = v.findViewById(R.id.file_grid_three_dots_for_file);
-            holderGrid.imageButtonThreeDots = v.findViewById(R.id.file_grid_three_dots);
-
-            holderGrid.imageViewVideoIcon = v.findViewById(R.id.file_grid_video_icon);
-            holderGrid.videoDuration = v.findViewById(R.id.file_grid_title_video_duration);
-            holderGrid.videoInfoLayout = v.findViewById(R.id.item_file_videoinfo_layout);
-            holderGrid.fileGridSelected = v.findViewById(R.id.file_grid_check_icon);
-
-            holderGrid.itemLayout.setTag(holderGrid);
-            holderGrid.itemLayout.setOnClickListener(this);
-            holderGrid.itemLayout.setOnLongClickListener(this);
-
-            holderGrid.imageButtonThreeDots.setTag(holderGrid);
-            holderGrid.imageButtonThreeDots.setOnClickListener(this);
-            holderGrid.imageButtonThreeDotsForFile.setTag(holderGrid);
-            holderGrid.imageButtonThreeDotsForFile.setOnClickListener(this);
-            v.setTag(holderGrid);
-
-            return holderGrid;
-        } else {
-            return null;
-        }
+        v.setTag(holderList);
+        return holderList;
     }
 
-    public void onBindViewHolder(NodeAttachmentHistoryAdapter.ViewHolderBrowser holder, int position) {
+    public void onBindViewHolder(NodeAttachmentHistoryAdapter.ViewHolderBrowserList holder, int position) {
         Timber.d("position: %s", position);
 
-        if (adapterType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST) {
-            NodeAttachmentHistoryAdapter.ViewHolderBrowserList holderList = (NodeAttachmentHistoryAdapter.ViewHolderBrowserList) holder;
-            onBindViewHolderList(holderList, position);
-        } else if (adapterType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_GRID) {
-            NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid holderGrid = (NodeAttachmentHistoryAdapter.ViewHolderBrowserGrid) holder;
-            onBindViewHolderGrid(holderGrid, position);
-        }
-    }
-
-    public void onBindViewHolderGrid(ViewHolderBrowserGrid holder, int position) {
-        Timber.d("position: %s", position);
-        MegaChatMessage m = (MegaChatMessage) getItem(position);
-        MegaNode node = m.getMegaNodeList().get(0);
-
-        holder.document = node.getHandle();
-        Bitmap thumb = null;
-
-        Timber.d("Node : %d %s", position, node.getName());
-
-        holder.textViewFileName.setText(node.getName());
-        holder.videoInfoLayout.setVisibility(View.GONE);
-
-        holder.itemLayout.setVisibility(View.VISIBLE);
-
-        holder.imageViewThumb.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
-        holder.imageViewThumb.setVisibility(View.GONE);
-        holder.fileLayout.setVisibility(View.VISIBLE);
-        holder.textViewFileName.setVisibility(View.VISIBLE);
-
-        holder.textViewFileNameForFile.setText(node.getName());
-
-        holder.fileGridIconForFile.setVisibility(View.VISIBLE);
-        holder.fileGridIconForFile.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
-        holder.thumbLayoutForFile.setBackgroundColor(Color.TRANSPARENT);
-
-        if (multipleSelect && isItemChecked(position)) {
-            holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_item_grid_selected));
-            holder.fileGridSelected.setVisibility(View.VISIBLE);
-
-        } else {
-            holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
-            holder.fileGridSelected.setVisibility(View.GONE);
-        }
-
-        if (isVideoFile(node.getName())) {
-            holder.videoInfoLayout.setVisibility(View.VISIBLE);
-            holder.videoDuration.setVisibility(View.GONE);
-            Timber.d("%s DURATION: %d", node.getName(), node.getDuration());
-            int duration = node.getDuration();
-            if (duration > 0) {
-                holder.videoDuration.setText(getVideoDuration(duration));
-                holder.videoDuration.setVisibility(View.VISIBLE);
-            }
-        }
-
-        if (node.hasThumbnail()) {
-
-            Bitmap temp = ThumbnailUtils.getThumbnailFromCache(node);
-
-            if (temp != null) {
-                thumb = ThumbnailUtils.getRoundedRectBitmap(context, temp, 2);
-                holder.fileGridIconForFile.setVisibility(View.GONE);
-                holder.imageViewThumb.setVisibility(View.VISIBLE);
-                holder.imageViewThumb.setImageBitmap(thumb);
-                holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_010));
-
-            } else {
-                temp = ThumbnailUtils.getThumbnailFromFolder(node, context);
-
-                if (temp != null) {
-                    thumb = ThumbnailUtils.getRoundedRectBitmap(context, temp, 2);
-                    holder.fileGridIconForFile.setVisibility(View.GONE);
-                    holder.imageViewThumb.setVisibility(View.VISIBLE);
-                    holder.imageViewThumb.setImageBitmap(thumb);
-                    holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_010));
-
-                } else {
-                    try {
-                        temp = ThumbnailUtils.getThumbnailFromMegaGrid(node, context, holder, megaApi, this);
-
-                    } catch (Exception e) {
-                    } // Too many AsyncTasks
-
-                    if (temp != null) {
-                        thumb = ThumbnailUtils.getRoundedRectBitmap(context, temp, 2);
-                        holder.imageViewIcon.setVisibility(View.GONE);
-                        holder.imageViewThumb.setVisibility(View.VISIBLE);
-                        holder.imageViewThumb.setImageBitmap(thumb);
-                        holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_010));
-                    }
-                }
-            }
-        } else {
-            Bitmap temp = ThumbnailUtils.getThumbnailFromCache(node);
-
-            if (temp != null) {
-                thumb = ThumbnailUtils.getRoundedRectBitmap(context, temp, 2);
-                holder.fileGridIconForFile.setVisibility(View.GONE);
-                holder.imageViewThumb.setVisibility(View.VISIBLE);
-                holder.imageViewThumb.setImageBitmap(thumb);
-                holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_010));
-            } else {
-                temp = ThumbnailUtils.getThumbnailFromFolder(node, context);
-
-                if (temp != null) {
-                    thumb = ThumbnailUtils.getRoundedRectBitmap(context, temp, 2);
-                    holder.fileGridIconForFile.setVisibility(View.GONE);
-                    holder.imageViewThumb.setVisibility(View.VISIBLE);
-                    holder.imageViewThumb.setImageBitmap(thumb);
-                    holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_010));
-                } else {
-                    try {
-                        ThumbnailUtils.createThumbnailGrid(context, node, holder, megaApi, this);
-                    } catch (Exception e) {
-                    } // Too many AsyncTasks
-                }
-            }
-        }
+        onBindViewHolderList(holder, position);
     }
 
     public void onBindViewHolderList(ViewHolderBrowserList holder, int position) {
@@ -538,7 +324,6 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         MegaNode node = m.getMegaNodeList().get(0);
 
         holder.document = node.getHandle();
-        Bitmap thumb = null;
 
         holder.textViewFileName.setText(node.getName());
         holder.textViewMessageInfo.setText("");
@@ -587,38 +372,32 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         holder.textViewMessageInfo.setText(secondRowInfo);
         holder.textViewMessageInfo.setVisibility(View.VISIBLE);
 
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+        params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+        params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
+        params.setMargins(0, 0, 0, 0);
+        holder.imageView.setLayoutParams(params);
+
+        CoilUtils.dispose(holder.imageView);
         if (!multipleSelect) {
             holder.threeDotsLayout.setVisibility(View.VISIBLE);
             holder.threeDotsLayout.setOnClickListener(this);
             Timber.d("Not multiselect");
             holder.itemLayout.setBackground(null);
-            holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-            params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-            params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-            params.setMargins(0, 0, 0, 0);
-            holder.imageView.setLayoutParams(params);
 
             Timber.d("Check the thumb");
 
             if (node.hasThumbnail()) {
                 Timber.d("Node has thumbnail");
-                getThumbAndSetView(holder, node);
+                loadThumbnail(m, node, holder.imageView);
             } else {
-                Timber.d("Node NOT thumbnail");
-                getThumbAndSetViewOrCreate(holder, node);
+                holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
             }
         } else {
             holder.threeDotsLayout.setOnClickListener(null);
             holder.threeDotsLayout.setVisibility(View.GONE);
             Timber.d("Multiselection ON");
             if (this.isItemChecked(position)) {
-                RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-                paramsMultiselect.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-                paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
-                paramsMultiselect.setMargins(0, 0, 0, 0);
-                holder.imageView.setLayoutParams(paramsMultiselect);
                 holder.imageView.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
             } else {
                 Timber.d("Check the thumb");
@@ -627,21 +406,36 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
                 if (node.hasThumbnail()) {
                     Timber.d("Node has thumbnail");
-                    getThumbAndSetView(holder, node);
+                    loadThumbnail(m, node, holder.imageView);
                 } else {
-                    Timber.d("Node NOT thumbnail");
-                    getThumbAndSetViewOrCreate(holder, node);
+                    holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                 }
             }
         }
     }
 
-    private void getThumbAndSetView(ViewHolderBrowserList holder, MegaNode node) {
-        getThumbAndSetViewForList(context, node, holder, megaApi, this, holder.imageView);
-    }
+    private void loadThumbnail(MegaChatMessage message, MegaNode node, ImageView target) {
+        Coil.imageLoader(context).enqueue(
+                new ImageRequest.Builder(context)
+                        .placeholder(MimeTypeList.typeForName(node.getName()).getIconResourceId())
+                        .data(new ChatThumbnailRequest(((NodeAttachmentHistoryActivity) context).chatId, message.getMsgId()))
+                        .target(target)
+                        .crossfade(true)
+                        .transformations(new RoundedCornersTransformation(context.getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
+                        .listener(new ImageRequest.Listener() {
+                            @Override
+                            public void onSuccess(@NonNull ImageRequest request, @NonNull SuccessResult result) {
+                                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) target.getLayoutParams();
+                                params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                                params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
+                                int left = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, context.getResources().getDisplayMetrics());
+                                params.setMargins(left, 0, 0, 0);
 
-    private void getThumbAndSetViewOrCreate(ViewHolderBrowserList holder, MegaNode node) {
-        getThumbAndSetViewOrCreateForList(context, node, holder, megaApi, this, holder.imageView);
+                                target.setLayoutParams(params);
+                            }
+                        })
+                        .build()
+        );
     }
 
     @Override
@@ -651,11 +445,6 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         } else {
             return 0;
         }
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return adapterType;
     }
 
     public Object getItem(int position) {
@@ -698,11 +487,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         } else if (id == R.id.file_list_item_layout || id == R.id.file_grid_item_layout) {
             int[] screenPosition = new int[2];
             ImageView imageView;
-            if (adapterType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST) {
-                imageView = v.findViewById(R.id.file_list_thumbnail);
-            } else {
-                imageView = v.findViewById(R.id.file_grid_thumbnail);
-            }
+            imageView = v.findViewById(R.id.file_list_thumbnail);
             imageView.getLocationOnScreen(screenPosition);
 
             int[] dimens = new int[4];
