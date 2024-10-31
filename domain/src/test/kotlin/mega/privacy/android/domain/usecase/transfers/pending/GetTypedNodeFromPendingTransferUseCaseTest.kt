@@ -127,7 +127,7 @@ class GetTypedNodeFromPendingTransferUseCaseTest {
             }
             val expected = mock<PublicLinkFile>()
             val fileNode = mock<FileNode>()
-            whenever(nodeRepository.getNodeById(nodeId)) doReturn fileNode
+            whenever(nodeRepository.getNodeByHandle(nodeId.longValue, true)) doReturn fileNode
             whenever(mapNodeToPublicLinkUseCase(fileNode, null)) doReturn expected
 
             val actual = underTest(pendingTransfer)
@@ -145,7 +145,7 @@ class GetTypedNodeFromPendingTransferUseCaseTest {
             }
             val expected = mock<PublicLinkFile>()
             val folderNode = mock<FolderNode>()
-            whenever(nodeRepository.getNodeById(nodeId)) doReturn folderNode
+            whenever(nodeRepository.getNodeByHandle(nodeId.longValue, true)) doReturn folderNode
             whenever(mapNodeToPublicLinkUseCase(folderNode, null)) doReturn expected
 
             val actual = underTest(pendingTransfer)

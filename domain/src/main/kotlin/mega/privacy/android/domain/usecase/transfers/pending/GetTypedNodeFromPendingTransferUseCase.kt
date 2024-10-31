@@ -47,7 +47,7 @@ class GetTypedNodeFromPendingTransferUseCase @Inject constructor(
         }
 
     private suspend fun getPublicLinkNode(nodeId: NodeId): PublicLinkNode? =
-        nodeRepository.getNodeById(nodeId)?.let {
+        nodeRepository.getNodeByHandle(nodeId.longValue, attemptFromFolderApi = true)?.let {
             mapNodeToPublicLinkUseCase(it as UnTypedNode, null)
         }
 }
