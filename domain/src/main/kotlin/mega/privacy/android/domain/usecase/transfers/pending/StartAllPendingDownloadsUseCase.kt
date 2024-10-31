@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdateScanningFoldersData
+import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodesUseCase
 import javax.inject.Inject
@@ -37,7 +38,7 @@ class StartAllPendingDownloadsUseCase @Inject constructor(
      *
      * @return a flow with the number of pending downloads that needs to be started
      */
-    suspend operator fun invoke(): Flow<Int> =
+    operator fun invoke(): Flow<Int> =
         channelFlow {
             getPendingTransfersByTypeAndStateUseCase(
                 TransferType.DOWNLOAD,
@@ -58,6 +59,10 @@ class StartAllPendingDownloadsUseCase @Inject constructor(
                                 getTypedNodeFromPendingTransferUseCase(pendingTransfer)
                             }.getOrElse {
                                 errorOnStartingPendingTransfer(pendingTransfer, null, it)
+                                return@launch
+                            } ?: run {
+                                errorOnStartingPendingTransfer(pendingTransfer, null,
+                                    NodeDoesNotExistsException())
                                 return@launch
                             }
                             downloadNodesUseCase(

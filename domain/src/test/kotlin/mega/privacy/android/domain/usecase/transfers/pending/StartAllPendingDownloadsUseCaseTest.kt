@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
+import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodesUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -24,6 +25,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isA
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -242,6 +244,29 @@ class StartAllPendingDownloadsUseCaseTest {
                 pendingTransfer,
                 0,
                 exception,
+            )
+        }
+
+    @Test
+    fun `test that pending transfers state is updated to ErrorStarting and failed completed transfer is added when node does not exist`() =
+        runTest {
+            val pendingTransfer = mock<PendingTransfer>()
+            stubNotSentPendingTransfers(listOf(pendingTransfer))
+            whenever(getTypedNodeFromPendingTransferUseCase(pendingTransfer)) doReturn null
+
+            underTest().test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(updatePendingTransferStateUseCase)(
+                listOf(pendingTransfer),
+                PendingTransferState.ErrorStarting
+            )
+            verify(transferRepository).addCompletedTransferFromFailedPendingTransfer(
+                eq(pendingTransfer),
+                eq(0),
+                isA<NodeDoesNotExistsException>(),
             )
         }
 
