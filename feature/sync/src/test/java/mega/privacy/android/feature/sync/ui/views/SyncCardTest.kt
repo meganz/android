@@ -13,6 +13,8 @@ import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.shared.resources.R as sharedR
+import androidx.compose.ui.test.performClick
+import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -48,6 +50,7 @@ class SyncCardTest {
                 pauseRunClicked = {},
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
                 isLowBatteryLevel = false,
                 isFreeAccount = false,
                 errorRes = null,
@@ -94,6 +97,7 @@ class SyncCardTest {
                 pauseRunClicked = {},
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
                 isLowBatteryLevel = false,
                 isFreeAccount = false,
                 errorRes = null,
@@ -122,6 +126,38 @@ class SyncCardTest {
     }
 
     @Test
+    fun `test that device folder path is clickable for an expanded Sync card`() {
+        var clicked = false
+        val deviceStoragePath = "Device Path"
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_TWOWAY,
+                    folderPairName = "Sync Name",
+                    status = SyncStatus.SYNCING,
+                    deviceStoragePath = deviceStoragePath,
+                    hasStalledIssues = false,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = true,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = { clicked = true },
+                isLowBatteryLevel = false,
+                isFreeAccount = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+        composeTestRule.onNodeWithText(deviceStoragePath).performClick()
+        assertThat(clicked).isTrue()
+    }
+
+    @Test
     fun `test that required components are visible for a collapsed Backup card`() {
         composeTestRule.setContent {
             SyncCard(
@@ -140,6 +176,7 @@ class SyncCardTest {
                 pauseRunClicked = {},
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
                 isLowBatteryLevel = false,
                 isFreeAccount = false,
                 errorRes = null,
@@ -186,6 +223,7 @@ class SyncCardTest {
                 pauseRunClicked = {},
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
                 isLowBatteryLevel = false,
                 isFreeAccount = false,
                 errorRes = null,
@@ -211,5 +249,37 @@ class SyncCardTest {
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(mega.privacy.android.shared.resources.R.string.sync_stop_backup_button))
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that device folder path is not clickable for an expanded Backup card`() {
+        var clicked = false
+        val deviceStoragePath = "Device Path"
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_BACKUP,
+                    folderPairName = "Backup Name",
+                    status = SyncStatus.SYNCING,
+                    deviceStoragePath = deviceStoragePath,
+                    hasStalledIssues = false,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = true,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = { clicked = true },
+                isLowBatteryLevel = false,
+                isFreeAccount = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+        composeTestRule.onNodeWithText(deviceStoragePath).performClick()
+        assertThat(clicked).isFalse()
     }
 }

@@ -273,6 +273,7 @@ class SyncFoldersScreenTest {
                 addFolderClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
                 isLowBatteryLevel = false,
                 isFreeAccount = false,
                 isLoading = true,

@@ -7,6 +7,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -54,6 +56,7 @@ internal fun SyncCard(
     pauseRunClicked: () -> Unit,
     removeFolderClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
+    onOpenDeviceFolderClicked: (String) -> Unit,
     isLowBatteryLevel: Boolean,
     isFreeAccount: Boolean,
     @StringRes errorRes: Int?,
@@ -88,6 +91,7 @@ internal fun SyncCard(
                     totalSizeInBytes = sync.totalSizeInBytes,
                     creationTime = sync.creationTime,
                     deviceName = deviceName,
+                    onOpenDeviceFolderClicked = onOpenDeviceFolderClicked,
                 )
             }
 
@@ -188,13 +192,28 @@ private fun SyncCardDetailedInfo(
     totalSizeInBytes: Long,
     creationTime: Long,
     deviceName: String,
+    onOpenDeviceFolderClicked: (String) -> Unit,
 ) {
     Column(Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)) {
-        InfoRow(
-            title = stringResource(id = R.string.sync_folders_device_storage),
-            info = deviceStoragePath,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+        if (syncType == SyncType.TYPE_TWOWAY) {
+            InfoRow(
+                title = stringResource(id = R.string.sync_folders_device_storage),
+                info = {
+                    MegaText(
+                        text = deviceStoragePath,
+                        textColor = TextColor.Accent,
+                        modifier = Modifier.clickable { onOpenDeviceFolderClicked(deviceStoragePath) },
+                        style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Medium)
+                    )
+                }, modifier = Modifier.padding(bottom = 8.dp)
+            )
+        } else {
+            InfoRow(
+                title = stringResource(id = R.string.sync_folders_device_storage),
+                info = deviceStoragePath,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
 
         InfoRow(
             title = stringResource(id = R.string.sync_folders_mega_storage),
@@ -258,17 +277,32 @@ private fun InfoRow(
     info: String,
     modifier: Modifier = Modifier,
 ) {
+    InfoRow(
+        title = title,
+        info = {
+            MegaText(
+                text = info,
+                textColor = TextColor.Secondary,
+                style = MaterialTheme.typography.caption,
+            )
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun InfoRow(
+    title: String,
+    info: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier = modifier) {
         MegaText(
             text = title,
             textColor = TextColor.Primary,
             style = MaterialTheme.typography.subtitle2,
         )
-        MegaText(
-            text = info,
-            textColor = TextColor.Secondary,
-            style = MaterialTheme.typography.caption,
-        )
+        info()
     }
 }
 
@@ -368,6 +402,7 @@ private fun SyncCardExpandedPreview(
             expandClicked = {},
             removeFolderClicked = {},
             issuesInfoClicked = {},
+            onOpenDeviceFolderClicked = {},
             isLowBatteryLevel = false,
             isFreeAccount = false,
             errorRes = null,
@@ -401,6 +436,7 @@ private fun SyncCardExpandedWithBannerPreview(
             expandClicked = {},
             removeFolderClicked = {},
             issuesInfoClicked = {},
+            onOpenDeviceFolderClicked = {},
             isLowBatteryLevel = false,
             isFreeAccount = false,
             errorRes = sharedR.string.general_sync_active_sync_below_path,
@@ -434,6 +470,7 @@ private fun SyncCardCollapsedPreview(
             expandClicked = {},
             removeFolderClicked = {},
             issuesInfoClicked = {},
+            onOpenDeviceFolderClicked = {},
             isLowBatteryLevel = false,
             isFreeAccount = false,
             errorRes = null,
@@ -467,6 +504,7 @@ private fun SyncCardCollapsedWithBannerPreview(
             expandClicked = {},
             removeFolderClicked = {},
             issuesInfoClicked = {},
+            onOpenDeviceFolderClicked = {},
             isLowBatteryLevel = false,
             isFreeAccount = false,
             errorRes = sharedR.string.general_sync_active_sync_below_path,
