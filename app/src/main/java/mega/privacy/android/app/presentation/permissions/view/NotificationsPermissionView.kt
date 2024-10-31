@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.permissions.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -53,7 +54,7 @@ fun NotificationsPermissionView(
 
         Image(
             modifier = Modifier.requiredSize(120.dp),
-            painter = painterResource(id = R.drawable.ic_notifications_permission),
+            painter = painterResource(id = iconPackR.drawable.ic_bell_glass),
             contentDescription = "Notifications permissions image"
         )
 

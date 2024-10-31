@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.extensions
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.os.Build
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.permissions.model.PermissionScreen
@@ -27,8 +28,8 @@ internal val PermissionScreen.description: Int
 
 internal val PermissionScreen.image: Int
     get() = when (this) {
-        PermissionScreen.Notifications -> R.drawable.ic_notifications_permission
-        PermissionScreen.Media -> R.drawable.photos
-        PermissionScreen.Camera -> R.drawable.enable_camera
-        PermissionScreen.Calls -> R.drawable.calls
+        PermissionScreen.Notifications -> iconPackR.drawable.ic_bell_glass
+        PermissionScreen.Media -> iconPackR.drawable.ic_image_glass
+        PermissionScreen.Camera -> iconPackR.drawable.ic_video_glass
+        PermissionScreen.Calls -> iconPackR.drawable.ic_message_call_glass
     }

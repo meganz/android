@@ -300,14 +300,12 @@ private fun EmptyView(
     val descriptionResource: Int
     val buttonResource: Int
     if (isMeetingView) {
-        imageResource =
-            if (isSystemInDarkTheme()) IconR.drawable.ic_meeting_video_dark else IconR.drawable.ic_meeting_video
+        imageResource = IconR.drawable.ic_video_glass
         titleResource = sharedR.string.meeting_recent_list_empty_title
         descriptionResource = sharedR.string.meeting_recent_list_empty_subtitle
         buttonResource = R.string.action_start_meeting_now
     } else {
-        imageResource =
-            if (isSystemInDarkTheme()) IconR.drawable.ic_message_call_dark else IconR.drawable.ic_message_call
+        imageResource = IconR.drawable.ic_message_call_glass
         titleResource = sharedR.string.chat_recent_list_empty_title
         descriptionResource = sharedR.string.chat_recent_list_empty_subtitle
         buttonResource =
