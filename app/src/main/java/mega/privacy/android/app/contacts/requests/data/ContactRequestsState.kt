@@ -13,6 +13,7 @@ internal sealed interface ContactRequestsState {
         val items: List<ContactRequestItem>,
         val incoming: List<ContactRequestItem>,
         val outGoing: List<ContactRequestItem>,
+        val selectedItem: ContactRequestItem? = null
     ) : ContactRequestsState {
         override val hasIncoming = incoming.isNotEmpty()
         override val hasOutgoing = outGoing.isNotEmpty()

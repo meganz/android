@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -40,6 +41,7 @@ internal class ContactRequestsViewModel @Inject constructor(
     private val _state = MutableStateFlow<ContactRequestsState>(
         ContactRequestsState.Empty
     )
+    val state = _state.asStateFlow()
     private val queryFlow: MutableStateFlow<String?> = MutableStateFlow(null)
 
     init {
@@ -89,6 +91,32 @@ internal class ContactRequestsViewModel @Inject constructor(
     fun getContactRequest(requestHandle: Long): LiveData<ContactRequestItem?> =
         _state.mapNotNull { (it as? ContactRequestsState.Data)?.items?.find { item -> item.handle == requestHandle } }
             .asLiveData()
+
+    /**
+     * Select item
+     *
+     * @param requestHandle
+     */
+    fun selectItem(requestHandle: Long) {
+        viewModelScope.launch {
+            val updated = (_state.value as? ContactRequestsState.Data)?.copy(
+                selectedItem = (_state.value as? ContactRequestsState.Data)?.items?.find { it.handle == requestHandle }
+            )
+            updated?.let { _state.emit(it) }
+        }
+    }
+
+    /**
+     * Deselect item
+     */
+    fun deselectItem() {
+        viewModelScope.launch {
+            val updated = (_state.value as? ContactRequestsState.Data)?.copy(
+                selectedItem = null
+            )
+            updated?.let { _state.emit(it) }
+        }
+    }
 
     /**
      * Handle contact request with a specific action

@@ -22,4 +22,11 @@
         android:visibility="gone"
         app:drawableTopCompat="@drawable/ic_zero_data_sent_requests"
         tools:visibility="visible" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_contact_request_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        />
 </FrameLayout>
