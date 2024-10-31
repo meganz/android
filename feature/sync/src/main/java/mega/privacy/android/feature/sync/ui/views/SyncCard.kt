@@ -195,25 +195,16 @@ private fun SyncCardDetailedInfo(
     onOpenDeviceFolderClicked: (String) -> Unit,
 ) {
     Column(Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)) {
-        if (syncType == SyncType.TYPE_TWOWAY) {
-            InfoRow(
-                title = stringResource(id = R.string.sync_folders_device_storage),
-                info = {
-                    MegaText(
-                        text = deviceStoragePath,
-                        textColor = TextColor.Accent,
-                        modifier = Modifier.clickable { onOpenDeviceFolderClicked(deviceStoragePath) },
-                        style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Medium)
-                    )
-                }, modifier = Modifier.padding(bottom = 8.dp)
-            )
-        } else {
-            InfoRow(
-                title = stringResource(id = R.string.sync_folders_device_storage),
-                info = deviceStoragePath,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-        }
+        InfoRow(
+            title = stringResource(id = R.string.sync_folders_device_storage), info = {
+                MegaText(
+                    text = deviceStoragePath,
+                    textColor = TextColor.Accent,
+                    modifier = Modifier.clickable { onOpenDeviceFolderClicked(deviceStoragePath) },
+                    style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Medium)
+                )
+            }, modifier = Modifier.padding(bottom = 8.dp)
+        )
 
         InfoRow(
             title = stringResource(id = R.string.sync_folders_mega_storage),

@@ -252,7 +252,7 @@ class SyncCardTest {
     }
 
     @Test
-    fun `test that device folder path is not clickable for an expanded Backup card`() {
+    fun `test that device folder path is clickable for an expanded Backup card`() {
         var clicked = false
         val deviceStoragePath = "Device Path"
         composeTestRule.setContent {
@@ -280,6 +280,6 @@ class SyncCardTest {
             )
         }
         composeTestRule.onNodeWithText(deviceStoragePath).performClick()
-        assertThat(clicked).isFalse()
+        assertThat(clicked).isTrue()
     }
 }
