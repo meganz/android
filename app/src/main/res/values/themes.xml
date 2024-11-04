@@ -60,6 +60,7 @@
         <item name="actionModeBackground">?attr/colorPrimary</item>
         <item name="actionModeCloseDrawable">@drawable/action_mode_close</item>
         <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>
+        <item name="actionOverflowMenuStyle">@style/OverflowMenu</item>
         <!-- we need this to tint the overflow icon (3 dots) -->
         <item name="actionBarTheme">@style/Widget.Mega.ActionBar</item>
 

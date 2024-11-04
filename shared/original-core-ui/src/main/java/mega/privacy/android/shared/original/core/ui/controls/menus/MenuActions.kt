@@ -2,9 +2,11 @@ package mega.privacy.android.shared.original.core.ui.controls.menus
 
 import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -32,6 +34,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import com.google.android.material.R
 import mega.privacy.android.shared.original.core.ui.controls.appbar.LocalMegaAppBarColors
+import mega.privacy.android.shared.original.core.ui.controls.appbar.addClick
 import mega.privacy.android.shared.original.core.ui.controls.tooltips.Tooltip
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.model.MenuActionWithClick
@@ -47,32 +50,16 @@ import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
  * @param onActionClick event to receive clicks on actions, both in the toolbar or in the drop down menu
  */
 @Composable
-fun MenuActions(
+fun RowScope.MenuActions(
     actions: List<MenuAction>,
     maxActionsToShow: Int,
     onActionClick: (MenuAction) -> Unit,
     enabled: Boolean = true,
-) {
-    val sortedActions = actions.sortedBy { it.orderInCategory }
-    val visible = sortedActions
-        .filterIsInstance<MenuActionWithIcon>()
-        .take(maxActionsToShow)
-    visible.forEach {
-        IconButtonForAction(
-            menuAction = it,
-            onActionClick = onActionClick,
-            enabled = enabled && it.enabled,
-        )
-    }
-    sortedActions.filterNot { visible.contains(it) }.takeIf { it.isNotEmpty() }?.let { notVisible ->
-        DropDown(
-            actions = notVisible,
-            onActionClick = onActionClick,
-            enabled = enabled,
-        )
-    }
-
-}
+) = MenuActions(
+    actions.addClick(onActionClick) ?: emptyList(),
+    maxActionsToShow,
+    enabled
+)
 
 /**
  * Utility function to generate actions for [TopAppBar]
@@ -81,7 +68,7 @@ fun MenuActions(
  * @param enabled if false, all actions will be disabled, if true each [MenuAction.enabled] will be used to check if the action is enabled or not
  */
 @Composable
-fun MenuActions(
+fun RowScope.MenuActions(
     actions: List<MenuActionWithClick>,
     maxActionsToShow: Int,
     enabled: Boolean = true,
@@ -97,28 +84,11 @@ fun MenuActions(
         )
     }
     sortedActions.filterNot { visible.contains(it) }.takeIf { it.isNotEmpty() }?.let { notVisible ->
-        DropDown(
+        OverflowDropDown(
             actions = notVisible,
             enabled = enabled,
         )
     }
-
-}
-
-@Composable
-private fun IconButtonForAction(
-    menuAction: MenuActionWithIcon,
-    onActionClick: (MenuAction) -> Unit,
-    enabled: Boolean = true,
-) {
-    IconButtonWithTooltip(
-        iconPainter = menuAction.getIconPainter(),
-        description = menuAction.getDescription(),
-        onClick = { onActionClick(menuAction) },
-        modifier = Modifier.testTag(menuAction.testTag),
-        enabled = enabled,
-        highlightIconColor = menuAction.highlightIcon,
-    )
 }
 
 @Composable
@@ -137,52 +107,10 @@ private fun IconButtonForAction(
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-private fun DropDown(
-    actions: List<MenuAction>,
-    onActionClick: (MenuAction) -> Unit,
-    enabled: Boolean = true,
-) {
-    var showMoreMenu by remember {
-        mutableStateOf(false)
-    }
-    Box(contentAlignment = Alignment.BottomEnd) {
-        IconButtonWithTooltip(
-            iconPainter = painterResource(id = IconPackR.drawable.ic_more_vertical_medium_regular_outline),
-            description = stringResource(id = R.string.abc_action_menu_overflow_description),
-            onClick = { showMoreMenu = !showMoreMenu },
-            modifier = Modifier.testTag(TAG_MENU_ACTIONS_SHOW_MORE),
-            enabled = enabled,
-        )
-
-        DropdownMenu(
-            modifier = Modifier.semantics {
-                testTagsAsResourceId = true
-            },
-            expanded = showMoreMenu,
-            onDismissRequest = {
-                showMoreMenu = false
-            }
-        ) {
-            actions.forEach {
-                DropdownMenuItem(
-                    onClick = {
-                        onActionClick(it)
-                        showMoreMenu = false
-                    },
-                    modifier = Modifier.testTag(it.testTag)
-                ) {
-                    Text(text = it.getDescription())
-                }
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun DropDown(
+private fun RowScope.OverflowDropDown(
     actions: List<MenuActionWithClick>,
     enabled: Boolean = true,
 ) {
@@ -197,11 +125,13 @@ private fun DropDown(
             modifier = Modifier.testTag(TAG_MENU_ACTIONS_SHOW_MORE),
             enabled = enabled,
         )
-
+    }
+    // Overflow menu, as opposed to an ordinary DropdownMenu, is show on top of the icons. With this top 0 size box we do the trick
+    Box(modifier = Modifier.align(Alignment.Top)) {
         DropdownMenu(
-            modifier = Modifier.semantics {
-                testTagsAsResourceId = true
-            },
+            modifier = Modifier
+                .semantics { testTagsAsResourceId = true }
+                .background(MegaOriginalTheme.colors.background.surface1),
             expanded = showMoreMenu,
             onDismissRequest = {
                 showMoreMenu = false

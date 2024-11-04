@@ -1,6 +1,7 @@
 package mega.privacy.android.app.controls
 
 import android.R
+import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -83,13 +84,14 @@ class MenuActionsTest {
     }
 
     @Composable
-    private fun MenuActionsForTest(actions: List<MenuAction>) =
+    private fun MenuActionsForTest(actions: List<MenuAction>) = Row {
         MenuActions(
             actions,
             defaultAmount,
             {},
             enabled = true,
         )
+    }
 
     private class MenuActionWithIconForTest(val title: String, override val testTag: String) :
 

@@ -185,6 +185,10 @@
         <item name="searchViewStyle">@style/Widget.Mega.SearchView</item>
     </style>
 
+    <style name="OverflowMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:popupBackground">@color/color_background_surface_1</item>
+    </style>
+
     <style name="Widget.Mega.ActionBar" parent="@style/ThemeOverlay.AppCompat.DayNight">
         <item name="colorControlNormal">?attr/colorSecondary</item>
     </style>
