@@ -1,7 +1,6 @@
 package mega.privacy.android.app.main.controllers;
 
 import static mega.privacy.android.app.listeners.ShareListener.CHANGE_PERMISSIONS_LISTENER;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Util.isOnline;
 
 import android.content.Context;
@@ -12,7 +11,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.listeners.ShareListener;
-import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.main.listeners.MultipleRequestListener;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
@@ -51,17 +49,7 @@ public class ContactController {
     public void inviteContact(String contactEmail) {
         Timber.d("inviteContact");
 
-        if (context instanceof ManagerActivity) {
-            if (!isOnline(context)) {
-                ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-                return;
-            }
-
-            if (((ManagerActivity) context).isFinishing()) {
-                return;
-            }
-            megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (ManagerActivity) context);
-        } else if (context instanceof GroupChatInfoActivity) {
+        if (context instanceof GroupChatInfoActivity) {
             megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (GroupChatInfoActivity) context);
         } else if (context instanceof ContactAttachmentActivity) {
             megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, (ContactAttachmentActivity) context);
@@ -75,25 +63,7 @@ public class ContactController {
 
         MultipleRequestListener inviteMultipleListener = null;
 
-        if (context instanceof ManagerActivity) {
-            if (!isOnline(context)) {
-                ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-                return;
-            }
-
-            if (((ManagerActivity) context).isFinishing()) {
-                return;
-            }
-
-            if (contactEmails.size() == 1) {
-                megaApi.inviteContact(contactEmails.get(0), null, MegaContactRequest.INVITE_ACTION_ADD, (ManagerActivity) context);
-            } else if (contactEmails.size() > 1) {
-                inviteMultipleListener = new MultipleRequestListener(-1, context);
-                for (int i = 0; i < contactEmails.size(); i++) {
-                    megaApi.inviteContact(contactEmails.get(i), null, MegaContactRequest.INVITE_ACTION_ADD, inviteMultipleListener);
-                }
-            }
-        } else if (context instanceof ContactAttachmentActivity) {
+        if (context instanceof ContactAttachmentActivity) {
             if (!isOnline(context)) {
                 ((ContactAttachmentActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
                 return;

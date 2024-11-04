@@ -136,7 +136,6 @@ import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListene
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener
-import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.ClearRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.Enable2FADialogFragment
@@ -351,7 +350,6 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatListItem
-import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaFolderInfo
 import nz.mega.sdk.MegaNode
@@ -512,7 +510,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     var rootNode: MegaNode? = null
     val nodeController: NodeController by lazy { NodeController(this) }
-    private val contactController: ContactController by lazy { ContactController(this) }
 
     private val badgeDrawable: BadgeDrawerArrowDrawable by lazy {
         BadgeDrawerArrowDrawable(
@@ -584,7 +581,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private var openLink = false
     private var requestNotificationsPermissionFirstLogin = false
     private var askPermissions = false
-    private var megaContacts = true
     private var homepageScreen = HomepageScreen.HOMEPAGE
     private var pathNavigationOffline: String? = null
 
@@ -6102,7 +6098,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     return
                 }
                 val contactsData = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
-                megaContacts = intent.getBooleanExtra(AddContactActivity.EXTRA_MEGA_CONTACTS, true)
                 val multiselectIntent = intent.getIntExtra("MULTISELECT", -1)
                 if (multiselectIntent == 0) {
                     //One file to share
@@ -6256,19 +6251,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         chatId = chatId,
                         action = Constants.ACTION_CHAT_SHOW_MESSAGES
                     )
-                }
-            }
-
-            requestCode == Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == Activity.RESULT_OK -> {
-                Timber.d("REQUEST_INVITE_CONTACT_FROM_DEVICE OK")
-                if (intent == null) {
-                    Timber.w("Intent NULL")
-                    return
-                }
-                val contactsData = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
-                megaContacts = intent.getBooleanExtra(AddContactActivity.EXTRA_MEGA_CONTACTS, true)
-                if (contactsData != null) {
-                    contactController.inviteMultipleContacts(contactsData)
                 }
             }
 
@@ -6685,77 +6667,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         getString(R.string.general_text_error),
                         getString(R.string.general_error_word)
                     )
-                }
-            }
-
-            MegaRequest.TYPE_INVITE_CONTACT -> {
-                Timber.d("MegaRequest.TYPE_INVITE_CONTACT finished: %s", request.number)
-                dismissAlertDialogIfExists(statusDialog)
-                if (request.number == MegaContactRequest.INVITE_ACTION_REMIND.toLong()) {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.context_contact_invitation_resent),
-                        -1
-                    )
-                } else {
-                    if (e.errorCode == MegaError.API_OK) {
-                        Timber.d("OK INVITE CONTACT: %s", request.email)
-                        if (request.number == MegaContactRequest.INVITE_ACTION_ADD.toLong()) {
-                            showSnackbar(
-                                Constants.SNACKBAR_TYPE,
-                                getString(R.string.context_contact_request_sent, request.email),
-                                -1
-                            )
-                        } else if (request.number == MegaContactRequest.INVITE_ACTION_DELETE.toLong()) {
-                            showSnackbar(
-                                Constants.SNACKBAR_TYPE,
-                                getString(R.string.context_contact_invitation_deleted),
-                                -1
-                            )
-                        }
-                    } else {
-                        Timber.e("ERROR invite contact: %s___%s", e.errorCode, e.errorString)
-                        if (e.errorCode == MegaError.API_EEXIST) {
-                            var found = false
-                            val outgoingContactRequests =
-                                megaApi.outgoingContactRequests
-                            if (outgoingContactRequests?.asSequence()?.map { it.targetEmail }
-                                    ?.contains(request.email) == true) {
-                                found = true
-                            }
-                            if (found) {
-                                showSnackbar(
-                                    Constants.SNACKBAR_TYPE,
-                                    getString(
-                                        R.string.invite_not_sent_already_sent,
-                                        request.email
-                                    ),
-                                    -1
-                                )
-                            } else {
-                                showSnackbar(
-                                    Constants.SNACKBAR_TYPE,
-                                    getString(
-                                        R.string.context_contact_already_exists,
-                                        request.email
-                                    ),
-                                    -1
-                                )
-                            }
-                        } else if (request.number == MegaContactRequest.INVITE_ACTION_ADD.toLong() && e.errorCode == MegaError.API_EARGS) {
-                            showSnackbar(
-                                Constants.SNACKBAR_TYPE,
-                                getString(R.string.error_own_email_as_contact),
-                                -1
-                            )
-                        } else {
-                            showSnackbar(
-                                Constants.SNACKBAR_TYPE,
-                                getString(R.string.general_error),
-                                -1
-                            )
-                        }
-                    }
                 }
             }
 

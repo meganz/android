@@ -22,7 +22,6 @@ public class Constants {
     public static final int TAKE_PHOTO_CODE = 1010;
     public static final int REQUEST_CODE_TREE = 1014;
     public static final int TAKE_PICTURE_PROFILE_CODE = 1015;
-    public static final int REQUEST_INVITE_CONTACT_FROM_DEVICE = 1017;
     public static final int REQUEST_CREATE_CHAT = 1018;
     public static final int REQUEST_ADD_PARTICIPANTS = 1019;
     public static final int REQUEST_CODE_SELECT_CHAT = 1025;

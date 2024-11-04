@@ -65,7 +65,6 @@ import mega.privacy.android.app.main.adapters.MegaContactsAdapter
 import mega.privacy.android.app.main.adapters.PhoneContactsAdapter
 import mega.privacy.android.app.main.adapters.ShareContactsAdapter
 import mega.privacy.android.app.main.adapters.ShareContactsHeaderAdapter
-import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.model.AddContactState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsLimitWarningView
@@ -2571,20 +2570,6 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
                 confirmAddMail = mail
                 queryIfContactShouldBeAddedTask = QueryIfContactShouldBeAddedTask(this)
                 queryIfContactShouldBeAddedTask?.execute(true)
-            }
-        } else if (requestCode == Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == RESULT_OK) {
-            Timber.d("REQUEST_INVITE_CONTACT_FROM_DEVICE OK")
-
-            if (intent == null) {
-                Timber.w("Return.....")
-                return
-            }
-
-            val contactsData = intent.getStringArrayListExtra(EXTRA_CONTACTS)
-
-            if (contactsData != null) {
-                val cC = ContactController(this)
-                cC.inviteMultipleContacts(contactsData)
             }
         }
     }
