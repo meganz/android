@@ -40,6 +40,7 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.view.extension.fileInfo
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.domain.entity.AccountType
@@ -528,16 +529,10 @@ private fun ImagePreviewMenuActionHeader(
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
     getImageThumbnailPath: suspend (ImageResult?) -> String?,
 ) {
-    val context = LocalContext.current
-
     val imageThumbnailPath by produceState<String?>(null, imageNode) {
         downloadImage(imageNode).collectLatest { imageResult ->
             value = getImageThumbnailPath(imageResult)
         }
-    }
-
-    val imageInfo = remember(imageNode) {
-        MegaNode.unserialize(imageNode.serializedData)?.getInfoText(context)
     }
 
     Row(
@@ -561,7 +556,7 @@ private fun ImagePreviewMenuActionHeader(
                 modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_HEADER_TEXT_NAME),
             )
             MiddleEllipsisText(
-                text = imageInfo.orEmpty(),
+                text = imageNode.fileInfo(),
                 color = TextColor.Secondary,
                 modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_HEADER_TEXT_INFO),
             )
