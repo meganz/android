@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import android.text.format.DateFormat
 import androidx.activity.OnBackPressedCallback
@@ -38,9 +39,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +58,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import de.palm.composestateevents.EventEffect
@@ -88,6 +92,7 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericD
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTitleTextField
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
@@ -460,7 +465,7 @@ private fun ActionButton(
                     ScheduleMeetingAction.EndRecurrence,
                     ScheduleMeetingAction.AddParticipants,
                     ScheduleMeetingAction.AddDescription,
-                    -> false
+                        -> false
 
                     else -> true
                 }
@@ -473,7 +478,7 @@ private fun ActionButton(
                     ScheduleMeetingAction.AddParticipants,
                     ScheduleMeetingAction.SendCalendarInvite,
                     ScheduleMeetingAction.WaitingRoom,
-                    -> true
+                        -> true
 
                     else -> false
                 }
@@ -579,18 +584,37 @@ private fun ScheduleMeetingAppBar(
                     .fillMaxWidth()
                     .padding(start = 72.dp, end = 15.dp, bottom = 20.dp)
             ) {
+                var emptyValueError = rememberSaveable { mutableStateOf(state.isEmptyTitleError) }
                 GenericTitleTextField(
                     value = state.meetingTitle.ifEmpty { "" },
-                    isEmptyValueError = state.isEmptyTitleError,
+                    isEmptyValueError = emptyValueError.value,
                     placeholderId = R.string.meetings_schedule_meeting_name_hint,
                     shouldInitialFocus = state.type == ScheduledMeetingType.Creation,
                     onValueChange = { text ->
                         onValueChange(text)
+                        emptyValueError.value = text.isEmpty()
                     },
                     charLimitErrorId = R.string.meetings_schedule_meeting_meeting_name_too_long_error,
                     emptyValueErrorId = R.string.meetings_schedule_meeting_empty_meeting_name_error,
                     charLimit = Constants.MAX_TITLE_SIZE
                 )
+
+                if (emptyValueError.value.not()) {
+                    Text(
+                        modifier = Modifier
+                            .testTag(TEST_TAG_MEETING_TITLE_DISCLAIMER)
+                            .padding(
+                                start = 0.dp,
+                                top = 10.dp,
+                                end = 15.dp
+                            ),
+                        style = MaterialTheme.typography.body2.copy(
+                            color = MaterialTheme.colors.textColorSecondary,
+                            fontSize = 12.sp,
+                        ),
+                        text = stringResource(sharedR.string.meetings_schedule_meeting_meeting_title_disclaimer),
+                    )
+                }
             }
         }
     }
@@ -659,7 +683,7 @@ private fun ActionOption(
                     ScheduleMeetingAction.MeetingLink,
                     ScheduleMeetingAction.SendCalendarInvite,
                     ScheduleMeetingAction.WaitingRoom,
-                    -> {
+                        -> {
                         action.description?.let { description ->
                             subtitle = stringResource(id = description)
                         }
@@ -884,15 +908,18 @@ private fun PreviewCreateScheduledMeetingView() {
     name = "DarkCreateScheduledMeetingViewWithFreePlanLimitWarningPreview"
 )
 @Composable
-private fun CreateScheduledMeetingViewWithFreePlanLimitWarningPreview() {
+private fun CreateScheduledMeetingViewWithFreePlanLimitWarningPreview(
+    @PreviewParameter(BooleanProvider::class) isEmptyTitleError: Boolean,
+) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         CreateScheduledMeetingView(
             state = CreateScheduledMeetingState(
-                meetingTitle = "Title meeting",
+                meetingTitle = if (isEmptyTitleError) "" else "Title meeting",
                 rulesSelected = ChatScheduledRules(),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.entries,
                 snackbarMessageContent = consumed(),
+                isEmptyTitleError = isEmptyTitleError
             ),
             managementState = ScheduledMeetingManagementUiState(
                 isCallUnlimitedProPlanFeatureFlagEnabled = true,
@@ -916,3 +943,5 @@ private fun CreateScheduledMeetingViewWithFreePlanLimitWarningPreview() {
         )
     }
 }
+
+private const val TEST_TAG_MEETING_TITLE_DISCLAIMER = "schedule_meeting:title_disclaimer"
