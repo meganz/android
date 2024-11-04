@@ -15,7 +15,7 @@ class MonitorAlmostFullStorageBannerVisibilityUseCase @Inject constructor(
     /**
      * Invoke function
      *
-     * @return Flow of Boolean
+     * @return Flow of Boolean, true if the banner should be visible, false otherwise
      */
     operator fun invoke(): Flow<Boolean> =
         repository.monitorAlmostFullStorageBannerClosingTimestamp().mapNotNull { timestamp ->

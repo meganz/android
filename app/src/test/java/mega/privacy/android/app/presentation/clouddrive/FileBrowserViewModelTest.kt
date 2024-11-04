@@ -46,9 +46,10 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibilityUseCase
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
+import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTimestampUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
-import mega.privacy.android.domain.usecase.account.GetCurrentStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
@@ -130,8 +131,11 @@ class FileBrowserViewModelTest {
     private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
-    private val getCurrentStorageStateUseCase = mock<GetCurrentStorageStateUseCase>()
     private val storageCapacityMapper = mock<StorageCapacityMapper>()
+    private val setAlmostFullStorageBannerClosingTimestampUseCase =
+        mock<SetAlmostFullStorageBannerClosingTimestampUseCase>()
+    private val monitorAlmostFullStorageBannerClosingTimestampUseCase =
+        mock<MonitorAlmostFullStorageBannerVisibilityUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -170,6 +174,8 @@ class FileBrowserViewModelTest {
             monitorStorageStateUseCase = monitorStorageStateUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            setAlmostFullStorageBannerClosingTimestampUseCase = setAlmostFullStorageBannerClosingTimestampUseCase,
+            monitorAlmostFullStorageBannerClosingTimestampUseCase = monitorAlmostFullStorageBannerClosingTimestampUseCase,
             storageCapacityMapper = storageCapacityMapper
         )
     }
@@ -177,32 +183,43 @@ class FileBrowserViewModelTest {
     private fun provideStorageStateParameters(): Stream<Arguments> = Stream.of(
         Arguments.of(
             StorageState.Red,
+            true,
             StorageOverQuotaCapacity.FULL
         ),
         Arguments.of(
             StorageState.Green,
+            true,
             StorageOverQuotaCapacity.DEFAULT
         ), Arguments.of(
             StorageState.Orange,
+            true,
             StorageOverQuotaCapacity.ALMOST_FULL
+        ), Arguments.of(
+            StorageState.Orange,
+            false,
+            StorageOverQuotaCapacity.DEFAULT
         ),
         Arguments.of(
             StorageState.Change,
+            true,
             StorageOverQuotaCapacity.DEFAULT
         ), Arguments.of(
             StorageState.Unknown,
+            true,
             StorageOverQuotaCapacity.DEFAULT
         ), Arguments.of(
             StorageState.PayWall,
+            true,
             StorageOverQuotaCapacity.DEFAULT
         )
     )
 
 
-    @ParameterizedTest(name = "when storage state is: {0} then storageCapacity is: {1}")
+    @ParameterizedTest(name = "when storage state is: {0} and isDismissiblePeriodOver is: {1} then storageCapacity is: {2}")
     @MethodSource("provideStorageStateParameters")
     fun `test that storageCapacity is updated correctly when monitorStorageStateUseCase is invoked`(
         storageState: StorageState,
+        isDismissiblePeriodOver: Boolean,
         storageOverQuotaCapacity: StorageOverQuotaCapacity,
     ) = runTest {
         runBlocking {
@@ -214,14 +231,17 @@ class FileBrowserViewModelTest {
             whenever(monitorStorageStateUseCase()).thenReturn(
                 storageState.asHotFlow()
             )
-            whenever(getCurrentStorageStateUseCase()).thenReturn(
-                storageState
+            whenever(monitorAlmostFullStorageBannerClosingTimestampUseCase()).thenReturn(
+                flowOf(
+                    isDismissiblePeriodOver
+                )
             )
             whenever(
                 storageCapacityMapper(
                     storageState = storageState,
                     isFullStorageOverQuotaBannerEnabled = true,
-                    isAlmostFullStorageQuotaBannerEnabled = true
+                    isAlmostFullStorageQuotaBannerEnabled = true,
+                    isDismissiblePeriodOver = isDismissiblePeriodOver
                 )
             ).thenReturn(
                 storageOverQuotaCapacity
@@ -713,12 +733,14 @@ class FileBrowserViewModelTest {
         whenever(monitorStorageStateUseCase()).thenReturn(
             StorageState.Green.asHotFlow()
         )
-        getCurrentStorageStateUseCase.stub { onBlocking { invoke() }.thenReturn(StorageState.Green) }
+        whenever(setAlmostFullStorageBannerClosingTimestampUseCase()).thenReturn(Unit)
+        whenever(monitorAlmostFullStorageBannerClosingTimestampUseCase()).thenReturn(flowOf(true))
         whenever(
             storageCapacityMapper(
                 storageState = any(),
                 isFullStorageOverQuotaBannerEnabled = any(),
                 isAlmostFullStorageQuotaBannerEnabled = any(),
+                isDismissiblePeriodOver = any()
             )
         ).thenReturn(
             StorageOverQuotaCapacity.DEFAULT
@@ -744,7 +766,8 @@ class FileBrowserViewModelTest {
             monitorConnectivityUseCase,
             monitorStorageStateUseCase,
             getFeatureFlagValueUseCase,
-            getCurrentStorageStateUseCase,
+            setAlmostFullStorageBannerClosingTimestampUseCase,
+            monitorAlmostFullStorageBannerClosingTimestampUseCase,
             storageCapacityMapper,
         )
     }

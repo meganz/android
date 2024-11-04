@@ -4,7 +4,7 @@ import mega.privacy.android.domain.repository.AccountRepository
 import javax.inject.Inject
 
 /**
- * Set timestamp for when user closed the almost full storage quota warning banner (yellow banner)
+ * Set timestamp for when user closed the almost full storage quota warning banner (yellow banner) to the current time
  */
 class SetAlmostFullStorageBannerClosingTimestampUseCase @Inject constructor(
     private val repository: AccountRepository,
@@ -12,9 +12,8 @@ class SetAlmostFullStorageBannerClosingTimestampUseCase @Inject constructor(
     /**
      * Invoke function
      *
-     * @param timestamp
      */
-    suspend operator fun invoke(timestamp: Long) {
-        repository.setAlmostFullStorageBannerClosingTimestamp(timestamp)
+    suspend operator fun invoke() {
+        repository.setAlmostFullStorageBannerClosingTimestamp(System.currentTimeMillis())
     }
 }

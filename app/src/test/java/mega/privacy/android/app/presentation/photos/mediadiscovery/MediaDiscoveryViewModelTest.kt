@@ -13,9 +13,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
@@ -44,7 +42,9 @@ import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibilityUseCase
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
+import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTimestampUseCase
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
@@ -132,6 +132,10 @@ class MediaDiscoveryViewModelTest {
     private val getNodeContentUriByHandleUseCase = mock<GetNodeContentUriByHandleUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val getCurrentStorageStateUseCase = mock<GetCurrentStorageStateUseCase>()
+    private val setAlmostFullStorageBannerClosingTimestampUseCase =
+        mock<SetAlmostFullStorageBannerClosingTimestampUseCase>()
+    private val monitorAlmostFullStorageBannerClosingTimestampUseCase =
+        mock<MonitorAlmostFullStorageBannerVisibilityUseCase>()
     private val storageCapacityMapper = mock<StorageCapacityMapper>()
 
     @BeforeAll
@@ -175,6 +179,8 @@ class MediaDiscoveryViewModelTest {
             getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
             monitorStorageStateUseCase = monitorStorageStateUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            setAlmostFullStorageBannerClosingTimestampUseCase = setAlmostFullStorageBannerClosingTimestampUseCase,
+            monitorAlmostFullStorageBannerClosingTimestampUseCase = monitorAlmostFullStorageBannerClosingTimestampUseCase,
             storageCapacityMapper = storageCapacityMapper
         )
     }
@@ -192,11 +198,17 @@ class MediaDiscoveryViewModelTest {
             StorageState.Green.asHotFlow()
         )
         getCurrentStorageStateUseCase.stub { onBlocking { invoke() }.thenReturn(StorageState.Green) }
+
+        setAlmostFullStorageBannerClosingTimestampUseCase.stub {
+            onBlocking { invoke() }.thenReturn(Unit)
+        }
+        whenever(monitorAlmostFullStorageBannerClosingTimestampUseCase()).thenReturn(flowOf(true))
         whenever(
             storageCapacityMapper(
                 storageState = any(),
                 isFullStorageOverQuotaBannerEnabled = any(),
                 isAlmostFullStorageQuotaBannerEnabled = any(),
+                isDismissiblePeriodOver = any()
             )
         ).thenReturn(
             StorageOverQuotaCapacity.DEFAULT
@@ -235,35 +247,12 @@ class MediaDiscoveryViewModelTest {
             getNodeContentUriByHandleUseCase,
             monitorStorageStateUseCase,
             getCurrentStorageStateUseCase,
+            setAlmostFullStorageBannerClosingTimestampUseCase,
+            monitorAlmostFullStorageBannerClosingTimestampUseCase,
             storageCapacityMapper,
         )
         commonStub()
     }
-
-    private fun provideStorageStateParameters(): Stream<Arguments> = Stream.of(
-        Arguments.of(
-            StorageState.Red,
-            StorageOverQuotaCapacity.FULL
-        ),
-        Arguments.of(
-            StorageState.Green,
-            StorageOverQuotaCapacity.DEFAULT
-        ),
-        Arguments.of(
-            StorageState.Orange,
-            StorageOverQuotaCapacity.ALMOST_FULL
-        ),
-        Arguments.of(
-            StorageState.Change,
-            StorageOverQuotaCapacity.DEFAULT
-        ), Arguments.of(
-            StorageState.Unknown,
-            StorageOverQuotaCapacity.DEFAULT
-        ), Arguments.of(
-            StorageState.PayWall,
-            StorageOverQuotaCapacity.DEFAULT
-        )
-    )
 
     @Test
     fun `test that start download node event is launched with correct value when on save to device is invoked with download worker feature flag is enabled`() =
@@ -559,16 +548,53 @@ class MediaDiscoveryViewModelTest {
         runTest {
             val paramHandle = 1L
             val expectedContentUri = NodeContentUri.RemoteContentUri("", false)
-            whenever(getNodeContentUriByHandleUseCase(paramHandle)).thenReturn(expectedContentUri)
+            whenever(getNodeContentUriByHandleUseCase(paramHandle)).thenReturn(
+                expectedContentUri
+            )
             val actual = underTest.getNodeContentUri(paramHandle)
             assertThat(actual).isEqualTo(expectedContentUri)
             verify(getNodeContentUriByHandleUseCase).invoke(paramHandle)
         }
 
-    @ParameterizedTest(name = "when storage state is: {0} then storageCapacity is: {1}")
+    private fun provideStorageStateParameters(): Stream<Arguments> = Stream.of(
+        Arguments.of(
+            StorageState.Red,
+            true,
+            StorageOverQuotaCapacity.FULL
+        ),
+        Arguments.of(
+            StorageState.Green,
+            true,
+            StorageOverQuotaCapacity.DEFAULT
+        ), Arguments.of(
+            StorageState.Orange,
+            true,
+            StorageOverQuotaCapacity.ALMOST_FULL
+        ), Arguments.of(
+            StorageState.Orange,
+            false,
+            StorageOverQuotaCapacity.DEFAULT
+        ),
+        Arguments.of(
+            StorageState.Change,
+            true,
+            StorageOverQuotaCapacity.DEFAULT
+        ), Arguments.of(
+            StorageState.Unknown,
+            true,
+            StorageOverQuotaCapacity.DEFAULT
+        ), Arguments.of(
+            StorageState.PayWall,
+            true,
+            StorageOverQuotaCapacity.DEFAULT
+        )
+    )
+
+    @ParameterizedTest(name = "when storage state is: {0} and isDismissiblePeriodOver is: {1} then storageCapacity is: {2}")
     @MethodSource("provideStorageStateParameters")
     fun `test that storageCapacity is updated correctly when getCurrentStorageStateUseCase is invoked`(
         storageState: StorageState,
+        isDismissiblePeriodOver: Boolean,
         storageOverQuotaCapacity: StorageOverQuotaCapacity,
     ) = runTest {
         commonStub()
@@ -582,11 +608,17 @@ class MediaDiscoveryViewModelTest {
         whenever(getCurrentStorageStateUseCase()).thenReturn(
             storageState
         )
+        whenever(monitorAlmostFullStorageBannerClosingTimestampUseCase()).thenReturn(
+            flowOf(
+                isDismissiblePeriodOver
+            )
+        )
         whenever(
             storageCapacityMapper(
                 storageState = storageState,
                 isFullStorageOverQuotaBannerEnabled = true,
-                isAlmostFullStorageQuotaBannerEnabled = true
+                isAlmostFullStorageQuotaBannerEnabled = true,
+                isDismissiblePeriodOver = isDismissiblePeriodOver
             )
         ).thenReturn(
             storageOverQuotaCapacity

@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -29,7 +30,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
-import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.DEFAULT
+import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
@@ -50,7 +51,9 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibilityUseCase
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
+import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTimestampUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
@@ -121,6 +124,8 @@ class FileBrowserViewModel @Inject constructor(
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase,
+    private val monitorAlmostFullStorageBannerClosingTimestampUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase,
     private val storageCapacityMapper: StorageCapacityMapper,
 ) : ViewModel() {
 
@@ -137,6 +142,7 @@ class FileBrowserViewModel @Inject constructor(
     private val handleStack = Stack<Long>()
 
     private var showHiddenItems: Boolean = true
+    private var cachedStorageState: StorageState? = null
 
     init {
         refreshNodes()
@@ -173,10 +179,12 @@ class FileBrowserViewModel @Inject constructor(
                 monitorStorageStateUseCase()
             )
             { isFullStorageOverQuotaBannerEnabled: Boolean, isAlmostFullStorageQuotaBannerEnabled: Boolean, storageState: StorageState ->
+                cachedStorageState = storageState
                 storageCapacityMapper(
                     storageState,
                     isFullStorageOverQuotaBannerEnabled,
-                    isAlmostFullStorageQuotaBannerEnabled
+                    isAlmostFullStorageQuotaBannerEnabled,
+                    isDismissiblePeriodOver = checkForDismissiblePeriodForAlmostFullStorage()
                 )
             }.catch { Timber.e(it) }
                 .collectLatest { storageCapacity ->
@@ -185,6 +193,36 @@ class FileBrowserViewModel @Inject constructor(
                     }
                 }
         }
+    }
+
+    /**
+     * Update storage capacity if needed
+     */
+    fun updateStorageCapacityIfNeeded() {
+        viewModelScope.launch {
+            val isDismissiblePeriodOver = checkForDismissiblePeriodForAlmostFullStorage()
+            val currentStorageCapacity = _state.value.storageCapacity
+            if (currentStorageCapacity == StorageOverQuotaCapacity.DEFAULT
+                && isDismissiblePeriodOver
+                && cachedStorageState == StorageState.Orange
+            ) {
+                _state.update { it.copy(storageCapacity = StorageOverQuotaCapacity.ALMOST_FULL) }
+            } else if (currentStorageCapacity == StorageOverQuotaCapacity.ALMOST_FULL && !isDismissiblePeriodOver) {
+                _state.update { it.copy(storageCapacity = StorageOverQuotaCapacity.DEFAULT) }
+            }
+        }
+    }
+
+    /**
+     * Check if dismissible period for almost full storage banner is over
+     * @return true if dismissible period is over
+     */
+    private suspend fun checkForDismissiblePeriodForAlmostFullStorage(): Boolean {
+        return runCatching {
+            monitorAlmostFullStorageBannerClosingTimestampUseCase().firstOrNull()
+        }.onFailure {
+            Timber.e(it)
+        }.getOrNull() ?: false
     }
 
     private fun monitorConnectivity() {
@@ -927,8 +965,11 @@ class FileBrowserViewModel @Inject constructor(
      * Reset storage capacity to default
      */
     fun setStorageCapacityAsDefault() {
-        _state.update {
-            it.copy(storageCapacity = DEFAULT)
+        _state.update { it.copy(storageCapacity = StorageOverQuotaCapacity.DEFAULT) }
+        viewModelScope.launch {
+            runCatching {
+                setAlmostFullStorageBannerClosingTimestampUseCase()
+            }.onFailure { Timber.e(it) }
         }
     }
 }

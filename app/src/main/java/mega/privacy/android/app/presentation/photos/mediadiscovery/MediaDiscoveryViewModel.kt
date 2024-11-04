@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -29,7 +30,7 @@ import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
-import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity.DEFAULT
+import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID
@@ -65,7 +66,9 @@ import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibilityUseCase
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
+import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTimestampUseCase
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
@@ -126,6 +129,8 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val storageCapacityMapper: StorageCapacityMapper,
+    private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase,
+    private val monitorAlmostFullStorageBannerClosingTimestampUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase,
     @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -163,7 +168,8 @@ class MediaDiscoveryViewModel @Inject constructor(
                 storageCapacityMapper(
                     storageState,
                     isFullStorageOverQuotaBannerEnabled,
-                    isAlmostFullStorageQuotaBannerEnabled
+                    isAlmostFullStorageQuotaBannerEnabled,
+                    isDismissiblePeriodOver = checkForDismissiblePeriodForAlmostFullStorage()
                 )
             }.catch { Timber.e(it) }
                 .collectLatest { storageCapacity ->
@@ -172,6 +178,18 @@ class MediaDiscoveryViewModel @Inject constructor(
                     }
                 }
         }
+    }
+
+    /**
+     * Check if dismissible period for almost full storage banner is over
+     * @return true if dismissible period is over
+     */
+    private suspend fun checkForDismissiblePeriodForAlmostFullStorage(): Boolean {
+        return runCatching {
+            monitorAlmostFullStorageBannerClosingTimestampUseCase().firstOrNull()
+        }.onFailure {
+            Timber.e(it)
+        }.getOrNull() ?: false
     }
 
     private suspend fun isHiddenNodesActive(): Boolean {
@@ -787,8 +805,11 @@ class MediaDiscoveryViewModel @Inject constructor(
      * Reset storage capacity to default
      */
     fun setStorageCapacityAsDefault() {
-        _state.update {
-            it.copy(storageCapacity = DEFAULT)
+        _state.update { it.copy(storageCapacity = StorageOverQuotaCapacity.DEFAULT) }
+        viewModelScope.launch {
+            runCatching {
+                setAlmostFullStorageBannerClosingTimestampUseCase()
+            }.onFailure { Timber.e(it) }
         }
     }
 }

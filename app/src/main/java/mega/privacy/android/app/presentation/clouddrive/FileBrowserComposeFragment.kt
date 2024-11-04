@@ -48,7 +48,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -291,6 +290,7 @@ class FileBrowserComposeFragment : Fragment() {
                 ExitFileBrowser(uiState.exitFileBrowserEvent) {
                     fileBrowserViewModel.consumeExitFileBrowserEvent()
                 }
+                fileBrowserViewModel.updateStorageCapacityIfNeeded()
                 clickedFile?.let {
                     HandleNodeAction(
                         typedFileNode = it,

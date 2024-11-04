@@ -18,15 +18,17 @@ class StorageCapacityMapper @Inject constructor() {
      * @param storageState The [StorageState] object
      * @param isFullStorageOverQuotaBannerEnabled true if the feature flag FullStorageOverQuotaBanner is enabled
      * @param isAlmostFullStorageQuotaBannerEnabled true if the feature flag AlmostFullStorageOverQuotaBanner is enabled
+     * @param isDismissiblePeriodOver true if the dismissible period is over (typically 24 hours)
      * @return The mapped [StorageOverQuotaCapacity]
      */
     operator fun invoke(
         storageState: StorageState,
         isFullStorageOverQuotaBannerEnabled: Boolean,
         isAlmostFullStorageQuotaBannerEnabled: Boolean,
+        isDismissiblePeriodOver: Boolean,
     ): StorageOverQuotaCapacity = when (storageState) {
         StorageState.Red -> if (isFullStorageOverQuotaBannerEnabled) FULL else DEFAULT
-        StorageState.Orange -> if (isAlmostFullStorageQuotaBannerEnabled) ALMOST_FULL else DEFAULT
+        StorageState.Orange -> if (isAlmostFullStorageQuotaBannerEnabled && isDismissiblePeriodOver) ALMOST_FULL else DEFAULT
         else -> DEFAULT
     }
 }
