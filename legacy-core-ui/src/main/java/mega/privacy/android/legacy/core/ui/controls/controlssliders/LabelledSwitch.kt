@@ -14,8 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.R
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
@@ -64,7 +62,8 @@ private fun LabelledSwitchPreview(
 ) {
     var checked by remember { mutableStateOf(initialValue) }
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
-        LabelledSwitch(label = stringResource(if (checked) R.string.on else R.string.off),
+        LabelledSwitch(
+            label = if (checked) "On" else "Off",
             checked = checked,
             onCheckChanged = { checked = !checked })
     }

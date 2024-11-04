@@ -1,5 +1,4 @@
 @file:OptIn(
-    ExperimentalFoundationApi::class, ExperimentalMaterialApi::class,
     ExperimentalComposeUiApi::class
 )
 
@@ -13,7 +12,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -32,7 +30,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -532,7 +529,7 @@ private fun ImagePreviewContent(
             HorizontalPager(
                 modifier = Modifier.fillMaxSize(),
                 state = pagerState,
-                beyondBoundsPageCount = 1,
+                beyondViewportPageCount = 1,
                 key = { imageNodes.getOrNull(it)?.id?.longValue ?: -1L },
             ) { index ->
                 val imageNode = imageNodes.getOrNull(index)

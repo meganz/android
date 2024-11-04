@@ -2,7 +2,6 @@ package mega.privacy.android.feature.sync.ui
 
 import android.content.Context
 import androidx.activity.ComponentActivity
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
@@ -32,7 +31,6 @@ import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 
-@OptIn(ExperimentalMaterialApi::class)
 @RunWith(AndroidJUnit4::class)
 class SyncPromotionBottomSheetTest {
 
@@ -109,11 +107,14 @@ class SyncPromotionBottomSheetTest {
     @Test
     fun `test that click the primary button on a non free account sends the right analytics tracker event`() {
         initComposeRule()
-        composeRule.onNodeWithText(context.getString(R.string.sync_promotion_bottom_sheet_primary_button_text_pro))
-            .assertExists().assertIsDisplayed().performClick()
-        assertThat(analyticsRule.events).contains(
-            SyncPromotionBottomSheetSyncFoldersButtonPressedEvent
-        )
+        coroutineScope.launch {
+            modalSheetState.show()
+            composeRule.onNodeWithText(context.getString(R.string.sync_promotion_bottom_sheet_primary_button_text_pro))
+                .assertExists().assertIsDisplayed().performClick()
+            assertThat(analyticsRule.events).contains(
+                SyncPromotionBottomSheetSyncFoldersButtonPressedEvent
+            )
+        }
     }
 
     @Test

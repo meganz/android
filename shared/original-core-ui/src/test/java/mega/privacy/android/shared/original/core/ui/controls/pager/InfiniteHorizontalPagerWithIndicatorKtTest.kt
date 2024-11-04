@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.pager
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerScope
 import androidx.compose.material.Text
@@ -20,7 +19,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(ExperimentalFoundationApi::class)
 @RunWith(AndroidJUnit4::class)
 class InfiniteHorizontalPagerWithIndicatorKtTest {
 
@@ -54,7 +52,7 @@ class InfiniteHorizontalPagerWithIndicatorKtTest {
     private fun ComposeContentTestRule.setContent(
         pageCount: Int = 0,
         isOverScrollModeEnable: Boolean = true,
-        beyondBoundsPageCount: Int = PagerDefaults.BeyondBoundsPageCount,
+        beyondViewportPageCount: Int = PagerDefaults.BeyondViewportPageCount,
         verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
         pagerIndicator: @Composable ((currentPage: Int) -> Unit)? = null,
         pageContent: @Composable PagerScope.(page: Int) -> Unit = { page ->
@@ -69,7 +67,7 @@ class InfiniteHorizontalPagerWithIndicatorKtTest {
             InfiniteHorizontalPagerWithIndicator(
                 pageCount = pageCount,
                 isOverScrollModeEnable = isOverScrollModeEnable,
-                beyondBoundsPageCount = beyondBoundsPageCount,
+                beyondViewportPageCount = beyondViewportPageCount,
                 verticalAlignment = verticalAlignment,
                 pagerIndicator = pagerIndicator,
                 pageContent = pageContent

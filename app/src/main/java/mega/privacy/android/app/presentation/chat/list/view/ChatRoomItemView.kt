@@ -17,7 +17,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -101,7 +101,7 @@ internal fun ChatRoomItemView(
             )
             .indication(
                 interactionSource = MutableInteractionSource(),
-                indication = rememberRipple(bounded = true),
+                indication = ripple(bounded = true),
             ),
     ) {
         val (

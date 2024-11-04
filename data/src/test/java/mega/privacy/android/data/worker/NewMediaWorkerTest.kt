@@ -3,14 +3,15 @@ package mega.privacy.android.data.worker
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.work.DefaultWorkerFactory
 import androidx.work.SystemClock
-import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.impl.WorkDatabase
 import androidx.work.impl.utils.WorkForegroundUpdater
 import androidx.work.impl.utils.WorkProgressUpdater
 import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
@@ -69,8 +70,9 @@ class NewMediaWorkerTest {
                 1,
                 1,
                 executor,
+                Dispatchers.Unconfined,
                 workExecutor,
-                WorkerFactory.getDefaultWorkerFactory(),
+                DefaultWorkerFactory,
                 WorkProgressUpdater(workDatabase, workExecutor),
                 WorkForegroundUpdater(
                     workDatabase,

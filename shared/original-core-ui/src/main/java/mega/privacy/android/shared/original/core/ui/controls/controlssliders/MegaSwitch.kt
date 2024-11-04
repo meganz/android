@@ -29,7 +29,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.minimumInteractiveComponentSize
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -228,7 +228,7 @@ fun MegaSwitch(
                 .background(thumbColor, shape = CircleShape)
                 .indication(
                     interactionSource,
-                    rememberRipple(
+                    ripple(
                         bounded = false,
                         radius = rippleSize / 2,
                     )

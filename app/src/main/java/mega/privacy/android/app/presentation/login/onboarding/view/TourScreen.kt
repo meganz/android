@@ -274,7 +274,7 @@ private fun HorizontalTourPager(
         // We need to know the tallest height among the onboarding items.
         // Since the initial page is the middle item,
         // we only need to render the half left and right sides.
-        beyondBoundsPageCount = item.size / 2,
+        beyondViewportPageCount = item.size / 2,
         verticalAlignment = Alignment.Top
     ) { page ->
         Column(

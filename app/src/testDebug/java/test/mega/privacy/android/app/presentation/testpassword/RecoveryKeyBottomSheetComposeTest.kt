@@ -20,6 +20,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import androidx.compose.ui.platform.LocalDensity
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -31,8 +32,9 @@ class RecoveryKeyBottomSheetComposeTest {
 
     private fun setComposeContent() {
         composeTestRule.setContent {
+            val density = LocalDensity.current
             RecoveryKeyBottomSheet(
-                modalSheetState = ModalBottomSheetState(ModalBottomSheetValue.Expanded),
+                modalSheetState = ModalBottomSheetState(ModalBottomSheetValue.Expanded, density),
                 onPrint = {},
                 onCopy = {},
                 onSave = {}

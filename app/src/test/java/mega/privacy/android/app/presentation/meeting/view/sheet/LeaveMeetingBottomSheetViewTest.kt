@@ -1,17 +1,13 @@
 package mega.privacy.android.app.presentation.meeting.view.sheet
 
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
-import mega.privacy.android.app.presentation.meeting.view.sheet.BOTTOM_SHEET_ASSIGN_AND_LEAVE_BUTTON
-import mega.privacy.android.app.presentation.meeting.view.sheet.BOTTOM_SHEET_CONTAINER
-import mega.privacy.android.app.presentation.meeting.view.sheet.BOTTOM_SHEET_END_FOR_ALL_BUTTON
-import mega.privacy.android.app.presentation.meeting.view.sheet.BOTTOM_SHEET_HEADER
-import mega.privacy.android.app.presentation.meeting.view.sheet.BOTTOM_SHEET_LEAVE_ANYWAY_BUTTON
-import mega.privacy.android.app.presentation.meeting.view.sheet.LeaveMeetingBottomSheetView
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,11 +22,15 @@ class LeaveMeetingBottomSheetViewTest {
 
     @Test
     fun `test that Container is shown`() {
-        initComposeRuleContent(
-            onAssignAndLeaveClick = {},
-            onLeaveAnywayClick = {},
-            onEndForAllClick = {},
-        )
+        composeTestRule.setContent {
+            LeaveMeetingBottomSheetView(
+                state = InMeetingUiState(showEndMeetingAsOnlyHostBottomPanel = true),
+                onAssignAndLeaveClick = {},
+                onLeaveAnywayClick = {},
+                onEndForAllClick = {},
+                onDismiss = {},
+            )
+        }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER).assertExists()
     }
 
@@ -122,12 +122,14 @@ class LeaveMeetingBottomSheetViewTest {
         composeTestRule.setContent {
             val coroutineScope = rememberCoroutineScope()
 
-            LeaveMeetingBottomSheetView(
-                state = InMeetingUiState(showEndMeetingAsOnlyHostBottomPanel = true),
+            LeaveMeetingBottomSheetContentView(
+                coroutineScope = coroutineScope,
+                modalSheetState = rememberModalBottomSheetState(
+                    initialValue = ModalBottomSheetValue.Expanded
+                ),
                 onAssignAndLeaveClick = onAssignAndLeaveClick,
                 onLeaveAnywayClick = onLeaveAnywayClick,
                 onEndForAllClick = onEndForAllClick,
-                onDismiss = {}
             )
         }
     }

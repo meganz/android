@@ -16,11 +16,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.controls.pager.indicator.HorizontalPagerIndicator
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * A [HorizontalPager] that supports infinite scrolling with indicator.
@@ -28,7 +28,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
  * @param pageCount The total of the actual items.
  * @param modifier A modifier instance to be applied to this Pager outer layout.
  * @param isOverScrollModeEnable Whether the over scroll configuration is allowed.
- * @param beyondBoundsPageCount Pages to compose and layout before and after the list of visible
+ * @param beyondViewportPageCount Pages to compose and layout before and after the list of visible
  * pages.
  * @param verticalAlignment How pages are aligned vertically in this Pager.
  * @param pageContent This Pager's page Composable.
@@ -39,7 +39,7 @@ fun InfiniteHorizontalPagerWithIndicator(
     pageCount: Int,
     modifier: Modifier = Modifier,
     isOverScrollModeEnable: Boolean = true,
-    beyondBoundsPageCount: Int = PagerDefaults.BeyondBoundsPageCount,
+    beyondViewportPageCount: Int = PagerDefaults.BeyondViewportPageCount,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     pagerIndicator: @Composable ((currentPage: Int) -> Unit)? = null,
     pageContent: @Composable PagerScope.(page: Int) -> Unit,
@@ -64,7 +64,7 @@ fun InfiniteHorizontalPagerWithIndicator(
         HorizontalPager(
             modifier = modifier,
             state = pagerState,
-            beyondBoundsPageCount = beyondBoundsPageCount,
+            beyondViewportPageCount = beyondViewportPageCount,
             verticalAlignment = verticalAlignment
         ) { page ->
             pageContent(page % pageCount)
@@ -78,7 +78,6 @@ fun InfiniteHorizontalPagerWithIndicator(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @CombinedTextAndThemePreviews
 @Composable
 private fun InfiniteHorizontalPagerWithIndicatorPreview() {

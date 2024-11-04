@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
@@ -18,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,11 +32,11 @@ import mega.privacy.android.app.presentation.extensions.getDayAndMonth
 import mega.privacy.android.app.presentation.extensions.getTimeFormatted
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
 import mega.privacy.android.app.presentation.meeting.view.RecurringMeetingAvatarView
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
+import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
-import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import java.time.Instant
 import java.time.temporal.ChronoField
 import kotlin.random.Random
@@ -44,7 +44,6 @@ import kotlin.random.Random
 /**
  * Recurring Meeting Occurrence bottom sheet view
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun RecurringMeetingOccurrenceBottomSheetView(
     modalSheetState: ModalBottomSheetState,
@@ -70,7 +69,6 @@ internal fun RecurringMeetingOccurrenceBottomSheetView(
     ) {}
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun BottomSheetContent(
     modalSheetState: ModalBottomSheetState,
@@ -169,13 +167,13 @@ internal const val CANCEL_OCCURRENCE_TAG =
     "recurring_meeting_occurrence_bottom_sheet:cancel_occurrence"
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 private fun PreviewRecurringMeetingOccurrenceBottomSheetView() {
     val schedId = Random.nextLong()
+    val density = LocalDensity.current
     RecurringMeetingOccurrenceBottomSheetView(
-        modalSheetState = ModalBottomSheetState(ModalBottomSheetValue.Expanded),
+        modalSheetState = ModalBottomSheetState(ModalBottomSheetValue.Expanded, density),
         coroutineScope = rememberCoroutineScope(),
         meetingState = RecurringMeetingInfoState(
             finish = false,

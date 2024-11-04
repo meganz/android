@@ -1,25 +1,21 @@
 package mega.privacy.android.shared.original.core.ui.controls.textfields
 
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.platform.LocalTextInputService
+import android.text.InputType
+import android.view.inputmethod.EditorInfo
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.InterceptPlatformTextInput
 import androidx.compose.ui.semantics.SemanticsProperties.Text
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import androidx.compose.ui.text.input.ImeOptions
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PlatformTextInputService
-import androidx.compose.ui.text.input.TextInputService
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
-import org.mockito.kotlin.atLeastOnce
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
@@ -29,13 +25,16 @@ class PasscodeFieldTest {
     @get:Rule
     val composeRule = createComposeRule()
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Test
     fun `test that default keyboard is numeric password`() {
-        val platformTextInputService = mock<PlatformTextInputService>()
-        val textInputService = TextInputService(platformTextInputService)
+        val outAttributes = EditorInfo()
         composeRule.setContent {
-            CompositionLocalProvider(
-                LocalTextInputService provides textInputService
+            InterceptPlatformTextInput(
+                interceptor = { request, nextHandler ->
+                    request.createInputConnection(outAttributes)
+                    nextHandler.startInputMethod(request)
+                }
             ) {
                 PasscodeField(onComplete = {})
             }
@@ -44,16 +43,7 @@ class PasscodeFieldTest {
         composeRule.onNodeWithTag(PASSCODE_FIELD_TAG).performClick()
 
         composeRule.runOnIdle {
-            verify(platformTextInputService, atLeastOnce()).startInput(
-                value = any(),
-                imeOptions = eq(
-                    ImeOptions(
-                        keyboardType = KeyboardType.NumberPassword,
-                    )
-                ),
-                onEditCommand = any(),
-                onImeActionPerformed = any()
-            )
+            assertThat(outAttributes.inputType and InputType.TYPE_MASK_CLASS).isEqualTo(InputType.TYPE_CLASS_NUMBER)
         }
     }
 

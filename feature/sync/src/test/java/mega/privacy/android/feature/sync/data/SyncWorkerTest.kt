@@ -3,9 +3,9 @@ package mega.privacy.android.feature.sync.data
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.work.DefaultWorkerFactory
 import androidx.work.ListenableWorker.Result
 import androidx.work.SystemClock
-import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.impl.WorkDatabase
 import androidx.work.impl.utils.WorkForegroundUpdater
@@ -13,6 +13,7 @@ import androidx.work.impl.utils.WorkProgressUpdater
 import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.flowOf
@@ -70,8 +71,9 @@ class SyncWorkerTest {
             1,
             1,
             executor,
+            Dispatchers.Unconfined,
             workExecutor,
-            WorkerFactory.getDefaultWorkerFactory(),
+            DefaultWorkerFactory,
             WorkProgressUpdater(workDatabase, workExecutor),
             WorkForegroundUpdater(
                 workDatabase, { _, _ -> }, workExecutor

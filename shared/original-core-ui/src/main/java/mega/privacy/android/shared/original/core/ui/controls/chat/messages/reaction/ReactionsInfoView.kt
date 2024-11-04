@@ -40,8 +40,8 @@ import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehavi
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
@@ -131,7 +131,7 @@ fun ReactionsInfoView(
         HorizontalPager(
             modifier = Modifier.fillMaxWidth(),
             state = pagerState,
-            beyondBoundsPageCount = 3,
+            beyondViewportPageCount = 3,
             verticalAlignment = Alignment.Top,
         ) { page: Int ->
             val reaction = reactionList[page]

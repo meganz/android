@@ -1,9 +1,6 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package mega.privacy.android.app.presentation.imagepreview.slideshow.view
 
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -280,7 +277,7 @@ private fun SlideShowContent(
             modifier = Modifier
                 .fillMaxSize(),
             state = pagerState,
-            beyondBoundsPageCount = minOf(3, imageNodes.size),
+            beyondViewportPageCount = minOf(3, imageNodes.size),
             key = { imageNodes.getOrNull(it)?.id?.longValue ?: -1L }
         ) { index ->
 

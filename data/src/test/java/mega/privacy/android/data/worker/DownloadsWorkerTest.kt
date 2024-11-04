@@ -2,10 +2,10 @@ package mega.privacy.android.data.worker
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.DefaultWorkerFactory
 import androidx.work.ListenableWorker
 import androidx.work.ProgressUpdater
 import androidx.work.SystemClock
-import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.impl.WorkDatabase
 import androidx.work.impl.utils.WorkForegroundUpdater
@@ -114,8 +114,9 @@ class DownloadsWorkerTest {
                 1,
                 1,
                 executor,
+                Dispatchers.Unconfined,
                 workExecutor,
-                WorkerFactory.getDefaultWorkerFactory(),
+                DefaultWorkerFactory,
                 workProgressUpdater,
                 WorkForegroundUpdater(
                     workDatabase,

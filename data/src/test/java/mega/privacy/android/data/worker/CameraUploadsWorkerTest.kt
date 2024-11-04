@@ -3,10 +3,10 @@ package mega.privacy.android.data.worker
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.work.DefaultWorkerFactory
 import androidx.work.ForegroundInfo
 import androidx.work.ListenableWorker
 import androidx.work.SystemClock
-import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.impl.WorkDatabase
 import androidx.work.impl.utils.WorkForegroundUpdater
@@ -260,8 +260,9 @@ internal class CameraUploadsWorkerTest {
                     1,
                     1,
                     executor,
+                    Dispatchers.Unconfined,
                     workExecutor,
-                    WorkerFactory.getDefaultWorkerFactory(),
+                    DefaultWorkerFactory,
                     WorkProgressUpdater(workDatabase, workExecutor),
                     WorkForegroundUpdater(
                         workDatabase,
