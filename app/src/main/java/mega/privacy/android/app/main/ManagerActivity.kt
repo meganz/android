@@ -6688,35 +6688,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
             }
 
-            MegaRequest.TYPE_REMOVE_CONTACT -> {
-                when (e.errorCode) {
-                    MegaError.API_OK -> {
-                        showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            getString(R.string.context_contact_removed),
-                            -1
-                        )
-                    }
-
-                    MegaError.API_EMASTERONLY -> {
-                        showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            getString(R.string.error_remove_business_contact, request.email),
-                            -1
-                        )
-                    }
-
-                    else -> {
-                        Timber.e("Error deleting contact")
-                        showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            getString(R.string.context_contact_not_removed),
-                            -1
-                        )
-                    }
-                }
-            }
-
             MegaRequest.TYPE_INVITE_CONTACT -> {
                 Timber.d("MegaRequest.TYPE_INVITE_CONTACT finished: %s", request.number)
                 dismissAlertDialogIfExists(statusDialog)

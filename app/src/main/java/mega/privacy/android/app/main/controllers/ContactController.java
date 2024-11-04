@@ -1,39 +1,29 @@
 package mega.privacy.android.app.main.controllers;
 
 import static mega.privacy.android.app.listeners.ShareListener.CHANGE_PERMISSIONS_LISTENER;
-import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
-import static mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Util.isOnline;
 
 import android.content.Context;
-import android.content.Intent;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.listeners.ShareListener;
-import mega.privacy.android.app.main.legacycontact.AddContactActivity;
-import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.ManagerActivity;
+import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.main.listeners.MultipleRequestListener;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
-import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.presentation.achievements.AchievementsFeatureActivity;
-import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.data.database.DatabaseHandler;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
 public class ContactController {
@@ -55,61 +45,6 @@ public class ContactController {
 
         if (dbH == null) {
             dbH = DbHandlerModuleKt.getDbHandler();
-        }
-    }
-
-
-    public static Intent getPickFileToSendIntent(Context context, List<MegaUser> users) {
-        Timber.d("pickFileToSend");
-
-        Intent intent = new Intent(context, FileExplorerActivity.class);
-        intent.setAction(FileExplorerActivity.ACTION_MULTISELECT_FILE);
-        ArrayList<String> longArray = new ArrayList<String>();
-        for (int i = 0; i < users.size(); i++) {
-            longArray.add(users.get(i).getEmail());
-        }
-        intent.putStringArrayListExtra(SELECTED_CONTACTS, longArray);
-        return intent;
-    }
-
-    /**
-     * @deprecated Use {@link mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase} instead
-     */
-    @Deprecated
-    public void removeContact(MegaUser c) {
-        Timber.d("removeContact");
-
-        checkRemoveContact(c);
-
-        if (context instanceof ManagerActivity) {
-            megaApi.removeContact(c, (ManagerActivity) context);
-        } else if (context instanceof ContactInfoActivity) {
-            megaApi.removeContact(c, (ContactInfoActivity) context);
-        } else {
-            megaApi.removeContact(c);
-        }
-    }
-
-    private void checkRemoveContact(MegaUser c) {
-        ArrayList<MegaNode> inShares = megaApi.getInShares(c);
-
-        if (inShares.size() != 0) {
-            for (int i = 0; i < inShares.size(); i++) {
-                MegaNode removeNode = inShares.get(i);
-                megaApi.remove(removeNode);
-            }
-        }
-
-        if (megaChatApi != null && participatingInACall()) {
-            MegaChatRoom chatRoomTo = megaChatApi.getChatRoomByUser(c.getHandle());
-            if (chatRoomTo != null) {
-                long chatId = chatRoomTo.getChatId();
-                MegaChatCall call = megaChatApi.getChatCall(chatId);
-                if (call != null && (context instanceof ManagerActivity ||
-                        context instanceof ContactInfoActivity)) {
-                    megaChatApi.hangChatCall(call.getCallId(), new HangChatCallListener(context));
-                }
-            }
         }
     }
 
