@@ -95,7 +95,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
         val file = mockFile()
         underTest(file, NodeId(11L), 1L).test {
             verify(uploadFilesUseCase).invoke(
-                argThat { this.firstOrNull()?.file == file },
+                argThat { this.firstOrNull()?.uriPath?.value == file.absolutePath },
                 NodeId(any()), any(),
             )
             cancelAndIgnoreRemainingEvents()
@@ -275,6 +275,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
     private fun mockFile() = mock<File> {
         on { isDirectory }.thenReturn(false)
         on { path }.thenReturn("path")
+        on { absolutePath }.thenReturn("path")
     }
 
     private fun mockFlow(flow: Flow<MultiTransferEvent>) {

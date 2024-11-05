@@ -9,10 +9,11 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.StorageStatePayWallException
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
-import mega.privacy.android.domain.usecase.transfers.GetFileForUploadUseCase
+import mega.privacy.android.domain.usecase.transfers.GetPathForUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractStartTransfersWithWorkerUseCase
 import javax.inject.Inject
 
@@ -27,7 +28,7 @@ class StartUploadsWithWorkerUseCase @Inject constructor(
     private val uploadFilesUseCase: UploadFilesUseCase,
     private val startUploadsWorkerAndWaitUntilIsStartedUseCase: StartUploadsWorkerAndWaitUntilIsStartedUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val getFileForUploadUseCase: GetFileForUploadUseCase,
+    private val getPathForUploadUseCase: GetPathForUploadUseCase,
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
 ) : AbstractStartTransfersWithWorkerUseCase(cancelCancelTokenUseCase) {
 
@@ -49,36 +50,40 @@ class StartUploadsWithWorkerUseCase @Inject constructor(
             flow {
                 val uploadFileInfos: List<UploadFileInfo> =
                     urisWithNames.mapNotNull { (originalUri, name) ->
-                        val fileResult = runCatching {
-                            getFileForUploadUseCase(originalUri, false)
+                        val uriPathToUpload = runCatching {
+                            getPathForUploadUseCase(UriPath(originalUri), false)?.let {
+                                UriPath(it)
+                            }
                         }
-                        if (fileResult.getOrNull() == null) {
+                        if (uriPathToUpload.getOrNull() == null) {
                             emit(
                                 MultiTransferEvent.TransferNotStarted(
                                     name,
-                                    fileResult.exceptionOrNull()
+                                    uriPathToUpload.exceptionOrNull()
                                 )
                             )
                         }
-                        fileResult.getOrNull()?.let { file ->
-                            val appdata = if (file.absolutePath == originalUri) null else {
+                        uriPathToUpload.getOrNull()?.let { uripath ->
+                            val appdata = if (uripath.value == originalUri) null else {
                                 listOf(TransferAppData.OriginalContentUri(originalUri))
                             }
-                            UploadFileInfo(file, name, appdata)
+                            UploadFileInfo(uripath, name, appdata, 0L) //TODO modified date
                         }
                     }
-                emitAll(startTransfersAndThenWorkerFlow(
-                    doTransfers = {
-                        uploadFilesUseCase(
-                            uploadFileInfos = uploadFileInfos,
-                            parentFolderId = destinationId,
-                            isHighPriority = isHighPriority,
-                        )
-                    },
-                    startWorker = {
-                        startUploadsWorkerAndWaitUntilIsStartedUseCase()
-                    }
-                ))
+                if (uploadFileInfos.isNotEmpty()) {
+                    emitAll(startTransfersAndThenWorkerFlow(
+                        doTransfers = {
+                            uploadFilesUseCase(
+                                uploadFileInfos = uploadFileInfos,
+                                parentFolderId = destinationId,
+                                isHighPriority = isHighPriority,
+                            )
+                        },
+                        startWorker = {
+                            startUploadsWorkerAndWaitUntilIsStartedUseCase()
+                        }
+                    ))
+                }
             }
         }
 }

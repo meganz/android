@@ -16,9 +16,10 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
-import mega.privacy.android.domain.usecase.transfers.GetFileForUploadUseCase
+import mega.privacy.android.domain.usecase.transfers.GetPathForUploadUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -48,7 +49,7 @@ class StartUploadsWithWorkerUseCaseTest {
     private val startUploadsWorkerAndWaitUntilIsStartedUseCase =
         mock<StartUploadsWorkerAndWaitUntilIsStartedUseCase>()
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
-    private val getFileForUploadUseCase = mock<GetFileForUploadUseCase>()
+    private val getPathForUploadUseCase = mock<GetPathForUploadUseCase>()
     private val cancelCancelTokenUseCase = mock<CancelCancelTokenUseCase>()
 
     private val path = "path"
@@ -65,7 +66,7 @@ class StartUploadsWithWorkerUseCaseTest {
             uploadFilesUseCase,
             startUploadsWorkerAndWaitUntilIsStartedUseCase,
             monitorStorageStateEventUseCase,
-            getFileForUploadUseCase,
+            getPathForUploadUseCase,
             cancelCancelTokenUseCase,
         )
     }
@@ -76,7 +77,7 @@ class StartUploadsWithWorkerUseCaseTest {
             uploadFilesUseCase,
             startUploadsWorkerAndWaitUntilIsStartedUseCase,
             monitorStorageStateEventUseCase,
-            getFileForUploadUseCase,
+            getPathForUploadUseCase,
             cancelCancelTokenUseCase,
         )
         wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
@@ -118,10 +119,10 @@ class StartUploadsWithWorkerUseCaseTest {
 
     @Test
     fun `test that the file is send to upload files use case`() = runTest {
-        whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
+        whenever(getPathForUploadUseCase(UriPath(eq(path)), eq(false))).thenReturn(path)
         underTest(urisWithNames, destinationId, false).test {
             verify(uploadFilesUseCase).invoke(
-                argThat { singleOrNull()?.file == file },
+                argThat { singleOrNull()?.uriPath?.value == path },
                 NodeId(eq(destinationId.longValue)), any()
             )
             cancelAndIgnoreRemainingEvents()
@@ -129,10 +130,10 @@ class StartUploadsWithWorkerUseCaseTest {
     }
 
     @Test
-    fun `test that app data with original destination is send to upload files use case when getFileForUploadUseCase returns a different path`() =
+    fun `test that app data with original destination is send to upload files use case when getUriPathForUploadUseCase returns a different path`() =
         runTest {
-            val cacheFile = File("fileInCache")
-            whenever(getFileForUploadUseCase(path, false)).thenReturn(cacheFile)
+            val cacheFile = "fileInCache"
+            whenever(getPathForUploadUseCase(UriPath(path), false)).thenReturn(cacheFile)
             underTest(urisWithNames, destinationId, false).test {
                 verify(uploadFilesUseCase).invoke(
                     argThat {
@@ -146,9 +147,9 @@ class StartUploadsWithWorkerUseCaseTest {
         }
 
     @Test
-    fun `test that app data is not send to upload files use case when getFileForUploadUseCase returns the same path`() =
+    fun `test that app data is not send to upload files use case when getUriPathForUploadUseCase returns the same path`() =
         runTest {
-            whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
+            whenever(getPathForUploadUseCase(UriPath(path), false)).thenReturn(path)
             underTest(urisWithNames, destinationId, false).test {
                 verify(uploadFilesUseCase).invoke(
                     argThat { singleOrNull()?.appData == null },
@@ -159,9 +160,9 @@ class StartUploadsWithWorkerUseCaseTest {
         }
 
     @Test
-    fun `test that TransferNotStarted is emitted when getFileForUploadUseCase returns null`() =
+    fun `test that TransferNotStarted is emitted when getUriPathForUploadUseCase returns null`() =
         runTest {
-            whenever(getFileForUploadUseCase(path, false)).thenReturn(null)
+            whenever(getPathForUploadUseCase(UriPath(path), false)).thenReturn(null)
             underTest(urisWithNames, destinationId, false).test {
                 val actual = awaitItem()
                 assertThat(actual).isInstanceOf(MultiTransferEvent.TransferNotStarted::class.java)
@@ -170,10 +171,10 @@ class StartUploadsWithWorkerUseCaseTest {
         }
 
     @Test
-    fun `test that TransferNotStarted is emitted with an exception when getFileForUploadUseCase throws that exception`() =
+    fun `test that TransferNotStarted is emitted with an exception when getUriPathForUploadUseCase throws that exception`() =
         runTest {
             val exception = RuntimeException("exception")
-            whenever(getFileForUploadUseCase(path, false)).thenThrow(exception)
+            whenever(getPathForUploadUseCase(UriPath(path), false)).thenThrow(exception)
             underTest(urisWithNames, destinationId, false).test {
                 val actual = awaitItem()
                 assertThat(actual).isInstanceOf(MultiTransferEvent.TransferNotStarted::class.java)
@@ -188,7 +189,7 @@ class StartUploadsWithWorkerUseCaseTest {
     fun `test that the is high priority flag is send to upload files use case`(
         expected: Boolean,
     ) = runTest {
-        whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
+        whenever(getPathForUploadUseCase(UriPath(path), false)).thenReturn(path)
         underTest(urisWithNames, destinationId, expected).test {
             verify(uploadFilesUseCase).invoke(
                 any(),
@@ -202,7 +203,7 @@ class StartUploadsWithWorkerUseCaseTest {
 
     @Test
     fun `test that destinationId is used as destination`() = runTest {
-        whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
+        whenever(getPathForUploadUseCase(UriPath(path), false)).thenReturn(path)
         underTest(urisWithNames, destinationId, false).test {
             verify(uploadFilesUseCase).invoke(
                 any(),
@@ -215,7 +216,7 @@ class StartUploadsWithWorkerUseCaseTest {
 
     @Test
     fun `test that worker is started when start upload finish correctly`() = runTest {
-        whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
+        whenever(getPathForUploadUseCase(UriPath(path), false)).thenReturn(path)
         mockFlow(
             flow {
                 emit(mock<MultiTransferEvent.SingleTransferEvent> {
@@ -230,6 +231,7 @@ class StartUploadsWithWorkerUseCaseTest {
 
     @Test
     fun `test that flow is not finished until the worker is started`() = runTest {
+        whenever(getPathForUploadUseCase(UriPath(path), false)).thenReturn(path)
         var workerStarted = false
         mockFlow(
             flow {
@@ -239,7 +241,6 @@ class StartUploadsWithWorkerUseCaseTest {
                 awaitCancellation()
             }
         )
-        whenever(getFileForUploadUseCase(path, false)).thenReturn(file)
         whenever(startUploadsWorkerAndWaitUntilIsStartedUseCase()).then(
             AdditionalAnswers.answersWithDelay(
                 10

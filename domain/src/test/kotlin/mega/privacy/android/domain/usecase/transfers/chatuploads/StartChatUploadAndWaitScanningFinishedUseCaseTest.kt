@@ -53,7 +53,7 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
 
     @Test
     fun `test that upload files use case is invoked when the use case is invoked`() = runTest {
-        val filesAndNames = mapOf(mock<File>() to "name")
+        val filesAndNames = mapOf(file to "name")
         val pendingMessageIds = listOf(1L, 2L, 3L)
         whenever(uploadFilesUseCase(any(), NodeId(any()), any())) doReturn emptyFlow()
         val appData = pendingMessageIds.map {
@@ -80,7 +80,7 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
                 0L,
                 0L
             )
-            val filesAndNames = mapOf(mock<File>() to "name")
+            val filesAndNames = mapOf(file to "name")
             val pendingMessageIds = listOf(1L, 2L, 3L)
             whenever(
                 uploadFilesUseCase(
@@ -99,7 +99,7 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
         }
 
     @Test
-    fun `test that the scanning finished event is awaited when the use case is invoked`() =
+    fun `test that the scanning finished event is awaited when the use case is invoked`() {
         runTest {
             assertDoesNotThrow {
                 val finishEvent = MultiTransferEvent.SingleTransferEvent(
@@ -108,7 +108,7 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
                     0L,
                     scanningFinished = true,
                 )
-                val filesAndNames = mapOf(mock<File>() to "name")
+                val filesAndNames = mapOf(file to "name")
                 val pendingMessageIds = listOf(1L, 2L, 3L)
                 whenever(
                     uploadFilesUseCase(
@@ -129,6 +129,8 @@ class StartChatUploadAndWaitScanningFinishedUseCaseTest {
                 )
             }
         }
+    }
 
     private val myChatsFolderId = NodeId(45L)
+    private val file = File("/root/file.txt")
 }

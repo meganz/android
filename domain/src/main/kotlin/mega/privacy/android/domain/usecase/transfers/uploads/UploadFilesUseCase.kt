@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
@@ -50,11 +51,12 @@ class UploadFilesUseCase @Inject constructor(
             items = uploadFileInfos,
             null,
         ) { uploadFileInfo ->
-            val isSourceTemporary = cacheRepository.isFileInCacheDirectory(uploadFileInfo.file)
+            val isSourceTemporary =
+                cacheRepository.isFileInCacheDirectory(File(uploadFileInfo.uriPath.value))
             if (!uploadFileInfo.appData.isNullOrEmpty() && uploadFileInfo.appData.all { it is TransferAppData.ChatTransferAppData }) {
                 @Suppress("UNCHECKED_CAST")
                 transferRepository.startUploadForChat(
-                    localPath = uploadFileInfo.file.absolutePath,
+                    localPath = uploadFileInfo.uriPath.value,
                     parentNodeId = parentFolderId,
                     fileName = uploadFileInfo.fileName,
                     appData = uploadFileInfo.appData as List<TransferAppData.ChatTransferAppData>,
@@ -62,10 +64,10 @@ class UploadFilesUseCase @Inject constructor(
                 )
             } else {
                 transferRepository.startUpload(
-                    localPath = uploadFileInfo.file.absolutePath,
+                    localPath = uploadFileInfo.uriPath.value,
                     parentNodeId = parentFolderId,
                     fileName = uploadFileInfo.fileName,
-                    modificationTime = uploadFileInfo.file.lastModified() / 1000,
+                    modificationTime = uploadFileInfo.lastModifiedDate / 1000L,
                     appData = uploadFileInfo.appData,
                     isSourceTemporary = isSourceTemporary,
                     shouldStartFirst = isHighPriority,
@@ -75,7 +77,7 @@ class UploadFilesUseCase @Inject constructor(
     }
 
     override fun generateIdFromItem(item: UploadFileInfo): String =
-        item.file.path
+        item.uriPath.value
 
     override fun generateIdFromTransferEvent(transferEvent: TransferEvent) =
         transferEvent.transfer.localPath
@@ -85,12 +87,17 @@ class UploadFilesUseCase @Inject constructor(
 /**
  * Class to encapsulate the information needed to upload a file
  *
- * @param file the [File] to be uploaded
+ * @param uriPath the [UriPath] to be uploaded
  * @param fileName the name of the file if it should be renamed, if null the original name will be kept
  * @param appData the appData for this file
+ * @param lastModifiedDate in milliseconds
  */
 data class UploadFileInfo(
-    val file: File,
+    val uriPath: UriPath,
     val fileName: String?,
     val appData: List<TransferAppData>? = null,
-)
+    val lastModifiedDate: Long,
+) {
+    constructor(file: File, fileName: String?, appData: List<TransferAppData>? = null) :
+            this(UriPath(file.absolutePath), fileName, appData, file.lastModified())
+}

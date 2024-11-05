@@ -7,7 +7,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.PermissionRepository
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase
-import mega.privacy.android.domain.usecase.transfers.GetFileForUploadUseCase
+import mega.privacy.android.domain.usecase.transfers.GetPathForUploadUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -25,8 +25,8 @@ import java.io.File
 import java.io.IOException
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetFileForUploadUseCaseTest {
-    private lateinit var underTest: GetFileForUploadUseCase
+class GetPathForUploadUseCaseTest {
+    private lateinit var underTest: GetPathForUploadUseCase
 
     private val getCacheFileForUploadUseCase = mock<GetCacheFileForUploadUseCase>()
     private val doesPathHaveSufficientSpaceUseCase = mock<DoesPathHaveSufficientSpaceUseCase>()
@@ -35,7 +35,7 @@ class GetFileForUploadUseCaseTest {
 
     @BeforeAll
     fun setup() {
-        underTest = GetFileForUploadUseCase(
+        underTest = GetPathForUploadUseCase(
             getCacheFileForUploadUseCase = getCacheFileForUploadUseCase,
             doesPathHaveSufficientSpaceUseCase = doesPathHaveSufficientSpaceUseCase,
             fileSystemRepository = fileSystemRepository,
@@ -58,15 +58,14 @@ class GetFileForUploadUseCaseTest {
 
     @ParameterizedTest(name = " and isChatUpload is {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that file is returned if path represents an existing file`(
+    fun `test that original uri path is returned if uri path represents an existing file`(
         isChatUpload: Boolean,
     ) = runTest {
         val path = "/file.txt"
-        val file = mock<File>()
+        val uriPath = UriPath(path)
         whenever(permissionRepository.hasManageExternalStoragePermission()).thenReturn(false)
         whenever(fileSystemRepository.isFilePath(path)).thenReturn(true)
-        whenever(fileSystemRepository.getFileByPath(path)).thenReturn(file)
-        assertThat(underTest.invoke(path, isChatUpload)).isEqualTo(file)
+        assertThat(underTest.invoke(uriPath, isChatUpload)).isEqualTo(path)
     }
 
     @ParameterizedTest(name = " and isChatUpload is {0}")
@@ -75,11 +74,15 @@ class GetFileForUploadUseCaseTest {
         isChatUpload: Boolean,
     ) = runTest {
         val uri = "file://file.txt"
-        val file = mock<File>()
+        val path = "/file.txt"
+        val uriPath = UriPath(uri)
+        val file = mock<File> {
+            on { this.absolutePath } doReturn path
+        }
         whenever(permissionRepository.hasManageExternalStoragePermission()).thenReturn(false)
         whenever(fileSystemRepository.isFileUri(uri)).thenReturn(true)
         whenever(fileSystemRepository.getFileFromFileUri(uri)).thenReturn(file)
-        assertThat(underTest.invoke(uri, isChatUpload)).isEqualTo(file)
+        assertThat(underTest.invoke(uriPath, isChatUpload)).isEqualTo(path)
     }
 
     @ParameterizedTest(name = " and isChatUpload is {0}")
@@ -94,7 +97,7 @@ class GetFileForUploadUseCaseTest {
         whenever(fileSystemRepository.isContentUri(any())).thenReturn(true)
         whenever(fileSystemRepository.getFileNameFromUri(uriString)).thenReturn(filePath)
         whenever(getCacheFileForUploadUseCase(any(), any())).thenReturn(file)
-        assertThat(underTest.invoke(uriString, isChatUpload)).isEqualTo(file)
+        assertThat(underTest.invoke(UriPath(uriString), isChatUpload)).isEqualTo(filePath)
         verify(fileSystemRepository).copyContentUriToFile(UriPath(uriString), file)
     }
 
@@ -112,7 +115,7 @@ class GetFileForUploadUseCaseTest {
         whenever(fileSystemRepository.getFileNameFromUri(uriString)).thenReturn(filePath)
         whenever(getCacheFileForUploadUseCase(any(), any())).thenReturn(file)
         assertThrows<IOException> {
-            underTest.invoke(uriString, isChatUpload)
+            underTest.invoke(UriPath(uriString), isChatUpload)
         }
         verify(fileSystemRepository, never()).copyContentUriToFile(UriPath(uriString), file)
     }
@@ -122,13 +125,13 @@ class GetFileForUploadUseCaseTest {
     fun `test that the file is returned when uri is a content uri and permission is enabled`(
         isChatUpload: Boolean,
     ) = runTest {
-        val uriString = "content://example.txt"
+        val uriPath = UriPath("content://example.txt")
         val filePath = "/folder/example.txt"
         val file = File(filePath)
         whenever(permissionRepository.hasManageExternalStoragePermission()).thenReturn(true)
         whenever(fileSystemRepository.isContentUri(any())).thenReturn(true)
-        whenever(fileSystemRepository.getFileFromUri(UriPath(uriString))).thenReturn(file)
-        assertThat(underTest.invoke(uriString, isChatUpload)).isEqualTo(file)
+        whenever(fileSystemRepository.getFileFromUri(uriPath)).thenReturn(file)
+        assertThat(underTest.invoke(uriPath, isChatUpload)).isEqualTo(filePath)
     }
 
     @ParameterizedTest(name = " and isChatUpload is {0}")
@@ -137,14 +140,15 @@ class GetFileForUploadUseCaseTest {
         isChatUpload: Boolean,
     ) = runTest {
         val uriString = "content://example.txt"
+        val uriPath = UriPath(uriString)
         val filePath = "/folder/example.txt"
         val file = File(filePath)
         whenever(permissionRepository.hasManageExternalStoragePermission()).thenReturn(true)
         whenever(fileSystemRepository.isContentUri(any())).thenReturn(true)
-        whenever(fileSystemRepository.getFileFromUri(UriPath(uriString))).thenReturn(null)
+        whenever(fileSystemRepository.getFileFromUri(uriPath)).thenReturn(null)
         whenever(fileSystemRepository.getFileNameFromUri(uriString)).thenReturn(filePath)
         whenever(getCacheFileForUploadUseCase(any(), any())).thenReturn(file)
-        assertThat(underTest.invoke(uriString, isChatUpload)).isEqualTo(file)
+        assertThat(underTest.invoke(uriPath, isChatUpload)).isEqualTo(filePath)
         verify(fileSystemRepository).copyContentUriToFile(UriPath(uriString), file)
     }
 }

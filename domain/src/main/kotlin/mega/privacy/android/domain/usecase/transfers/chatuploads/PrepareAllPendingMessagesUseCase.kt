@@ -10,9 +10,11 @@ import kotlinx.coroutines.sync.withPermit
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndPathRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesByStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
-import mega.privacy.android.domain.usecase.transfers.GetFileForUploadUseCase
+import mega.privacy.android.domain.usecase.transfers.GetPathForUploadUseCase
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -23,7 +25,7 @@ import javax.inject.Inject
  */
 class PrepareAllPendingMessagesUseCase @Inject constructor(
     private val monitorPendingMessagesByStateUseCase: MonitorPendingMessagesByStateUseCase,
-    private val getFileForUploadUseCase: GetFileForUploadUseCase,
+    private val getPathForUploadUseCase: GetPathForUploadUseCase,
     private val chatAttachmentNeedsCompressionUseCase: ChatAttachmentNeedsCompressionUseCase,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
 ) {
@@ -45,12 +47,12 @@ class PrepareAllPendingMessagesUseCase @Inject constructor(
                             launch {
                                 semaphore.withPermit {
                                     val pendingMessageIds = pendingMessages.map { it.id }
-                                    val cacheCopy = getFileForUploadUseCase(
-                                        uriOrPathString = uri,
+                                    val uriPathToUpload = getPathForUploadUseCase(
+                                        originalUriPath = UriPath(uri),
                                         isChatUpload = true
-                                    )
+                                    )?.let { UriPath(it) }
                                     when {
-                                        cacheCopy == null -> {
+                                        uriPathToUpload == null -> {
                                             updatePendingMessageUseCase(
                                                 updatePendingMessageRequests = pendingMessageIds.map { pendingMessageId ->
                                                     UpdatePendingMessageStateRequest(
@@ -61,13 +63,13 @@ class PrepareAllPendingMessagesUseCase @Inject constructor(
                                             )
                                         }
 
-                                        chatAttachmentNeedsCompressionUseCase(cacheCopy) -> {
+                                        chatAttachmentNeedsCompressionUseCase(File(uriPathToUpload.value)) -> {
                                             updatePendingMessageUseCase(
                                                 updatePendingMessageRequests = pendingMessageIds.map { pendingMessageId ->
                                                     UpdatePendingMessageStateAndPathRequest(
                                                         pendingMessageId,
                                                         PendingMessageState.COMPRESSING,
-                                                        cacheCopy.path,
+                                                        uriPathToUpload.value,
                                                     )
                                                 }.toTypedArray()
                                             )
@@ -80,7 +82,7 @@ class PrepareAllPendingMessagesUseCase @Inject constructor(
                                                     UpdatePendingMessageStateAndPathRequest(
                                                         pendingMessageId,
                                                         PendingMessageState.READY_TO_UPLOAD,
-                                                        cacheCopy.path,
+                                                        uriPathToUpload.value,
                                                     )
                                                 }.toTypedArray()
                                             )

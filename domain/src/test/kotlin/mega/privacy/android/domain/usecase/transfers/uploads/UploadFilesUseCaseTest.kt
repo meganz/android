@@ -35,6 +35,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.internal.verification.Times
 import org.mockito.kotlin.anyVararg
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -120,7 +121,7 @@ class UploadFilesUseCaseTest {
         isSourceTemporary: Boolean,
     ) =
         runTest {
-            whenever(cacheRepository.isFileInCacheDirectory(file)) doReturn isSourceTemporary
+            whenever(cacheRepository.isFileInCacheDirectory(argThat { this.absolutePath == ABSOLUTE_PATH })) doReturn isSourceTemporary
             underTest(listOf(UploadFileInfo(file, null)), parentId, false).test {
 
                 verify(transferRepository).startUpload(
@@ -168,7 +169,7 @@ class UploadFilesUseCaseTest {
             ).test {
                 uploadFileInfos.forEach {
                     verify(transferRepository).startUpload(
-                        it.file.absolutePath,
+                        it.uriPath.value,
                         parentId,
                         null,
                         MODIFIED_TIME_SECS,
@@ -207,7 +208,7 @@ class UploadFilesUseCaseTest {
         isSourceTemporary: Boolean,
     ) =
         runTest {
-            whenever(cacheRepository.isFileInCacheDirectory(file)) doReturn isSourceTemporary
+            whenever(cacheRepository.isFileInCacheDirectory(argThat { this.absolutePath == ABSOLUTE_PATH })) doReturn isSourceTemporary
             val chatAppData = listOf(TransferAppData.ChatUpload(12345L))
             underTest(listOf(UploadFileInfo(file, null, chatAppData)), parentId, false).test {
 
@@ -248,7 +249,7 @@ class UploadFilesUseCaseTest {
             ).test {
                 fileNodesAndNullNames.forEach { uploadFileInfo ->
                     verify(transferRepository).startUpload(
-                        uploadFileInfo.file.absolutePath,
+                        uploadFileInfo.uriPath.value,
                         parentId,
                         null,
                         MODIFIED_TIME_SECS,
@@ -382,7 +383,7 @@ class UploadFilesUseCaseTest {
         fileNodesAndNullNames.forEach { fiuploadFileInfoe ->
             whenever(
                 transferRepository.startUpload(
-                    fiuploadFileInfoe.file.absolutePath,
+                    fiuploadFileInfoe.uriPath.value,
                     parentId,
                     null,
                     MODIFIED_TIME_SECS,
@@ -406,7 +407,7 @@ class UploadFilesUseCaseTest {
         fileNodesAndNullNames.forEach { uploadFileInfo ->
             whenever(
                 transferRepository.startUpload(
-                    uploadFileInfo.file.absolutePath,
+                    uploadFileInfo.uriPath.value,
                     parentId,
                     null,
                     MODIFIED_TIME_SECS,
@@ -439,7 +440,7 @@ class UploadFilesUseCaseTest {
         }
         private val parentId = NodeId(1L)
 
-        private const val ABSOLUTE_PATH = "root/parent/destination/File"
+        private const val ABSOLUTE_PATH = "/root/parent/destination/File"
         private const val FILE_NAME = "File"
         private const val MODIFIED_TIME_MILLIS = 1000L
         private const val MODIFIED_TIME_SECS = 1L
