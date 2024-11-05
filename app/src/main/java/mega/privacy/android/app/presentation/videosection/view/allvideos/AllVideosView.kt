@@ -68,7 +68,7 @@ internal fun AllVideosView(
 
     val durationModalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = false
+        skipHalfExpanded = true
     )
 
     LaunchedEffect(items) {
