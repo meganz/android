@@ -6705,27 +6705,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     Timber.e("ERROR requesting version info of the account")
                 }
             }
-
-            MegaRequest.TYPE_REMOVE -> {
-                Timber.d("Remove request finished")
-                when (e.errorCode) {
-                    MegaError.API_OK -> {
-                        finish()
-                    }
-
-                    MegaError.API_EMASTERONLY -> {
-                        showSnackbar(Constants.SNACKBAR_TYPE, e.errorString, -1)
-                    }
-
-                    else -> {
-                        showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            getString(R.string.context_no_removed),
-                            -1
-                        )
-                    }
-                }
-            }
         }
     }
 

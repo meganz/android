@@ -19,9 +19,6 @@ import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.shared.original.core.ui.utils.pop
-import mega.privacy.android.shared.original.core.ui.utils.push
-import mega.privacy.android.shared.original.core.ui.utils.toMutableArrayDeque
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -48,6 +45,9 @@ import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmai
 import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.shared.original.core.ui.utils.pop
+import mega.privacy.android.shared.original.core.ui.utils.push
+import mega.privacy.android.shared.original.core.ui.utils.toMutableArrayDeque
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -658,6 +658,20 @@ class IncomingSharesComposeViewModel @Inject constructor(
      */
     fun consumeUpdateToolbarTitleEvent() {
         _state.update { it.copy(updateToolbarTitleEvent = consumed) }
+    }
+
+    /**
+     * Sets the Show Leave Share Confirmation Dialog Event
+     */
+    fun setShowLeaveShareConfirmationDialog(handles: List<Long>) {
+        _state.update { it.copy(showConfirmLeaveShareEvent = triggered(handles)) }
+    }
+
+    /**
+     * Consumes the Show Leave Share Confirmation Dialog Event
+     */
+    fun consumeShowLeaveShareConfirmationDialog() {
+        _state.update { it.copy(showConfirmLeaveShareEvent = consumed()) }
     }
 
     /**

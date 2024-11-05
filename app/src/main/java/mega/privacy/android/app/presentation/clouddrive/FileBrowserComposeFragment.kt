@@ -50,7 +50,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
-import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
@@ -699,15 +698,8 @@ class FileBrowserComposeFragment : Fragment() {
                     disableSelectMode()
                 }
 
-                OptionItems.LEAVE_SHARE_CLICKED -> {
-                    val handleList =
-                        ArrayList<Long>().apply { addAll(it.selectedNode.map { node -> node.id.longValue }) }
-                    MegaNodeUtil.showConfirmationLeaveIncomingShares(
-                        requireActivity(),
-                        (requireActivity() as SnackbarShower), handleList
-                    )
-                    disableSelectMode()
-                }
+                // This option is only available in the Incoming Shares page
+                OptionItems.LEAVE_SHARE_CLICKED -> Unit
             }
         }
     }

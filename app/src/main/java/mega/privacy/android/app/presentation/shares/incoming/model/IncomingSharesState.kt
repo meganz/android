@@ -7,7 +7,6 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.preference.ViewType
 
@@ -25,8 +24,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property isPendingRefresh
  * @property nodesList list of [NodeUIItem]
  * @property isInSelection if list is in selection mode or not
- * @property itemIndex index of item clicked
- * @property currentFileNode [FileNode]
  * @property selectedNodes Set of selected node
  * @property totalSelectedFileNodes List of selected node handles
  * @property selectedNodeHandles number of selected file [NodeUIItem] on Compose
@@ -42,6 +39,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property isIncomingSharesEmpty true if there's no incoming shares
  * @property isContactVerificationOn true if contact verification is on
  * @property showContactNotVerifiedBanner true if show contact not verified banner
+ * @property showConfirmLeaveShareEvent State Event that shows the Leave Share confirmation dialog
  */
 data class IncomingSharesState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -65,6 +63,7 @@ data class IncomingSharesState(
     val openedFolderNodeHandles: List<Long> = emptyList(),
     val isContactVerificationOn: Boolean = false,
     val showContactNotVerifiedBanner: Boolean = false,
+    val showConfirmLeaveShareEvent: StateEventWithContent<List<Long>> = consumed(),
 ) {
     val isIncomingSharesEmpty: Boolean get() = currentHandle == -1L && nodesList.isEmpty()
     val isInRootLevel: Boolean = currentHandle == -1L

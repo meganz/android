@@ -38,8 +38,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -62,6 +60,7 @@ import mega.privacy.android.app.presentation.contact.authenticitycredendials.Aut
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesComposeViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -81,7 +80,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.isOutShare
 import mega.privacy.android.app.utils.MegaNodeUtil.manageEditTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
-import mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
@@ -112,6 +110,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private val nodeOptionsViewModel: NodeOptionsViewModel by viewModels()
     private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
     private val videoSectionViewModel: VideoSectionViewModel by activityViewModels()
+    private val incomingSharesComposeViewModel: IncomingSharesComposeViewModel by activityViewModels()
     private var tempNodeId: NodeId? = null
 
     /**
@@ -1386,10 +1385,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun onLeaveShareClicked(node: MegaNode) {
-        showConfirmationLeaveIncomingShare(
-            requireActivity(),
-            (requireActivity() as SnackbarShower), node
-        )
+        incomingSharesComposeViewModel.setShowLeaveShareConfirmationDialog(listOf(node.handle))
         setStateBottomSheetBehaviorHidden()
     }
 

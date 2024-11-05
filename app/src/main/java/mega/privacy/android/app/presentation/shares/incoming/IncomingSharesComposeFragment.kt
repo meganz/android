@@ -31,6 +31,7 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
@@ -40,7 +41,6 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
-import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
@@ -55,6 +55,7 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
+import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.incoming.ui.IncomingSharesView
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
@@ -220,6 +221,14 @@ class IncomingSharesComposeFragment : Fragment() {
                         onToggleAppBarElevation = ::toggleAppBarElevation,
                         fileTypeIconMapper = fileTypeIconMapper,
                     )
+
+                    uiState.showConfirmLeaveShareEvent.let {
+                        if (it is StateEventWithContentTriggered<List<Long>>) {
+                            LeaveShareDialog(it.content) {
+                                viewModel.consumeShowLeaveShareConfirmationDialog()
+                            }
+                        }
+                    }
 
                     LegacySnackBarWrapper(snackbarHostState = snackbarHostState, activity)
                     StartTransferComponent(
@@ -649,10 +658,7 @@ class IncomingSharesComposeFragment : Fragment() {
                 OptionItems.LEAVE_SHARE_CLICKED -> {
                     val handleList =
                         ArrayList<Long>().apply { addAll(it.selectedNode.map { node -> node.id.longValue }) }
-                    MegaNodeUtil.showConfirmationLeaveIncomingShares(
-                        requireActivity(),
-                        (requireActivity() as SnackbarShower), handleList
-                    )
+                    viewModel.setShowLeaveShareConfirmationDialog(handleList)
                     disableSelectMode()
                 }
             }

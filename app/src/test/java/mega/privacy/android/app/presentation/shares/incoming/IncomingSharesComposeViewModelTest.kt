@@ -511,6 +511,33 @@ class IncomingSharesComposeViewModelTest {
             }
         }
 
+    @Test
+    fun `test that leave share dialog is shown when setShowLeaveShareConfirmationDialog is called`() =
+        runTest {
+            val handles = listOf(1L, 2L, 3L)
+            underTest.setShowLeaveShareConfirmationDialog(handles)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.showConfirmLeaveShareEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+                assertThat((state.showConfirmLeaveShareEvent as StateEventWithContentTriggered<List<Long>>).content).isEqualTo(
+                    handles
+                )
+            }
+        }
+
+    @Test
+    fun `test that leave share dialog is consumed when consumeShowLeaveShareConfirmationDialog is called`() =
+        runTest {
+            underTest.consumeShowLeaveShareConfirmationDialog()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.showConfirmLeaveShareEvent).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
+                )
+            }
+        }
 
     private suspend fun stubCommon() {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
