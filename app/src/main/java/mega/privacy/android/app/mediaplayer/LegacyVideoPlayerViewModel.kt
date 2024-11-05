@@ -47,12 +47,12 @@ import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_P
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity.Companion.TYPE_PREVIOUS
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
+import mega.privacy.android.app.mediaplayer.model.LegacyVideoPlayerUiState
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlaybackPositionState
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
 import mega.privacy.android.app.mediaplayer.model.VideoControllerPadding
-import mega.privacy.android.app.mediaplayer.model.VideoPlayerUiState
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.playlist.finalizeItem
 import mega.privacy.android.app.mediaplayer.playlist.updateNodeName
@@ -232,7 +232,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
 
     private var currentMediaPlayerMediaId: String? = null
 
-    private val _state = MutableStateFlow(VideoPlayerUiState())
+    private val _state = MutableStateFlow(LegacyVideoPlayerUiState())
     internal val uiState = _state.asStateFlow()
 
     /**
@@ -434,7 +434,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
         isAddSubtitle: Boolean,
         subtitleFileInfo: SubtitleFileInfo?,
         videoRepeatToggleMode: RepeatToggleMode,
-    ) = VideoPlayerUiState(
+    ) = LegacyVideoPlayerUiState(
         subtitleDisplayState = SubtitleDisplayState(
             isSubtitleShown = subtitleShown,
             isSubtitleDialogShown = subtitleDialogShown,

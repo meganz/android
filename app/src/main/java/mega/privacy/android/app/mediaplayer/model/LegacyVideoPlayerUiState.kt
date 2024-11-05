@@ -12,7 +12,7 @@ import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
  * @property isVideoOptionPopupShown video option popup whether is shown, true is shown, otherwise is false
  * @property videoRepeatToggleMode videoRepeatToggleMode
  */
-data class VideoPlayerUiState(
+data class LegacyVideoPlayerUiState(
     val subtitleDisplayState: SubtitleDisplayState = SubtitleDisplayState(),
     val isFullScreen: Boolean = false,
     val isSpeedPopupShown: Boolean = false,
