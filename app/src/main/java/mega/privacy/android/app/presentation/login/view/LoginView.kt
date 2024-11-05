@@ -351,17 +351,19 @@ private fun RequireLogin(
                 )
             }
         }
-        Row(modifier = Modifier.padding(end = 22.dp)) {
+        Row(
+            modifier = Modifier.padding(end = 22.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
                 modifier = Modifier
-                    .padding(start = 22.dp, top = 18.dp)
+                    .padding(start = 22.dp)
                     .testTag(NEW_TO_MEGA_TAG),
                 text = stringResource(id = R.string.new_to_mega),
                 style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorPrimary),
             )
             TextMegaButton(
                 modifier = Modifier
-                    .padding(top = 4.dp)
                     .testTag(CREATE_ACCOUNT_TAG),
                 textId = R.string.create_account,
                 onClick = onCreateAccount
