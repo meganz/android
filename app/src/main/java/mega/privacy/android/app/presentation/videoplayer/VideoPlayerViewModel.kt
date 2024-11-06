@@ -16,18 +16,21 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.R
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INVALID_SIZE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -35,6 +38,7 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
@@ -43,6 +47,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
+import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
@@ -51,6 +56,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -80,6 +86,8 @@ class VideoPlayerViewModel @Inject constructor(
     private val megaApiHttpServerStop: MegaApiHttpServerStopUseCase,
     private val getLocalFolderLinkFromMegaApiFolderUseCase: GetLocalFolderLinkFromMegaApiFolderUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
+    private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase,
+    private val getOfflineNodesByParentIdUseCase: GetOfflineNodesByParentIdUseCase,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(VideoPlayerUiState())
@@ -156,7 +164,7 @@ class VideoPlayerViewModel @Inject constructor(
         }
 
         withContext(ioDispatcher) {
-            handlePlaybackSourceByLaunchSource(launchSource)
+            handlePlaybackSourceByLaunchSource(intent, launchSource, currentPlayingHandle)
         }
     }
 
@@ -283,16 +291,110 @@ class VideoPlayerViewModel @Inject constructor(
         }.getOrNull()
     }
 
-    private fun handlePlaybackSourceByLaunchSource(launchSource: Int) {
+    private suspend fun handlePlaybackSourceByLaunchSource(
+        intent: Intent,
+        launchSource: Int,
+        playingHandle: Long,
+    ) {
         when (launchSource) {
-            OFFLINE_ADAPTER -> handleOfflineSource()
+            OFFLINE_ADAPTER -> handleOfflineSource(intent, playingHandle)
             ZIP_ADAPTER -> handleZipSource()
             else -> handleGeneralSource()
         }
     }
 
-    private fun handleOfflineSource() {
-        //The function will be implemented in ticket CC-8414
+    private suspend fun handleOfflineSource(intent: Intent, playingHandle: Long) {
+        val parentId = intent.getIntExtra(INTENT_EXTRA_KEY_PARENT_ID, -1)
+        val title = if (parentId == -1) {
+            context.getString(R.string.section_saved_for_offline_new)
+        } else {
+            runCatching {
+                getOfflineNodeInformationByIdUseCase(parentId)
+            }.getOrNull()?.name.orEmpty()
+        }
+        buildPlaybackSourcesByOfflineNodes(title, parentId, playingHandle)
+    }
+
+    private suspend fun buildPlaybackSourcesByOfflineNodes(
+        title: String,
+        parentId: Int,
+        firstPlayHandle: Long,
+    ) {
+        runCatching {
+            getOfflineNodesByParentIdUseCase(parentId)
+        }.onSuccess { list ->
+            val mediaItems = mutableListOf<MediaItem>()
+            var currentPlayingIndex = -1
+            val videoPlayerItems = list.filter {
+                it.fileTypeInfo is VideoFileTypeInfo && it.fileTypeInfo?.isSupported == true
+            }.mapIndexed { index, item ->
+                if (item.handle.toLong() == firstPlayHandle) currentPlayingIndex = index
+
+                runCatching { Uri.parse(item.absolutePath) }.getOrNull()?.let {
+                    mediaItems.add(
+                        MediaItem.Builder()
+                            .setUri(it)
+                            .setMediaId(item.handle)
+                            .build()
+                    )
+                }
+
+                val thumbnailFile = runCatching {
+                    item.thumbnail?.let { File(it) }
+                }.getOrNull()
+
+                videoPlayerItemMapper(
+                    nodeHandle = item.handle.toLong(),
+                    nodeName = item.name,
+                    thumbnail = thumbnailFile,
+                    type = getMediaQueueItemType(index, currentPlayingIndex),
+                    size = item.totalSize,
+                    duration = (item.fileTypeInfo as? VideoFileTypeInfo)?.duration ?: 0.seconds,
+                )
+            }
+
+            updatePlaybackSources(
+                videoPlayerItems = videoPlayerItems,
+                mediaItems = mediaItems,
+                title = title,
+                currentPlayingIndex = currentPlayingIndex,
+                firstPlayHandle = firstPlayHandle
+            )
+        }.onFailure {
+            Timber.e(it)
+        }
+    }
+
+    private fun getMediaQueueItemType(currentIndex: Int, playingIndex: Int) =
+        when {
+            currentIndex == playingIndex -> MediaQueueItemType.Playing
+            playingIndex == -1 || currentIndex < playingIndex -> MediaQueueItemType.Previous
+            else -> MediaQueueItemType.Next
+        }
+
+    private fun updatePlaybackSources(
+        videoPlayerItems: List<VideoPlayerItem>,
+        mediaItems: List<MediaItem>,
+        title: String,
+        currentPlayingIndex: Int,
+        firstPlayHandle: Long,
+    ) {
+        val mediaPlaySources = MediaPlaySources(
+            mediaItems = mediaItems,
+            newIndexForCurrentItem = currentPlayingIndex,
+            nameToDisplay = null
+        )
+
+        _uiState.update {
+            it.copy(
+                items = videoPlayerItems,
+                mediaPlaySources = mediaPlaySources,
+                playQueueTitle = title,
+                currentPlayingIndex = currentPlayingIndex,
+                currentPlayingHandle = firstPlayHandle
+            )
+        }
+        buildPlaybackSourcesForPlayer(mediaPlaySources)
     }
 
     private fun handleZipSource() {

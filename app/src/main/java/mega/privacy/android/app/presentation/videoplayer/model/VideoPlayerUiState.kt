@@ -7,7 +7,7 @@ import mega.privacy.android.domain.exception.MegaException
 /**
  * The UI state for the video player feature.
  *
- * @property items the list of video player entities
+ * @property items the list of video player items
  * @property mediaPlaySources the media play sources
  * @property currentPlayingHandle the current playing handle
  * @property currentPlayingIndex the current playing index
