@@ -57,7 +57,10 @@ fun getSyncListRoute(
 ): String {
     var finalRoute = syncListRoute
     deviceName?.let { deviceNameValue ->
-        finalRoute = finalRoute.replace(oldValue = "{deviceName}", newValue = deviceNameValue)
+        finalRoute = finalRoute.replace(
+            oldValue = "{deviceName}",
+            newValue = encodeDeviceName(deviceNameValue),
+        )
     }
     val selectedChipJson = GsonBuilder().create().toJson(selectedChip)
     finalRoute = finalRoute.replace(oldValue = "{selectedChip}", newValue = selectedChipJson)
@@ -85,7 +88,10 @@ fun getSyncNewFolderRoute(syncType: SyncType, deviceName: String? = null): Strin
     val syncTypeJson = GsonBuilder().create().toJson(syncType)
     var finalRoute = syncNewFolderRoute.replace(oldValue = "{syncType}", newValue = syncTypeJson)
     deviceName?.let { deviceNameValue ->
-        finalRoute = finalRoute.replace(oldValue = "{deviceName}", newValue = deviceNameValue)
+        finalRoute = finalRoute.replace(
+            oldValue = "{deviceName}",
+            newValue = encodeDeviceName(deviceNameValue),
+        )
     }
     return finalRoute
 }
@@ -150,8 +156,8 @@ internal fun NavGraphBuilder.syncNavGraph(
                 .fromJson(navBackStackEntry.arguments?.getString("syncType"), SyncType::class.java)
                 ?: SyncType.TYPE_TWOWAY
             Timber.d("Sync Type = $syncType")
-            deviceName =
-                navBackStackEntry.arguments?.getString("deviceName", null)?.replace("+", " ")
+            deviceName = navBackStackEntry.arguments?.getString("deviceName", null)
+                ?.let { decodeDeviceName(it) }
 
             SyncNewFolderScreenRoute(
                 hiltViewModel<SyncNewFolderViewModel, SyncNewFolderViewModel.SyncNewFolderViewModelFactory> { factory ->
@@ -200,8 +206,8 @@ internal fun NavGraphBuilder.syncNavGraph(
                 }
             )
         ) { navBackStackEntry ->
-            deviceName =
-                navBackStackEntry.arguments?.getString("deviceName", null)?.replace("+", " ")
+            deviceName = navBackStackEntry.arguments?.getString("deviceName", null)
+                ?.let { decodeDeviceName(it) }
             val selectedChip = GsonBuilder().create().fromJson(
                 navBackStackEntry.arguments?.getString("selectedChip"),
                 SyncChip::class.java
@@ -242,3 +248,8 @@ internal fun NavGraphBuilder.syncNavGraph(
         }
     }
 }
+
+private fun encodeDeviceName(deviceName: String): String = deviceName.replace(".", "[dot]")
+
+private fun decodeDeviceName(deviceName: String): String =
+    deviceName.replace("+", " ").replace("[dot]", ".")
