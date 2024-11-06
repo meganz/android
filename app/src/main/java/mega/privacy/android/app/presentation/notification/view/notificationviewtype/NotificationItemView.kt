@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.notification.view.notificationviewtype
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,15 +30,15 @@ import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.view.components.GreenIconView
 import mega.privacy.android.app.presentation.notification.view.components.NotificationDate
 import mega.privacy.android.app.presentation.notification.view.components.NotificationSchedMeetingView
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_500_grey_400
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_900_grey_100
-import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 internal fun NotificationItemView(
@@ -152,7 +153,7 @@ private fun NotificationTitleRow(
 
         if (showNewIcon) {
             GreenIconView(
-                greenIconLabelRes = R.string.new_label_notification_item,
+                greenIconLabelRes = sharedR.string.notifications_notification_item_new_tag,
                 modifier = Modifier.testTag(NOTIFICATION_GREEN_ICON_TEST_TAG)
             )
         }

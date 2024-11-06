@@ -85,7 +85,7 @@
         style="@style/Widget.Mega.Chip.New"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/new_label_notification_item"
+        android:text="@string/notifications_notification_item_new_tag"
         android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@id/btn_more"
         app:layout_constraintTop_toTopOf="@id/btn_more"
