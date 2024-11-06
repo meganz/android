@@ -585,6 +585,7 @@ private fun ScheduleMeetingAppBar(
                     .padding(start = 72.dp, end = 15.dp, bottom = 20.dp)
             ) {
                 var emptyValueError = rememberSaveable { mutableStateOf(state.isEmptyTitleError) }
+                var charLimitError = rememberSaveable { mutableStateOf(false) }
                 GenericTitleTextField(
                     value = state.meetingTitle.ifEmpty { "" },
                     isEmptyValueError = emptyValueError.value,
@@ -596,10 +597,11 @@ private fun ScheduleMeetingAppBar(
                     },
                     charLimitErrorId = R.string.meetings_schedule_meeting_meeting_name_too_long_error,
                     emptyValueErrorId = R.string.meetings_schedule_meeting_empty_meeting_name_error,
-                    charLimit = Constants.MAX_TITLE_SIZE
+                    charLimit = Constants.MAX_TITLE_SIZE,
+                    onCharLimitError = { charLimitError.value = it },
                 )
 
-                if (emptyValueError.value.not()) {
+                if (emptyValueError.value.not() && charLimitError.value.not()) {
                     Text(
                         modifier = Modifier
                             .testTag(TEST_TAG_MEETING_TITLE_DISCLAIMER)

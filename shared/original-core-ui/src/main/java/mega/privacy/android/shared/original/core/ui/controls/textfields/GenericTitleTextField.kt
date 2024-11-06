@@ -38,8 +38,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * TextField Generic Title
@@ -60,6 +60,7 @@ fun GenericTitleTextField(
     onValueChange: (String) -> Unit,
     charLimit: Int,
     modifier: Modifier = Modifier,
+    onCharLimitError: (Boolean) -> Unit = {},
     @StringRes placeholderId: Int? = null,
     @StringRes charLimitErrorId: Int? = null,
     isEmptyValueError: Boolean = false,
@@ -74,6 +75,7 @@ fun GenericTitleTextField(
 
     fun validate(text: String) {
         isCharLimitError = text.length > charLimit
+        onCharLimitError(isCharLimitError)
     }
 
     Column(modifier = modifier) {
