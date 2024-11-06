@@ -6623,20 +6623,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish: %s_%d", request.requestString, e.errorCode)
         when (request.type) {
-            MegaRequest.TYPE_LOGOUT -> {
-                Timber.d("onRequestFinish: %s", MegaRequest.TYPE_LOGOUT)
-                if (e.errorCode == MegaError.API_OK) {
-                    Timber.d("onRequestFinish:OK:%s", MegaRequest.TYPE_LOGOUT)
-                    Timber.d("END logout sdk request - wait chat logout")
-                } else if (e.errorCode != MegaError.API_ESID) {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.general_text_error),
-                        -1
-                    )
-                }
-            }
-
             MegaRequest.TYPE_SET_ATTR_USER -> {
                 if (request.paramType == MegaApiJava.USER_ATTR_PWD_REMINDER) {
                     Timber.d("MK exported - USER_ATTR_PWD_REMINDER finished")
