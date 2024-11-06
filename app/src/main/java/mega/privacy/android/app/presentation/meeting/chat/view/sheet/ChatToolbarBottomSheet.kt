@@ -47,8 +47,8 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAttachContactActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.AttachItem
-import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.AttachItemPlaceHolder
+import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButton
+import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButtonPlaceHolder
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -280,7 +280,7 @@ fun ChatToolbarBottomSheet(
                 .padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 24.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            AttachItem(
+            CellButton(
                 iconId = R.drawable.ic_attach_from_gallery,
                 itemName = stringResource(id = R.string.chat_attach_panel_gallery),
                 onItemClick = {
@@ -289,7 +289,7 @@ fun ChatToolbarBottomSheet(
                 },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_GALLERY)
             )
-            AttachItem(
+            CellButton(
                 iconId = R.drawable.ic_attach_from_file,
                 itemName = pluralStringResource(id = R.plurals.general_num_files, count = 1),
                 onItemClick = {
@@ -298,7 +298,7 @@ fun ChatToolbarBottomSheet(
                 },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_FILE)
             )
-            AttachItem(
+            CellButton(
                 iconId = R.drawable.ic_attach_from_gif,
                 itemName = stringResource(id = R.string.chat_room_toolbar_gif_option),
                 onItemClick = {
@@ -307,7 +307,7 @@ fun ChatToolbarBottomSheet(
                 },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_GIF)
             )
-            AttachItem(
+            CellButton(
                 iconId = R.drawable.ic_attach_from_scan,
                 itemName = stringResource(id = R.string.chat_room_toolbar_scan_option),
                 onItemClick = {
@@ -323,7 +323,7 @@ fun ChatToolbarBottomSheet(
                 .padding(start = 24.dp, end = 24.dp, bottom = 40.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            AttachItem(
+            CellButton(
                 iconId = R.drawable.ic_attach_from_location,
                 itemName = stringResource(id = R.string.chat_room_toolbar_location_option),
                 onItemClick = {
@@ -332,7 +332,7 @@ fun ChatToolbarBottomSheet(
                 },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_LOCATION)
             )
-            AttachItem(
+            CellButton(
                 iconId = R.drawable.ic_attach_from_contact,
                 itemName = stringResource(id = R.string.attachment_upload_panel_contact),
                 onItemClick = {
@@ -341,8 +341,8 @@ fun ChatToolbarBottomSheet(
                 },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_CONTACT)
             )
-            AttachItemPlaceHolder()
-            AttachItemPlaceHolder()
+            CellButtonPlaceHolder()
+            CellButtonPlaceHolder()
         }
     }
 }

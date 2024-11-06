@@ -30,7 +30,7 @@ class AttachItemTest {
         initComposeRule()
         composeRule.onNodeWithTag(itemTag, true).assertIsDisplayed()
         composeRule.onNodeWithText(itemName).assertIsDisplayed()
-        composeRule.onNodeWithTag(TEST_TAG_ATTACH_ITEM_ICON, true).assertIsDisplayed()
+        composeRule.onNodeWithTag(TEST_TAG_CELL_BUTTON_ICON, true).assertIsDisplayed()
     }
 
     @Test
@@ -46,7 +46,7 @@ class AttachItemTest {
 
     private fun initComposeRule(onItemClick: () -> Unit = {}) {
         composeRule.setContent {
-            AttachItem(
+            CellButton(
                 iconId = iconId,
                 itemName = itemName,
                 onItemClick = onItemClick,

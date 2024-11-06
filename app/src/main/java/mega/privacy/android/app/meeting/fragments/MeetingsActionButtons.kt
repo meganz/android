@@ -14,14 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -29,21 +26,16 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.AbstractComposeView
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.core.content.ContextCompat
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.fragments.MeetingActionButtonsTestTags.CAMERA_BUTTON
 import mega.privacy.android.app.meeting.fragments.MeetingActionButtonsTestTags.END_CALL_BUTTON
 import mega.privacy.android.app.meeting.fragments.MeetingActionButtonsTestTags.MIC_BUTTON
@@ -53,10 +45,11 @@ import mega.privacy.android.app.meeting.fragments.MeetingActionButtonsTestTags.T
 import mega.privacy.android.app.meeting.fragments.fab.OnOffFab
 import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButton
+import mega.privacy.android.shared.original.core.ui.controls.chat.attachpanel.CellButtonType
+import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import kotlin.random.Random
 
 
@@ -95,12 +88,12 @@ internal class MeetingsActionButtonsView : AbstractComposeView {
     /**
      * Callback for the hold button.
      */
-    var onMoreClicked by mutableStateOf<((Boolean) -> Unit)?>(null)
+    var onMoreClicked by mutableStateOf<(() -> Unit)?>(null)
 
     /**
      * Callback for the end call button.
      */
-    var onEndClicked by mutableStateOf<((Boolean) -> Unit)?>(null)
+    var onEndClicked by mutableStateOf<(() -> Unit)?>(null)
 
     var backgroundTintAlpha by mutableFloatStateOf(0.0F)
 
@@ -156,8 +149,8 @@ fun MeetingsActionButtons(
     onMicClicked: ((Boolean) -> Unit)?,
     onCamClicked: ((Boolean) -> Unit)?,
     onSpeakerClicked: ((Boolean) -> Unit)?,
-    onMoreClicked: ((Boolean) -> Unit)?,
-    onEndClicked: ((Boolean) -> Unit)?,
+    onMoreClicked: (() -> Unit)?,
+    onEndClicked: (() -> Unit)?,
     onRaiseToRandTooltipDismissed: (() -> Unit)?,
     micEnabled: Boolean,
     cameraEnabled: Boolean,
@@ -172,16 +165,6 @@ fun MeetingsActionButtons(
     currentAudioDevice: AudioDevice,
     modifier: Modifier = Modifier,
 ) {
-
-    val context = LocalContext.current
-    val textStyle = MaterialTheme.typography.caption.copy(fontSize = 10.sp)
-    val backgroundTint by remember(backgroundTintAlpha) {
-        derivedStateOf {
-            val colorStart = Color(ContextCompat.getColor(context, R.color.grey_032_white_054))
-            val colorEnd = Color(ContextCompat.getColor(context, R.color.grey_060_white_054))
-            lerp(colorStart, colorEnd, backgroundTintAlpha)
-        }
-    }
 
     val isEnabled by rememberSaveable(buttonsEnabled) {
         mutableStateOf(buttonsEnabled)
@@ -213,6 +196,7 @@ fun MeetingsActionButtons(
                         val isOn = rememberSaveable(micEnabled) { mutableStateOf(micEnabled) }
 
                         OnOffFab(
+                            itemName = stringResource(id = R.string.general_mic),
                             modifier = Modifier
                                 .constrainAs(fab) {
                                     top.linkTo(parent.top)
@@ -224,8 +208,7 @@ fun MeetingsActionButtons(
                             onIcon = IconR.drawable.ic_mic,
                             offIcon = IconR.drawable.ic_mic_stop,
                             disableIcon = IconR.drawable.ic_mic_stop,
-                            onBackgroundTint = backgroundTint,
-                            onOff = onMicClicked
+                            onOff = onMicClicked,
                         )
                         val showWarning by rememberSaveable(showMicWarning) {
                             mutableStateOf(
@@ -246,12 +229,6 @@ fun MeetingsActionButtons(
                             )
                         }
                     }
-
-                    MegaText(
-                        text = stringResource(id = R.string.general_mic),
-                        textColor = TextColor.Primary,
-                        style = textStyle
-                    )
                 }
 
                 // Camera button
@@ -263,6 +240,7 @@ fun MeetingsActionButtons(
                         val (fab, warning) = createRefs()
                         val isOn = rememberSaveable(cameraEnabled) { mutableStateOf(cameraEnabled) }
                         OnOffFab(
+                            itemName = stringResource(id = R.string.general_camera),
                             modifier = Modifier
                                 .constrainAs(fab) {
                                     top.linkTo(parent.top)
@@ -274,7 +252,6 @@ fun MeetingsActionButtons(
                             onIcon = IconR.drawable.ic_video_on,
                             offIcon = IconR.drawable.ic_video_off,
                             disableIcon = IconR.drawable.ic_video_off,
-                            onBackgroundTint = backgroundTint,
                             onOff = onCamClicked
                         )
                         val showWarning by rememberSaveable(showCameraWarning) {
@@ -296,12 +273,6 @@ fun MeetingsActionButtons(
                             )
                         }
                     }
-
-                    MegaText(
-                        text = stringResource(id = R.string.general_camera),
-                        textColor = TextColor.Primary,
-                        style = textStyle
-                    )
                 }
 
                 // Speaker button
@@ -318,20 +289,14 @@ fun MeetingsActionButtons(
                             R.string.general_headphone
                         ) else Pair(IconR.drawable.ic_volume_max, R.string.general_speaker)
                     OnOffFab(
+                        itemName = stringResource(id = stringId),
                         modifier = Modifier.testTag(SPEAKER_BUTTON),
                         isOn = isOn,
                         enabled = if (currentAudioDevice == AudioDevice.None) false else isEnabled,
                         onIcon = onIcon,
                         offIcon = IconR.drawable.ic_volume_off,
                         disableIcon = IconR.drawable.ic_volume_off,
-                        onBackgroundTint = backgroundTint,
                         onOff = onSpeakerClicked
-                    )
-
-                    MegaText(
-                        text = stringResource(id = stringId),
-                        textColor = TextColor.Primary,
-                        style = textStyle
                     )
                 }
 
@@ -339,21 +304,13 @@ fun MeetingsActionButtons(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    val isOn = rememberSaveable(moreEnabled) { mutableStateOf(moreEnabled) }
                     if (isRaiseHandToolTipShown || backgroundTintAlpha == 1.0F) {
-                        OnOffFab(
+                        CellButton(
+                            itemName = stringResource(id = R.string.meetings_more_call_option_button),
                             modifier = Modifier.testTag(MORE_BUTTON),
-                            isOn = isOn,
-                            enabled = false,
-                            onIcon = R.drawable.more_call_options_icon,
-                            offIcon = R.drawable.more_call_options_icon,
-                            disableIcon = R.drawable.more_call_options_icon,
-                            onBackgroundTint = backgroundTint,
-                            offBackgroundTint = backgroundTint,
-                            onIconTint = Color.White,
-                            offIconTint = Color.White,
-                            disabledIconTint = Color.White,
-                            onOff = onMoreClicked
+                            iconId = R.drawable.more_call_options_icon,
+                            onItemClick = { onMoreClicked?.invoke() },
+                            enabled = moreEnabled,
                         )
                     } else {
                         LegacyMegaTooltip(
@@ -364,21 +321,15 @@ fun MeetingsActionButtons(
                             showOnTop = true,
                             setDismissWhenTouchOutside = true,
                             content = {
-                                OnOffFab(
+                                CellButton(
+                                    itemName = stringResource(id = R.string.meetings_more_call_option_button),
                                     modifier = Modifier.testTag(MORE_BUTTON),
-                                    isOn = isOn,
-                                    enabled = false,
-                                    onIcon = R.drawable.more_call_options_icon,
-                                    offIcon = R.drawable.more_call_options_icon,
-                                    disableIcon = R.drawable.more_call_options_icon,
-                                    onBackgroundTint = backgroundTint,
-                                    offBackgroundTint = backgroundTint,
-                                    onIconTint = Color.White,
-                                    offIconTint = Color.White,
-                                    onOff = {
-                                        onMoreClicked?.invoke(it)
+                                    iconId = R.drawable.more_call_options_icon,
+                                    onItemClick = {
+                                        onMoreClicked?.invoke()
                                         onRaiseToRandTooltipDismissed?.invoke()
-                                    }
+                                    },
+                                    enabled = moreEnabled,
                                 )
                             },
                             onDismissed = {
@@ -386,12 +337,6 @@ fun MeetingsActionButtons(
                             }
                         )
                     }
-
-                    MegaText(
-                        text = stringResource(id = R.string.meetings_more_call_option_button),
-                        textColor = TextColor.Primary,
-                        style = textStyle
-                    )
                 }
 
                 // End Call button
@@ -399,34 +344,13 @@ fun MeetingsActionButtons(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    val isOn = rememberSaveable { mutableStateOf(true) }
-                    OnOffFab(
+                    CellButton(
+                        itemName = stringResource(id = R.string.meeting_end),
                         modifier = Modifier.testTag(END_CALL_BUTTON),
-                        isOn = isOn,
+                        type = CellButtonType.Interactive,
                         enabled = true,
-                        onIcon = IconR.drawable.hang_call_icon,
-                        offIcon = IconR.drawable.hang_call_icon,
-                        disableIcon = IconR.drawable.hang_call_icon,
-                        onBackgroundTint = Color(
-                            ContextCompat.getColor(
-                                context,
-                                R.color.color_primary_400
-                            )
-                        ),
-                        offBackgroundTint = Color(
-                            ContextCompat.getColor(
-                                context,
-                                R.color.color_primary_400
-                            )
-                        ),
-                        onIconTint = Color.White,
-                        offIconTint = Color.White,
-                        onOff = onEndClicked
-                    )
-                    MegaText(
-                        text = stringResource(id = R.string.meeting_end),
-                        textColor = TextColor.Primary,
-                        style = textStyle
+                        iconId = IconR.drawable.hang_call_icon,
+                        onItemClick = { onEndClicked?.invoke() }
                     )
                 }
             }
@@ -437,7 +361,9 @@ fun MeetingsActionButtons(
 
 @CombinedThemePreviews
 @Composable
-private fun MeetingBottomFloatingPanelPreview() {
+private fun MeetingBottomFloatingPanelPreview(
+    @PreviewParameter(BooleanProvider::class) showMicWarning: Boolean,
+) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MeetingsActionButtons(
             modifier = Modifier.padding(vertical = 8.dp),
@@ -446,11 +372,11 @@ private fun MeetingBottomFloatingPanelPreview() {
             onSpeakerClicked = {},
             onMoreClicked = {},
             onEndClicked = {},
-            micEnabled = true,
+            micEnabled = !showMicWarning,
             cameraEnabled = true,
             speakerEnabled = true,
             moreEnabled = true,
-            showMicWarning = false,
+            showMicWarning = showMicWarning,
             buttonsEnabled = true,
             showCameraWarning = false,
             backgroundTintAlpha = 1.0F,

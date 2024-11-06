@@ -14,17 +14,20 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempThemeForPreviews
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 
 /**
- * Attach item for attach panel in chat.
+ * Cell button usually used in bottom sheets or toolbars
  *
  * @param iconId Icon resource id
  * @param itemName Item name
@@ -32,22 +35,29 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
  * @param modifier [Modifier]
  */
 @Composable
-fun AttachItem(
+fun CellButton(
     @DrawableRes iconId: Int,
     itemName: String,
     onItemClick: () -> Unit,
     modifier: Modifier = Modifier,
+    type: CellButtonType = CellButtonType.On,
+    enabled: Boolean = true,
 ) = Column(
     modifier = modifier
         .size(width = 64.dp, height = 66.dp)
-        .clickable { onItemClick() },
+        .clickable(enabled = enabled, onClick = onItemClick),
     horizontalAlignment = Alignment.CenterHorizontally,
 ) {
     Box(
         modifier = Modifier
             .size(48.dp)
+            .alpha(if (enabled) 1f else .3f)
             .background(
-                color = MegaOriginalTheme.colors.button.secondary,
+                color = when (type) {
+                    CellButtonType.On -> MegaOriginalTheme.colors.button.secondary
+                    CellButtonType.Off -> MegaOriginalTheme.colors.background.inverse
+                    CellButtonType.Interactive -> MegaOriginalTheme.colors.components.interactive
+                },
                 shape = CircleShape
             )
     ) {
@@ -57,8 +67,11 @@ fun AttachItem(
             modifier = Modifier
                 .size(24.dp)
                 .align(Alignment.Center)
-                .testTag(TEST_TAG_ATTACH_ITEM_ICON),
-            tint = MegaOriginalTheme.colors.icon.primary
+                .testTag(TEST_TAG_CELL_BUTTON_ICON),
+            tint = when (type) {
+                CellButtonType.On, CellButtonType.Interactive -> MegaOriginalTheme.colors.icon.primary
+                CellButtonType.Off -> MegaOriginalTheme.colors.icon.inverse
+            }
         )
     }
     Text(
@@ -69,20 +82,36 @@ fun AttachItem(
     )
 }
 
+/**
+ * Type for [CellButton]
+ */
+enum class CellButtonType {
+    On, Off, Interactive,
+}
+
 @Composable
-fun AttachItemPlaceHolder(modifier: Modifier = Modifier) =
+fun CellButtonPlaceHolder(modifier: Modifier = Modifier) =
     Box(modifier = modifier.size(width = 64.dp, height = 66.dp))
 
 @CombinedThemePreviews
 @Composable
-private fun AttachItemPreview() {
+private fun CellButtonPreview(
+    @PreviewParameter(CellButtonTypeProvider::class) typeAndEnabled: Pair<CellButtonType, Boolean>,
+) {
     OriginalTempThemeForPreviews {
-        AttachItem(
+        CellButton(
             iconId = R.drawable.ic_menu,
             itemName = "Item",
-            onItemClick = {}
+            onItemClick = {},
+            type = typeAndEnabled.first,
+            enabled = typeAndEnabled.second,
         )
     }
 }
 
-internal const val TEST_TAG_ATTACH_ITEM_ICON = "chat_view:attach_panel:attach_icon"
+private class CellButtonTypeProvider : PreviewParameterProvider<Pair<CellButtonType, Boolean>> {
+    override val values = CellButtonType.entries
+        .flatMap { listOf(it to true, it to false) }.asSequence()
+}
+
+internal const val TEST_TAG_CELL_BUTTON_ICON = "chat_view:attach_panel:attach_icon"
