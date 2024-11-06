@@ -51,15 +51,16 @@ private const val syncListRoute =
  * @param selectedChip [SyncChip] to set as selected in the Sync list
  * @return The route to the Sync list with the allowed possible parameters
  */
-fun getSyncListRoute(deviceName: String? = null, selectedChip: SyncChip? = null): String {
+fun getSyncListRoute(
+    deviceName: String? = null,
+    selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
+): String {
     var finalRoute = syncListRoute
     deviceName?.let { deviceNameValue ->
         finalRoute = finalRoute.replace(oldValue = "{deviceName}", newValue = deviceNameValue)
     }
-    selectedChip?.let { selectedChipValue ->
-        val selectedChipJson = GsonBuilder().create().toJson(selectedChipValue)
-        finalRoute = finalRoute.replace(oldValue = "{selectedChip}", newValue = selectedChipJson)
-    }
+    val selectedChipJson = GsonBuilder().create().toJson(selectedChip)
+    finalRoute = finalRoute.replace(oldValue = "{selectedChip}", newValue = selectedChipJson)
     return finalRoute
 }
 
