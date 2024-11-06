@@ -23,7 +23,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
-import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.LockableBottomSheetBehavior
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
@@ -76,7 +75,7 @@ class BottomFloatingPanelViewHolder(
     /**
      * Observer the change of layout
      */
-    val layoutListener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+    private val layoutListener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
         initTipsAndRatio()
     }
 
@@ -232,8 +231,8 @@ class BottomFloatingPanelViewHolder(
         disableEnableButtons(
             inMeetingViewModel.isCallEstablished()
         )
-        savedMicState = meetingViewModel.micLiveData.value ?: false
-        savedCamState = meetingViewModel.cameraLiveData.value ?: false
+        savedMicState = meetingViewModel.state.value.micEnabled
+        savedCamState = meetingViewModel.state.value.camEnabled
         // compose implementation
         meetingActionButtons.apply {
             isMicOn = savedMicState
@@ -321,13 +320,13 @@ class BottomFloatingPanelViewHolder(
     }
 
     /**
-     * Method that disables or enables buttons depending on whether the call is connected or not
+     * Method that disables or enables buttons depending on whether the call is connected and the call isn't in on hold.
      *
-     * @param isCallEstablished True, if the call is connected. False, otherwise
+     * @param enabled True, buttons should be enabled
      */
-    fun disableEnableButtons(isCallEstablished: Boolean) {
+    fun disableEnableButtons(enabled: Boolean) {
         meetingActionButtons.apply {
-            buttonsEnabled = isCallEstablished
+            buttonsEnabled = enabled
         }
     }
 
@@ -459,6 +458,7 @@ class BottomFloatingPanelViewHolder(
                 }
             }
         }
+
     }
 
     /**

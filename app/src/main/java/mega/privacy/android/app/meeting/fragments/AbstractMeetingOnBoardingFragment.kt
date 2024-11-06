@@ -16,6 +16,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
@@ -235,51 +237,57 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * Use ViewModel to manage UI-related data
      */
     private fun initViewModel() {
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.micEnabled }
+            .distinctUntilChanged()) {
+            binding.onOffFab.fabMic.isOn = it
+        }
+
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.camEnabled }
+            .distinctUntilChanged()) {
+            switchCamera(it)
+        }
+
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.speakerType }
+            .distinctUntilChanged()) {
+            when (it) {
+                AudioDevice.SpeakerPhone -> {
+                    binding.onOffFab.fabSpeaker.enable = true
+                    binding.onOffFab.fabSpeaker.isOn = true
+                    binding.onOffFab.fabSpeaker.setOnIcon(IconR.drawable.ic_volume_max)
+                    binding.onOffFab.fabSpeakerLabel.text =
+                        getString(R.string.general_speaker)
+                }
+
+                AudioDevice.Earpiece -> {
+                    binding.onOffFab.fabSpeaker.enable = true
+                    binding.onOffFab.fabSpeaker.isOn = false
+                    binding.onOffFab.fabSpeaker.setOnIcon(IconR.drawable.ic_volume_off)
+                    binding.onOffFab.fabSpeakerLabel.text =
+                        getString(R.string.general_speaker)
+                }
+
+                AudioDevice.WiredHeadset,
+                AudioDevice.Bluetooth,
+                    -> {
+                    binding.onOffFab.fabSpeaker.enable = true
+                    binding.onOffFab.fabSpeaker.isOn = true
+                    binding.onOffFab.fabSpeaker.setOnIcon(R.drawable.ic_headphone)
+                    binding.onOffFab.fabSpeakerLabel.text =
+                        getString(R.string.general_headphone)
+                }
+
+                else -> {
+                    binding.onOffFab.fabSpeaker.enable = false
+                    binding.onOffFab.fabSpeaker.isOn = true
+                    binding.onOffFab.fabSpeaker.setOnIcon(IconR.drawable.ic_volume_max)
+                    binding.onOffFab.fabSpeakerLabel.text =
+                        getString(R.string.general_speaker)
+                }
+            }
+        }
+
         sharedModel.let { model ->
             model.apply {
-                micLiveData.observe(viewLifecycleOwner) {
-                    binding.onOffFab.fabMic.isOn = it
-                }
-                cameraLiveData.observe(viewLifecycleOwner) {
-                    switchCamera(it)
-                }
-                speakerLiveData.observe(viewLifecycleOwner) {
-                    when (it) {
-                        AudioDevice.SpeakerPhone -> {
-                            binding.onOffFab.fabSpeaker.enable = true
-                            binding.onOffFab.fabSpeaker.isOn = true
-                            binding.onOffFab.fabSpeaker.setOnIcon(IconR.drawable.ic_volume_max)
-                            binding.onOffFab.fabSpeakerLabel.text =
-                                getString(R.string.general_speaker)
-                        }
-
-                        AudioDevice.Earpiece -> {
-                            binding.onOffFab.fabSpeaker.enable = true
-                            binding.onOffFab.fabSpeaker.isOn = false
-                            binding.onOffFab.fabSpeaker.setOnIcon(IconR.drawable.ic_volume_off)
-                            binding.onOffFab.fabSpeakerLabel.text =
-                                getString(R.string.general_speaker)
-                        }
-
-                        AudioDevice.WiredHeadset,
-                        AudioDevice.Bluetooth,
-                        -> {
-                            binding.onOffFab.fabSpeaker.enable = true
-                            binding.onOffFab.fabSpeaker.isOn = true
-                            binding.onOffFab.fabSpeaker.setOnIcon(R.drawable.ic_headphone)
-                            binding.onOffFab.fabSpeakerLabel.text =
-                                getString(R.string.general_headphone)
-                        }
-
-                        else -> {
-                            binding.onOffFab.fabSpeaker.enable = false
-                            binding.onOffFab.fabSpeaker.isOn = true
-                            binding.onOffFab.fabSpeaker.setOnIcon(IconR.drawable.ic_volume_max)
-                            binding.onOffFab.fabSpeakerLabel.text =
-                                getString(R.string.general_speaker)
-                        }
-                    }
-                }
                 tips.observe(viewLifecycleOwner) {
                     showToast(binding.fabTipLocation, it, Toast.LENGTH_SHORT)
                 }
@@ -558,7 +566,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * Method for release the video device and removing the video listener.
      */
     fun releaseVideoDeviceAndRemoveChatVideoListener() {
-        if (sharedModel.cameraLiveData.value == true) {
+        if (sharedModel.state.value.camEnabled) {
             sharedModel.releaseVideoDevice()
             removeChatVideoListener()
         }

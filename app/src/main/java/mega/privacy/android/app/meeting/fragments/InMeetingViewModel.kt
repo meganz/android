@@ -1168,7 +1168,7 @@ class InMeetingViewModel @Inject constructor(
      * @param chatId chat ID
      * @return True, if it is the same. False, otherwise
      */
-    fun isSameChatRoom(chatId: Long): Boolean =
+    private fun isSameChatRoom(chatId: Long): Boolean =
         chatId != MEGACHAT_INVALID_HANDLE && _state.value.currentChatId == chatId
 
     /**
@@ -1575,28 +1575,11 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Method that makes the necessary changes to the participant list when my own privileges have changed.
-     */
-    fun updateOwnPrivileges() {
-        inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
-            participants.value = participants.value?.map { participant ->
-                return@map participant.copy(
-                    hasOptionsAllowed = shouldParticipantsOptionBeVisible(
-                        participant.isMe,
-                        participant.isGuest
-                    )
-                )
-            }?.toMutableList()
-            updateMeetingInfoBottomPanel()
-        }
-    }
-
-    /**
      * Method for updating participant privileges
      *
      * @return list of participants with changes
      */
-    fun updateParticipantsPrivileges(): MutableSet<Participant> {
+    private fun updateParticipantsPrivileges(): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
         inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
             participants.value = participants.value?.map { participant ->
@@ -1688,7 +1671,7 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return the privileges
      */
-    fun getOwnPrivileges(): Int =
+    private fun getOwnPrivileges(): Int =
         inMeetingRepository.getOwnPrivileges(_state.value.currentChatId)
 
     /**
@@ -1720,7 +1703,7 @@ class InMeetingViewModel @Inject constructor(
      *
      * @param peerId User handle
      */
-    fun updateParticipantsVisibility(peerId: Long) {
+    private fun updateParticipantsVisibility(peerId: Long) {
         inMeetingRepository.getChatRoom(_state.value.currentChatId)?.let {
             participants.value?.let { listParticipants ->
                 val iterator = listParticipants.iterator()
@@ -2256,13 +2239,6 @@ class InMeetingViewModel @Inject constructor(
             }
         }
         return null
-    }
-
-    /**
-     * Method to get the first participant in the list, who will be the new speaker
-     */
-    fun getOwnParticipant(): Participant? {
-        return participants.value?.firstOrNull { it.isMe }
     }
 
     /**

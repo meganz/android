@@ -169,6 +169,7 @@ fun MeetingsActionButtons(
     val isEnabled by rememberSaveable(buttonsEnabled) {
         mutableStateOf(buttonsEnabled)
     }
+
     Box(
         modifier = modifier
             .semantics { testTagsAsResourceId = true }
@@ -310,7 +311,7 @@ fun MeetingsActionButtons(
                             modifier = Modifier.testTag(MORE_BUTTON),
                             iconId = R.drawable.more_call_options_icon,
                             onItemClick = { onMoreClicked?.invoke() },
-                            enabled = moreEnabled,
+                            enabled = true,
                         )
                     } else {
                         LegacyMegaTooltip(

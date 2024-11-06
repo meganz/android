@@ -143,6 +143,24 @@ data class InMeetingUiState(
         }
 
     /**
+     * Is call established
+     */
+    val isCallEstablished
+        get():Boolean {
+            call?.status?.let {
+                return it != ChatCallStatus.Initial && it != ChatCallStatus.Connecting && it != ChatCallStatus.TerminatingUserParticipation && it != ChatCallStatus.Destroyed
+            }
+
+            return false
+        }
+
+    /**
+     * Check if the buttons are enabled
+     */
+    val areButtonsEnabled
+        get() = isCallEstablished && isCallOnHold == false
+
+    /**
      * Has local video
      */
     val hasLocalVideo

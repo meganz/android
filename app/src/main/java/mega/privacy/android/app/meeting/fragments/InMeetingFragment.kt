@@ -40,6 +40,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -459,7 +460,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             setViewTreeViewModelStoreOwner(requireActivity())
             setContent {
                 OriginalTempTheme(isDark = true) {
-                    SnackbarInMeetingView()
+                    SnackbarInMeetingView(
+                        meetingActivityViewModel = sharedModel,
+                        inMeetingViewModel = inMeetingViewModel
+                    )
                 }
             }
         }
@@ -759,6 +763,36 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun collectFlows() {
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.micEnabled }
+            .distinctUntilChanged()) {
+            updateLocalAudio(it)
+        }
+
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.handRaisedSnackbarMsg }
+            .distinctUntilChanged()) {
+            if(it == consumed()) {
+                binding.snackbarComposeView.apply {
+                    isVisible = false
+                }
+            } else {
+                binding.snackbarComposeView.apply {
+                    isVisible = true
+                }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.camEnabled }
+            .distinctUntilChanged()) {
+            updateLocalVideo(it)
+        }
+
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.speakerType }
+            .distinctUntilChanged()) {
+            Timber.d("Speaker status has changed to $it")
+            speakerIsEnable = it == AudioDevice.SpeakerPhone
+            updateSpeaker(it)
+        }
+
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.joinedAsGuest }
             .distinctUntilChanged()) { joinedAsGuest ->
             if (joinedAsGuest) {
@@ -770,7 +804,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.isVideoEnabledDueToProximitySensor }
             .distinctUntilChanged()) {
             it?.let { shouldBeEnabled ->
-                if (inMeetingViewModel.getChatId() != MEGACHAT_INVALID_HANDLE && inMeetingViewModel.getCall() != null && shouldBeEnabled != sharedModel.cameraLiveData.value) {
+                if (inMeetingViewModel.getChatId() != MEGACHAT_INVALID_HANDLE && inMeetingViewModel.getCall() != null && shouldBeEnabled != sharedModel.state.value.camEnabled) {
                     MegaApplication.getChatManagement().isDisablingLocalVideo = true
                     inMeetingViewModel.onVideoEnabledDueToProximitySensorConsumed()
                     sharedModel.clickCamera(shouldBeEnabled)
@@ -1004,24 +1038,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.areButtonsEnabled }
+            .distinctUntilChanged()) {
+            bottomFloatingPanelViewHolder?.disableEnableButtons(it)
+        }
+
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.call?.status }
             .distinctUntilChanged()) { callStatus ->
             callStatus?.let { status ->
                 when (status) {
-                    ChatCallStatus.Initial -> bottomFloatingPanelViewHolder?.disableEnableButtons(
-                        false
-                    )
+                    ChatCallStatus.Initial -> {}
 
                     ChatCallStatus.Connecting -> {
-                        bottomFloatingPanelViewHolder?.disableEnableButtons(
-                            false
-                        )
-
                         checkMenuItemsVisibility()
                     }
 
                     ChatCallStatus.InProgress -> {
-                        bottomFloatingPanelViewHolder?.disableEnableButtons(true)
                         checkMenuItemsVisibility()
                         checkChildFragments()
                         controlVideoLocalOneToOneCall(
@@ -1335,20 +1367,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun initViewModel() {
         collectFlows()
-
-        sharedModel.micLiveData.observe(viewLifecycleOwner) {
-            updateLocalAudio(it)
-        }
-
-        sharedModel.cameraLiveData.observe(viewLifecycleOwner) {
-            updateLocalVideo(it)
-        }
-
-        sharedModel.speakerLiveData.observe(viewLifecycleOwner) {
-            Timber.d("Speaker status has changed to $it")
-            speakerIsEnable = it == AudioDevice.SpeakerPhone
-            updateSpeaker(it)
-        }
 
         sharedModel.snackBarLiveData.observe(viewLifecycleOwner) {
             if (it.isNotEmpty()) {
@@ -2348,13 +2366,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         //Observer the participant List
         inMeetingViewModel.participants.observe(viewLifecycleOwner) { participants ->
-            Timber.d("Shared model mic ${sharedModel.micLiveData.value} and cam ${sharedModel.cameraLiveData.value}")
             participants?.let {
                 bottomFloatingPanelViewHolder?.setParticipantsPanel(
                     it.toMutableList(),
                     inMeetingViewModel.getMyOwnInfo(
-                        sharedModel.micLiveData.value ?: false,
-                        sharedModel.cameraLiveData.value ?: false,
+                        sharedModel.state.value.micEnabled,
+                        sharedModel.state.value.camEnabled,
                     )
                 )
             }
@@ -2452,9 +2469,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun isCallOnHold(isHold: Boolean) {
         Timber.d("Changes in the on hold status of the call")
-        bottomFloatingPanelViewHolder?.disableEnableButtons(
-            inMeetingViewModel.isCallEstablished()
-        )
 
         showMuteBanner()
         if (inMeetingViewModel.isOneToOneCall() == false) {
@@ -2486,7 +2500,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to disable the local camera
      */
     private fun disableCamera() {
-        if (sharedModel.cameraLiveData.value == true) {
+        if (sharedModel.state.value.camEnabled) {
             sharedModel.clickCamera(false)
         }
     }
@@ -2550,8 +2564,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             bottomFloatingPanelViewHolder?.updateParticipants(
                 participants.toMutableList(),
                 inMeetingViewModel.getMyOwnInfo(
-                    sharedModel.micLiveData.value ?: false,
-                    sharedModel.cameraLiveData.value ?: false,
+                    sharedModel.state.value.micEnabled,
+                    sharedModel.state.value.camEnabled
                 )
             )
         }
@@ -2895,9 +2909,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method that updates the microphone and camera values
      */
     private fun updateMicAndCam() {
-        Timber.d("cam on ${sharedModel.cameraLiveData.value} and mic on ${sharedModel.micLiveData.value}")
-        val camIsEnable = sharedModel.cameraLiveData.value ?: false
-        val micIsEnable = sharedModel.micLiveData.value ?: false
+        val camIsEnable = sharedModel.state.value.camEnabled
+        val micIsEnable = sharedModel.state.value.micEnabled
         bottomFloatingPanelViewHolder?.updateCamIcon(camIsEnable)
         bottomFloatingPanelViewHolder?.updateMicIcon(micIsEnable)
         updateParticipantsBottomPanel()
@@ -2951,13 +2964,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to answer the call
      */
     private fun answerCall() {
-        var audio = sharedModel.micLiveData.value ?: false
+        var audio = sharedModel.state.value.micEnabled
         if (audio) {
             audio =
                 PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
         }
 
-        var video = sharedModel.cameraLiveData.value ?: false
+        var video = sharedModel.state.value.camEnabled
         if (video) {
             video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
         }
@@ -2972,13 +2985,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to start the call
      */
     private fun startCall() {
-        var audio = sharedModel.micLiveData.value ?: false
+        var audio = sharedModel.state.value.micEnabled
         if (audio) {
             audio =
                 PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
         }
 
-        var video = sharedModel.cameraLiveData.value ?: false
+        var video = sharedModel.state.value.camEnabled
         if (video) {
             video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
         }

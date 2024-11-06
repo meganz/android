@@ -37,8 +37,10 @@ fun OnOffFab(
         iconId = icon,
         itemName = itemName,
         onItemClick = {
-            onOff?.invoke(isOn.value)
-            isOn.value = !isOn.value
+            if (enabled) {
+                onOff?.invoke(isOn.value)
+                isOn.value = !isOn.value
+            }
         },
         modifier = modifier,
         type = if (isOn.value) CellButtonType.On else CellButtonType.Off,

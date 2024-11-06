@@ -7,6 +7,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.call.CallType
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
@@ -134,6 +135,9 @@ data class MeetingState(
     val isWaitingForCall: Boolean = false,
     val chatConnectionStatus: ChatConnectionStatus? = null,
     val userAvatarUpdateId: Long? = null,
+    val micEnabled: Boolean = false,
+    val camEnabled: Boolean = false,
+    val speakerType: AudioDevice = AudioDevice.None
 ) {
 
     /**

@@ -266,17 +266,6 @@ class MeetingActivityViewModel @Inject constructor(
     private var monitorChatConnectionStateJob: Job? = null
 
     // OnOffFab
-    private val _micLiveData: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
-    private val _cameraLiveData: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
-    private val _speakerLiveData: MutableLiveData<AudioDevice> =
-        MutableLiveData<AudioDevice>().apply {
-            val audioManager = rtcAudioManagerGateway.audioManager
-            value = audioManager?.selectedAudioDevice ?: AudioDevice.None
-        }
-
-    val micLiveData: LiveData<Boolean> = _micLiveData
-    val cameraLiveData: LiveData<Boolean> = _cameraLiveData
-    val speakerLiveData: LiveData<AudioDevice> = _speakerLiveData
 
     // Permissions
     private val _cameraGranted = MutableStateFlow(false)
@@ -318,6 +307,10 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     init {
+        rtcAudioManagerGateway.audioManager?.apply {
+            _state.update { it.copy(speakerType = selectedAudioDevice ?: AudioDevice.None) }
+        }
+
         viewModelScope.launch {
             monitorCallEndedUseCase()
                 .catch { Timber.e(it) }
@@ -392,12 +385,12 @@ class MeetingActivityViewModel @Inject constructor(
         viewModelScope.launch {
             monitorAudioOutputUseCase()
                 .catch { Timber.e(it) }
-                .collect {
-                    if (_speakerLiveData.value != it && it != AudioDevice.None) {
-                        Timber.d("Updating speaker $it")
+                .collect { audioDeviceType ->
+                    if (state.value.speakerType != audioDeviceType && audioDeviceType != AudioDevice.None) {
+                        Timber.d("Updating speaker $audioDeviceType")
+                        _state.update { it.copy(speakerType = audioDeviceType) }
 
-                        _speakerLiveData.value = it
-                        tips.value = when (it) {
+                        tips.value = when (audioDeviceType) {
                             AudioDevice.Earpiece -> context.getString(R.string.general_speaker_off)
                             AudioDevice.SpeakerPhone -> context.getString(R.string.general_speaker_on)
                             else -> context.getString(R.string.general_headphone_on)
@@ -1008,7 +1001,11 @@ class MeetingActivityViewModel @Inject constructor(
 
                             contains(ChatCallChanges.LocalAVFlags) -> {
                                 val isEnable = call.hasLocalAudio
-                                _micLiveData.value = isEnable
+                                _state.update { state ->
+                                    state.copy(
+                                        micEnabled = isEnable
+                                    )
+                                }
                                 Timber.d("open Mic: $isEnable")
                                 tips.value = when (isEnable) {
                                     true -> context.getString(
@@ -1352,7 +1349,11 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun micInitiallyOn() {
         Timber.d("Call with audio activated initially")
-        _micLiveData.value = true
+        _state.update { state ->
+            state.copy(
+                micEnabled = true
+            )
+        }
     }
 
     /**
@@ -1360,7 +1361,11 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun camInitiallyOn() {
         Timber.d("Call with video activated initially")
-        _cameraLiveData.value = true
+        _state.update { state ->
+            state.copy(
+                camEnabled = true
+            )
+        }
     }
 
     /**
@@ -1379,13 +1384,14 @@ class MeetingActivityViewModel @Inject constructor(
             isChatCreatedAndIParticipating() -> enableAudio(enable = shouldAudioBeEnabled)
             else -> {
                 //The chat is not yet created or the call is not yet established
-                _micLiveData.value = shouldAudioBeEnabled
                 Timber.d("open Mic: $shouldAudioBeEnabled")
-                tips.value = if (shouldAudioBeEnabled) {
-                    context.getString(R.string.general_mic_unmute)
-                } else {
-                    context.getString(R.string.general_mic_mute)
+                _state.update { state ->
+                    state.copy(
+                        micEnabled = shouldAudioBeEnabled
+                    )
                 }
+                tips.value =
+                    context.getString(if (shouldAudioBeEnabled) R.string.general_mic_unmute else R.string.general_mic_mute)
             }
         }
     }
@@ -1572,7 +1578,7 @@ class MeetingActivityViewModel @Inject constructor(
      * Response of clicking Speaker Fab
      */
     fun clickSpeaker() {
-        when (_speakerLiveData.value) {
+        when (state.value.speakerType) {
             AudioDevice.SpeakerPhone -> {
                 Timber.d("Trying to switch to EARPIECE")
                 meetingActivityRepository.switchSpeaker(AudioDevice.Earpiece)
@@ -1657,17 +1663,14 @@ class MeetingActivityViewModel @Inject constructor(
      * @param isVideoOn True, if the video is ON. False, otherwise
      */
     private fun updateCameraValueAndTips(isVideoOn: Boolean) {
-        _cameraLiveData.value = isVideoOn
-        Timber.d("Open video: ${_cameraLiveData.value}")
-        tips.value = when (isVideoOn) {
-            true -> context.getString(
-                R.string.general_camera_enable
-            )
-
-            false -> context.getString(
-                R.string.general_camera_disable
+        Timber.d("Open video: $isVideoOn")
+        _state.update { state ->
+            state.copy(
+                camEnabled = isVideoOn
             )
         }
+        tips.value =
+            context.getString(if (isVideoOn) R.string.general_camera_enable else R.string.general_camera_disable)
     }
 
     fun inviteToChat(context: Context, requestCode: Int, resultCode: Int, intent: Intent?) {

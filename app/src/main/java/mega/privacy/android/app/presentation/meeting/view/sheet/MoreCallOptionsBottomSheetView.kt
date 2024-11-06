@@ -39,7 +39,6 @@ import mega.privacy.android.domain.entity.call.CallOnHoldType
 /**
  * Recurring Meeting Occurrence bottom sheet view
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun MoreCallOptionsBottomSheetView(
     inMeetingViewModel: InMeetingViewModel = hiltViewModel(),
@@ -81,8 +80,14 @@ internal fun MoreCallOptionsBottomSheetView(
                     uiState = uiState,
                     meetingState = meetingState,
                     onPutCallOnHold = inMeetingViewModel::onClickOnHold,
-                    onRaiseHand = inMeetingViewModel::raiseHandToSpeak,
-                    onLowerHand = inMeetingViewModel::lowerHandToStopSpeak
+                    onRaiseHand = {
+                        meetingViewModel.onHandRaisedSnackbarMsgConsumed()
+                        inMeetingViewModel.raiseHandToSpeak()
+                    },
+                    onLowerHand = {
+                        meetingViewModel.onHandRaisedSnackbarMsgConsumed()
+                        inMeetingViewModel.lowerHandToStopSpeak()
+                    }
                 )
             }
         ) {
@@ -91,7 +96,6 @@ internal fun MoreCallOptionsBottomSheetView(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun BottomSheetContent(
     modalSheetState: ModalBottomSheetState,
@@ -115,7 +119,7 @@ private fun BottomSheetContent(
 
             Column(modifier = Modifier.verticalScroll(rememberScrollState()))
             {
-                if (isRaiseToSpeakFeatureFlagEnabled && isOneToOneCall == false) {
+                if (isRaiseToSpeakFeatureFlagEnabled && isOneToOneCall == false && isCallOnHold == false) {
                     BottomSheetMenuItemView(
                         modifier = Modifier.testTag(CALL_OPTIONS_BOTTOM_SHEET_RAISE_HAND_BUTTON),
                         res = R.drawable.raise_hand_icon,
@@ -158,7 +162,6 @@ private fun BottomSheetContent(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 private fun MoreCallOptionsBottomSheetViewWithoutCallOnHoldPreview() {
