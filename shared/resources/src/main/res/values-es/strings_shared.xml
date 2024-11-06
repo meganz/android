@@ -673,7 +673,7 @@
     <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
     <string name="document_scanning_error_type_insufficient_ram">El teléfono no cumple con los requisitos mínimos de memoria para completar el escaneo</string>
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
-    <string name="document_scanning_error_type_generic_error">We\’re having trouble opening the document scanner. Close and re-open the app, and try again.</string>
+    <string name="document_scanning_error_type_generic_error">Tenemos problemas para abrir el escáner de documentos. Cierra y vuelve a abrir la aplicación e inténtalo de nuevo.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">Cerrar</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
@@ -693,7 +693,7 @@
     <!-- Body message of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_body_message">Sincroniza una carpeta de tu dispositivo con MEGA para acceder a la última versión de tus archivos desde cualquier lugar</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Pro users ("Sync folders") -->
-    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Carpetas sincronizadas</string>
+    <string name="sync_promotion_bottom_sheet_primary_button_text_pro">Sincronizar carpetas</string>
     <!-- Text of the primary button of the bottom sheet to promote Sync feature for Free users ("Upgrade") -->
     <string name="sync_promotion_bottom_sheet_primary_button_text_free">Amplía para usar la sincronización</string>
     <!-- Text of the secondary button of the bottom sheet to promote Sync feature ("Learn more") -->
@@ -796,4 +796,8 @@
     <string name="device_center_sync_backup_list_empty_state_message_free_account">Upgrade to a premium account to keep your important information safe and up-to-date with sync and backup</string>
     <!-- Synced folder list empty state "See upgrade options" button label -->
     <string name="device_center_sync_backup_see_upgrade_options_button_label">See upgrade options</string>
+    <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
+    <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA puede ver el nombre y la descripción de tu reunión, pero los mantenemos privados</string>
+    <!-- Capital letters. Text of the label of a new historic notifications-->
+    <string name="notifications_notification_item_new_tag">Nueva</string>
 </resources>

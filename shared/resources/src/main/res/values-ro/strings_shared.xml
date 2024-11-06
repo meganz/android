@@ -796,4 +796,8 @@
     <string name="device_center_sync_backup_list_empty_state_message_free_account">Treceți la un cont premium pentru a vă menține informațiile importante în siguranță și actualizate cu sincronizare și backup</string>
     <!-- Synced folder list empty state "See upgrade options" button label -->
     <string name="device_center_sync_backup_see_upgrade_options_button_label">Consultați opțiunile de upgrade</string>
+    <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
+    <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA poate vedea numele și descrierea întâlnirii dvs., dar le păstrăm private</string>
+    <!-- Capital letters. Text of the label of a new historic notifications-->
+    <string name="notifications_notification_item_new_tag">Nou</string>
 </resources>
