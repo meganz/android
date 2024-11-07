@@ -13,7 +13,7 @@ import mega.privacy.android.domain.exception.PublicNodeException
 /**
  * Data class defining the state of [mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity]
  *
- * @property shouldLogin            Whether to show login screen
+ * @property showLoginScreenEvent   Event to show login screen
  * @property url                    Url of the file
  * @property hasDbCredentials       Whether has db credentials
  * @property fileNode               Current file node
@@ -36,7 +36,7 @@ import mega.privacy.android.domain.exception.PublicNodeException
  * @property foreignNodeError       State to show foreign node error
  */
 data class FileLinkState(
-    val shouldLogin: Boolean? = null,
+    val showLoginScreenEvent: StateEvent = consumed,
     val hasDbCredentials: Boolean = false,
     val url: String = "",
     val fileNode: TypedFileNode? = null,
