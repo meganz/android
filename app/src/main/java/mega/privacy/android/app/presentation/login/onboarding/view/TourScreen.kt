@@ -50,6 +50,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.extensions.isTablet
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.presentation.login.onboarding.model.OnboardingUiItem
 import mega.privacy.android.app.presentation.login.onboarding.model.TourUiState
@@ -61,6 +62,7 @@ import mega.privacy.android.shared.original.core.ui.controls.pager.InfiniteHoriz
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
@@ -156,6 +158,9 @@ internal fun TourScreen(
                 HorizontalTourPager(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .conditional(context.isTablet()) {
+                            weight(1f)
+                        }
                         .padding(bottom = 40.dp),
                     item = getOnboardingUiItem()
                 )
@@ -182,7 +187,7 @@ internal fun TourScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
-                    .padding(bottom = 40.dp, start = 24.dp, end = 24.dp)
+                    .padding(bottom = 40.dp, start = 24.dp, end = 24.dp, top = 16.dp)
                     .testTag(JOIN_A_MEETING_AS_GUEST_TAG),
                 textId = R.string.join_meeting_as_guest,
                 onClick = {
@@ -277,6 +282,8 @@ private fun HorizontalTourPager(
         beyondViewportPageCount = item.size / 2,
         verticalAlignment = Alignment.Top
     ) { page ->
+        val context = LocalContext.current
+        val isTablet = context.isTablet()
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -286,9 +293,15 @@ private fun HorizontalTourPager(
             Image(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(imageRatio),
+                    .then(
+                        if (isTablet) {
+                            Modifier.weight(1f)
+                        } else {
+                            Modifier.aspectRatio(imageRatio)
+                        }
+                    ),
                 painter = painter,
-                contentScale = ContentScale.Fit,
+                contentScale = if (isTablet) ContentScale.Crop else ContentScale.Fit,
                 contentDescription = stringResource(id = item[page].titleStringId)
             )
 
