@@ -808,4 +808,8 @@
     <string name="device_center_sync_backup_list_empty_state_message_free_account">Перейдите на премиум-аккаунт, чтобы обеспечить безопасность и актуальность важной информации с помощью синхронизации и резервного копирования</string>
     <!-- Synced folder list empty state "See upgrade options" button label -->
     <string name="device_center_sync_backup_see_upgrade_options_button_label">Посмотреть варианты</string>
+    <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
+    <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA может видеть название и описание вашей встречи, но мы сохраняем их конфиденциальность</string>
+    <!-- Capital letters. Text of the label of a new historic notifications-->
+    <string name="notifications_notification_item_new_tag">Новые</string>
 </resources>
