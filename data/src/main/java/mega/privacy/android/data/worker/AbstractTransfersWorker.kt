@@ -115,10 +115,10 @@ abstract class AbstractTransfersWorker(
     override suspend fun doWork() = withContext(ioDispatcher) {
         Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Started")
         crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} Started")
+        correctActiveTransfersUseCase(type) //to be sure we haven't missed any event before monitoring them
         val doWorkJob = this.launch(ioDispatcher) {
             doWorkInternal(this)
         }
-        correctActiveTransfersUseCase(type) //to be sure we haven't missed any event before monitoring them
         onStart()
         val lastMonitorOngoingActiveTransfersResult = monitorProgress()
             .catch { Timber.e("${this@AbstractTransfersWorker::class.java.simpleName}error: $it") }
@@ -165,6 +165,7 @@ abstract class AbstractTransfersWorker(
         return@withContext Result.success() // If there are no ongoing transfers it means no more work needed
     }.also {
         crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} Finished")
+        Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Finished")
     }
 
     private fun <T> Flow<T>.onFirst(action: suspend (T) -> Unit): Flow<T> =
@@ -231,6 +232,7 @@ abstract class AbstractTransfersWorker(
     }
 
     private suspend fun stopWork(performWorkJob: Job) {
+        Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Stop work")
         notificationManager.cancel(updateNotificationId)
         clearActiveTransfersIfFinishedUseCase()
         performWorkJob.cancel()

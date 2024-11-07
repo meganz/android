@@ -57,7 +57,7 @@ class DownloadsWorker @AssistedInject constructor(
     private val transfersNotificationMapper: TransfersNotificationMapper,
     private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
     private val scanMediaFileUseCase: ScanMediaFileUseCase,
-    crashReporter: CrashReporter,
+    private val crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
     private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
@@ -100,7 +100,8 @@ class DownloadsWorker @AssistedInject constructor(
                 return@transformWhile notSendPendingTransfers > 0 || (ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers() && !ongoingActiveTransfersResult.transfersOverQuota)
             }
             .catch {
-                Timber.e(it)
+                crashReporter.report(it)
+                Timber.e("Error monitoring Downloads", it)
             }
             .onCompletion {
                 Timber.d("DownloadWorker monitor progress finished $it")
@@ -113,7 +114,10 @@ class DownloadsWorker @AssistedInject constructor(
         }
         scope.launch {
             startAllPendingDownloadsUseCase()
-                .catch { Timber.e("Error on downloading nodes", it) }
+                .catch {
+                    Timber.e("Error on start downloading nodes", it)
+                    crashReporter.report(it)
+                }
                 .collect { Timber.d("Start downloading $it nodes") }
         }
     }
