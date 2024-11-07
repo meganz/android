@@ -107,7 +107,7 @@ class FileLinkViewModelTest {
     fun `test that initial state is returned`() = runTest {
         underTest.state.test {
             val initial = awaitItem()
-            assertThat(initial.shouldLogin).isNull()
+            assertThat(initial.showLoginScreenEvent).isEqualTo(consumed)
             assertThat(initial.hasDbCredentials).isFalse()
             assertThat(initial.url).isEmpty()
             assertThat(initial.fileNode).isNull()
@@ -124,7 +124,7 @@ class FileLinkViewModelTest {
     }
 
     @Test
-    fun `test that login is not required when root node exists and db credentials are valid`() =
+    fun `test that showLoginScreenEvent is not triggered when root node exists and db credentials are valid`() =
         runTest {
             whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(rootNodeExistsUseCase()).thenReturn(true)
@@ -132,13 +132,23 @@ class FileLinkViewModelTest {
             underTest.state.test {
                 underTest.checkLoginRequired()
                 val newValue = expectMostRecentItem()
-                assertThat(newValue.shouldLogin).isFalse()
+                assertThat(newValue.showLoginScreenEvent).isEqualTo(consumed)
                 assertThat(newValue.hasDbCredentials).isTrue()
             }
         }
 
     @Test
-    fun `test that login is not required when db credentials are valid and rootnode does not exist`() =
+    fun `test that showLoginScreenEvent is consumed when onShowLoginScreenEventConsumed is invoked`() =
+        runTest {
+            underTest.state.test {
+                underTest.onShowLoginScreenEventConsumed()
+                val newValue = expectMostRecentItem()
+                assertThat(newValue.showLoginScreenEvent).isEqualTo(consumed)
+            }
+        }
+
+    @Test
+    fun `test that showLoginScreenEvent is triggered when db credentials are valid and rootnode does not exist`() =
         runTest {
             whenever(hasCredentialsUseCase()).thenReturn(true)
             whenever(rootNodeExistsUseCase()).thenReturn(false)
@@ -146,7 +156,7 @@ class FileLinkViewModelTest {
             underTest.state.test {
                 underTest.checkLoginRequired()
                 val newValue = expectMostRecentItem()
-                assertThat(newValue.shouldLogin).isTrue()
+                assertThat(newValue.showLoginScreenEvent).isEqualTo(triggered)
                 assertThat(newValue.hasDbCredentials).isTrue()
             }
         }

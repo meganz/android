@@ -84,7 +84,21 @@ class FileLinkViewModel @Inject constructor(
         viewModelScope.launch {
             val hasCredentials = hasCredentialsUseCase()
             val shouldLogin = hasCredentials && !rootNodeExistsUseCase()
-            _state.update { it.copy(shouldLogin = shouldLogin, hasDbCredentials = hasCredentials) }
+            _state.update {
+                it.copy(
+                    showLoginScreenEvent = if (shouldLogin) triggered else consumed,
+                    hasDbCredentials = hasCredentials
+                )
+            }
+        }
+    }
+
+    /**
+     * Consume show login screen event
+     */
+    fun onShowLoginScreenEventConsumed() {
+        _state.update {
+            it.copy(showLoginScreenEvent = consumed)
         }
     }
 

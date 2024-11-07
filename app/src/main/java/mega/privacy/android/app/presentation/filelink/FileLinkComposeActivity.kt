@@ -137,6 +137,12 @@ class FileLinkComposeActivity : PasscodeActivity(),
                 action = ::onOpenFile
             )
 
+            EventEffect(
+                event = uiState.showLoginScreenEvent,
+                onConsumed = viewModel::onShowLoginScreenEventConsumed,
+                action = ::showLoginScreen
+            )
+
             val snackBarHostState = remember { SnackbarHostState() }
             OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 FileLinkView(
@@ -206,10 +212,6 @@ class FileLinkComposeActivity : PasscodeActivity(),
     private fun setupObserver() {
         this.collectFlow(viewModel.state) {
             when {
-                it.shouldLogin == true -> {
-                    showLoginScreen()
-                }
-
                 it.askForDecryptionDialog -> {
                     askForDecryptionKeyDialog()
                 }
