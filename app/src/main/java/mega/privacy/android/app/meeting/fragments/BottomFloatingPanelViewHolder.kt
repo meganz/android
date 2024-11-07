@@ -516,7 +516,6 @@ class BottomFloatingPanelViewHolder(
     fun updateSpeakerIcon(device: AudioDevice) {
         Timber.d("Update speaker icon. Audio device is $device")
         meetingActionButtons.currentAudioDevice = device
-        meetingActionButtons.isSpeakerOn = device != AudioDevice.Earpiece
     }
 
     /**

@@ -65,7 +65,6 @@ internal class MeetingsActionButtonsView : AbstractComposeView {
     var isMicOn by mutableStateOf(false)
 
     var isCameraOn by mutableStateOf(false)
-    var isSpeakerOn by mutableStateOf(false)
     private var isMoreOn by mutableStateOf(true)
     var buttonsEnabled by mutableStateOf(true)
     var isRaiseHandToolTipShown by mutableStateOf(false)
@@ -125,7 +124,6 @@ internal class MeetingsActionButtonsView : AbstractComposeView {
                 onEndClicked = onEndClicked,
                 micEnabled = isMicOn,
                 cameraEnabled = isCameraOn,
-                speakerEnabled = isSpeakerOn,
                 moreEnabled = isMoreOn,
                 showMicWarning = showMicWarning,
                 showCameraWarning = showCameraWarning,
@@ -154,7 +152,6 @@ fun MeetingsActionButtons(
     onRaiseToRandTooltipDismissed: (() -> Unit)?,
     micEnabled: Boolean,
     cameraEnabled: Boolean,
-    speakerEnabled: Boolean,
     moreEnabled: Boolean,
     showMicWarning: Boolean,
     showCameraWarning: Boolean,
@@ -194,8 +191,6 @@ fun MeetingsActionButtons(
                 ) {
                     ConstraintLayout {
                         val (fab, warning) = createRefs()
-                        val isOn = rememberSaveable(micEnabled) { mutableStateOf(micEnabled) }
-
                         OnOffFab(
                             itemName = stringResource(id = R.string.general_mic),
                             modifier = Modifier
@@ -204,7 +199,7 @@ fun MeetingsActionButtons(
                                     start.linkTo(parent.start)
                                 }
                                 .testTag(MIC_BUTTON),
-                            isOn = isOn,
+                            isOn = micEnabled,
                             enabled = isEnabled,
                             onIcon = IconR.drawable.ic_mic,
                             offIcon = IconR.drawable.ic_mic_stop,
@@ -239,7 +234,6 @@ fun MeetingsActionButtons(
                 ) {
                     ConstraintLayout {
                         val (fab, warning) = createRefs()
-                        val isOn = rememberSaveable(cameraEnabled) { mutableStateOf(cameraEnabled) }
                         OnOffFab(
                             itemName = stringResource(id = R.string.general_camera),
                             modifier = Modifier
@@ -248,7 +242,7 @@ fun MeetingsActionButtons(
                                     start.linkTo(parent.start)
                                 }
                                 .testTag(CAMERA_BUTTON),
-                            isOn = isOn,
+                            isOn = cameraEnabled,
                             enabled = isEnabled,
                             onIcon = IconR.drawable.ic_video_on,
                             offIcon = IconR.drawable.ic_video_off,
@@ -281,7 +275,6 @@ fun MeetingsActionButtons(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    val isOn = rememberSaveable(speakerEnabled) { mutableStateOf(speakerEnabled) }
                     val (onIcon, stringId) =
                         if (currentAudioDevice == AudioDevice.WiredHeadset ||
                             currentAudioDevice == AudioDevice.Bluetooth
@@ -292,7 +285,7 @@ fun MeetingsActionButtons(
                     OnOffFab(
                         itemName = stringResource(id = stringId),
                         modifier = Modifier.testTag(SPEAKER_BUTTON),
-                        isOn = isOn,
+                        isOn = currentAudioDevice != AudioDevice.Earpiece,
                         enabled = if (currentAudioDevice == AudioDevice.None) false else isEnabled,
                         onIcon = onIcon,
                         offIcon = IconR.drawable.ic_volume_off,
@@ -375,7 +368,6 @@ private fun MeetingBottomFloatingPanelPreview(
             onEndClicked = {},
             micEnabled = !showMicWarning,
             cameraEnabled = true,
-            speakerEnabled = true,
             moreEnabled = true,
             showMicWarning = showMicWarning,
             buttonsEnabled = true,

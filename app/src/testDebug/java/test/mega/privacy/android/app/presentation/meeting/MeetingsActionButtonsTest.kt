@@ -82,7 +82,6 @@ class MeetingsActionButtonsTest {
                 onEndClicked = {},
                 micEnabled = true,
                 cameraEnabled = true,
-                speakerEnabled = true,
                 moreEnabled = true,
                 showMicWarning = false,
                 buttonsEnabled = true,
