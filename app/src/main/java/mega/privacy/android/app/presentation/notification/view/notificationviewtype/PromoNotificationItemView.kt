@@ -25,20 +25,21 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.notification.view.components.GreenIconView
 import mega.privacy.android.app.presentation.notification.view.components.NotificationDate
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.domain.entity.notifications.PromoNotification
+import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
+import mega.privacy.android.shared.original.core.ui.controls.chip.TagChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_800
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.domain.entity.notifications.PromoNotification
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 internal fun PromoNotificationItemView(
@@ -122,8 +123,10 @@ internal fun PromoNotificationItemView(
                 modifier = Modifier
                     .padding(end = 16.dp)
             ) {
-                GreenIconView(
-                    greenIconLabelRes = R.string.notifications_screen_notification_label_promo,
+                MegaChip(
+                    text = stringResource(R.string.notifications_screen_notification_label_promo),
+                    selected = true,
+                    style = TagChipStyle,
                     modifier = Modifier.testTag(PROMO_NOTIFICATION_GREEN_ICON_TEST_TAG)
                 )
                 if (!hasPreview) {

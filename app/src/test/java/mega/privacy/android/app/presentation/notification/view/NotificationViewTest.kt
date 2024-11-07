@@ -7,14 +7,13 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.NotificationState
-import mega.privacy.android.app.presentation.notification.view.NotificationView
-import mega.privacy.android.app.presentation.notification.view.notificationviewtype.NOTIFICATION_GREEN_ICON_TEST_TAG
-import mega.privacy.android.app.presentation.notification.view.notificationviewtype.NOTIFICATION_TEST_TAG
 import mega.privacy.android.app.presentation.notification.view.notificationviewtype.PROMO_NOTIFICATION_TEST_TAG
 import mega.privacy.android.domain.entity.notifications.PromoNotification
+import mega.privacy.android.shared.original.core.ui.controls.notifications.NOTIFICATION_GREEN_ICON_TEST_TAG
+import mega.privacy.android.shared.original.core.ui.controls.notifications.NOTIFICATION_TEST_TAG
+import mega.privacy.android.shared.original.core.ui.controls.notifications.NotificationItemType
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,16 +26,13 @@ class NotificationViewTest {
 
     private val normalNotification = Notification(
         sectionTitle = { "CONTACTS" },
-        sectionColour = R.color.orange_400_orange_300,
-        sectionIcon = null,
+        sectionType = NotificationItemType.Others,
         title = { "New Contact" },
         titleTextSize = 16.sp,
         description = { "xyz@gmail.com is now a contact" },
         schedMeetingNotification = null,
         dateText = { "11 October 2022 6:46 pm" },
         isNew = true,
-        backgroundColor = { "#D3D3D3" },
-        separatorMargin = { 0 },
     ) {}
 
     private val promoNotification = PromoNotification(

@@ -20,6 +20,7 @@ import mega.privacy.android.domain.usecase.AcknowledgeUserAlertsUseCase
 import mega.privacy.android.domain.usecase.MonitorUserAlertsUseCase
 import mega.privacy.android.domain.usecase.notifications.GetPromoNotificationsUseCase
 import mega.privacy.android.domain.usecase.notifications.SetLastReadNotificationUseCase
+import mega.privacy.android.shared.original.core.ui.controls.notifications.NotificationItemType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -97,16 +98,13 @@ class NotificationViewModelTest {
 
         val expectedNotification = Notification(
             sectionTitle = { "" },
-            sectionColour = 0,
-            sectionIcon = null,
+            sectionType = NotificationItemType.Others,
             title = { "" },
             titleTextSize = 16.sp,
             description = { "" },
             schedMeetingNotification = null,
             dateText = { "" },
             isNew = true,
-            backgroundColor = { "#D3D3D3" },
-            separatorMargin = { 0 },
         ) {}
 
         val expectedPromoNotification = PromoNotification(
@@ -143,16 +141,13 @@ class NotificationViewModelTest {
         val newAlert = mock<ContactChangeContactEstablishedAlert>()
         val initialNotification = Notification(
             sectionTitle = { "" },
-            sectionColour = 0,
-            sectionIcon = null,
+            sectionType = NotificationItemType.Others,
             title = { "Initial" },
             titleTextSize = 16.sp,
             description = { "" },
             schedMeetingNotification = null,
             dateText = { "" },
             isNew = true,
-            backgroundColor = { "#D3D3D3" },
-            separatorMargin = { 0 },
         ) {}
         val newNotification = initialNotification.copy(title = { "New title" })
         whenever(notificationMapper(initialAlert)).thenReturn(initialNotification)

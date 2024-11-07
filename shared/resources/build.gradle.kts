@@ -9,6 +9,5 @@ android {
 
     dependencies {
         lintChecks(project(":lint"))
-        implementation(project(":shared:original-core-ui"))
     }
 }
