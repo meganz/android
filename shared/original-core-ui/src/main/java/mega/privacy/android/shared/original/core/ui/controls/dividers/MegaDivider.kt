@@ -10,19 +10,21 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * MegaDivider
  *
  * @param dividerType [DividerType]
  * @param modifier [Modifier]
+ * @param strong If true the divider color will be strong, if false the color will be subtle, default to false
  */
 @Composable
 fun MegaDivider(
     dividerType: DividerType,
     modifier: Modifier = Modifier,
+    strong: Boolean = false,
 ) {
     val finalModifier = when (dividerType) {
         DividerType.FullSize -> modifier.fillMaxWidth()
@@ -33,7 +35,7 @@ fun MegaDivider(
     Divider(
         modifier = finalModifier,
         thickness = 1.dp,
-        color = MegaOriginalTheme.colors.border.subtle
+        color = if (strong) MegaOriginalTheme.colors.border.strong else MegaOriginalTheme.colors.border.subtle
     )
 }
 

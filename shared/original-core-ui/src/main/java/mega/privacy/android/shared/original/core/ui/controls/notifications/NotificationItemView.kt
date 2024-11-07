@@ -137,6 +137,7 @@ fun NotificationItemView(
         MegaDivider(
             modifier = Modifier.testTag(NOTIFICATION_DIVIDER),
             dividerType = DividerType.FullSize,
+            strong = !isNew,
         )
     }
 }
