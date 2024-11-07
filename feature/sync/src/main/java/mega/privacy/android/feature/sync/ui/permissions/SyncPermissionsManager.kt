@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.permissions
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -11,15 +12,16 @@ import android.os.PowerManager
 import android.provider.Settings
 import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * Permissions manager for Sync feature
  */
-class SyncPermissionsManager @Inject constructor(@ActivityContext private val context: Context) {
+class SyncPermissionsManager @Inject constructor(@ApplicationContext private val context: Context) {
 
     /**
      * Checks if battery optimisation is disabled
@@ -71,6 +73,20 @@ class SyncPermissionsManager @Inject constructor(@ActivityContext private val co
     fun getDisableBatteryOptimizationsIntent(): Intent =
         Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
             .setData(Uri.parse("package:${context.packageName}"))
+
+    /**
+     * Check whether the permission to send notifications is granted
+     */
+    fun isNotificationsPermissionGranted(): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+
 
     /**
      * When android SDK is 11 or above

@@ -74,6 +74,7 @@ class SyncMonitorViewModel @Inject constructor(
 
     private var monitorTransferEventsJob: Job? = null
     private var monitorSyncsStateJob: Job? = null
+    private var monitorNotificationsJob: Job? = null
 
     /**
      * Start monitoring sync state and sync transfers progress
@@ -153,32 +154,34 @@ class SyncMonitorViewModel @Inject constructor(
     }
 
     private fun monitorNotifications() {
-        combine(
-            monitorSyncStalledIssuesUseCase(),
-            monitorSyncsUseCase(),
-            monitorBatteryInfoUseCase(),
-            monitorSyncByWiFiUseCase(),
-            monitorConnectivityUseCase()
-        ) { stalledIssues: List<StalledIssue>, syncs: List<FolderPair>, batteryInfo: BatteryInfo, syncByWifi: Boolean, _ ->
-            runCatching {
-                getSyncNotificationUseCase(
-                    isBatteryLow = batteryInfo.level < LOW_BATTERY_LEVEL && !batteryInfo.isCharging,
-                    isUserOnWifi = isOnWifiNetworkUseCase(),
-                    isSyncOnlyByWifi = syncByWifi,
-                    syncs = syncs,
-                    stalledIssues = stalledIssues
-                )
-            }.onSuccess { notification ->
-                notification?.let {
-                    _state.update { it.copy(displayNotification = notification) }
+        if (monitorNotificationsJob == null || monitorNotificationsJob?.isCancelled == true) {
+            monitorNotificationsJob = combine(
+                monitorSyncStalledIssuesUseCase(),
+                monitorSyncsUseCase(),
+                monitorBatteryInfoUseCase(),
+                monitorSyncByWiFiUseCase(),
+                monitorConnectivityUseCase()
+            ) { stalledIssues: List<StalledIssue>, syncs: List<FolderPair>, batteryInfo: BatteryInfo, syncByWifi: Boolean, _ ->
+                runCatching {
+                    getSyncNotificationUseCase(
+                        isBatteryLow = batteryInfo.level < LOW_BATTERY_LEVEL && !batteryInfo.isCharging,
+                        isUserOnWifi = isOnWifiNetworkUseCase(),
+                        isSyncOnlyByWifi = syncByWifi,
+                        syncs = syncs,
+                        stalledIssues = stalledIssues
+                    )
+                }.onSuccess { notification ->
+                    notification?.let {
+                        _state.update { it.copy(displayNotification = notification) }
+                    }
                 }
+                    .onFailure {
+                        Timber.e(it)
+                    }
             }
-                .onFailure {
-                    Timber.e(it)
-                }
+                .distinctUntilChanged()
+                .launchIn(viewModelScope)
         }
-            .distinctUntilChanged()
-            .launchIn(viewModelScope)
     }
 
     /**

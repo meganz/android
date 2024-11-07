@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.sync.data
 
 import android.content.Context
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.DefaultWorkerFactory
 import androidx.work.ListenableWorker.Result
@@ -22,18 +21,31 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.BatteryInfo
+import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
+import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.sync.data.SyncWorker.Companion.SYNC_WORKER_RECHECK_DELAY
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
+import mega.privacy.android.feature.sync.domain.usecase.notifcation.GetSyncNotificationUseCase
+import mega.privacy.android.feature.sync.domain.usecase.notifcation.SetSyncNotificationShownUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
+import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
+import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.UUID
 import java.util.concurrent.Executor
@@ -52,12 +64,21 @@ class SyncWorkerTest {
     private lateinit var workDatabase: WorkDatabase
     private val loginMutex: Mutex = mock()
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
+    private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase = mock()
+    private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
+    private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
+    private val getSyncNotificationUseCase: GetSyncNotificationUseCase = mock()
+    private val isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase = mock()
+    private val syncNotificationManager: SyncNotificationManager = mock()
+    private val setSyncNotificationShownUseCase: SetSyncNotificationShownUseCase = mock()
+    private val syncPermissionsManager: SyncPermissionsManager = mock()
 
     private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
 
     @Before
     fun setUp() {
-        context = ApplicationProvider.getApplicationContext()
+        context = mock()
         executor = Executors.newSingleThreadExecutor()
         workExecutor = WorkManagerTaskExecutor(executor)
         workDatabase =
@@ -80,12 +101,25 @@ class SyncWorkerTest {
             )
         )
         whenever(loginMutex.isLocked).thenReturn(true)
+        whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
+        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(mock()))
+        whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf(false))
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
         underTest = SyncWorker(
             context,
             workParams,
             monitorSyncsUseCase,
             loginMutex,
-            backgroundFastLoginUseCase
+            backgroundFastLoginUseCase,
+            monitorSyncStalledIssuesUseCase,
+            monitorBatteryInfoUseCase,
+            monitorSyncByWiFiUseCase,
+            monitorConnectivityUseCase,
+            getSyncNotificationUseCase,
+            isOnWifiNetworkUseCase,
+            syncNotificationManager,
+            setSyncNotificationShownUseCase,
+            syncPermissionsManager
         )
     }
 
@@ -159,5 +193,44 @@ class SyncWorkerTest {
         val result = deferredResult.await()
 
         assertEquals(Result.success(), result)
+    }
+
+    @Test
+    fun `test that sync worker dispatches notifications`() = runTest {
+        val notification: SyncNotificationMessage = mock()
+        val firstSync = FolderPair(
+            id = 1,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "first",
+            localFolderPath = "first",
+            remoteFolder = RemoteFolder(id = 1232L, name = "first"),
+            syncStatus = SyncStatus.SYNCED,
+            syncError = SyncError.ACTIVE_SYNC_SAME_PATH
+        )
+        val secondSync = FolderPair(
+            id = 2,
+            syncType = SyncType.TYPE_TWOWAY,
+            pairName = "second",
+            localFolderPath = "second",
+            remoteFolder = RemoteFolder(id = 2222L, name = "second"),
+            syncStatus = SyncStatus.SYNCED
+        )
+        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(firstSync, secondSync)))
+        whenever(isOnWifiNetworkUseCase()).thenReturn(true)
+        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, false)))
+        whenever(
+            getSyncNotificationUseCase(
+                isBatteryLow = false,
+                isUserOnWifi = true,
+                isSyncOnlyByWifi = false,
+                syncs = listOf(firstSync, secondSync),
+                stalledIssues = emptyList()
+            )
+        ).thenReturn(notification)
+        whenever(syncPermissionsManager.isNotificationsPermissionGranted()).thenReturn(true)
+
+        underTest.doWork()
+
+        verify(syncNotificationManager).show(context, notification)
     }
 }
