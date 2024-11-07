@@ -68,11 +68,6 @@ enum class SyncError {
     FOREIGN_TARGET_OVERSTORAGE,
 
     /**
-     * Represents a Remote Path has Changed Sub State
-     */
-    REMOTE_PATH_HAS_CHANGED,
-
-    /**
      * Represents a Sub State in which the existing Incoming Share Sync or part thereof lost full
      * access
      */

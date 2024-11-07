@@ -30,7 +30,6 @@ class DeviceFolderUINodeErrorMessageMapper @Inject constructor() {
         SyncError.STORAGE_OVERQUOTA -> R.string.general_sync_storage_overquota
         SyncError.ACCOUNT_EXPIRED -> R.string.general_sync_account_expired
         SyncError.FOREIGN_TARGET_OVERSTORAGE -> R.string.general_sync_foreign_target_overshare
-        SyncError.REMOTE_PATH_HAS_CHANGED -> R.string.general_sync_remote_path_has_changed
         SyncError.SHARE_NON_FULL_ACCESS -> R.string.general_sync_share_non_full_access
         SyncError.LOCAL_FILESYSTEM_MISMATCH -> R.string.general_sync_local_filesystem_mismatch
         SyncError.PUT_NODES_ERROR -> R.string.general_sync_put_nodes_error
@@ -55,21 +54,21 @@ class DeviceFolderUINodeErrorMessageMapper @Inject constructor() {
 
         SyncError.UNABLE_TO_RETRIEVE_ROOT_FSID,
         SyncError.FAILURE_ACCESSING_PERSISTENT_STORAGE,
-        -> R.string.general_sync_unable_to_retrieve_root_fsid
+            -> R.string.general_sync_unable_to_retrieve_root_fsid
 
         SyncError.UNABLE_TO_OPEN_DATABASE,
         SyncError.MISMATCH_OF_ROOT_FSID,
         SyncError.FILESYSTEM_FILE_IDS_ARE_UNSTABLE,
         SyncError.FILESYSTEM_ID_UNAVAILABLE,
-        -> R.string.general_sync_message_folder_backup_issue
+            -> R.string.general_sync_message_folder_backup_issue
 
         SyncError.REMOTE_NODE_MOVED_TO_RUBBISH,
         SyncError.REMOTE_NODE_INSIDE_RUBBISH,
-        -> R.string.general_sync_message_node_in_rubbish_bin
+            -> R.string.general_sync_message_node_in_rubbish_bin
 
         SyncError.ACTIVE_SYNC_ABOVE_PATH,
         SyncError.LOCAL_PATH_SYNC_COLLISION,
-        -> R.string.general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder
+            -> R.string.general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder
 
         else -> R.string.general_sync_message_unknown_error
     }

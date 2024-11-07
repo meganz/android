@@ -30,7 +30,6 @@ class SyncErrorMapper @Inject constructor() {
         Error.STORAGE_OVERQUOTA.swigValue() -> SyncError.STORAGE_OVERQUOTA
         Error.ACCOUNT_EXPIRED.swigValue() -> SyncError.ACCOUNT_EXPIRED
         Error.FOREIGN_TARGET_OVERSTORAGE.swigValue() -> SyncError.FOREIGN_TARGET_OVERSTORAGE
-        Error.REMOTE_PATH_HAS_CHANGED.swigValue() -> SyncError.REMOTE_PATH_HAS_CHANGED
         Error.SHARE_NON_FULL_ACCESS.swigValue() -> SyncError.SHARE_NON_FULL_ACCESS
         Error.LOCAL_FILESYSTEM_MISMATCH.swigValue() -> SyncError.LOCAL_FILESYSTEM_MISMATCH
         Error.PUT_NODES_ERROR.swigValue() -> SyncError.PUT_NODES_ERROR

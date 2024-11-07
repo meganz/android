@@ -66,10 +66,6 @@ internal class SyncErrorMapperTest {
             SyncError.FOREIGN_TARGET_OVERSTORAGE,
         ),
         Arguments.of(
-            Error.REMOTE_PATH_HAS_CHANGED.swigValue(),
-            SyncError.REMOTE_PATH_HAS_CHANGED,
-        ),
-        Arguments.of(
             Error.SHARE_NON_FULL_ACCESS.swigValue(),
             SyncError.SHARE_NON_FULL_ACCESS,
         ),

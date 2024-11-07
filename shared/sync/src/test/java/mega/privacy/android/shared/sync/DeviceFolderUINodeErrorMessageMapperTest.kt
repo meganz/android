@@ -88,10 +88,6 @@ internal class DeviceFolderUINodeErrorMessageMapperTest {
             R.string.general_sync_foreign_target_overshare,
         ),
         Arguments.of(
-            SyncError.REMOTE_PATH_HAS_CHANGED,
-            R.string.general_sync_remote_path_has_changed,
-        ),
-        Arguments.of(
             SyncError.SHARE_NON_FULL_ACCESS,
             R.string.general_sync_share_non_full_access,
         ),
