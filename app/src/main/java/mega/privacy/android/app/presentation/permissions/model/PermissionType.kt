@@ -11,6 +11,11 @@ enum class PermissionType {
     Notifications,
 
     /**
+     * Display over other apps permission.
+     */
+    DisplayOverOtherApps,
+
+    /**
      * Read and write permissions.
      */
     ReadAndWrite,

@@ -12,6 +12,8 @@ import mega.privacy.android.app.presentation.permissions.model.PermissionType
  */
 fun PermissionScreen.toPermissionType(missingPermissions: List<Permission>): PermissionType =
     when (this) {
+        PermissionScreen.Notifications -> PermissionType.Notifications
+        PermissionScreen.DisplayOverOtherApps -> PermissionType.DisplayOverOtherApps
         PermissionScreen.Media -> when {
             missingPermissions.contains(Permission.Read)
                     && missingPermissions.contains(Permission.Write) -> PermissionType.ReadAndWrite
@@ -28,6 +30,4 @@ fun PermissionScreen.toPermissionType(missingPermissions: List<Permission>): Per
             missingPermissions.contains(Permission.Microphone) -> PermissionType.Microphone
             else -> PermissionType.Bluetooth
         }
-
-        else -> PermissionType.Notifications
     }

@@ -1,21 +1,30 @@
 package mega.privacy.android.app.presentation.permissions
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION
+import android.provider.Settings.canDrawOverlays
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.databinding.FragmentPermissionsBinding
 import mega.privacy.android.app.databinding.PermissionsImageLayoutBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.image
+import mega.privacy.android.app.presentation.extensions.positiveButton
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.permissions.model.Permission
 import mega.privacy.android.app.presentation.permissions.model.PermissionScreen
@@ -52,6 +61,12 @@ class PermissionsFragment : Fragment() {
             )
         }
 
+    private val startDisplayOverOtherAppsPermissionForResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        setNextPermission()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -79,7 +94,6 @@ class PermissionsFragment : Fragment() {
         }
         binding.setupButton.setOnClickListener { viewModel.grantAskForPermissions() }
         binding.notNowButton2.setOnClickListener { setNextPermission() }
-        binding.enableButton.setOnClickListener { viewModel.askPermission() }
     }
 
     private fun setupData() {
@@ -94,6 +108,13 @@ class PermissionsFragment : Fragment() {
                     )
                 )
             }
+
+            add(
+                Pair(
+                    Permission.DisplayOverOtherApps,
+                    canDrawOverlays(requireContext())
+                )
+            )
 
             add(
                 Pair(
@@ -164,6 +185,10 @@ class PermissionsFragment : Fragment() {
             getString(currentPermission.title)
         permissionBinding.subtitlePermissions.text =
             getString(currentPermission.description)
+        binding.enableButton.apply {
+            text = getString(currentPermission.positiveButton)
+            setOnClickListener { viewModel.askPermission() }
+        }
     }
 
     /**
@@ -174,6 +199,7 @@ class PermissionsFragment : Fragment() {
     private fun askForPermission(permissionType: PermissionType) {
         when (permissionType) {
             PermissionType.Notifications -> askForNotificationsPermission()
+            PermissionType.DisplayOverOtherApps -> askForDisplayOverOtherAppsPermission()
             PermissionType.ReadAndWrite -> askForReadAndWritePermissions()
             PermissionType.Write -> askForWritePermission()
             PermissionType.Read -> askForReadPermission()
@@ -193,6 +219,20 @@ class PermissionsFragment : Fragment() {
             PERMISSIONS_FRAGMENT,
             Manifest.permission.POST_NOTIFICATIONS
         )
+    }
+
+    private fun askForDisplayOverOtherAppsPermission() {
+        context?.let {
+            Intent(
+                ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:${it.packageName}")
+            ).also { intent -> startActivity(intent) }
+        }
+        lifecycleScope.launch {
+            //Give some time to the setting screen to be opened
+            delay(500)
+            setNextPermission()
+        }
     }
 
     /**

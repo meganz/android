@@ -22,6 +22,7 @@ fun List<Permission>.toPermissionScreen(): MutableList<PermissionScreen> =
         this@toPermissionScreen.forEach { permissionType ->
             when (permissionType) {
                 Permission.Notifications -> add(PermissionScreen.Notifications)
+                Permission.DisplayOverOtherApps -> add(PermissionScreen.DisplayOverOtherApps)
                 Permission.Read -> add(PermissionScreen.Media)
                 Permission.Write -> if (!contains(PermissionScreen.Media))
                     add(PermissionScreen.Media)

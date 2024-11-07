@@ -10,6 +10,11 @@ enum class PermissionScreen {
     Notifications,
 
     /**
+     * Display over other apps permission.
+     */
+    DisplayOverOtherApps,
+
+    /**
      * Media permission.
      */
     Media,
