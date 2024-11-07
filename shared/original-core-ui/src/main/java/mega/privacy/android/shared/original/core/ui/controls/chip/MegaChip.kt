@@ -3,6 +3,7 @@ package mega.privacy.android.shared.original.core.ui.controls.chip
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ExperimentalMaterialApi
@@ -13,13 +14,17 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
@@ -43,15 +48,21 @@ fun MegaChip(
     text: String,
     modifier: Modifier = Modifier,
     style: ChipStyle = DefaultChipStyle,
-    onClick: () -> Unit = {},
     enabled: Boolean = true,
     @DrawableRes leadingIcon: Int? = null,
     @DrawableRes trailingIcon: Int? = null,
+    onClick: () -> Unit = {},
 ) {
     FilterChip(
         modifier = modifier
             .clearAndSetSemantics {
                 this.contentDescription = text
+            }
+            .composed {
+                style
+                    .height()
+                    ?.let { height(it) }
+                    ?: Modifier
             },
         selected = selected,
         enabled = enabled,
@@ -132,5 +143,31 @@ private fun ChipPreviewWithLeadAndTrail(
             leadingIcon = R.drawable.ic_chevron_down,
             trailingIcon = R.drawable.ic_icon_chevron_left_medium_regular_outline,
         )
+    }
+}
+
+private class ChipStyleProvider : PreviewParameterProvider<Pair<ChipStyle, String>> {
+    override val values = listOf(
+        DefaultChipStyle to "Default",
+        TransparentChipStyle to "Transparent",
+        RoundedChipStyle to "Rounded",
+        TagChipStyle to "Tag"
+    ).asSequence()
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ChipPreviewWithStyles(
+    @PreviewParameter(ChipStyleProvider::class) chipStyleAndName: Pair<ChipStyle, String>,
+) {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        var selected = remember { mutableStateOf(true) }
+        MegaChip(
+            selected = selected.value,
+            text = chipStyleAndName.second,
+            style = chipStyleAndName.first,
+        ) {
+            selected.value = selected.value.not()
+        }
     }
 }

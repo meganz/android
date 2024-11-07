@@ -107,6 +107,8 @@ fun CameraBottomAppBar(
 
                 if (isCaptureVideo) {
                     MegaChip(
+                        selected = true,
+                        text = stringResource(id = R.string.video_button),
                         modifier = Modifier
                             .width(80.dp)
                             .testTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_VIDEO)
@@ -115,13 +117,12 @@ fun CameraBottomAppBar(
                                 end.linkTo(parent.end)
                                 top.linkTo(parent.top)
                             },
-                        style = RoundedChipStyle,
-                        selected = true,
-                        text = stringResource(id = R.string.video_button),
-                        onClick = {}
+                        style = RoundedChipStyle
                     )
 
                     MegaChip(
+                        selected = false,
+                        text = stringResource(id = R.string.camera_photo_button),
                         modifier = Modifier
                             .width(80.dp)
                             .testTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_PHOTO)
@@ -130,12 +131,12 @@ fun CameraBottomAppBar(
                                 top.linkTo(parent.top)
                             },
                         style = RoundedChipStyle,
-                        selected = false,
-                        text = stringResource(id = R.string.camera_photo_button),
                         onClick = onToggleCaptureMode
                     )
                 } else {
                     MegaChip(
+                        selected = true,
+                        text = stringResource(id = R.string.camera_photo_button),
                         modifier = Modifier
                             .width(80.dp)
                             .testTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_PHOTO)
@@ -144,13 +145,12 @@ fun CameraBottomAppBar(
                                 end.linkTo(parent.end)
                                 top.linkTo(parent.top)
                             },
-                        style = RoundedChipStyle,
-                        text = stringResource(id = R.string.camera_photo_button),
-                        selected = true,
-                        onClick = {}
+                        style = RoundedChipStyle
                     )
 
                     MegaChip(
+                        selected = false,
+                        text = stringResource(id = R.string.video_button),
                         modifier = Modifier
                             .width(80.dp)
                             .testTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_VIDEO)
@@ -159,8 +159,6 @@ fun CameraBottomAppBar(
                                 top.linkTo(parent.top)
                             },
                         style = RoundedChipStyle,
-                        text = stringResource(id = R.string.video_button),
-                        selected = false,
                         onClick = onToggleCaptureMode
                     )
                 }

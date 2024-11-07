@@ -62,19 +62,17 @@ internal fun SaveScannedDocumentsFileTypeGroup(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             MegaChip(
-                modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_FILE_TYPE_GROUP_CHIP_PDF),
                 selected = selectedScanFileType == ScanFileType.Pdf,
-                style = RoundedChipStyle,
                 text = stringResource(SharedR.string.document_scanning_confirmation_file_type_pdf),
-                onClick = { onScanFileTypeSelected(ScanFileType.Pdf) },
-            )
-            MegaChip(
-                modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_FILE_TYPE_GROUP_CHIP_JPG),
-                selected = selectedScanFileType == ScanFileType.Jpg,
+                modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_FILE_TYPE_GROUP_CHIP_PDF),
                 style = RoundedChipStyle,
+            ) { onScanFileTypeSelected(ScanFileType.Pdf) }
+            MegaChip(
+                selected = selectedScanFileType == ScanFileType.Jpg,
                 text = stringResource(SharedR.string.document_scanning_confirmation_file_type_jpg),
-                onClick = { onScanFileTypeSelected(ScanFileType.Jpg) },
-            )
+                modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_FILE_TYPE_GROUP_CHIP_JPG),
+                style = RoundedChipStyle,
+            ) { onScanFileTypeSelected(ScanFileType.Jpg) }
         }
     }
 }

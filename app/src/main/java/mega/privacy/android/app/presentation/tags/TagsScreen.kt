@@ -227,16 +227,14 @@ private fun TagsContent(
             uiState.tags.forEach { tag ->
                 val isSelected = uiState.nodeTags.contains(tag)
                 MegaChip(
-                    modifier = Modifier.testTag(TAGS_SCREEN_TAG_CHIP),
                     selected = isSelected,
                     text = "#$tag",
-                    enabled = true,
-                    onClick = {
-                        addTag(tag)
-                        Analytics.tracker.trackEvent(NodeInfoTagsRemovedEvent)
-                    },
+                    modifier = Modifier.testTag(TAGS_SCREEN_TAG_CHIP),
                     leadingIcon = if (isSelected) CoreR.drawable.ic_filter_selected else null,
-                )
+                ) {
+                    addTag(tag)
+                    Analytics.tracker.trackEvent(NodeInfoTagsRemovedEvent)
+                }
             }
         }
     }

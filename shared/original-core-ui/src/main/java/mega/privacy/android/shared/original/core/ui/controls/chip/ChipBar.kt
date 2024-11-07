@@ -58,14 +58,13 @@ private fun ChipBarPreview() {
                 MegaChip(
                     selected = isSelected,
                     text = item,
-                    onClick = {
-                        if (isSelected) {
-                            selectedChips.remove(item)
-                        } else {
-                            selectedChips.add(item)
-                        }
-                    },
-                )
+                ) {
+                    if (isSelected) {
+                        selectedChips.remove(item)
+                    } else {
+                        selectedChips.add(item)
+                    }
+                }
             }
         }
     }

@@ -357,23 +357,20 @@ private fun HeaderChips(
     ChipBar(modifier = modifier.padding(vertical = 8.dp)) {
         MegaChip(
             selected = selectedChip == SYNC_FOLDERS,
-            text = stringResource(id = R.string.sync_folders),
-            onClick = { onChipSelected(SYNC_FOLDERS) }
-        )
+            text = stringResource(id = R.string.sync_folders)
+        ) { onChipSelected(SYNC_FOLDERS) }
         MegaChip(
             selected = selectedChip == STALLED_ISSUES,
             text = if (stalledIssuesCount > 0) {
                 stringResource(R.string.sync_stalled_issues, stalledIssuesCount)
             } else {
                 stringResource(id = R.string.sync_stalled_issue_zero)
-            },
-            onClick = { onChipSelected(STALLED_ISSUES) }
-        )
+            }
+        ) { onChipSelected(STALLED_ISSUES) }
         MegaChip(
             selected = selectedChip == SOLVED_ISSUES,
-            text = stringResource(id = sharedR.string.device_center_sync_solved_issues_chip_text),
-            onClick = { onChipSelected(SOLVED_ISSUES) }
-        )
+            text = stringResource(id = sharedR.string.device_center_sync_solved_issues_chip_text)
+        ) { onChipSelected(SOLVED_ISSUES) }
     }
 }
 

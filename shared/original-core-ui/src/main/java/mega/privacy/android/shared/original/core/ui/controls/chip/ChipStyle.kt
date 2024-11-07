@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
@@ -18,7 +19,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2me
 /**
  * Definition of chips
  */
-interface ChipStyle {
+sealed interface ChipStyle {
 
     /**
      * Colors of selectable chip
@@ -49,6 +50,8 @@ interface ChipStyle {
      * @return [Shape]
      */
     fun shape(): Shape = RoundedCornerShape(8.dp)
+
+    fun height(): Dp? = null
 }
 
 /**
@@ -126,4 +129,27 @@ object RoundedChipStyle : ChipStyle {
     override fun typography(): TextStyle = MaterialTheme.typography.subtitle2medium
 
     override fun shape(): Shape = RoundedCornerShape(18.dp)
+}
+
+object TagChipStyle : ChipStyle {
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    override fun selectableChipColors(): SelectableChipColors = ChipDefaults.filterChipColors(
+        selectedBackgroundColor = MegaOriginalTheme.colors.button.brand,
+        selectedContentColor = MegaOriginalTheme.colors.text.inverse,
+        selectedLeadingIconColor = MegaOriginalTheme.colors.icon.inverse,
+        backgroundColor = MegaOriginalTheme.colors.button.secondary,
+        contentColor = MegaOriginalTheme.colors.text.secondary,
+        leadingIconColor = MegaOriginalTheme.colors.icon.inverse,
+        disabledBackgroundColor = MegaOriginalTheme.colors.button.secondary,
+        disabledContentColor = MegaOriginalTheme.colors.text.secondary,
+        disabledLeadingIconColor = MegaOriginalTheme.colors.icon.secondary,
+    )
+
+    @Composable
+    override fun typography(): TextStyle = MaterialTheme.typography.button
+
+    override fun shape(): Shape = RoundedCornerShape(4.dp)
+
+    override fun height() = 24.dp
 }

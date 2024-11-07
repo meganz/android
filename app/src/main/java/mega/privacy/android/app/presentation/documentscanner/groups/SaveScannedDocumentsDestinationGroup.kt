@@ -64,22 +64,20 @@ internal fun SaveScannedDocumentsDestinationGroup(
         ) {
             if (!originatedFromChat) {
                 MegaChip(
+                    selected = selectedScanDestination == ScanDestination.CloudDrive,
+                    text = stringResource(SharedR.string.video_section_videos_location_option_cloud_drive),
                     modifier = Modifier.testTag(
                         SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_CHIP_CLOUD_DRIVE
                     ),
-                    selected = selectedScanDestination == ScanDestination.CloudDrive,
                     style = RoundedChipStyle,
-                    text = stringResource(SharedR.string.video_section_videos_location_option_cloud_drive),
-                    onClick = { onScanDestinationSelected(ScanDestination.CloudDrive) },
-                )
+                ) { onScanDestinationSelected(ScanDestination.CloudDrive) }
             }
             MegaChip(
-                modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_CHIP_CHAT),
                 selected = selectedScanDestination == ScanDestination.Chat,
-                style = RoundedChipStyle,
                 text = stringResource(SharedR.string.document_scanning_confirmation_destination_chat),
-                onClick = { onScanDestinationSelected(ScanDestination.Chat) },
-            )
+                modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_CHIP_CHAT),
+                style = RoundedChipStyle,
+            ) { onScanDestinationSelected(ScanDestination.Chat) }
         }
     }
 }

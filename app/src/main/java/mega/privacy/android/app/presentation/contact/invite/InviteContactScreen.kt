@@ -592,15 +592,14 @@ private fun ContactChipBar(
     Row(modifier = modifier) {
         values.forEach {
             MegaChip(
+                selected = false,
+                text = it.getContactName(),
                 modifier = Modifier
                     .padding(start = 10.dp)
                     .testTag(SELECTED_CONTACT_CHIP_TAG + it.getContactName()),
-                selected = false,
-                text = it.getContactName(),
                 style = TransparentChipStyle,
-                trailingIcon = IconPackR.drawable.ic_x_circle_medium_regular_solid,
-                onClick = { onClick(it) }
-            )
+                trailingIcon = IconPackR.drawable.ic_x_circle_medium_regular_solid
+            ) { onClick(it) }
         }
     }
 }
