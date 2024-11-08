@@ -59,9 +59,12 @@ import mega.privacy.android.legacy.core.ui.controls.dialogs.EditOccurrenceDialog
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
@@ -301,12 +304,12 @@ private fun OccurrenceItemView(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         state.schedTitle?.let { title ->
-                            Text(
-                                modifier = Modifier.testTag("Occurrence_item_view_title"),
+                            MegaText(
                                 text = title,
+                                modifier = Modifier.testTag("Occurrence_item_view_title"),
+                                textColor = TextColor.Primary,
                                 style = MaterialTheme.typography.subtitle1,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = LongTextBehaviour.Ellipsis(1)
                             )
                         }
                     }
