@@ -112,7 +112,9 @@ pipeline {
 
                         // Send to android slack channel
                         def slackVersionInfo = getSlackBuildVersionInfo(common)
-                        def version = common.readAppVersion()[0]
+                        def appVersionInfo = common.readAppVersion()
+                        def version = appVersionInfo[0]
+                        def versionCode = appVersionInfo[2]
                         def (slackChannelId, qaSlackChannelId) = common.fetchSlackChannelIdsByReleaseVersion(version)
 
                         if (slackChannelId == "") {
@@ -139,6 +141,15 @@ pipeline {
                                 slackSend channel: "qa", message: slackVersionInfo
                             }
                         }
+                        def releaseInfo = "release_info.txt"
+                        def releaseInfoPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/v${version}/${releaseInfo}"
+
+                        sh """
+                            cd ${WORKSPACE}
+                            echo ${versionCode} > ${releaseInfo}
+                        """
+
+                        common.uploadToArtifactory(releaseInfo, releaseInfoPath)
 
                         // send to MR
                         common.sendToMR(getBuildVersionInfo(common))
@@ -525,12 +536,19 @@ pipeline {
 
                     def parameters = parsePostReleaseParameters(env.gitlabTriggerPhrase)
                     def releaseVersion = parameters[0]
+                    def releaseInfo = "release_info.txt"
+                    def releaseInfoPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/v${releaseVersion}/${releaseInfo}"
+
+                    common.downloadFromArtifactory(releaseInfoPath, releaseInfo)
+                    def content = readFile(WORKSPACE + "/" + releaseInfo)
+                    def versionCode = content.trim()
 
                     withCredentials([
                             string(credentialsId: 'ANDROID_TRANSIFIX_AUTHORIZATION_TOKEN', variable: 'TRANSIFEX_TOKEN'),
                             string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN'),
                             string(credentialsId: 'GITLAB_API_BASE_URL', variable: 'GITLAB_API_BASE_URL'),
                             string(credentialsId: 'GITLAB_PERSONAL_ACCESS_TOKEN_TEXT', variable: 'GITLAB_PERSONAL_ACCESS_TOKEN_TEXT'),
+                            string(credentialsId: 'GITHUB_ACCESS_TOKEN_TEXT', variable: 'GITHUB_ACCESS_TOKEN_TEXT'),
                             string(credentialsId: 'JIRA_API_URL', variable: 'JIRA_API_URL'),
                             string(credentialsId: 'JIRA_BASE_URL', variable: 'JIRA_BASE_URL'),
                             string(credentialsId: 'JIRA_TOKEN', variable: 'JIRA_TOKEN'),
@@ -542,7 +560,8 @@ pipeline {
                         util.useGpg() {
                             sh("./gradlew postRelease --rv ${releaseVersion}")
                             sh("./gradlew setReleaseStatus --rv ${releaseVersion}")
-                            sh("./gradlew createGitlabRelease --rv ${releaseVersion}")
+                            sh("./gradlew createGitlabRelease --rv ${releaseVersion} --vc ${versionCode}")
+                            sh("./gradlew createGithubRelease --rv ${releaseVersion} --vc ${versionCode}")
                         }
                     }
                 }
