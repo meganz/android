@@ -6532,15 +6532,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish: %s_%d", request.requestString, e.errorCode)
         when (request.type) {
-            MegaRequest.TYPE_SET_ATTR_USER -> {
-                if (request.paramType == MegaApiJava.USER_ATTR_PWD_REMINDER) {
-                    Timber.d("MK exported - USER_ATTR_PWD_REMINDER finished")
-                    if (e.errorCode == MegaError.API_OK || e.errorCode == MegaError.API_ENOENT) {
-                        Timber.d("New value of attribute USER_ATTR_PWD_REMINDER: %s", request.text)
-                    }
-                }
-            }
-
             MegaRequest.TYPE_GET_CANCEL_LINK -> {
                 Timber.d("TYPE_GET_CANCEL_LINK")
                 Util.hideKeyboard(this, 0)
