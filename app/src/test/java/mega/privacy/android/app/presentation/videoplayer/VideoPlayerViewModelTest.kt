@@ -21,11 +21,14 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
+import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
@@ -36,10 +39,12 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStopUseCase
@@ -62,6 +67,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import java.io.File
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -94,11 +100,13 @@ class VideoPlayerViewModelTest {
     private val getLocalFolderLinkFromMegaApiFolderUseCase =
         mock<GetLocalFolderLinkFromMegaApiFolderUseCase>()
     private val getLocalFolderLinkFromMegaApiUseCase = mock<GetLocalFolderLinkFromMegaApiUseCase>()
+    private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()
     private val getOfflineNodeInformationByIdUseCase = mock<GetOfflineNodeInformationByIdUseCase>()
     private val getOfflineNodesByParentIdUseCase = mock<GetOfflineNodesByParentIdUseCase>()
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val fakeMonitorTransferEventsFlow =
         MutableSharedFlow<TransferEvent.TransferTemporaryErrorEvent>()
+    private val getFileByPathUseCase = mock<GetFileByPathUseCase>()
 
     private val testHandle: Long = 123456
     private val testFileName = "test.mp4"
@@ -124,9 +132,11 @@ class VideoPlayerViewModelTest {
             megaApiHttpServerStop = megaApiHttpServerStop,
             getLocalFolderLinkFromMegaApiFolderUseCase = getLocalFolderLinkFromMegaApiFolderUseCase,
             getLocalFolderLinkFromMegaApiUseCase = getLocalFolderLinkFromMegaApiUseCase,
+            getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
             getOfflineNodeInformationByIdUseCase = getOfflineNodeInformationByIdUseCase,
             getOfflineNodesByParentIdUseCase = getOfflineNodesByParentIdUseCase,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
+            getFileByPathUseCase = getFileByPathUseCase,
         )
     }
 
@@ -154,9 +164,11 @@ class VideoPlayerViewModelTest {
             megaApiHttpServerStop,
             getLocalFolderLinkFromMegaApiFolderUseCase,
             getLocalFolderLinkFromMegaApiUseCase,
+            getFileTypeInfoByNameUseCase,
             getOfflineNodeInformationByIdUseCase,
             getOfflineNodesByParentIdUseCase,
             monitorTransferEventsUseCase,
+            getFileByPathUseCase,
         )
     }
 
@@ -413,10 +425,10 @@ class VideoPlayerViewModelTest {
 
     private fun initTypedVideoNode() =
         mock<TypedVideoNode> {
-            on { id }.thenReturn(NodeId(testHandle))
-            on { name }.thenReturn(testFileName)
-            on { size }.thenReturn(testSize)
-            on { duration }.thenReturn(testDuration)
+            on { this.id }.thenReturn(NodeId(testHandle))
+            on { this.name }.thenReturn(testFileName)
+            on { this.size }.thenReturn(testSize)
+            on { this.duration }.thenReturn(testDuration)
         }
 
     private fun initVideoPlayerItem(handle: Long, name: String, duration: Duration) =
@@ -530,4 +542,90 @@ class VideoPlayerViewModelTest {
             playingIndex == -1 || currentIndex < playingIndex -> MediaQueueItemType.Previous
             else -> MediaQueueItemType.Next
         }
+
+    @Test
+    fun `test that stat is updated correctly when launch source is ZIP_ADAPTER`() =
+        runTest {
+            val intent = mock<Intent>()
+            val testHandle: Long = 1.toString().hashCode().toLong()
+            val testFileName = "test.mp4"
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                adapterType = ZIP_ADAPTER,
+                data = mock(),
+                handle = testHandle,
+                fileName = testFileName
+            )
+
+            val testZipPath = "test.zip"
+            whenever(
+                intent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY)
+            ).thenReturn(testZipPath)
+            val testTitle = "video queue title"
+            val testFiles: Array<File> = (1..3).map {
+                val name = it.toString()
+                whenever(getFileTypeInfoByNameUseCase(name)).thenReturn(mock<VideoFileTypeInfo>())
+                initFile(name)
+            }.toTypedArray()
+            val testParentFile = mock<File> {
+                on { name }.thenReturn(testTitle)
+                on { listFiles() }.thenReturn(testFiles)
+            }
+            val testFile = mock<File> {
+                on { parentFile }.thenReturn(testParentFile)
+            }
+            whenever(getFileByPathUseCase(testZipPath)).thenReturn(testFile)
+            val items = testFiles.map {
+                initVideoPlayerItem(it.name.hashCode().toLong(), it.name, 200.seconds)
+            }
+            testFiles.forEachIndexed { index, file ->
+                whenever(
+                    videoPlayerItemMapper(
+                        file.name.hashCode().toLong(),
+                        file.name,
+                        null,
+                        getMediaQueueItemType(index, 0),
+                        file.length(),
+                        0.seconds
+                    )
+                ).thenReturn(items[index])
+            }
+            whenever(
+                intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)
+            ).thenReturn(true)
+            Mockito.mockStatic(FileUtil::class.java).use {
+                testFiles.forEach { file ->
+                    whenever(FileUtil.getUriForFile(context, file)).thenReturn(mock())
+                }
+                underTest.initVideoPlaybackSources(intent)
+                underTest.uiState.test {
+                    val actual = awaitItem()
+                    actual.items.let { items ->
+                        assertThat(items).isNotEmpty()
+                        assertThat(items.size).isEqualTo(3)
+                        items.forEachIndexed { index, item ->
+                            assertThat(item).isEqualTo(items[index])
+                        }
+                    }
+                    actual.mediaPlaySources?.let { sources ->
+                        assertThat(sources.mediaItems).isNotEmpty()
+                        assertThat(sources.mediaItems.size).isEqualTo(3)
+                        assertThat(sources.newIndexForCurrentItem).isEqualTo(0)
+                    }
+                    assertThat(actual.playQueueTitle).isEqualTo(testTitle)
+                    assertThat(actual.currentPlayingIndex).isEqualTo(0)
+                    assertThat(actual.currentPlayingHandle).isEqualTo(
+                        1.toString().hashCode().toLong()
+                    )
+                    cancelAndConsumeRemainingEvents()
+                }
+            }
+        }
+
+    private fun initFile(name: String) = mock<File> {
+        on { this.name }.thenReturn(name)
+        on { this.length() }.thenReturn(100L)
+        on { isFile }.thenReturn(true)
+    }
 }
