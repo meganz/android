@@ -119,7 +119,7 @@ fun <T : TypedNode> NodeListView(
                 subtitle = nodeUiItem.node.getNodeItemDescription(
                     showPublicLinkCreationTime = showPublicLinkCreationTime
                 ),
-                description = nodeUiItem.node.description,
+                description = nodeUiItem.node.description?.replace("\n", " "),
                 tags = nodeUiItem.node.tags.takeIf { nodeSourceType != NodeSourceType.RUBBISH_BIN && nodeSourceType != NodeSourceType.INCOMING_SHARES },
                 icon = nodeUiItem.node.getNodeItemThumbnail(fileTypeIconMapper = fileTypeIconMapper),
                 thumbnailData = ThumbnailRequest(nodeUiItem.id, isPublicNode),
