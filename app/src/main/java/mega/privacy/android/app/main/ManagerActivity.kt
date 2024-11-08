@@ -13,7 +13,6 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.Color
 import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Build
@@ -43,7 +42,6 @@ import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.LaunchedEffect
@@ -342,7 +340,6 @@ import mega.privacy.mobile.analytics.event.OutgoingSharesTabEvent
 import mega.privacy.mobile.analytics.event.SharedItemsScreenEvent
 import mega.privacy.mobile.analytics.event.StartMeetingNowPressedEvent
 import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetDismissedEvent
-import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -366,7 +363,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     NavigationView.OnNavigationItemSelectedListener,
-    View.OnClickListener,
     BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
     ChatManagementCallback, ActionNodeCallback, SnackbarShower,
     MeetingBottomSheetDialogActionListener, NotificationNavigationHandler,
@@ -500,11 +496,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     @Inject
     lateinit var syncNotificationManager: SyncNotificationManager
 
-    //GET PRO ACCOUNT PANEL
-    private lateinit var getProLayout: LinearLayout
-    private lateinit var getProText: TextView
-    private lateinit var leftCancelButton: TextView
-    private lateinit var rightUpgradeButton: TextView
     private lateinit var fabButton: FloatingActionButton
     private var pendingActionsBadge: View? = null
 
@@ -916,7 +907,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         enableEdgeToEdge()
         setupView()
         consumeInsetsWithToolbar(customToolbar = appBarLayout)
-        setGetProLabelText()
         initialiseChatBadgeView()
         setCallBadge()
         if (mElevationCause > 0) {
@@ -1056,10 +1046,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.navigation_view)
         fabButton = findViewById(R.id.floating_button)
-        getProLayout = findViewById(R.id.get_pro_account)
-        getProText = findViewById(R.id.get_pro_account_text)
-        rightUpgradeButton = findViewById(R.id.btnRight_upgrade)
-        leftCancelButton = findViewById(R.id.btnLeft_cancel)
         fragmentContainer = findViewById(R.id.fragment_container)
         cameraUploadViewTypes = findViewById(R.id.cu_view_type)
         tabLayoutShares = findViewById(R.id.sliding_tabs_shares)
@@ -1095,15 +1081,9 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     @SuppressLint("UnrememberedMutableState")
-    @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
+    @OptIn(ExperimentalComposeUiApi::class)
     private fun setInitialViewProperties() {
         viewPagerShares.offscreenPageLimit = 3
-        getProLayout.setBackgroundColor(
-            if (Util.isDarkMode(this)) ColorUtils.getColorForElevation(
-                this,
-                8f
-            ) else Color.WHITE
-        )
 
         waitingRoomComposeView.apply {
             isVisible = true
@@ -1228,7 +1208,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
+    @OptIn(ExperimentalComposeUiApi::class)
     private fun setSyncPromotionBottomSheetComposeView() {
         syncPromotionBottomSheetComposeView.apply {
             isVisible = true
@@ -1420,16 +1400,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         miniAudioPlayerController?.let { lifecycle.addObserver(it) }
     }
 
-    private fun setGetProLabelText() {
-        var getProTextString: String = getString(R.string.get_pro_account)
-        try {
-            getProTextString = getProTextString.replace("[A]", "\n")
-        } catch (e: Exception) {
-            Timber.e(e, "Formatted string: %s", getProTextString)
-        }
-        getProText.text = getProTextString
-    }
-
     private fun checkDatabaseValues(): Boolean {
         val ephemeral =
             runBlocking { runCatching { monitorEphemeralCredentialsUseCase().firstOrNull() }.getOrNull() }
@@ -1558,7 +1528,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             val numberUploads: Int =
                                 intent.getIntExtra(Constants.NUMBER_UPLOADS, 1)
                             showSnackbar(
-                                Constants.SNACKBAR_TYPE,
+                                SNACKBAR_TYPE,
                                 resources.getQuantityString(
                                     R.plurals.upload_began,
                                     numberUploads,
@@ -1569,7 +1539,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         }
                         intent.getStringExtra(Constants.EXTRA_MESSAGE)?.let {
                             showSnackbar(
-                                Constants.SNACKBAR_TYPE,
+                                SNACKBAR_TYPE,
                                 it,
                                 MEGACHAT_INVALID_HANDLE
                             )
@@ -2038,7 +2008,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             if (managerState.titleChatArchivedEvent != null) {
                 showSnackbar(
-                    Constants.SNACKBAR_TYPE,
+                    SNACKBAR_TYPE,
                     getString(R.string.success_archive_chat, managerState.titleChatArchivedEvent),
                     MEGACHAT_INVALID_HANDLE
                 )
@@ -2150,7 +2120,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         collectFlow(waitingRoomManagementViewModel.state) { state ->
             state.snackbarString?.let {
                 showSnackbar(
-                    Constants.SNACKBAR_TYPE,
+                    SNACKBAR_TYPE,
                     it,
                     MEGACHAT_INVALID_HANDLE
                 )
@@ -2201,7 +2171,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 showMovementResult(data, data.nodes.first())
             }
             showSnackbar(
-                Constants.SNACKBAR_TYPE,
+                SNACKBAR_TYPE,
                 moveRequestMessageMapper(data),
                 MEGACHAT_INVALID_HANDLE
             )
@@ -2677,7 +2647,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     intent.extras?.getString(Constants.EXTRA_PATH_ZIP)?.let {
                         navigator.openZipBrowserActivity(this, it) {
                             showSnackbar(
-                                Constants.SNACKBAR_TYPE,
+                                SNACKBAR_TYPE,
                                 getString(R.string.message_zip_format_error),
                                 MEGACHAT_INVALID_HANDLE
                             )
@@ -2767,7 +2737,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 Constants.SHOW_REPEATED_UPLOAD -> {
                     Timber.d("Intent SHOW_REPEATED_UPLOAD")
                     val message = intent.getStringExtra("MESSAGE")
-                    showSnackbar(Constants.SNACKBAR_TYPE, message, -1)
+                    showSnackbar(SNACKBAR_TYPE, message, -1)
                 }
 
                 Constants.ACTION_IPC -> {
@@ -2820,7 +2790,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         val numberUploads: Int =
                             intent.getIntExtra(Constants.NUMBER_UPLOADS, 1)
                         showSnackbar(
-                            Constants.SNACKBAR_TYPE,
+                            SNACKBAR_TYPE,
                             resources.getQuantityString(
                                 R.plurals.upload_began,
                                 numberUploads,
@@ -2831,7 +2801,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     }
                     intent.getStringExtra(Constants.EXTRA_MESSAGE)?.let {
                         showSnackbar(
-                            Constants.SNACKBAR_TYPE,
+                            SNACKBAR_TYPE,
                             it,
                             MEGACHAT_INVALID_HANDLE
                         )
@@ -3138,7 +3108,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             updateHomepageFabPosition()
             return
         }
-        if (lifecycle.currentState == Lifecycle.State.RESUMED && getProLayout.visibility == View.GONE && TextUtils.isEmpty(
+        if (lifecycle.currentState == Lifecycle.State.RESUMED && TextUtils.isEmpty(
                 psa.url
             )
         ) {
@@ -5357,7 +5327,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * @param message      Text message to show as the request result.
      */
     private fun showRestorationOrRemovalResult(message: String) {
-        showSnackbar(Constants.SNACKBAR_TYPE, message, MEGACHAT_INVALID_HANDLE)
+        showSnackbar(SNACKBAR_TYPE, message, MEGACHAT_INVALID_HANDLE)
     }
 
     fun showRenameDialog(document: MegaNode?) {
@@ -5372,7 +5342,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     fun showGetLinkActivity(nodes: List<MegaNode>?) {
         if (nodes.isNullOrEmpty()) {
             showSnackbar(
-                Constants.SNACKBAR_TYPE,
+                SNACKBAR_TYPE,
                 getString(R.string.general_text_error),
                 MEGACHAT_INVALID_HANDLE
             )
@@ -5398,7 +5368,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         val node = megaApi.getNodeByHandle(handle)
         if (node == null) {
             showSnackbar(
-                Constants.SNACKBAR_TYPE,
+                SNACKBAR_TYPE,
                 getString(R.string.warning_node_not_exists_in_cloud),
                 MEGACHAT_INVALID_HANDLE
             )
@@ -5620,13 +5590,13 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             errorString = getString(error)
         }
         if (parentHandle == -1L && errorString != null) {
-            showSnackbar(Constants.SNACKBAR_TYPE, errorString, -1)
+            showSnackbar(SNACKBAR_TYPE, errorString, -1)
             Timber.d("%s: parentHandle == -1", errorString)
             return null
         }
         val parentNode = megaApi.getNodeByHandle(parentHandle)
         if (parentNode == null && errorString != null) {
-            showSnackbar(Constants.SNACKBAR_TYPE, errorString, -1)
+            showSnackbar(SNACKBAR_TYPE, errorString, -1)
             Timber.d("%s: parentNode == null", errorString)
             return null
         }
@@ -5652,7 +5622,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 viewModel.createFolder(currentParentHandle, folderName)
             }.onSuccess { node ->
                 showSnackbar(
-                    Constants.SNACKBAR_TYPE,
+                    SNACKBAR_TYPE,
                     getString(R.string.context_folder_created),
                     -1
                 )
@@ -6015,7 +5985,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     override fun navigateToMyAccount() {
         Timber.d("navigateToMyAccount")
-        getProLayout.visibility = View.GONE
         showMyAccount()
     }
 
@@ -6025,21 +5994,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     override fun navigateToContactInfo(email: String) {
         ContactUtil.openContactInfoActivity(this, email)
-    }
-
-    override fun onClick(v: View) {
-        Timber.d("onClick")
-        when (v.id) {
-            R.id.btnLeft_cancel -> {
-                getProLayout.visibility = View.GONE
-            }
-
-            R.id.btnRight_upgrade -> {
-                //Add navigation to Upgrade Account
-                Timber.d("Click on Upgrade in pro panel!")
-                navigateToUpgradeAccount()
-            }
-        }
     }
 
     override fun manageCopyMoveException(throwable: Throwable?): Boolean = when (throwable) {
@@ -6066,7 +6020,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         Timber.d("Request code: %d, Result code:%d", requestCode, resultCode)
         if (resultCode == Activity.RESULT_FIRST_USER) {
             showSnackbar(
-                Constants.SNACKBAR_TYPE,
+                SNACKBAR_TYPE,
                 getString(R.string.context_no_destination_folder),
                 -1
             )
@@ -6084,7 +6038,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         return
                     }
                     showSnackbar(
-                        Constants.SNACKBAR_TYPE,
+                        SNACKBAR_TYPE,
                         result,
                         MEGACHAT_INVALID_HANDLE
                     )
@@ -6308,7 +6262,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }.onFailure { throwable: Throwable? ->
                 Timber.e(throwable)
                 showSnackbar(
-                    Constants.SNACKBAR_TYPE,
+                    SNACKBAR_TYPE,
                     getString(R.string.general_error),
                     MEGACHAT_INVALID_HANDLE
                 )
@@ -6371,44 +6325,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
-    private fun showProPanel() {
-        Timber.d("showProPanel")
-        //Left and Right margin
-        val proTextParams = getProText.layoutParams as LinearLayout.LayoutParams
-        proTextParams.setMargins(
-            Util.scaleWidthPx(24, outMetrics),
-            Util.scaleHeightPx(23, outMetrics),
-            Util.scaleWidthPx(24, outMetrics),
-            Util.scaleHeightPx(23, outMetrics)
-        )
-        getProText.layoutParams = proTextParams
-        rightUpgradeButton.setOnClickListener(this)
-        rightUpgradeButton.layoutParams
-        //Left and Right margin
-        val optionTextParams = rightUpgradeButton.layoutParams as LinearLayout.LayoutParams
-        optionTextParams.setMargins(
-            Util.scaleWidthPx(6, outMetrics),
-            0,
-            Util.scaleWidthPx(8, outMetrics),
-            0
-        )
-        rightUpgradeButton.layoutParams = optionTextParams
-        leftCancelButton.setOnClickListener(this)
-        val cancelButtonLayoutParameters = leftCancelButton.layoutParams
-        leftCancelButton.layoutParams = cancelButtonLayoutParameters
-        //Left and Right margin
-        val cancelTextParams = leftCancelButton.layoutParams as LinearLayout.LayoutParams
-        cancelTextParams.setMargins(
-            Util.scaleWidthPx(6, outMetrics),
-            0,
-            Util.scaleWidthPx(6, outMetrics),
-            0
-        )
-        leftCancelButton.layoutParams = cancelTextParams
-        getProLayout.visibility = View.VISIBLE
-        getProLayout.bringToFront()
-    }
-
     /**
      * Check the current storage state.
      */
@@ -6430,13 +6346,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         when (newStorageState) {
             StorageState.Green -> {
                 Timber.d("STORAGE STATE GREEN")
-                if (myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-                    Timber.d("ACCOUNT TYPE FREE")
-                    if (Util.showMessageRandom()) {
-                        Timber.d("Show message random: TRUE")
-                        showProPanel()
-                    }
-                }
                 storageState = newStorageState
             }
 
@@ -6548,7 +6457,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             dismissAlertDialogIfExists(statusDialog)
             dismissAlertDialogIfExists(processFileDialog)
             showSnackbar(
-                Constants.SNACKBAR_TYPE,
+                SNACKBAR_TYPE,
                 getString(R.string.error_temporary_unavaible),
                 -1
             )
@@ -6559,7 +6468,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             dismissAlertDialogIfExists(statusDialog)
             dismissAlertDialogIfExists(processFileDialog)
             showSnackbar(
-                Constants.SNACKBAR_TYPE,
+                SNACKBAR_TYPE,
                 getString(R.string.upload_can_not_open),
                 MEGACHAT_INVALID_HANDLE
             )
@@ -6961,7 +6870,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     fun copyError() {
         try {
             dismissAlertDialogIfExists(statusDialog)
-            showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied), -1)
+            showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1)
         } catch (ex: Exception) {
             Timber.w(ex)
         }
@@ -7215,7 +7124,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         val file = getFileFromUri(transfer.path)
                         if (file?.exists() != true) {
                             showSnackbar(
-                                Constants.SNACKBAR_TYPE,
+                                SNACKBAR_TYPE,
                                 getString(R.string.location_not_exist),
                                 MEGACHAT_INVALID_HANDLE
                             )
@@ -7235,7 +7144,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             MegaTransfer.TYPE_UPLOAD -> {
                 megaApi.getNodeByHandle(transfer.handle)
-                    ?.let { viewNodeInFolder(it) }?: run {
+                    ?.let { viewNodeInFolder(it) } ?: run {
                     showSnackbar(
                         SNACKBAR_TYPE,
                         getString(R.string.warning_node_not_exists_in_cloud),
@@ -7378,7 +7287,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             if (chatLinkContent is ChatLinkContent.MeetingLink) {
                 if (joiningToChatLink && TextUtil.isTextEmpty(chatLinkContent.link) && chatLinkContent.chatHandle == MEGACHAT_INVALID_HANDLE) {
                     showSnackbar(
-                        Constants.SNACKBAR_TYPE,
+                        SNACKBAR_TYPE,
                         getString(R.string.error_chat_link_init_error),
                         MEGACHAT_INVALID_HANDLE
                     )

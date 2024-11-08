@@ -82,7 +82,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -204,17 +203,6 @@ public class Util {
         }
 
         return count;
-    }
-
-    public static boolean showMessageRandom() {
-        Random r = new Random(System.currentTimeMillis());
-        int randomInt = r.nextInt(100) + 1;
-
-        if (randomInt < 5) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     public static String toCDATA(String src) {

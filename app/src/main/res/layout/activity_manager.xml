@@ -164,14 +164,6 @@
 
             </LinearLayout>
 
-            <include
-                layout="@layout/layout_get_pro_account"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_gravity="bottom"
-                android:elevation="@dimen/elevation_high"
-                android:visibility="gone" />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <androidx.compose.ui.platform.ComposeView
