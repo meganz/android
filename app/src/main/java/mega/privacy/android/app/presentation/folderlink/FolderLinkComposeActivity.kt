@@ -371,7 +371,7 @@ class FolderLinkComposeActivity : PasscodeActivity(),
 
                     else -> {
                         Timber.w("Unknown File Type")
-                        viewModel.updateNodesToDownload(listOf(fileNode))
+                        viewModel.openOtherTypeFile(this, fileNode)
                     }
                 }
             }
@@ -597,15 +597,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         }
 
         return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
-    }
-
-    /**
-     * Download nodes
-     *
-     * @param nodes List of nodes to download
-     */
-    fun downloadNodes(nodes: List<TypedNode>) {
-        viewModel.updateNodesToDownload(nodes)
     }
 
     private fun navigateToAchievements() {
