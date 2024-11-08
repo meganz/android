@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
+import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
@@ -28,7 +28,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
@@ -57,6 +56,7 @@ import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCa
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.navigation.MegaNavigator
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -106,6 +106,8 @@ class FolderLinkViewModelTest {
     private val mapNodeToPublicLinkUseCase: MapNodeToPublicLinkUseCase = mock()
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase = mock()
     private val getFolderLinkNodeContentUriUseCase: GetFolderLinkNodeContentUriUseCase = mock()
+    private val megaNavigator: MegaNavigator = mock()
+    private val nodeContentUriIntentMapper: NodeContentUriIntentMapper = mock()
 
 
     @BeforeEach
@@ -145,7 +147,9 @@ class FolderLinkViewModelTest {
             getFileUriUseCase,
             mapNodeToPublicLinkUseCase,
             checkNodesNameCollisionUseCase,
-            getFolderLinkNodeContentUriUseCase
+            getFolderLinkNodeContentUriUseCase,
+            megaNavigator,
+            nodeContentUriIntentMapper
         )
     }
 
@@ -179,7 +183,9 @@ class FolderLinkViewModelTest {
             getFileUriUseCase,
             mapNodeToPublicLinkUseCase,
             checkNodesNameCollisionUseCase,
-            getFolderLinkNodeContentUriUseCase
+            getFolderLinkNodeContentUriUseCase,
+            megaNavigator,
+            nodeContentUriIntentMapper
         )
     }
 
@@ -692,19 +698,16 @@ class FolderLinkViewModelTest {
     @Test
     fun `test that downloadEvent is triggered when updateNodesToDownload is invoked`() =
         runTest {
-            val node1 = mock<TypedFileNode>()
-            val node2 = mock<TypedFolderNode>()
-            val nodes = listOf(node1, node2)
-            val link1 = mock<PublicLinkFile>()
-            val link2 = mock<PublicLinkFolder>()
-            whenever(mapNodeToPublicLinkUseCase(node1, null)).thenReturn(link1)
-            whenever(mapNodeToPublicLinkUseCase(node2, null)).thenReturn(link2)
-            underTest.updateNodesToDownload(nodes)
+            val node = mock<TypedFileNode>()
+            val link = mock<PublicLinkFile>()
+            whenever(mapNodeToPublicLinkUseCase(node, null)).thenReturn(link)
+            whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
+            underTest.openOtherTypeFile(mock(), node)
             underTest.state.test {
                 val res = awaitItem()
                 assertThat(res.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
                 assertThat((res.downloadEvent as StateEventWithContentTriggered).content.nodes)
-                    .containsExactly(link1, link2)
+                    .containsExactly(link)
             }
         }
 

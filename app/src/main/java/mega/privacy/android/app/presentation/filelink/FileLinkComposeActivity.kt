@@ -378,7 +378,14 @@ class FileLinkComposeActivity : PasscodeActivity(),
 
                 else -> {
                     Timber.w("Unknown File Type")
-                    null
+                    fileNode?.let {
+                        viewModel.openOtherTypeFile(
+                            this@FileLinkComposeActivity,
+                            fileNode
+                        ) { stringRes ->
+                            showSnackbar(SNACKBAR_TYPE, getString(stringRes), INVALID_HANDLE)
+                        }
+                    }
                 }
             }
         }

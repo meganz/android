@@ -26,6 +26,7 @@ import mega.privacy.android.app.presentation.extensions.snackBarMessageId
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
+import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -36,10 +37,12 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -74,7 +77,9 @@ import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCa
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -111,6 +116,8 @@ class FolderLinkViewModel @Inject constructor(
     private val mapNodeToPublicLinkUseCase: MapNodeToPublicLinkUseCase,
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
     private val getFolderLinkNodeContentUriUseCase: GetFolderLinkNodeContentUriUseCase,
+    private val megaNavigator: MegaNavigator,
+    private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
 ) : ViewModel() {
 
     /**
@@ -732,23 +739,90 @@ class FolderLinkViewModel @Inject constructor(
         _state.update { it.copy(openFile = triggered(intent)) }
     }
 
+    internal fun openOtherTypeFile(context: Context, fileNode: TypedNode) {
+        viewModelScope.launch {
+            val typedFileNode = fileNode as? TypedFileNode ?: return@launch
+            getLocalFileForNodeUseCase(fileNode)?.let { localFile ->
+                if (fileNode.type is ZipFileTypeInfo) {
+                    openZipFile(
+                        context = context,
+                        localFile = localFile,
+                        fileNode = typedFileNode,
+                    )
+                } else {
+                    handleOtherFiles(
+                        context = context,
+                        localFile = localFile,
+                        currentFileNode = fileNode,
+                    )
+                }
+            } ?: updateNodesToDownload(listOf(fileNode))
+        }
+    }
+
+    private fun openZipFile(
+        context: Context,
+        localFile: File,
+        fileNode: TypedFileNode,
+    ) {
+        Timber.d("The file is zip, open in-app.")
+        megaNavigator.openZipBrowserActivity(
+            context = context,
+            zipFilePath = localFile.absolutePath,
+            nodeHandle = fileNode.id.longValue,
+        ) {
+            showSnackbar(R.string.message_zip_format_error)
+        }
+    }
+
+    private fun handleOtherFiles(
+        context: Context,
+        localFile: File,
+        currentFileNode: TypedFileNode,
+    ) {
+        Intent(Intent.ACTION_VIEW).apply {
+            nodeContentUriIntentMapper(
+                intent = this,
+                content = NodeContentUri.LocalContentUri(localFile),
+                mimeType = currentFileNode.type.mimeType,
+                isSupported = false
+            )
+            runCatching {
+                context.startActivity(this)
+            }.onFailure { error ->
+                Timber.e(error)
+                openShareIntent(context = context)
+            }
+        }
+    }
+
+    private fun Intent.openShareIntent(context: Context) {
+        if (resolveActivity(context.packageManager) == null) {
+            action = Intent.ACTION_SEND
+        }
+        runCatching {
+            context.startActivity(this)
+        }.onFailure {
+            Timber.e(it)
+            showSnackbar(R.string.intent_not_available)
+        }
+    }
+
     /**
      * Update nodes to download
      */
-    fun updateNodesToDownload(nodes: List<TypedNode>) {
-        viewModelScope.launch {
-            val linkNodes = nodes.mapNotNull {
-                runCatching {
-                    mapNodeToPublicLinkUseCase(it as UnTypedNode, null)
-                }.onFailure {
-                    Timber.e(it)
-                }.getOrNull()
-            }
-            _state.update {
-                it.copy(
-                    downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(linkNodes))
-                )
-            }
+    private suspend fun updateNodesToDownload(nodes: List<TypedNode>) {
+        val linkNodes = nodes.mapNotNull {
+            runCatching {
+                mapNodeToPublicLinkUseCase(it as UnTypedNode, null)
+            }.onFailure {
+                Timber.e(it)
+            }.getOrNull()
+        }
+        _state.update {
+            it.copy(
+                downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(linkNodes))
+            )
         }
     }
 

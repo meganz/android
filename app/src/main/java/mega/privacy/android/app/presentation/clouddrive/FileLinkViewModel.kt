@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.clouddrive
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.activity.result.ActivityResult
@@ -18,19 +19,24 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
+import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.ZipFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
@@ -42,7 +48,9 @@ import mega.privacy.android.domain.usecase.node.GetFileLinkNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -62,6 +70,9 @@ class FileLinkViewModel @Inject constructor(
     private val mapNodeToPublicLinkUseCase: MapNodeToPublicLinkUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val getFileLinkNodeContentUriUseCase: GetFileLinkNodeContentUriUseCase,
+    private val megaNavigator: MegaNavigator,
+    private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
+    private val getLocalFileForNodeUseCase: GetLocalFileForNodeUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileLinkState())
@@ -285,7 +296,7 @@ class FileLinkViewModel @Inject constructor(
             val linkNodes = listOfNotNull(
                 (_state.value.fileNode as? UnTypedNode)?.let {
                     runCatching {
-                        mapNodeToPublicLinkUseCase(it, null) as? TypedNode
+                        mapNodeToPublicLinkUseCase(it, null)
                     }.onFailure {
                         Timber.e(it)
                     }.getOrNull()
@@ -427,4 +438,104 @@ class FileLinkViewModel @Inject constructor(
     fun resetForeignNodeError() = _state.update { it.copy(foreignNodeError = consumed) }
 
     internal suspend fun getNodeContentUri() = getFileLinkNodeContentUriUseCase(_state.value.url)
+
+
+    internal fun openOtherTypeFile(
+        context: Context,
+        fileNode: TypedNode,
+        showSnackBar: (Int) -> Unit,
+    ) {
+        viewModelScope.launch {
+            val typedFileNode = fileNode as? TypedFileNode ?: return@launch
+            getLocalFileForNodeUseCase(fileNode)?.let { localFile ->
+                if (fileNode.type is ZipFileTypeInfo) {
+                    openZipFile(
+                        context = context,
+                        localFile = localFile,
+                        fileNode = typedFileNode,
+                        showSnackBar = showSnackBar
+                    )
+                } else {
+                    handleOtherFiles(
+                        context = context,
+                        localFile = localFile,
+                        currentFileNode = fileNode,
+                        showSnackBar = showSnackBar
+                    )
+                }
+            } ?: updateNodesToDownload(listOf(fileNode))
+        }
+    }
+
+    private fun openZipFile(
+        context: Context,
+        localFile: File,
+        fileNode: TypedFileNode,
+        showSnackBar: (Int) -> Unit,
+    ) {
+        Timber.d("The file is zip, open in-app.")
+        megaNavigator.openZipBrowserActivity(
+            context = context,
+            zipFilePath = localFile.absolutePath,
+            nodeHandle = fileNode.id.longValue,
+        ) {
+            showSnackBar(R.string.message_zip_format_error)
+        }
+    }
+
+    private fun handleOtherFiles(
+        context: Context,
+        localFile: File,
+        currentFileNode: TypedFileNode,
+        showSnackBar: (Int) -> Unit,
+    ) {
+        Intent(Intent.ACTION_VIEW).apply {
+            nodeContentUriIntentMapper(
+                intent = this,
+                content = NodeContentUri.LocalContentUri(localFile),
+                mimeType = currentFileNode.type.mimeType,
+                isSupported = false
+            )
+            runCatching {
+                context.startActivity(this)
+            }.onFailure { error ->
+                Timber.e(error)
+                openShareIntent(context, showSnackBar)
+            }
+        }
+    }
+
+    private fun Intent.openShareIntent(
+        context: Context,
+        showSnackBar: (Int) -> Unit,
+    ) {
+        if (resolveActivity(context.packageManager) == null) {
+            action = Intent.ACTION_SEND
+        }
+        runCatching {
+            context.startActivity(this)
+        }.onFailure {
+            Timber.e(it)
+            showSnackBar(R.string.intent_not_available)
+        }
+    }
+
+
+    /**
+     * Update nodes to download
+     */
+    private suspend fun updateNodesToDownload(nodes: List<TypedNode>) {
+        val linkNodes = nodes.mapNotNull {
+            runCatching {
+                mapNodeToPublicLinkUseCase(it as UnTypedNode, null)
+            }.onFailure {
+                Timber.e(it)
+            }.getOrNull()
+        }
+        _state.update {
+            it.copy(
+                downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(linkNodes))
+            )
+        }
+    }
 }

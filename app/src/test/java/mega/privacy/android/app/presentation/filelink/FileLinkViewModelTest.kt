@@ -10,6 +10,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
+import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
@@ -20,6 +21,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.exception.PublicNodeException
+import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
@@ -31,6 +33,7 @@ import mega.privacy.android.domain.usecase.node.GetFileLinkNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -60,6 +63,9 @@ class FileLinkViewModelTest {
     private val mapNodeToPublicLinkUseCase = mock<MapNodeToPublicLinkUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
     private val getFileLinkNodeContentUriUseCase = mock<GetFileLinkNodeContentUriUseCase>()
+    private val megaNavigator = mock<MegaNavigator>()
+    private val nodeContentUriIntentMapper = mock<NodeContentUriIntentMapper>()
+    private val getLocalFileForNodeUseCase = mock<GetLocalFileForNodeUseCase>()
 
     private val url = "https://mega.co.nz/abc"
     private val filePreviewPath = "data/cache/xyz.jpg"
@@ -81,7 +87,10 @@ class FileLinkViewModelTest {
             httpServerIsRunning,
             getFileUrlByPublicLinkUseCase,
             mapNodeToPublicLinkUseCase,
-            getFileLinkNodeContentUriUseCase
+            getFileLinkNodeContentUriUseCase,
+            megaNavigator,
+            nodeContentUriIntentMapper,
+            getLocalFileForNodeUseCase
         )
         initViewModel()
     }
@@ -99,7 +108,10 @@ class FileLinkViewModelTest {
             getFileUrlByPublicLinkUseCase = getFileUrlByPublicLinkUseCase,
             mapNodeToPublicLinkUseCase = mapNodeToPublicLinkUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
-            getFileLinkNodeContentUriUseCase = getFileLinkNodeContentUriUseCase
+            getFileLinkNodeContentUriUseCase = getFileLinkNodeContentUriUseCase,
+            megaNavigator = megaNavigator,
+            nodeContentUriIntentMapper = nodeContentUriIntentMapper,
+            getLocalFileForNodeUseCase = getLocalFileForNodeUseCase
         )
     }
 
@@ -427,4 +439,20 @@ class FileLinkViewModelTest {
         whenever(getFileLinkNodeContentUriUseCase(anyOrNull())).thenReturn(expectedNodeContentUri)
         assertThat(underTest.getNodeContentUri()).isEqualTo(expectedNodeContentUri)
     }
+
+    @Test
+    fun `test that downloadEvent is triggered when updateNodesToDownload is invoked`() =
+        runTest {
+            val node = mock<TypedFileNode>()
+            val link = mock<PublicLinkFile>()
+            whenever(mapNodeToPublicLinkUseCase(node, null)).thenReturn(link)
+            whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
+            underTest.openOtherTypeFile(mock(), node, {})
+            underTest.state.test {
+                val res = awaitItem()
+                assertThat(res.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((res.downloadEvent as StateEventWithContentTriggered).content.nodes)
+                    .containsExactly(link)
+            }
+        }
 }
