@@ -127,7 +127,7 @@ internal class DefaultTransfersRepository @Inject constructor(
      * to store current transferred bytes in memory instead of in database
      */
     private val transferredBytesFlows =
-        HashMap<TransferType, MutableStateFlow<MutableMap<Int, Long>>>()
+        HashMap<TransferType, MutableStateFlow<Map<Int, Long>>>()
 
     init {
         //pause transfers if db indicates it should be paused
@@ -545,8 +545,8 @@ internal class DefaultTransfersRepository @Inject constructor(
             grouped.forEach { (transferType, transfersOfThisType) ->
                 val tagToBytes =
                     transfersOfThisType.mapNotNull { if (it.transferredBytes == 0L) null else it.tag to it.transferredBytes }
-                transferredBytesFlow(transferType).update { mutableMap ->
-                    mutableMap.also { it.putAll(tagToBytes) }
+                transferredBytesFlow(transferType).update { map ->
+                    map + tagToBytes
                 }
             }
         }
@@ -554,14 +554,14 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun deleteAllActiveTransfersByType(transferType: TransferType) =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.deleteAllActiveTransfersByType(transferType)
-            transferredBytesFlow(transferType).value = mutableMapOf()
+            transferredBytesFlow(transferType).value = mapOf()
         }
 
     override suspend fun deleteAllActiveTransfers() =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.deleteAllActiveTransfers()
             TransferType.entries.forEach {
-                transferredBytesFlow(it).value = mutableMapOf()
+                transferredBytesFlow(it).value = mapOf()
             }
         }
 
@@ -691,10 +691,10 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
 
     private val transferredBytesFlowMutex = Mutex()
-    private suspend fun transferredBytesFlow(transferType: TransferType): MutableStateFlow<MutableMap<Int, Long>> {
+    private suspend fun transferredBytesFlow(transferType: TransferType): MutableStateFlow<Map<Int, Long>> {
         transferredBytesFlowMutex.withLock {
             return transferredBytesFlows[transferType]
-                ?: MutableStateFlow<MutableMap<Int, Long>>(mutableMapOf()).also {
+                ?: MutableStateFlow<Map<Int, Long>>(mapOf()).also {
                     transferredBytesFlows[transferType] = it
                 }
         }

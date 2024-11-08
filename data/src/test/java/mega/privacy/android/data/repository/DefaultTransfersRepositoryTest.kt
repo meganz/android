@@ -1290,6 +1290,33 @@ class DefaultTransfersRepositoryTest {
             )
         }
 
+        @ParameterizedTest
+        @EnumSource(TransferType::class)
+        fun `test that updateTransferredBytes with non zero transferred bytes emits a new value`(
+            transferType: TransferType,
+        ) = runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType } doReturn transferType
+                on { this.transferredBytes } doReturn 34857L
+            }
+            val expected = mock<ActiveTransferTotals>()
+            val list = mock<List<ActiveTransfer>>()
+            val flow = flowOf(list)
+            whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
+                .thenReturn(flow)
+            whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any()))
+                .thenReturn(expected)
+
+            underTest.getActiveTransferTotalsByType(transferType).test {
+                awaitItem() //initial
+                underTest.updateTransferredBytes(listOf(transfer))
+                val actual = awaitItem()
+                assertThat(actual).isEqualTo(expected)
+                cancelAndIgnoreRemainingEvents()
+            }
+            underTest.deleteAllActiveTransfersByType(transferType)
+        }
+
         /**
          * As getCurrentActiveTransferTotalsByType is based on a state flow, we need to reset this state to make testing stateless
          * This is a convenient function to test changes on this state and then reset it to its initial empty value.
