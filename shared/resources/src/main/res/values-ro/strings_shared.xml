@@ -705,7 +705,7 @@
     <!-- Title of the Contact Permission Explanation -->
     <string name="title_enable_access_contact">Activați accesul pentru a invita prieteni</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">Pentru a invita prieteni, trebuie să permiteți MEGA să acceseze lista dvs. de contacte</string>
+    <string name="subtitle_enable_access_contact">De asemenea, puteți adăuga contacte din lista de contacte a telefonului dvs., dacă permiteți MEGA accesul la listă.</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">Activează accesul</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -800,4 +800,10 @@
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA poate vedea numele și descrierea întâlnirii dvs., dar le păstrăm private</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
     <string name="notifications_notification_item_new_tag">Nou</string>
+    <!-- Title in the display over other apps permission screen -->
+    <string name="display_over_other_apps_permission_screen_title">Permiteți MEGA să se afișeze peste alte aplicații</string>
+    <!-- Context message in the display over other apps permission screen -->
+    <string name="display_over_other_apps_permission_screen_message">MEGA are nevoie de permisiunea dvs. pentru a afișa peste aplicații. Aceasta înseamnă că nu veți pierde niciodată o altă notificare de apel primit.</string>
+    <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
+    <string name="general_allow_permission_positive_button">Acordă permisiunea</string>
 </resources>

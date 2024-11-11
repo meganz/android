@@ -693,7 +693,7 @@
     <!-- Title of the Contact Permission Explanation -->
     <string name="title_enable_access_contact">Toegang inschakelen om vrienden uit te nodigen</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">Om vrienden uit te nodigen, moet u MEGA toegang geven tot uw contactenlijst</string>
+    <string name="subtitle_enable_access_contact">U kunt ook contacten toevoegen uit de lijst van uw contactpersonen op uw telefoon, als u MEGA toegang tot de lijst geeft.</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">Toegang Toestaan</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -788,4 +788,10 @@
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA kan de naam en beschrijving van uw vergadering zien, maar we houden ze privé</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
     <string name="notifications_notification_item_new_tag">Nieuw</string>
+    <!-- Title in the display over other apps permission screen -->
+    <string name="display_over_other_apps_permission_screen_title">Sta toe dat MEGA wordt weergegeven in andere applicaties</string>
+    <!-- Context message in the display over other apps permission screen -->
+    <string name="display_over_other_apps_permission_screen_message">MEGA heeft uw toestemming nodig voor weergave via applicaties. Dit betekent dat u nooit meer meldingen van inkomende oproepen mist.</string>
+    <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
+    <string name="general_allow_permission_positive_button">Toestemming toestaan</string>
 </resources>
