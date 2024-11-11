@@ -24,7 +24,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.fileexplorer.model.FileExplorerUiState
@@ -235,6 +234,7 @@ class FileExplorerViewModel @Inject constructor(
                     getParcelableArrayListExtra(Intent.EXTRA_STREAM)
                 })?.let { uris ->
                     Timber.d("Multiple files")
+                    grantUriPermission(context, uris)
                     setUrisAndNames(uris.associateWith { uri -> getFileName(uri, context) })
                     uris
                 } ?: (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -243,9 +243,20 @@ class FileExplorerViewModel @Inject constructor(
                     getParcelableExtra(Intent.EXTRA_STREAM)
                 })?.let { uri ->
                     Timber.d("Single file")
+                    grantUriPermission(context, listOf(uri))
                     setUrisAndNames(mapOf(uri to getFileName(uri, context)))
                 }
             }
+        }
+    }
+
+    private fun grantUriPermission(context: Context, uris: List<Uri>) {
+        uris.forEach {
+            context.grantUriPermission(
+                context.packageName,
+                it,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
         }
     }
 

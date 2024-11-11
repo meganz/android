@@ -4,6 +4,7 @@ import android.Manifest
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.app.Activity
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -97,11 +98,26 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
     }
 
     private val openMultipleDocumentLauncher =
-        managerActivity.registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) {
+        managerActivity.registerForActivityResult(OpenMultipleDocumentsPersistable()) {
             if (it.isNotEmpty()) {
+                it.forEach { uri ->
+                    managerActivity.contentResolver.takePersistableUriPermission(
+                        uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                }
                 managerActivity.handleFileUris(it)
             }
         }
+
+    private class OpenMultipleDocumentsPersistable :
+        ActivityResultContracts.OpenMultipleDocuments() {
+        override fun createIntent(context: Context, input: Array<String>): Intent {
+            return super.createIntent(context, input).also {
+                it.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                it.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+            }
+        }
+    }
 
     /**
      * When manually uploading Files and the device is running Android 13 and above, this Launcher
