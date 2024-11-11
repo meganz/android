@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.toFormattedText
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.io.File
@@ -104,7 +105,7 @@ class ChatMessageNotificationManager @Inject constructor(
             Person.Builder().apply { setName(title) }.build()
         ).also {
             it.addMessage(
-                msgContent,
+                msgContent.toFormattedText(),
                 msg.timestamp,
                 Person.Builder().apply { setName(senderName) }.build()
             )

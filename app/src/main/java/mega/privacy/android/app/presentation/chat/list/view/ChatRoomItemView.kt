@@ -41,6 +41,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.GroupChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
+import mega.privacy.android.shared.original.core.ui.controls.chat.messages.MessageText
 import mega.privacy.android.shared.original.core.ui.controls.meetings.CallChronometer
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
@@ -438,14 +439,26 @@ private fun MiddleTextView(
         else -> MaterialTheme.colors.textColorSecondary
     }
 
-    Text(
-        text = textMessage ?: stringResource(R.string.error_message_unrecognizable),
-        color = textColor,
-        style = MaterialTheme.typography.subtitle2,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = modifier
-    )
+    textMessage?.let { text ->
+        MessageText(
+            message = text,
+            style = MaterialTheme.typography.subtitle2.copy(
+                color = textColor,
+            ),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = modifier
+        )
+    } ?: run {
+        Text(
+            text = stringResource(R.string.error_message_unrecognizable),
+            color = textColor,
+            style = MaterialTheme.typography.subtitle2,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = modifier
+        )
+    }
 }
 
 @Composable

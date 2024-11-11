@@ -23,6 +23,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
@@ -37,6 +38,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.robotoMono
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
+
 /**
  * Message text view.
  * Display the message text with the correct format.
@@ -50,6 +52,57 @@ fun MessageText(
     interactionEnabled: Boolean,
     onLinkClicked: (String) -> String?,
     onLongClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    style: TextStyle = LocalTextStyle.current,
+) {
+    MessageTextView(
+        message = message,
+        isEdited = isEdited,
+        links = links,
+        interactionEnabled = interactionEnabled,
+        onLinkClicked = onLinkClicked,
+        onLongClick = onLongClick,
+        modifier = modifier,
+        style = style
+    )
+}
+
+/**
+ * Message text view.
+ * Display the message text with the correct format.
+ */
+@Composable
+fun MessageText(
+    message: String,
+    overflow: TextOverflow,
+    maxLines: Int,
+    modifier: Modifier = Modifier,
+    style: TextStyle = LocalTextStyle.current,
+) {
+    MessageTextView(
+        message = message,
+        overflow = overflow,
+        maxLines = maxLines,
+        modifier = modifier,
+        style = style
+    )
+}
+
+/**
+ * Message text view.
+ * Display the message text with the correct format.
+ * If the message is edited, it will display a text indicating that the message was edited.
+ */
+@Composable
+private fun MessageTextView(
+    message: String,
+    isEdited: Boolean = false,
+    links: List<String> = emptyList(),
+    interactionEnabled: Boolean = false,
+    onLinkClicked: (String) -> String? = { null },
+    onLongClick: () -> Unit = { },
+    overflow: TextOverflow = TextOverflow.Clip,
+    maxLines: Int = Int.MAX_VALUE,
     modifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
 ) {
@@ -82,6 +135,8 @@ fun MessageText(
                 then(pressIndicator)
             },
             style = style,
+            maxLines = maxLines,
+            overflow = overflow,
             onTextLayout = { layoutResult.value = it }
         )
     }
