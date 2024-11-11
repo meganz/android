@@ -47,7 +47,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -532,15 +531,6 @@ private fun SelectedContactView(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
-
-    var lastItemSize by remember { mutableIntStateOf(contactNames.size) }
-    LaunchedEffect(contactNames.size) {
-        // Only scroll if the user add new contact.
-        if (contactNames.size > lastItemSize) {
-            scrollState.scrollTo(scrollState.maxValue)
-        }
-        lastItemSize = contactNames.size
-    }
 
     // We will process the text whenever it changes.
     // Therefore, we need this local query state to update the UI immediately.
