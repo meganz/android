@@ -6,6 +6,7 @@ import android.os.Looper
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.view.MenuItem
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.view.inputmethod.EditorInfo.IME_ACTION_NEXT
 import android.view.inputmethod.EditorInfo.IME_FLAG_NO_FULLSCREEN
@@ -22,7 +23,9 @@ import androidx.biometric.BiometricPrompt.ERROR_USER_CANCELED
 import androidx.biometric.BiometricPrompt.PromptInfo
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -151,7 +154,6 @@ class PasscodeLockActivity : BaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
 
         passcodeManagement.needsOpenAgain = false
@@ -169,6 +171,17 @@ class PasscodeLockActivity : BaseActivity() {
         }
 
         setOrUnlockMode = mode == SET_MODE || mode == UNLOCK_MODE
+        enableEdgeToEdgeAndConsumeInsets { insets ->
+            val imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            val isImeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            binding.passcodeOptionsButton.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = if (isImeVisible) {
+                    imeHeight
+                } else {
+                    dp2px(40f, resources.displayMetrics)
+                }
+            }
+        }
 
         binding = ActivityPasscodeBinding.inflate(layoutInflater)
         setContentView(binding.root)

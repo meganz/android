@@ -367,7 +367,10 @@ class PasscodeUtil @Inject constructor(
                 }
             activity.addContentView(
                 view,
-                (activity.findViewById(android.R.id.content) as ViewGroup).layoutParams
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
             )
         }
 
