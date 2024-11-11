@@ -34,6 +34,7 @@ import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.DocumentScannerEdgeToEdgeActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
@@ -360,7 +361,11 @@ private fun openLegacyDocumentScanner(
     context: Context,
     scanDocumentLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
 ) {
-    DocumentScannerActivity.getIntent(context, arrayOf(context.getString(R.string.section_chat)))
+    DocumentScannerActivity.getIntent(
+        context = context,
+        targetClass = DocumentScannerEdgeToEdgeActivity::class.java,
+        saveDestinations = arrayOf(context.getString(R.string.section_chat))
+    )
         .also {
             scanDocumentLauncher.launch(it)
         }
