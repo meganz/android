@@ -964,7 +964,6 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
@@ -1051,7 +1050,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         addContactActivity = this
 
         checkChatChanges()
-
+        enableEdgeToEdge()
         setContentView(R.layout.activity_add_contact)
 
         val tB = findViewById<Toolbar>(R.id.add_contact_toolbar)
@@ -1061,8 +1060,8 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         }
 
         tB.visibility = View.VISIBLE
-        consumeInsetsWithToolbar(customToolbar = tB)
         setSupportActionBar(tB)
+        consumeInsetsWithToolbar(customToolbar = tB)
         supportActionBar?.let {
             it.setHomeButtonEnabled(true)
             it.setDisplayHomeAsUpEnabled(true)
