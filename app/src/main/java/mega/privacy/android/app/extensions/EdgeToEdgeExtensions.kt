@@ -15,7 +15,10 @@ import androidx.fragment.app.Fragment
  *
  */
 @JvmOverloads
-fun ComponentActivity.enableEdgeToEdgeAndConsumeInsets(type: Int = WindowInsetsCompat.Type.systemBars()) {
+fun ComponentActivity.enableEdgeToEdgeAndConsumeInsets(
+    type: Int = WindowInsetsCompat.Type.systemBars(),
+    handleWindowInsets: (WindowInsetsCompat) -> Unit = {},
+) {
     // we need condition to check if the device running Android 15 when we target sdk to 35
     // because it will enable edge to edge by default
     enableEdgeToEdge()
@@ -27,6 +30,8 @@ fun ComponentActivity.enableEdgeToEdgeAndConsumeInsets(type: Int = WindowInsetsC
             rightMargin = insets.right
             topMargin = insets.top
         }
+
+        handleWindowInsets(windowInsets)
 
         WindowInsetsCompat.CONSUMED
     }

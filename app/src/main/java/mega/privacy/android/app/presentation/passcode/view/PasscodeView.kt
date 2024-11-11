@@ -95,6 +95,7 @@ internal fun PasscodeView(
 
     Surface(
         modifier = Modifier
+            .background(MaterialTheme.colors.background)
             .fillMaxSize()
             .systemBarsPadding()
             .imePadding()
