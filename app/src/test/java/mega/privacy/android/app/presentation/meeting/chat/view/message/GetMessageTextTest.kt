@@ -43,9 +43,29 @@ internal class GetMessageTextTest {
                     " Text with bold format"
                 ),
                 Arguments.of(
+                    "* Text with bold format *",
+                    emptyList<String>(),
+                    " Text with bold format "
+                ),
+                Arguments.of(
                     "*Text with bold format *",
                     emptyList<String>(),
                     "Text with bold format "
+                ),
+                Arguments.of(
+                    "*\nText with bold format*",
+                    emptyList<String>(),
+                    "*\nText with bold format*",
+                ),
+                Arguments.of(
+                    "*\nText with bold format\n*",
+                    emptyList<String>(),
+                    "*\nText with bold format\n*",
+                ),
+                Arguments.of(
+                    "*Text with bold format\n*",
+                    emptyList<String>(),
+                    "*Text with bold format\n*",
                 ),
                 Arguments.of(
                     "*Text with bold format* new bold*",
@@ -73,9 +93,29 @@ internal class GetMessageTextTest {
                     " Text with italic format"
                 ),
                 Arguments.of(
+                    "_ Text with italic format _",
+                    emptyList<String>(),
+                    " Text with italic format "
+                ),
+                Arguments.of(
                     "_Text with italic format _",
                     emptyList<String>(),
                     "Text with italic format "
+                ),
+                Arguments.of(
+                    "_\nText with italic format_",
+                    emptyList<String>(),
+                    "_\nText with italic format_"
+                ),
+                Arguments.of(
+                    "_\nText with italic format\n_",
+                    emptyList<String>(),
+                    "_\nText with italic format\n_",
+                ),
+                Arguments.of(
+                    "_Text with italic format\n_",
+                    emptyList<String>(),
+                    "_Text with italic format\n_"
                 ),
                 Arguments.of(
                     "_Text with italic format_ new italic_",
@@ -103,9 +143,29 @@ internal class GetMessageTextTest {
                     " Text with strikethrough format"
                 ),
                 Arguments.of(
+                    "~ Text with strikethrough format ~",
+                    emptyList<String>(),
+                    " Text with strikethrough format "
+                ),
+                Arguments.of(
                     "~Text with strikethrough format ~",
                     emptyList<String>(),
                     "Text with strikethrough format "
+                ),
+                Arguments.of(
+                    "~\nText with italic format~",
+                    emptyList<String>(),
+                    "~\nText with italic format~"
+                ),
+                Arguments.of(
+                    "~\nText with italic format\n~",
+                    emptyList<String>(),
+                    "~\nText with italic format\n~",
+                ),
+                Arguments.of(
+                    "~Text with italic format\n~",
+                    emptyList<String>(),
+                    "~Text with italic format\n~"
                 ),
                 Arguments.of(
                     "~Text with strikethrough format~ new strikethrough~",
@@ -138,9 +198,29 @@ internal class GetMessageTextTest {
                     " Text with quote format"
                 ),
                 Arguments.of(
+                    "` Text with quote format `",
+                    emptyList<String>(),
+                    " Text with quote format "
+                ),
+                Arguments.of(
                     "` Text with quote format`",
                     emptyList<String>(),
                     " Text with quote format"
+                ),
+                Arguments.of(
+                    "`\nText with italic format`",
+                    emptyList<String>(),
+                    "`\nText with italic format`"
+                ),
+                Arguments.of(
+                    "`\nText with italic format\n`",
+                    emptyList<String>(),
+                    "`\nText with italic format\n`",
+                ),
+                Arguments.of(
+                    "`Text with italic format\n`",
+                    emptyList<String>(),
+                    "`Text with italic format\n`"
                 ),
                 Arguments.of(
                     "`Text with quote format` new quote`",
