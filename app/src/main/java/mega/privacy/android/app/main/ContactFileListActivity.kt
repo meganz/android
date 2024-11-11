@@ -36,6 +36,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.DocumentScannerEdgeToEdgeActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
@@ -554,7 +555,11 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             getString(R.string.section_cloud_drive),
             getString(R.string.section_chat)
         )
-        val intent = DocumentScannerActivity.getIntent(this, saveDestinations)
+        val intent = DocumentScannerActivity.getIntent(
+            context = this,
+            targetClass = DocumentScannerEdgeToEdgeActivity::class.java,
+            saveDestinations = saveDestinations
+        )
         legacyScanDocumentLauncher.launch(intent)
     }
 

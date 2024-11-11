@@ -17,6 +17,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import dagger.hilt.android.scopes.ActivityScoped
+import mega.privacy.android.app.DocumentScannerEdgeToEdgeActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.main.CameraPermissionManager
@@ -246,7 +247,11 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
             managerActivity.getString(R.string.section_cloud_drive),
             managerActivity.getString(R.string.section_chat)
         )
-        val intent = DocumentScannerActivity.getIntent(managerActivity, saveDestinations)
+        val intent = DocumentScannerActivity.getIntent(
+            context = managerActivity,
+            targetClass = DocumentScannerEdgeToEdgeActivity::class.java,
+            saveDestinations = saveDestinations
+        )
         legacyScanDocumentLauncher.launch(intent)
     }
 
