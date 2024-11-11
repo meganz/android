@@ -20,6 +20,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -53,6 +55,8 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.doReturn
+import org.junit.jupiter.params.provider.NullSource
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -124,6 +128,7 @@ class DownloadNodesUseCaseTest {
 
     @ParameterizedTest(name = "appdata: \"{0}\"")
     @MethodSource("provideAppData")
+    @NullSource
     fun `test that repository start download is called with the proper appData`(
         appData: List<TransferAppData>?,
     ) = runTest {
@@ -132,6 +137,36 @@ class DownloadNodesUseCaseTest {
                 node,
                 DESTINATION_PATH_FOLDER,
                 appData,
+                false
+
+            )
+            awaitComplete()
+        }
+    }
+
+    @ParameterizedTest(name = "appdata: \"{0}\"")
+    @MethodSource("provideAppData")
+    @NullSource
+    fun `test that ChatDownload app data is added when the node is a ChatFile`(
+        appData: List<TransferAppData>?,
+    ) = runTest {
+        val chatId = 454L
+        val msgId = 765L
+        val msgIndex = 0
+        val node = mock<ChatDefaultFile> {
+            on { this.id } doReturn NodeId(2895L)
+            on { this.chatId } doReturn chatId
+            on { this.messageId } doReturn msgId
+            on { this.messageIndex } doReturn msgIndex
+
+        }
+        val expected =
+            (appData ?: emptyList()) + TransferAppData.ChatDownload(chatId, msgId, msgIndex)
+        underTest(listOf(node), DESTINATION_PATH_FOLDER, appData, false).test {
+            verify(transferRepository).startDownload(
+                node,
+                DESTINATION_PATH_FOLDER,
+                expected,
                 false
 
             )

@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -56,10 +57,17 @@ class DownloadNodesUseCase @Inject constructor(
             beforeStartTransfer = {
                 fileSystemRepository.createDirectory(destinationPath)
             }) { node ->
+            val finalAppData = if (node is ChatFile) {
+                (appData ?: emptyList()) + TransferAppData.ChatDownload(
+                    node.chatId,
+                    node.messageId,
+                    node.messageIndex
+                )
+            } else appData
             transferRepository.startDownload(
                 node = node,
                 localPath = destinationPath,
-                appData = appData,
+                appData = finalAppData,
                 shouldStartFirst = isHighPriority,
             )
         }
