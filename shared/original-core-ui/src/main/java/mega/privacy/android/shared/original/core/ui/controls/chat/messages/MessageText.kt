@@ -344,7 +344,7 @@ private fun String.getFormat(formatList: List<Format>, index: Int, formatType: F
         val indexAfterFormat = index + formatTypeList.size + if (isMultiQuote) 2 else 0
         val indexBeforeFormat = endIndex - formatTypeList.size
 
-        if (this[indexAfterFormat] != '\n' && this[indexBeforeFormat] != '\n') {
+        if (isMultiQuote || (this[indexAfterFormat] != '\n' && this[indexBeforeFormat] != '\n')) {
             Format(
                 formatStart = index,
                 formatEnd = endIndex,
@@ -362,7 +362,7 @@ private fun String.getEndFormatIndex(tag: String, isMultiQuote: Boolean, startIn
     val endIndex = indexOf(tag, startIndex + formatCharsSize)
     val existsStringInFormat = startIndex != endIndex - 1
 
-    while (endIndex != -1 && existsStringInFormat) {
+    if (endIndex != -1 && existsStringInFormat) {
         val breaksSimpleFormat = !isMultiQuote && substring(startIndex, endIndex).contains('\n')
 
         if (!breaksSimpleFormat) {
