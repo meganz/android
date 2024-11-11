@@ -506,19 +506,40 @@ interface MegaLocalRoomGateway {
     suspend fun insertPendingTransfers(pendingTransfers: List<InsertPendingTransferRequest>)
 
     /**
+     * Get a flow for pending transfers by type
+     * @return A flow with a list of all pending transfers of this type
+     */
+    fun monitorPendingTransfersByType(transferType: TransferType): Flow<List<PendingTransfer>>
+
+    /**
      * Get pending transfers by type
      * @return A list of all pending transfers of this type
      */
-    fun getPendingTransfersByType(transferType: TransferType): Flow<List<PendingTransfer>>
+    suspend fun getPendingTransfersByType(transferType: TransferType): List<PendingTransfer>
+
+    /**
+     * Get pending transfers by state
+     * @return A list of all pending transfers in this state
+     */
+    suspend fun getPendingTransfersByState(pendingTransferState: PendingTransferState): List<PendingTransfer>
+
+    /**
+     * Get a flow for pending transfers by type and state
+     * @return A flow with a list of all pending transfers of this type and state
+     */
+    fun monitorPendingTransfersByTypeAndState(
+        transferType: TransferType,
+        pendingTransferState: PendingTransferState,
+    ): Flow<List<PendingTransfer>>
 
     /**
      * Get pending transfers by type and state
      * @return A list of all pending transfers of this type and state
      */
-    fun getPendingTransfersByTypeAndState(
+    suspend fun getPendingTransfersByTypeAndState(
         transferType: TransferType,
         pendingTransferState: PendingTransferState,
-    ): Flow<List<PendingTransfer>>
+    ): List<PendingTransfer>
 
     /**
      * Get pending transfers by tag

@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase.transfers.active
 
-import kotlinx.coroutines.flow.firstOrNull
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
@@ -58,16 +57,12 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         transferRepository.insertOrUpdateActiveTransfers(inProgressNotInActiveTransfers)
 
         val pendingTransfersWaitingSdkScanning = if (transferType == null) {
-            TransferType.entries.flatMap {
-                transferRepository
-                    .getPendingTransfersByTypeAndState(it, PendingTransferState.SdkScanning)
-                    .firstOrNull() ?: emptyList()
-            }
+            transferRepository.getPendingTransfersByState(PendingTransferState.SdkScanning)
         } else {
             transferRepository.getPendingTransfersByTypeAndState(
                 transferType,
                 PendingTransferState.SdkScanning
-            ).firstOrNull() ?: emptyList()
+            )
         }
 
         // pending transfers that are waiting the finish of the folder scanning but are not in the sdk. Set them as errors.

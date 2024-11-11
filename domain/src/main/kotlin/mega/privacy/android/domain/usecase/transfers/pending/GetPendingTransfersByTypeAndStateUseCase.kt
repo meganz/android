@@ -19,5 +19,5 @@ class GetPendingTransfersByTypeAndStateUseCase @Inject constructor(
     operator fun invoke(
         transferType: TransferType,
         pendingTransferState: PendingTransferState,
-    ) = transferRepository.getPendingTransfersByTypeAndState(transferType, pendingTransferState)
+    ) = transferRepository.monitorPendingTransfersByTypeAndState(transferType, pendingTransferState)
 }

@@ -1565,12 +1565,50 @@ class DefaultTransfersRepositoryTest {
 
     @ParameterizedTest
     @EnumSource(TransferType::class)
-    fun `test that getPendingTransfersByType gateway result is returned when getPendingTransfersByType is called`(
+    fun `test that monitorPendingTransfersByType gateway result is returned when monitorPendingTransfersByType is called`(
         transferType: TransferType,
     ) = runTest {
         val expected = flowOf(listOf(mock<PendingTransfer>()))
+        whenever(megaLocalRoomGateway.monitorPendingTransfersByType(transferType)).thenReturn(expected)
+        val actual = underTest.monitorPendingTransfersByType(transferType)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @EnumSource(TransferType::class)
+    fun `test that getPendingTransfersByType gateway result is returned when getPendingTransfersByType is called`(
+        transferType: TransferType,
+    ) = runTest {
+        val expected = listOf(mock<PendingTransfer>())
         whenever(megaLocalRoomGateway.getPendingTransfersByType(transferType)).thenReturn(expected)
         val actual = underTest.getPendingTransfersByType(transferType)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @EnumSource(PendingTransferState::class)
+    fun `test that getPendingTransfersByState gateway result is returned when getPendingTransfersByState is called`(
+        state: PendingTransferState,
+    ) = runTest {
+        val expected = listOf(mock<PendingTransfer>())
+        whenever(megaLocalRoomGateway.getPendingTransfersByState(state)).thenReturn(expected)
+        val actual = underTest.getPendingTransfersByState(state)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @EnumSource(PendingTransferState::class)
+    fun `test that monitorPendingTransfersByTypeAndState gateway result is returned when monitorPendingTransfersByTypeAndState is called`(
+        pendingTransferState: PendingTransferState,
+    ) = runTest {
+        val expected = flowOf(listOf(mock<PendingTransfer>()))
+        whenever(
+            megaLocalRoomGateway
+                .monitorPendingTransfersByTypeAndState(TransferType.DOWNLOAD, pendingTransferState)
+        )
+            .thenReturn(expected)
+        val actual = underTest
+            .monitorPendingTransfersByTypeAndState(TransferType.DOWNLOAD, pendingTransferState)
         assertThat(actual).isEqualTo(expected)
     }
 
@@ -1579,7 +1617,7 @@ class DefaultTransfersRepositoryTest {
     fun `test that getPendingTransfersByTypeAndState gateway result is returned when getPendingTransfersByTypeAndState is called`(
         pendingTransferState: PendingTransferState,
     ) = runTest {
-        val expected = flowOf(listOf(mock<PendingTransfer>()))
+        val expected = listOf(mock<PendingTransfer>())
         whenever(
             megaLocalRoomGateway
                 .getPendingTransfersByTypeAndState(TransferType.DOWNLOAD, pendingTransferState)

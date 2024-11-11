@@ -39,13 +39,25 @@ internal interface PendingTransferDao {
     suspend fun getPendingTransferByTag(tag: Int): PendingTransferEntity?
 
     @Query("SELECT * FROM $TABLE_PENDING_TRANSFER WHERE transferType = :transferType")
-    fun getPendingTransfersByType(transferType: TransferType): Flow<List<PendingTransferEntity>>
+    fun monitorPendingTransfersByType(transferType: TransferType): Flow<List<PendingTransferEntity>>
+
+    @Query("SELECT * FROM $TABLE_PENDING_TRANSFER WHERE transferType = :transferType")
+    suspend fun getPendingTransfersByType(transferType: TransferType): List<PendingTransferEntity>
+
+    @Query("SELECT * FROM $TABLE_PENDING_TRANSFER WHERE state = :state")
+    suspend fun getPendingTransfersByState(state: PendingTransferState): List<PendingTransferEntity>
 
     @Query("SELECT * FROM $TABLE_PENDING_TRANSFER WHERE transferType = :transferType AND state = :state")
-    fun getPendingTransfersByTypeAndState(
+    fun monitorPendingTransfersByTypeAndState(
         transferType: TransferType,
         state: PendingTransferState,
     ): Flow<List<PendingTransferEntity>>
+
+    @Query("SELECT * FROM $TABLE_PENDING_TRANSFER WHERE transferType = :transferType AND state = :state")
+    suspend fun getPendingTransfersByTypeAndState(
+        transferType: TransferType,
+        state: PendingTransferState,
+    ): List<PendingTransferEntity>
 
     /**
      * Update the pending transfer

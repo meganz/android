@@ -36,7 +36,7 @@ class GetPendingTransfersByTypeUseCaseTest {
     fun `test that repository result is returned when the use case is invoked`(transferType: TransferType) =
         runTest {
             val expected = mock<Flow<List<PendingTransfer>>>()
-            whenever(transferRepository.getPendingTransfersByType(transferType)) doReturn expected
+            whenever(transferRepository.monitorPendingTransfersByType(transferType)) doReturn expected
             val actual = underTest.invoke(transferType)
             assertThat(actual).isEqualTo(expected)
         }

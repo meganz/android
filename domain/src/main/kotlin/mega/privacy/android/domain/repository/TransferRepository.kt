@@ -542,17 +542,35 @@ interface TransferRepository {
     suspend fun removeInProgressTransfers(tags: Set<Int>)
 
     /**
+     * Gets a flow for pending transfers by type.
+     */
+    fun monitorPendingTransfersByType(transferType: TransferType): Flow<List<PendingTransfer>>
+
+    /**
      * Gets pending transfers by type.
      */
-    fun getPendingTransfersByType(transferType: TransferType): Flow<List<PendingTransfer>>
+    suspend fun getPendingTransfersByType(transferType: TransferType): List<PendingTransfer>
+
+    /**
+     * Gets pending transfers by state.
+     */
+    suspend fun getPendingTransfersByState(pendingTransferState: PendingTransferState): List<PendingTransfer>
+
+    /**
+     * Gets a flow for pending transfers by type and state.
+     */
+    fun monitorPendingTransfersByTypeAndState(
+        transferType: TransferType,
+        pendingTransferState: PendingTransferState,
+    ): Flow<List<PendingTransfer>>
 
     /**
      * Gets pending transfers by type and state.
      */
-    fun getPendingTransfersByTypeAndState(
+    suspend fun getPendingTransfersByTypeAndState(
         transferType: TransferType,
         pendingTransferState: PendingTransferState,
-    ): Flow<List<PendingTransfer>>
+    ): List<PendingTransfer>
 
     /**
      * Inserts a list of pending transfers.

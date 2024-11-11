@@ -756,13 +756,33 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
     }
 
-    override fun getPendingTransfersByType(transferType: TransferType): Flow<List<PendingTransfer>> =
+    override fun monitorPendingTransfersByType(transferType: TransferType): Flow<List<PendingTransfer>> =
+        megaLocalRoomGateway.monitorPendingTransfersByType(transferType)
+
+    override suspend fun getPendingTransfersByType(transferType: TransferType) =
         megaLocalRoomGateway.getPendingTransfersByType(transferType)
 
-    override fun getPendingTransfersByTypeAndState(
+    /**
+     * Gets pending transfers by state.
+     */
+    override suspend fun getPendingTransfersByState(pendingTransferState: PendingTransferState) =
+        megaLocalRoomGateway.getPendingTransfersByState(pendingTransferState)
+
+    override fun monitorPendingTransfersByTypeAndState(
         transferType: TransferType,
         pendingTransferState: PendingTransferState,
-    ) = megaLocalRoomGateway.getPendingTransfersByTypeAndState(transferType, pendingTransferState)
+    ) = megaLocalRoomGateway.monitorPendingTransfersByTypeAndState(
+        transferType,
+        pendingTransferState
+    )
+
+    override suspend fun getPendingTransfersByTypeAndState(
+        transferType: TransferType,
+        pendingTransferState: PendingTransferState,
+    ) = megaLocalRoomGateway.getPendingTransfersByTypeAndState(
+        transferType,
+        pendingTransferState
+    )
 
     override suspend fun insertPendingTransfers(pendingTransfer: List<InsertPendingTransferRequest>) {
         megaLocalRoomGateway.insertPendingTransfers(pendingTransfer)

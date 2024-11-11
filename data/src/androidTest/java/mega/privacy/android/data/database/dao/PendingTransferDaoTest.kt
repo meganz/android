@@ -57,7 +57,7 @@ class PendingTransferDaoTest {
         val newEntities = (1..50).map { createEntity(it) }
         underTest.insertOrUpdatePendingTransfers(newEntities, 10)
 
-        val actual = underTest.getPendingTransfersByType(TransferType.DOWNLOAD).first()
+        val actual = underTest.getPendingTransfersByType(TransferType.DOWNLOAD)
         assertThat(actual)
             .comparingElementsUsing(entityCorrespondence)
             .containsExactlyElementsIn(newEntities)
@@ -71,10 +71,52 @@ class PendingTransferDaoTest {
         }
         underTest.insertOrUpdatePendingTransfers(newEntities, 10)
 
-        val actual = underTest.getPendingTransfersByType(transferType).first()
+        val actual = underTest.getPendingTransfersByType(transferType)
         assertThat(actual)
             .comparingElementsUsing(entityCorrespondence)
             .containsExactlyElementsIn(newEntities.filter { it.transferType == transferType })
+    }
+
+    @Test
+    fun test_that_getPendingTransfersByState_returns_the_correct_entities() = runTest {
+        val state = PendingTransferState.NotSentToSdk
+        val newEntities = (1..50).map {
+            createEntity(
+                it,
+                state = if (it < 5) PendingTransferState.NotSentToSdk else PendingTransferState.SdkScanning
+            )
+        }
+        underTest.insertOrUpdatePendingTransfers(newEntities, 10)
+
+        val actual = underTest.getPendingTransfersByState(state)
+        assertThat(actual)
+            .comparingElementsUsing(entityCorrespondence)
+            .containsExactlyElementsIn(newEntities.filter { it.state == state })
+    }
+
+    @Test
+    fun test_that_monitorPendingTransfersByTypeAndState_returns_the_correct_entities() = runTest {
+        val state = PendingTransferState.SdkScanning
+        val transferType = TransferType.GENERAL_UPLOAD
+        val newEntities = (1..50).map {
+            createEntity(
+                it, if (it < 5) TransferType.DOWNLOAD else TransferType.GENERAL_UPLOAD,
+                if (it > 10) PendingTransferState.SdkScanning else PendingTransferState.NotSentToSdk
+            )
+        }
+        underTest.insertOrUpdatePendingTransfers(newEntities, 10)
+
+        val actual =
+            underTest.monitorPendingTransfersByTypeAndState(
+                transferType,
+                state
+            ).first()
+        assertThat(actual)
+            .comparingElementsUsing(entityCorrespondence)
+            .containsExactlyElementsIn(newEntities.filter {
+                it.transferType == transferType
+                        && it.state == state
+            })
     }
 
     @Test
@@ -93,7 +135,7 @@ class PendingTransferDaoTest {
             underTest.getPendingTransfersByTypeAndState(
                 transferType,
                 state
-            ).first()
+            )
         assertThat(actual)
             .comparingElementsUsing(entityCorrespondence)
             .containsExactlyElementsIn(newEntities.filter {
@@ -160,7 +202,7 @@ class PendingTransferDaoTest {
         val newEntities = (1..50).map { createEntity(it) }
         underTest.insertOrUpdatePendingTransfers(newEntities, 10)
 
-        underTest.getPendingTransfersByType(TransferType.DOWNLOAD).test {
+        underTest.monitorPendingTransfersByType(TransferType.DOWNLOAD).test {
             assertThat(awaitItem()).hasSize(newEntities.size)
 
             underTest.deletePendingTransferByTag(newEntities.first().transferTag ?: -1)
@@ -177,7 +219,7 @@ class PendingTransferDaoTest {
         val newEntities = (1..50).map { createEntity(it) }
         underTest.insertOrUpdatePendingTransfers(newEntities, 10)
 
-        underTest.getPendingTransfersByType(TransferType.DOWNLOAD).test {
+        underTest.monitorPendingTransfersByType(TransferType.DOWNLOAD).test {
             assertThat(awaitItem()).isNotEmpty()
 
             underTest.deleteAllPendingTransfers()

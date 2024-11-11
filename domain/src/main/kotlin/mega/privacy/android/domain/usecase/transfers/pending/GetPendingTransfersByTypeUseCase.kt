@@ -15,5 +15,5 @@ class GetPendingTransfersByTypeUseCase @Inject constructor(
      * @param transferType
      */
     operator fun invoke(transferType: TransferType) =
-        transferRepository.getPendingTransfersByType(transferType)
+        transferRepository.monitorPendingTransfersByType(transferType)
 }

@@ -514,16 +514,31 @@ internal class MegaLocalRoomFacade @Inject constructor(
             )
     }
 
-    override fun getPendingTransfersByType(transferType: TransferType) =
-        pendingTransferDao.get().getPendingTransfersByType(transferType)
+    override fun monitorPendingTransfersByType(transferType: TransferType) =
+        pendingTransferDao.get().monitorPendingTransfersByType(transferType)
             .map { it.map { pendingTransferModelMapper(it) } }
 
-    override fun getPendingTransfersByTypeAndState(
+    override suspend fun getPendingTransfersByType(transferType: TransferType) =
+        pendingTransferDao.get().getPendingTransfersByType(transferType)
+            .map { pendingTransferModelMapper(it) }
+
+    override suspend fun getPendingTransfersByState(pendingTransferState: PendingTransferState) =
+        pendingTransferDao.get().getPendingTransfersByState(pendingTransferState)
+            .map { pendingTransferModelMapper(it) }
+
+    override fun monitorPendingTransfersByTypeAndState(
+        transferType: TransferType,
+        pendingTransferState: PendingTransferState,
+    ) = pendingTransferDao.get()
+        .monitorPendingTransfersByTypeAndState(transferType, pendingTransferState)
+        .map { it.map { pendingTransferModelMapper(it) } }
+
+    override suspend fun getPendingTransfersByTypeAndState(
         transferType: TransferType,
         pendingTransferState: PendingTransferState,
     ) = pendingTransferDao.get()
         .getPendingTransfersByTypeAndState(transferType, pendingTransferState)
-        .map { it.map { pendingTransferModelMapper(it) } }
+        .map { pendingTransferModelMapper(it) }
 
     override suspend fun getPendingTransfersByTag(tag: Int): PendingTransfer? =
         pendingTransferDao.get().getPendingTransferByTag(tag)

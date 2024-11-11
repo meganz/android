@@ -831,7 +831,7 @@ internal class MegaLocalRoomFacadeTest {
         }
 
     @Test
-    fun `test that getPendingTransfersByType return mapped dao result`() = runTest {
+    fun `test that monitorPendingTransfersByType return mapped dao result`() = runTest {
         val type = TransferType.DOWNLOAD
         val pendingTransferEntity = mock<PendingTransferEntity>()
         val pendingTransfer = mock<PendingTransfer>()
@@ -839,12 +839,40 @@ internal class MegaLocalRoomFacadeTest {
         val expected = listOf(pendingTransfer)
 
         whenever(pendingTransferModelMapper(pendingTransferEntity)) doReturn pendingTransfer
-        whenever(pendingTransferDao.getPendingTransfersByType(type)) doReturn result
-        underTest.getPendingTransfersByType(type).test {
+        whenever(pendingTransferDao.monitorPendingTransfersByType(type)) doReturn result
+        underTest.monitorPendingTransfersByType(type).test {
             val actual = awaitItem()
             assertThat(actual).isEqualTo(expected)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test that getPendingTransfersByType return mapped dao result`() = runTest {
+        val type = TransferType.DOWNLOAD
+        val pendingTransferEntity = mock<PendingTransferEntity>()
+        val pendingTransfer = mock<PendingTransfer>()
+        val result = listOf(pendingTransferEntity)
+        val expected = listOf(pendingTransfer)
+
+        whenever(pendingTransferModelMapper(pendingTransferEntity)) doReturn pendingTransfer
+        whenever(pendingTransferDao.getPendingTransfersByType(type)) doReturn result
+        val actual = underTest.getPendingTransfersByType(type)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that getPendingTransfersByState return mapped dao result`() = runTest {
+        val state = PendingTransferState.NotSentToSdk
+        val pendingTransferEntity = mock<PendingTransferEntity>()
+        val pendingTransfer = mock<PendingTransfer>()
+        val result = listOf(pendingTransferEntity)
+        val expected = listOf(pendingTransfer)
+
+        whenever(pendingTransferModelMapper(pendingTransferEntity)) doReturn pendingTransfer
+        whenever(pendingTransferDao.getPendingTransfersByState(state)) doReturn result
+        val actual = underTest.getPendingTransfersByState(state)
+        assertThat(actual).isEqualTo(expected)
     }
 
     @Test
@@ -853,12 +881,32 @@ internal class MegaLocalRoomFacadeTest {
         val state = PendingTransferState.NotSentToSdk
         val pendingTransferEntity = mock<PendingTransferEntity>()
         val pendingTransfer = mock<PendingTransfer>()
-        val result = flowOf(listOf(pendingTransferEntity))
+        val result = listOf(pendingTransferEntity)
         val expected = listOf(pendingTransfer)
 
         whenever(pendingTransferModelMapper(pendingTransferEntity)) doReturn pendingTransfer
         whenever(pendingTransferDao.getPendingTransfersByTypeAndState(type, state)) doReturn result
-        underTest.getPendingTransfersByTypeAndState(type, state).test {
+        val actual = underTest.getPendingTransfersByTypeAndState(type, state)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that monitorPendingTransfersByTypeAndState return mapped dao result`() = runTest {
+        val type = TransferType.DOWNLOAD
+        val state = PendingTransferState.NotSentToSdk
+        val pendingTransferEntity = mock<PendingTransferEntity>()
+        val pendingTransfer = mock<PendingTransfer>()
+        val result = flowOf(listOf(pendingTransferEntity))
+        val expected = listOf(pendingTransfer)
+
+        whenever(pendingTransferModelMapper(pendingTransferEntity)) doReturn pendingTransfer
+        whenever(
+            pendingTransferDao.monitorPendingTransfersByTypeAndState(
+                type,
+                state
+            )
+        ) doReturn result
+        underTest.monitorPendingTransfersByTypeAndState(type, state).test {
             val actual = awaitItem()
             assertThat(actual).isEqualTo(expected)
             cancelAndIgnoreRemainingEvents()

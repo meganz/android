@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.NullSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
@@ -61,12 +62,18 @@ internal class CorrectActiveTransfersUseCaseTest {
             *mockedTransfers.toTypedArray(),
         )
         whenever(
-            transferRepository.getPendingTransfersByTypeAndState(
+            transferRepository.monitorPendingTransfersByTypeAndState(
                 anyOrNull(),
                 any()
             )
         ) doReturn flowOf(emptyList())
         whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            .thenReturn(emptyList())
+        whenever(transferRepository.getCurrentActiveTransfers())
+            .thenReturn(emptyList())
+        whenever(transferRepository.getPendingTransfersByTypeAndState(any(), any()))
+            .thenReturn(emptyList())
+        whenever(transferRepository.getPendingTransfersByState(any()))
             .thenReturn(emptyList())
     }
 
@@ -168,8 +175,9 @@ internal class CorrectActiveTransfersUseCaseTest {
 
     @ParameterizedTest
     @EnumSource(TransferType::class)
+    @NullSource
     fun `test that pending transfers waiting for sdk scanning not known by sdk are set as errors`(
-        transferType: TransferType,
+        transferType: TransferType?,
     ) = runTest {
         val pendingTransfer1 = mock<PendingTransfer> { on { this.transferTag } doReturn 1 }
         val pendingTransfer2 = mock<PendingTransfer> { on { this.transferTag } doReturn 2 }
@@ -177,10 +185,22 @@ internal class CorrectActiveTransfersUseCaseTest {
         val pendingTransfers = listOf(pendingTransfer1, pendingTransfer2, pendingTransfer3)
         val transfer2 = mock<Transfer> { on { this.tag } doReturn 2 }
         val expected = listOf(pendingTransfer1, pendingTransfer3)
-        whenever(
-            transferRepository
-                .getPendingTransfersByTypeAndState(transferType, PendingTransferState.SdkScanning)
-        ) doReturn flowOf(pendingTransfers)
+        if (transferType == null) {
+            whenever(
+                transferRepository
+                    .getPendingTransfersByState(
+                        PendingTransferState.SdkScanning
+                    )
+            ) doReturn pendingTransfers
+        } else {
+            whenever(
+                transferRepository
+                    .getPendingTransfersByTypeAndState(
+                        transferType,
+                        PendingTransferState.SdkScanning
+                    )
+            ) doReturn pendingTransfers
+        }
         whenever(getInProgressTransfersUseCase()) doReturn listOf(transfer2)
 
         underTest(transferType)
@@ -201,7 +221,10 @@ internal class CorrectActiveTransfersUseCaseTest {
         val transfer = mock<Transfer> { on { this.tag } doReturn 1 }
         whenever(
             transferRepository
-                .getPendingTransfersByTypeAndState(transferType, PendingTransferState.SdkScanning)
+                .monitorPendingTransfersByTypeAndState(
+                    transferType,
+                    PendingTransferState.SdkScanning
+                )
         ) doReturn flowOf(pendingTransfers)
         whenever(getInProgressTransfersUseCase()) doReturn listOf(transfer)
 

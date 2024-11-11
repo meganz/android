@@ -40,7 +40,7 @@ class GetPendingTransfersByTypeAndStateUseCaseTest {
         val expected = mock<Flow<List<PendingTransfer>>>()
         val state = PendingTransferState.NotSentToSdk
         whenever(
-            transferRepository.getPendingTransfersByTypeAndState(transferType, state)
+            transferRepository.monitorPendingTransfersByTypeAndState(transferType, state)
         ) doReturn expected
         val actual = underTest.invoke(transferType, state)
         assertThat(actual).isEqualTo(expected)
@@ -54,7 +54,7 @@ class GetPendingTransfersByTypeAndStateUseCaseTest {
         val expected = mock<Flow<List<PendingTransfer>>>()
         val type = TransferType.DOWNLOAD
         whenever(
-            transferRepository.getPendingTransfersByTypeAndState(type, pendingTransferState)
+            transferRepository.monitorPendingTransfersByTypeAndState(type, pendingTransferState)
         ) doReturn expected
         val actual = underTest.invoke(type, pendingTransferState)
         assertThat(actual).isEqualTo(expected)
