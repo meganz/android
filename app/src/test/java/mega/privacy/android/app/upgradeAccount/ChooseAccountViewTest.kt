@@ -5,6 +5,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.app.R
+import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
@@ -18,7 +19,6 @@ import mega.privacy.android.domain.entity.account.CurrencyAmount
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import mega.privacy.android.app.onNodeWithText
 import java.text.DecimalFormat
 
 @RunWith(AndroidJUnit4::class)
@@ -112,10 +112,9 @@ internal class ChooseAccountViewTest {
             InstrumentationRegistry.getInstrumentation().targetContext.getString(
                 R.string.account_upgrade_storage_label,
                 "20 GB"
-            ).replace("[A]", "").replace("[/A]", "") + "1",
+            ).replace("[A]", "").replace("[/A]", ""),
             InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.account_choose_free_limited_transfer_quota)
                 .replace("[A]", "").replace("[/A]", ""),
-            "1 " + InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.footnote_achievements)
         )
 
         expectedResults.forEach {

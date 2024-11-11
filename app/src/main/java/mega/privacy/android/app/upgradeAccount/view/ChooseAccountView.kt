@@ -25,14 +25,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.account.model.AccountStorageUIState
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
@@ -53,11 +50,9 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.body2
 import mega.privacy.android.shared.original.core.ui.theme.caption
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
-import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
 import mega.privacy.android.shared.original.core.ui.theme.extensions.green_500_green_300
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_500_grey_400
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_600_grey_300
-import mega.privacy.android.shared.original.core.ui.theme.extensions.red_500_red_300
 import mega.privacy.android.shared.original.core.ui.theme.subtitle2
 import java.util.Locale
 
@@ -156,7 +151,7 @@ fun FreePlanRow(
             .alpha(alpha = ContentAlpha.high)
             .testTag(AccountType.FREE.toString())
     ) {
-        val (image, title, storage, transfer, footnote) = createRefs()
+        val (image, title, info) = createRefs()
 
         Image(
             painter = painterResource(id = UIAccountType.FREE.iconValue),
@@ -174,59 +169,35 @@ fun FreePlanRow(
                 start.linkTo(image.start)
             }
         )
-        MegaSpannedText(
-            value = stringResource(
-                id = R.string.account_upgrade_storage_label,
-                baseStorageFormatted
-            ) + "[B]1[/B]",
-            baseStyle = subtitle2,
-            styles = hashMapOf(
-                SpanIndicator('A') to SpanStyle(
-                    color = MaterialTheme.colors.black_white,
-                ),
-                SpanIndicator('B') to SpanStyle(
-                    baselineShift = BaselineShift.Superscript,
-                    color = MaterialTheme.colors.red_500_red_300,
-                    fontSize = 12.sp
-                )
-            ),
-            modifier = Modifier.constrainAs(storage) {
-                top.linkTo(parent.top, margin = 10.dp)
+        Column(modifier = Modifier
+            .constrainAs(info) {
                 start.linkTo(image.end, margin = 60.dp)
-            },
-            color = MaterialTheme.colors.grey_600_grey_300,
-        )
-        MegaSpannedText(
-            value = stringResource(id = R.string.account_choose_free_limited_transfer_quota),
-            baseStyle = subtitle2,
-            styles = hashMapOf(
-                SpanIndicator('A') to SpanStyle(
-                    color = MaterialTheme.colors.black_white,
-                )
-            ),
-            modifier = Modifier.constrainAs(transfer) {
-                top.linkTo(storage.bottom, margin = 2.dp)
-                start.linkTo(storage.start)
-            },
-            color = MaterialTheme.colors.grey_600_grey_300,
-        )
-        MegaSpannedText(
-            value = "[A]1 [/A]" + stringResource(id = R.string.footnote_achievements),
-            baseStyle = MaterialTheme.typography.body4,
-            styles = hashMapOf(
-                SpanIndicator('A') to SpanStyle(
-                    baselineShift = BaselineShift.Superscript,
-                    color = MaterialTheme.colors.red_500_red_300,
-                    fontSize = 10.sp
-                )
-            ),
-            modifier = Modifier.constrainAs(footnote) {
-                linkTo(transfer.start, parent.end, bias = 0f)
-                top.linkTo(transfer.bottom, margin = 5.dp)
-                width = Dimension.preferredWrapContent
-            },
-            color = MaterialTheme.colors.grey_600_grey_300,
-        )
+                centerVerticallyTo(parent)
+            }) {
+            MegaSpannedText(
+                value = stringResource(
+                    id = R.string.account_upgrade_storage_label,
+                    baseStorageFormatted
+                ),
+                baseStyle = subtitle2,
+                styles = hashMapOf(
+                    SpanIndicator('A') to SpanStyle(
+                        color = MaterialTheme.colors.black_white,
+                    )
+                ),
+                color = MaterialTheme.colors.grey_600_grey_300,
+            )
+            MegaSpannedText(
+                value = stringResource(id = R.string.account_choose_free_limited_transfer_quota),
+                baseStyle = subtitle2,
+                styles = hashMapOf(
+                    SpanIndicator('A') to SpanStyle(
+                        color = MaterialTheme.colors.black_white,
+                    )
+                ),
+                color = MaterialTheme.colors.grey_600_grey_300,
+            )
+        }
     }
 }
 
