@@ -125,7 +125,6 @@ import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import java.io.File
-import java.io.IOException
 import javax.inject.Inject
 
 
@@ -259,7 +258,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             if (chatExplorer != null) {
                                 chatExplorer?.clearSelections()
                                 showFabButton(false)
-                                chooseFragment(IMPORT_FRAGMENT)
+                                if (isFromUploadDestinationActivity) {
+                                    finishAndRemoveTask()
+                                } else {
+                                    chooseFragment(IMPORT_FRAGMENT)
+                                }
                             }
                         }
                     }
@@ -2115,28 +2118,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         dismissAlertDialogIfExists(statusDialog)
         dismissAlertDialogIfExists(newFolderDialog)
         super.onDestroy()
-    }
-
-    @Throws(IOException::class)
-    private fun deleteFile(file: File) {
-        if (file.isDirectory) {
-            if (file.list()?.isEmpty() == true) {
-                file.delete()
-            } else {
-                val files = file.list() ?: return
-
-                for (temp in files) {
-                    val deleteFile = File(file, temp)
-                    deleteFile(deleteFile)
-                }
-
-                if (files.isEmpty()) {
-                    file.delete()
-                }
-            }
-        } else {
-            file.delete()
-        }
     }
 
     override fun onAccountUpdate(api: MegaApiJava) {
