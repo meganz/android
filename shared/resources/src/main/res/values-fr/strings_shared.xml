@@ -673,7 +673,7 @@
     <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
     <string name="document_scanning_error_type_insufficient_ram">Votre téléphone ne dispose pas de la mémoire minimale requise pour terminer la numérisation</string>
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
-    <string name="document_scanning_error_type_generic_error">We’re having trouble opening the document scanner. Close and re-open the app, and try again.</string>
+    <string name="document_scanning_error_type_generic_error">Nous ne parvenons pas à ouvrir le scanner de documents. Fermez et ouvrez de nouveau l\’application, puis réessayez.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">Fermer</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
@@ -705,7 +705,7 @@
     <!-- Title of the Contact Permission Explanation -->
     <string name="title_enable_access_contact">Activez l\’accès pour inviter des amis</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">Pour inviter des amis, vous devez autoriser MEGA à accéder à votre liste de contacts</string>
+    <string name="subtitle_enable_access_contact">Vous pouvez aussi ajouter des contacts depuis la liste de contacts de votre téléphone, si vous autorisez MEGA à y accéder.</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">Autoriser l’accès</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -799,5 +799,11 @@
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA peut voir le nom et la description de votre réunion, mais nous les gardons privés</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
-    <string name="notifications_notification_item_new_tag">Nouvelle</string>
+    <string name="notifications_notification_item_new_tag">Nouveau</string>
+    <!-- Title in the display over other apps permission screen -->
+    <string name="display_over_other_apps_permission_screen_title">Autoriser MEGA à s\’afficher sur d\’autres applis</string>
+    <!-- Context message in the display over other apps permission screen -->
+    <string name="display_over_other_apps_permission_screen_message">MEGA a besoin de votre autorisation pour s\’afficher sur les applis. Cela signifie que vous ne manquerez plus jamais une notification d\’appel entrant.</string>
+    <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
+    <string name="general_allow_permission_positive_button">Accorder la permission</string>
 </resources>

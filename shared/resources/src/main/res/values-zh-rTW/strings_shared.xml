@@ -681,7 +681,7 @@
     <!-- Title of the Contact Permission Explanation -->
     <string name="title_enable_access_contact">允許存取以邀請朋友</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">為了邀請朋友，您必須允許MEGA存取您的聯絡人列表</string>
+    <string name="subtitle_enable_access_contact">如果您允許MEGA存取通訊錄，您還可以從手機的聯絡人列表中新增聯絡人。</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">允許存取</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -776,4 +776,10 @@
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA可以看到您的會議名稱和描述，但我們會將其保密</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
     <string name="notifications_notification_item_new_tag">新的</string>
+    <!-- Title in the display over other apps permission screen -->
+    <string name="display_over_other_apps_permission_screen_title">允許MEGA顯示在其它應用程式的上方</string>
+    <!-- Context message in the display over other apps permission screen -->
+    <string name="display_over_other_apps_permission_screen_message">MEGA needs your permission to display over apps. This means that you’ll never miss another incoming call notification.</string>
+    <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
+    <string name="general_allow_permission_positive_button">允許權限</string>
 </resources>

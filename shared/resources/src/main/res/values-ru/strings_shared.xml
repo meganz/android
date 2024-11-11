@@ -717,7 +717,7 @@
     <!-- Title of the Contact Permission Explanation -->
     <string name="title_enable_access_contact">Откройте доступ, чтобы пригласить друзей</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">Чтобы приглашать друзей, нужно разрешить MEGA доступ к вашему списку контактов</string>
+    <string name="subtitle_enable_access_contact">Вы также можете добавлять контакты из списка контактов телефона, если разрешите MEGA доступ к списку.</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">Открыть доступ</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -812,4 +812,10 @@
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA может видеть название и описание вашей встречи, но мы сохраняем их конфиденциальность</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
     <string name="notifications_notification_item_new_tag">Новые</string>
+    <!-- Title in the display over other apps permission screen -->
+    <string name="display_over_other_apps_permission_screen_title">Разрешите отображение MEGA поверх других приложений</string>
+    <!-- Context message in the display over other apps permission screen -->
+    <string name="display_over_other_apps_permission_screen_message">MEGA нужно разрешение на отображение поверх приложений. Это означает, что вы больше никогда не пропустите уведомление о входящем звонке.</string>
+    <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
+    <string name="general_allow_permission_positive_button">Разрешить</string>
 </resources>

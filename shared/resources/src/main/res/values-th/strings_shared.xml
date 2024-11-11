@@ -681,7 +681,7 @@
     <!-- Title of the Contact Permission Explanation -->
     <string name="title_enable_access_contact">อนุญาตให้เข้าถึงรายชื่อติดต่อเพื่อเชิญเพื่อน</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">เพื่อที่จะเชิญเพื่อน คุณต้องอนุญาตให้แอปพลิเคชัน MEGA เข้าถึงรายชื่อติดต่อของคุณ</string>
+    <string name="subtitle_enable_access_contact">You can also add contacts from your phone’s contact list, if you allow MEGA access to the list.</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">อนุญาตให้เข้าถึง</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -776,4 +776,10 @@
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA มองเห็นชื่อและรายละเอียดการประชุมของคุณ แต่เราเก็บข้อมูลเหล่านี้ไว้เป็นส่วนตัว</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
     <string name="notifications_notification_item_new_tag">ใหม่</string>
+    <!-- Title in the display over other apps permission screen -->
+    <string name="display_over_other_apps_permission_screen_title">Allow MEGA to display over other apps</string>
+    <!-- Context message in the display over other apps permission screen -->
+    <string name="display_over_other_apps_permission_screen_message">MEGA needs your permission to display over apps. This means that you’ll never miss another incoming call notification.</string>
+    <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
+    <string name="general_allow_permission_positive_button">อนุญาตให้เข้าถึง</string>
 </resources>
