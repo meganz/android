@@ -13,6 +13,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.AddNodesTypeUseCase
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -33,7 +34,27 @@ class SearchUseCaseTest {
                 searchParameters = SearchParameters(
                     query = "",
                     searchTarget = SearchTarget.INCOMING_SHARE,
-                    searchCategory = SearchCategory.ALL
+                    searchCategory = SearchCategory.ALL,
+                    description = null,
+                    tag = null,
+                )
+            )
+            verify(searchRepository).getInShares()
+        }
+
+    @Test
+    fun `test that getInShares is called when query is empty and description and tag exist and parentHandle is invalid and searchTarget is INCOMING_SHARE`() =
+        runTest {
+            whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
+            underTest(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                searchParameters = SearchParameters(
+                    query = "",
+                    searchTarget = SearchTarget.INCOMING_SHARE,
+                    searchCategory = SearchCategory.ALL,
+                    description = "description",
+                    tag = "tag",
                 )
             )
             verify(searchRepository).getInShares()
@@ -49,10 +70,30 @@ class SearchUseCaseTest {
                 searchParameters = SearchParameters(
                     query = "",
                     searchTarget = SearchTarget.OUTGOING_SHARE,
-                    searchCategory = SearchCategory.ALL
+                    searchCategory = SearchCategory.ALL,
+                    description = null,
+                    tag = null,
                 )
             )
             verify(searchRepository).getOutShares()
+        }
+
+    @Test
+    fun `test that getOutShares is not called when query is empty but description and tag exist and parentHandle is invalid and searchTarget is OUTGOING_SHARE`() =
+        runTest {
+            whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
+            underTest(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.OUTGOING_SHARES,
+                searchParameters = SearchParameters(
+                    query = "",
+                    searchTarget = SearchTarget.OUTGOING_SHARE,
+                    searchCategory = SearchCategory.ALL,
+                    description = "description",
+                    tag = "tag",
+                )
+            )
+            verify(searchRepository, times(0)).getOutShares()
         }
 
     @Test
@@ -65,14 +106,86 @@ class SearchUseCaseTest {
                 searchParameters = SearchParameters(
                     query = "",
                     searchTarget = SearchTarget.LINKS_SHARE,
-                    searchCategory = SearchCategory.ALL
+                    searchCategory = SearchCategory.ALL,
+                    description = null,
+                    tag = null,
                 )
             )
             verify(searchRepository).getPublicLinks()
         }
 
     @Test
-    fun `test that getChildren is called when query is empty`() =
+    fun `test that getPublicLinks is not called when query is empty but description and tag exist and parentHandle is invalid and searchTarget is LINKS_SHARE`() =
+        runTest {
+            whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
+            underTest(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.LINKS,
+                searchParameters = SearchParameters(
+                    query = "",
+                    searchTarget = SearchTarget.LINKS_SHARE,
+                    searchCategory = SearchCategory.ALL,
+                    description = "description",
+                    tag = "tag",
+                )
+            )
+            verify(searchRepository, times(0)).getPublicLinks()
+        }
+
+    @Test
+    fun `test that search is called when query is empty and description and tag exist and parentHandle is invalid and searchTarget is OUTGOING_SHARE`() {
+        runTest {
+            whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            val searchParameters = SearchParameters(
+                query = "",
+                searchTarget = SearchTarget.OUTGOING_SHARE,
+                searchCategory = SearchCategory.ALL,
+                description = "description",
+                tag = "tag",
+            )
+
+            underTest(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.OUTGOING_SHARES,
+                searchParameters = searchParameters,
+            )
+            verify(searchRepository).search(
+                nodeId = null,
+                order = getCloudSortOrder(),
+                parameters = searchParameters,
+            )
+        }
+    }
+
+    @Test
+    fun `test that search is called when query is empty and description and tag exist and parentHandle is invalid and searchTarget is LINKS_SHARE`() {
+        runTest {
+            whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            val searchParameters = SearchParameters(
+                query = "",
+                searchTarget = SearchTarget.LINKS_SHARE,
+                searchCategory = SearchCategory.ALL,
+                description = "description",
+                tag = "tag",
+            )
+
+            underTest(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.LINKS,
+                searchParameters = searchParameters,
+            )
+            verify(searchRepository).search(
+                nodeId = null,
+                order = getCloudSortOrder(),
+                parameters = searchParameters,
+            )
+        }
+    }
+
+    @Test
+    fun `test that getChildren is called when query is empty and source type is cloud drive`() =
         runTest {
             whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -97,7 +210,7 @@ class SearchUseCaseTest {
         }
 
     @Test
-    fun `test that getChildren is called when query is not empty and source type backup`() =
+    fun `test that getChildren is called when query is empty and source type is backups`() =
         runTest {
             whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -122,7 +235,7 @@ class SearchUseCaseTest {
         }
 
     @Test
-    fun `test that getChildren is called when query is not empty and source type rubbish`() =
+    fun `test that getChildren is called when query is empty and source type is rubbish bin`() =
         runTest {
             whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
@@ -147,7 +260,7 @@ class SearchUseCaseTest {
         }
 
     @Test
-    fun `test that getChildren is called when query is not empty parent handle not empty`() =
+    fun `test that getChildren is called when query is empty and parent handle is not invalid handle`() =
         runTest {
             whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
