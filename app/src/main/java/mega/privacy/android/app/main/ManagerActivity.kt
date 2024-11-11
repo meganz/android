@@ -330,12 +330,15 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.widgets.setTransfersWidgetContent
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.ArchivedChatsMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatRoomDNDMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatRoomsBottomNavigationItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveBottomNavigationItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveSearchMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.IncomingSharesTabEvent
 import mega.privacy.mobile.analytics.event.JoinMeetingPressedEvent
 import mega.privacy.mobile.analytics.event.LinkSharesTabEvent
+import mega.privacy.mobile.analytics.event.OpenLinkMenuItemEvent
 import mega.privacy.mobile.analytics.event.OutgoingSharesTabEvent
 import mega.privacy.mobile.analytics.event.SharedItemsScreenEvent
 import mega.privacy.mobile.analytics.event.StartMeetingNowPressedEvent
@@ -4781,12 +4784,14 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
 
             R.id.action_open_link -> {
+                Analytics.tracker.trackEvent(OpenLinkMenuItemEvent)
                 showOpenLinkDialog()
                 true
             }
 
             R.id.action_menu_do_not_disturb -> {
                 if (drawerItem == DrawerItem.CHAT) {
+                    Analytics.tracker.trackEvent(ChatRoomDNDMenuItemEvent)
                     if (ChatUtil.getGeneralNotification() == Constants.NOTIFICATIONS_ENABLED) {
                         ChatUtil.createMuteNotificationsChatAlertDialog(this, null)
                     } else {
@@ -4801,6 +4806,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
 
             R.id.action_menu_archived -> {
+                Analytics.tracker.trackEvent(ArchivedChatsMenuItemEvent)
                 startActivity(Intent(this, ArchivedChatsActivity::class.java))
                 true
             }

@@ -71,6 +71,8 @@ import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.MeetingInfoAddParticipantButtonTappedEvent
+import mega.privacy.mobile.analytics.event.MeetingInfoLeaveMeetingButtonTappedEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableMeetingLinkButtonEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableOpenInviteButtonEvent
@@ -565,9 +567,15 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                     managementState = managementState,
                     onButtonClicked = ::onActionTap,
                     onEditClicked = { onEditTap() },
-                    onAddParticipantsClicked = { viewModel.onInviteParticipantsTap() },
+                    onAddParticipantsClicked = {
+                        Analytics.tracker.trackEvent(MeetingInfoAddParticipantButtonTappedEvent)
+                        viewModel.onInviteParticipantsTap()
+                    },
                     onSeeMoreOrLessClicked = { viewModel.onSeeMoreOrLessTap() },
-                    onLeaveGroupClicked = { viewModel.onLeaveGroupTap() },
+                    onLeaveGroupClicked = {
+                        Analytics.tracker.trackEvent(MeetingInfoLeaveMeetingButtonTappedEvent)
+                        viewModel.onLeaveGroupTap()
+                    },
                     onParticipantClicked = { showParticipantOptionsPanel(it) },
                     onBackPressed = {
                         Timber.d(

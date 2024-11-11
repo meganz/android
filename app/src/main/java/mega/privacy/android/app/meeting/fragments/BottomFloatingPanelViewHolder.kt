@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
@@ -32,6 +33,8 @@ import mega.privacy.android.app.presentation.meeting.view.ParticipantsBottomPane
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.CallUIMoreButtonPressedEvent
+import mega.privacy.mobile.analytics.event.ParticipantListInviteParticipantRowPressedEvent
 import timber.log.Timber
 
 /**
@@ -347,6 +350,7 @@ class BottomFloatingPanelViewHolder(
                 updateBottomFloatingPanelIfNeeded()
             }
             onMoreClicked = {
+                Analytics.tracker.trackEvent(CallUIMoreButtonPressedEvent)
                 collapse()
                 inMeetingViewModel.onClickMoreCallOptions()
             }
@@ -446,19 +450,22 @@ class BottomFloatingPanelViewHolder(
                     ParticipantsBottomPanelView(
                         viewModel = meetingViewModel,
                         waitingRoomManagementViewModel = waitingRoomManagementViewModel,
-                        onInviteParticipantsClick = { listener.onInviteParticipants() },
+                        onInviteParticipantsClick = {
+                            Analytics.tracker.trackEvent(
+                                ParticipantListInviteParticipantRowPressedEvent
+                            )
+                            listener.onInviteParticipants()
+                        },
                         onParticipantMoreOptionsClicked = { chatParticipant ->
                             meetingViewModel.state.value.usersInCall.find { it.peerId == chatParticipant.handle }
                                 ?.let {
                                     listener.onParticipantOption(it)
                                 }
                         },
-
-                        )
+                    )
                 }
             }
         }
-
     }
 
     /**
