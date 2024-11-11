@@ -144,7 +144,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         localPath: String,
         parentNodeId: NodeId,
         fileName: String?,
-        modificationTime: Long,
+        modificationTime: Long?,
         appData: List<TransferAppData>?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,

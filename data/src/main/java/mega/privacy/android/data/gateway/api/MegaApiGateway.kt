@@ -116,7 +116,7 @@ interface MegaApiGateway {
         localPath: String,
         parentNode: MegaNode,
         fileName: String?,
-        modificationTime: Long,
+        modificationTime: Long?,
         appData: String?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,

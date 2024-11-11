@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.entity.transfer.UploadFileInfo
 import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
@@ -67,7 +67,7 @@ class UploadFilesUseCase @Inject constructor(
                     localPath = uploadFileInfo.uriPath.value,
                     parentNodeId = parentFolderId,
                     fileName = uploadFileInfo.fileName,
-                    modificationTime = uploadFileInfo.lastModifiedDate / 1000L,
+                    modificationTime = null,
                     appData = uploadFileInfo.appData,
                     isSourceTemporary = isSourceTemporary,
                     shouldStartFirst = isHighPriority,
@@ -82,22 +82,4 @@ class UploadFilesUseCase @Inject constructor(
     override fun generateIdFromTransferEvent(transferEvent: TransferEvent) =
         transferEvent.transfer.localPath
 
-}
-
-/**
- * Class to encapsulate the information needed to upload a file
- *
- * @param uriPath the [UriPath] to be uploaded
- * @param fileName the name of the file if it should be renamed, if null the original name will be kept
- * @param appData the appData for this file
- * @param lastModifiedDate in milliseconds
- */
-data class UploadFileInfo(
-    val uriPath: UriPath,
-    val fileName: String?,
-    val appData: List<TransferAppData>? = null,
-    val lastModifiedDate: Long,
-) {
-    constructor(file: File, fileName: String?, appData: List<TransferAppData>? = null) :
-            this(UriPath(file.absolutePath), fileName, appData, file.lastModified())
 }

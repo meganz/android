@@ -99,7 +99,7 @@ internal class MegaApiFacade @Inject constructor(
         localPath: String,
         parentNode: MegaNode,
         fileName: String?,
-        modificationTime: Long,
+        modificationTime: Long?,
         appData: String?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,
@@ -110,7 +110,7 @@ internal class MegaApiFacade @Inject constructor(
             localPath,
             parentNode,
             fileName,
-            modificationTime,
+            modificationTime ?: INVALID_CUSTOM_MOD_TIME,
             appData,
             isSourceTemporary,
             shouldStartFirst,
@@ -656,6 +656,7 @@ internal class MegaApiFacade @Inject constructor(
 
     companion object {
         private const val ANDROID_SUPPORT_ISSUE = 10
+        private const val INVALID_CUSTOM_MOD_TIME = -1L
     }
 
     override suspend fun getContacts(): List<MegaUser> = megaApi.contacts

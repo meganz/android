@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.UploadFileInfo
 import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.repository.CancelTokenRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -106,7 +107,7 @@ class UploadFilesUseCaseTest {
                     ABSOLUTE_PATH,
                     parentId,
                     null,
-                    MODIFIED_TIME_SECS,
+                    null,
                     null,
                     false,
                     priority,
@@ -128,7 +129,7 @@ class UploadFilesUseCaseTest {
                     ABSOLUTE_PATH,
                     parentId,
                     null,
-                    MODIFIED_TIME_SECS,
+                    null,
                     null,
                     isSourceTemporary,
                     false,
@@ -149,7 +150,7 @@ class UploadFilesUseCaseTest {
                 ABSOLUTE_PATH,
                 parentId,
                 null,
-                MODIFIED_TIME_SECS,
+                null,
                 appData,
                 isSourceTemporary = false,
                 shouldStartFirst = false,
@@ -172,7 +173,7 @@ class UploadFilesUseCaseTest {
                         it.uriPath.value,
                         parentId,
                         null,
-                        MODIFIED_TIME_SECS,
+                        null,
                         it.appData,
                         isSourceTemporary = false,
                         shouldStartFirst = false,
@@ -252,7 +253,7 @@ class UploadFilesUseCaseTest {
                         uploadFileInfo.uriPath.value,
                         parentId,
                         null,
-                        MODIFIED_TIME_SECS,
+                        null,
                         null,
                         isSourceTemporary = false,
                         shouldStartFirst = false,
@@ -352,7 +353,7 @@ class UploadFilesUseCaseTest {
                 ABSOLUTE_PATH,
                 parentId,
                 name,
-                MODIFIED_TIME_SECS,
+                null,
                 null,
                 false,
                 false,
@@ -386,7 +387,7 @@ class UploadFilesUseCaseTest {
                     fiuploadFileInfoe.uriPath.value,
                     parentId,
                     null,
-                    MODIFIED_TIME_SECS,
+                    null,
                     null,
                     isSourceTemporary = false,
                     shouldStartFirst = false,
@@ -410,7 +411,7 @@ class UploadFilesUseCaseTest {
                     uploadFileInfo.uriPath.value,
                     parentId,
                     null,
-                    MODIFIED_TIME_SECS,
+                    null,
                     null,
                     isSourceTemporary = false,
                     shouldStartFirst = false,
@@ -425,7 +426,6 @@ class UploadFilesUseCaseTest {
             on { name }.thenReturn(FILE_NAME)
             on { path }.thenReturn(ABSOLUTE_PATH)
             on { absolutePath }.thenReturn(ABSOLUTE_PATH)
-            on { lastModified() }.thenReturn(MODIFIED_TIME_MILLIS)
         }
         private val fileNodesAndNullNames = (0L..10L).map { nodeId ->
             UploadFileInfo(
@@ -433,7 +433,6 @@ class UploadFilesUseCaseTest {
                     on { name }.thenReturn("$FILE_NAME$nodeId")
                     on { path }.thenReturn("$ABSOLUTE_PATH$nodeId")
                     on { absolutePath }.thenReturn("$ABSOLUTE_PATH$nodeId")
-                    on { lastModified() }.thenReturn(MODIFIED_TIME_MILLIS)
                 },
                 null
             )
@@ -442,7 +441,5 @@ class UploadFilesUseCaseTest {
 
         private const val ABSOLUTE_PATH = "/root/parent/destination/File"
         private const val FILE_NAME = "File"
-        private const val MODIFIED_TIME_MILLIS = 1000L
-        private const val MODIFIED_TIME_SECS = 1L
     }
 }

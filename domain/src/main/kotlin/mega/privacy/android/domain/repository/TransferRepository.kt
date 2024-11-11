@@ -270,7 +270,7 @@ interface TransferRepository {
      * @param fileName The custom file name for the file or folder. Leave the parameter as "null"
      * if there are no changes
      * @param modificationTime The custom modification time for the file or folder, denoted in
-     * seconds since the epoch
+     * seconds since the epoch. Null if no custom modification time is needed.
      * @param appData The custom app data to save, which can be nullable
      * @param isSourceTemporary Whether the temporary file or folder that is created for upload
      * should be deleted or not
@@ -283,7 +283,7 @@ interface TransferRepository {
         localPath: String,
         parentNodeId: NodeId,
         fileName: String?,
-        modificationTime: Long,
+        modificationTime: Long?,
         appData: List<TransferAppData>?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,

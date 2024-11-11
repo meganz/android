@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.UploadFileInfo
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.StorageStatePayWallException
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -67,7 +68,7 @@ class StartUploadsWithWorkerUseCase @Inject constructor(
                             val appdata = if (uripath.value == originalUri) null else {
                                 listOf(TransferAppData.OriginalContentUri(originalUri))
                             }
-                            UploadFileInfo(uripath, name, appdata, 0L) //TODO modified date
+                            UploadFileInfo(uripath, name, appdata)
                         }
                     }
                 if (uploadFileInfos.isNotEmpty()) {
