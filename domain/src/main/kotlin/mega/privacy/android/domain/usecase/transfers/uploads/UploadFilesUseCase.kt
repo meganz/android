@@ -53,13 +53,13 @@ class UploadFilesUseCase @Inject constructor(
         ) { uploadFileInfo ->
             val isSourceTemporary =
                 cacheRepository.isFileInCacheDirectory(File(uploadFileInfo.uriPath.value))
-            if (!uploadFileInfo.appData.isNullOrEmpty() && uploadFileInfo.appData.all { it is TransferAppData.ChatTransferAppData }) {
+            if (!uploadFileInfo.appData.isNullOrEmpty() && uploadFileInfo.appData.all { it is TransferAppData.ChatUploadAppData }) {
                 @Suppress("UNCHECKED_CAST")
                 transferRepository.startUploadForChat(
                     localPath = uploadFileInfo.uriPath.value,
                     parentNodeId = parentFolderId,
                     fileName = uploadFileInfo.fileName,
-                    appData = uploadFileInfo.appData as List<TransferAppData.ChatTransferAppData>,
+                    appData = uploadFileInfo.appData as List<TransferAppData.ChatUploadAppData>,
                     isSourceTemporary = isSourceTemporary,
                 )
             } else {

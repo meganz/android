@@ -49,6 +49,15 @@ class TransferAppDataMapper @Inject constructor() {
                         TransferAppData.OriginalContentUri(it)
                     }
 
+                    AppDataTypeConstants.ChatDownload -> {
+                        val chatId = values.getOrNull(0)?.toLongOrNull()
+                        val msgId = values.getOrNull(1)?.toLongOrNull()
+                        val msgIndex = values.getOrNull(2)?.toIntOrNull()
+                        if (chatId != null && msgId != null && msgIndex != null) {
+                            TransferAppData.ChatDownload(chatId, msgId, msgIndex)
+                        } else null
+                    }
+
                     else -> null
                 }
                 if (result == null) {

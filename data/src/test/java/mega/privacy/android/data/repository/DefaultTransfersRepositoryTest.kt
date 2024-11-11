@@ -202,7 +202,7 @@ class DefaultTransfersRepositoryTest {
             listener = any(),
         )
 
-        private fun startChatUploadFlow(appData: List<TransferAppData.ChatTransferAppData> = chatAppData) =
+        private fun startChatUploadFlow(appData: List<TransferAppData.ChatUploadAppData> = chatAppData) =
             underTest.startUploadForChat(
                 localPath = "test local path",
                 parentNodeId = NodeId(1L),

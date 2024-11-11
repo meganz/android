@@ -186,7 +186,7 @@ class UploadFilesUseCaseTest {
     @ParameterizedTest(name = "appdata: \"{0}\"")
     @MethodSource("provideChatAppData")
     fun `test that repository start upload for chat is called when appData is chat transfer app data`(
-        appData: List<TransferAppData.ChatTransferAppData>,
+        appData: List<TransferAppData.ChatUploadAppData>,
     ) = runTest {
         underTest(
             listOf(UploadFileInfo(file, null, appData)), parentId,
@@ -365,7 +365,7 @@ class UploadFilesUseCaseTest {
     @ParameterizedTest(name = "appdata: \"{0}\"")
     @MethodSource("provideChatAppData")
     fun `test that fileName is used in startUploadForChat when is not null`(
-        appData: List<TransferAppData.ChatTransferAppData>,
+        appData: List<TransferAppData.ChatUploadAppData>,
     ) = runTest {
         val name = "RenamedFile"
         underTest(listOf(UploadFileInfo(file, name, appData)), parentId, false).test {

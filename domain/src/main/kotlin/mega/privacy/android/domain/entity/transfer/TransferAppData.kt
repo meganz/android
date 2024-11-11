@@ -12,18 +12,18 @@ sealed interface TransferAppData {
     /**
      * Common interface for chat transfers app data
      */
-    sealed interface ChatTransferAppData : TransferAppData
+    sealed interface ChatUploadAppData : TransferAppData
 
     /**
      * Identify a voice clip transfer
      */
-    data object VoiceClip : ChatTransferAppData
+    data object VoiceClip : ChatUploadAppData
 
     /**
      * Identify a chat transfer and its message
      * @param pendingMessageId the chat message Id related to this transfer
      */
-    data class ChatUpload(val pendingMessageId: Long) : ChatTransferAppData
+    data class ChatUpload(val pendingMessageId: Long) : ChatUploadAppData
 
 
     /**
@@ -43,4 +43,7 @@ sealed interface TransferAppData {
      * @param originalUri
      */
     data class OriginalContentUri(val originalUri: String) : TransferAppData
+
+    data class ChatDownload(val chatId: Long, val msgId: Long, val msgIndex: Int) :
+        TransferAppData
 }

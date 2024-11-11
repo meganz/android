@@ -307,7 +307,7 @@ interface TransferRepository {
         localPath: String,
         parentNodeId: NodeId,
         fileName: String?,
-        appData: List<TransferAppData.ChatTransferAppData>,
+        appData: List<TransferAppData.ChatUploadAppData>,
         isSourceTemporary: Boolean,
     ): Flow<TransferEvent>
 

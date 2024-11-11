@@ -1,12 +1,7 @@
 package mega.privacy.android.data.mapper.transfer
 
 import com.google.common.truth.Truth
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.BackgroundTransfer
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.CameraUpload
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatUpload
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OriginalContentUri
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SDCardDownload
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.*
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_INDICATOR
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_REPEATED_TRANSFER_SEPARATOR
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_SEPARATOR
@@ -104,6 +99,16 @@ class TransferAppDataMapperTest {
             val expected = TransferAppData.OriginalContentUri(uri)
             Truth.assertThat(underTest(raw)).containsExactly(expected)
         }
+
+        @Test
+        fun `test that a ChatDownload is mapped correctly`() {
+            val chatId = 4252345L
+            val msgId = 454L
+            val msgIndex = 0
+            val raw = "CHAT_DOWNLOAD>$chatId>$msgId>$msgIndex"
+            val expected = TransferAppData.ChatDownload(chatId, msgId, msgIndex)
+            Truth.assertThat(underTest(raw)).containsExactly(expected)
+        }
     }
 
     private fun provideWrongParameters() = wrongParameters
@@ -125,6 +130,8 @@ class TransferAppDataMapperTest {
 
     companion object {
         private const val FAKE_ID = 12345L
+        private const val FAKE_ID_2 = 23456L
+        private const val FAKE_INDEX = 1
         private const val TARGET_PATH = "target"
         private const val TARGET_URI = "targetUri"
         private val wrongParameters = listOf(
@@ -149,6 +156,12 @@ class TransferAppDataMapperTest {
                     to listOf(TransferAppData.SdCardDownload(TARGET_PATH, TARGET_URI)),
             generateAppDataString(OriginalContentUri, TARGET_URI)
                     to listOf(TransferAppData.OriginalContentUri(TARGET_URI)),
+            generateAppDataString(
+                ChatDownload,
+                FAKE_ID.toString(),
+                FAKE_ID_2.toString(),
+                FAKE_INDEX.toString()
+            ) to listOf(TransferAppData.ChatDownload(FAKE_ID, FAKE_ID_2, FAKE_INDEX)),
         )
 
         private fun generateAppDataString(
