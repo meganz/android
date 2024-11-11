@@ -32,7 +32,6 @@ internal const val BOTTOM_SHEET_BODY_OWN_DEVICE =
  * @param onAddBackupClicked Lambda that is executed when the "Add backup" Tile is selected
  * @param isFreeAccount True if is a Free account or False otherwise
  * @param isBackupForAndroidEnabled True if the Backup feature is enabled or False otherwise
- * @param isAndroidSyncFeatureEnabled True if the Android Sync feature is enabled or False otherwise
  */
 @Composable
 internal fun OwnDeviceBottomSheetBody(
@@ -44,19 +43,16 @@ internal fun OwnDeviceBottomSheetBody(
     onAddBackupClicked: () -> Unit,
     isFreeAccount: Boolean,
     isBackupForAndroidEnabled: Boolean,
-    isAndroidSyncFeatureEnabled: Boolean,
 ) {
     Column(modifier = Modifier.testTag(BOTTOM_SHEET_BODY_OWN_DEVICE)) {
         if (hasSyncedFolders || isCameraUploadsEnabled) {
             InfoBottomSheetTile(onActionClicked = onInfoClicked)
         }
-        if (isAndroidSyncFeatureEnabled) {
-            AddNewSyncBottomSheetTile(
-                isFreeAccount = isFreeAccount,
-                onActionClicked = onAddNewSyncClicked,
-            )
-        }
-        if (isAndroidSyncFeatureEnabled && isBackupForAndroidEnabled) {
+        AddNewSyncBottomSheetTile(
+            isFreeAccount = isFreeAccount,
+            onActionClicked = onAddNewSyncClicked,
+        )
+        if (isBackupForAndroidEnabled) {
             AddBackupBottomSheetTile(
                 isFreeAccount = isFreeAccount,
                 onActionClicked = onAddBackupClicked,
@@ -87,7 +83,6 @@ private fun PreviewOwnDeviceBottomSheet(
             onAddBackupClicked = {},
             isFreeAccount = true,
             isBackupForAndroidEnabled = true,
-            isAndroidSyncFeatureEnabled = true,
         )
     }
 }

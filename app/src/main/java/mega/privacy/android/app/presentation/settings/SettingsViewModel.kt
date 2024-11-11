@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.COOKIES_URI
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.SettingsState
@@ -49,7 +48,6 @@ import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscover
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
-import mega.privacy.android.shared.sync.domain.IsSyncFeatureEnabledUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -81,7 +79,6 @@ class SettingsViewModel @Inject constructor(
     private val setShowHiddenItemsUseCase: SetShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val setAudioBackgroundPlayEnabledUseCase: SetAudioBackgroundPlayEnabledUseCase,
-    private val isSyncFeatureEnabledUseCase: IsSyncFeatureEnabledUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
 ) : ViewModel() {
     private val state = MutableStateFlow(initialiseState())
@@ -104,7 +101,6 @@ class SettingsViewModel @Inject constructor(
             cameraUploadsOn = false,
             chatEnabled = true,
             callsEnabled = true,
-            syncEnabled = true,
             startScreen = 0,
             hideRecentActivityChecked = false,
             mediaDiscoveryViewState = MediaDiscoveryViewSettings.INITIAL.ordinal,
@@ -122,10 +118,6 @@ class SettingsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             merge(
-                flow { emit(isSyncFeatureEnabledUseCase()) }
-                    .map { enabled ->
-                        { state: SettingsState -> state.copy(syncEnabled = enabled) }
-                    },
                 monitorPasscodePreference(),
                 flow { emit(isCameraUploadsEnabledUseCase()) }.map { enabled ->
                     { state: SettingsState -> state.copy(cameraUploadsOn = enabled) }

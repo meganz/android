@@ -29,10 +29,8 @@ import mega.privacy.android.feature.sync.domain.usecase.notifcation.SetSyncNotif
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.RemoveFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.ui.SyncMonitorViewModel
-import mega.privacy.android.shared.sync.domain.IsSyncFeatureEnabledUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -57,15 +55,11 @@ class SyncMonitorViewModelTest {
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val pauseResumeSyncsBasedOnBatteryAndWiFiUseCase: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase =
         mock()
-    private val isSyncFeatureEnabledUseCase: IsSyncFeatureEnabledUseCase = mock {
-        on { invoke() }.thenReturn(true)
-    }
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase = mock()
     private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
     private val setSyncNotificationShownUseCase: SetSyncNotificationShownUseCase = mock()
     private val getSyncNotificationUseCase: GetSyncNotificationUseCase = mock()
     private val isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase = mock()
-    private val removeSyncUseCase: RemoveFolderPairUseCase = mock()
 
     private lateinit var underTest: SyncMonitorViewModel
 
@@ -95,7 +89,6 @@ class SyncMonitorViewModelTest {
             setSyncNotificationShownUseCase,
             getSyncNotificationUseCase,
             isOnWifiNetworkUseCase,
-            removeSyncUseCase
         )
     }
 
@@ -235,8 +228,6 @@ class SyncMonitorViewModelTest {
             setSyncNotificationShownUseCase,
             getSyncNotificationUseCase,
             isOnWifiNetworkUseCase,
-            isSyncFeatureEnabledUseCase,
-            removeSyncUseCase
         )
     }
 }

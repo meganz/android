@@ -14,7 +14,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.COOKIES_URI
-import mega.privacy.android.app.presentation.settings.SettingsViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.exception.MegaException
@@ -58,7 +57,6 @@ import org.mockito.kotlin.whenever
 import mega.privacy.android.app.TEST_USER_ACCOUNT
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
-import mega.privacy.android.shared.sync.domain.IsSyncFeatureEnabledUseCase
 import java.util.stream.Stream
 
 @ExperimentalCoroutinesApi
@@ -91,9 +89,6 @@ class SettingsViewModelTest {
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val setAudioBackgroundPlayEnabledUseCase = mock<SetAudioBackgroundPlayEnabledUseCase>()
-    private val isSyncFeatureEnabledUseCase = mock<IsSyncFeatureEnabledUseCase> {
-        onBlocking { invoke() }.thenReturn(true)
-    }
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
     @BeforeEach
@@ -183,7 +178,6 @@ class SettingsViewModelTest {
             setShowHiddenItemsUseCase = mock(),
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             setAudioBackgroundPlayEnabledUseCase = setAudioBackgroundPlayEnabledUseCase,
-            isSyncFeatureEnabledUseCase = isSyncFeatureEnabledUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
         )
     }

@@ -8,7 +8,7 @@ import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
  *
  * This repository is used to monitor and store the solved stalled issues
  */
-interface SyncSolvedIssuesRepository {
+internal interface SyncSolvedIssuesRepository {
 
     /**
      * Monitors the solved stalled issues

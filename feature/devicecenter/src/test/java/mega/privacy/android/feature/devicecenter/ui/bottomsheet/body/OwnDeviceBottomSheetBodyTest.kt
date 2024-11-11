@@ -35,7 +35,6 @@ internal class OwnDeviceBottomSheetBodyTest {
                 onAddBackupClicked = {},
                 isFreeAccount = false,
                 isBackupForAndroidEnabled = true,
-                isAndroidSyncFeatureEnabled = true
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_BODY_OWN_DEVICE).assertIsDisplayed()

@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.node.NodeId
  * @property localPaths - list of local paths
  * @property resolutionExplanation - explanation of the resolution
  */
-data class SolvedIssue(
+internal data class SolvedIssue(
     val syncId: Long,
     val nodeIds: List<NodeId>,
     val localPaths: List<String>,

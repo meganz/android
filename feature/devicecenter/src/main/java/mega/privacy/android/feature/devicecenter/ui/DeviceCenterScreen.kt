@@ -193,7 +193,6 @@ internal fun DeviceCenterScreen(
                 },
                 isFreeAccount = uiState.isFreeAccount,
                 isBackupForAndroidEnabled = uiState.enabledFlags.contains(SyncFeatures.BackupForAndroid),
-                isAndroidSyncFeatureEnabled = uiState.isSyncFeatureEnabled,
             )
         },
         content = {

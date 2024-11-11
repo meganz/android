@@ -28,7 +28,6 @@ import mega.privacy.android.domain.entity.account.AccountDetail
  * @property isHiddenNodesEnabled
  * @property showHiddenItems
  * @property accountDetail
- * @property syncEnabled whether sync section should be shown
  */
 data class SettingsState(
     val autoAcceptEnabled: Boolean,
@@ -42,7 +41,6 @@ data class SettingsState(
     val cameraUploadsOn: Boolean,
     val chatEnabled: Boolean,
     val callsEnabled: Boolean,
-    val syncEnabled: Boolean,
     val startScreen: Int,
     val hideRecentActivityChecked: Boolean,
     val mediaDiscoveryViewState: Int,

@@ -3,10 +3,15 @@ package mega.privacy.android.app.globalmanagement
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.worker.StartSyncWorkerUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.worker.StopSyncWorkerUseCase
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,6 +22,9 @@ import javax.inject.Singleton
 @Singleton
 class ActivityLifecycleHandler @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val startSyncWorkerUseCase: StartSyncWorkerUseCase,
+    private val stopSyncWorkerUseCase: StopSyncWorkerUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : Application.ActivityLifecycleCallbacks {
     // The current App Activity
     private var currentActivity: Activity? = null
@@ -43,6 +51,13 @@ class ActivityLifecycleHandler @Inject constructor(
      */
     override fun onActivityStarted(activity: Activity) {
         Timber.d("onActivityStarted: %s", activity.javaClass.simpleName)
+        if (activityReferences == 0) {
+            Timber.i("Stopping SyncWorker")
+            applicationScope.launch {
+                stopSyncWorkerUseCase()
+            }
+        }
+
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
             Timber.i("App enters foreground")
             if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
@@ -81,6 +96,13 @@ class ActivityLifecycleHandler @Inject constructor(
         isActivityChangingConfigurations = activity.isChangingConfigurations
         if (--activityReferences == 0 && !isActivityChangingConfigurations) {
             Timber.i("App enters background")
+        }
+
+        if (activityReferences == 0) {
+            Timber.i("Starting SyncWorker")
+            applicationScope.launch {
+                startSyncWorkerUseCase()
+            }
         }
     }
 

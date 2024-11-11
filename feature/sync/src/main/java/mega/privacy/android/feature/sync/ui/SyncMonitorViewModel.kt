@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,9 +35,7 @@ import mega.privacy.android.feature.sync.domain.usecase.notifcation.SetSyncNotif
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase.Companion.LOW_BATTERY_LEVEL
-import mega.privacy.android.feature.sync.domain.usecase.sync.RemoveFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
-import mega.privacy.android.shared.sync.domain.IsSyncFeatureEnabledUseCase
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -61,8 +58,6 @@ class SyncMonitorViewModel @Inject constructor(
     private val setSyncNotificationShownUseCase: SetSyncNotificationShownUseCase,
     private val getSyncNotificationUseCase: GetSyncNotificationUseCase,
     private val isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase,
-    private val isSyncFeatureEnabledUseCase: IsSyncFeatureEnabledUseCase,
-    private val removeSyncUseCase: RemoveFolderPairUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncMonitorState())
@@ -80,16 +75,9 @@ class SyncMonitorViewModel @Inject constructor(
      * Start monitoring sync state and sync transfers progress
      */
     fun startMonitoring() {
-        if (isSyncFeatureEnabledUseCase()) {
-            monitorCompletedSyncTransfers()
-            monitorSyncState()
-            monitorNotifications()
-        } else {
-            viewModelScope.launch {
-                val syncs = monitorSyncsUseCase().first()
-                syncs.forEach { removeSyncUseCase(it.id) }
-            }
-        }
+        monitorCompletedSyncTransfers()
+        monitorSyncState()
+        monitorNotifications()
     }
 
     private fun monitorCompletedSyncTransfers() {
