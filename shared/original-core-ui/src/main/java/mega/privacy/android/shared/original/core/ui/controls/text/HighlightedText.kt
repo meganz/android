@@ -1,6 +1,5 @@
 package mega.privacy.android.shared.original.core.ui.controls.text
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.LocalTextStyle
@@ -20,6 +19,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.red_200
 import mega.privacy.android.shared.original.core.ui.theme.teal_300_alpha_020
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import java.text.Normalizer
 
 /**
  * @param text Text to show
@@ -32,7 +32,6 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
  * @param style Text style
  * @param overflow Overflow option
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HighlightedText(
     text: String,
@@ -61,7 +60,8 @@ fun HighlightedText(
 
     val annotatedText: AnnotatedString = buildAnnotatedString {
         append(text)
-        var startIndex = text.indexOf(string = highlightText, ignoreCase = true)
+        var startIndex = text.normalize().indexOf(string = highlightText, ignoreCase = true)
+
         while (startIndex >= 0) {
             val endIndex = startIndex + highlightText.length
             addStyle(
@@ -89,6 +89,11 @@ fun HighlightedText(
         color = MegaOriginalTheme.textColor(textColor = textColor),
     )
 }
+
+
+private fun String.normalize(): String = runCatching {
+    Normalizer.normalize(this, Normalizer.Form.NFD)
+}.getOrDefault(this)
 
 @CombinedThemePreviews
 @Composable
