@@ -5,6 +5,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
+import mega.privacy.android.app.fromId
 import mega.privacy.android.app.presentation.extensions.login.error
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.login.model.LoginError
@@ -17,7 +18,6 @@ import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import mega.privacy.android.app.fromId
 
 @RunWith(AndroidJUnit4::class)
 class LoginViewTest {
@@ -142,6 +142,12 @@ class LoginViewTest {
     fun `test that fetch nodes progress bar is shown if the progress of fetch nodes is greater than 0`() {
         setupRule(LoginState(fetchNodesUpdate = FetchNodesUpdate(Progress(0.5F))))
         composeRule.onNodeWithTag(FETCH_NODES_PROGRESS_TEST_TAG).assertExists()
+    }
+
+    @Test
+    fun `test that request status progress bar is shown if the request status progress is greater than -1`() {
+        setupRule(LoginState(requestStatusProgress = 500L, isLoginInProgress = true))
+        composeRule.onNodeWithTag(REQUEST_STATUS_PROGRESS_TEST_TAG).assertExists()
     }
 
     @Test

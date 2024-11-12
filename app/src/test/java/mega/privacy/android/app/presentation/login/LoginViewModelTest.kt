@@ -5,9 +5,12 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -15,11 +18,14 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.AnalyticsTestExtension
 import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetails
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.Event
+import mega.privacy.android.domain.entity.NormalEvent
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
@@ -50,6 +56,7 @@ import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
+import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
@@ -57,12 +64,15 @@ import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUpload
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -115,9 +125,15 @@ internal class LoginViewModelTest {
     private val getHistoricalProcessExitReasonsUseCase =
         mock<GetHistoricalProcessExitReasonsUseCase>()
     private val enableRequestStatusMonitorUseCase = mock<EnableRequestStatusMonitorUseCase>()
+    private val requestStatusProgressFakeFlow = MutableSharedFlow<Event>()
+    private val monitorRequestStatusProgressEventUseCase =
+        mock<MonitorRequestStatusProgressEventUseCase>()
 
     @BeforeEach
     fun setUp() {
+        runBlocking {
+            stubCommon()
+        }
         underTest = LoginViewModel(
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
@@ -156,8 +172,23 @@ internal class LoginViewModelTest {
             clearUserCredentialsUseCase = clearUserCredentialsUseCase,
             startUploadsWorkerUseCase = startUploadsWorkerUseCase,
             getHistoricalProcessExitReasonsUseCase = getHistoricalProcessExitReasonsUseCase,
-            enableRequestStatusMonitorUseCase = enableRequestStatusMonitorUseCase
+            enableRequestStatusMonitorUseCase = enableRequestStatusMonitorUseCase,
+            monitorRequestStatusProgressEventUseCase = monitorRequestStatusProgressEventUseCase
         )
+    }
+
+    private suspend fun stubCommon() {
+        whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(
+            requestStatusProgressFakeFlow
+        )
+        whenever(getFeatureFlagValueUseCase(AppFeatures.RequestStatusProgressDialog)).thenReturn(
+            true
+        )
+    }
+
+    @AfterEach
+    fun resetMocks() {
+        reset(monitorRequestStatusProgressEventUseCase)
     }
 
     @Test
@@ -379,6 +410,31 @@ internal class LoginViewModelTest {
     @Test
     fun `test that getHistoricalProcessExitReasonsUseCase invoke correctly`() = runTest {
         verify(getHistoricalProcessExitReasonsUseCase).invoke()
+    }
+
+    @Test
+    fun `test that requestStatusProgress is updated when event is received`() = runTest {
+        val newProgress = 50L
+        requestStatusProgressFakeFlow.emit(mock<NormalEvent> {
+            on { number } doReturn newProgress
+        })
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.requestStatusProgress).isEqualTo(newProgress)
+        }
+    }
+
+    @Test
+    fun `test that requestStatusProgress is set to -1 when exception is thrown`() = runTest {
+        whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(
+            flow {
+                throw MegaException(1, "error")
+            }
+        )
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.requestStatusProgress).isEqualTo(-1L)
+        }
     }
 
     companion object {

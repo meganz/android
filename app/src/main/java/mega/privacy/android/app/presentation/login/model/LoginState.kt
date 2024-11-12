@@ -50,6 +50,7 @@ import mega.privacy.android.domain.exception.LoginException
  * @property snackbarMessage            Message to show in Snackbar.
  * @property isFastLoginInProgress      True if a fast login is in progress, false otherwise.
  * @property loginTemporaryError        [TemporaryWaitingError] during login
+ * @property requestStatusProgress      Progress of the request status, 0 to 1000, hide progress bar if -1
  */
 data class LoginState(
     val intentState: LoginIntentState? = null,
@@ -86,7 +87,13 @@ data class LoginState(
     val isCheckingSignupLink: Boolean = false,
     val snackbarMessage: StateEventWithContent<Int> = consumed(),
     val loginTemporaryError: TemporaryWaitingError? = null,
+    val requestStatusProgress: Long = -1L,
 ) {
+
+    /**
+     * True if the request status progress event is being processed
+     */
+    val isRequestStatusInProgress = requestStatusProgress > -1L
 
     /**
      * Temporary error during login or fetch nodes
@@ -99,7 +106,7 @@ data class LoginState(
     @StringRes
     val currentStatusText: Int = when {
         isCheckingSignupLink -> R.string.login_querying_signup_link
-        temporaryError != null -> temporaryError?.messageId
+        temporaryError != null && !isRequestStatusInProgress -> temporaryError?.messageId
             ?: R.string.login_connecting_to_server
 
         isFastLoginInProgress -> R.string.login_connecting_to_server

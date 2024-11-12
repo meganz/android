@@ -1,12 +1,20 @@
 package mega.privacy.android.app.presentation.login.view
 
+import mega.privacy.android.shared.resources.R as SharedRes
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -27,6 +35,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -48,10 +57,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -135,7 +149,8 @@ fun LoginView(
     val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
     var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
-    val showLoginInProgress = state.isLoginInProgress || state.fetchNodesUpdate != null
+    val showLoginInProgress =
+        state.isLoginInProgress || state.fetchNodesUpdate != null || state.isRequestStatusInProgress
     Scaffold(
         modifier = modifier
             .conditional(!showLoginInProgress) {
@@ -411,18 +426,60 @@ private fun LoginInProgress(
                 .windowInsetsPadding(WindowInsets.navigationBars),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            MegaAnimatedLinearProgressIndicator(
-                indicatorProgress = state.currentProgress,
-                progressAnimDuration = if (state.currentProgress > 0.5f) 1000 else 3000,
+            Box(
                 modifier = Modifier
                     .padding(start = 56.dp, end = 56.dp)
                     .widthIn(max = 300.dp)
-                    .testTag(FETCH_NODES_PROGRESS_TEST_TAG)
-            )
+            ) {
+                MegaAnimatedLinearProgressIndicator(
+                    indicatorProgress = state.currentProgress,
+                    progressAnimDuration = if (state.currentProgress > 0.5f) 1000 else 3000,
+                    modifier = Modifier
+                        .testTag(FETCH_NODES_PROGRESS_TEST_TAG)
+                )
+
+                if (state.isRequestStatusInProgress) {
+                    val infiniteTransition =
+                        rememberInfiniteTransition(label = "Request Status Progress")
+                    val shimmerTranslateX by infiniteTransition.animateFloat(
+                        initialValue = 0f,
+                        targetValue = 1f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(durationMillis = 1000, easing = LinearEasing),
+                            repeatMode = RepeatMode.Restart
+                        ), label = "Progress"
+                    )
+                    // Shimmer Effect
+                    Box(
+                        modifier = Modifier
+                            .height(8.dp)
+                            .fillMaxWidth(fraction = state.currentProgress + 0.015f)
+                            .clip(RoundedCornerShape(20.dp))
+                            .graphicsLayer(translationX = shimmerTranslateX * 700f)
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        Color.White.copy(alpha = 0.6f),
+                                        Color.Transparent
+                                    ),
+                                    start = Offset(0f, 0f),
+                                    end = Offset(
+                                        100f,
+                                        0f
+                                    )
+                                ),
+                                shape = RoundedCornerShape(40.dp)
+                            )
+                            .testTag(REQUEST_STATUS_PROGRESS_TEST_TAG)
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(10.dp))
             Box {
                 LoginInProgressText(
                     stringId = state.currentStatusText,
+                    progress = state.requestStatusProgress,
                     modifier = Modifier
                         .padding(
                             start = 16.dp,
@@ -448,6 +505,8 @@ private fun LoginInProgress(
 @Composable
 private fun LoginInProgressText(
     @StringRes stringId: Int,
+    progress: Long = -1L,
+    textChangeDuration: Long = 200,
     modifier: Modifier,
 ) {
     val isInPreview = LocalInspectionMode.current // To avoid text being hidden in previews
@@ -460,7 +519,11 @@ private fun LoginInProgressText(
         exit = fadeOut(),
     ) {
         Text(
-            text = stringResource(id = currentTextId),
+            text = if (progress > -1L) {
+                stringResource(SharedRes.string.login_completing_operation, (progress / 10).toInt())
+            } else {
+                stringResource(id = currentTextId)
+            },
             style = MaterialTheme.typography.subtitle2,
             modifier = modifier,
             textAlign = TextAlign.Center,
@@ -470,7 +533,7 @@ private fun LoginInProgressText(
 
     LaunchedEffect(stringId) {
         visible = false
-        delay(200)
+        delay(textChangeDuration)
         currentTextId = stringId
         visible = true
     }
@@ -643,6 +706,14 @@ internal class LoginStateProvider : PreviewParameterProvider<LoginState> {
             isLoginInProgress = true,
         ),
         LoginState(
+            isLoginInProgress = true,
+            requestStatusProgress = 200
+        ),
+        LoginState(
+            isLoginInProgress = true,
+            requestStatusProgress = 700
+        ),
+        LoginState(
             fetchNodesUpdate = FetchNodesUpdate(
                 progress = Progress(0.5F),
                 temporaryError = TemporaryWaitingError.ConnectivityIssues
@@ -664,6 +735,7 @@ internal class LoginStateProvider : PreviewParameterProvider<LoginState> {
 }
 
 internal const val MEGA_LOGO_TEST_TAG = "MEGA_LOGO"
+internal const val REQUEST_STATUS_PROGRESS_TEST_TAG = "login_in_progress:request_status_progress"
 internal const val FETCH_NODES_PROGRESS_TEST_TAG = "FETCH_NODES_PROGRESS"
 internal const val LOGIN_PROGRESS_TEST_TAG = "LOGIN_PROGRESS"
 internal const val TWO_FA_PROGRESS_TEST_TAG = "TWO_FA_PROGRESS"

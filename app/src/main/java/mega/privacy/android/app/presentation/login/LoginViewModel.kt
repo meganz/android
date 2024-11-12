@@ -8,6 +8,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
@@ -79,6 +80,7 @@ import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
+import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
@@ -135,6 +137,7 @@ class LoginViewModel @Inject constructor(
     private val startUploadsWorkerUseCase: StartUploadsWorkerUseCase,
     private val getHistoricalProcessExitReasonsUseCase: GetHistoricalProcessExitReasonsUseCase,
     private val enableRequestStatusMonitorUseCase: EnableRequestStatusMonitorUseCase,
+    private val monitorRequestStatusProgressEventUseCase: MonitorRequestStatusProgressEventUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -156,19 +159,36 @@ class LoginViewModel @Inject constructor(
     private val cleanFetchNodesUpdate by lazy { FetchNodesUpdate() }
 
     init {
+        enableAndMonitorRequestStatusProgressEvent()
         viewModelScope.launch {
             runCatching {
-                if (getFeatureFlagValueUseCase(AppFeatures.RequestStatusProgressDialog)) {
-                    enableRequestStatusMonitorUseCase()
-                }
+                getHistoricalProcessExitReasonsUseCase()
             }.onFailure {
                 Timber.e(it)
             }
         }
+    }
 
+    private fun enableAndMonitorRequestStatusProgressEvent() {
         viewModelScope.launch {
             runCatching {
-                getHistoricalProcessExitReasonsUseCase()
+                if (getFeatureFlagValueUseCase(AppFeatures.RequestStatusProgressDialog)) {
+                    enableRequestStatusMonitorUseCase()
+                    monitorRequestStatusProgressEventUseCase()
+                        .catch { throwable ->
+                            Timber.e(throwable)
+                            // Hide progress bar on error
+                            _state.update {
+                                it.copy(requestStatusProgress = -1L)
+                            }
+                        }.collect { event ->
+                            _state.update {
+                                it.copy(
+                                    requestStatusProgress = event.number
+                                )
+                            }
+                        }
+                }
             }.onFailure {
                 Timber.e(it)
             }
@@ -710,8 +730,13 @@ class LoginViewModel @Inject constructor(
 
         is LoginStatus.LoginWaiting -> {
             Timber.d("Login waiting")
-            _state.update {
-                it.copy(loginTemporaryError = this.error)
+            // Ignore the temporary error if request status event is in progress
+            if (!state.value.isRequestStatusInProgress) {
+                _state.update {
+                    it.copy(loginTemporaryError = this.error)
+                }
+            } else {
+                Unit
             }
         }
     }
