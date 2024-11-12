@@ -83,6 +83,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -524,7 +526,7 @@ private fun isValidPhone(number: String) = PHONE_NUMBER_REGEX.matcher(number).ma
 @Composable
 private fun SelectedContactView(
     inputQuery: String,
-    contactNames: List<InvitationContactInfo>,
+    contactNames: ImmutableList<InvitationContactInfo>,
     onSearchQueryChange: (query: String) -> Unit,
     onContactChipClick: (contactInfo: InvitationContactInfo) -> Unit,
     onDone: () -> Unit,
@@ -939,7 +941,7 @@ private fun InviteContactScreenWithSelectedContactsPreview() {
                     InvitationContactInfo(name = "Abc 3"),
                     InvitationContactInfo(name = "Abc 4"),
                     InvitationContactInfo(name = "Abc 5"),
-                )
+                ).toImmutableList()
             ),
             isDarkMode = isSystemInDarkTheme(),
             onBackPressed = {},

@@ -3,6 +3,8 @@ package mega.privacy.android.app.main.model
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import mega.privacy.android.app.main.InvitationContactInfo
 import mega.privacy.android.app.presentation.contact.invite.navigation.InviteContactScreenResult
 
@@ -27,7 +29,7 @@ data class InviteContactUiState(
     val isLoading: Boolean = false,
     val areContactsInitialized: Boolean = false,
     val contactLink: String = "",
-    val selectedContactInformation: List<InvitationContactInfo> = emptyList(),
+    val selectedContactInformation: ImmutableList<InvitationContactInfo> = persistentListOf(),
     val showOpenCameraConfirmation: Boolean = false,
     val shouldInitializeQR: Boolean = false,
     val filteredContacts: List<InvitationContactInfo> = emptyList(),

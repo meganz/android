@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -313,9 +314,9 @@ class InviteContactViewModel @Inject constructor(
     internal fun addSelectedContactInformation(contact: InvitationContactInfo) {
         _uiState.update {
             it.copy(
-                selectedContactInformation = it.selectedContactInformation + contact.copy(
+                selectedContactInformation = (it.selectedContactInformation + contact.copy(
                     isHighlighted = true
-                )
+                )).toImmutableList()
             )
         }
     }
@@ -421,7 +422,7 @@ class InviteContactViewModel @Inject constructor(
             }
         }
 
-        _uiState.update { it.copy(selectedContactInformation = selectedContactInfo) }
+        _uiState.update { it.copy(selectedContactInformation = selectedContactInfo.toImmutableList()) }
 
         // Update the highlighted value of the contact
         toggleContactHighlightedInfo(
@@ -455,9 +456,9 @@ class InviteContactViewModel @Inject constructor(
     internal fun removeSelectedContactInformation(contact: InvitationContactInfo) {
         _uiState.update { uiState ->
             uiState.copy(
-                selectedContactInformation = uiState.selectedContactInformation.filterNot {
+                selectedContactInformation = (uiState.selectedContactInformation.filterNot {
                     isTheSameContact(it, contact)
-                }
+                }).toImmutableList()
             )
         }
     }

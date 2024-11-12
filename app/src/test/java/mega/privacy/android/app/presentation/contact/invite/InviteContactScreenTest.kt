@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import kotlinx.collections.immutable.toImmutableList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.InvitationContactInfo
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT
@@ -65,7 +66,7 @@ class InviteContactScreenTest {
                             id = 2L,
                             name = "name 2"
                         )
-                    )
+                    ).toImmutableList()
                 ),
                 onInviteContactClick = onInviteContactClick
             )
@@ -125,7 +126,7 @@ class InviteContactScreenTest {
                             id = 2L,
                             name = "name 2"
                         )
-                    )
+                    ).toImmutableList()
                 )
             )
 
@@ -154,7 +155,7 @@ class InviteContactScreenTest {
                     selectedContactInformation = listOf(
                         firstContact,
                         secondContact
-                    )
+                    ).toImmutableList()
                 )
             )
 
