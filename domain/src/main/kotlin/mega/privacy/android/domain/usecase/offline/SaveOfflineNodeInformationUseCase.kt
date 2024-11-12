@@ -4,6 +4,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.getChatDownloadAppData
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import javax.inject.Inject
@@ -20,11 +22,17 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
      * invoke the use case
      * @param nodeId [NodeId] of the node
      */
-    suspend operator fun invoke(nodeId: NodeId, originalName: String) {
+    suspend operator fun invoke(transferFinishEvent: TransferEvent.TransferFinishEvent) {
+        if (transferFinishEvent.error != null) return
+        val transfer = transferFinishEvent.transfer
+        val nodeId = NodeId(transfer.nodeHandle)
+        val originalName = transfer.fileName
         //we don't want to save backup parent node (Vault)
         val backupRootNodeId = monitorBackupFolder().firstOrNull()?.getOrNull() ?: NodeId(-1L)
         val driveRootNode = nodeRepository.getRootNode()?.id ?: NodeId(-1L)
-        nodeRepository.getNodeById(nodeId)?.let { node ->
+        val node = nodeRepository.getNodeById(nodeId) ?: transfer.getChatDownloadAppData()
+            ?.let { nodeRepository.getNodeFromChatMessage(it.chatId, it.msgId, it.msgIndex) }
+        node?.let { node ->
             //we need to save parents before the node itself
             saveNodeAndItsParentsRecursively(
                 currentNode = node,

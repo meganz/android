@@ -61,7 +61,7 @@ class HandleAvailableOfflineEventUseCaseTest {
 
             underTest(event)
 
-            verify(saveOfflineNodeInformationUseCase).invoke(NodeId(nodeId), name)
+            verify(saveOfflineNodeInformationUseCase).invoke(event)
         }
 
     @Test

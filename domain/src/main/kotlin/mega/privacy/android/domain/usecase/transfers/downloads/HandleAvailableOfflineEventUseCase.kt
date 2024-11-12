@@ -30,7 +30,7 @@ class HandleAvailableOfflineEventUseCase @Inject constructor(
                 launch {
                     if (isOfflineTransferUseCase(event.transfer)) {
                         event.transfer.nodeHandle.takeIf { it != -1L }?.let {
-                            saveOfflineNodeInformationUseCase(NodeId(it), event.transfer.fileName)
+                            saveOfflineNodeInformationUseCase(event)
                             broadcastOfflineFileAvailabilityUseCase(it)
                         }
                     }

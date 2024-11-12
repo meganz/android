@@ -6,6 +6,9 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import org.junit.jupiter.api.BeforeAll
@@ -13,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -34,8 +38,6 @@ internal class SaveOfflineNodeInformationUseCaseTest {
     private val parentParentOfflineNodeInformation = mock<OtherOfflineNodeInformation>()
 
     private lateinit var underTest: SaveOfflineNodeInformationUseCase
-
-    private val originalName = "originalName"
 
     @BeforeAll
     fun setup() {
@@ -84,7 +86,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
 
         whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(mock<OtherOfflineNodeInformation>())
 
-        underTest(nodeId, originalName)
+        underTest(transferFinishEvent)
         verify(nodeRepository, times(0)).saveOfflineNodeInformation(anyOrNull(), anyOrNull())
     }
 
@@ -95,7 +97,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
 
         whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
 
-        underTest(nodeId, originalName)
+        underTest(transferFinishEvent)
         verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, null)
     }
 
@@ -107,7 +109,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
 
         whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
 
-        underTest(nodeId, originalName)
+        underTest(transferFinishEvent)
         verify(nodeRepository).saveOfflineNodeInformation(
             nodeOfflineInformation,
             nodeParentOfflineInformationId
@@ -127,7 +129,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
         whenever(nodeRepository.getRootNode()).thenReturn(parent)
 
-        underTest(nodeId, originalName)
+        underTest(transferFinishEvent)
         verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, null)
         verify(nodeRepository, times(0)).saveOfflineNodeInformation(parentOfflineInformation, null)
     }
@@ -141,7 +143,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
         whenever(monitorBackupFolder()).thenReturn(flowOf(Result.success(backupId)))
 
-        underTest(nodeId, originalName)
+        underTest(transferFinishEvent)
         verify(nodeRepository).saveOfflineNodeInformation(
             nodeOfflineInformation,
             nodeParentOfflineInformationId
@@ -151,6 +153,26 @@ internal class SaveOfflineNodeInformationUseCaseTest {
             null
         )
     }
+
+    @Test
+    fun `test that chat node is obtained from the repository when app data is chat download`() =
+        runTest {
+            val chatId = 458L
+            val msgId = 943L
+            val msgIndex = 75
+            stubDriveNodeWithoutParent()
+            stubNodeOfflineInfo()
+            whenever(nodeRepository.getNodeById(nodeId)) doReturn null
+            whenever(nodeRepository.getNodeFromChatMessage(chatId, msgId, msgIndex)) doReturn node
+            whenever(transfer.appData) doReturn listOf(
+                TransferAppData.ChatDownload(chatId, msgId, msgIndex)
+            )
+            whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
+
+            underTest(transferFinishEvent)
+
+            verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, null)
+        }
 
     private fun stubDriveNodeWithoutParent() = runTest {
         whenever(nodeRepository.getNodeById(nodeId)).thenReturn(node)
@@ -194,8 +216,14 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         private val parentParentId = NodeId(3L)
         private val invalidId = NodeId(-1L)
         private val backupId = NodeId(2L)
+        private const val originalName = "originalName"
         private const val nodeOfflineInformationId = 5L
         private const val nodeParentOfflineInformationId = 6L
         private const val nodeParentParentOfflineInformationId = 7L
+        private val transfer = mock<Transfer> {
+            on { this.nodeHandle } doReturn nodeId.longValue
+            on { this.fileName } doReturn originalName
+        }
+        private val transferFinishEvent = TransferEvent.TransferFinishEvent(transfer, null)
     }
 }

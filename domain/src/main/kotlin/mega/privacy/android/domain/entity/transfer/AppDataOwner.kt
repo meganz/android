@@ -75,3 +75,12 @@ fun AppDataOwner.getSDCardDownloadAppData(): TransferAppData.SdCardDownload? =
             .filterIsInstance<TransferAppData.SdCardDownload>()
             .firstOrNull()
     } else null
+
+/**
+ * @return [TransferAppData.ChatDownload] associated to this transfer if it's a ChatDownload transfer, null otherwise.
+ */
+fun AppDataOwner.getChatDownloadAppData(): TransferAppData.ChatDownload? =
+    appData
+        .filterIsInstance<TransferAppData.ChatDownload>()
+        .firstOrNull()
+
