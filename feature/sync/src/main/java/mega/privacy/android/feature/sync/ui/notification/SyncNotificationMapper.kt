@@ -7,8 +7,10 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.app.NotificationCompat
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType
 import mega.privacy.android.feature.sync.navigation.getSyncListRoute
 import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager.Companion.CHANNEL_ID
+import mega.privacy.android.feature.sync.ui.synclist.SyncChip
 import mega.privacy.android.icon.pack.R
 import javax.inject.Inject
 
@@ -21,7 +23,18 @@ class SyncNotificationMapper @Inject constructor() {
         context: Context,
         syncNotificationMessage: SyncNotificationMessage,
     ): Notification {
-        val androidSyncIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://mega.nz/${getSyncListRoute()}"))
+        val androidSyncIntent = Intent(
+            Intent.ACTION_VIEW, Uri.parse(
+                "https://mega.nz/${
+                    getSyncListRoute(
+                        selectedChip = when (syncNotificationMessage.syncNotificationType) {
+                            SyncNotificationType.STALLED_ISSUE -> SyncChip.STALLED_ISSUES
+                            else -> SyncChip.SYNC_FOLDERS
+                        }
+                    )
+                }"
+            )
+        )
         val pendingIntent = PendingIntent.getActivity(
             context,
             0,

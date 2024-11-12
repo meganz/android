@@ -72,7 +72,6 @@ import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.mobile.analytics.event.SyncListBannerUpgradeButtonPressedEvent
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun SyncListScreen(
     stalledIssuesCount: Int,
@@ -307,13 +306,11 @@ private fun SyncListScreenContent(
             )
         }
 
-        if (syncStalledIssuesState.stalledIssues.isNotEmpty() || syncSolvedIssuesState.solvedIssues.isNotEmpty()) {
+        if (checkedChip != SYNC_FOLDERS || syncStalledIssuesState.stalledIssues.isNotEmpty() || syncSolvedIssuesState.solvedIssues.isNotEmpty()) {
             HeaderChips(
                 selectedChip = checkedChip,
                 stalledIssuesCount = stalledIssuesCount,
                 onChipSelected = { checkedChip = it })
-        } else {
-            checkedChip = SYNC_FOLDERS
         }
 
         Box(
