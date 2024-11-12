@@ -1,19 +1,18 @@
 package mega.privacy.android.app.presentation.settings.camerauploads.dialogs
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.CAMERA_UPLOADS_BUSINESS_ACCOUNT_DIALOG
-import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.CameraUploadsBusinessAccountDialog
+import mega.privacy.android.app.onNodeWithText
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.app.onNodeWithText
 
 /**
  * Test class for [CameraUploadsBusinessAccountDialog]
@@ -36,7 +35,7 @@ internal class CameraUploadsBusinessAccountDialogTest {
         composeTestRule.onNodeWithText(R.string.section_photo_sync).assertExists()
         composeTestRule.onNodeWithText(R.string.camera_uploads_business_alert).assertExists()
         composeTestRule.onNodeWithText(R.string.general_enable).assertExists()
-        composeTestRule.onNodeWithText(R.string.general_cancel).assertExists()
+        composeTestRule.onNodeWithText(sharedR.string.general_dialog_cancel_button).assertExists()
     }
 
     @Test
@@ -61,7 +60,7 @@ internal class CameraUploadsBusinessAccountDialogTest {
                 onAlertDismissed = onAlertDismissed,
             )
         }
-        composeTestRule.onNodeWithText(R.string.general_cancel).performClick()
+        composeTestRule.onNodeWithText(sharedR.string.general_dialog_cancel_button).performClick()
         verify(onAlertDismissed).invoke()
     }
 }

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.megachat
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -526,7 +527,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             val name = chatC?.getParticipantFullName(handle)
             builder.setMessage(resources.getString(R.string.confirmation_remove_chat_contact, name))
                 .setPositiveButton(R.string.general_remove) { _: DialogInterface?, _: Int -> removeParticipant() }
-                .setNegativeButton(R.string.general_cancel, null)
+                .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
                 .show()
         }
     }
@@ -814,7 +815,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             }
         ).setMessage(getString(R.string.confirmation_leave_group_chat))
             .setPositiveButton(R.string.general_leave) { _: DialogInterface?, _: Int -> notifyShouldLeaveChat() }
-            .setNegativeButton(R.string.general_cancel, null).show()
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button, null).show()
     }
 
     /**

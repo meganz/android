@@ -352,7 +352,7 @@ internal fun DeleteItemsDialog(
         title = title,
         text = text ?: "",
         confirmButtonText = confirmButtonText,
-        cancelButtonText = stringResource(id = R.string.button_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onConfirm = onDeleteButtonClicked,
         onDismiss = onDismiss
     )

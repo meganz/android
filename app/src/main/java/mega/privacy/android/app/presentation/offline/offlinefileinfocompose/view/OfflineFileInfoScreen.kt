@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view
 
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -93,7 +94,7 @@ internal fun OfflineFileInfoScreen(
         MegaAlertDialog(
             text = stringResource(id = R.string.confirmation_delete_from_save_for_offline),
             confirmButtonText = stringResource(id = R.string.general_remove),
-            cancelButtonText = stringResource(id = R.string.general_cancel),
+            cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
             onConfirm = onRemoveFromOffline,
             onDismiss = { showRemoveFromOfflineDialog = false }
         )

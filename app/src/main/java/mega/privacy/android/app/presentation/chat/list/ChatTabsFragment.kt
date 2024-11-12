@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.chat.list
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
@@ -616,7 +617,7 @@ class ChatTabsFragment : Fragment() {
                                 viewModel.leaveChats(selectedMeetings)
                             }
                             .setNegativeButton(
-                                getString(R.string.general_cancel),
+                                getString(sharedR.string.general_dialog_cancel_button),
                                 null
                             )
                             .show()

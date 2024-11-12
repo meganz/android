@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.chat.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
@@ -35,7 +36,7 @@ class AddParticipantsNoContactsDialogFragment : DialogFragment() {
             .apply {
                 setTitle(getString(R.string.chat_add_participants_no_contacts_title))
                 setMessage(getString(R.string.chat_add_participants_no_contacts_message))
-                setNegativeButton(getString(R.string.button_cancel)) { _, _ ->
+                setNegativeButton(getString(sharedR.string.general_dialog_cancel_button)) { _, _ ->
                     dismiss()
                 }
                 setPositiveButton(getString(R.string.contact_invite)) { _, _ ->

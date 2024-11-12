@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.photos.albums.importlink
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -652,7 +653,7 @@ private fun InputDecryptionKeyDialog(
                 onClick = onDismiss,
                 content = {
                     Text(
-                        text = stringResource(id = R.string.general_cancel),
+                        text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                         color = teal_300,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
@@ -764,7 +765,7 @@ private fun RenameAlbumDialog(
                 onClick = onDismiss,
                 content = {
                     Text(
-                        text = stringResource(id = R.string.general_cancel),
+                        text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                         color = teal_300,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
@@ -880,7 +881,7 @@ private fun StorageExceededDialog(
                 onClick = onDismiss,
                 content = {
                     Text(
-                        text = stringResource(id = R.string.general_cancel),
+                        text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                         color = teal_300,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
@@ -897,7 +898,7 @@ private fun StorageExceededDialog(
                 },
                 content = {
                     Text(
-                        text = stringResource(id = R.string.my_account_upgrade_pro),
+                        text = stringResource(id = sharedR.string.general_upgrade_button),
                         color = teal_300,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,

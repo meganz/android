@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -11,6 +12,7 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_REMOVE_MESSAGES_CONFIRMATION_DIALOG
+import mega.privacy.android.core.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import mega.privacy.mobile.analytics.event.ChatConversationDeleteActionMenuEvent
@@ -24,7 +26,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
-import mega.privacy.android.core.test.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 class DeleteMessagesActionTest {
@@ -108,7 +109,7 @@ class DeleteMessagesActionTest {
             }
             onNodeWithTag(TEST_TAG_REMOVE_MESSAGES_CONFIRMATION_DIALOG)
                 .assertIsDisplayed()
-            onNodeWithText(activity.getString(R.string.button_cancel)).performClick()
+            onNodeWithText(activity.getString(sharedR.string.general_dialog_cancel_button)).performClick()
         }
         verifyNoInteractions(chatViewModel)
     }

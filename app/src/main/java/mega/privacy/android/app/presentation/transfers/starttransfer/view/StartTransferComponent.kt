@@ -324,7 +324,7 @@ private fun StartTransferComponent(
             text = stringResource(id = R.string.alert_larger_file, it.sizeString),
             buttonOption1Text = stringResource(id = R.string.transfers_confirm_large_download_button_start),
             buttonOption2Text = stringResource(id = R.string.transfers_confirm_large_download_button_start_always),
-            cancelButtonText = stringResource(id = R.string.general_cancel),
+            cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
             onOption1 = {
                 onLargeDownloadAnswered(it.transferTriggerEvent, false)
             },

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.settingsFragments
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
 import android.os.Bundle
 import android.text.format.Formatter
@@ -415,7 +416,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
             ) { _, _ ->
                 viewModel.enableFileVersionOption(false)
             }
-            .setNegativeButton(getString(R.string.general_cancel), null)
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
             .show()
     }
 

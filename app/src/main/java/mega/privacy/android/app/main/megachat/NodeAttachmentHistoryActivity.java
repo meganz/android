@@ -45,7 +45,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -916,7 +915,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
             builder.setMessage(R.string.confirmation_delete_several_messages);
         }
         builder.setPositiveButton(R.string.context_remove, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+                .setNegativeButton(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button, dialogClickListener).show();
     }
 
     public void forwardMessages(ArrayList<MegaChatMessage> messagesSelected) {

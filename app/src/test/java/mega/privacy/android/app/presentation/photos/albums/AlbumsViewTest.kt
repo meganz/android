@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -9,6 +10,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDialog
@@ -23,8 +26,6 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class AlbumsViewTest {
@@ -141,7 +142,7 @@ class AlbumsViewTest {
             )
         }
 
-        composeRule.onNodeWithText(R.string.general_cancel).performClick()
+        composeRule.onNodeWithText(sharedR.string.general_dialog_cancel_button).performClick()
 
         verify(onDismissRequest).invoke()
     }

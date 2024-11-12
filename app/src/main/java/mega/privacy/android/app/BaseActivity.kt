@@ -1,5 +1,6 @@
 package mega.privacy.android.app
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -1115,7 +1116,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             text = if (isLoggedIn) {
                 val isFreeAccount =
                     myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE
-                getString(if (isFreeAccount) R.string.my_account_upgrade_pro else R.string.plans_depleted_transfer_overquota)
+                getString(if (isFreeAccount) sharedR.string.general_upgrade_button else R.string.plans_depleted_transfer_overquota)
             } else {
                 getString(R.string.login_text)
             }
@@ -1375,7 +1376,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     .create()
 
             PurchaseType.DOWNGRADE -> upgradeAlert =
-                builder.setTitle(getString(R.string.my_account_upgrade_pro))
+                builder.setTitle(getString(sharedR.string.general_upgrade_button))
                     .setMessage(getString(R.string.message_user_purchased_subscription_down_grade))
                     .create()
 

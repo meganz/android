@@ -1,5 +1,6 @@
 package mega.privacy.android.app.providers
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.SearchManager
@@ -343,7 +344,7 @@ class FileProviderActivity : PasscodeFileProviderActivity(), MegaRequestListener
 
                 cancelButton = findViewById<Button?>(R.id.cancel_button).apply {
                     setOnClickListener { finish() }
-                    text = getString(R.string.general_cancel)
+                    text = getString(sharedR.string.general_dialog_cancel_button)
                     val cancelButtonParams = layoutParams as LinearLayout.LayoutParams
                     cancelButtonParams.setMargins(
                         /* left = */ Util.scaleWidthPx(10, resources.displayMetrics),

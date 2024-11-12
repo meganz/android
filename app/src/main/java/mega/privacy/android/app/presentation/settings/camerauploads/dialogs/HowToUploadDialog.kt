@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.settings.camerauploads.dialogs
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -30,7 +31,7 @@ internal fun HowToUploadDialog(
         titleText = stringResource(R.string.settings_camera_upload_how_to_upload),
         initialSelectedOption = currentUploadConnectionType,
         radioOptions = UploadConnectionType.entries.toList(),
-        cancelButtonText = stringResource(id = R.string.general_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onOptionSelected = onOptionSelected,
         onDismissRequest = onDismissRequest,
         optionDescriptionMapper = { stringResource(it.textRes) },

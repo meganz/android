@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.coverselection
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -171,7 +172,7 @@ private fun AlbumCoverSelectionFooter(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = stringResource(id = R.string.button_cancel),
+            text = stringResource(id = sharedR.string.general_dialog_cancel_button),
             modifier = Modifier
                 .clickable { onBackClicked() },
             color = teal_200,

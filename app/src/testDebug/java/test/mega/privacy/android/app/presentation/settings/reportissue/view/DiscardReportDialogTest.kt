@@ -2,6 +2,7 @@
 
 package mega.privacy.android.app.presentation.settings.reportissue.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,14 +21,13 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.settings.reportissue.view.DiscardReportDialog
+import mega.privacy.android.app.fromId
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.app.fromId
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -59,7 +59,7 @@ class DiscardReportDialogTest {
         }
 
         composeTestRule.onNodeWithText(
-                fromId(R.string.general_cancel),
+                fromId(sharedR.string.general_dialog_cancel_button),
                 ignoreCase = true
         ).performClick()
 

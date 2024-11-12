@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.dialogs.leaveshare
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
@@ -47,7 +48,7 @@ private fun LeaveShareDialogBody(
         MegaAlertDialog(
             text = title,
             confirmButtonText = stringResource(id = R.string.general_leave),
-            cancelButtonText = stringResource(id = R.string.general_cancel),
+            cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
             onConfirm = onOkClicked,
             onDismiss = onCancelClicked
         )

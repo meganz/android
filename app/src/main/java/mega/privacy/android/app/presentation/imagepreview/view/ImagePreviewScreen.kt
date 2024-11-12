@@ -5,6 +5,7 @@
 package mega.privacy.android.app.presentation.imagepreview.view
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -225,7 +226,7 @@ internal fun ImagePreviewScreen(
                     count = 1
                 ),
                 confirmButtonText = stringResource(id = R.string.general_remove),
-                cancelButtonText = stringResource(id = R.string.general_cancel),
+                cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                 onConfirm = {
                     viewModel.disableExport(currentImageNode)
                     hideBottomSheet(coroutineScope, modalSheetState)
@@ -241,7 +242,7 @@ internal fun ImagePreviewScreen(
             MegaAlertDialog(
                 text = stringResource(id = R.string.confirmation_move_to_rubbish),
                 confirmButtonText = stringResource(id = R.string.general_move),
-                cancelButtonText = stringResource(id = R.string.general_cancel),
+                cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                 onConfirm = {
                     onClickMoveToRubbishBin(currentImageNode)
                     hideBottomSheet(coroutineScope, modalSheetState)
@@ -257,7 +258,7 @@ internal fun ImagePreviewScreen(
             MegaAlertDialog(
                 text = stringResource(id = R.string.confirmation_delete_from_mega),
                 confirmButtonText = stringResource(id = R.string.general_remove),
-                cancelButtonText = stringResource(id = R.string.general_cancel),
+                cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                 onConfirm = {
                     onClickRemove(currentImageNode)
                     showRemoveDialog = false

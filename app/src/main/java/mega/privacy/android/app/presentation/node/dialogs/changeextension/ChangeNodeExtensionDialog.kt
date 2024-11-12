@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.dialogs.changeextension
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -43,7 +44,7 @@ private fun ChangeNodeExtensionDialogBody(
         title = stringResource(id = R.string.file_extension_change_title),
         text = stringResource(id = R.string.file_extension_change_warning),
         confirmButtonText = stringResource(id = R.string.action_change_anyway),
-        cancelButtonText = stringResource(id = R.string.general_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onConfirm = {
             onChangeNodeExtension()
         },

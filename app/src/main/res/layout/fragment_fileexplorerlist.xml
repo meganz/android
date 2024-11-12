@@ -54,7 +54,7 @@
 			<com.google.android.material.button.MaterialButton
 				android:id="@+id/cancel_text"
 				android:layout_marginEnd="16dp"
-				android:text="@string/general_cancel"
+				android:text="@string/general_dialog_cancel_button"
 				style="@style/Widget.Mega.Button.TextButton"/>
 
 			<com.google.android.material.button.MaterialButton

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.logout
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -8,9 +9,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.logout.model.LogoutState
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 internal fun LogoutConfirmationDialog(
@@ -64,7 +65,7 @@ private fun ShowDialog(
     MegaAlertDialog(
         text = confirmationMessage,
         confirmButtonText = stringResource(id = R.string.action_logout),
-        cancelButtonText = stringResource(id = R.string.general_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onConfirm = {
             logout()
             onDismissed()

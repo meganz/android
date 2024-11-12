@@ -39,7 +39,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioAttributes;
@@ -60,7 +59,6 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -80,7 +78,6 @@ import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.textEditor.TextEditorActivity;
 import mega.privacy.android.domain.entity.settings.ChatSettings;
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch;
-import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -179,7 +176,7 @@ public class ChatUtil {
                         ((GroupChatInfoActivity) context).removeChatLink();
                     }
                 })
-                .setNegativeButton(R.string.general_cancel, null).show();
+                .setNegativeButton(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button, null).show();
     }
 
     public static MegaChatMessage getMegaChatMessage(Context context, MegaChatApiAndroid megaChatApi, long chatId, long messageId) {
@@ -702,7 +699,7 @@ public class ChatUtil {
                             );
                     dialog.dismiss();
                 });
-        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
+        dialogBuilder.setNegativeButton(context.getString(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button), (dialog, which) -> dialog.dismiss());
 
         muteDialog = dialogBuilder.create();
         muteDialog.show();
@@ -1031,7 +1028,7 @@ public class ChatUtil {
                     new ChatController(activity).deleteMessage(message, chatId);
                     activity.finish();
                 })
-                .setNegativeButton(activity.getString(R.string.general_cancel), null);
+                .setNegativeButton(activity.getString(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button), null);
     }
 
     /**

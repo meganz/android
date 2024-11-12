@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.twofactorauthentication.view.screens
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -48,12 +49,12 @@ import mega.privacy.android.app.presentation.qrcode.mycode.view.QRCode
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.drawableId
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.toSeedArray
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body1Medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_800
@@ -307,7 +308,7 @@ private fun AlertNoAppAvailableDialog(
             title = stringResource(id = R.string.no_authentication_apps_title),
             text = text,
             confirmButtonText = stringResource(id = R.string.context_open_link),
-            cancelButtonText = stringResource(id = R.string.general_cancel),
+            cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
             onConfirm = onConfirm,
             onDismiss = onDismissRequest,
             dismissOnClickOutside = false,
@@ -327,7 +328,7 @@ private fun AlertHelpDialog(
             title = stringResource(id = R.string.no_authentication_apps_title),
             text = stringResource(id = R.string.text_2fa_help),
             confirmButtonText = stringResource(id = R.string.play_store_label),
-            cancelButtonText = stringResource(id = R.string.general_cancel),
+            cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
             onConfirm = onConfirm,
             onDismiss = onDismissRequest,
             dismissOnClickOutside = false,

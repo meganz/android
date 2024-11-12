@@ -1,5 +1,6 @@
 package mega.privacy.android.app.myAccount
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -508,7 +509,7 @@ class MyAccountActivity : PasscodeActivity(),
             .setMessage(getString(R.string.confirmation_close_sessions_text))
             .setPositiveButton(getString(R.string.contact_accept)) { _, _ ->
                 viewModel.killOtherSessions()
-            }.setNegativeButton(getString(R.string.general_cancel), null)
+            }.setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
             .show()
     }
 
@@ -669,7 +670,7 @@ class MyAccountActivity : PasscodeActivity(),
             .setTitle(getString(R.string.change_mail_title_last_step))
             .setMessage(getString(R.string.change_mail_text_last_step))
             .setView(errorInputBinding.root)
-            .setNegativeButton(getString(R.string.general_cancel), null)
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
             .setPositiveButton(getString(R.string.change_pass), null)
             .create()
 
@@ -755,7 +756,7 @@ class MyAccountActivity : PasscodeActivity(),
                     )
                 }
             }
-            .setNegativeButton(R.string.general_cancel, null)
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
             .show()
     }
 

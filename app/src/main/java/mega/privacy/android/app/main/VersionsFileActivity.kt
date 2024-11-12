@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -457,7 +458,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
             .setTitle(R.string.title_delete_version_history)
             .setMessage(R.string.text_delete_version_history)
             .setPositiveButton(R.string.context_delete) { _: DialogInterface?, _: Int -> deleteVersionHistory() }
-            .setNegativeButton(R.string.general_cancel) { _: DialogInterface?, _: Int -> }
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button) { _: DialogInterface?, _: Int -> }
             .show()
     }
 
@@ -900,7 +901,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 .setTitle(R.string.permissions_error_label)
                 .setMessage(R.string.alert_not_enough_permissions_revert)
                 .setPositiveButton(R.string.create_new_file_action) { _: DialogInterface?, _: Int -> revertVersion() }
-                .setNegativeButton(R.string.general_cancel) { _: DialogInterface?, _: Int -> }
+                .setNegativeButton(sharedR.string.general_dialog_cancel_button) { _: DialogInterface?, _: Int -> }
                 .show()
         } else {
             revertVersion()
@@ -946,7 +947,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
             .setTitle(resources.getQuantityString(R.plurals.title_dialog_delete_version, 1))
             .setMessage(getString(R.string.content_dialog_delete_version))
             .setPositiveButton(R.string.context_delete) { _: DialogInterface?, _: Int -> removeVersion() }
-            .setNegativeButton(R.string.general_cancel) { _: DialogInterface?, _: Int -> }
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button) { _: DialogInterface?, _: Int -> }
             .show()
     }
 
@@ -971,7 +972,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
             .setPositiveButton(R.string.context_delete) { _: DialogInterface?, _: Int ->
                 removeVersions(removeNodes)
             }
-            .setNegativeButton(R.string.general_cancel) { _: DialogInterface?, _: Int -> }
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button) { _: DialogInterface?, _: Int -> }
             .show()
     }
 

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.utils
 
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -865,7 +866,7 @@ object MegaNodeUtil {
                         )
                     )
             }
-            .setNegativeButton(activity.getString(R.string.general_cancel), null)
+            .setNegativeButton(activity.getString(sharedR.string.general_dialog_cancel_button), null)
             .show()
     }
 

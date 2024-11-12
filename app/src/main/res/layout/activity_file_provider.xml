@@ -53,7 +53,7 @@
             android:id="@+id/cancel_button"
             style="?attr/borderlessButtonStyle"
             android:gravity="center_vertical|center_horizontal"
-            android:text="@string/general_cancel" />
+            android:text="@string/general_dialog_cancel_button" />
 
         <Button
             android:id="@+id/attach_button"

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.filelink
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -320,7 +321,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
         Timber.d("askForDecryptionKeyDialog")
         val decryptAlertDialog = DecryptAlertDialog.Builder()
             .setTitle(getString(R.string.alert_decryption_key))
-            .setPosText(R.string.general_decryp).setNegText(R.string.general_cancel)
+            .setPosText(R.string.general_decryp).setNegText(sharedR.string.general_dialog_cancel_button)
             .setMessage(getString(R.string.message_decryption_key))
             .setErrorMessage(R.string.invalid_decryption_key).setKey(mKey)
             .build()

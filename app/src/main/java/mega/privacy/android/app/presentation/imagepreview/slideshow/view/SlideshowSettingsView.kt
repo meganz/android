@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.imagepreview.slideshow.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
@@ -190,7 +191,7 @@ private fun SlideshowSpeedDialog(
                 onClick = onDialogDismissed,
             ) {
                 Text(
-                    text = stringResource(id = R.string.button_cancel),
+                    text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     style = button,
                     color = teal_300.takeIf { isLight } ?: teal_200
                 )
@@ -251,7 +252,7 @@ private fun SlideshowOrderDialog(
                 onClick = onDialogDismissed,
             ) {
                 Text(
-                    text = stringResource(id = R.string.button_cancel),
+                    text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     style = button,
                     color = teal_300.takeIf { isLight } ?: teal_200
                 )

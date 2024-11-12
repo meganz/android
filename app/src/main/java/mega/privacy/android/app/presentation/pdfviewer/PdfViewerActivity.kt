@@ -55,7 +55,6 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityPdfviewerBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
@@ -1374,7 +1373,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
         builder.setMessage(R.string.confirmation_delete_one_attachment)
         builder.setPositiveButton(R.string.context_remove, dialogClickListener)
-            .setNegativeButton(R.string.general_cancel, dialogClickListener).show()
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button, dialogClickListener).show()
         isDeleteDialogShow = true
         builder.setOnDismissListener { isDeleteDialogShow = false }
     }
@@ -1466,7 +1465,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         builder.setPositiveButton(getString(R.string.context_remove)) { _: DialogInterface?, _: Int ->
             megaApi.disableExport(megaApi.getNodeByHandle(handle), this@PdfViewerActivity)
         }
-        builder.setNegativeButton(getString(R.string.general_cancel)) { _: DialogInterface?, _: Int -> }
+        builder.setNegativeButton(getString(sharedR.string.general_dialog_cancel_button)) { _: DialogInterface?, _: Int -> }
         removeLinkDialog = builder.create()
         removeLinkDialog.show()
     }

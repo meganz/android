@@ -1,5 +1,6 @@
 package mega.privacy.android.app.contacts.list.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.content.DialogInterface
 import android.os.Bundle
@@ -276,7 +277,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         removeContactDialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(resources.getQuantityString(R.plurals.title_confirmation_remove_contact, 1))
             .setMessage(resources.getQuantityString(R.plurals.confirmation_remove_contact, 1))
-            .setNegativeButton(R.string.general_cancel, null)
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
             .setPositiveButton(R.string.general_remove) { _, _ ->
                 viewModel.removeContact(contactEmail)
                 dismiss()

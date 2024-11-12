@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -90,7 +91,7 @@ private fun OverQuotaBannerText(
             ) {
                 TextMegaButton(
                     modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                    text = stringResource(id = R.string.my_account_upgrade_pro),
+                    text = stringResource(id = sharedR.string.general_upgrade_button),
                     onClick = { onUpgradeClicked() }
                 )
                 TextMegaButton(

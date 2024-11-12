@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -942,7 +943,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                 dialogClickListener
             )
             builder.setNegativeButton(
-                R.string.general_cancel,
+                sharedR.string.general_dialog_cancel_button,
                 dialogClickListener
             )
             builder.show()

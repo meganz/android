@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.contactinfo
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.app.Activity
 import android.content.BroadcastReceiver
@@ -1282,7 +1283,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     setNicknameDialog?.dismiss()
                 }
             }
-        builder.setNegativeButton(getString(R.string.general_cancel)) { _, _ -> setNicknameDialog?.dismiss() }
+        builder.setNegativeButton(getString(sharedR.string.general_dialog_cancel_button)) { _, _ -> setNicknameDialog?.dismiss() }
         builder.setView(layout)
         setNicknameDialog = builder.create().apply {
             show()
@@ -1321,7 +1322,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             .setTitle(resources.getQuantityString(R.plurals.title_confirmation_remove_contact, 1))
             .setMessage(resources.getQuantityString(R.plurals.confirmation_remove_contact, 1))
             .setPositiveButton(R.string.general_remove) { _, _ -> viewModel.removeContact() }
-            .setNegativeButton(R.string.general_cancel) { _, _ -> }
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button) { _, _ -> }
             .show()
     }
 

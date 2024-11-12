@@ -39,8 +39,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants
+import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.caption
 import mega.privacy.android.shared.original.core.ui.theme.grey_300
@@ -50,8 +52,6 @@ import mega.privacy.android.shared.original.core.ui.theme.teal_200
 import mega.privacy.android.shared.original.core.ui.theme.teal_300
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white
-import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -237,7 +237,7 @@ internal fun CreateVideoPlaylistDialog(
                 ),
             ) {
                 Text(
-                    stringResource(id = R.string.general_cancel),
+                    stringResource(id = sharedR.string.general_dialog_cancel_button),
                     color = teal_300
                 )
             }

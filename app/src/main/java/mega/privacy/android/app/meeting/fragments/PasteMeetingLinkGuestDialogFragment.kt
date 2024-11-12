@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.fragments
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
@@ -53,7 +54,7 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
             .setMessage(getString(R.string.paste_meeting_link_guest_instruction))
             .setView(view)
             .setPositiveButton(R.string.general_ok, null)
-            .setNegativeButton(R.string.general_cancel, null)
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
 
         val dialog = builder.create()
         dialog.show()

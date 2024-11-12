@@ -792,7 +792,7 @@ private fun RecurringMeetingDialog(
     if (state.recurringMeetingDialog) {
         ConfirmationDialogWithRadioButtons(
             titleText = stringResource(id = R.string.meetings_schedule_meeting_recurrence_label),
-            cancelButtonText = stringResource(id = R.string.general_cancel),
+            cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
             radioOptions = state.getRecurrenceDialogOptionList(),
             initialSelectedOption = state.getRecurrenceDialogOptionSelected(),
             onOptionSelected = onOptionSelected,

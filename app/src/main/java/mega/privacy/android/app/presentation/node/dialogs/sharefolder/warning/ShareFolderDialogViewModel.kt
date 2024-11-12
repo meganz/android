@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.dialogs.sharefolder.warning
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -57,7 +58,7 @@ class ShareFolderDialogViewModel @Inject constructor(
                         state.copy(
                             info = R.string.backup_multi_share_permission_text,
                             positiveButton = R.string.general_positive_button,
-                            negativeButton = R.string.general_cancel,
+                            negativeButton = sharedR.string.general_dialog_cancel_button,
                             typeNodeList = typeNodeList
                         )
                     }

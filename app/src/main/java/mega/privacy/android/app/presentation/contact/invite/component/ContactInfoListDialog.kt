@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.contact.invite.component
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import android.telephony.PhoneNumberUtils
 import androidx.compose.foundation.clickable
@@ -114,7 +115,7 @@ internal fun ContactInfoListDialog(
                 ) {
                     TextMegaButton(
                         modifier = Modifier.testTag(CANCEL_BUTTON_TAG),
-                        text = stringResource(id = R.string.general_cancel),
+                        text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                         onClick = onCancel,
                     )
                     TextMegaButton(

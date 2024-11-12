@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.settings.passcode.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,7 +37,7 @@ internal fun PasscodeTimeoutDialog(
         titleText = stringResource(R.string.settings_require_passcode),
         initialSelectedOption = state.currentOption,
         radioOptions = state.options,
-        cancelButtonText = stringResource(id = R.string.general_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onOptionSelected = onTimeoutSelected,
         onDismissRequest = onDismiss,
         optionDescriptionMapper = { it.getTitle(context) },

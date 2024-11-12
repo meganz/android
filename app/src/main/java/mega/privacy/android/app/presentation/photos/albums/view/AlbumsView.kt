@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.photos.albums.view
 
 import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.graphics.Typeface
@@ -471,7 +472,7 @@ fun DeleteAlbumsConfirmationDialog(
                 },
             ) {
                 Text(
-                    text = stringResource(id = R.string.button_cancel),
+                    text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     style = button,
                     color = teal_300.takeIf { isLight } ?: teal_200
                 )
@@ -503,7 +504,7 @@ fun RemoveLinksConfirmationDialog(
             id = R.plurals.album_share_remove_links_dialog_button,
             count = numLinks,
         ),
-        cancelButtonText = stringResource(id = R.string.button_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onConfirm = onRemove,
         onDismiss = onCancel,
     )

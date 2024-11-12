@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.text.Spanned
 import android.view.LayoutInflater
@@ -258,7 +259,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         binding.cancelText.setOnClickListener {
             (requireActivity() as FileExplorerActivity).finishAndRemoveTask()
         }
-        binding.cancelText.text = getString(R.string.general_cancel)
+        binding.cancelText.text = getString(sharedR.string.general_dialog_cancel_button)
         binding.fabSelect.setOnClickListener { buttonClicked() }
 
         // Initialization for recycler view

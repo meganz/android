@@ -103,7 +103,7 @@
                     android:paddingTop="10dp"
                     android:paddingEnd="16dp"
                     android:paddingBottom="10dp"
-                    android:text="@string/my_account_upgrade_pro" />
+                    android:text="@string/general_upgrade_button" />
             </RelativeLayout>
 
         </LinearLayout>

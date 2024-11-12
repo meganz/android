@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.myaccount.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import androidx.annotation.StringRes
@@ -714,7 +715,7 @@ internal fun AccountTypeSection(
 
         if (showUpgradeButton) {
             RaisedDefaultMegaButton(
-                textId = R.string.my_account_upgrade_pro,
+                textId = sharedR.string.general_upgrade_button,
                 onClick = onButtonClickListener,
                 modifier = Modifier
                     .testTag(UPGRADE_BUTTON)

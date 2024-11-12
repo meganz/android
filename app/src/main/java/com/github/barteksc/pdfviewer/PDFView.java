@@ -819,7 +819,7 @@ public class PDFView extends RelativeLayout {
                 builder.setView(layout);
                 builder.setTitle(getContext().getString(R.string.title_pdf_password))
                         .setMessage(getContext().getString(R.string.text_pdf_password, pdfViewer.getPdfFileName()))
-                        .setNegativeButton(R.string.general_cancel, (dialogInterface, i) -> pdfViewer.finish())
+                        .setNegativeButton(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button, (dialogInterface, i) -> pdfViewer.finish())
                         .setPositiveButton(R.string.contact_accept, (dialogInterface, i) -> pdfViewer.reloadPDFwithPassword(passwordText.getText().toString()))
                         .show();
             } else {

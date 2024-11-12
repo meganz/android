@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.fragments
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.app.Dialog
 import android.content.Intent
@@ -494,7 +495,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 inMeetingViewModel.state.value.minutesToEndMeeting ?: 1
                             ),
                             text = stringResource(id = R.string.meetings_in_call_warning_dialog_body),
-                            confirmButtonText = stringResource(id = R.string.meetings_in_call_warning_dialog_action_button),
+                            confirmButtonText = stringResource(id = sharedR.string.general_upgrade_button),
                             cancelButtonText = stringResource(id = R.string.meetings_in_call_warning_dialog_negative_button),
                             onConfirm = {
                                 inMeetingViewModel.onMeetingEndWarningDialogDismissed()

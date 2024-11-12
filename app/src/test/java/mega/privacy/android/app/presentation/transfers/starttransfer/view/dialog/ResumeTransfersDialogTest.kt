@@ -1,17 +1,17 @@
 package mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeTransfersDialog
+import mega.privacy.android.app.onNodeWithText
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class ResumeTransfersDialogTest {
@@ -29,7 +29,7 @@ class ResumeTransfersDialogTest {
             onNodeWithText(R.string.warning_resume_transfers).assertIsDisplayed()
             onNodeWithText(R.string.warning_message_resume_transfers).assertIsDisplayed()
             onNodeWithText(R.string.button_resume_individual_transfer).assertIsDisplayed()
-            onNodeWithText(R.string.general_cancel).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_dialog_cancel_button).assertIsDisplayed()
         }
     }
 
@@ -43,7 +43,7 @@ class ResumeTransfersDialogTest {
     @Test
     fun `test that onDismiss is invoked when dismiss button is clicked`() {
         initComposeRule()
-        composeRule.onNodeWithText(R.string.general_cancel).performClick()
+        composeRule.onNodeWithText(sharedR.string.general_dialog_cancel_button).performClick()
         verify(onDismiss).invoke()
     }
 

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.offline.confirmremovedialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -43,7 +44,7 @@ internal class ConfirmRemoveFromOfflineDialogFragment : DialogFragment() {
                     MegaAlertDialog(
                         text = stringResource(id = R.string.confirmation_delete_from_save_for_offline),
                         confirmButtonText = stringResource(id = R.string.general_remove),
-                        cancelButtonText = stringResource(id = R.string.general_cancel),
+                        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                         onConfirm = {
                             activityViewModel.removeOfflineNodes(handles)
                             dismissAllowingStateLoss()

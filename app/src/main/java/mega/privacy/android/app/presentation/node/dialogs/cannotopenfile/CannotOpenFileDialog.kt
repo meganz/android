@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.dialogs.cannotopenfile
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,7 +23,7 @@ internal fun CannotOpenFileDialog(
         title = stringResource(id = R.string.dialog_cannot_open_file_title),
         text = stringResource(id = R.string.dialog_cannot_open_file_text),
         confirmButtonText = stringResource(id = R.string.context_download),
-        cancelButtonText = stringResource(id = R.string.general_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onConfirm = {
             onDismiss()
             onDownload()

@@ -18,7 +18,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.myaccount.MyAccountHomeViewActions
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.fromPluralId
 import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
 import mega.privacy.android.app.presentation.myaccount.view.AccountTypeSection
@@ -63,8 +64,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.fromPluralId
 import kotlin.random.Random
 
 @HiltAndroidTest
@@ -219,7 +218,7 @@ class MyAccountHomeViewTest {
         )
 
         composeTestRule.onNodeWithTag(UPGRADE_BUTTON).assertIsDisplayed()
-            .assert(hasText(fromId(R.string.my_account_upgrade_pro)))
+            .assert(hasText(fromId(sharedR.string.general_upgrade_button)))
     }
 
     @Test

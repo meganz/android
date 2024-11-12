@@ -1,17 +1,16 @@
 package mega.privacy.android.app.presentation.settings.camerauploads.dialogs
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FILE_UPLOAD_DIALOG
-import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FileUploadDialog
+import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadOptionUiItem
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import mega.privacy.android.app.onNodeWithText
 
 /**
  * Test class for [FileUploadDialog]
@@ -29,7 +28,7 @@ internal class FileUploadDialogTest {
         composeTestRule.onNodeWithTag(FILE_UPLOAD_DIALOG).assertIsDisplayed()
         composeTestRule.onNodeWithText(R.string.settings_camera_upload_what_to_upload)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(R.string.general_cancel).assertIsDisplayed()
+        composeTestRule.onNodeWithText(sharedR.string.general_dialog_cancel_button).assertIsDisplayed()
         composeTestRule.onNodeWithText(R.string.settings_camera_upload_only_photos)
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(R.string.settings_camera_upload_only_videos)

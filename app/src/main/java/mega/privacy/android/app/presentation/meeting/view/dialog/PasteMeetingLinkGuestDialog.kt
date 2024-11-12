@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.view.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -70,7 +71,7 @@ internal fun PasteMeetingLinkGuestDialog(
             }
         },
         confirmButtonText = stringResource(id = R.string.general_ok),
-        cancelButtonText = stringResource(id = R.string.general_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onConfirm = onConfirm,
         onDismiss = onDismiss,
         onCancel = onCancel,

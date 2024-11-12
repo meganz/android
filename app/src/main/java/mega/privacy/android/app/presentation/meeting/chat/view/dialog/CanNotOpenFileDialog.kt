@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -17,7 +18,7 @@ internal fun CanNotOpenFileDialog(
         title = stringResource(id = R.string.dialog_cannot_open_file_title),
         text = stringResource(id = R.string.dialog_cannot_open_file_text),
         confirmButtonText = stringResource(id = R.string.context_download),
-        cancelButtonText = stringResource(id = R.string.general_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onConfirm = onDownloadClick,
         onDismiss = onDismiss
     )

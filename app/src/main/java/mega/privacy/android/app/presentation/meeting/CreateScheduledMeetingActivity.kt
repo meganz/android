@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -322,7 +323,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                         R.string.meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button
                 )
             )
-            .setNegativeButtonText(getString(R.string.button_cancel))
+            .setNegativeButtonText(getString(sharedR.string.general_dialog_cancel_button))
             .setTitleText(getString(R.string.meetings_schedule_meeting_calendar_select_date_label))
             .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
             .setSelection(currentDate.getTruncatedUtcTimeInMillis())
@@ -376,7 +377,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                     TimeFormat.CLOCK_12H
             )
             .setPositiveButtonText(getString(R.string.general_ok))
-            .setNegativeButtonText(getString(R.string.button_cancel))
+            .setNegativeButtonText(getString(sharedR.string.general_dialog_cancel_button))
             .setTitleText(getString(R.string.meetings_schedule_meeting_enter_time_title_dialog))
             .build()
             .apply {

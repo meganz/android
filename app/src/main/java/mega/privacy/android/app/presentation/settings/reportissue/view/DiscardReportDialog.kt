@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.settings.reportissue.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
@@ -12,8 +13,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 fun DiscardReportDialog(
@@ -43,7 +44,7 @@ fun DiscardReportDialog(
                 modifier = Modifier
             ) {
                 Text(
-                    text = stringResource(id = R.string.general_cancel),
+                    text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     style = MaterialTheme.typography.button,
                     color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300

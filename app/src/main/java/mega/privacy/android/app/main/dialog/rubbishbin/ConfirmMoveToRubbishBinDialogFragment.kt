@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.dialog.rubbishbin
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,9 +17,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 import javax.inject.Inject
@@ -59,7 +60,7 @@ internal class ConfirmMoveToRubbishBinDialogFragment : DialogFragment() {
                     MegaAlertDialog(
                         text = message,
                         confirmButtonText = positiveText,
-                        cancelButtonText = stringResource(id = R.string.general_cancel),
+                        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                         onConfirm = {
                             if (uiState.isNodeInRubbish) {
                                 activityViewModel.deleteNodes(handles)

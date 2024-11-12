@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -446,7 +447,7 @@ private fun RemoveParticipantAlertDialog(
         MegaAlertDialog(
             text = stringResource(id = R.string.confirmation_remove_chat_contact, participantName),
             confirmButtonText = stringResource(id = R.string.general_remove),
-            cancelButtonText = stringResource(id = R.string.general_cancel),
+            cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
             onConfirm = onRemove,
             onDismiss = onDismiss,
         )

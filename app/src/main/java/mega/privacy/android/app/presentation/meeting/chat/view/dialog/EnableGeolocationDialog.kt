@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -24,7 +25,7 @@ fun EnableGeolocationDialog(
         text = stringResource(id = R.string.explanation_send_location),
         confirmButtonText = stringResource(id = R.string.button_continue),
         onDismiss = onDismiss,
-        cancelButtonText = stringResource(id = R.string.button_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onConfirm = {
             onConfirm()
             onDismiss()

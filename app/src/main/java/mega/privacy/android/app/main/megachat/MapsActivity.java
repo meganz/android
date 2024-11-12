@@ -387,7 +387,7 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
                 .setMessage(R.string.open_location_settings)
                 .setCancelable(false)
                 .setPositiveButton(R.string.general_ok, (dialog, id) -> startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)))
-                .setNegativeButton(R.string.general_cancel, (dialog, id) -> {
+                .setNegativeButton(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button, (dialog, id) -> {
                     isFullScreenEnabled = true;
                     mapHandler.initMap();
                     dialog.cancel();

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.dialogs.removelink
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -49,7 +50,7 @@ private fun RemoveNodeLinkDialogBody(
                 count = count
             ),
             confirmButtonText = stringResource(id = R.string.general_remove),
-            cancelButtonText = stringResource(id = R.string.general_cancel),
+            cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
             onConfirm = onConfirmClicked,
             onDismiss = onCancelClicked,
         )

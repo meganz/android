@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.legacycontact
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.DialogInterface
@@ -1366,7 +1367,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
                 bundle
             )
         }
-        builder.setNegativeButton(getString(R.string.general_cancel)) { _: DialogInterface?, _: Int -> finish() }
+        builder.setNegativeButton(getString(sharedR.string.general_dialog_cancel_button)) { _: DialogInterface?, _: Int -> finish() }
         builder.show()
     }
 
@@ -2351,7 +2352,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         builder.setMessage(getString(R.string.confirmation_delete_contact, contact.fullName))
         builder.setOnDismissListener { isConfirmDeleteShown = false }
         builder.setPositiveButton(R.string.context_remove, dialogClickListener)
-            .setNegativeButton(R.string.general_cancel, dialogClickListener).show()
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button, dialogClickListener).show()
         isConfirmDeleteShown = true
     }
 

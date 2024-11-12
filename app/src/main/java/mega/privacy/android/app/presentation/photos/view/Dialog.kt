@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.DialogInterface
 import androidx.appcompat.app.AlertDialog
@@ -25,7 +26,7 @@ fun Fragment.showSortByDialog(
         dialog.dismiss()
     }
 
-    dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel)) {
+    dialogBuilder.setNegativeButton(context.getString(sharedR.string.general_dialog_cancel_button)) {
             dialog: DialogInterface,
             _,
         ->

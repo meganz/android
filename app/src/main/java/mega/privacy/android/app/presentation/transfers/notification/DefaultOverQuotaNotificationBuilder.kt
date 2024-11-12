@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.transfers.notification
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
@@ -13,9 +14,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.facade.AccountInfoFacade
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.notifications.DismissNotificationBroadcastReceiver
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.notifications.DismissNotificationBroadcastReceiver
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
@@ -115,7 +116,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
         customView.setTextViewText(R.id.dismiss_button, dismissButtonText)
         customView.setOnClickPendingIntent(R.id.dismiss_button, dismissIntent)
         val upgradeButtonText =
-            context.getString(if (!isLoggedIn) R.string.continue_without_account_transfer_overquota else if (isFreeAccount) R.string.my_account_upgrade_pro else R.string.plans_depleted_transfer_overquota)
+            context.getString(if (!isLoggedIn) R.string.continue_without_account_transfer_overquota else if (isFreeAccount) sharedR.string.general_upgrade_button else R.string.plans_depleted_transfer_overquota)
         customView.setTextViewText(R.id.upgrade_button, upgradeButtonText)
         customView.setOnClickPendingIntent(R.id.upgrade_button, pendingIntent)
 

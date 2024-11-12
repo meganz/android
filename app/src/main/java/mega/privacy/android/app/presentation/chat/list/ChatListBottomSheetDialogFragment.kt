@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.chat.list
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -265,7 +266,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
             .setPositiveButton(R.string.general_leave) { _, _ ->
                 viewModel.leaveChat(chatId)
                 dismissAllowingStateLoss()
-            }.setNegativeButton(R.string.general_cancel, null).show()
+            }.setNegativeButton(sharedR.string.general_dialog_cancel_button, null).show()
     }
 
     /**

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.photos.albums.photosselection
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -424,7 +425,7 @@ private fun SelectLocationDialog(
                     Spacer(modifier = Modifier.size(4.dp))
                 }
                 Text(
-                    text = stringResource(id = R.string.button_cancel),
+                    text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     modifier = Modifier
                         .align(Alignment.End)
                         .padding(top = 8.dp, end = 16.dp, bottom = 16.dp)

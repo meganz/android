@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.original.core.ui.controls.chat
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -409,7 +410,7 @@ private fun CancelButton(
         modifier = modifier
             .padding(start = 8.dp)
             .clickable { onCancel() },
-        text = stringResource(id = R.string.general_cancel),
+        text = stringResource(id = sharedR.string.general_dialog_cancel_button),
         color = MegaOriginalTheme.colors.components.interactive,
         style = MaterialTheme.typography.subtitle2,
         fontWeight = FontWeight.Medium,

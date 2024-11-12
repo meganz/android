@@ -833,7 +833,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
                     statusDialog = createProgressDialog(fileContactListActivity, getString(R.string.context_removing_contact_folder));
                     nodeController.removeShare(new ShareListener(this, REMOVE_SHARE_LISTENER, 1), node, email);
                 })
-                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {
+                .setNegativeButton(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button, (dialog, which) -> {
                 })
                 .show();
     }
@@ -856,7 +856,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
         String message = getResources().getQuantityString(R.plurals.remove_multiple_contacts_shared_folder, contacts.size(), contacts.size());
         builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+                .setNegativeButton(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button, dialogClickListener).show();
     }
 
     public void removeMultipleShares(ArrayList<MegaShare> shares) {

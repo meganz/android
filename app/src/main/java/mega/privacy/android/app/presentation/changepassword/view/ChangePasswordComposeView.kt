@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.changepassword.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -481,7 +482,7 @@ fun ChangePasswordActionButtonGroup(
             onClick = { onFinishActivity() },
             content = {
                 Text(
-                    text = stringResource(id = R.string.button_cancel),
+                    text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     color = MaterialTheme.colors.secondary,
                     style = MaterialTheme.typography.button,
                 )

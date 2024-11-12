@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.settings.passcode.biometric
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricPrompt
@@ -80,7 +81,7 @@ class BiometricAuth @Inject constructor(
     private fun promptInfo(context: Context) =
         BiometricPrompt.PromptInfo.Builder()
             .setTitle(context.getString(R.string.title_enable_fingerprint))
-            .setNegativeButtonText(context.getString(R.string.general_cancel))
+            .setNegativeButtonText(context.getString(sharedR.string.general_dialog_cancel_button))
             .setAllowedAuthenticators(BIOMETRIC_STRONG)
             .build()
 }

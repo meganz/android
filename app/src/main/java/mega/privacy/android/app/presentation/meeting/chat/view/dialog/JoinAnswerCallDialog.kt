@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -24,7 +25,7 @@ internal fun JoinAnswerCallDialog(
         title = stringResource(id = if (isGroup) R.string.title_join_call else R.string.title_join_one_to_one_call),
         text = stringResource(id = R.string.text_join_call),
         confirmButtonText = stringResource(id = if (isGroup) R.string.end_and_join_call_incoming else R.string.end_and_answer_call_incoming),
-        cancelButtonText = stringResource(id = R.string.general_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onConfirm = onEndAndAnswer,
         onDismiss = onDismiss,
         modifier = Modifier.testTag(TEST_TAG_JOIN_ANSWER_CALL_DIALOG)
@@ -35,7 +36,7 @@ internal fun JoinAnswerCallDialog(
         text = stringResource(id = R.string.text_join_another_call),
         buttonOption1Text = stringResource(id = if (isGroup) R.string.hold_and_join_call_incoming else R.string.hold_and_answer_call_incoming),
         buttonOption2Text = stringResource(id = if (isGroup) R.string.end_and_join_call_incoming else R.string.end_and_answer_call_incoming),
-        cancelButtonText = stringResource(id = R.string.general_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onOption1 = onHoldAndAnswer,
         onOption2 = onEndAndAnswer,
         onDismiss = onDismiss,

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.contactinfo.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
@@ -8,8 +9,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 @Composable
 internal fun UpdateNickNameDialog(
@@ -24,7 +25,7 @@ internal fun UpdateNickNameDialog(
         text = nickName.orEmpty(),
         hint = nickName ?: stringResource(R.string.nickname_title),
         confirmButtonText = stringResource(id = R.string.button_set),
-        cancelButtonText = stringResource(id = R.string.general_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onConfirm = {
             updateNickName(it)
             updateNickNameDialogVisibility(false)

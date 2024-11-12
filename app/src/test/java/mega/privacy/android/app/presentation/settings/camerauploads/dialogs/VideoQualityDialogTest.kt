@@ -1,17 +1,16 @@
 package mega.privacy.android.app.presentation.settings.camerauploads.dialogs
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.VIDEO_QUALITY_DIALOG
-import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.VideoQualityDialog
+import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.settings.camerauploads.model.VideoQualityUiItem
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import mega.privacy.android.app.onNodeWithText
 
 /**
  * Test class for [VideoQualityDialog]
@@ -28,7 +27,8 @@ internal class VideoQualityDialogTest {
 
         composeTestRule.onNodeWithTag(VIDEO_QUALITY_DIALOG).assertIsDisplayed()
         composeTestRule.onNodeWithText(R.string.settings_video_upload_quality).assertIsDisplayed()
-        composeTestRule.onNodeWithText(R.string.general_cancel).assertIsDisplayed()
+        composeTestRule.onNodeWithText(
+            sharedR.string.general_dialog_cancel_button).assertIsDisplayed()
         composeTestRule.onNodeWithText(R.string.settings_camera_uploads_video_quality_dialog_option_low)
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(R.string.settings_camera_uploads_video_quality_dialog_option_medium)

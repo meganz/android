@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
@@ -174,7 +175,7 @@ class PasscodeUtil @Inject constructor(
             }
         }
 
-        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), null)
+        dialogBuilder.setNegativeButton(context.getString(sharedR.string.general_dialog_cancel_button), null)
 
         val requirePasscodeDialog = dialogBuilder.create()
         requirePasscodeDialog.show()

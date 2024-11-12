@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -87,7 +88,7 @@ internal fun SortByDialog(
                 onClick = onDialogDismissed,
             ) {
                 Text(
-                    text = stringResource(id = R.string.general_cancel),
+                    text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     style = MaterialTheme.typography.button,
                     color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300
@@ -158,7 +159,7 @@ internal fun FilterDialog(
                 onClick = onDialogDismissed,
             ) {
                 Text(
-                    text = stringResource(id = R.string.general_cancel),
+                    text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     style = MaterialTheme.typography.button,
                     color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300
@@ -207,7 +208,7 @@ internal fun RemovePhotosFromAlbumDialog(
                 onClick = onDialogDismissed,
             ) {
                 Text(
-                    text = stringResource(id = R.string.general_cancel),
+                    text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     style = MaterialTheme.typography.button,
                     color = if (!isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300

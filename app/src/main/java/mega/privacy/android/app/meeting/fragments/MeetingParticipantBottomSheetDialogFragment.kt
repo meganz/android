@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.fragments
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -181,7 +182,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
             setPositiveButton(R.string.general_remove) { _, _ ->
                 removeParticipant(chatId)
             }
-            setNegativeButton(R.string.general_cancel, null)
+            setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
             show()
         }
     }

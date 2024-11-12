@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.dialog.link
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -107,7 +108,7 @@ internal class OpenLinkDialogFragment : DialogFragment() {
                         hint = hint,
                         text = viewModel.inputLink,
                         confirmButtonText = stringResource(id = openLinkPositiveTextMapper(state.linkType)),
-                        cancelButtonText = stringResource(id = R.string.general_cancel),
+                        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                         onConfirm = viewModel::openLink,
                         onDismiss = { dismissAllowingStateLoss() },
                         onInputChange = viewModel::onLinkChanged,

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.chat.dialog.view
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -283,7 +284,7 @@ internal fun ChatRoomItemBottomSheetView(
                         MenuItem(
                             modifier = Modifier.testTag("cancel"),
                             res = R.drawable.ic_trash,
-                            text = R.string.general_cancel,
+                            text = sharedR.string.general_dialog_cancel_button,
                             description = "Cancel",
                             tintRed = true,
                             onClick = onCancelClick

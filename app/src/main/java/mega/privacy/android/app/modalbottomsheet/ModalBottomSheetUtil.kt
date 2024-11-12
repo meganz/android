@@ -1,5 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -115,7 +116,7 @@ object ModalBottomSheetUtil {
                 nodeDownloader()
                 this.dismissAllowingStateLoss()
             }
-            .setNegativeButton(getString(R.string.general_cancel), null)
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
             .show()
 
     /**

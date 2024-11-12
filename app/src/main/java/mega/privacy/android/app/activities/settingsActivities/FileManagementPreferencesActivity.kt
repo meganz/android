@@ -1,6 +1,6 @@
 package mega.privacy.android.app.activities.settingsActivities
 
-
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.DialogInterface
@@ -200,7 +200,7 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
             val nC = NodeController(this)
             nC.cleanRubbishBin()
         }
-        builder.setNegativeButton(getFormattedStringOrDefault(R.string.general_cancel), null)
+        builder.setNegativeButton(getFormattedStringOrDefault(sharedR.string.general_dialog_cancel_button), null)
         clearRubbishBinDialog = builder.create()
         clearRubbishBinDialog?.show()
     }
@@ -218,7 +218,7 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
             val nC = NodeController(this)
             nC.clearAllVersions()
         }
-        builder.setNegativeButton(getFormattedStringOrDefault(R.string.general_cancel), null)
+        builder.setNegativeButton(getFormattedStringOrDefault(sharedR.string.general_dialog_cancel_button), null)
         clearRubbishBinDialog = builder.create()
         clearRubbishBinDialog?.show()
     }
@@ -379,7 +379,7 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
             getFormattedStringOrDefault(R.string.general_ok)
         ) { _: DialogInterface?, _: Int -> }
         builder.setNegativeButton(
-            getString(R.string.general_cancel)
+            getString(sharedR.string.general_dialog_cancel_button)
         ) { _: DialogInterface?, _: Int ->
             if (isEnabling && sttFileManagement != null) {
                 sttFileManagement?.updateRBScheduler(0)

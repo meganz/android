@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.view.open.camera.confirmation
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -45,7 +46,7 @@ internal fun OpenCameraConfirmationDialog(
         title = stringResource(id = R.string.title_confirmation_open_camera_on_chat),
         text = stringResource(id = R.string.confirmation_open_camera_on_chat),
         confirmButtonText = stringResource(id = R.string.context_open_link),
-        cancelButtonText = stringResource(id = R.string.general_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onConfirm = onConfirm,
         onDismiss = onDismiss,
     )

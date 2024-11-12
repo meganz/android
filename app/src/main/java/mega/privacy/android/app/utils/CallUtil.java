@@ -71,9 +71,9 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
-import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
+import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
@@ -818,7 +818,8 @@ public class CallUtil {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         String message = activity.getString(R.string.confirmation_open_camera_on_chat);
         builder.setTitle(R.string.title_confirmation_open_camera_on_chat);
-        builder.setMessage(message).setPositiveButton(R.string.context_open_link, dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        builder.setMessage(message).setPositiveButton(R.string.context_open_link, dialogClickListener)
+                .setNegativeButton(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button, dialogClickListener).show();
     }
 
     /**

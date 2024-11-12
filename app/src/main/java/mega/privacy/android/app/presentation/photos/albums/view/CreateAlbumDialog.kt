@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -260,7 +261,7 @@ fun CreateNewAlbumDialog(
                 ),
             ) {
                 Text(
-                    stringResource(id = R.string.general_cancel),
+                    stringResource(id = sharedR.string.general_dialog_cancel_button),
                     color = teal_300
                 )
             }

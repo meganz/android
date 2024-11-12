@@ -158,7 +158,7 @@ internal fun SyncListRoute(
             } else {
                 stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_message)
             },
-            confirmButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_confirm_button),
+            confirmButtonText = stringResource(id = sharedR.string.general_upgrade_button),
             cancelButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_cancel_button),
             onConfirm = {
                 Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogUpgradeButtonPressedEvent)

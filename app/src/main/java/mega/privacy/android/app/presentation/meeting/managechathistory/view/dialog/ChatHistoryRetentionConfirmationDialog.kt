@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.managechathistory.view.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -73,7 +74,7 @@ internal fun ChatHistoryRetentionConfirmationDialog(
         },
         isConfirmButtonEnable = { isConfirmButtonEnable },
         onConfirmRequest = onConfirmClick,
-        cancelButtonText = stringResource(id = R.string.general_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onDismissRequest = onDismissRequest,
     )
 }

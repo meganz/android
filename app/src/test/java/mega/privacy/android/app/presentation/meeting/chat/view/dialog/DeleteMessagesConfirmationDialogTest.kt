@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -7,9 +8,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.view.dialog.DeleteMessagesConfirmationDialog
-import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG
-import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_REMOVE_MESSAGES_CONFIRMATION_DIALOG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,7 +25,7 @@ class DeleteMessagesConfirmationDialogTest {
             onNodeWithTag(TEST_TAG_REMOVE_MESSAGES_CONFIRMATION_DIALOG).assertIsDisplayed()
             onNodeWithText(activity.getString(R.string.confirmation_delete_one_message))
                 .assertIsDisplayed()
-            onNodeWithText(activity.getString(R.string.button_cancel)).assertIsDisplayed()
+            onNodeWithText(activity.getString(sharedR.string.general_dialog_cancel_button)).assertIsDisplayed()
             onNodeWithText(activity.getString(R.string.context_remove)).assertIsDisplayed()
         }
     }
@@ -39,7 +37,7 @@ class DeleteMessagesConfirmationDialogTest {
             onNodeWithTag(TEST_TAG_REMOVE_MESSAGES_CONFIRMATION_DIALOG).assertIsDisplayed()
             onNodeWithText(activity.getString(R.string.confirmation_delete_several_messages))
                 .assertIsDisplayed()
-            onNodeWithText(activity.getString(R.string.button_cancel)).assertIsDisplayed()
+            onNodeWithText(activity.getString(sharedR.string.general_dialog_cancel_button)).assertIsDisplayed()
             onNodeWithText(activity.getString(R.string.context_remove)).assertIsDisplayed()
         }
     }

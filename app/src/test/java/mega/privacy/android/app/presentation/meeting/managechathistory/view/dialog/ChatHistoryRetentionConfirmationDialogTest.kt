@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.managechathistory.view.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -14,6 +15,8 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ChatHistoryRetentionOption
 import mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_DAY
@@ -23,8 +26,6 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.CONFIRMATIO
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class ChatHistoryRetentionConfirmationDialogTest {
@@ -40,7 +41,7 @@ class ChatHistoryRetentionConfirmationDialogTest {
                 onDismissRequest = { isDismissRequestInvoked = true }
             )
 
-            onNodeWithText(R.string.general_cancel).performClick()
+            onNodeWithText(sharedR.string.general_dialog_cancel_button).performClick()
 
             assertThat(isDismissRequestInvoked).isTrue()
         }

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.dialogs.deletenode
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -66,7 +67,7 @@ private fun MoveToRubbishOrDeleteNodeDialogBody(
         MegaAlertDialog(
             text = message,
             confirmButtonText = positiveText,
-            cancelButtonText = stringResource(id = R.string.general_cancel),
+            cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
             onConfirm = onPositiveButtonClicked,
             onDismiss = onNegativeButtonClicked
         )

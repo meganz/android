@@ -77,7 +77,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="15dp"
-        android:text="@string/button_cancel"
+        android:text="@string/general_dialog_cancel_button"
         android:textColor="@color/teal_300"
         app:layout_constraintBaseline_toBaselineOf="@id/bt_ok"
         app:layout_constraintBottom_toBottomOf="parent"

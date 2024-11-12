@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting.view
 
 import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -256,7 +257,7 @@ private fun LeaveGroupAlertDialog(
             title = stringResource(id = R.string.meetings_leave_meeting_confirmation_dialog_title),
             text = stringResource(id = R.string.confirmation_leave_group_chat),
             confirmButtonText = stringResource(id = R.string.general_leave),
-            cancelButtonText = stringResource(id = R.string.general_cancel),
+            cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
             onConfirm = onLeave,
             onDismiss = onDismiss,
         )
@@ -292,7 +293,7 @@ private fun AddParticipantsAlertDialog(
                     R.string.chat_add_participants_no_contacts_left_to_add_message
             ),
             confirmButtonText = stringResource(id = R.string.contact_invite),
-            cancelButtonText = stringResource(id = R.string.button_cancel),
+            cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
             onConfirm = onInvite,
             onDismiss = onDismiss,
         )

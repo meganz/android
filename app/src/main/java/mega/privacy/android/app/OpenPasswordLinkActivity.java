@@ -69,7 +69,7 @@ public class OpenPasswordLinkActivity extends PasscodeActivity
         new DecryptAlertDialog.Builder()
                 .setTitle(getString(R.string.hint_set_password_protection_dialog))
                 .setPosText(R.string.general_decryp)
-                .setNegText(R.string.general_cancel)
+                .setNegText(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button)
                 .setErrorMessage(R.string.invalid_link_password)
                 .setKey(key)
                 .setShownPassword(true)

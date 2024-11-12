@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -88,7 +89,7 @@ object AlertsAndWarnings {
 
                 dialog.dismiss()
             }
-            .setNegativeButton(context.getString(R.string.general_cancel)) { dialog, _ ->
+            .setNegativeButton(context.getString(sharedR.string.general_dialog_cancel_button)) { dialog, _ ->
                 dialog.dismiss()
             }.setOnDismissListener {
                 if (context is BaseActivity) {
@@ -142,7 +143,7 @@ object AlertsAndWarnings {
             .setPositiveButton(context.getString(R.string.context_remove)) { _, _ ->
                 onPositive()
             }
-            .setNegativeButton(context.getString(R.string.general_cancel), null)
+            .setNegativeButton(context.getString(sharedR.string.general_dialog_cancel_button), null)
             .create()
             .show()
     }
@@ -162,7 +163,7 @@ object AlertsAndWarnings {
                 ) { _, _ ->
                     onConfirmed(notShowAgain.isChecked)
                 }
-                .setNegativeButton(activity.getString(R.string.general_cancel)) { _, _ -> }
+                .setNegativeButton(activity.getString(sharedR.string.general_dialog_cancel_button)) { _, _ -> }
                 .create()
                 .show()
         }

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.activities.settingsActivities.passcodelock
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -291,7 +292,7 @@ class PasscodeLockActivity : BaseActivity() {
                 isConfirmLogoutDialogShown = false
                 logout()
             }
-            .setNegativeButton(getString(R.string.general_cancel)) { _, _ ->
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button)) { _, _ ->
                 isConfirmLogoutDialogShown = false
             }
             .create()

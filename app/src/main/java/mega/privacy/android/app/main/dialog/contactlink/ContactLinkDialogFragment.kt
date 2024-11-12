@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.dialog.contactlink
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,10 +20,10 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaChatApiJava
 import javax.inject.Inject
 
@@ -69,7 +70,7 @@ internal class ContactLinkDialogFragment : DialogFragment() {
                                     title = contactLink.fullName.orEmpty(),
                                     text = message,
                                     confirmButtonText = confirmButtonText,
-                                    cancelButtonText = stringResource(id = R.string.general_cancel),
+                                    cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                                     onConfirm = {
                                         if (contactLink.isContact) {
                                             ContactUtil.openContactInfoActivity(

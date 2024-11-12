@@ -1,17 +1,16 @@
 package mega.privacy.android.app.presentation.settings.camerauploads.dialogs
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HOW_TO_UPLOAD_DIALOG
-import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HowToUploadDialog
+import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import mega.privacy.android.app.onNodeWithText
 
 /**
  * Test class for [HowToUploadDialog]
@@ -28,7 +27,7 @@ internal class HowToUploadDialogTest {
         composeTestRule.onNodeWithTag(HOW_TO_UPLOAD_DIALOG).assertIsDisplayed()
         composeTestRule.onNodeWithText(R.string.settings_camera_upload_how_to_upload)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(R.string.general_cancel)
+        composeTestRule.onNodeWithText(sharedR.string.general_dialog_cancel_button)
             .assertIsDisplayed()
     }
 

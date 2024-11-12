@@ -44,7 +44,6 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -843,7 +842,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 .setPositiveButton(R.string.discard_close_action) { _, _ ->
                     finish()
                 }
-                .setNegativeButton(R.string.button_cancel) { dialog, _ ->
+                .setNegativeButton(sharedR.string.general_dialog_cancel_button) { dialog, _ ->
                     dialog.dismiss()
                 }.show()
     }

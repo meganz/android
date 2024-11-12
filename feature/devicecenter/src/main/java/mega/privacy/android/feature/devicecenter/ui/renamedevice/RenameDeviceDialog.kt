@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.devicecenter.ui.renamedevice
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,10 +16,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.renamedevice.model.RenameDeviceState
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.DeviceCenterSaveNewDeviceNameButtonEvent
 
@@ -95,7 +96,7 @@ private fun RenameDeviceDialogBody(
         modifier = Modifier.testTag(RENAME_DEVICE_DIALOG_TAG),
         title = stringResource(id = R.string.device_center_rename_device_dialog_title),
         confirmButtonText = stringResource(id = R.string.device_center_rename_device_dialog_positive_button),
-        cancelButtonText = stringResource(id = R.string.device_center_rename_device_dialog_negative_button),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         text = initialInput,
         onInputChange = { initialInput = it },
         error = uiState.errorMessage?.let { nonNullErrorMessage ->

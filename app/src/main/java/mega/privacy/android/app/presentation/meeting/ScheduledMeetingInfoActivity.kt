@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -343,7 +344,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         val name = participant.data.fullName
         dialogBuilder.setMessage(getString(R.string.confirmation_remove_chat_contact, name))
             .setPositiveButton(R.string.general_remove) { _: DialogInterface?, _: Int -> viewModel.removeSelectedParticipant() }
-            .setNegativeButton(R.string.general_cancel, null)
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
             .show()
     }
 

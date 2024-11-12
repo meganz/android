@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
@@ -25,7 +26,7 @@ fun MutePushNotificationDialog(
         titleText = getTitle(isMeeting),
         subTitleText = "",
         confirmButtonText = stringResource(id = R.string.general_ok),
-        cancelButtonText = stringResource(id = R.string.general_cancel),
+        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         radioOptions = state,
         initialSelectedOption = null,
         onDismissRequest = onCancel,

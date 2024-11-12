@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.dialogs.cannotopenfile
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -9,7 +10,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import org.junit.Rule
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.*
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
@@ -27,7 +27,7 @@ class CannotOpenFileDialogTest {
             onNodeWithText(activity.getString(R.string.dialog_cannot_open_file_text))
                 .assertIsDisplayed()
             onNodeWithText(activity.getString(R.string.context_download)).assertIsDisplayed()
-            onNodeWithText(activity.getString(R.string.general_cancel)).assertIsDisplayed()
+            onNodeWithText(activity.getString(sharedR.string.general_dialog_cancel_button)).assertIsDisplayed()
         }
     }
 

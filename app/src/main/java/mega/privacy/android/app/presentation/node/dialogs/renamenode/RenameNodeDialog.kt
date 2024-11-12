@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.dialogs.renamenode
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
@@ -17,13 +18,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnChangeNodeExtensionDialogShown
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnLoadNodeName
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameConfirmed
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnRenameValidationPassed
-import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialogAction.OnChangeNodeExtensionDialogShown
+import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 internal const val RENAME_NODE_DIALOG_TAG = "rename_node_dialog:input_dialog"
 internal const val NODE_NAME_INVALID_CHARACTERS = "\" * / : < > ? \\ |"
@@ -93,7 +94,7 @@ private fun RenameNodeDialogBody(
             modifier = Modifier.testTag(RENAME_NODE_DIALOG_TAG),
             title = stringResource(id = R.string.context_rename),
             confirmButtonText = stringResource(id = R.string.context_rename),
-            cancelButtonText = stringResource(id = R.string.general_cancel),
+            cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
             text = initialInput,
             onInputChange = { initialInput = it },
             error = errorMessage?.let { nonNullErrorMessage ->

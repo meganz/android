@@ -1,12 +1,16 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
+import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -23,13 +27,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
@@ -41,6 +45,7 @@ import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SYNC_FOLDERS
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
+import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_FAB
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesRoute
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesRoute
@@ -48,10 +53,6 @@ import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIs
 import mega.privacy.android.feature.sync.ui.views.ConflictDetailsDialog
 import mega.privacy.android.feature.sync.ui.views.IssuesResolutionDialog
 import mega.privacy.android.feature.sync.ui.views.SyncPermissionWarningBanner
-import mega.privacy.android.icon.pack.R as iconPackR
-import androidx.compose.material.Icon
-import androidx.compose.ui.platform.testTag
-import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_FAB
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.banners.ActionBanner
@@ -68,7 +69,6 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
-import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.mobile.analytics.event.SyncListBannerUpgradeButtonPressedEvent
 
@@ -277,7 +277,7 @@ private fun SyncListScreenContent(
         if (syncFoldersState.isFreeAccount && syncFoldersState.syncUiItems.isNotEmpty()) {
             ActionBanner(
                 mainText = stringResource(id = sharedR.string.sync_error_banner_free_user),
-                leftActionText = stringResource(sharedR.string.sync_error_storage_over_quota_banner_action),
+                leftActionText = stringResource(sharedR.string.general_upgrade_button),
                 leftActionClicked = {
                     Analytics.tracker.trackEvent(SyncListBannerUpgradeButtonPressedEvent)
                     onOpenUpgradeAccountClicked()
@@ -291,7 +291,7 @@ private fun SyncListScreenContent(
         } else if (syncFoldersState.isStorageOverQuota) {
             ActionBanner(
                 mainText = stringResource(sharedR.string.sync_error_storage_over_quota_banner_title),
-                leftActionText = stringResource(sharedR.string.sync_error_storage_over_quota_banner_action),
+                leftActionText = stringResource(sharedR.string.general_upgrade_button),
                 leftActionClicked = onOpenUpgradeAccountClicked,
                 modifier = Modifier.padding(top = 20.dp)
             )

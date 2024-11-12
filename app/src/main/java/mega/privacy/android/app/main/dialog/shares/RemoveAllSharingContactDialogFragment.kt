@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.dialog.shares
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,10 +18,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -62,7 +63,7 @@ internal class RemoveAllSharingContactDialogFragment : DialogFragment() {
                     stringResource(id = R.string.shared_items_outgoing_unshare_confirm_dialog_button_yes)
                 }
                 val cancelButtonText = if (uiState.numberOfShareFolder == 1) {
-                    stringResource(id = R.string.general_cancel)
+                    stringResource(id = sharedR.string.general_dialog_cancel_button)
                 } else {
                     stringResource(id = R.string.shared_items_outgoing_unshare_confirm_dialog_button_no)
                 }

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.fragments
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Dialog
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
@@ -27,7 +28,7 @@ class MeetingHasEndedDialogFragment(
 
         } else {
             builder.setMessage(getString(R.string.meeting_has_ended))
-                .setPositiveButton(R.string.general_cancel, null)
+                .setPositiveButton(sharedR.string.general_dialog_cancel_button, null)
                 .setNegativeButton(R.string.view_meeting_chat, null)
         }
 

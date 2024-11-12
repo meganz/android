@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -33,7 +34,7 @@ fun ClearChatConfirmationDialog(
         id = if (isMeeting) R.string.meetings_clear_history_confirmation_dialog_message
         else R.string.confirmation_clear_chat_history
     ),
-    cancelButtonText = stringResource(id = R.string.button_cancel),
+    cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
     confirmButtonText = stringResource(id = R.string.general_clear),
     onDismiss = onDismiss,
     onConfirm = onConfirm,

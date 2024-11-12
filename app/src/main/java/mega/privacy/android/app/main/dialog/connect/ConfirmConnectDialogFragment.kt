@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.dialog.connect
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,10 +17,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -43,7 +44,7 @@ internal class ConfirmConnectDialogFragment : DialogFragment() {
                     MegaAlertDialog(
                         text = stringResource(id = R.string.confirmation_to_reconnect),
                         confirmButtonText = stringResource(id = R.string.general_ok),
-                        cancelButtonText = stringResource(id = R.string.general_cancel),
+                        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                         onConfirm = {
                             navigateToLogin()
                         },

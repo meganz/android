@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.settingsFragments
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
@@ -87,7 +88,7 @@ class LegacySettingsPasscodeLockFragment : SettingsBaseFragment() {
     private val promptInfo: BiometricPrompt.PromptInfo by lazy {
         BiometricPrompt.PromptInfo.Builder()
             .setTitle(getString(R.string.title_enable_fingerprint))
-            .setNegativeButtonText(getString(R.string.general_cancel))
+            .setNegativeButtonText(getString(sharedR.string.general_dialog_cancel_button))
             .setAllowedAuthenticators(BIOMETRIC_STRONG)
             .build()
     }

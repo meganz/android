@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,10 +15,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -44,7 +45,7 @@ internal class ClearRubbishBinDialogFragment : DialogFragment() {
                         title = stringResource(id = R.string.context_clear_rubbish),
                         text = stringResource(id = R.string.clear_rubbish_confirmation),
                         confirmButtonText = stringResource(id = R.string.general_clear),
-                        cancelButtonText = stringResource(id = R.string.general_cancel),
+                        cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                         onConfirm = {
                             nodeController.cleanRubbishBin()
                             dismissAllowingStateLoss()

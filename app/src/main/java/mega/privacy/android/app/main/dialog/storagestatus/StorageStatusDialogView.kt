@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.dialog.storagestatus
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -33,12 +34,12 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.h6
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.h6
 
 internal const val TITLE_TAG = "storage_status_dialog:text_title"
 internal const val IMAGE_STATUS_TAG = "storage_status_dialog:image_status"
@@ -302,9 +303,9 @@ private fun getDetail(state: StorageStatusDialogState): DialogViewDetail {
                 else -> {}
             }
             verticalActionButtonText =
-                stringResource(id = R.string.my_account_upgrade_pro)
+                stringResource(id = sharedR.string.general_upgrade_button)
             horizontalActionButtonText =
-                stringResource(id = R.string.my_account_upgrade_pro)
+                stringResource(id = sharedR.string.general_upgrade_button)
         }
 
         else -> {

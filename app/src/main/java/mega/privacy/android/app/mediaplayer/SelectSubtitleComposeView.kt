@@ -1,6 +1,7 @@
 package mega.privacy.android.app.mediaplayer
 
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -259,7 +260,7 @@ internal fun SelectSubtitleView(
                     onClick = onBackPressed
                 ) {
                     Text(
-                        text = stringResource(id = R.string.general_cancel),
+                        text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                         color = colorResource(id = R.color.teal_300)
                     )
                 }

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,7 +24,7 @@ fun ResumeTransfersDialog(
         title = stringResource(R.string.warning_resume_transfers),
         text = stringResource(R.string.warning_message_resume_transfers),
         confirmButtonText = stringResource(R.string.button_resume_individual_transfer),
-        cancelButtonText = stringResource(R.string.general_cancel),
+        cancelButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
         onConfirm = onResume,
         onDismiss = onDismiss,
         modifier = modifier.testTag(RESUME_TRANSFERS_DIALOG_TAG),

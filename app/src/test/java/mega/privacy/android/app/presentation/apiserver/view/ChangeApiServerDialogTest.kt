@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.apiserver.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -7,7 +8,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.apiserver.model.ApiServerUIState
-import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -63,7 +63,7 @@ class ChangeApiServerDialogTest {
     @Test
     fun `test that cancel button is displayed`() {
         initComposeRuleContent()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.general_cancel))
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_dialog_cancel_button))
             .assertIsDisplayed()
     }
 

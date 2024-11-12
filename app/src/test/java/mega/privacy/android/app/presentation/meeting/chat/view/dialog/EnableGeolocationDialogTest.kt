@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -7,9 +8,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.view.dialog.EnableGeolocationDialog
-import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG
-import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_ENABLE_GEOLOCATION_DIALOG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,7 +28,7 @@ class EnableGeolocationDialogTest {
             onNodeWithText(activity.getString(R.string.explanation_send_location))
                 .assertIsDisplayed()
             onNodeWithText(activity.getString(R.string.button_continue)).assertIsDisplayed()
-            onNodeWithText(activity.getString(R.string.button_cancel)).assertIsDisplayed()
+            onNodeWithText(activity.getString(sharedR.string.general_dialog_cancel_button)).assertIsDisplayed()
         }
     }
 

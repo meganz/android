@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.dialogs.removesharefolder
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -9,9 +10,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
@@ -66,7 +67,7 @@ private fun RemoveShareFolderDialogBody(
             stringResource(id = R.string.shared_items_outgoing_unshare_confirm_dialog_button_yes)
         }
         val cancelButtonText = if (state.numberOfShareFolder == 1) {
-            stringResource(id = R.string.general_cancel)
+            stringResource(id = sharedR.string.general_dialog_cancel_button)
         } else {
             stringResource(id = R.string.shared_items_outgoing_unshare_confirm_dialog_button_no)
         }

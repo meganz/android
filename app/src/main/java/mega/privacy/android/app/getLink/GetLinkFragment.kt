@@ -38,7 +38,6 @@ import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -702,7 +701,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
                 setupView()
                 setupObservers()
             }
-            .setNegativeButton(R.string.general_cancel) { _, _ -> activity?.finish() }
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button) { _, _ -> activity?.finish() }
             .show()
     }
 

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.activities.settingsActivities
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.DialogInterface
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
@@ -44,7 +45,7 @@ class CookiePreferencesActivity : PreferencesBaseActivity() {
             .setPositiveButton(getString(R.string.save_action)) { _: DialogInterface, _: Int ->
                 saveCookieSettings()
             }
-            .setNegativeButton(getString(R.string.button_cancel), null)
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
             .create()
             .show()
     }

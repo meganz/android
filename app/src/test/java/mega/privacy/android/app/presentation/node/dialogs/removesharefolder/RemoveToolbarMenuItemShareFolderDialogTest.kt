@@ -1,18 +1,19 @@
 package mega.privacy.android.app.presentation.node.dialogs.removesharefolder
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.R
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.fromPluralId
 import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.fromPluralId
 
 @RunWith(AndroidJUnit4::class)
 class RemoveToolbarMenuItemShareFolderDialogTest {
@@ -90,7 +91,7 @@ class RemoveToolbarMenuItemShareFolderDialogTest {
         ).assertExists()
 
         composeTestRule.onNodeWithText(
-            fromId(R.string.general_cancel)
+            fromId(sharedR.string.general_dialog_cancel_button)
         ).assertExists()
     }
 
@@ -126,7 +127,7 @@ class RemoveToolbarMenuItemShareFolderDialogTest {
         ).assertExists()
 
         composeTestRule.onNodeWithText(
-            fromId(R.string.general_cancel)
+            fromId(sharedR.string.general_dialog_cancel_button)
         ).assertExists()
     }
 }

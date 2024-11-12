@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
@@ -110,7 +111,7 @@ object MegaNodeDialogUtil {
         renameDialogBuilder
             .setTitle(context.getString(R.string.context_rename))
             .setPositiveButton(R.string.context_rename, null)
-            .setNegativeButton(R.string.general_cancel, null)
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
 
         return setFinalValuesAndShowDialog(
             context, node, actionNodeCallback, snackbarShower,
@@ -139,7 +140,7 @@ object MegaNodeDialogUtil {
         newFolderDialogBuilder
             .setTitle(R.string.menu_new_folder)
             .setPositiveButton(R.string.general_create, null)
-            .setNegativeButton(R.string.general_cancel, null)
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
 
         val dialog = setFinalValuesAndShowDialog(
             context, parentNode, actionNodeCallback, null, null, null,
@@ -174,7 +175,7 @@ object MegaNodeDialogUtil {
         newTxtFileDialogBuilder
             .setTitle(R.string.dialog_title_new_text_file)
             .setPositiveButton(R.string.general_create, null)
-            .setNegativeButton(R.string.general_cancel, null)
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
 
         val dialog = setFinalValuesAndShowDialog(
             context,
@@ -529,7 +530,7 @@ object MegaNodeDialogUtil {
         MaterialAlertDialogBuilder(context)
             .setTitle(context.getString(R.string.file_extension_change_title))
             .setMessage(context.getString(R.string.file_extension_change_warning))
-            .setPositiveButton(context.getString(R.string.general_cancel), null)
+            .setPositiveButton(context.getString(sharedR.string.general_dialog_cancel_button), null)
             .setNegativeButton(context.getString(R.string.action_change_anyway)) { _, _ ->
                 confirmRenameAction(node, typedString, snackbarShower, actionNodeCallback)
             }
@@ -656,7 +657,7 @@ object MegaNodeDialogUtil {
 
                     progress.show()
                 }
-                .setNegativeButton(activity.getString(R.string.general_cancel), null)
+                .setNegativeButton(activity.getString(sharedR.string.general_dialog_cancel_button), null)
                 .show()
         } else {
             MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
@@ -679,7 +680,7 @@ object MegaNodeDialogUtil {
 
                     progress.show()
                 }
-                .setNegativeButton(activity.getString(R.string.general_cancel), null)
+                .setNegativeButton(activity.getString(sharedR.string.general_dialog_cancel_button), null)
                 .show()
         }
     }
@@ -777,7 +778,7 @@ object MegaNodeDialogUtil {
                     dialogClickListener
                 )
                 builder.setNegativeButton(
-                    activity.getString(R.string.general_cancel),
+                    activity.getString(sharedR.string.general_dialog_cancel_button),
                     dialogClickListener
                 )
             } else {

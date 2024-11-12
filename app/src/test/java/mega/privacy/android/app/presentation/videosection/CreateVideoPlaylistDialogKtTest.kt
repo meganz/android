@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.videosection
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -10,17 +11,16 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.videosection.view.playlist.CreateVideoPlaylistDialog
 import mega.privacy.android.app.presentation.videosection.view.playlist.ERROR_MESSAGE_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.POSITIVE_BUTTON_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.*
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class CreateVideoPlaylistDialogKtTest {
@@ -120,7 +120,7 @@ class CreateVideoPlaylistDialogKtTest {
             onDismissRequest = onDismissRequest,
         )
 
-        composeTestRule.onNodeWithText(R.string.general_cancel).performClick()
+        composeTestRule.onNodeWithText(sharedR.string.general_dialog_cancel_button).performClick()
 
         verify(onDismissRequest).invoke()
     }

@@ -1,12 +1,12 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.view.dialog.CanNotOpenFileDialog
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +26,7 @@ class CanNotOpenFileDialogTest {
             .assertIsDisplayed()
         composeRule.onNodeWithText(composeRule.activity.getString(R.string.context_download))
             .assertIsDisplayed()
-        composeRule.onNodeWithText(composeRule.activity.getString(R.string.general_cancel))
+        composeRule.onNodeWithText(composeRule.activity.getString(sharedR.string.general_dialog_cancel_button))
     }
 
     private fun initComposeRuleContent() {

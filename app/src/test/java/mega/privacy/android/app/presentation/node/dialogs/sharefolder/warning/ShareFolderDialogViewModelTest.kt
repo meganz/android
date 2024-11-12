@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.dialogs.sharefolder.warning
 
+import mega.privacy.android.shared.resources.R as sharedR
 import com.google.common.truth.Truth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -59,7 +60,7 @@ class ShareFolderDialogViewModelTest {
             val state = underTest.state.value
             Truth.assertThat(state.info).isEqualTo(R.string.backup_multi_share_permission_text)
             Truth.assertThat(state.positiveButton).isEqualTo(R.string.general_positive_button)
-            Truth.assertThat(state.negativeButton).isEqualTo(R.string.general_cancel)
+            Truth.assertThat(state.negativeButton).isEqualTo(sharedR.string.general_dialog_cancel_button)
         }
 
     @AfterEach

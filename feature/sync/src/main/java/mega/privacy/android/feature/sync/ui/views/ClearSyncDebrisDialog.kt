@@ -26,7 +26,7 @@ internal fun ClearSyncDebrisDialog(
         title = stringResource(R.string.settings_sync_clear_debris_dialog_title),
         text = stringResource(R.string.settings_sync_clear_debris_dialog_body),
         confirmButtonText = stringResource(R.string.settings_sync_clear_debris_dialog_continue),
-        cancelButtonText = stringResource(R.string.settings_sync_clear_debris_dialog_cancel),
+        cancelButtonText = stringResource(R.string.general_dialog_cancel_button),
         onConfirm = onConfirm,
         onDismiss = onDismiss,
         modifier = modifier

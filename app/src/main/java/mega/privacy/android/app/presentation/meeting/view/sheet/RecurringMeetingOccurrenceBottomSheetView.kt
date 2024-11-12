@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.view.sheet
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -151,7 +152,7 @@ private fun BottomSheetContent(
         BottomSheetMenuItemView(
             modifier = Modifier.testTag(CANCEL_OCCURRENCE_TAG),
             res = R.drawable.ic_trash,
-            text = R.string.general_cancel,
+            text = sharedR.string.general_dialog_cancel_button,
             description = "Cancel",
             tintRed = true,
             onClick = {

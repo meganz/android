@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.settings.reportissue.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -52,7 +53,7 @@ private fun ProgressHandler(
             title = stringResource(id = R.string.settings_help_report_issue_uploading_log_file),
             progress = uploadProgress,
             onCancel = cancelUpload,
-            cancelButtonText = stringResource(id = R.string.general_cancel)
+            cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button)
         )
     }
 }

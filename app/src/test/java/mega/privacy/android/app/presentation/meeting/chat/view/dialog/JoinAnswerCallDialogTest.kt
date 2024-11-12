@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.dialog
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -7,16 +8,12 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.view.dialog.JoinAnswerCallDialog
-import mega.privacy.android.app.presentation.meeting.chat.view.dialog.JoinAnswerCallDialogStatus
-import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_JOIN_ANSWER_CALL_DIALOG
-import org.junit.Assert.*
+import mega.privacy.android.app.onNodeWithText
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class JoinAnswerCallDialogTest {
@@ -42,7 +39,7 @@ class JoinAnswerCallDialogTest {
             onNodeWithText(R.string.text_join_another_call).assertIsDisplayed()
             onNodeWithText(R.string.hold_and_join_call_incoming).assertIsDisplayed()
             onNodeWithText(R.string.end_and_join_call_incoming).assertIsDisplayed()
-            onNodeWithText(R.string.general_cancel).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_dialog_cancel_button).assertIsDisplayed()
         }
     }
 
@@ -60,7 +57,7 @@ class JoinAnswerCallDialogTest {
             onNodeWithText(R.string.text_join_call).assertIsDisplayed()
             onNodeWithText(R.string.hold_and_join_call_incoming).assertDoesNotExist()
             onNodeWithText(R.string.end_and_join_call_incoming).assertIsDisplayed()
-            onNodeWithText(R.string.general_cancel).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_dialog_cancel_button).assertIsDisplayed()
         }
     }
 
@@ -78,7 +75,7 @@ class JoinAnswerCallDialogTest {
             onNodeWithText(R.string.text_join_another_call).assertIsDisplayed()
             onNodeWithText(R.string.hold_and_answer_call_incoming).assertIsDisplayed()
             onNodeWithText(R.string.end_and_answer_call_incoming).assertIsDisplayed()
-            onNodeWithText(R.string.general_cancel).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_dialog_cancel_button).assertIsDisplayed()
         }
     }
 
@@ -96,7 +93,7 @@ class JoinAnswerCallDialogTest {
             onNodeWithText(R.string.text_join_call).assertIsDisplayed()
             onNodeWithText(R.string.hold_and_answer_call_incoming).assertDoesNotExist()
             onNodeWithText(R.string.end_and_answer_call_incoming).assertIsDisplayed()
-            onNodeWithText(R.string.general_cancel).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_dialog_cancel_button).assertIsDisplayed()
         }
     }
 
@@ -211,7 +208,7 @@ class JoinAnswerCallDialogTest {
             )
         )
         with(composeRule) {
-            onNodeWithText(R.string.general_cancel).apply {
+            onNodeWithText(sharedR.string.general_dialog_cancel_button).apply {
                 assertIsDisplayed()
                 performClick()
             }
@@ -228,7 +225,7 @@ class JoinAnswerCallDialogTest {
             )
         )
         with(composeRule) {
-            onNodeWithText(R.string.general_cancel).apply {
+            onNodeWithText(sharedR.string.general_dialog_cancel_button).apply {
                 assertIsDisplayed()
                 performClick()
             }
@@ -245,7 +242,7 @@ class JoinAnswerCallDialogTest {
             )
         )
         with(composeRule) {
-            onNodeWithText(R.string.general_cancel).apply {
+            onNodeWithText(sharedR.string.general_dialog_cancel_button).apply {
                 assertIsDisplayed()
                 performClick()
             }
@@ -262,7 +259,7 @@ class JoinAnswerCallDialogTest {
             )
         )
         with(composeRule) {
-            onNodeWithText(R.string.general_cancel).apply {
+            onNodeWithText(sharedR.string.general_dialog_cancel_button).apply {
                 assertIsDisplayed()
                 performClick()
             }

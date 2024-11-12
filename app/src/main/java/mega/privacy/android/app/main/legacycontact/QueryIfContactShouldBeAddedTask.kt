@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.legacycontact
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.DialogInterface
 import android.os.AsyncTask
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -166,7 +167,7 @@ class QueryIfContactShouldBeAddedTask(addContactActivity: AddContactActivity) :
                     )
 
                     builder.setPositiveButton(R.string.menu_add_contact, dialogClickListener)
-                        .setNegativeButton(R.string.general_cancel, dialogClickListener).show()
+                        .setNegativeButton(sharedR.string.general_dialog_cancel_button, dialogClickListener).show()
                 }
 
                 isPhoneContact, addContactPhone -> {
@@ -178,7 +179,7 @@ class QueryIfContactShouldBeAddedTask(addContactActivity: AddContactActivity) :
                     )
 
                     builder.setPositiveButton(R.string.menu_add_contact, dialogClickListener)
-                        .setNegativeButton(R.string.general_cancel, dialogClickListener).show()
+                        .setNegativeButton(sharedR.string.general_dialog_cancel_button, dialogClickListener).show()
                 }
 
                 isAddedContact -> {
@@ -189,7 +190,7 @@ class QueryIfContactShouldBeAddedTask(addContactActivity: AddContactActivity) :
                         )
                     )
 
-                    builder.setNegativeButton(R.string.general_cancel, dialogClickListener).show()
+                    builder.setNegativeButton(sharedR.string.general_dialog_cancel_button, dialogClickListener).show()
                 }
 
                 isMegaContact -> {
@@ -200,7 +201,7 @@ class QueryIfContactShouldBeAddedTask(addContactActivity: AddContactActivity) :
                         )
                     )
 
-                    builder.setNegativeButton(R.string.general_cancel, dialogClickListener).show()
+                    builder.setNegativeButton(sharedR.string.general_dialog_cancel_button, dialogClickListener).show()
                 }
             }
             addContactActivity.isConfirmAddShown = true

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.login
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -752,7 +753,7 @@ class LoginFragment : Fragment() {
         ).setTitle(getString(R.string.title_dialog_insert_MK))
             .setMessage(getString(R.string.text_dialog_insert_MK))
             .setPositiveButton(getString(R.string.general_ok), null)
-            .setNegativeButton(getString(R.string.general_cancel), null)
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
             .setView(layout)
             .setOnDismissListener {
                 Util.hideKeyboard(requireActivity(), InputMethodManager.HIDE_NOT_ALWAYS)
@@ -829,7 +830,7 @@ class LoginFragment : Fragment() {
     private fun showCancelTransfersDialog() = AlertDialog.Builder(requireContext()).apply {
         setMessage(R.string.login_warning_abort_transfers)
         setPositiveButton(R.string.login_text) { _, _ -> viewModel.onLoginClicked(true) }
-        setNegativeButton(R.string.general_cancel) { _, _ -> viewModel.resetOngoingTransfers() }
+        setNegativeButton(sharedR.string.general_dialog_cancel_button) { _, _ -> viewModel.resetOngoingTransfers() }
         setCancelable(false)
         show()
     }

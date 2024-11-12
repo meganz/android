@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.views
 
+import mega.privacy.android.shared.resources.R as sharedRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -8,7 +9,6 @@ import mega.privacy.android.feature.sync.ui.model.SyncFrequency
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.resources.R as sharedRes
 
 @Composable
 internal fun SyncFrequencyDialog(
@@ -23,7 +23,7 @@ internal fun SyncFrequencyDialog(
             onSyncFrequencyClicked(it)
         },
         initialSelectedOption = selectedSyncFrequency,
-        cancelButtonText = stringResource(sharedRes.string.settings_sync_option_cancel),
+        cancelButtonText = stringResource(sharedRes.string.general_dialog_cancel_button),
         onDismissRequest = onDismiss,
         optionDescriptionMapper = { syncFrequency ->
             frequencyToString(syncFrequency)

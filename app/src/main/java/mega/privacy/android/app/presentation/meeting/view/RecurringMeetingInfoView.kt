@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.view
 
 import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.text.format.DateFormat
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -158,7 +159,7 @@ fun RecurringMeetingInfoView(
             EditOccurrenceDialog(
                 title = stringResource(id = R.string.meetings_update_scheduled_meeting_occurrence_dialog_title),
                 confirmButtonText = stringResource(id = R.string.meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button),
-                cancelButtonText = stringResource(id = R.string.button_cancel),
+                cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                 dateTitleText = stringResource(id = R.string.meetings_update_scheduled_meeting_occurrence_dialog_date_section),
                 dateText = it.getDateFormatted() ?: "",
                 startTimeTitleText = stringResource(id = R.string.meetings_update_scheduled_meeting_occurrence_dialog_start_time_section),

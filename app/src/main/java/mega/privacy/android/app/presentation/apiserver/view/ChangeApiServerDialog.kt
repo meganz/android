@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.apiserver.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,10 +13,10 @@ import mega.privacy.android.app.presentation.apiserver.ApiServerViewModel
 import mega.privacy.android.app.presentation.apiserver.extensions.getTextId
 import mega.privacy.android.app.presentation.apiserver.model.ApiServerUIState
 import mega.privacy.android.app.presentation.apiserver.view.navigation.openLoginActivity
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.domain.entity.apiserver.ApiServer
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.apiserver.ApiServer
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Change api server dialog wit radio buttons for each available api server.
@@ -54,7 +55,7 @@ internal fun ChangeApiServerDialog(
     radioOptions = ApiServer.values().toList(),
     onOptionSelected = onOptionSelected,
     onDismissRequest = onDismissRequest,
-    cancelButtonText = stringResource(id = R.string.general_cancel),
+    cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
     confirmButtonText = stringResource(id = R.string.general_ok),
     onConfirmRequest = onConfirmRequest,
     titleText = stringResource(id = R.string.title_change_server),

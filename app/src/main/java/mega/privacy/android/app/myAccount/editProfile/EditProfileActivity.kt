@@ -1,5 +1,6 @@
 package mega.privacy.android.app.myAccount.editProfile
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -564,7 +565,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             .setTitle(getString(R.string.change_name_action))
             .setView(dialogBinding.root)
             .setPositiveButton(getString(R.string.save_action), null)
-            .setNegativeButton(getString(R.string.button_cancel), null)
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
             .create()
 
         changeNameDialog?.apply {
@@ -662,7 +663,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             .setTitle(getString(R.string.change_mail_title_last_step))
             .setView(dialogBinding.root)
             .setPositiveButton(getString(R.string.save_action), null)
-            .setNegativeButton(getString(R.string.button_cancel), null)
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
             .create()
 
         changeEmailDialog?.apply {
@@ -732,7 +733,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             .setPositiveButton(R.string.context_delete) { _, _ ->
                 viewModel.deleteProfileAvatar(this, this)
             }
-            .setNegativeButton(R.string.general_cancel, null)
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
             .show()
     }
 
@@ -756,7 +757,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 .setPositiveButton(R.string.general_ok) { _, _ ->
                     viewModel.resetPhoneNumber(isModify, this)
                 }
-                .setNegativeButton(getString(R.string.general_cancel), null)
+                .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
                 .show()
     }
 

@@ -266,7 +266,7 @@ internal fun ConfirmEmailScreen(
 
                 TextMegaButton(
                     modifier = Modifier.testTag(CANCEL_BUTTON_TAG),
-                    textId = R.string.general_cancel,
+                    textId = SharedResR.string.general_dialog_cancel_button,
                     onClick = onCancelClick
                 )
             }

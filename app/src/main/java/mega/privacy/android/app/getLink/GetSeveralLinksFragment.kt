@@ -25,7 +25,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentGetSeveralLinksBinding
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.getLink.adapter.LinksAdapter
 import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -152,7 +151,7 @@ class GetSeveralLinksFragment : Fragment() {
                 setupView()
                 setupObservers()
             }
-            .setNegativeButton(R.string.general_cancel) { _, _ -> activity?.finish() }
+            .setNegativeButton(sharedR.string.general_dialog_cancel_button) { _, _ -> activity?.finish() }
             .show()
     }
 

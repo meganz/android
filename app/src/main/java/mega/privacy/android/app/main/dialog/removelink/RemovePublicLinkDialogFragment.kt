@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.dialog.removelink
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,10 +19,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -50,7 +51,7 @@ internal class RemovePublicLinkDialogFragment : DialogFragment() {
                         count = ids.size
                     ),
                     confirmButtonText = stringResource(id = R.string.general_remove),
-                    cancelButtonText = stringResource(id = R.string.general_cancel),
+                    cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     onConfirm = {
                         activityViewModel.disableExport(ids.toList())
                         dismissAllowingStateLoss()

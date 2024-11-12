@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.settings.camerauploads.dialogs
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -36,7 +37,7 @@ internal fun CameraUploadsBusinessAccountDialog(
         title = stringResource(R.string.section_photo_sync),
         text = stringResource(R.string.camera_uploads_business_alert),
         confirmButtonText = stringResource(R.string.general_enable),
-        cancelButtonText = stringResource(R.string.general_cancel),
+        cancelButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
         onConfirm = onAlertAcknowledged,
         onDismiss = onAlertDismissed,
     )
