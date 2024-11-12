@@ -5,6 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -19,7 +20,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.red_200
 import mega.privacy.android.shared.original.core.ui.theme.teal_300_alpha_020
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import java.text.Normalizer
+import mega.privacy.android.shared.original.core.ui.utils.normalize
 
 /**
  * @param text Text to show
@@ -58,25 +59,29 @@ fun HighlightedText(
         return
     }
 
-    val annotatedText: AnnotatedString = buildAnnotatedString {
-        append(text)
-        var startIndex = text.normalize().indexOf(string = highlightText, ignoreCase = true)
+    val annotatedText: AnnotatedString = remember(text) {
+        buildAnnotatedString {
+            append(text)
+            val normalizedHighlight = highlightText.normalize()
+            var startIndex =
+                text.normalize().indexOf(string = normalizedHighlight, ignoreCase = true)
 
-        while (startIndex >= 0) {
-            val endIndex = startIndex + highlightText.length
-            addStyle(
-                style = SpanStyle(
-                    background = highlightColor,
-                    fontWeight = highlightFontWeight,
-                ),
-                start = startIndex,
-                end = endIndex
-            )
-            startIndex = text.indexOf(
-                string = highlightText,
-                startIndex = startIndex + highlightText.length,
-                ignoreCase = true
-            )
+            while (startIndex >= 0) {
+                val endIndex = startIndex + normalizedHighlight.length
+                addStyle(
+                    style = SpanStyle(
+                        background = highlightColor,
+                        fontWeight = highlightFontWeight,
+                    ),
+                    start = startIndex,
+                    end = endIndex
+                )
+                startIndex = text.indexOf(
+                    string = normalizedHighlight,
+                    startIndex = startIndex + normalizedHighlight.length,
+                    ignoreCase = true
+                )
+            }
         }
     }
 
@@ -89,11 +94,6 @@ fun HighlightedText(
         color = MegaOriginalTheme.textColor(textColor = textColor),
     )
 }
-
-
-private fun String.normalize(): String = runCatching {
-    Normalizer.normalize(this, Normalizer.Form.NFD)
-}.getOrDefault(this)
 
 @CombinedThemePreviews
 @Composable
@@ -112,7 +112,7 @@ private fun HighlightedTextPreview() {
 private fun HighlightedTextBoldPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         HighlightedText(
-            text = "This is a title with TITLE highlight",
+            text = "This is ä tìtle with TITLE highlight",
             highlightText = "TITLE",
             textColor = TextColor.Primary,
             highlightColor = red_200,
