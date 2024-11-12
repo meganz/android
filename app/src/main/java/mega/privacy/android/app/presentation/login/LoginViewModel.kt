@@ -78,6 +78,7 @@ import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
@@ -133,6 +134,7 @@ class LoginViewModel @Inject constructor(
     private val clearUserCredentialsUseCase: ClearUserCredentialsUseCase,
     private val startUploadsWorkerUseCase: StartUploadsWorkerUseCase,
     private val getHistoricalProcessExitReasonsUseCase: GetHistoricalProcessExitReasonsUseCase,
+    private val enableRequestStatusMonitorUseCase: EnableRequestStatusMonitorUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -154,6 +156,16 @@ class LoginViewModel @Inject constructor(
     private val cleanFetchNodesUpdate by lazy { FetchNodesUpdate() }
 
     init {
+        viewModelScope.launch {
+            runCatching {
+                if (getFeatureFlagValueUseCase(AppFeatures.RequestStatusProgressDialog)) {
+                    enableRequestStatusMonitorUseCase()
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+
         viewModelScope.launch {
             runCatching {
                 getHistoricalProcessExitReasonsUseCase()

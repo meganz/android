@@ -29,19 +29,19 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 /**
  * Wrapper for [MegaAnimatedLinearProgressIndicator] to set default parameters to better represent the project theme
  * @param indicatorProgress set the current progress [0..1] or null for an indeterminate progress indicator
- *
+ * @param progressAnimDuration set the duration of the progress animation in milliseconds
  */
 @Composable
 fun MegaAnimatedLinearProgressIndicator(
     modifier: Modifier = Modifier,
     indicatorProgress: Float = 0f,
-    fastAnimation: Boolean = false,
+    progressAnimDuration: Int = 500,
     height: Dp = 8.dp,
+    clip: RoundedCornerShape = RoundedCornerShape(20.dp),
     strokeCap: StrokeCap = StrokeCap.Round,
 ) {
     val isInPreview = LocalInspectionMode.current
     var progress by remember { mutableFloatStateOf(if (isInPreview) indicatorProgress else 0f) }
-    val progressAnimDuration = if (fastAnimation) 1000 else 3000
     val progressAnimation by animateFloatAsState(
         targetValue = progress,
         animationSpec = tween(durationMillis = progressAnimDuration, easing = FastOutSlowInEasing),
@@ -52,7 +52,7 @@ fun MegaAnimatedLinearProgressIndicator(
         modifier = modifier
             .fillMaxWidth()
             .height(height)
-            .clip(RoundedCornerShape(20.dp)),
+            .clip(clip),
         progress = progressAnimation,
         color = MegaOriginalTheme.colors.button.brand,
         strokeCap = strokeCap,

@@ -57,6 +57,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
@@ -210,6 +211,7 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscover
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketFragment
+import mega.privacy.android.app.presentation.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinComposeFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.SearchActivity
@@ -551,6 +553,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private lateinit var documentScanningErrorDialogComposeView: ComposeView
     private lateinit var freePlanLimitParticipantsDialogComposeView: ComposeView
     private lateinit var syncPromotionBottomSheetComposeView: ComposeView
+    private lateinit var requestStatusProgressComposeView: ComposeView
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var navigationView: NavigationView
     private lateinit var adsContainerView: FrameLayout
@@ -1042,6 +1045,8 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             findViewById(R.id.free_plan_limit_dialog_compose_view)
         syncPromotionBottomSheetComposeView =
             findViewById(R.id.sync_promotion_bottom_sheet_compose_view)
+        requestStatusProgressComposeView =
+            findViewById(R.id.request_status_progress_compose_view)
         adsContainerView = findViewById(R.id.ads_web_compose_view)
         fragmentLayout = findViewById(R.id.fragment_layout)
         bottomNavigationView =
@@ -1131,6 +1136,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
         }
 
+        setRequestStatusProgressComposeView()
         setSyncPromotionBottomSheetComposeView()
 
         freePlanLimitParticipantsDialogComposeView.apply {
@@ -1206,6 +1212,20 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             findViewById<ComposeView>(R.id.call_in_progress_layout).setContent {
                 OngoingCallBanner(viewModel = callInProgressViewModel) { isShow ->
                     changeAppBarElevation(isShow, ELEVATION_CALL_IN_PROGRESS)
+                }
+            }
+        }
+    }
+
+    private fun setRequestStatusProgressComposeView() {
+        requestStatusProgressComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val isDark = themeMode.isDarkMode()
+                OriginalTempTheme(isDark = isDark) {
+                    RequestStatusProgressContainer()
                 }
             }
         }
@@ -6942,7 +6962,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * Shows all the content of bottom view.
      */
     private fun showBottomView() {
-        val bottomView: LinearLayout = findViewById(R.id.container_bottom)
+        val bottomView: ConstraintLayout = findViewById(R.id.container_bottom)
         if (isInImagesPage) {
             return
         }

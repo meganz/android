@@ -24,6 +24,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
+     * Enable request status progress dialog
+     */
+    RequestStatusProgressDialog(
+        "Enable request status progress dialog",
+        true
+    ),
+
+    /**
      * Enable video recently watched feature
      */
     VideoRecentlyWatched(

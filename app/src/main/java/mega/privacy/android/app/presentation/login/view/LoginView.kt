@@ -413,7 +413,7 @@ private fun LoginInProgress(
         ) {
             MegaAnimatedLinearProgressIndicator(
                 indicatorProgress = state.currentProgress,
-                fastAnimation = state.currentProgress > 0.5f,
+                progressAnimDuration = if (state.currentProgress > 0.5f) 1000 else 3000,
                 modifier = Modifier
                     .padding(start = 56.dp, end = 56.dp)
                     .widthIn(max = 300.dp)

@@ -49,6 +49,7 @@ import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
@@ -113,6 +114,7 @@ internal class LoginViewModelTest {
     private val startUploadsWorkerUseCase = mock<StartUploadsWorkerUseCase>()
     private val getHistoricalProcessExitReasonsUseCase =
         mock<GetHistoricalProcessExitReasonsUseCase>()
+    private val enableRequestStatusMonitorUseCase = mock<EnableRequestStatusMonitorUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -153,7 +155,8 @@ internal class LoginViewModelTest {
             transfersManagement = transfersManagement,
             clearUserCredentialsUseCase = clearUserCredentialsUseCase,
             startUploadsWorkerUseCase = startUploadsWorkerUseCase,
-            getHistoricalProcessExitReasonsUseCase = getHistoricalProcessExitReasonsUseCase
+            getHistoricalProcessExitReasonsUseCase = getHistoricalProcessExitReasonsUseCase,
+            enableRequestStatusMonitorUseCase = enableRequestStatusMonitorUseCase
         )
     }
 
