@@ -56,12 +56,12 @@ fun getSyncListRoute(
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
 ): String {
     var finalRoute = syncListRoute
-    deviceName?.let { deviceNameValue ->
-        finalRoute = finalRoute.replace(
-            oldValue = "{deviceName}",
-            newValue = encodeDeviceName(deviceNameValue),
-        )
-    }
+    finalRoute = finalRoute.replace(
+        oldValue = "{deviceName}",
+        newValue = deviceName?.let { deviceNameValue ->
+            encodeDeviceName(deviceNameValue)
+        } ?: ""
+    )
     val selectedChipJson = GsonBuilder().create().toJson(selectedChip)
     finalRoute = finalRoute.replace(oldValue = "{selectedChip}", newValue = selectedChipJson)
     return finalRoute
@@ -87,12 +87,12 @@ private const val syncNewFolderRoute = "$syncRoute/new-folder/{syncType}?deviceN
 fun getSyncNewFolderRoute(syncType: SyncType, deviceName: String? = null): String {
     val syncTypeJson = GsonBuilder().create().toJson(syncType)
     var finalRoute = syncNewFolderRoute.replace(oldValue = "{syncType}", newValue = syncTypeJson)
-    deviceName?.let { deviceNameValue ->
-        finalRoute = finalRoute.replace(
-            oldValue = "{deviceName}",
-            newValue = encodeDeviceName(deviceNameValue),
-        )
-    }
+    finalRoute = finalRoute.replace(
+        oldValue = "{deviceName}",
+        newValue = deviceName?.let { deviceNameValue ->
+            encodeDeviceName(deviceNameValue)
+        } ?: ""
+    )
     return finalRoute
 }
 
@@ -157,7 +157,7 @@ internal fun NavGraphBuilder.syncNavGraph(
                 ?: SyncType.TYPE_TWOWAY
             Timber.d("Sync Type = $syncType")
             deviceName = navBackStackEntry.arguments?.getString("deviceName", null)
-                ?.let { decodeDeviceName(it) }
+                ?.let { if (it.isNotEmpty()) decodeDeviceName(it) else null }
 
             SyncNewFolderScreenRoute(
                 hiltViewModel<SyncNewFolderViewModel, SyncNewFolderViewModel.SyncNewFolderViewModelFactory> { factory ->
@@ -207,7 +207,7 @@ internal fun NavGraphBuilder.syncNavGraph(
             )
         ) { navBackStackEntry ->
             deviceName = navBackStackEntry.arguments?.getString("deviceName", null)
-                ?.let { decodeDeviceName(it) }
+                ?.let { if (it.isNotEmpty()) decodeDeviceName(it) else null }
             val selectedChip = GsonBuilder().create().fromJson(
                 navBackStackEntry.arguments?.getString("selectedChip"),
                 SyncChip::class.java
