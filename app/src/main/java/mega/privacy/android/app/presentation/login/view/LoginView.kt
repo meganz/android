@@ -39,10 +39,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -98,17 +95,20 @@ import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.TemporaryWaitingError
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaAnimatedLinearProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.LabelTextField
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
  * Login fragment view.
@@ -145,26 +145,21 @@ fun LoginView(
     onReportIssue: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scrollState = rememberScrollState()
-    val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
     var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
     val showLoginInProgress =
         state.isLoginInProgress || state.fetchNodesUpdate != null || state.isRequestStatusInProgress
-    Scaffold(
+    MegaScaffold(
         modifier = modifier
-            .conditional(!showLoginInProgress) {
-                systemBarsPadding()
-            }
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
         scaffoldState = scaffoldState,
         topBar = {
             if (state.is2FARequired || state.multiFactorAuthState != null) {
-                SimpleTopAppBar(
-                    titleId = R.string.login_verification,
-                    elevation = scrollState.value > 0,
-                    onBackPressed = onBackPressed
+                MegaAppBar(
+                    appBarType = AppBarType.BACK_NAVIGATION,
+                    title = stringResource(R.string.login_verification),
+                    onNavigationPressed = onBackPressed,
                 )
             }
         },
@@ -173,7 +168,7 @@ fun LoginView(
             when {
                 showLoginInProgress -> LoginInProgress(
                     state = this,
-                    paddingValues = paddingValues
+                    modifier = Modifier.padding(paddingValues)
                 )
 
                 isLoginRequired -> RequireLogin(
@@ -186,7 +181,7 @@ fun LoginView(
                     paddingValues = paddingValues,
                     onChangeApiServer = { showChangeApiServerDialog = true },
                     onReportIssue = onReportIssue,
-                    modifier = modifier,
+                    modifier = Modifier.padding(paddingValues).systemBarsPadding()
                 )
 
                 is2FARequired || multiFactorAuthState != null -> TwoFactorAuthentication(
@@ -195,14 +190,13 @@ fun LoginView(
                     on2FAPinChanged = on2FAPinChanged,
                     on2FAChanged = on2FAChanged,
                     onLostAuthenticatorDevice = onLostAuthenticatorDevice,
-                    onFirstTime2FAConsumed = onFirstTime2FAConsumed
+                    onFirstTime2FAConsumed = onFirstTime2FAConsumed,
+                    modifier = Modifier.padding(paddingValues).systemBarsPadding()
                 )
             }
         }
 
         BackHandler { onBackPressed() }
-
-        SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
 
         val context = LocalContext.current
 
@@ -246,7 +240,7 @@ private fun RequireLogin(
         val passwordFocusRequester = remember { FocusRequester() }
         val focusManager = LocalFocusManager.current
 
-        Text(
+        MegaText(
             modifier = Modifier
                 .padding(start = 22.dp, top = 17.dp, end = 22.dp)
                 .pointerInput(Unit) {
@@ -261,9 +255,9 @@ private fun RequireLogin(
                 }
                 .testTag(LOGIN_TO_MEGA_TAG),
             text = stringResource(id = R.string.login_to_mega),
+            textColor = TextColor.Primary,
             style = MaterialTheme.typography.subtitle1.copy(
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colors.textColorPrimary
             ),
         )
         LabelTextField(
@@ -342,12 +336,13 @@ private fun RequireLogin(
                     .testTag(CANCEL_LOGIN_PROGRESS_TAG),
                 strokeWidth = 1.dp
             )
-            Text(
+            MegaText(
                 text = stringResource(id = R.string.login_in_progress),
                 modifier = Modifier
                     .padding(start = 6.dp)
                     .testTag(CANCELLING_LOGIN_TAG),
-                style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.secondary)
+                style = MaterialTheme.typography.caption,
+                textColor = TextColor.Secondary,
             )
         }
         if (state.enabledFlags.contains(AppFeatures.LoginReportIssueButton)) {
@@ -359,10 +354,11 @@ private fun RequireLogin(
                     }
                     .padding(start = 22.dp, top = 18.dp, end = 22.dp),
             ) {
-                Text(
+                MegaText(
                     modifier = Modifier.testTag(TROUBLE_LOGIN_TAG),
                     text = stringResource(id = R.string.general_login_label_trouble_logging_in),
-                    style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorPrimary)
+                    style = MaterialTheme.typography.subtitle2,
+                    textColor = TextColor.Primary,
                 )
             }
         }
@@ -370,12 +366,13 @@ private fun RequireLogin(
             modifier = Modifier.padding(end = 22.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
+            MegaText(
                 modifier = Modifier
                     .padding(start = 22.dp)
                     .testTag(NEW_TO_MEGA_TAG),
                 text = stringResource(id = R.string.new_to_mega),
-                style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorPrimary),
+                style = MaterialTheme.typography.subtitle2,
+                textColor = TextColor.Primary,
             )
             TextMegaButton(
                 modifier = Modifier
@@ -396,7 +393,6 @@ private fun clickLogin(onLoginClicked: () -> Unit, focusManager: FocusManager) {
 @Composable
 private fun LoginInProgress(
     state: LoginState,
-    paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
     val isInLandscape =
@@ -406,7 +402,6 @@ private fun LoginInProgress(
         modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(paddingValues)
             .padding(horizontal = 20.dp)
             .verticalScroll(scrollState),
     ) {
@@ -606,8 +601,7 @@ private fun TwoFactorAuthentication(
 }
 
 
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkEmptyLoginViewPreview")
+@CombinedThemePreviews
 @Composable
 private fun EmptyLoginViewPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
@@ -629,8 +623,7 @@ private fun EmptyLoginViewPreview() {
     }
 }
 
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkLoginViewPreview")
+@CombinedThemePreviews
 @Composable
 private fun LoginViewPreview(
     @PreviewParameter(LoginStateProvider::class) state: LoginState,
@@ -654,7 +647,6 @@ private fun LoginViewPreview(
     }
 }
 
-@Preview
 @Preview(
     uiMode = Configuration.ORIENTATION_LANDSCAPE,
     heightDp = 360,

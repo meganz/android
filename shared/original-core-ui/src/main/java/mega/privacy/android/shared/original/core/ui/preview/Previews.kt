@@ -50,7 +50,7 @@ private annotation class ArabicLocale
 @Preview(
     showBackground = true,
     locale = "en",
-    backgroundColor = 0xFF121212,
+    backgroundColor = 0xFF18191A,
     name = "1-Dark theme",
     group = "themes",
     uiMode = Configuration.UI_MODE_NIGHT_YES
