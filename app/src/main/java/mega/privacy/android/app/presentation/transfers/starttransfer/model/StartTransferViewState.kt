@@ -12,6 +12,7 @@ import de.palm.composestateevents.consumed
  * @property confirmLargeDownload user needs to confirm a large download if not null.
  * @property askDestinationForDownload user needs to choose a destination for this [TransferTriggerEvent.DownloadTriggerEvent]. Depending on Android version and user settings, download destination should be asked for each new download.
  * @property requestFilesPermissionDenied True if the user denied the files permission request.
+ * @property triggerEventWithoutPermission user needs to answer requested permission after triggering this event
  * @constructor Create empty Start transfer view state
  */
 data class StartTransferViewState(
@@ -21,4 +22,5 @@ data class StartTransferViewState(
     val confirmLargeDownload: ConfirmLargeDownloadInfo? = null,
     val askDestinationForDownload: TransferTriggerEvent.DownloadTriggerEvent? = null,
     val requestFilesPermissionDenied: Boolean = false,
+    val triggerEventWithoutPermission: TransferTriggerEvent? = null,
 )

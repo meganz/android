@@ -932,6 +932,71 @@ class StartTransfersComponentViewModelTest {
             }
     }
 
+    @Nested
+    inner class TriggerEventWithoutPermission {
+
+        @BeforeEach
+        fun cleanUp() {
+            underTest.consumeRequestPermission()
+        }
+
+        @Test
+        fun `test that transferEventWaitingForPermissionRequest sets triggerEventWithoutPermission`() =
+            runTest {
+                val expected = mock<TransferTriggerEvent.StartUpload.Files>()
+                underTest.uiState.test {
+                    assertThat(awaitItem().triggerEventWithoutPermission).isNull()
+                    underTest.transferEventWaitingForPermissionRequest(expected)
+
+                    val actual = awaitItem().triggerEventWithoutPermission
+                    assertThat(actual).isEqualTo(expected)
+                }
+            }
+
+        @Test
+        fun `test that consumeRequestPermission clears triggerEventWithoutPermission`() =
+            runTest {
+                val expected = mock<TransferTriggerEvent.StartUpload.Files>()
+                underTest.uiState.test {
+                    assertThat(awaitItem().triggerEventWithoutPermission).isNull()
+                    underTest.transferEventWaitingForPermissionRequest(expected)
+                    assertThat(awaitItem().triggerEventWithoutPermission).isNotNull()
+
+                    underTest.consumeRequestPermission()
+
+                    assertThat(awaitItem().triggerEventWithoutPermission).isNull()
+                }
+            }
+
+
+        @Test
+        fun `test that startTransferAfterPermissionRequest starts transfer flow`() = runTest {
+            commonStub()
+            val event = mock<TransferTriggerEvent.StartUpload.Files>()
+            underTest.transferEventWaitingForPermissionRequest(event)
+
+            underTest.startTransferAfterPermissionRequest()
+
+            verify(clearActiveTransfersIfFinishedUseCase).invoke()
+        }
+
+        @Test
+        fun `test that startTransferAfterPermissionRequest clears triggerEventWithoutPermission`() =
+            runTest {
+                commonStub()
+                val expected = mock<TransferTriggerEvent.StartUpload.Files>()
+                underTest.uiState.test {
+                    assertThat(awaitItem().triggerEventWithoutPermission).isNull()
+                    underTest.transferEventWaitingForPermissionRequest(expected)
+                    assertThat(awaitItem().triggerEventWithoutPermission).isNotNull()
+
+                    underTest.startTransferAfterPermissionRequest()
+                    awaitItem() //new ui state for the started transfer
+                    assertThat(awaitItem().triggerEventWithoutPermission).isNull()
+                }
+            }
+    }
+
     private fun provideDownloadNodeParameters() = listOf(
         Arguments.of(
             mock<MultiTransferEvent.SingleTransferEvent> {

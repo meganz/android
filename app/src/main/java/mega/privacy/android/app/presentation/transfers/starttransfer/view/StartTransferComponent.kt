@@ -85,9 +85,6 @@ internal fun StartTransferComponent(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    var eventWithoutWritePermission by remember {
-        mutableStateOf<TransferTriggerEvent?>(null)
-    }
     var showFilesPermissionRequest by rememberSaveable { mutableStateOf(false) }
     val notificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
@@ -97,11 +94,10 @@ internal fun StartTransferComponent(
     val mediaReadPermission = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
         rememberPermissionState(Manifest.permission.WRITE_EXTERNAL_STORAGE) { granted ->
             if (granted) {
-                eventWithoutWritePermission?.let {
-                    viewModel.startTransfer(it)
-                }
+                viewModel.startTransferAfterPermissionRequest()
+            } else {
+                viewModel.consumeRequestPermission()
             }
-            eventWithoutWritePermission = null
         }
     } else {
         null
@@ -130,13 +126,13 @@ internal fun StartTransferComponent(
             }
             when {
                 shouldAskForFilesPermission(uiState.requestFilesPermissionDenied, triggerEvent) -> {
-                    eventWithoutWritePermission = triggerEvent
+                    viewModel.transferEventWaitingForPermissionRequest(triggerEvent)
                     showFilesPermissionRequest = true
                 }
 
                 triggerEvent !is TransferTriggerEvent.StartUpload.TextFile
                         && mediaReadPermission?.status?.isGranted == false -> {
-                    eventWithoutWritePermission = triggerEvent
+                    viewModel.transferEventWaitingForPermissionRequest(triggerEvent)
                     mediaReadPermission.launchPermissionRequest()
                 }
 
@@ -150,11 +146,8 @@ internal fun StartTransferComponent(
         FilesPermissionDialog(
             onDoNotShowAgainClick = { viewModel.setRequestFilesPermissionDenied() },
             onStartTransferAndDismiss = {
-                eventWithoutWritePermission?.let { event ->
-                    viewModel.startTransfer(event)
-                }
+                viewModel.startTransferAfterPermissionRequest()
                 showFilesPermissionRequest = false
-                eventWithoutWritePermission = null
             }
         )
     }

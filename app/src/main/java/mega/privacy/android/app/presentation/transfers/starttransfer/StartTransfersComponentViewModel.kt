@@ -884,4 +884,23 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 .onFailure { Timber.e(it) }
         }
     }
+
+    fun transferEventWaitingForPermissionRequest(transferTriggerEvent: TransferTriggerEvent) {
+        viewModelScope.launch {
+            _uiState.update { state -> state.copy(triggerEventWithoutPermission = transferTriggerEvent) }
+        }
+    }
+
+    fun startTransferAfterPermissionRequest() {
+        _uiState.value.triggerEventWithoutPermission?.let {
+            startTransfer(it)
+        }
+        consumeRequestPermission()
+    }
+
+    fun consumeRequestPermission() {
+        viewModelScope.launch {
+            _uiState.update { state -> state.copy(triggerEventWithoutPermission = null) }
+        }
+    }
 }
