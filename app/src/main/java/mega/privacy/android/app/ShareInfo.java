@@ -30,7 +30,6 @@ import java.util.List;
 
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
-import mega.privacy.android.domain.entity.chat.FileGalleryItem;
 import timber.log.Timber;
 
 
@@ -42,32 +41,13 @@ public class ShareInfo implements Serializable {
     private static final String APP_PRIVATE_DIR1 = "/data/data/mega.privacy.android.app";
     private static final String APP_PRIVATE_DIR2 = "/data/user/0/mega.privacy.android.app";
 
-    public String title = null;
+    private String title = null;
     private long lastModified;
-    public transient InputStream inputStream = null;
-    public long size = -1;
+    private transient InputStream inputStream = null;
+    private long size = -1;
     private File file = null;
-    public boolean isContact = false;
-    public Uri contactUri = null;
 
     private static Intent mIntent;
-
-    /*
-     * Get ShareInfo from File
-     */
-    public static ShareInfo infoFromFile(File file) {
-        ShareInfo info = new ShareInfo();
-        info.file = file;
-        info.lastModified = file.lastModified();
-        info.size = file.length();
-        info.title = file.getName();
-        try {
-            info.inputStream = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            return null;
-        }
-        return info;
-    }
 
     public String getOriginalFileName() {
         return file.getName();
@@ -81,16 +61,12 @@ public class ShareInfo implements Serializable {
         return title;
     }
 
-    public InputStream getInputStream() {
-        return inputStream;
+    public long getLastModified() {
+        return lastModified;
     }
 
     public long getSize() {
         return size;
-    }
-
-    public long getLastModified() {
-        return lastModified;
     }
 
     /*
@@ -167,41 +143,6 @@ public class ShareInfo implements Serializable {
         return result;
     }
 
-    /**
-     * Process files to upload to chat from gallery
-     *
-     * @param context Context
-     * @param files   List of FileGalleryItem
-     * @return List of ShareInfo
-     */
-    public static List<ShareInfo> processUploadFile(Context context, ArrayList<FileGalleryItem> files) {
-        List<ShareInfo> result = new ArrayList<>();
-
-        if (files.isEmpty())
-            return result;
-
-        // Get File info from Data URI
-        for (int i = 0; i < files.size(); i++) {
-            ShareInfo shareInfo = new ShareInfo();
-            FileGalleryItem file = files.get(i);
-            Uri dataUri = Uri.parse(file.getFileUri());
-            if (dataUri == null) {
-                Timber.w("Data uri is null");
-                continue;
-            }
-
-            if (isPathInsecure(dataUri.getPath())) {
-                Timber.w("Data uri is insecure");
-                continue;
-            }
-
-            shareInfo.processUri(null, dataUri, context);
-            result.add(shareInfo);
-        }
-
-        return result;
-    }
-
     private static boolean isPathInsecure(String path) {
         return path.contains("../") || path.contains(APP_PRIVATE_DIR1)
                 || path.contains(APP_PRIVATE_DIR2);
@@ -215,7 +156,7 @@ public class ShareInfo implements Serializable {
      * the different with `isPathInsecure` is this method removes spaces from the path
      * it also checks if intent is received by external app trigger via ACTION_SEND / ACTION_SEND_MULTIPLE
      * eg: /data/data/ mega.privacy.android.app
-     * */
+     */
     private static boolean isPathFromExternalAppMalformed(String action, String path) {
         // Method to check if intent is received from external app with action: ACTION_SEND / ACTION_SEND_MULTIPLE
         boolean isDataFromExternalApp = action != null &&
@@ -229,7 +170,7 @@ public class ShareInfo implements Serializable {
      * Process Multiple files from GET_CONTENT Intent
      */
     @SuppressLint("NewApi")
-    public static List<ShareInfo> processGetContentMultiple(Intent intent, Context context) {
+    private static List<ShareInfo> processGetContentMultiple(Intent intent, Context context) {
         Timber.d("processGetContentMultiple");
         ArrayList<ShareInfo> result = new ArrayList<>();
         ClipData cD = intent.getClipData();
@@ -263,7 +204,7 @@ public class ShareInfo implements Serializable {
     /*
      * Process Multiple files
      */
-    public static List<ShareInfo> processIntentMultiple(Intent intent, Context context) {
+    private static List<ShareInfo> processIntentMultiple(Intent intent, Context context) {
         Timber.d("processIntentMultiple");
         ArrayList<Uri> imageUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
 
@@ -298,7 +239,7 @@ public class ShareInfo implements Serializable {
      * Get info from Uri
      * action is Intent.getAction()
      */
-    public boolean processUri(String action, Uri uri, Context context) {
+    protected boolean processUri(String action, Uri uri, Context context) {
         if (isPathFromExternalAppMalformed(action, uri.getPath())) {
             Timber.e("processUri: Uri from external app is malformed: %s", uri);
             return false;
@@ -436,10 +377,6 @@ public class ShareInfo implements Serializable {
                 size = file.length();
                 Timber.d("The file is accesible!");
                 return false;
-            } else {
-                Timber.w("The file is not accesible!");
-                isContact = true;
-                contactUri = uri;
             }
         }
         Timber.d("END processUri");

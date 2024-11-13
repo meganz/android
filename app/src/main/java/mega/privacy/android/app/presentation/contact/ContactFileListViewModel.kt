@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.extensions.getState
@@ -195,21 +194,6 @@ class ContactFileListViewModel @Inject constructor(
             mapOf(file.absolutePath to null),
             NodeId(destination)
         )
-    }
-
-    /**
-     * Uploads a list of files to the specified destination.
-     *
-     * @param shareInfo The files as [ShareInfo] to upload.
-     * @param destination The destination where the files will be uploaded.
-     */
-    fun uploadShareInfo(
-        shareInfo: List<ShareInfo>,
-        destination: Long,
-    ) {
-        val pathsAndNames = shareInfo.map { it.fileAbsolutePath }.associateWith { null }
-
-        uploadFiles(pathsAndNames, NodeId(destination))
     }
 
     /**

@@ -7,9 +7,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.middlelayer.scanner.ScannerHandler
-import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
 import mega.privacy.android.app.presentation.documentscanner.model.DocumentScanningError
 import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -23,9 +21,8 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
-import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
@@ -43,7 +40,6 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -351,27 +347,6 @@ internal class ContactFileListViewModelTest {
         )
 
         underTest.uploadFile(file, parentHandle)
-        underTest.state.map { it.uploadEvent }.test {
-            assertThat(awaitItem()).isEqualTo(expected)
-        }
-    }
-
-    @Test
-    fun `test that state is updated correctly if a ShareInfo is uploaded`() = runTest {
-        val file = File("path")
-        val path = file.absolutePath
-        val shareInfo = mock<ShareInfo> {
-            on { fileAbsolutePath } doReturn path
-        }
-        val parentHandle = 123L
-        val expected = triggered(
-            TransferTriggerEvent.StartUpload.Files(
-                mapOf(path to null),
-                NodeId(parentHandle)
-            )
-        )
-
-        underTest.uploadShareInfo(listOf(shareInfo), parentHandle)
         underTest.state.map { it.uploadEvent }.test {
             assertThat(awaitItem()).isEqualTo(expected)
         }
