@@ -40,7 +40,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -107,7 +106,6 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.LabelTex
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
@@ -181,7 +179,9 @@ fun LoginView(
                     paddingValues = paddingValues,
                     onChangeApiServer = { showChangeApiServerDialog = true },
                     onReportIssue = onReportIssue,
-                    modifier = Modifier.padding(paddingValues).systemBarsPadding()
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .systemBarsPadding()
                 )
 
                 is2FARequired || multiFactorAuthState != null -> TwoFactorAuthentication(
@@ -191,7 +191,9 @@ fun LoginView(
                     on2FAChanged = on2FAChanged,
                     onLostAuthenticatorDevice = onLostAuthenticatorDevice,
                     onFirstTime2FAConsumed = onFirstTime2FAConsumed,
-                    modifier = Modifier.padding(paddingValues).systemBarsPadding()
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .systemBarsPadding()
                 )
             }
         }
@@ -483,9 +485,10 @@ private fun LoginInProgress(
                         .testTag(CONNECTING_TO_SERVER_TAG)
                 )
                 // White-space to prevent jumping when visibility animates
-                Text(
+                MegaText(
                     text = " ",
                     style = MaterialTheme.typography.subtitle2,
+                    textColor = TextColor.Primary,
                     minLines = 2
                 )
             }
@@ -513,7 +516,7 @@ private fun LoginInProgressText(
         enter = fadeIn(),
         exit = fadeOut(),
     ) {
-        Text(
+        MegaText(
             text = if (progress > -1L) {
                 stringResource(SharedRes.string.login_completing_operation, (progress / 10).toInt())
             } else {
@@ -522,6 +525,7 @@ private fun LoginInProgressText(
             style = MaterialTheme.typography.subtitle2,
             modifier = modifier,
             textAlign = TextAlign.Center,
+            textColor = TextColor.Primary,
             minLines = 2
         )
     }
@@ -557,13 +561,14 @@ private fun TwoFactorAuthentication(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val isError = state.multiFactorAuthState == MultiFactorAuthState.Failed
-        Text(
+        MegaText(
             text = stringResource(id = R.string.explain_confirm_2fa),
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 40.dp)
                 .testTag(ENTER_AUTHENTICATION_CODE_TAG),
-            style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.textColorSecondary),
-            textAlign = TextAlign.Center
+            style = MaterialTheme.typography.subtitle1,
+            textAlign = TextAlign.Center,
+            textColor = TextColor.Secondary,
         )
         TwoFactorAuthenticationField(
             twoFAPin = state.twoFAPin,
@@ -574,12 +579,13 @@ private fun TwoFactorAuthentication(
             onRequestFocusConsumed = onFirstTime2FAConsumed
         )
         if (isError) {
-            Text(
+            MegaText(
                 text = stringResource(id = R.string.pin_error_2fa),
                 modifier = Modifier
                     .padding(start = 10.dp, top = 18.dp, end = 10.dp)
                     .testTag(INVALID_CODE_TAG),
-                style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.error)
+                style = MaterialTheme.typography.caption,
+                textColor = TextColor.Error,
             )
         }
         TextMegaButton(
