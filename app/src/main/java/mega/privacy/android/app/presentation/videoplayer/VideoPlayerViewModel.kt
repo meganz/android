@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.videoplayer
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
@@ -13,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,33 +27,65 @@ import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
+import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
+import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
+import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
+import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
+import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
+import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INVALID_SIZE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
+import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER
+import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
+import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
+import mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER
+import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
+import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
+import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
+import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
+import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
+import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
+import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStopUseCase
@@ -59,7 +93,17 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByEmailUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByHandlesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByParentHandleUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesFromInSharesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesFromOutSharesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesFromPublicLinksUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosByParentHandleFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosBySearchTypeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -79,6 +123,22 @@ class VideoPlayerViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val videoPlayerItemMapper: VideoPlayerItemMapper,
     private val getVideoNodeByHandleUseCase: GetVideoNodeByHandleUseCase,
+    private val getVideoNodesUseCase: GetVideoNodesUseCase,
+    private val getVideoNodesFromPublicLinksUseCase: GetVideoNodesFromPublicLinksUseCase,
+    private val getVideoNodesFromInSharesUseCase: GetVideoNodesFromInSharesUseCase,
+    private val getVideoNodesFromOutSharesUseCase: GetVideoNodesFromOutSharesUseCase,
+    private val getVideoNodesByEmailUseCase: GetVideoNodesByEmailUseCase,
+    private val getUserNameByEmailUseCase: GetUserNameByEmailUseCase,
+    private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
+    private val getBackupsNodeUseCase: GetBackupsNodeUseCase,
+    private val getRootNodeUseCase: GetRootNodeUseCase,
+    private val getVideosBySearchTypeUseCase: GetVideosBySearchTypeUseCase,
+    private val getVideoNodesByParentHandleUseCase: GetVideoNodesByParentHandleUseCase,
+    private val getVideoNodesByHandlesUseCase: GetVideoNodesByHandlesUseCase,
+    private val getRootNodeFromMegaApiFolderUseCase: GetRootNodeFromMegaApiFolderUseCase,
+    private val getParentNodeFromMegaApiFolderUseCase: GetParentNodeFromMegaApiFolderUseCase,
+    private val getVideosByParentHandleFromMegaApiFolderUseCase: GetVideosByParentHandleFromMegaApiFolderUseCase,
+    private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val megaApiFolderHttpServerIsRunningUseCase: MegaApiFolderHttpServerIsRunningUseCase,
@@ -92,6 +152,9 @@ class VideoPlayerViewModel @Inject constructor(
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
     private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase,
     private val getOfflineNodesByParentIdUseCase: GetOfflineNodesByParentIdUseCase,
+    private val getLocalLinkFromMegaApiUseCase: GetLocalLinkFromMegaApiUseCase,
+    private val getLocalFilePathUseCase: GetLocalFilePathUseCase,
+    private val getFingerprintUseCase: GetFingerprintUseCase,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val getFileByPathUseCase: GetFileByPathUseCase,
 ) : ViewModel() {
@@ -303,7 +366,7 @@ class VideoPlayerViewModel @Inject constructor(
         when (launchSource) {
             OFFLINE_ADAPTER -> handleOfflineSource(intent, playingHandle)
             ZIP_ADAPTER -> handleZipSource(intent, playingHandle)
-            else -> handleGeneralSource()
+            else -> handleGeneralSource(intent, launchSource, playingHandle)
         }
     }
 
@@ -448,9 +511,232 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
-    private fun handleGeneralSource() {
-        //The function will be implemented in ticket CC-8417
+    private suspend fun handleGeneralSource(
+        intent: Intent,
+        launchSource: Int,
+        playingHandle: Long,
+    ) {
+        val parentHandle = intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
+        val order = getSortOrderFromIntent(intent)
+        val (title, videoNodes) = when (launchSource) {
+            VIDEO_BROWSE_ADAPTER ->
+                context.getString(R.string.sortby_type_video_first) to getVideoNodesUseCase(order)
+
+            RECENTS_ADAPTER, RECENTS_BUCKET_ADAPTER -> {
+                val videoNodes = intent.getLongArrayExtra(NODE_HANDLES)?.let { handles ->
+                    getVideoNodesByHandlesUseCase(handles.toList())
+                }.orEmpty()
+                context.getString(R.string.section_recents) to videoNodes
+            }
+
+            FOLDER_LINK_ADAPTER -> {
+                val parentNode = if (parentHandle == INVALID_HANDLE) {
+                    getRootNodeFromMegaApiFolderUseCase()
+                } else {
+                    getParentNodeFromMegaApiFolderUseCase(parentHandle)
+                }
+
+                val videoNodes = parentNode?.let {
+                    getVideosByParentHandleFromMegaApiFolderUseCase(
+                        parentHandle = it.id.longValue,
+                        order = order
+                    )
+                }.orEmpty()
+
+                (parentNode?.name.orEmpty()) to videoNodes
+            }
+
+            SEARCH_BY_ADAPTER -> {
+                val title = intent.getStringExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE).orEmpty()
+                val videoNodes = intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)
+                    ?.let { handles ->
+                        getVideoNodesByHandlesUseCase(handles.toList())
+                    }.orEmpty()
+                title to videoNodes
+            }
+
+            FILE_BROWSER_ADAPTER,
+            RUBBISH_BIN_ADAPTER,
+            BACKUPS_ADAPTER,
+            LINKS_ADAPTER,
+            INCOMING_SHARES_ADAPTER,
+            OUTGOING_SHARES_ADAPTER,
+            CONTACT_FILE_ADAPTER,
+            FROM_MEDIA_DISCOVERY,
+            FROM_IMAGE_VIEWER,
+            FROM_ALBUM_SHARING,
+            FAVOURITES_ADAPTER,
+                -> {
+                when {
+                    launchSource == LINKS_ADAPTER && parentHandle == INVALID_HANDLE ->
+                        context.getString(R.string.tab_links_shares) to getVideoNodesFromPublicLinksUseCase(
+                            order
+                        )
+
+                    launchSource == INCOMING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE ->
+                        context.getString(R.string.tab_incoming_shares) to getVideoNodesFromInSharesUseCase(
+                            order
+                        )
+
+                    launchSource == OUTGOING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE ->
+                        context.getString(R.string.tab_outgoing_shares) to getVideoNodesFromOutSharesUseCase(
+                            lastHandle = INVALID_HANDLE,
+                            order = order
+                        )
+
+                    launchSource == CONTACT_FILE_ADAPTER && parentHandle == INVALID_HANDLE -> {
+                        intent.getStringExtra(Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL)
+                            ?.let { email ->
+                                val videoNodes = getVideoNodesByEmailUseCase(email).orEmpty()
+                                val userName = getUserNameByEmailUseCase(email)
+                                val title = if (userName == null) {
+                                    ""
+                                } else {
+                                    "${context.getString(R.string.title_incoming_shares_with_explorer)} $userName"
+                                }
+                                title to videoNodes
+                            } ?: ("" to emptyList())
+                    }
+
+                    else -> {
+                        val parentNode =
+                            if (parentHandle == INVALID_HANDLE) {
+                                when (launchSource) {
+                                    RUBBISH_BIN_ADAPTER -> getRubbishNodeUseCase()
+                                    BACKUPS_ADAPTER -> getBackupsNodeUseCase()
+                                    else -> getRootNodeUseCase()
+                                }
+                            } else {
+                                getVideoNodeByHandleUseCase(parentHandle)
+                            }
+                        val title =
+                            if (parentHandle == INVALID_HANDLE) {
+                                context.getString(
+                                    when (launchSource) {
+                                        RUBBISH_BIN_ADAPTER -> R.string.section_rubbish_bin
+                                        BACKUPS_ADAPTER -> R.string.home_side_menu_backups_title
+                                        else -> R.string.section_cloud_drive
+                                    }
+                                )
+                            } else {
+                                parentNode?.name
+                            }.orEmpty()
+
+                        val videoNodes = parentNode?.let {
+                            if (launchSource == FROM_MEDIA_DISCOVERY) {
+                                getVideosBySearchTypeUseCase(
+                                    handle = it.id.longValue,
+                                    recursive = monitorSubFolderMediaDiscoverySettingsUseCase().first(),
+                                    order = order
+                                )
+                            } else {
+                                getVideoNodesByParentHandleUseCase(
+                                    parentHandle = it.id.longValue,
+                                    order = order
+                                )
+                            }
+                        }.orEmpty()
+
+                        title to videoNodes
+                    }
+                }
+            }
+
+            else -> {
+                "" to emptyList()
+            }
+        }
+        buildPlaybackSourcesByNodes(title, videoNodes, playingHandle, launchSource)
     }
+
+    private fun getSortOrderFromIntent(intent: Intent): SortOrder =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getSerializableExtra(
+                INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                SortOrder::class.java
+            ) ?: SortOrder.ORDER_DEFAULT_ASC
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getSerializableExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN) as SortOrder?
+                ?: SortOrder.ORDER_DEFAULT_ASC
+        }
+
+    private suspend fun buildPlaybackSourcesByNodes(
+        title: String,
+        videoNodes: List<TypedVideoNode>,
+        firstPlayHandle: Long,
+        launchSource: Int,
+    ) {
+        val mediaItems = mutableListOf<MediaItem>()
+        var currentPlayingIndex = -1
+        val videoPlayerItems = videoNodes.mapIndexed { index, node ->
+            runCatching {
+                if (node.id.longValue == firstPlayHandle) currentPlayingIndex = index
+
+                getMediaItemForNode(node, launchSource)?.let { mediaItems.add(it) }
+
+                videoPlayerItemMapper(
+                    nodeHandle = node.id.longValue,
+                    nodeName = node.name,
+                    thumbnail = node.thumbnailPath?.let { path ->
+                        File(path)
+                    },
+                    type = getMediaQueueItemType(index, currentPlayingIndex),
+                    size = node.size,
+                    duration = node.duration,
+                )
+            }.onFailure {
+                Timber.e(it)
+            }.getOrNull()
+        }.filterNotNull()
+
+        updatePlaybackSources(
+            videoPlayerItems = videoPlayerItems,
+            mediaItems = mediaItems,
+            title = title,
+            currentPlayingIndex = currentPlayingIndex,
+            firstPlayHandle = firstPlayHandle
+        )
+    }
+
+    private suspend fun getMediaItemForNode(node: TypedVideoNode, launchSource: Int) =
+        getLocalFilePathUseCase(node).let { localPath ->
+            if (localPath != null && isLocalFile(node, localPath)) {
+                MediaItem.Builder()
+                    .setUri(FileUtil.getUriForFile(context, File(localPath)))
+                    .setMediaId(node.id.longValue.toString())
+                    .build()
+            } else {
+                when (launchSource) {
+                    FOLDER_LINK_ADAPTER -> {
+                        if (!hasCredentialsUseCase()) {
+                            getLocalFolderLinkFromMegaApiFolderUseCase(node.id.longValue)
+                        } else {
+                            getLocalFolderLinkFromMegaApiUseCase(node.id.longValue)
+                        }
+                    }
+
+                    else -> getLocalLinkFromMegaApiUseCase(node.id.longValue)
+                }?.let { url ->
+                    MediaItem.Builder()
+                        .setUri(Uri.parse(url))
+                        .setMediaId(node.id.longValue.toString())
+                        .build()
+                }
+            }
+        }
+
+    private suspend fun isLocalFile(node: TypedFileNode, localPath: String): Boolean {
+        val isFingerPrintAvailable = node.fingerprint?.let {
+            it == getFingerprintUseCase(localPath)
+        } ?: false
+        return isOnMegaDownloads(node) || isFingerPrintAvailable
+    }
+
+    private fun isOnMegaDownloads(node: TypedFileNode): Boolean =
+        File(FileUtil.getDownloadLocation(), node.name).let { file ->
+            FileUtil.isFileAvailable(file) && file.length() == node.size
+        }
 
     /**
      * onCleared

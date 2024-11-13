@@ -8,6 +8,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.TimberJUnit5Extension
@@ -16,21 +17,41 @@ import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
+import mega.privacy.android.app.utils.Constants.BACKUPS_ADAPTER
+import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
+import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
+import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
+import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
+import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
+import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER
+import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
+import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
+import mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER
+import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
@@ -39,12 +60,21 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.usecase.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
+import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
+import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
+import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
+import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
+import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStopUseCase
@@ -52,8 +82,17 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByEmailUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByHandlesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByParentHandleUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesFromInSharesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesFromOutSharesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesFromPublicLinksUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosByParentHandleFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosBySearchTypeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -62,6 +101,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -88,6 +130,24 @@ class VideoPlayerViewModelTest {
     private val videoPlayerItemMapper = mock<VideoPlayerItemMapper>()
     private val getVideoNodeByHandleUseCase = mock<GetVideoNodeByHandleUseCase>()
     private val getVideoNodesUseCase = mock<GetVideoNodesUseCase>()
+    private val getVideoNodesFromPublicLinksUseCase = mock<GetVideoNodesFromPublicLinksUseCase>()
+    private val getVideoNodesFromInSharesUseCase = mock<GetVideoNodesFromInSharesUseCase>()
+    private val getVideoNodesFromOutSharesUseCase = mock<GetVideoNodesFromOutSharesUseCase>()
+    private val getVideoNodesByEmailUseCase = mock<GetVideoNodesByEmailUseCase>()
+    private val getUserNameByEmailUseCase = mock<GetUserNameByEmailUseCase>()
+    private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
+    private val getBackupsNodeUseCase = mock<GetBackupsNodeUseCase>()
+    private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
+    private val getVideosBySearchTypeUseCase = mock<GetVideosBySearchTypeUseCase>()
+    private val getVideoNodesByParentHandleUseCase = mock<GetVideoNodesByParentHandleUseCase>()
+    private val getVideoNodesByHandlesUseCase = mock<GetVideoNodesByHandlesUseCase>()
+    private val getRootNodeFromMegaApiFolderUseCase = mock<GetRootNodeFromMegaApiFolderUseCase>()
+    private val getParentNodeFromMegaApiFolderUseCase =
+        mock<GetParentNodeFromMegaApiFolderUseCase>()
+    private val getVideosByParentHandleFromMegaApiFolderUseCase =
+        mock<GetVideosByParentHandleFromMegaApiFolderUseCase>()
+    private val monitorSubFolderMediaDiscoverySettingsUseCase =
+        mock<MonitorSubFolderMediaDiscoverySettingsUseCase>()
     private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
     private val hasCredentialsUseCase = mock<HasCredentialsUseCase>()
     private val megaApiFolderHttpServerIsRunningUseCase =
@@ -97,12 +157,15 @@ class VideoPlayerViewModelTest {
     private val megaApiHttpServerIsRunningUseCase = mock<MegaApiHttpServerIsRunningUseCase>()
     private val megaApiHttpServerStartUseCase = mock<MegaApiHttpServerStartUseCase>()
     private val megaApiHttpServerStop = mock<MegaApiHttpServerStopUseCase>()
+    private val getLocalLinkFromMegaApiUseCase = mock<GetLocalLinkFromMegaApiUseCase>()
     private val getLocalFolderLinkFromMegaApiFolderUseCase =
         mock<GetLocalFolderLinkFromMegaApiFolderUseCase>()
     private val getLocalFolderLinkFromMegaApiUseCase = mock<GetLocalFolderLinkFromMegaApiUseCase>()
     private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()
     private val getOfflineNodeInformationByIdUseCase = mock<GetOfflineNodeInformationByIdUseCase>()
     private val getOfflineNodesByParentIdUseCase = mock<GetOfflineNodesByParentIdUseCase>()
+    private val getLocalFilePathUseCase = mock<GetLocalFilePathUseCase>()
+    private val getFingerprintUseCase = mock<GetFingerprintUseCase>()
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val fakeMonitorTransferEventsFlow =
         MutableSharedFlow<TransferEvent.TransferTemporaryErrorEvent>()
@@ -113,6 +176,7 @@ class VideoPlayerViewModelTest {
     private val testSize = 100L
     private val testDuration = 200.seconds
     private val testAbsolutePath = "https://www.example.com"
+    private val testTitle = "video queue title"
 
     private fun initViewModel() {
         underTest = VideoPlayerViewModel(
@@ -122,6 +186,22 @@ class VideoPlayerViewModelTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             videoPlayerItemMapper = videoPlayerItemMapper,
             getVideoNodeByHandleUseCase = getVideoNodeByHandleUseCase,
+            getVideoNodesUseCase = getVideoNodesUseCase,
+            getVideoNodesFromPublicLinksUseCase = getVideoNodesFromPublicLinksUseCase,
+            getVideoNodesFromInSharesUseCase = getVideoNodesFromInSharesUseCase,
+            getVideoNodesFromOutSharesUseCase = getVideoNodesFromOutSharesUseCase,
+            getVideoNodesByEmailUseCase = getVideoNodesByEmailUseCase,
+            getUserNameByEmailUseCase = getUserNameByEmailUseCase,
+            getRubbishNodeUseCase = getRubbishNodeUseCase,
+            getBackupsNodeUseCase = getBackupsNodeUseCase,
+            getRootNodeUseCase = getRootNodeUseCase,
+            getVideosBySearchTypeUseCase = getVideosBySearchTypeUseCase,
+            getVideoNodesByParentHandleUseCase = getVideoNodesByParentHandleUseCase,
+            getVideoNodesByHandlesUseCase = getVideoNodesByHandlesUseCase,
+            getRootNodeFromMegaApiFolderUseCase = getRootNodeFromMegaApiFolderUseCase,
+            getParentNodeFromMegaApiFolderUseCase = getParentNodeFromMegaApiFolderUseCase,
+            getVideosByParentHandleFromMegaApiFolderUseCase = getVideosByParentHandleFromMegaApiFolderUseCase,
+            monitorSubFolderMediaDiscoverySettingsUseCase = monitorSubFolderMediaDiscoverySettingsUseCase,
             getThumbnailUseCase = getThumbnailUseCase,
             hasCredentialsUseCase = hasCredentialsUseCase,
             megaApiFolderHttpServerIsRunningUseCase = megaApiFolderHttpServerIsRunningUseCase,
@@ -135,6 +215,9 @@ class VideoPlayerViewModelTest {
             getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
             getOfflineNodeInformationByIdUseCase = getOfflineNodeInformationByIdUseCase,
             getOfflineNodesByParentIdUseCase = getOfflineNodesByParentIdUseCase,
+            getLocalLinkFromMegaApiUseCase = getLocalLinkFromMegaApiUseCase,
+            getLocalFilePathUseCase = getLocalFilePathUseCase,
+            getFingerprintUseCase = getFingerprintUseCase,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             getFileByPathUseCase = getFileByPathUseCase,
         )
@@ -143,6 +226,7 @@ class VideoPlayerViewModelTest {
     @BeforeEach
     fun setUp() {
         whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
+        whenever(monitorSubFolderMediaDiscoverySettingsUseCase()).thenReturn(flowOf(true))
         initViewModel()
     }
 
@@ -154,6 +238,23 @@ class VideoPlayerViewModelTest {
             videoPlayerItemMapper,
             getVideoNodeByHandleUseCase,
             getVideoNodesUseCase,
+            getVideoNodeByHandleUseCase,
+            getVideoNodesUseCase,
+            getVideoNodesFromPublicLinksUseCase,
+            getVideoNodesFromInSharesUseCase,
+            getVideoNodesFromOutSharesUseCase,
+            getVideoNodesByEmailUseCase,
+            getUserNameByEmailUseCase,
+            getRubbishNodeUseCase,
+            getBackupsNodeUseCase,
+            getRootNodeUseCase,
+            getVideosBySearchTypeUseCase,
+            getVideoNodesByParentHandleUseCase,
+            getVideoNodesByHandlesUseCase,
+            getRootNodeFromMegaApiFolderUseCase,
+            getParentNodeFromMegaApiFolderUseCase,
+            getVideosByParentHandleFromMegaApiFolderUseCase,
+            monitorSubFolderMediaDiscoverySettingsUseCase,
             getThumbnailUseCase,
             hasCredentialsUseCase,
             megaApiFolderHttpServerIsRunningUseCase,
@@ -167,6 +268,9 @@ class VideoPlayerViewModelTest {
             getFileTypeInfoByNameUseCase,
             getOfflineNodeInformationByIdUseCase,
             getOfflineNodesByParentIdUseCase,
+            getLocalLinkFromMegaApiUseCase,
+            getLocalFilePathUseCase,
+            getFingerprintUseCase,
             monitorTransferEventsUseCase,
             getFileByPathUseCase,
         )
@@ -627,5 +731,316 @@ class VideoPlayerViewModelTest {
         on { this.name }.thenReturn(name)
         on { this.length() }.thenReturn(100L)
         on { isFile }.thenReturn(true)
+    }
+
+    @Test
+    fun `test that state is updated correctly when launch source is VIDEO_BROWSE_ADAPTER`() =
+        runTest {
+            val intent = mock<Intent>()
+            testStateIsUpdatedCorrectlyByLaunchSource(
+                intent = intent,
+                launchSource = VIDEO_BROWSE_ADAPTER
+            ) {
+                getVideoNodesUseCase(any())
+            }
+        }
+
+    @ParameterizedTest(name = "when launch source is {0}")
+    @ValueSource(ints = [RECENTS_ADAPTER, RECENTS_BUCKET_ADAPTER])
+    fun `test that state is updated correctly with node handles`(launchSource: Int) =
+        runTest {
+            val intent = mock<Intent>()
+            whenever(intent.getLongArrayExtra(any())).thenReturn(longArrayOf(1, 2, 3))
+            testStateIsUpdatedCorrectlyByLaunchSource(
+                intent = intent,
+                launchSource = launchSource
+            ) {
+                getVideoNodesByHandlesUseCase(any())
+            }
+        }
+
+    @ParameterizedTest(name = "parentHandle is {0} and hasCredentials is {1}")
+    @MethodSource("provideParametersForFolderLink")
+    fun `test that state is updated correctly when launch source is FOLDER_LINK_ADAPTER`(
+        parentHandle: Long,
+        hasCredentials: Boolean,
+        getParentNode: suspend () -> FileNode,
+        initSourceData: suspend () -> String,
+    ) =
+        runTest {
+            val intent = mock<Intent>()
+            val testParentNode = mock<FileNode> {
+                on { name }.thenReturn(testTitle)
+            }
+            whenever(
+                intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
+            ).thenReturn(parentHandle)
+            whenever(getParentNode()).thenReturn(testParentNode)
+            whenever(hasCredentialsUseCase()).thenReturn(hasCredentials)
+            whenever(initSourceData()).thenReturn(testAbsolutePath)
+            testStateIsUpdatedCorrectlyByLaunchSource(
+                intent = intent,
+                launchSource = FOLDER_LINK_ADAPTER
+            ) {
+                getVideosByParentHandleFromMegaApiFolderUseCase(any(), any())
+            }
+        }
+
+    private fun provideParametersForFolderLink() = listOf(
+        arrayOf(
+            INVALID_VALUE,
+            true,
+            suspend { getRootNodeFromMegaApiFolderUseCase() },
+            suspend { getLocalFolderLinkFromMegaApiUseCase(any()) }
+        ),
+        arrayOf(
+            INVALID_VALUE,
+            false,
+            suspend { getRootNodeFromMegaApiFolderUseCase() },
+            suspend { getLocalFolderLinkFromMegaApiFolderUseCase(any()) }
+        ),
+        arrayOf(
+            testHandle,
+            true,
+            suspend { getParentNodeFromMegaApiFolderUseCase(any()) },
+            suspend { getLocalFolderLinkFromMegaApiUseCase(any()) }
+        ),
+        arrayOf(
+            testHandle, false,
+            suspend { getParentNodeFromMegaApiFolderUseCase(any()) },
+            suspend { getLocalFolderLinkFromMegaApiFolderUseCase(any()) }
+        ),
+    )
+
+    private suspend fun testStateIsUpdatedCorrectlyByLaunchSource(
+        intent: Intent,
+        launchSource: Int,
+        playingIndex: Int = 1,
+        testArray: IntArray = intArrayOf(1, 2, 3),
+        queueTitle: String = testTitle,
+        initSourceData: suspend () -> List<TypedVideoNode>?,
+    ) {
+        val testHandle: Long = 2
+        val testFileName = "test.mp4"
+        initTestDataForTestingInvalidParams(
+            intent = intent,
+            rebuildPlaylist = true,
+            adapterType = launchSource,
+            data = mock(),
+            handle = testHandle,
+            fileName = testFileName
+        )
+
+        whenever(context.getString(any())).thenReturn(testTitle)
+
+        val testVideoNodes = testArray.map {
+            initVideoNode(it.toLong())
+        }
+        whenever(initSourceData()).thenReturn(testVideoNodes)
+        whenever(getLocalLinkFromMegaApiUseCase(any())).thenReturn(testAbsolutePath)
+
+        val entities = testVideoNodes.map {
+            initVideoPlayerItem(it.id.longValue, it.name, it.duration)
+        }
+        testVideoNodes.forEachIndexed { index, node ->
+            whenever(
+                videoPlayerItemMapper(
+                    node.id.longValue,
+                    node.name,
+                    null,
+                    getMediaQueueItemType(index, playingIndex),
+                    node.size,
+                    node.duration
+                )
+            ).thenReturn(entities[index])
+        }
+
+        whenever(
+            intent.getBooleanExtra(
+                INTENT_EXTRA_KEY_IS_PLAYLIST,
+                true
+            )
+        ).thenReturn(true)
+        Mockito.mockStatic(Uri::class.java).use {
+            whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
+            underTest.initVideoPlaybackSources(intent)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                actual.items.let { items ->
+                    assertThat(items).isNotEmpty()
+                    assertThat(items.size).isEqualTo(testArray.size)
+                    items.forEachIndexed { index, item ->
+                        assertThat(item).isEqualTo(entities[index])
+                    }
+                }
+                actual.mediaPlaySources?.let { sources ->
+                    assertThat(sources.mediaItems).isNotEmpty()
+                    assertThat(sources.mediaItems.size).isEqualTo(testArray.size)
+                    assertThat(sources.newIndexForCurrentItem).isEqualTo(playingIndex)
+                }
+                assertThat(actual.playQueueTitle).isEqualTo(queueTitle)
+                assertThat(actual.currentPlayingIndex).isEqualTo(playingIndex)
+                assertThat(actual.currentPlayingHandle).isEqualTo(testArray[playingIndex])
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+    }
+
+    private fun initVideoNode(handle: Long) =
+        mock<TypedVideoNode> {
+            on { id }.thenReturn(NodeId(handle))
+            on { name }.thenReturn(testFileName)
+            on { size }.thenReturn(testSize)
+            on { duration }.thenReturn(testDuration)
+        }
+
+    @Test
+    fun `test that state is updated correctly when launch source is SEARCH_BY_ADAPTER`() =
+        runTest {
+            val intent = mock<Intent>()
+            whenever(intent.getStringExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE)).thenReturn(testTitle)
+            whenever(intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)).thenReturn(
+                longArrayOf(1, 2, 3)
+            )
+            testStateIsUpdatedCorrectlyByLaunchSource(
+                intent = intent,
+                launchSource = SEARCH_BY_ADAPTER
+            ) {
+                getVideoNodesByHandlesUseCase(any())
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly when launch source is CONTACT_FILE_ADAPTER and parentHandle is INVALID_HANDLE`() =
+        runTest {
+            val intent = mock<Intent>()
+            whenever(intent.getStringExtra(INTENT_EXTRA_KEY_CONTACT_EMAIL)).thenReturn("email")
+            whenever(getUserNameByEmailUseCase(any())).thenReturn(testTitle)
+            initTestDataByParentNode(intent, INVALID_HANDLE) {
+                getRootNodeUseCase()
+            }
+            testStateIsUpdatedCorrectlyByLaunchSource(
+                intent = intent,
+                launchSource = CONTACT_FILE_ADAPTER,
+                queueTitle = "$testTitle $testTitle"
+            ) {
+                getVideoNodesByEmailUseCase(any())
+            }
+        }
+
+    @ParameterizedTest(name = "when launch source is {0}, and parentHandle is {1}")
+    @MethodSource("provideParameters")
+    fun `test that state is updated correctly`(
+        launchSource: Int,
+        parentHandle: Long,
+        queueTitle: String,
+        initParentNode: suspend () -> Node?,
+        getVideoNodes: suspend () -> List<TypedVideoNode>?,
+    ) = runTest {
+        val intent = mock<Intent>()
+        initTestDataByParentNode(intent, parentHandle) {
+            initParentNode()
+        }
+        testStateIsUpdatedCorrectlyByLaunchSource(
+            intent = intent,
+            launchSource = launchSource,
+            queueTitle = queueTitle
+        ) {
+            getVideoNodes()
+        }
+    }
+
+    private fun provideParameters() = createInvalidTestParameters() + createValidTestParameters()
+
+    private fun createInvalidTestParameters() = listOf(
+        createTestParameterWithInvalidHandle(
+            launchSource = FAVOURITES_ADAPTER,
+            initParentNode = { getRootNodeUseCase() },
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = FROM_ALBUM_SHARING,
+            initParentNode = { getRootNodeUseCase() },
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = FROM_IMAGE_VIEWER,
+            initParentNode = { getRootNodeUseCase() },
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = FROM_MEDIA_DISCOVERY,
+            initParentNode = { getRootNodeUseCase() },
+            getVideoNodes = { getVideosBySearchTypeUseCase(any(), any(), any(), any()) },
+        ),
+        createTestParameterWithValidHandle(
+            launchSource = FROM_MEDIA_DISCOVERY,
+            getVideoNodes = { getVideosBySearchTypeUseCase(any(), any(), any(), any()) },
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = OUTGOING_SHARES_ADAPTER,
+            initParentNode = { getRootNodeUseCase() },
+            getVideoNodes = { getVideoNodesFromOutSharesUseCase(any(), any()) }
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = INCOMING_SHARES_ADAPTER,
+            initParentNode = { getRootNodeUseCase() },
+            getVideoNodes = { getVideoNodesFromInSharesUseCase(any()) }
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = LINKS_ADAPTER,
+            initParentNode = { getRootNodeUseCase() },
+            getVideoNodes = { getVideoNodesFromPublicLinksUseCase(any()) }
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = FILE_BROWSER_ADAPTER,
+            initParentNode = { getRootNodeUseCase() },
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = BACKUPS_ADAPTER,
+            initParentNode = { getBackupsNodeUseCase() },
+        ),
+        createTestParameterWithInvalidHandle(
+            launchSource = RUBBISH_BIN_ADAPTER,
+            initParentNode = { getRubbishNodeUseCase() },
+        ),
+    )
+
+    private fun createValidTestParameters() = listOf(
+        createTestParameterWithValidHandle(launchSource = FAVOURITES_ADAPTER),
+        createTestParameterWithValidHandle(launchSource = FROM_ALBUM_SHARING),
+        createTestParameterWithValidHandle(launchSource = FROM_IMAGE_VIEWER),
+        createTestParameterWithValidHandle(launchSource = CONTACT_FILE_ADAPTER),
+        createTestParameterWithValidHandle(launchSource = OUTGOING_SHARES_ADAPTER),
+        createTestParameterWithValidHandle(launchSource = INCOMING_SHARES_ADAPTER),
+        createTestParameterWithValidHandle(launchSource = LINKS_ADAPTER),
+        createTestParameterWithValidHandle(launchSource = FILE_BROWSER_ADAPTER),
+        createTestParameterWithValidHandle(launchSource = BACKUPS_ADAPTER),
+        createTestParameterWithValidHandle(launchSource = RUBBISH_BIN_ADAPTER),
+    )
+
+    private fun createTestParameterWithInvalidHandle(
+        launchSource: Int,
+        initParentNode: suspend () -> Node? = { getVideoNodeByHandleUseCase(any(), any()) },
+        getVideoNodes: suspend () -> List<TypedVideoNode>? =
+            { getVideoNodesByParentHandleUseCase(any(), any()) },
+    ) = arrayOf(launchSource, INVALID_HANDLE, testTitle, initParentNode, getVideoNodes)
+
+    private fun createTestParameterWithValidHandle(
+        launchSource: Int,
+        initParentNode: suspend () -> Node? = { getVideoNodeByHandleUseCase(any(), any()) },
+        getVideoNodes: suspend () -> List<TypedVideoNode>? =
+            { getVideoNodesByParentHandleUseCase(any(), any()) },
+    ) = arrayOf(launchSource, testHandle, testTitle, initParentNode, getVideoNodes)
+
+    private suspend fun initTestDataByParentNode(
+        intent: Intent,
+        parentHandle: Long,
+        initParentNode: suspend () -> Node? = { getVideoNodeByHandleUseCase(any(), any()) },
+    ) {
+        val testParentNode = mock<TypedVideoNode> {
+            on { name }.thenReturn(testTitle)
+        }
+        whenever(
+            intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
+        ).thenReturn(parentHandle)
+        whenever(initParentNode()).thenReturn(testParentNode)
     }
 }
