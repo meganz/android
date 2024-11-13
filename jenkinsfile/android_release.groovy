@@ -503,7 +503,7 @@ pipeline {
                             string(credentialsId: 'MOBILE_DEV_TEAM_SLACK_CHANNEL_ID', variable: 'MOBILE_DEV_TEAM_SLACK_CHANNEL_ID'),
                             string(credentialsId: 'RELEASE_ANNOUNCEMENT_SLACK_TOKEN', variable: 'RELEASE_ANNOUNCEMENT_SLACK_TOKEN'),
                     ]) {
-                        sh("./gradlew sendCodeFreezeReminder --current-version ${currentVersion} --next-version ${nextVersion} --project MEGA")
+                        sh("./gradlew sendCodeFreezeReminder --current-version ${currentVersion} --next-version ${nextVersion} --app MEGA")
                     }
                 }
             }
