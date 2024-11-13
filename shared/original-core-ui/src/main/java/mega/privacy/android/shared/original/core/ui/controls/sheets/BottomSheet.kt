@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.ModalBottomSheetDefaults
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
@@ -29,6 +30,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
@@ -85,6 +87,7 @@ fun BottomSheet(
     modalSheetState: ModalBottomSheetState,
     sheetBody: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
+    sheetElevation: Dp = ModalBottomSheetDefaults.Elevation,
     sheetGesturesEnabled: Boolean = true,
     expandedRoundedCorners: Boolean = false,
     content: (@Composable () -> Unit)? = null,
@@ -100,6 +103,7 @@ fun BottomSheet(
             topStart = roundedCornerRadius,
             topEnd = roundedCornerRadius
         ),
+        sheetElevation = sheetElevation,
         sheetState = modalSheetState,
         sheetGesturesEnabled = sheetGesturesEnabled,
         scrimColor = MegaOriginalTheme.colors.background.blur,

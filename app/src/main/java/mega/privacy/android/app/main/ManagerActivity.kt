@@ -42,6 +42,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.compose.material.ModalBottomSheetDefaults
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.LaunchedEffect
@@ -57,6 +58,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
@@ -1265,6 +1267,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     }
                     BottomSheet(
                         modalSheetState = syncPromotionBottomSheetState,
+                        sheetElevation = if (syncPromotionBottomSheetState.isVisible) ModalBottomSheetDefaults.Elevation else 0.dp,
                         sheetBody = {
                             SyncPromotionBottomSheet(
                                 modifier = Modifier.semantics { testTagsAsResourceId = true },
