@@ -806,4 +806,12 @@
     <string name="display_over_other_apps_permission_screen_message">MEGA are nevoie de permisiunea dvs. pentru a afișa peste aplicații. Aceasta înseamnă că nu veți pierde niciodată o altă notificare de apel primit.</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">Acordă permisiunea</string>
+    <!-- Message displayed with progress percentage while the app is doing some background operation -->
+    <string name="login_completing_operation">Finalizarea operațiunii: %1$d%%</string>
+    <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
+    <string name="dialog_not_enough_space_to_upload_title">Nu este suficient spațiu pentru a încărca fișiere noi</string>
+    <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
+    <string name="dialog_not_enough_space_to_upload_message">Te-ai depășit cotă de stocare. Actualizați la un abonament mai mare sau goliți puțin spațiu pentru a încărca fișiere noi. [A]Aflați mai multe[/A].</string>
+    <!-- Name for a general button which action is navigate to the "Upgrade" account -->
+    <string name="general_upgrade_button">Upgradează</string>
 </resources>

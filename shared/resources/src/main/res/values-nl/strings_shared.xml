@@ -794,4 +794,12 @@
     <string name="display_over_other_apps_permission_screen_message">MEGA heeft uw toestemming nodig voor weergave via applicaties. Dit betekent dat u nooit meer meldingen van inkomende oproepen mist.</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">Toestemming toestaan</string>
+    <!-- Message displayed with progress percentage while the app is doing some background operation -->
+    <string name="login_completing_operation">Completing operation: %1$d%%</string>
+    <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
+    <string name="dialog_not_enough_space_to_upload_title">Not enough space to upload new files</string>
+    <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
+    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a larger plan, or clear some space, to upload new files. [A]Learn more[/A].</string>
+    <!-- Name for a general button which action is navigate to the "Upgrade" account -->
+    <string name="general_upgrade_button">Upgraden</string>
 </resources>

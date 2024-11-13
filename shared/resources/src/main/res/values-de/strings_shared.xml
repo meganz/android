@@ -661,7 +661,7 @@
     <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
     <string name="document_scanning_error_type_insufficient_ram">Ihr Smartphone erfüllt nicht die Mindestanforderungen an den Arbeitsspeicher, um den Scanvorgang abzuschließen</string>
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
-    <string name="document_scanning_error_type_generic_error">We’re having trouble opening the document scanner. Close and re-open the app, and try again.</string>
+    <string name="document_scanning_error_type_generic_error">Der Dokumentscanner kann nicht geöffnet werden. Schließen Sie die App, öffnen Sie sie wieder, und versuchen Sie es erneut.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">Schließen</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
@@ -693,7 +693,7 @@
     <!-- Title of the Contact Permission Explanation -->
     <string name="title_enable_access_contact">Zugriff erlauben, um Freunde einladen zu können</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">You can also add contacts from your phone’s contact list, if you allow MEGA access to the list.</string>
+    <string name="subtitle_enable_access_contact">Sie können auch Kontakte aus Ihrem Telefon hinzufügen, wenn Sie MEGA den Zugriff auf Ihre Kontakte erlauben.</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">Zugriff erlauben</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -789,9 +789,17 @@
     <!-- Capital letters. Text of the label of a new historic notifications-->
     <string name="notifications_notification_item_new_tag">Neu</string>
     <!-- Title in the display over other apps permission screen -->
-    <string name="display_over_other_apps_permission_screen_title">Allow MEGA to display over other apps</string>
+    <string name="display_over_other_apps_permission_screen_title">MEGA das Einblenden über anderen Apps erlauben</string>
     <!-- Context message in the display over other apps permission screen -->
-    <string name="display_over_other_apps_permission_screen_message">MEGA needs your permission to display over apps. This means that you’ll never miss another incoming call notification.</string>
+    <string name="display_over_other_apps_permission_screen_message">MEGA benötigt Ihre Erlaubnis, um über anderen Apps angezeigt zu werden. Dadurch werden Sie nie mehr die Benachrichtigung über einen eingehenden Anruf verpassen.</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">Zugriff gewähren</string>
+    <!-- Message displayed with progress percentage while the app is doing some background operation -->
+    <string name="login_completing_operation">Completing operation: %1$d%%</string>
+    <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
+    <string name="dialog_not_enough_space_to_upload_title">Not enough space to upload new files</string>
+    <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
+    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a larger plan, or clear some space, to upload new files. [A]Learn more[/A].</string>
+    <!-- Name for a general button which action is navigate to the "Upgrade" account -->
+    <string name="general_upgrade_button">Upgraden</string>
 </resources>
