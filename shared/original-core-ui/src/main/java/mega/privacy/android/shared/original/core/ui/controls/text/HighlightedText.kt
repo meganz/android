@@ -5,7 +5,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -59,15 +58,14 @@ fun HighlightedText(
         return
     }
 
-    val annotatedText: AnnotatedString = remember(text) {
-        buildAnnotatedString {
-            append(text)
-            val normalizedHighlight = highlightText.normalize()
-            var startIndex =
-                text.normalize().indexOf(string = normalizedHighlight, ignoreCase = true)
-
-            while (startIndex >= 0) {
-                val endIndex = startIndex + normalizedHighlight.length
+    val annotatedText: AnnotatedString = buildAnnotatedString {
+        append(text)
+        val normalizedHighlight = highlightText.normalize()
+        val normalizedText = text.normalize()
+        var startIndex = normalizedText.indexOf(string = normalizedHighlight, ignoreCase = true)
+        while (startIndex >= 0) {
+            val endIndex = startIndex + normalizedHighlight.length
+            if (endIndex <= text.length) {
                 addStyle(
                     style = SpanStyle(
                         background = highlightColor,
@@ -76,12 +74,14 @@ fun HighlightedText(
                     start = startIndex,
                     end = endIndex
                 )
-                startIndex = text.indexOf(
-                    string = normalizedHighlight,
-                    startIndex = startIndex + normalizedHighlight.length,
-                    ignoreCase = true
-                )
+            } else {
+                break
             }
+            startIndex = normalizedText.indexOf(
+                string = normalizedHighlight,
+                startIndex = endIndex,
+                ignoreCase = true
+            )
         }
     }
 
