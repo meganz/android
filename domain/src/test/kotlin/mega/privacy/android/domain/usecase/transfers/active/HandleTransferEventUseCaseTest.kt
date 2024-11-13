@@ -31,6 +31,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -214,12 +215,13 @@ class HandleTransferEventUseCaseTest {
 
     @ParameterizedTest
     @EnumSource(value = TransferType::class, names = ["GENERAL_UPLOAD", "CHAT_UPLOAD", "CU_UPLOAD"])
-    fun `test that broadcastStorageOverQuotaUseCase is invoked when a QuotaExceededMegaException is received as a temporal error for upload Event`(
+    fun `test that broadcastStorageOverQuotaUseCase is invoked when a QuotaExceededMegaException is received as a temporal error for upload Event and the transfer isForeignOverQuota value is false`(
         type: TransferType,
     ) = runTest {
         reset(broadcastStorageOverQuotaUseCase)
         val transfer = mock<Transfer> {
             on { this.transferType }.thenReturn(type)
+            on { this.isForeignOverQuota }.thenReturn(false)
         }
         val transferEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
             on { this.transfer }.thenReturn(transfer)
@@ -227,6 +229,24 @@ class HandleTransferEventUseCaseTest {
         }
         underTest.invoke(transferEvent)
         verify(broadcastStorageOverQuotaUseCase).invoke(true)
+        verifyNoMoreInteractions(broadcastTransferOverQuotaUseCase)
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = TransferType::class, names = ["GENERAL_UPLOAD", "CHAT_UPLOAD", "CU_UPLOAD"])
+    fun `test that broadcastStorageOverQuotaUseCase is not invoked when a QuotaExceededMegaException is received as a temporal error for upload Event and the transfer isForeignOverQuota value is true`(
+        type: TransferType,
+    ) = runTest {
+        reset(broadcastStorageOverQuotaUseCase)
+        val transfer = mock<Transfer> {
+            on { this.transferType }.thenReturn(type)
+            on { this.isForeignOverQuota }.thenReturn(true)
+        }
+        val transferEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+            on { this.transfer }.thenReturn(transfer)
+            on { this.error }.thenReturn(QuotaExceededMegaException(1, value = 1))
+        }
+        underTest.invoke(transferEvent)
         verifyNoInteractions(broadcastTransferOverQuotaUseCase)
     }
 

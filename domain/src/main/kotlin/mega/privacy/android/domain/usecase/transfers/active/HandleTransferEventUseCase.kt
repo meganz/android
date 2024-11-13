@@ -85,7 +85,9 @@ class HandleTransferEventUseCase @Inject internal constructor(
             when {
                 !it.transfer.transferType.isUploadType() -> previous
                 it is TransferEvent.TransferStartEvent || it is TransferEvent.TransferUpdateEvent -> false
-                (it as? TransferEvent.TransferTemporaryErrorEvent)?.error is QuotaExceededMegaException -> true
+                (it as? TransferEvent.TransferTemporaryErrorEvent)?.error is QuotaExceededMegaException
+                        && it.transfer.isForeignOverQuota.not() -> true
+
                 else -> previous
             }
         }.lastOrNull()?.let { transferOverQuota ->

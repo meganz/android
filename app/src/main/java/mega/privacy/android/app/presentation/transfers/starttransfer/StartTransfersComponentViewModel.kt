@@ -65,6 +65,7 @@ import mega.privacy.android.domain.usecase.transfers.filespermission.MonitorRequ
 import mega.privacy.android.domain.usecase.transfers.filespermission.SetRequestFilesPermissionDeniedUseCase
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.DeleteAllPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingDownloadsForNodesUseCase
@@ -114,6 +115,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val monitorPendingTransfersUntilResolvedUseCase: MonitorPendingTransfersUntilResolvedUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val insertPendingDownloadsForNodesUseCase: InsertPendingDownloadsForNodesUseCase,
+    private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val _uiState = MutableStateFlow(StartTransferViewState())
@@ -127,6 +129,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         checkDownloadRating()
         checkUploadRating()
         monitorRequestFilesPermissionDenied()
+        monitorStorageOverQuota()
     }
 
     /**
@@ -901,6 +904,14 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     fun consumeRequestPermission() {
         viewModelScope.launch {
             _uiState.update { state -> state.copy(triggerEventWithoutPermission = null) }
+        }
+    }
+
+    private fun monitorStorageOverQuota() {
+        viewModelScope.launch {
+            monitorStorageOverQuotaUseCase().collect { isStorageOverQuota ->
+                _uiState.update { state -> state.copy(isStorageOverQuota = isStorageOverQuota) }
+            }
         }
     }
 }

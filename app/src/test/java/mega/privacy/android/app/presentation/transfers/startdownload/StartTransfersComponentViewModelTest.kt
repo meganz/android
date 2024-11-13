@@ -59,6 +59,7 @@ import mega.privacy.android.domain.usecase.transfers.filespermission.MonitorRequ
 import mega.privacy.android.domain.usecase.transfers.filespermission.SetRequestFilesPermissionDeniedUseCase
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.DeleteAllPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.InsertPendingDownloadsForNodesUseCase
@@ -74,6 +75,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
@@ -133,6 +135,9 @@ class StartTransfersComponentViewModelTest {
     private val deleteAllPendingTransfersUseCase = mock<DeleteAllPendingTransfersUseCase>()
     private val monitorPendingTransfersUntilResolvedUseCase =
         mock<MonitorPendingTransfersUntilResolvedUseCase>()
+    private val monitorStorageOverQuotaUseCase = mock<MonitorStorageOverQuotaUseCase> {
+        on { invoke() } doReturn emptyFlow()
+    }
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -195,7 +200,8 @@ class StartTransfersComponentViewModelTest {
             deleteAllPendingTransfersUseCase = deleteAllPendingTransfersUseCase,
             monitorPendingTransfersUntilResolvedUseCase = monitorPendingTransfersUntilResolvedUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            insertPendingDownloadsForNodesUseCase = insertPendingDownloadsForNodesUseCase
+            insertPendingDownloadsForNodesUseCase = insertPendingDownloadsForNodesUseCase,
+            monitorStorageOverQuotaUseCase = monitorStorageOverQuotaUseCase,
         )
     }
 
@@ -252,6 +258,7 @@ class StartTransfersComponentViewModelTest {
         ).thenReturn(emptyFlow())
         whenever(monitorRequestFilesPermissionDeniedUseCase()).thenReturn(emptyFlow())
         whenever(getFeatureFlagValueUseCase(AppFeatures.StartDownloadsInWorker)).thenReturn(false)
+        whenever(monitorStorageOverQuotaUseCase()).thenReturn(emptyFlow())
     }
 
     @ParameterizedTest
@@ -818,6 +825,20 @@ class StartTransfersComponentViewModelTest {
         verify(setRequestFilesPermissionDeniedUseCase).invoke()
     }
 
+    @ParameterizedTest(name = " if use case returns {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that monitorStorageOverQuota updates state`(
+        isStorageOverQuota: Boolean,
+    ) = runTest {
+        whenever(monitorStorageOverQuotaUseCase()).thenReturn(flowOf(isStorageOverQuota))
+
+        initTest()
+
+        underTest.uiState.map { it.isStorageOverQuota }.test {
+            assertThat(awaitItem()).isEqualTo(isStorageOverQuota)
+        }
+    }
+
     @Nested
     inner class StartInWorkerTests {
         @BeforeEach
@@ -1064,6 +1085,7 @@ class StartTransfersComponentViewModelTest {
         whenever(shouldAskDownloadDestinationUseCase()).thenReturn(false)
         stubStartTransfers(flowOf(finishProcessingEvent))
         whenever(monitorRequestFilesPermissionDeniedUseCase()).thenReturn(emptyFlow())
+        whenever(monitorStorageOverQuotaUseCase()).thenReturn(emptyFlow())
     }
 
     private fun stubStartTransfers(flow: Flow<MultiTransferEvent>) {
