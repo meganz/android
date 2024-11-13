@@ -63,6 +63,7 @@ import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
+import mega.privacy.android.app.presentation.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.app.presentation.search.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.app.presentation.search.navigation.contactArraySeparator
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
@@ -262,7 +263,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                 .padding(padding)
                                 .fillMaxSize()
                         ) {
-                            val (audioPlayer, searchContainer) = createRefs()
+                            val (audioPlayer, searchContainer, requestStatusProgressBar) = createRefs()
                             MiniAudioPlayerView(
                                 modifier = Modifier
                                     .constrainAs(audioPlayer) {
@@ -312,6 +313,13 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                         onBackPressedDispatcher.onBackPressed()
                                     }
                                 }
+                            )
+
+                            RequestStatusProgressContainer(
+                                modifier = Modifier
+                                    .constrainAs(requestStatusProgressBar) {
+                                        bottom.linkTo(parent.bottom)
+                                    }
                             )
                         }
                     }

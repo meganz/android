@@ -25,12 +25,14 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 @Composable
 fun RequestStatusProgressContainer(
     viewModel: RequestStatusProgressViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     RequestStatusProgressBarContent(
         showProgressBar = uiState.showProgressBar,
-        progress = uiState.progress
+        progress = uiState.progress,
+        modifier = modifier
     )
 }
 
@@ -41,6 +43,7 @@ fun RequestStatusProgressContainer(
 fun RequestStatusProgressBarContent(
     showProgressBar: Boolean,
     progress: Long,
+    modifier: Modifier = Modifier
 ) {
     AnimatedVisibility(
         visible = showProgressBar,
@@ -50,7 +53,8 @@ fun RequestStatusProgressBarContent(
         ),
         exit = fadeOut(
             animationSpec = tween(durationMillis = 100)
-        )
+        ),
+        modifier = modifier
     ) {
         MegaAnimatedLinearProgressIndicator(
             indicatorProgress = progress / 1000f,
