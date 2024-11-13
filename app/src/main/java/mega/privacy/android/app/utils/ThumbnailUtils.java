@@ -12,8 +12,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 
 import androidx.core.content.ContextCompat;
 
@@ -21,14 +19,7 @@ import java.io.File;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ThumbnailCache;
-import mega.privacy.android.app.main.providers.MegaProviderAdapter;
-import mega.privacy.android.app.main.providers.MegaProviderAdapter.ViewHolderProvider;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import timber.log.Timber;
 
 /*
@@ -132,70 +123,6 @@ public class ThumbnailUtils {
         return path;
     }
 
-    static class ThumbnailDownloadListenerProvider implements MegaRequestListenerInterface {
-        Context context;
-        ViewHolderProvider holder;
-        MegaProviderAdapter adapter;
-
-        ThumbnailDownloadListenerProvider(Context context, ViewHolderProvider holder, MegaProviderAdapter adapter) {
-            this.context = context;
-            this.holder = holder;
-            this.adapter = adapter;
-        }
-
-        @Override
-        public void onRequestStart(MegaApiJava api, MegaRequest request) {
-
-
-        }
-
-        @Override
-        public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-
-            final long handle = request.getNodeHandle();
-            Timber.d("Downloading thumbnail finished");
-            String handleBase64 = MegaApiJava.handleToBase64(handle);
-            if (e.getErrorCode() == MegaError.API_OK) {
-                Timber.d("Downloading thumbnail OK: %s", handle);
-                thumbnailCache.remove(handle);
-
-                if (holder != null) {
-                    File thumbDir = getThumbFolder(context);
-                    File thumb = new File(thumbDir, handleBase64 + ".jpg");
-                    if (thumb.exists()) {
-                        if (thumb.length() > 0) {
-                            final Bitmap bitmap = getBitmapForCache(thumb, context);
-                            if (bitmap != null) {
-                                thumbnailCache.put(handle, bitmap);
-                                if ((holder.document == handle)) {
-                                    holder.imageView.setImageBitmap(bitmap);
-                                    Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-                                    holder.imageView.startAnimation(fadeInAnimation);
-                                    adapter.notifyItemChanged(holder.getAbsoluteAdapterPosition());
-                                    Timber.d("Thumbnail update");
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                Timber.e("ERROR: %d___%s", e.getErrorCode(), e.getErrorString());
-            }
-        }
-
-        @Override
-        public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-
-
-        }
-
-        @Override
-        public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
-
-        }
-    }
-
     /*
      * Get thumbnail folder
      */
@@ -227,19 +154,6 @@ public class ThumbnailUtils {
             return thumbnailCache.get(node.getHandle());
         }
         return null;
-    }
-
-    public static Bitmap getThumbnailFromMegaProvider(MegaNode document, Context context, ViewHolderProvider viewHolder, MegaApiAndroid megaApi, MegaProviderAdapter adapter) {
-        if (!Util.isOnline(context)) {
-            return thumbnailCache.get(document.getHandle());
-        }
-
-        ThumbnailDownloadListenerProvider listener = new ThumbnailDownloadListenerProvider(context, viewHolder, adapter);
-        File thumbFile = new File(getThumbFolder(context), document.getBase64Handle() + ".jpg");
-        megaApi.getThumbnail(document, thumbFile.getAbsolutePath(), listener);
-
-        return thumbnailCache.get(document.getHandle());
-
     }
 
     /*
