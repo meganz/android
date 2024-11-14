@@ -503,7 +503,7 @@ private fun LoginInProgress(
 @Composable
 private fun LoginInProgressText(
     @StringRes stringId: Int,
-    progress: Long = -1L,
+    progress: Progress? = null,
     textChangeDuration: Long = 200,
     modifier: Modifier,
 ) {
@@ -517,8 +517,8 @@ private fun LoginInProgressText(
         exit = fadeOut(),
     ) {
         MegaText(
-            text = if (progress > -1L) {
-                stringResource(SharedRes.string.login_completing_operation, (progress / 10).toInt())
+            text = if (progress != null) {
+                stringResource(SharedRes.string.login_completing_operation, progress.intValue)
             } else {
                 stringResource(id = currentTextId)
             },
@@ -705,11 +705,11 @@ internal class LoginStateProvider : PreviewParameterProvider<LoginState> {
         ),
         LoginState(
             isLoginInProgress = true,
-            requestStatusProgress = 200
+            requestStatusProgress = Progress(0.2f)
         ),
         LoginState(
             isLoginInProgress = true,
-            requestStatusProgress = 700
+            requestStatusProgress = Progress(0.7f)
         ),
         LoginState(
             fetchNodesUpdate = FetchNodesUpdate(

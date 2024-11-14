@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaAnimatedLinearProgressIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
@@ -30,7 +31,6 @@ fun RequestStatusProgressContainer(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     RequestStatusProgressBarContent(
-        showProgressBar = uiState.showProgressBar,
         progress = uiState.progress,
         modifier = modifier
     )
@@ -41,12 +41,11 @@ fun RequestStatusProgressContainer(
  */
 @Composable
 fun RequestStatusProgressBarContent(
-    showProgressBar: Boolean,
-    progress: Long,
+    progress: Progress?,
     modifier: Modifier = Modifier
 ) {
     AnimatedVisibility(
-        visible = showProgressBar,
+        visible = progress != null,
         enter = slideInVertically(
             initialOffsetY = { fullHeight -> fullHeight },
             animationSpec = tween(durationMillis = 400)
@@ -56,10 +55,11 @@ fun RequestStatusProgressBarContent(
         ),
         modifier = modifier
     ) {
+        val progressValue = progress?.floatValue ?: 0f
         MegaAnimatedLinearProgressIndicator(
-            indicatorProgress = progress / 1000f,
+            indicatorProgress = progressValue,
             height = 4.dp,
-            progressAnimDuration = 500,
+            progressAnimDuration = if (progressValue > 0.9f) 200 else 500,
             modifier = Modifier.testTag(PROGRESS_BAR_TEST_TAG),
             clip = RoundedCornerShape(0.dp),
             strokeCap = StrokeCap.Square
@@ -73,6 +73,6 @@ internal const val PROGRESS_BAR_TEST_TAG = "request_status_progress_bar_content:
 @Composable
 private fun RequestStatusProgressBarContentPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
-        RequestStatusProgressBarContent(true, progress = 500)
+        RequestStatusProgressBarContent(progress = Progress(0.5f))
     }
 }

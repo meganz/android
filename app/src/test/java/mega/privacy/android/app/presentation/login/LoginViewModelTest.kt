@@ -24,8 +24,7 @@ import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetai
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.Event
-import mega.privacy.android.domain.entity.NormalEvent
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
@@ -70,7 +69,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -125,7 +123,7 @@ internal class LoginViewModelTest {
     private val getHistoricalProcessExitReasonsUseCase =
         mock<GetHistoricalProcessExitReasonsUseCase>()
     private val enableRequestStatusMonitorUseCase = mock<EnableRequestStatusMonitorUseCase>()
-    private val requestStatusProgressFakeFlow = MutableSharedFlow<Event>()
+    private val requestStatusProgressFakeFlow = MutableSharedFlow<Progress>()
     private val monitorRequestStatusProgressEventUseCase =
         mock<MonitorRequestStatusProgressEventUseCase>()
 
@@ -414,18 +412,16 @@ internal class LoginViewModelTest {
 
     @Test
     fun `test that requestStatusProgress is updated when event is received`() = runTest {
-        val newProgress = 50L
-        requestStatusProgressFakeFlow.emit(mock<NormalEvent> {
-            on { number } doReturn newProgress
-        })
+        val newProgress = 0.5f
+        requestStatusProgressFakeFlow.emit(Progress(newProgress))
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.requestStatusProgress).isEqualTo(newProgress)
+            assertThat(state.requestStatusProgress?.floatValue).isEqualTo(newProgress)
         }
     }
 
     @Test
-    fun `test that requestStatusProgress is set to -1 when exception is thrown`() = runTest {
+    fun `test that requestStatusProgress is set to null when exception is thrown`() = runTest {
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(
             flow {
                 throw MegaException(1, "error")
@@ -433,7 +429,7 @@ internal class LoginViewModelTest {
         )
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.requestStatusProgress).isEqualTo(-1L)
+            assertThat(state.requestStatusProgress).isNull()
         }
     }
 

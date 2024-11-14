@@ -145,8 +145,8 @@ class LoginViewTest {
     }
 
     @Test
-    fun `test that request status progress bar is shown if the request status progress is greater than -1`() {
-        setupRule(LoginState(requestStatusProgress = 500L, isLoginInProgress = true))
+    fun `test that request status progress bar is shown if the request status progress is not null`() {
+        setupRule(LoginState(requestStatusProgress = Progress(0.5f), isLoginInProgress = true))
         composeRule.onNodeWithTag(REQUEST_STATUS_PROGRESS_TEST_TAG).assertExists()
     }
 

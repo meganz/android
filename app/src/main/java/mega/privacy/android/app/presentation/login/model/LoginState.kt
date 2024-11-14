@@ -7,6 +7,7 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.TemporaryWaitingError
@@ -87,13 +88,13 @@ data class LoginState(
     val isCheckingSignupLink: Boolean = false,
     val snackbarMessage: StateEventWithContent<Int> = consumed(),
     val loginTemporaryError: TemporaryWaitingError? = null,
-    val requestStatusProgress: Long = -1L,
+    val requestStatusProgress: Progress? = null,
 ) {
 
     /**
      * True if the request status progress event is being processed
      */
-    val isRequestStatusInProgress = requestStatusProgress > -1L
+    val isRequestStatusInProgress = requestStatusProgress != null
 
     /**
      * Temporary error during login or fetch nodes

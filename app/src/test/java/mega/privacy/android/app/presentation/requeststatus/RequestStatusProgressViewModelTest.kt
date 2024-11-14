@@ -9,8 +9,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.Event
-import mega.privacy.android.domain.entity.NormalEvent
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
 import org.junit.jupiter.api.AfterEach
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -32,7 +30,7 @@ class RequestStatusProgressViewModelTest {
 
     private val monitorRequestStatusProgressEventUseCase =
         mock<MonitorRequestStatusProgressEventUseCase>()
-    private val requestStatusProgressFakeFlow = MutableSharedFlow<Event>()
+    private val requestStatusProgressFakeFlow = MutableSharedFlow<Progress>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeEach
@@ -54,24 +52,22 @@ class RequestStatusProgressViewModelTest {
     fun `test that initial state is returned`() = runTest {
         underTest.uiState.test {
             val initial = awaitItem()
-            assertThat(initial.progress).isEqualTo(-1)
+            assertThat(initial.progress).isNull()
         }
     }
 
     @Test
     fun `test that progress is updated when event is received`() = runTest {
-        val newProgress = 50L
-        requestStatusProgressFakeFlow.emit(mock<NormalEvent> {
-            on { number } doReturn newProgress
-        })
+        val newProgress = 0.5f
+        requestStatusProgressFakeFlow.emit(Progress(newProgress))
         underTest.uiState.test {
             val state = awaitItem()
-            assertThat(state.progress).isEqualTo(newProgress)
+            assertThat(state.progress?.floatValue).isEqualTo(newProgress)
         }
     }
 
     @Test
-    fun `test that progress is set to -1 when exception is thrown`() = runTest {
+    fun `test that progress is set to null when exception is thrown`() = runTest {
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(
             flow {
                 throw Exception()
@@ -79,7 +75,7 @@ class RequestStatusProgressViewModelTest {
         )
         underTest.uiState.test {
             val state = awaitItem()
-            assertThat(state.progress).isEqualTo(-1L)
+            assertThat(state.progress).isNull()
         }
     }
 

@@ -179,13 +179,11 @@ class LoginViewModel @Inject constructor(
                             Timber.e(throwable)
                             // Hide progress bar on error
                             _state.update {
-                                it.copy(requestStatusProgress = -1L)
+                                it.copy(requestStatusProgress = null)
                             }
-                        }.collect { event ->
+                        }.collect { progress ->
                             _state.update {
-                                it.copy(
-                                    requestStatusProgress = event.number
-                                )
+                                it.copy(requestStatusProgress = progress)
                             }
                         }
                 }
