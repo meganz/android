@@ -8,13 +8,20 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.BottomSheetVersionsFileBinding
 import mega.privacy.android.app.presentation.versions.dialog.VersionsBottomSheetDialogViewModel
 import mega.privacy.android.app.presentation.versions.dialog.model.VersionsBottomSheetDialogState
+import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 
 /**
  * [BaseBottomSheetDialogFragment] that displays the list of options when selecting the Menu icon
@@ -131,11 +138,15 @@ class VersionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     node = node,
                     context = requireContext(),
                 )
-                ModalBottomSheetUtil.setNodeThumbnail(
-                    context = requireContext(),
-                    node = node,
-                    nodeThumb = versionsFileThumbnail,
-                )
+                versionsFileThumbnail.load(ThumbnailRequest(NodeId(node.handle))) {
+                    placeholder(typeForName(node.name).iconResourceId)
+                    crossfade(true)
+                    transformations(
+                        RoundedCornersTransformation(
+                            dp2px(THUMB_CORNER_RADIUS_DP).toFloat()
+                        )
+                    )
+                }
                 optionDelete.isVisible = uiState.canDeleteVersion
                 separatorDelete.isVisible = uiState.canDeleteVersion
                 optionRevert.isVisible = uiState.canRevertVersion

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
 import static mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
 import static mega.privacy.android.app.utils.Constants.HANDLE;
@@ -30,6 +29,9 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import coil.Coil;
+import coil.request.ImageRequest;
+import coil.transform.RoundedCornersTransformation;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
@@ -37,6 +39,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.main.ContactFileListActivity;
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import timber.log.Timber;
@@ -138,7 +141,15 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
             long nodeSize = node.getSize();
             nodeInfo.setText(getSizeString(nodeSize, requireContext()));
             nodeIconLayout.setVisibility(View.GONE);
-            setNodeThumbnail(requireContext(), node, nodeThumb);
+            Coil.imageLoader(requireContext()).enqueue(
+                    new ImageRequest.Builder(requireContext())
+                            .placeholder(MimeTypeList.typeForName(node.getName()).getIconResourceId())
+                            .data(ThumbnailRequest.fromHandle(node.getHandle()))
+                            .crossfade(true)
+                            .target(nodeThumb)
+                            .transformations(new RoundedCornersTransformation(getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
+                            .build()
+            );
             optionLeave.setVisibility(View.GONE);
 
             if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())

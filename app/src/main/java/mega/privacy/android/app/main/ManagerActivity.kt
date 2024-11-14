@@ -6663,22 +6663,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     val isSearchOpen: Boolean
         get() = searchExpand
 
-    override fun onTrimMemory(level: Int) {
-        super.onTrimMemory(level)
-
-        // Determine which lifecycle or system event was raised.
-        //we will stop creating thumbnails while the phone is running low on memory to prevent OOM
-        Timber.d("Level: %s", level)
-        if (level >= ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL) {
-            Timber.w("Low memory")
-            ThumbnailUtils.isDeviceMemoryLow = true
-        } else {
-            Timber.d("Memory OK")
-            ThumbnailUtils.isDeviceMemoryLow = false
-        }
-    }
-
-
     fun homepageToSearch() {
         hideItemsWhenSearchSelected()
         searchMenuItem?.expandActionView()

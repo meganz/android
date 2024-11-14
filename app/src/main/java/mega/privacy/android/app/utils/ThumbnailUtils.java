@@ -4,7 +4,6 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -18,8 +17,6 @@ import androidx.core.content.ContextCompat;
 import java.io.File;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.ThumbnailCache;
-import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
 /*
@@ -27,8 +24,6 @@ import timber.log.Timber;
  */
 public class ThumbnailUtils {
     public static File thumbDir;
-    public static ThumbnailCache thumbnailCache = new ThumbnailCache();
-    public static Boolean isDeviceMemoryLow = false;
 
     public static Bitmap getRoundedRectBitmap(Context context, final Bitmap bitmap, final int pixels) {
         Timber.d("getRoundedRectBitmap");
@@ -50,26 +45,6 @@ public class ThumbnailUtils {
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, rect, rect, paint);
-        return result;
-    }
-
-    public static Bitmap getRoundedBitmap(Context context, final Bitmap bitmap, final int pixels) {
-        Timber.d("getRoundedRectBitmap");
-        final Bitmap result = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        final Canvas canvas = new Canvas(result);
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-        final RectF rectF = new RectF(rect);
-
-        final float densityMultiplier = context.getResources().getDisplayMetrics().density;
-        final float roundPx = pixels * densityMultiplier;
-        paint.setAntiAlias(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(ContextCompat.getColor(context, R.color.white));
-        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
-
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, 0, 0, paint);
         return result;
     }
 
@@ -132,37 +107,5 @@ public class ThumbnailUtils {
         }
         Timber.d("getThumbFolder(): thumbDir= %s", thumbDir);
         return thumbDir;
-    }
-
-    public static Bitmap getThumbnailFromCache(MegaNode node) {
-        return thumbnailCache.get(node.getHandle());
-    }
-
-    public static Bitmap getThumbnailFromFolder(MegaNode node, Context context) {
-        File thumbDir = getThumbFolder(context);
-        if (node != null) {
-            File thumb = new File(thumbDir, node.getBase64Handle() + ".jpg");
-            Bitmap bitmap;
-            if (thumb.exists() && thumb.length() > 0) {
-                bitmap = getBitmapForCache(thumb, context);
-                if (bitmap == null) {
-                    thumb.delete();
-                } else {
-                    thumbnailCache.put(node.getHandle(), bitmap);
-                }
-            }
-            return thumbnailCache.get(node.getHandle());
-        }
-        return null;
-    }
-
-    /*
-     * Load Bitmap for cache
-     */
-    private static Bitmap getBitmapForCache(File bmpFile, Context context) {
-        BitmapFactory.Options bOpts = new BitmapFactory.Options();
-        bOpts.inPurgeable = true;
-        bOpts.inInputShareable = true;
-        return BitmapFactory.decodeFile(bmpFile.getAbsolutePath(), bOpts);
     }
 }
