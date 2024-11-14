@@ -10,16 +10,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
+import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
 import javax.inject.Inject
 
 /**
@@ -60,7 +64,15 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
                             SaveScannedDocumentsScreen(
                                 viewModel = viewModel,
                                 onUploadScansStarted = { uriToUpload ->
-                                    if (viewModel.uiState.value.originatedFromChat) {
+                                    val uiState = viewModel.uiState.value
+                                    if (uiState.originatedFromChat) {
+                                        Analytics.tracker.trackEvent(
+                                            if (uiState.scanFileType == ScanFileType.Pdf) {
+                                                DocumentScannerUploadingPDFToChatEvent
+                                            } else {
+                                                DocumentScannerUploadingImageToChatEvent
+                                            }
+                                        )
                                         redirectBackToChat(uriToUpload)
                                     } else {
                                         proceedToFileExplorer(uriToUpload)
@@ -102,6 +114,7 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
 
         val intent = Intent(this, FileExplorerActivity::class.java).apply {
             putExtra(Intent.EXTRA_STREAM, uriToUpload)
+            putExtra(FileExplorerActivity.EXTRA_SCAN_FILE_TYPE, uiState.scanFileType.ordinal)
             when (scanDestination) {
                 ScanDestination.CloudDrive -> {
                     action = FileExplorerActivity.ACTION_SAVE_TO_CLOUD

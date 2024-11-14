@@ -62,6 +62,7 @@ import mega.privacy.mobile.analytics.event.ChatConversationScanMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationTakePictureMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatImageAttachmentItemSelected
 import mega.privacy.mobile.analytics.event.ChatImageAttachmentItemSelectedEvent
+import mega.privacy.mobile.analytics.event.DocumentScanInitiatedEvent
 import nz.mega.documentscanner.DocumentScannerActivity
 import timber.log.Timber
 
@@ -380,6 +381,7 @@ private fun openNewDocumentScanner(
     context.findActivity()?.let { activity ->
         documentScanner.getStartScanIntent(activity)
             .addOnSuccessListener { intentSender ->
+                Analytics.tracker.trackEvent(DocumentScanInitiatedEvent)
                 documentScannerLauncher.launch(
                     IntentSenderRequest.Builder(intentSender).build()
                 )

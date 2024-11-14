@@ -8,6 +8,7 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.AnalyticsTestExtension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsSnackbarMessageUiItem
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
@@ -16,11 +17,19 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.documentscanner.IsScanFilenameValidUseCase
 import mega.privacy.android.domain.usecase.file.RenameFileAndDeleteOriginalUseCase
+import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToChatEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToCloudDriveEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerSavePDFToChatEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerSavePDFToCloudDriveEvent
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.Mockito
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.doReturn
@@ -427,5 +436,49 @@ internal class SaveScannedDocumentsViewModelTest {
         underTest.uiState.test {
             assertThat(awaitItem().uploadScansEvent).isEqualTo(consumed())
         }
+    }
+
+    @ParameterizedTest(name = "when scan file type is {0} and the destination is {1}")
+    @MethodSource("provideScanFileTypeAndDestination")
+    fun `test that correct analytics event is tracked`(
+        scanFileType: ScanFileType,
+        scanDestination: ScanDestination,
+    ) = runTest {
+        initViewModel()
+        underTest.logDocumentScanEvent(scanFileType, scanDestination)
+        when {
+            scanFileType == ScanFileType.Pdf && scanDestination == ScanDestination.CloudDrive ->
+                assertThat(analyticsExtension.events.first()).isInstanceOf(
+                    DocumentScannerSavePDFToCloudDriveEvent::class.java
+                )
+
+            scanFileType == ScanFileType.Pdf && scanDestination == ScanDestination.Chat ->
+                assertThat(analyticsExtension.events.first()).isInstanceOf(
+                    DocumentScannerSavePDFToChatEvent::class.java
+                )
+
+            scanFileType == ScanFileType.Jpg && scanDestination == ScanDestination.CloudDrive ->
+                assertThat(analyticsExtension.events.first()).isInstanceOf(
+                    DocumentScannerSaveImageToCloudDriveEvent::class.java
+                )
+
+            scanFileType == ScanFileType.Jpg && scanDestination == ScanDestination.Chat ->
+                assertThat(analyticsExtension.events.first()).isInstanceOf(
+                    DocumentScannerSaveImageToChatEvent::class.java
+                )
+        }
+    }
+
+    private fun provideScanFileTypeAndDestination() = listOf(
+        Arguments.of(ScanFileType.Pdf, ScanDestination.CloudDrive),
+        Arguments.of(ScanFileType.Pdf, ScanDestination.Chat),
+        Arguments.of(ScanFileType.Jpg, ScanDestination.CloudDrive),
+        Arguments.of(ScanFileType.Jpg, ScanDestination.Chat),
+    )
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
     }
 }

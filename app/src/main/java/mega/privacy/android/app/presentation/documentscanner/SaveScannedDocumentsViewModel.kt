@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.documentscanner
 
 import android.net.Uri
+import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsSnackbarMessageUiItem
 import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsUiState
@@ -21,6 +23,10 @@ import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.documentscanner.IsScanFilenameValidUseCase
 import mega.privacy.android.domain.usecase.file.RenameFileAndDeleteOriginalUseCase
+import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToChatEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToCloudDriveEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerSavePDFToChatEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerSavePDFToCloudDriveEvent
 import timber.log.Timber
 import java.util.Calendar
 import java.util.Locale
@@ -150,6 +156,7 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
                                 newFilename = uiState.actualFilename,
                             )
                         }.onSuccess { renamedFile ->
+                            logDocumentScanEvent(uiState.scanFileType, uiState.scanDestination)
                             _uiState.update { it.copy(uploadScansEvent = triggered(renamedFile.toUri())) }
                         }.onFailure { exception ->
                             Timber.e("Unable to upload the scan/s due to a renaming issue:\n ${exception.printStackTrace()}")
@@ -161,6 +168,26 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
             } ?: run {
                 Timber.e("Unable to upload the scan/s as the Uri is missing")
             }
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun logDocumentScanEvent(
+        scanFileType: ScanFileType,
+        scanDestination: ScanDestination,
+    ) {
+        when {
+            scanFileType == ScanFileType.Pdf && scanDestination == ScanDestination.CloudDrive ->
+                Analytics.tracker.trackEvent(DocumentScannerSavePDFToCloudDriveEvent)
+
+            scanFileType == ScanFileType.Pdf && scanDestination == ScanDestination.Chat ->
+                Analytics.tracker.trackEvent(DocumentScannerSavePDFToChatEvent)
+
+            scanFileType == ScanFileType.Jpg && scanDestination == ScanDestination.CloudDrive ->
+                Analytics.tracker.trackEvent(DocumentScannerSaveImageToCloudDriveEvent)
+
+            scanFileType == ScanFileType.Jpg && scanDestination == ScanDestination.Chat ->
+                Analytics.tracker.trackEvent(DocumentScannerSaveImageToChatEvent)
         }
     }
 

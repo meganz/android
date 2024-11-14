@@ -18,6 +18,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import dagger.hilt.android.scopes.ActivityScoped
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.DocumentScannerEdgeToEdgeActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -45,6 +46,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog
 import mega.privacy.android.app.utils.Util.checkTakePicture
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
+import mega.privacy.mobile.analytics.event.DocumentScanInitiatedEvent
 import nz.mega.documentscanner.DocumentScannerActivity
 import timber.log.Timber
 import javax.inject.Inject
@@ -280,6 +282,7 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
         documentScanner.apply {
             getStartScanIntent(managerActivity)
                 .addOnSuccessListener {
+                    Analytics.tracker.trackEvent(DocumentScanInitiatedEvent)
                     newScanDocumentLauncher.launch(
                         IntentSenderRequest.Builder(it).build()
                     )

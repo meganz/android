@@ -37,6 +37,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.DocumentScannerEdgeToEdgeActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -98,6 +99,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.DocumentScanInitiatedEvent
 import nz.mega.documentscanner.DocumentScannerActivity
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -573,6 +575,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         documentScanner.apply {
             getStartScanIntent(this@ContactFileListActivity)
                 .addOnSuccessListener {
+                    Analytics.tracker.trackEvent(DocumentScanInitiatedEvent)
                     newScanDocumentLauncher.launch(IntentSenderRequest.Builder(it).build())
                 }
                 .addOnFailureListener { exception ->

@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
@@ -67,6 +68,7 @@ import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
+import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -102,6 +104,10 @@ import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToCloudDriveEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToCloudDriveEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
@@ -1723,6 +1729,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             UPLOAD, SAVE -> {
                 Timber.d("mode UPLOAD")
+                if (intent.action == ACTION_SAVE_TO_CLOUD || action == ACTION_UPLOAD_TO_CHAT) {
+                    logDocumentScanEvent(isCloudDrive = true)
+                }
                 if (viewModel.isImportingText(intent)) {
                     val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
                     val info = viewModel.textInfoContent
@@ -1807,6 +1816,24 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 intent.putExtra(EXTRA_MEGA_SELECTED_FOLDER, parentNode?.handle)
                 setResult(RESULT_OK, intent)
                 finishAndRemoveTask()
+            }
+        }
+    }
+
+    private fun logDocumentScanEvent(isCloudDrive: Boolean) {
+        ScanFileType.entries.getOrNull(intent.getIntExtra(EXTRA_SCAN_FILE_TYPE, 0))?.let { type ->
+            when {
+                type == ScanFileType.Pdf && isCloudDrive ->
+                    Analytics.tracker.trackEvent(DocumentScannerUploadingPDFToCloudDriveEvent)
+
+                type == ScanFileType.Pdf && !isCloudDrive ->
+                    Analytics.tracker.trackEvent(DocumentScannerUploadingPDFToChatEvent)
+
+                type == ScanFileType.Jpg && isCloudDrive ->
+                    Analytics.tracker.trackEvent(DocumentScannerUploadingImageToCloudDriveEvent)
+
+                type == ScanFileType.Jpg && !isCloudDrive ->
+                    Analytics.tracker.trackEvent(DocumentScannerUploadingImageToChatEvent)
             }
         }
     }
@@ -2257,6 +2284,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
         when (v.id) {
             R.id.fab_file_explorer -> {
+                if (intent.action == ACTION_UPLOAD_TO_CHAT) {
+                    logDocumentScanEvent(isCloudDrive = false)
+                }
                 v.isEnabled = false
                 chatExplorer = chatExplorerFragment
                 chatExplorer?.let { getChatAdded(it.addedChats ?: return) }
@@ -2645,6 +2675,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
          * Intent extra for the selected MEGA Folder
          */
         const val EXTRA_MEGA_SELECTED_FOLDER = "EXTRA_MEGA_SELECTED_FOLDER"
+
+        /**
+         * Intent extra for the scan file type
+         */
+        const val EXTRA_SCAN_FILE_TYPE = "scan_file_type"
 
         /**
          * Intent action for processed info.
