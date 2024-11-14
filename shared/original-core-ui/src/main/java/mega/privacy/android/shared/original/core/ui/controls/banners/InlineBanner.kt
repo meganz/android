@@ -62,6 +62,7 @@ private fun InlineBaseBanner(
                 modifier = Modifier
                     .padding(
                         start = 8.dp,
+                        top = 3.dp,
                         end = 16.dp
                     )
                     .weight(1f),
