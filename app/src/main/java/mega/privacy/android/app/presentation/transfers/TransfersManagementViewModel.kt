@@ -96,6 +96,11 @@ class TransfersManagementViewModel @Inject constructor(
     }
 
     /**
+     * Notifies about updates on if should show or not the transfers completed tab because some failed transfer.
+     */
+    fun shouldCheckTransferError() = false
+
+    /**
      * Notifies about updates on if should show or not the Completed tab.
      */
     fun onGetShouldCompletedTab(): LiveData<Boolean> = shouldShowCompletedTab
@@ -109,7 +114,7 @@ class TransfersManagementViewModel @Inject constructor(
         val newTransferInfo = transfersInfoMapper(
             numPendingDownloadsNonBackground = transfersStatusInfo.pendingDownloads,
             numPendingUploads = transfersStatusInfo.pendingUploads,
-            isTransferError = transfersManagement.shouldShowNetworkWarning || transfersManagement.getAreFailedTransfers(),
+            isTransferError = transfersManagement.shouldShowNetworkWarning || shouldCheckTransferError(),
             isTransferOverQuota = transfersStatusInfo.transferOverQuota,
             isStorageOverQuota = transfersStatusInfo.storageOverQuota,
             areTransfersPaused = transfersStatusInfo.paused,
@@ -132,8 +137,8 @@ class TransfersManagementViewModel @Inject constructor(
      */
     fun checkIfShouldShowCompletedTab() {
         viewModelScope.launch {
-            shouldShowCompletedTab.value =
-                !isCompletedTransfersEmptyUseCase() && getNumPendingTransfersUseCase() <= 0
+            shouldShowCompletedTab.value = shouldCheckTransferError() ||
+                    !isCompletedTransfersEmptyUseCase() && getNumPendingTransfersUseCase() <= 0
         }
     }
 

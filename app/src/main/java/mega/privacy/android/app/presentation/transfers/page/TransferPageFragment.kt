@@ -300,7 +300,7 @@ internal class TransferPageFragment : Fragment() {
      * @param showCompleted True if should show the Completed tab, false otherwise.
      */
     private fun updateTransfersTab(showCompleted: Boolean) {
-        viewModel.setTransfersTab(if (transfersManagement.getAreFailedTransfers() || showCompleted) TransfersTab.COMPLETED_TAB else TransfersTab.PENDING_TAB)
+        viewModel.setTransfersTab(if (transfersManagementViewModel.shouldCheckTransferError() || showCompleted) TransfersTab.COMPLETED_TAB else TransfersTab.PENDING_TAB)
         when (viewModel.state.value.transfersTab) {
             TransfersTab.COMPLETED_TAB -> {
                 binding.transfersTabsPager.currentItem = TransfersTab.COMPLETED_TAB.position

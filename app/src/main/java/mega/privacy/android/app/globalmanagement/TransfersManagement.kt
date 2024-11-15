@@ -58,7 +58,6 @@ class TransfersManagement @Inject constructor(
     private var transferOverQuotaTimestamp: Long = 0
     var isCurrentTransferOverQuota = false
     var isOnTransfersSection = false
-    private var areFailedTransfers = false
     var isTransferOverQuotaNotificationShown = false
     var isTransferOverQuotaBannerShown = false
     var hasResumeTransfersWarningAlreadyBeenShown = false
@@ -73,7 +72,6 @@ class TransfersManagement @Inject constructor(
         transferOverQuotaTimestamp = 0
         isCurrentTransferOverQuota = false
         isOnTransfersSection = false
-        areFailedTransfers = false
         isTransferOverQuotaNotificationShown = false
         isTransferOverQuotaBannerShown = false
         hasResumeTransfersWarningAlreadyBeenShown = false
@@ -256,10 +254,4 @@ class TransfersManagement @Inject constructor(
             Timber.e(e, "Error moving file to the sd card path")
         }
     }
-
-    fun setAreFailedTransfers(failed: Boolean) {
-        areFailedTransfers = failed
-    }
-
-    fun getAreFailedTransfers(): Boolean = areFailedTransfers
 }

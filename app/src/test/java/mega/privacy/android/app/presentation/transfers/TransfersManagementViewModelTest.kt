@@ -143,7 +143,6 @@ class TransfersManagementViewModelTest {
         }
 
     private fun commonStub() {
-        whenever(transfersManagement.getAreFailedTransfers()) doReturn false
         whenever(transfersManagement.shouldShowNetworkWarning) doReturn false
         whenever(monitorConnectivityUseCase()) doReturn monitorConnectivityUseCaseFlow
         whenever(monitorLastTransfersHaveBeenCancelledUseCase()) doReturn monitorLastTransfersHaveBeenCancelledUseCaseFlow

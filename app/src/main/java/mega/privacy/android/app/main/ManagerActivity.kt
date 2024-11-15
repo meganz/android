@@ -1389,7 +1389,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     private fun onTransfersWidgetClick() {
-        transfersManagement.setAreFailedTransfers(false)
         lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
                 navigator.openTransfers(this@ManagerActivity, IN_PROGRESS_TAB_INDEX)

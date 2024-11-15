@@ -383,7 +383,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
      * Handle widget click
      */
     private fun onTransfersWidgetClick() {
-        transfersManagement.setAreFailedTransfers(false)
         if (transfersManagement.isOnTransferOverQuota()) {
             transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
         }

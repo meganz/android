@@ -276,7 +276,6 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
     }
 
     private fun openTransfersScreen() {
-        transfersManagement.setAreFailedTransfers(false)
         lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
                 megaNavigator.openTransfers(this@PhotosSearchActivity, IN_PROGRESS_TAB_INDEX)

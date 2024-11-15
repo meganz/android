@@ -138,17 +138,11 @@ class TransfersViewModel @Inject constructor(
                         is TransferEvent.TransferDataEvent,
                         is TransferEvent.TransferPaused,
                         is TransferEvent.FolderTransferUpdateEvent,
-                        -> Unit
+                            -> Unit
                     }
                 }
         }
-        viewModelScope.launch {
-            monitorCompletedTransferEventUseCase()
-                .catch { Timber.e(it) }
-                .collect {
-                    completedTransferFinished()
-                }
-        }
+
         viewModelScope.launch {
             monitorCompletedTransfersUseCase(MAX_TRANSFERS)
                 .catch {
@@ -250,9 +244,6 @@ class TransfersViewModel @Inject constructor(
             previousTab = currentTab
         }
         currentTab = tab
-        if (currentTab == TransfersTab.COMPLETED_TAB) {
-            transfersManagement.setAreFailedTransfers(false)
-        }
     }
 
     /**
@@ -341,17 +332,6 @@ class TransfersViewModel @Inject constructor(
         getTransferByTagUseCase(tag)?.let { transfer ->
             Timber.d("The transfer with tag : $tag has been paused/resumed, left: ${_activeTransfers.value.size}")
             updateTransfer(transfer)
-        }
-    }
-
-    /**
-     * Adds new completed transfer.
-     *
-     * @param transfer the transfer to add
-     */
-    private fun completedTransferFinished() {
-        if (currentTab == TransfersTab.COMPLETED_TAB) {
-            transfersManagement.setAreFailedTransfers(false)
         }
     }
 

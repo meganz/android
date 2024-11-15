@@ -695,7 +695,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     }
 
     private fun transfersWidgetClicked() {
-        transfersManagement.setAreFailedTransfers(false)
         lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
                 megaNavigator.openTransfers(this@SearchActivity, IN_PROGRESS_TAB_INDEX)
