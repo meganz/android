@@ -24,6 +24,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
+     * New create account fragment(compose version)
+     */
+    NewCreateAccountFragment(
+        "Enable new create account fragment",
+        false
+    ),
+
+    /**
      * Enable request status progress dialog
      */
     RequestStatusProgressDialog(
