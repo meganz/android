@@ -1,8 +1,5 @@
 package mega.privacy.android.app.presentation.contact.invite
 
-import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.content.Context
 import android.content.Intent
@@ -42,7 +39,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -56,7 +52,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -130,6 +125,9 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 import mega.privacy.mobile.analytics.event.InviteContactsButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ScanQRCodeButtonPressedEvent
 import timber.log.Timber
+import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -564,13 +562,7 @@ private fun SelectedContactView(
             keyboardType = KeyboardType.Email,
             imeAction = ImeAction.Done,
             keyboardActions = KeyboardActions(onDone = { onDone() }),
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                errorIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = MaterialTheme.colors.secondary,
-            )
+            showIndicatorLine = false,
         )
     }
 }

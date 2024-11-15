@@ -24,7 +24,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
@@ -418,16 +416,9 @@ private fun GuestNameInputText(
     modifier: Modifier = Modifier,
 ) {
     Row(modifier = modifier) {
-        val textFieldColors = TextFieldDefaults.textFieldColors(
-            backgroundColor = Color.Unspecified,
-            focusedIndicatorColor = Color.Unspecified,
-            unfocusedIndicatorColor = Color.Unspecified,
-            cursorColor = MaterialTheme.colors.secondary,
-        )
         GenericTextField(
             placeholder = stringResource(R.string.first_name_text),
             text = firstName,
-            colors = textFieldColors,
             imeAction = ImeAction.Next,
             onTextChange = { onFirstNameChange(it.take(15)) },
             modifier = Modifier
@@ -437,7 +428,6 @@ private fun GuestNameInputText(
         GenericTextField(
             placeholder = stringResource(R.string.lastname_text),
             text = lastName,
-            colors = textFieldColors,
             onTextChange = { onLastNameChange(it.take(15)) },
             modifier = Modifier
                 .weight(1f)

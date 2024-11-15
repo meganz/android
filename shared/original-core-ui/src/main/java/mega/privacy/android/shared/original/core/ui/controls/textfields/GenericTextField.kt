@@ -9,7 +9,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -23,10 +22,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -36,21 +37,24 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldProvider
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldState
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Text field generic.
  *
- * @param placeholder     String to show when the field is empty.
+ * @param text            Typed text.
  * @param onTextChange    Action required for notifying about text changes.
- * @param imeAction       [ImeAction]
- * @param keyboardActions [KeyboardActions]
  * @param modifier        [Modifier]
  * @param textFieldModifier [Modifier]
- * @param text            Typed text.
+ * @param placeholder     String to show when the field is empty.
  * @param errorText       Error to show if any.
+ * @param imeAction       [ImeAction]
  * @param keyboardType Specifies the type of keys available for the Keyboard (e.g. Text, Number)
+ * @param keyboardActions [KeyboardActions]
+ * @param singleLine when set to true, this text field becomes a single horizontally scrolling text field instead of wrapping onto multiple lines.
+ * @param trailingIcon  the optional trailing icon to be displayed at the end of the text field container
+ * @param showIndicatorLine when set to false the indicator line under the text won't be shown
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -61,74 +65,58 @@ fun GenericTextField(
     textFieldModifier: Modifier = Modifier,
     placeholder: String = "",
     errorText: String? = null,
-    singleLine: Boolean = true,
     imeAction: ImeAction = ImeAction.Done,
     keyboardType: KeyboardType = KeyboardType.Text,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    singleLine: Boolean = true,
     trailingIcon: @Composable (() -> Unit)? = null,
-    colors: TextFieldColors = TextFieldDefaults.textFieldColors(
-        textColor = MegaOriginalTheme.colors.text.primary,
-        backgroundColor = MegaOriginalTheme.colors.background.surface1,
-        cursorColor = MegaOriginalTheme.colors.border.strongSelected,
-        errorCursorColor = MegaOriginalTheme.colors.text.error,
-        errorIndicatorColor = MegaOriginalTheme.colors.text.error,
-        focusedIndicatorColor = MegaOriginalTheme.colors.border.strongSelected,
-        unfocusedIndicatorColor = MegaOriginalTheme.colors.border.disabled,
-    ),
-) = Column(modifier = modifier) {
-    val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
-    val isError = errorText != null
-    val customTextSelectionColors = TextSelectionColors(
-        handleColor = MegaOriginalTheme.colors.border.strongSelected,
-        backgroundColor = MegaOriginalTheme.colors.border.strongSelected
-    )
-
-    CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
-        BasicTextField(
-            value = text,
-            onValueChange = onTextChange,
-            modifier = textFieldModifier
-                .testTag(GENERIC_TEXT_FIELD_TEXT_TAG)
-                .background(Color.Transparent)
-                .indicatorLine(true, isError, interactionSource, colors)
-                .fillMaxWidth(),
-            textStyle = MaterialTheme.typography.body1.copy(color = MegaOriginalTheme.colors.text.primary),
-            cursorBrush = SolidColor(colors.cursorColor(isError).value),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = keyboardType,
-                imeAction = imeAction
-            ),
-            keyboardActions = keyboardActions,
-            interactionSource = interactionSource,
-            singleLine = singleLine,
-        ) {
-            GenericDecorationBox(
-                text = text,
-                innerTextField = it,
-                singleLine = singleLine,
-                interactionSource = interactionSource,
-                isError = isError,
-                placeholder = placeholder,
-                colors = colors,
-                trailingIcon = trailingIcon
+    showIndicatorLine: Boolean = true,
+) = GenericTextField(
+    text = text,
+    onTextChange = onTextChange,
+    modifier = modifier,
+    textFieldModifier = textFieldModifier,
+    placeholder = placeholder,
+    errorText = errorText,
+    imeAction = imeAction,
+    keyboardType = keyboardType,
+    keyboardActions = keyboardActions,
+    singleLine = singleLine,
+    trailingIcon = trailingIcon,
+    showIndicatorLine = showIndicatorLine,
+    basicTextField = @Composable {
+        with(it) {
+            BasicTextField(
+                value = this.value,
+                onValueChange = this.onValueChange,
+                modifier = this.textFieldModifier,
+                textStyle = this.textStyle,
+                cursorBrush = this.cursorBrush,
+                singleLine = this.singleLine,
+                keyboardOptions = this.keyboardOptions,
+                keyboardActions = this.keyboardActions,
+                interactionSource = this.interactionSource,
+                decorationBox = this.decorationBox,
             )
         }
     }
-
-    GenericError(errorText)
-}
+)
 
 /**
  * Text field generic with [TextFieldValue] as input
  *
  * @param textFieldValue  Typed text with selection.
  * @param onTextChange    Action required for notifying about text changes.
+ * @param modifier        [Modifier]
+ * @param textFieldModifier [Modifier]
  * @param placeholder     String to show when the field is empty.
+ * @param errorText       Error to show if any.
  * @param imeAction       [ImeAction]
  * @param keyboardType Specifies the type of keys available for the Keyboard (e.g. Text, Number)
  * @param keyboardActions [KeyboardActions]
- * @param modifier        [Modifier]
- * @param errorText       Error to show if any.
+ * @param singleLine when set to true, this text field becomes a single horizontally scrolling text field instead of wrapping onto multiple lines.
+ * @param trailingIcon  the optional trailing icon to be displayed at the end of the text field container
+ * @param showIndicatorLine when set to false the indicator line under the text won't be shown
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -136,59 +124,114 @@ fun GenericTextField(
     textFieldValue: TextFieldValue,
     onTextChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
+    textFieldModifier: Modifier = Modifier,
     placeholder: String = "",
     errorText: String? = null,
     imeAction: ImeAction = ImeAction.Done,
     keyboardType: KeyboardType = KeyboardType.Text,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
-    colors: TextFieldColors = TextFieldDefaults.textFieldColors(
-        textColor = MegaOriginalTheme.colors.text.primary,
-        backgroundColor = MegaOriginalTheme.colors.background.surface1,
-        cursorColor = MegaOriginalTheme.colors.border.strongSelected,
-        errorCursorColor = MegaOriginalTheme.colors.text.error,
-        errorIndicatorColor = MegaOriginalTheme.colors.text.error,
-        focusedIndicatorColor = MegaOriginalTheme.colors.border.strongSelected,
-        unfocusedIndicatorColor = MegaOriginalTheme.colors.border.disabled,
-    ),
     singleLine: Boolean = true,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    showIndicatorLine: Boolean = true,
+) = GenericTextField(
+    text = textFieldValue,
+    onTextChange = onTextChange,
+    modifier = modifier,
+    textFieldModifier = textFieldModifier,
+    placeholder = placeholder,
+    errorText = errorText,
+    imeAction = imeAction,
+    keyboardType = keyboardType,
+    keyboardActions = keyboardActions,
+    singleLine = singleLine,
+    trailingIcon = trailingIcon,
+    showIndicatorLine = showIndicatorLine,
+    @Composable {
+        with(it) {
+            BasicTextField(
+                value = this.value,
+                onValueChange = this.onValueChange,
+                modifier = this.textFieldModifier,
+                textStyle = this.textStyle,
+                cursorBrush = this.cursorBrush,
+                singleLine = this.singleLine,
+                keyboardOptions = this.keyboardOptions,
+                keyboardActions = this.keyboardActions,
+                interactionSource = this.interactionSource,
+                decorationBox = this.decorationBox,
+            )
+        }
+    }
+)
+
+private data class BasicTextFieldParams<T>(
+    val value: T,
+    val onValueChange: (T) -> Unit,
+    val textFieldModifier: Modifier,
+    val textStyle: TextStyle,
+    val cursorBrush: Brush,
+    val singleLine: Boolean,
+    val keyboardOptions: KeyboardOptions,
+    val keyboardActions: KeyboardActions,
+    val interactionSource: MutableInteractionSource,
+    val decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit,
+)
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun <T> GenericTextField(
+    text: T,
+    onTextChange: (T) -> Unit,
+    modifier: Modifier = Modifier,
+    textFieldModifier: Modifier,
+    placeholder: String,
+    errorText: String?,
+    imeAction: ImeAction,
+    keyboardType: KeyboardType,
+    keyboardActions: KeyboardActions,
+    singleLine: Boolean,
+    trailingIcon: @Composable (() -> Unit)?,
+    showIndicatorLine: Boolean,
+    basicTextField: @Composable (BasicTextFieldParams<T>) -> Unit,
 ) = Column(modifier = modifier) {
     val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
     val isError = errorText != null
-    val customTextSelectionColors = TextSelectionColors(
-        handleColor = MegaOriginalTheme.colors.border.strongSelected,
-        backgroundColor = MegaOriginalTheme.colors.border.strongSelected
-    )
+
+    val colors = textFieldColors(showIndicatorLine)
+    val customTextSelectionColors = customTextSelectionColors()
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
-        BasicTextField(
-            value = textFieldValue,
-            onValueChange = onTextChange,
-            modifier = Modifier
-                .testTag(GENERIC_TEXT_FIELD_TEXT_TAG)
-                .background(Color.Transparent)
-                .indicatorLine(true, isError, interactionSource, colors)
-                .fillMaxWidth(),
-            textStyle = MaterialTheme.typography.body1.copy(color = MegaOriginalTheme.colors.text.primary),
-            cursorBrush = SolidColor(colors.cursorColor(isError).value),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = keyboardType,
-                imeAction = imeAction
-            ),
-            keyboardActions = keyboardActions,
-            interactionSource = interactionSource,
-            singleLine = singleLine,
-        ) {
-            GenericDecorationBox(
-                text = textFieldValue.text,
-                innerTextField = it,
-                trailingIcon = null,
-                singleLine = singleLine,
+        basicTextField(
+            BasicTextFieldParams<T>(
+                value = text,
+                onValueChange = onTextChange,
+                textFieldModifier = textFieldModifier
+                    .testTag(GENERIC_TEXT_FIELD_TEXT_TAG)
+                    .background(Color.Transparent)
+                    .indicatorLine(true, isError, interactionSource, colors)
+                    .fillMaxWidth(),
+                textStyle = MaterialTheme.typography.body1.copy(color = MegaOriginalTheme.colors.text.primary),
+                cursorBrush = SolidColor(colors.cursorColor(isError).value),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = keyboardType,
+                    imeAction = imeAction
+                ),
+                keyboardActions = keyboardActions,
                 interactionSource = interactionSource,
-                isError = isError,
-                placeholder = placeholder,
-                colors = colors
-            )
-        }
+                singleLine = singleLine,
+            ) {
+                GenericDecorationBox(
+                    text = if (text is TextFieldValue) text.text else text.toString(),
+                    innerTextField = it,
+                    trailingIcon = trailingIcon,
+                    singleLine = singleLine,
+                    interactionSource = interactionSource,
+                    isError = isError,
+                    placeholder = placeholder,
+                    colors = colors,
+                )
+            })
+
     }
 
     GenericError(errorText)
@@ -227,7 +270,7 @@ private fun GenericDecorationBox(
         placeholder = {
             Text(
                 text = placeholder,
-                style = MaterialTheme.typography.body1.copy(color = MegaOriginalTheme.colors.text.placeholder)
+                style = MaterialTheme.typography.body1
             )
         },
         colors = colors,
