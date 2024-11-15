@@ -41,6 +41,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
@@ -201,6 +202,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         mediaQueueTitle: String?,
         collectionTitle: String?,
         collectionId: Long?,
+        enableAddToAlbum: Boolean,
     ) {
         manageMediaIntent(
             context = context,
@@ -216,7 +218,8 @@ internal class MegaNavigatorImpl @Inject constructor(
             searchedItems = searchedItems,
             mediaQueueTitle = mediaQueueTitle,
             collectionTitle = collectionTitle,
-            collectionId = collectionId
+            collectionId = collectionId,
+            enableAddToAlbum = enableAddToAlbum,
         )
     }
 
@@ -239,6 +242,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         nodeHandles: List<Long>? = null,
         collectionTitle: String? = null,
         collectionId: Long? = null,
+        enableAddToAlbum: Boolean = false,
     ) {
         val intent = getIntent(context, fileTypeInfo).apply {
             putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder)
@@ -278,6 +282,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                 putExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID, it)
             }
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            putExtra(INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM, false)
         }
         val mimeType =
             if (fileTypeInfo.extension == "opus") "audio/*" else fileTypeInfo.mimeType

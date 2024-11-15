@@ -80,6 +80,7 @@ import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
+import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -104,6 +105,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FROM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_FROM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
 import mega.privacy.android.app.utils.Constants.MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS
@@ -742,6 +744,15 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                         )
                     }
                 }
+
+                R.id.add_to -> {
+                    val intent = Intent(this, AddToAlbumActivity::class.java).apply {
+                        val ids = listOf(playingHandle).toTypedArray()
+                        putExtra("ids", ids)
+                        putExtra("type", 1)
+                    }
+                    addToAlbumLauncher.launch(intent)
+                }
             }
         }
 
@@ -1069,6 +1080,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
             R.id.move,
             R.id.copy,
             R.id.move_to_trash,
+            R.id.add_to,
                 -> {
                 if (item.itemId == R.id.properties && adapterType != OFFLINE_ADAPTER) {
                     val node = megaApi.getNodeByHandle(playingHandle)
@@ -1330,6 +1342,9 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
             // After establishing the Options menu, check if read-only properties should be applied
             checkIfShouldApplyReadOnlyState(menu)
         }
+        menu.findItem(R.id.add_to).isVisible = intent.getBooleanExtra(
+            INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM, false
+        )
     }
 
     /**
@@ -1733,6 +1748,19 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
             ActivityResultContracts.StartActivityForResult(),
             ::handleHiddenNodesOnboardingResult,
         )
+
+    private val addToAlbumLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAddToAlbumResult,
+        )
+
+    private fun handleAddToAlbumResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+        val message = result.data?.getStringExtra("message") ?: return
+
+        mega.privacy.android.app.utils.Util.showSnackbar(this, message)
+    }
 
     private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
         if (result.resultCode != Activity.RESULT_OK) return

@@ -812,4 +812,13 @@
     <string name="photos_search_empty_state_description">Try a different search term</string>
     <!-- Photos search recent search -->
     <string name="photos_search_recent_search">Recently searched</string>
+    <!-- Add to album by image -->
+    <string name="album_add_to_image">Add to album</string>
+    <!-- Add to album by media -->
+    <string name="album_add_to_media">Add to</string>
+    <!-- Add to album success message -->
+    <plurals name="album_add_to_message">
+        <item quantity="one">Added to “%1$s”</item>
+        <item quantity="other">Added %2$d items to “%1$s”</item>
+    </plurals>
 </resources>

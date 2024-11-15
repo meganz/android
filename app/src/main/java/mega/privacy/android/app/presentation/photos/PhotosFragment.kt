@@ -56,6 +56,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumsActionModeCallback
+import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentFragment
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
@@ -730,6 +731,7 @@ class PhotosFragment : Fragment() {
                     TimelineImageNodeFetcher.TIMELINE_FILTER_TYPE to timelineViewModel.getFilterType(),
                     TimelineImageNodeFetcher.TIMELINE_MEDIA_SOURCE to timelineViewModel.getMediaSource(),
                 ),
+                enableAddToAlbum = true,
             )
             startActivity(intent)
         }
@@ -918,6 +920,12 @@ class PhotosFragment : Fragment() {
             ::handleHiddenNodesOnboardingResult,
         )
 
+    private val addToAlbumLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAddToAlbumResult,
+        )
+
     private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
         if (result.resultCode != Activity.RESULT_OK) return
 
@@ -953,6 +961,22 @@ class PhotosFragment : Fragment() {
         openAlbum(uiAlbum ?: return)
 
         photosViewModel.onTabSelected(PhotosTab.Albums)
+    }
+
+    fun openAddToAlbum(nodeIds: List<NodeId>, viewType: Int) {
+        val intent = Intent(requireContext(), AddToAlbumActivity::class.java).apply {
+            val ids = nodeIds.map { it.longValue }.toTypedArray()
+            putExtra("ids", ids)
+            putExtra("type", viewType)
+        }
+        addToAlbumLauncher.launch(intent)
+    }
+
+    private fun handleAddToAlbumResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+        val message = result.data?.getStringExtra("message") ?: return
+
+        Util.showSnackbar(requireActivity(), message)
     }
 
     /**

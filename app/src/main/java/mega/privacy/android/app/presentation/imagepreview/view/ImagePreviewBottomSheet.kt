@@ -84,6 +84,7 @@ internal fun ImagePreviewBottomSheet(
     showAvailableOfflineMenu: suspend (ImageNode) -> Boolean,
     showRemoveOfflineMenu: suspend (ImageNode) -> Boolean,
     showMoveToRubbishBin: suspend (ImageNode) -> Boolean,
+    showAddToAlbum: suspend (ImageNode) -> Boolean,
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
     getImageThumbnailPath: suspend (ImageResult?) -> String?,
     isAvailableOffline: Boolean = false,
@@ -113,6 +114,7 @@ internal fun ImagePreviewBottomSheet(
     onClickRestore: () -> Unit = {},
     onClickRemove: () -> Unit = {},
     onClickMoveToRubbishBin: () -> Unit = {},
+    onClickAddToAlbum: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val isLight = MaterialTheme.colors.isLight
@@ -217,6 +219,10 @@ internal fun ImagePreviewBottomSheet(
 
             val isMoveToRubbishBinMenuVisible by produceState(false, imageNode) {
                 value = showMoveToRubbishBin(imageNode)
+            }
+
+            val isAddToAlbumMenuVisible by produceState(false, imageNode) {
+                value = showAddToAlbum(imageNode)
             }
 
             Column(
@@ -459,6 +465,15 @@ internal fun ImagePreviewBottomSheet(
                         onActionClicked = onClickMove,
                         dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_MOVE),
+                    )
+                }
+
+                if (isAddToAlbumMenuVisible) {
+                    MenuActionListTile(
+                        icon = painterResource(id = IconPack.drawable.ic_add_to_album),
+                        text = stringResource(id = SharedResources.string.album_add_to_image),
+                        onActionClicked = onClickAddToAlbum,
+                        dividerType = null,
                     )
                 }
 

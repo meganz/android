@@ -146,6 +146,7 @@ interface AppNavigator {
      * @param searchedItems the list of searched items, this is only used under the search mode
      * @param mediaQueueTitle the title of the media queue
      * @param collectionTitle the title of the video collection
+     * @param enableAddToAlbum the flag to show add to album in context menu
      */
     suspend fun openMediaPlayerActivityByFileNode(
         context: Context,
@@ -159,6 +160,7 @@ interface AppNavigator {
         mediaQueueTitle: String? = null,
         collectionTitle: String? = null,
         collectionId: Long? = null,
+        enableAddToAlbum: Boolean = false,
     )
 
     /**

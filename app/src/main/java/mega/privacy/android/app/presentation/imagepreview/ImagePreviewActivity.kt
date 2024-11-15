@@ -36,6 +36,7 @@ import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.FETCHER_PARAMS
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_NODE_FETCHER_SOURCE
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_ADD_TO_ALBUM
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_IS_FOREIGN
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_MENU_OPTIONS
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
@@ -45,6 +46,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewStat
 import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowActivity
 import mega.privacy.android.app.presentation.imagepreview.view.ImagePreviewScreen
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
@@ -55,6 +57,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NameCollision
@@ -112,6 +115,12 @@ class ImagePreviewActivity : BaseActivity() {
         }
     }
 
+    private val addToAlbumLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAddToAlbumResult,
+        )
+
     private val viewModel: ImagePreviewViewModel by viewModels()
     private val nodeAttachmentViewModel: NodeAttachmentViewModel by viewModels()
 
@@ -156,6 +165,7 @@ class ImagePreviewActivity : BaseActivity() {
                             onClickRestore = ::restoreNode,
                             onClickRemove = ::removeNode,
                             onClickMoveToRubbishBin = ::moveNodeToRubbishBin,
+                            onClickAddToAlbum = ::addToAlbum,
                         )
 
                         NodeAttachmentView(
@@ -351,6 +361,17 @@ class ImagePreviewActivity : BaseActivity() {
         viewModel.moveToRubbishBin(imageNode.id)
     }
 
+    private fun addToAlbum(imageNode: ImageNode) {
+        val intent = Intent(this, AddToAlbumActivity::class.java).apply {
+            val ids = listOf(imageNode).map { it.id.longValue }.toTypedArray()
+            val viewType = 0.takeIf { imageNode.type is ImageFileTypeInfo } ?: 1
+
+            putExtra("ids", ids)
+            putExtra("type", viewType)
+        }
+        addToAlbumLauncher.launch(intent)
+    }
+
     private fun playSlideshow() {
         Analytics.tracker.trackEvent(PlaySlideshowMenuToolbarEvent)
         val intent = Intent(this, SlideshowActivity::class.java)
@@ -390,6 +411,13 @@ class ImagePreviewActivity : BaseActivity() {
         viewModel.setResultMessage(message)
     }
 
+    private fun handleAddToAlbumResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+        val message = result.data?.getStringExtra("message") ?: return
+
+        viewModel.setResultMessage(message)
+    }
+
     override fun onDestroy() {
         viewModel.clearImageResultCache()
         super.onDestroy()
@@ -405,6 +433,7 @@ class ImagePreviewActivity : BaseActivity() {
             anchorImageNodeId: NodeId? = null,
             params: Map<String, Any> = mapOf(),
             isForeign: Boolean = false,
+            enableAddToAlbum: Boolean = false,
         ): Intent {
             return Intent(context, ImagePreviewActivity::class.java).apply {
                 putExtra(IMAGE_NODE_FETCHER_SOURCE, imageSource)
@@ -412,6 +441,7 @@ class ImagePreviewActivity : BaseActivity() {
                 putExtra(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE, anchorImageNodeId?.longValue)
                 putExtra(FETCHER_PARAMS, bundleOf(*params.toList().toTypedArray()))
                 putExtra(IMAGE_PREVIEW_IS_FOREIGN, isForeign)
+                putExtra(IMAGE_PREVIEW_ADD_TO_ALBUM, false)
             }
         }
 
@@ -430,6 +460,7 @@ class ImagePreviewActivity : BaseActivity() {
                 anchorImageNodeId = anchorImageNodeId?.let { NodeId(it) },
                 params = params,
                 isForeign = isForeign,
+                enableAddToAlbum = false,
             )
         }
     }

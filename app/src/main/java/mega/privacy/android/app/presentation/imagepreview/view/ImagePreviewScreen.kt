@@ -128,6 +128,7 @@ internal fun ImagePreviewScreen(
     onClickRestore: (ImageNode) -> Unit = {},
     onClickRemove: (ImageNode) -> Unit = {},
     onClickMoveToRubbishBin: (ImageNode) -> Unit = {},
+    onClickAddToAlbum: (ImageNode) -> Unit = {},
 ) {
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     val imageNodes = viewState.imageNodes
@@ -389,6 +390,7 @@ internal fun ImagePreviewScreen(
                         showAvailableOfflineMenu = viewModel::isAvailableOfflineMenuVisible,
                         showRemoveOfflineMenu = viewModel::isRemoveOfflineMenuVisible,
                         showMoveToRubbishBin = viewModel::isMoveToRubbishBinMenuVisible,
+                        showAddToAlbum = viewModel::isAddToAlbumMenuVisible,
                         downloadImage = viewModel::monitorImageResult,
                         getImageThumbnailPath = viewModel::getLowestResolutionImagePath,
                         onClickInfo = {
@@ -482,6 +484,10 @@ internal fun ImagePreviewScreen(
                         },
                         onClickMoveToRubbishBin = {
                             showMoveToRubbishBinDialog = true
+                            hideBottomSheet(coroutineScope, modalSheetState)
+                        },
+                        onClickAddToAlbum = {
+                            onClickAddToAlbum(currentImageNode)
                             hideBottomSheet(coroutineScope, modalSheetState)
                         },
                     )

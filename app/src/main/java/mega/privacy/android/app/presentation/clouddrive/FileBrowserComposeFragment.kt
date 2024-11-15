@@ -65,6 +65,7 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
+import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -506,7 +507,8 @@ class FileBrowserComposeFragment : Fragment() {
                     )
                     CloudStorageOptionControlUtil.applyControl(menu, control)
 
-                    handleHiddeNodes(selected, nodeList, menu)
+                    handleHiddenNodes(selected, nodeList, menu)
+                    handleAddToAlbum(selected, nodeList, menu)
                 }.onFailure {
                     Timber.e(it)
                 }
@@ -521,7 +523,7 @@ class FileBrowserComposeFragment : Fragment() {
             return result.getOrNull() ?: false
         }
 
-        private suspend fun handleHiddeNodes(
+        private suspend fun handleHiddenNodes(
             selected: List<Long>,
             nodeList: List<NodeUIItem<TypedNode>>,
             menu: Menu,
@@ -557,6 +559,15 @@ class FileBrowserComposeFragment : Fragment() {
                 !isPaid || isBusinessAccountExpired || (hasNonSensitiveNode && !includeSensitiveInheritedNode)
             menu.findItem(R.id.cab_menu_unhide)?.isVisible =
                 isPaid && !isBusinessAccountExpired && !hasNonSensitiveNode && !includeSensitiveInheritedNode
+        }
+
+        private fun handleAddToAlbum(
+            selected: List<Long>,
+            nodeList: List<NodeUIItem<TypedNode>>,
+            menu: Menu,
+        ) {
+            menu.findItem(R.id.cab_menu_add_to_album)?.isVisible = false
+            menu.findItem(R.id.cab_menu_add_to)?.isVisible = false
         }
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
@@ -700,6 +711,26 @@ class FileBrowserComposeFragment : Fragment() {
 
                 // This option is only available in the Incoming Shares page
                 OptionItems.LEAVE_SHARE_CLICKED -> Unit
+
+                OptionItems.ADD_TO_ALBUM -> {
+                    val intent = Intent(requireContext(), AddToAlbumActivity::class.java).apply {
+                        val ids = it.selectedNode.map { it.id.longValue }.toTypedArray()
+                        putExtra("ids", ids)
+                        putExtra("type", 0)
+                    }
+                    addToAlbumLauncher.launch(intent)
+                    disableSelectMode()
+                }
+
+                OptionItems.ADD_TO -> {
+                    val intent = Intent(requireContext(), AddToAlbumActivity::class.java).apply {
+                        val ids = it.selectedNode.map { it.id.longValue }.toTypedArray()
+                        putExtra("ids", ids)
+                        putExtra("type", 1)
+                    }
+                    addToAlbumLauncher.launch(intent)
+                    disableSelectMode()
+                }
             }
         }
     }
@@ -763,6 +794,12 @@ class FileBrowserComposeFragment : Fragment() {
             ::handleHiddenNodesOnboardingResult,
         )
 
+    private val addToAlbumLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAddToAlbumResult,
+        )
+
     private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
         if (result.resultCode != Activity.RESULT_OK) return
 
@@ -777,6 +814,13 @@ class FileBrowserComposeFragment : Fragment() {
                 tempNodeIds.size,
                 tempNodeIds.size,
             )
+        Util.showSnackbar(requireActivity(), message)
+    }
+
+    private fun handleAddToAlbumResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+        val message = result.data?.getStringExtra("message") ?: return
+
         Util.showSnackbar(requireActivity(), message)
     }
 }

@@ -11,6 +11,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.PhotosFragment
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.mobile.analytics.event.TimelineHideNodeMenuItemEvent
 
 class TimelineActionModeCallback(
@@ -61,6 +62,10 @@ class TimelineActionModeCallback(
             } else {
                 menu?.findItem(R.id.cab_menu_hide)?.isVisible = false
                 menu?.findItem(R.id.cab_menu_unhide)?.isVisible = false
+            }
+
+            menu?.findItem(R.id.cab_menu_add_to_album)?.let {
+                it.isVisible = false
             }
         }
         return true
@@ -129,6 +134,12 @@ class TimelineActionModeCallback(
                 fragment.actionRemoveLink()
                 fragment.destroyActionMode()
 
+            }
+
+            R.id.cab_menu_add_to_album -> {
+                val nodeIds = fragment.timelineViewModel.selectedPhotosIds.map { NodeId(it) }
+                fragment.openAddToAlbum(nodeIds, 0)
+                fragment.destroyActionMode()
             }
         }
         return true

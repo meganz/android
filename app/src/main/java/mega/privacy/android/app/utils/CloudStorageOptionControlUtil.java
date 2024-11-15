@@ -64,6 +64,8 @@ public class CloudStorageOptionControlUtil {
     private final Option removeFavourites;
 
     private final Option disputeTakedown;
+    private final Option addToAlbum;
+    private final Option addTo;
 
     private final List<Option> options;
 
@@ -87,10 +89,12 @@ public class CloudStorageOptionControlUtil {
       trash = new Option(true);
       removeFavourites = new Option(false);
       disputeTakedown = new Option(false);
+      addToAlbum = new Option(false);
+      addTo = new Option(false);
 
       options = Arrays.asList(
               selectAll, clearSelection, hide, unhide, removeLink, removeShare, rename, saveToDevice, getLink, disputeTakedown,
-              manageLink, shareFolder, sendToChat, shareOut, move, copy, leaveShare, trash, removeFavourites);
+              manageLink, shareFolder, sendToChat, shareOut, move, copy, leaveShare, trash, removeFavourites, addToAlbum, addTo);
     }
 
     public Option selectAll() {

@@ -633,6 +633,10 @@ class OutgoingSharesComposeFragment : Fragment() {
 
                 // This option is only available in the Incoming Shares page
                 OptionItems.LEAVE_SHARE_CLICKED -> Unit
+
+                OptionItems.ADD_TO_ALBUM -> {}
+
+                OptionItems.ADD_TO -> {}
             }
         }
     }

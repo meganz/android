@@ -37,6 +37,7 @@ import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageM
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -383,6 +384,11 @@ class ImagePreviewViewModel @Inject constructor(
 
     suspend fun isMoveToRubbishBinMenuVisible(imageNode: ImageNode): Boolean {
         return menu?.isMoveToRubbishBinMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isAddToAlbumMenuVisible(imageNode: ImageNode): Boolean {
+        return (savedStateHandle[IMAGE_PREVIEW_ADD_TO_ALBUM] ?: false) &&
+                (imageNode.type is ImageFileTypeInfo || imageNode.type is VideoFileTypeInfo)
     }
 
     suspend fun isMagnifierMenuVisible(imageNode: ImageNode): Boolean {
@@ -837,5 +843,6 @@ class ImagePreviewViewModel @Inject constructor(
         const val FETCHER_PARAMS = "fetcher_params"
         const val PARAMS_CURRENT_IMAGE_NODE_ID_VALUE = "currentImageNodeIdValue"
         const val IMAGE_PREVIEW_IS_FOREIGN = "image_preview_is_foreign"
+        const val IMAGE_PREVIEW_ADD_TO_ALBUM = "image_preview_add_to_album"
     }
 }

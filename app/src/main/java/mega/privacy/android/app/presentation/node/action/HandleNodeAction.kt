@@ -90,7 +90,8 @@ fun HandleNodeAction(
                         snackBarHostState = snackBarHostState,
                         sortOrder = sortOrder,
                         viewType = nodeSourceType ?: Constants.FILE_BROWSER_ADAPTER,
-                        coroutineScope = coroutineScope
+                        coroutineScope = coroutineScope,
+                        enableAddToAlbum = nodeSourceType == Constants.FILE_BROWSER_ADAPTER,
                     )
                 }
 
@@ -224,6 +225,7 @@ private fun openImageViewerActivity(
         menuOptionsSource = menuOptionsSource,
         anchorImageNodeId = currentFileNode.id,
         params = mapOf(paramKey to currentFileNodeParentId),
+        enableAddToAlbum = nodeSourceType == Constants.FILE_BROWSER_ADAPTER,
     )
 
     context.startActivity(intent)
@@ -237,6 +239,7 @@ private suspend fun openVideoOrAudioFile(
     sortOrder: SortOrder,
     viewType: Int,
     coroutineScope: CoroutineScope,
+    enableAddToAlbum: Boolean,
 ) {
     coroutineScope.launch {
         runCatching {
@@ -247,7 +250,8 @@ private suspend fun openVideoOrAudioFile(
                     fileNode = fileNode,
                     sortOrder = sortOrder,
                     viewType = viewType,
-                    isFolderLink = false
+                    isFolderLink = false,
+                    enableAddToAlbum = enableAddToAlbum,
                 )
         }.onFailure {
             snackBarHostState?.showAutoDurationSnackbar(context.getString(R.string.intent_not_available))

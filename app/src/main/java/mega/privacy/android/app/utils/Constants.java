@@ -197,6 +197,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE = "mediaQueueTitle";
     public static final String INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE = "videoCollectionTitle";
     public static final String INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID = "videoCollectionId";
+    public static final String INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM = "videoAddToAlbum";
     public static final String INTENT_EXTRA_KEY_VIEWER_FROM = "viewerFrom";
     public static final String INTENT_EXTRA_KEY_FROM_DOWNLOAD_SERVICE = "fromDownloadService";
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";

@@ -661,6 +661,10 @@ class IncomingSharesComposeFragment : Fragment() {
                     viewModel.setShowLeaveShareConfirmationDialog(handleList)
                     disableSelectMode()
                 }
+
+                OptionItems.ADD_TO_ALBUM -> {}
+
+                OptionItems.ADD_TO -> {}
             }
         }
     }

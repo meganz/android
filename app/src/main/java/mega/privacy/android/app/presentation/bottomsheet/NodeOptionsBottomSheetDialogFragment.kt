@@ -87,6 +87,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
@@ -122,11 +123,28 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
 
+    @Inject
+    lateinit var getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase
+
     private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
             ::handleHiddenNodesOnboardingResult,
         )
+
+    private val addToAlbumLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAddToAlbumResult,
+        )
+
+    private fun handleAddToAlbumResult(result: ActivityResult) {
+        if (result.resultCode == Activity.RESULT_OK) {
+            val message = result.data?.getStringExtra("message") ?: return
+            Util.showSnackbar(requireActivity(), message)
+        }
+        dismiss()
+    }
 
     private val hideHiddenActions: Boolean by lazy {
         arguments?.getBoolean(HIDE_HIDDEN_ACTIONS_KEY) ?: false
@@ -168,6 +186,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val permissionsIcon = contentView.findViewById<ImageView>(R.id.permissions_icon)
         val optionEdit = contentView.findViewById<LinearLayout>(R.id.edit_file_option)
         val optionInfo = contentView.findViewById<TextView>(R.id.properties_option)
+        val optionAddToAlbum = contentView.findViewById<TextView>(R.id.add_to_album_option)
         // option Versions
         val optionVersionsLayout =
             contentView.findViewById<LinearLayout>(R.id.option_versions_layout)
@@ -788,6 +807,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     optionLabelCurrent.visibility = View.GONE
                 }
                 state.shareData?.let { data -> hideNodeActions(data, node) }
+
+                optionAddToAlbum.let { option ->
+                    option.visibility = View.GONE
+                }
 
                 if (savedInstanceState?.getBoolean(
                         Constants.CANNOT_OPEN_FILE_SHOWN,

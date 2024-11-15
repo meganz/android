@@ -429,6 +429,13 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/add_to_album_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/album_add_to_image"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_add_to_album"/>
+
+            <TextView
                 android:id="@+id/move_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_move_to"
