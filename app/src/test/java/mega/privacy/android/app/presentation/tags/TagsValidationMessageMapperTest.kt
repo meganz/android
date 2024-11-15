@@ -86,4 +86,26 @@ class TagsValidationMessageMapperTest {
         assertThat(message).isEqualTo(null)
         assertThat(error).isEqualTo(false)
     }
+
+    @Test
+    fun `test that tags is valid when input text is diacritical marks`() {
+        val (message, error) = underTest("วัorคุ", nodeTags, userTags)
+        assertThat(message).isEqualTo(null)
+        assertThat(error).isEqualTo(false)
+    }
+
+    @Test
+    fun `test that tags is valid when input text is accent text`() {
+        val (message, error) = underTest("âéǐôű", nodeTags, userTags)
+        assertThat(message).isEqualTo(null)
+        assertThat(error).isEqualTo(false)
+    }
+
+    @Test
+    fun `test that tags is not valid when input text has spaces`() {
+        val (message, error) = underTest("tag abc", nodeTags, userTags)
+        assertThat(message)
+            .isEqualTo(context.getString(R.string.add_tags_error_special_characters))
+        assertThat(error).isEqualTo(true)
+    }
 }

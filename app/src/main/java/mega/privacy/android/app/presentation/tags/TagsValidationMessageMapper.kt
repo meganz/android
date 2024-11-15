@@ -36,12 +36,7 @@ class TagsValidationMessageMapper @Inject constructor(@ApplicationContext privat
                 isError = false
             }
 
-            isBlank -> {
-                message = null
-                isError = false
-            }
-
-            tag.all { it.isLetterOrDigit() }.not() -> {
+            !tag.matches(Regex(TAGS_REGEX)) -> {
                 message = context.getString(R.string.add_tags_error_special_characters)
                 isError = true
             }
@@ -67,5 +62,24 @@ class TagsValidationMessageMapper @Inject constructor(@ApplicationContext privat
             }
         }
         return Pair(message, isError)
+    }
+
+    companion object {
+
+        /**
+         * Regular expression to validate tags.
+         * This regex ensures that the tag contains only letters, numbers, and diacritical marks, and nothing else.
+         *
+         *      ^: Asserts the position at the start of the string.
+         *      [\\p{L}0-9\\p{Mn}\\p{Me}]*: A character class that matches any combination of:
+         *          \\p{L}: Any kind of letter from any language.
+         *          0-9: Any digit from 0 to 9.
+         *          \\p{Mn}: A non-spacing mark (a character intended to be combined with another character without taking up extra space).
+         *          \\p{Me}: An enclosing mark (a character that encloses the character it is combined with).
+         *          *: Matches zero or more of the preceding element (the character class).
+         *      $: Asserts the position at the end of the string.
+         */
+        private const val TAGS_REGEX =
+            "^[\\p{L}0-9\\p{Mn}\\p{Me}]*$"
     }
 }

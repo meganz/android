@@ -57,7 +57,8 @@ class UploadDestinationViewModel @Inject constructor(
      */
     fun updateUri(fileUriList: List<Uri>) = viewModelScope.launch {
         val importableItems = fileUriList.map { uri ->
-            val fileName = runCatching { getFileNameFromContentUri(uri.toString()) }.getOrNull().orEmpty()
+            val fileName =
+                runCatching { getFileNameFromContentUri(uri.toString()) }.getOrNull().orEmpty()
             ImportUiItem(
                 filePath = uri.toString(),
                 originalFileName = fileName,
@@ -89,7 +90,7 @@ class UploadDestinationViewModel @Inject constructor(
     /**
      * Confirm the import
      */
-    fun isValidNameForUpload() : Boolean {
+    fun isValidNameForUpload(): Boolean {
         Timber.d("Import confirmed")
         val emptyNames = uiState.value.importUiItems.count { it.fileName.isBlank() }
         val hasWrongNames = uiState.value.importUiItems.any {
