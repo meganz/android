@@ -54,10 +54,8 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
     }
 
     private fun setupFlow() {
-        viewLifecycleOwner.collectFlow(viewModel.failedTransfer) { isFailed ->
-            if (isFailed) {
-                requireActivity().invalidateOptionsMenu()
-            }
+        viewLifecycleOwner.collectFlow(viewModel.failedTransfer) {
+            requireActivity().invalidateOptionsMenu()
         }
         viewLifecycleOwner.collectFlow(viewModel.completedTransfers) { completedTransfers ->
             adapter.submitList(completedTransfers) {

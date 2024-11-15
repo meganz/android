@@ -34,7 +34,6 @@ internal class AppEventFacade @Inject constructor(
     private val _cookieSettings = MutableSharedFlow<Set<CookieType>>()
     private val logout = MutableSharedFlow<Boolean>()
     private val fetchNodesFinish = MutableSharedFlow<Boolean>()
-    private val _transferFailed = MutableSharedFlow<Boolean>()
     private val pushNotificationSettingsUpdate = MutableSharedFlow<Boolean>()
     private val myAccountUpdate = MutableSharedFlow<MyAccountUpdate>()
     private val chatArchived = MutableSharedFlow<String>()
@@ -105,17 +104,11 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadcastLogout() = logout.emit(true)
 
-    override fun monitorFailedTransfer(): Flow<Boolean> = _transferFailed.asSharedFlow()
-
     override fun monitorSecurityUpgrade(): Flow<Boolean> =
         updateUpgradeSecurityState.asStateFlow()
 
     override suspend fun setUpgradeSecurity(isSecurityUpgrade: Boolean) {
         updateUpgradeSecurityState.value = isSecurityUpgrade
-    }
-
-    override suspend fun broadcastFailedTransfer(isFailed: Boolean) {
-        _transferFailed.emit(isFailed)
     }
 
     override fun monitorFinishActivity() = _finishActivity.toSharedFlow(appScope)

@@ -29,7 +29,6 @@ import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorFailedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
@@ -57,7 +56,6 @@ internal class TransfersViewModelTest {
     private lateinit var underTest: TransfersViewModel
     private val transfersManagement: TransfersManagement = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
-    private val monitorFailedTransferUseCase: MonitorFailedTransferUseCase = mock()
     private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase = mock()
     private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase = mock()
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase = mock()
@@ -84,7 +82,6 @@ internal class TransfersViewModelTest {
         underTest = TransfersViewModel(
             transfersManagement = transfersManagement,
             ioDispatcher = ioDispatcher,
-            monitorFailedTransferUseCase = monitorFailedTransferUseCase,
             moveTransferBeforeByTagUseCase = moveTransferBeforeByTagUseCase,
             moveTransferToFirstByTagUseCase = moveTransferToFirstByTagUseCase,
             moveTransferToLastByTagUseCase = moveTransferToLastByTagUseCase,

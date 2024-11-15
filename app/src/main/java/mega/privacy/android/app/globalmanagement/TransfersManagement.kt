@@ -18,7 +18,6 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.getSDCardDownloadAppData
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.transfers.BroadcastFailedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferIfNotExistUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
@@ -39,7 +38,6 @@ import javax.inject.Singleton
 @Singleton
 class TransfersManagement @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val broadcastFailedTransferUseCase: BroadcastFailedTransferUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val addCompletedTransferIfNotExistUseCase: AddCompletedTransferIfNotExistUseCase,
@@ -261,9 +259,6 @@ class TransfersManagement @Inject constructor(
 
     fun setAreFailedTransfers(failed: Boolean) {
         areFailedTransfers = failed
-        applicationScope.launch {
-            broadcastFailedTransferUseCase(failed)
-        }
     }
 
     fun getAreFailedTransfers(): Boolean = areFailedTransfers

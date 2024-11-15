@@ -387,12 +387,6 @@ internal class DefaultTransfersRepository @Inject constructor(
             megaApiGateway.cancelTransfers(direction, listener)
         }
 
-    override fun monitorFailedTransfer(): Flow<Boolean> = appEventGateway.monitorFailedTransfer()
-
-    override suspend fun broadcastFailedTransfer(isFailed: Boolean) {
-        appEventGateway.broadcastFailedTransfer(isFailed)
-    }
-
     override suspend fun ongoingTransfersExist(): Boolean =
         megaApiGateway.numberOfPendingUploads > 0 || megaApiGateway.numberOfPendingDownloads > 0
 

@@ -93,19 +93,7 @@ internal interface AppEventGateway {
      * Monitor transfer failed
      *
      */
-    fun monitorFailedTransfer(): Flow<Boolean>
-
-    /**
-     * Monitor transfer failed
-     *
-     */
     fun monitorSecurityUpgrade(): Flow<Boolean>
-
-    /**
-     * Broadcast transfer failed
-     *
-     */
-    suspend fun broadcastFailedTransfer(isFailed: Boolean)
 
     /**
      * Monitor Finish Activity

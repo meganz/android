@@ -128,18 +128,6 @@ interface TransferRepository {
     suspend fun cancelTransfers()
 
     /**
-     * Monitor transfer failed
-     *
-     */
-    fun monitorFailedTransfer(): Flow<Boolean>
-
-    /**
-     * Broadcast transfer failed
-     *
-     */
-    suspend fun broadcastFailedTransfer(isFailed: Boolean)
-
-    /**
      * Checks if exist ongoing transfers.
      */
     suspend fun ongoingTransfersExist(): Boolean
