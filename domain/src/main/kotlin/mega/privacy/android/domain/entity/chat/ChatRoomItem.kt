@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat
 
+import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
@@ -15,7 +16,7 @@ import kotlin.time.toDuration
  * @property chatId
  * @property title
  * @property lastMessage
- * @property isLastMessageVoiceClip
+ * @property lastMessageType
  * @property currentCallStatus
  * @property unreadCount
  * @property hasPermissions
@@ -34,7 +35,7 @@ sealed class ChatRoomItem(
     open val chatId: Long,
     open val title: String,
     open val lastMessage: String? = null,
-    open val isLastMessageVoiceClip: Boolean = false,
+    open val lastMessageType: ChatRoomLastMessage = ChatRoomLastMessage.Unknown,
     open val currentCallStatus: ChatRoomItemStatus = ChatRoomItemStatus.NotStarted,
     open val unreadCount: Int = 0,
     open val hasPermissions: Boolean = false,
@@ -46,6 +47,17 @@ sealed class ChatRoomItem(
     open val highlight: Boolean = false,
     open val header: String? = null,
 ) {
+    /**
+     * Check if the last message is voice clip
+     */
+    val isLastMessageVoiceClip
+        get() = lastMessageType == ChatRoomLastMessage.VoiceClip
+
+    /**
+     * Check if the last message is normal text
+     */
+    val isLastMessageNormal
+        get() = lastMessageType == ChatRoomLastMessage.Normal
 
     /**
      * Individual chat room item
@@ -57,7 +69,7 @@ sealed class ChatRoomItem(
      * @property chatId
      * @property title
      * @property lastMessage
-     * @property isLastMessageVoiceClip
+     * @property lastMessageType
      * @property currentCallStatus
      * @property unreadCount
      * @property hasPermissions
@@ -79,7 +91,7 @@ sealed class ChatRoomItem(
         override val chatId: Long,
         override val title: String,
         override val lastMessage: String? = null,
-        override val isLastMessageVoiceClip: Boolean = false,
+        override val lastMessageType: ChatRoomLastMessage = ChatRoomLastMessage.Unknown,
         override val currentCallStatus: ChatRoomItemStatus = ChatRoomItemStatus.NotStarted,
         override val unreadCount: Int = 0,
         override val hasPermissions: Boolean = false,
@@ -90,7 +102,7 @@ sealed class ChatRoomItem(
         override val lastTimestampFormatted: String? = null,
         override val highlight: Boolean = false,
         override val header: String? = null,
-    ) : ChatRoomItem(call, chatId, title, lastMessage, isLastMessageVoiceClip, currentCallStatus,
+    ) : ChatRoomItem(call, chatId, title, lastMessage, lastMessageType, currentCallStatus,
         unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
         lastTimestampFormatted, highlight, header
     )
@@ -103,7 +115,7 @@ sealed class ChatRoomItem(
      * @property chatId
      * @property title
      * @property lastMessage
-     * @property isLastMessageVoiceClip
+     * @property lastMessageType
      * @property currentCallStatus
      * @property unreadCount
      * @property hasPermissions
@@ -123,7 +135,7 @@ sealed class ChatRoomItem(
         override val chatId: Long,
         override val title: String,
         override val lastMessage: String? = null,
-        override val isLastMessageVoiceClip: Boolean = false,
+        override val lastMessageType: ChatRoomLastMessage = ChatRoomLastMessage.Unknown,
         override val currentCallStatus: ChatRoomItemStatus = ChatRoomItemStatus.NotStarted,
         override val unreadCount: Int = 0,
         override val hasPermissions: Boolean = false,
@@ -134,7 +146,7 @@ sealed class ChatRoomItem(
         override val lastTimestampFormatted: String? = null,
         override val highlight: Boolean = false,
         override val header: String? = null,
-    ) : ChatRoomItem(call, chatId, title, lastMessage, isLastMessageVoiceClip, currentCallStatus,
+    ) : ChatRoomItem(call, chatId, title, lastMessage, lastMessageType, currentCallStatus,
         unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
         lastTimestampFormatted, highlight, header
     )
@@ -156,7 +168,7 @@ sealed class ChatRoomItem(
      * @property chatId
      * @property title
      * @property lastMessage
-     * @property isLastMessageVoiceClip
+     * @property lastMessageType
      * @property currentCallStatus
      * @property unreadCount
      * @property hasPermissions
@@ -186,7 +198,7 @@ sealed class ChatRoomItem(
         override val chatId: Long,
         override val title: String,
         override val lastMessage: String? = null,
-        override val isLastMessageVoiceClip: Boolean = false,
+        override val lastMessageType: ChatRoomLastMessage = ChatRoomLastMessage.Unknown,
         override val currentCallStatus: ChatRoomItemStatus = ChatRoomItemStatus.NotStarted,
         override val unreadCount: Int = 0,
         override val hasPermissions: Boolean = false,
@@ -197,7 +209,7 @@ sealed class ChatRoomItem(
         override val lastTimestampFormatted: String? = null,
         override val highlight: Boolean = false,
         override val header: String? = null,
-    ) : ChatRoomItem(call, chatId, title, lastMessage, isLastMessageVoiceClip, currentCallStatus,
+    ) : ChatRoomItem(call, chatId, title, lastMessage, lastMessageType, currentCallStatus,
         unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
         lastTimestampFormatted, highlight, header
     ) {
@@ -281,7 +293,7 @@ sealed class ChatRoomItem(
         chatId: Long = this.chatId,
         title: String = this.title,
         lastMessage: String? = this.lastMessage,
-        isLastMessageVoiceClip: Boolean = this.isLastMessageVoiceClip,
+        lastMessageType: ChatRoomLastMessage = this.lastMessageType,
         currentCallStatus: ChatRoomItemStatus = this.currentCallStatus,
         unreadCount: Int = this.unreadCount,
         hasPermissions: Boolean = this.hasPermissions,
@@ -312,7 +324,7 @@ sealed class ChatRoomItem(
             chatId = chatId,
             title = title,
             lastMessage = lastMessage,
-            isLastMessageVoiceClip = isLastMessageVoiceClip,
+            lastMessageType = lastMessageType,
             currentCallStatus = currentCallStatus,
             unreadCount = unreadCount,
             hasPermissions = hasPermissions,
@@ -334,7 +346,7 @@ sealed class ChatRoomItem(
             chatId = chatId,
             title = title,
             lastMessage = lastMessage,
-            isLastMessageVoiceClip = isLastMessageVoiceClip,
+            lastMessageType = lastMessageType,
             currentCallStatus = currentCallStatus,
             unreadCount = unreadCount,
             hasPermissions = hasPermissions,
@@ -354,7 +366,7 @@ sealed class ChatRoomItem(
             chatId = chatId,
             title = title,
             lastMessage = lastMessage,
-            isLastMessageVoiceClip = isLastMessageVoiceClip,
+            lastMessageType = lastMessageType,
             currentCallStatus = currentCallStatus,
             unreadCount = unreadCount,
             hasPermissions = hasPermissions,

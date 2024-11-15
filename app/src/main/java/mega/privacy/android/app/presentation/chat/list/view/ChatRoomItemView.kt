@@ -294,6 +294,7 @@ internal fun ChatRoomItemView(
             isRecurringDaily = item is MeetingChatRoomItem && item.isRecurringDaily,
             isRecurringWeekly = item is MeetingChatRoomItem && item.isRecurringWeekly,
             isRecurringMonthly = item is MeetingChatRoomItem && item.isRecurringMonthly,
+            isNormalMessage = item.isLastMessageNormal
         )
 
         if (shouldShownCallDuration) {
@@ -404,6 +405,7 @@ private fun MiddleTextView(
     isRecurringDaily: Boolean,
     isRecurringWeekly: Boolean,
     isRecurringMonthly: Boolean,
+    isNormalMessage: Boolean,
 ) {
     val textMessage = when {
         isPending && !scheduledTimestamp.isNullOrBlank() ->
@@ -439,21 +441,21 @@ private fun MiddleTextView(
         else -> MaterialTheme.colors.textColorSecondary
     }
 
-    textMessage?.let { text ->
-        MessageText(
-            message = text,
-            style = MaterialTheme.typography.subtitle2.copy(
-                color = textColor,
-            ),
+    if (textMessage.isNullOrBlank() || !isNormalMessage) {
+        Text(
+            text = textMessage ?: stringResource(R.string.error_message_unrecognizable),
+            color = textColor,
+            style = MaterialTheme.typography.subtitle2,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = modifier
         )
-    } ?: run {
-        Text(
-            text = stringResource(R.string.error_message_unrecognizable),
-            color = textColor,
-            style = MaterialTheme.typography.subtitle2,
+    } else {
+        MessageText(
+            message = textMessage,
+            style = MaterialTheme.typography.subtitle2.copy(
+                color = textColor,
+            ),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = modifier
