@@ -19,6 +19,7 @@ import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,9 +47,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
@@ -85,7 +86,7 @@ fun TwoFactorAuthenticationField(
         focusRequesterFourthPin,
         focusRequesterFifthPin,
         focusRequesterSixthPin,
-    ) = FocusRequester.createRefs()
+    ) = remember { FocusRequester.createRefs() }
 
     Row(horizontalArrangement = Arrangement.SpaceBetween) {
         PinTwoFactorAuthentication(
@@ -180,8 +181,11 @@ fun TwoFactorAuthenticationField(
         )
     }
 
-    EventEffect(event = requestFocus, onConsumed = onRequestFocusConsumed) {
-        focusRequesterFirstPin.requestFocus()
+    SideEffect {
+        if (requestFocus == triggered) {
+            focusRequesterFirstPin.requestFocus()
+            onRequestFocusConsumed()
+        }
     }
 }
 
