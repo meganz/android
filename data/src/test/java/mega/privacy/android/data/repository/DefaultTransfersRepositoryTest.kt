@@ -40,11 +40,13 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
@@ -724,9 +726,11 @@ class DefaultTransfersRepositoryTest {
         }
 
     @Test
-    fun `test that addCompletedTransfers call local storage gateway addCompletedTransfers and app event gateway broadcastCompletedTransfer with the mapped transfers`() =
+    fun `test that addCompletedTransfers call local storage gateway addCompletedTransfers and app event gateway broadcastCompletedTransfer with error`() =
         runTest {
-            val transfer = mock<Transfer>()
+            val transfer = mock<Transfer> {
+                on { it.state } doReturn TransferState.STATE_FAILED
+            }
             val error = mock<MegaException>()
             val expected = listOf(mock<CompletedTransfer>())
             val path = "path"
@@ -737,7 +741,26 @@ class DefaultTransfersRepositoryTest {
             whenever(completedTransferMapper(transfer, error, path)).thenReturn(expected.first())
             underTest.addCompletedTransfers(mapOf(event to path))
             verify(megaLocalRoomGateway).addCompletedTransfers(expected)
-            verify(appEventGateway).broadcastCompletedTransfer()
+            verify(appEventGateway).broadcastCompletedTransfer(CompletedTransferState.Error)
+        }
+
+    @Test
+    fun `test that addCompletedTransfers call local storage gateway addCompletedTransfers and app event gateway broadcastCompletedTransfer with completed`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { it.state } doReturn TransferState.STATE_COMPLETED
+            }
+            val error = mock<MegaException>()
+            val expected = listOf(mock<CompletedTransfer>())
+            val path = "path"
+            val event = mock<TransferEvent.TransferFinishEvent> {
+                on { it.transfer } doReturn transfer
+                on { it.error } doReturn error
+            }
+            whenever(completedTransferMapper(transfer, error, path)).thenReturn(expected.first())
+            underTest.addCompletedTransfers(mapOf(event to path))
+            verify(megaLocalRoomGateway).addCompletedTransfers(expected)
+            verify(appEventGateway).broadcastCompletedTransfer(CompletedTransferState.Completed)
         }
 
     @Test
@@ -751,7 +774,7 @@ class DefaultTransfersRepositoryTest {
                 .thenReturn(expected)
             underTest.addCompletedTransferFromFailedPendingTransfer(transfer, size, error)
             verify(megaLocalRoomGateway).addCompletedTransfer(expected)
-            verify(appEventGateway).broadcastCompletedTransfer()
+            verify(appEventGateway).broadcastCompletedTransfer(CompletedTransferState.Error)
         }
 
     @Test
@@ -811,9 +834,10 @@ class DefaultTransfersRepositoryTest {
     @Test
     fun `test that monitorCompletedTransfer returns the result of app event gateway monitorCompletedTransfer`() =
         runTest {
-            whenever(appEventGateway.monitorCompletedTransfer).thenReturn(flowOf(Unit))
+            val expected = CompletedTransferState.Completed
+            whenever(appEventGateway.monitorCompletedTransfer).thenReturn(flowOf(expected))
             underTest.monitorCompletedTransfer().test {
-                assertThat(awaitItem()).isEqualTo(Unit)
+                assertThat(awaitItem()).isEqualTo(expected)
                 awaitComplete()
             }
         }
