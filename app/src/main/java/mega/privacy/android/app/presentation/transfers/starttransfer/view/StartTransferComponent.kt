@@ -57,6 +57,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.filespermission.FilesPermissionDialog
+import mega.privacy.android.app.presentation.transfers.view.dialog.NotEnoughSpaceForUploadDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.TransferInProgressDialog
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
@@ -86,6 +87,7 @@ internal fun StartTransferComponent(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var showFilesPermissionRequest by rememberSaveable { mutableStateOf(false) }
+    var showStorageOverQuotaWarning by rememberSaveable { mutableStateOf(false) }
     val notificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
     } else {
@@ -115,6 +117,11 @@ internal fun StartTransferComponent(
         event = event,
         onConsumed = onConsumeEvent,
         action = { triggerEvent ->
+            if (uiState.isStorageOverQuota) {
+                showStorageOverQuotaWarning = true
+                return@EventEffect
+            }
+
             notificationPermission?.status?.let { permissionStatus ->
                 if (permissionStatus.shouldShowRationale) {
                     context.startActivity(
@@ -150,6 +157,10 @@ internal fun StartTransferComponent(
                 showFilesPermissionRequest = false
             }
         )
+    }
+
+    if (showStorageOverQuotaWarning) {
+        NotEnoughSpaceForUploadDialog(onCancel = { showStorageOverQuotaWarning = false })
     }
 
     StartTransferComponent(

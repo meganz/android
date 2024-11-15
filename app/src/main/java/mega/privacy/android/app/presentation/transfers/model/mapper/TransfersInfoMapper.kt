@@ -25,7 +25,13 @@ class TransfersInfoMapper @Inject constructor() {
         lastTransfersCancelled: Boolean,
     ): TransfersInfo {
         if (numPendingUploads + numPendingDownloadsNonBackground <= 0) {
-            return TransfersInfo(if (lastTransfersCancelled) TransfersStatus.Cancelled else TransfersStatus.Completed)
+            return TransfersInfo(
+                when {
+                    isTransferError -> TransfersStatus.TransferError
+                    lastTransfersCancelled -> TransfersStatus.Cancelled
+                    else -> TransfersStatus.Completed
+                }
+            )
         }
         val pendingDownloads = numPendingDownloadsNonBackground > 0
         val pendingUploads = numPendingUploads > 0

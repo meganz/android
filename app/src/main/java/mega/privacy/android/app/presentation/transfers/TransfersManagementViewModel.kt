@@ -18,12 +18,14 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.TransfersStatusInfo
+import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.GetNumPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorLastTransfersHaveBeenCancelledUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.IsCompletedTransfersEmptyUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import timber.log.Timber
 import javax.inject.Inject
@@ -47,6 +49,7 @@ class TransfersManagementViewModel @Inject constructor(
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     monitorTransfersStatusUseCase: MonitorTransfersStatusUseCase,
     monitorLastTransfersHaveBeenCancelledUseCase: MonitorLastTransfersHaveBeenCancelledUseCase,
+    private val monitorCompletedTransfersEventUseCase: MonitorCompletedTransferEventUseCase,
     private val samplePeriod: Long?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransferManagementUiState())
@@ -93,12 +96,45 @@ class TransfersManagementViewModel @Inject constructor(
                 }
             }
         }
+        monitorFailedTransfers()
+    }
+
+    private fun monitorFailedTransfers() {
+        viewModelScope.launch(ioDispatcher) {
+            monitorCompletedTransfersEventUseCase().collect { completedState ->
+                if (completedState == CompletedTransferState.Error) {
+                    _state.update { state -> state.copy(isTransferError = true) }
+                }
+            }
+        }
     }
 
     /**
-     * Notifies about updates on if should show or not the transfers completed tab because some failed transfer.
+     * Checks if should show transfer errors. If so, updates state as the error is immediately consumed.
      */
-    fun shouldCheckTransferError() = false
+    fun shouldCheckTransferError() = state.value.isTransferError.let { isTransferError ->
+        if (isTransferError) {
+            _state.update { state ->
+                val transferInfo = state.transfersInfo.let {
+                    if (it.status == TransfersStatus.TransferError) {
+                        it.copy(
+                            status =
+                            if (it.totalSizeToTransfer == 0L) TransfersStatus.Completed
+                            else TransfersStatus.Transferring
+                        )
+                    } else {
+                        it
+                    }
+                }
+                state.copy(
+                    isTransferError = false,
+                    transfersInfo = transferInfo
+                )
+            }
+        }
+
+        isTransferError
+    }
 
     /**
      * Notifies about updates on if should show or not the Completed tab.
@@ -114,7 +150,7 @@ class TransfersManagementViewModel @Inject constructor(
         val newTransferInfo = transfersInfoMapper(
             numPendingDownloadsNonBackground = transfersStatusInfo.pendingDownloads,
             numPendingUploads = transfersStatusInfo.pendingUploads,
-            isTransferError = transfersManagement.shouldShowNetworkWarning || shouldCheckTransferError(),
+            isTransferError = transfersManagement.shouldShowNetworkWarning || state.value.isTransferError,
             isTransferOverQuota = transfersStatusInfo.transferOverQuota,
             isStorageOverQuota = transfersStatusInfo.storageOverQuota,
             areTransfersPaused = transfersStatusInfo.paused,
