@@ -20,13 +20,16 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldDefaults
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
@@ -184,12 +187,16 @@ private fun MegaScaffold(
                 )
             },
             snackbarHost = {
-                SnackbarHost(hostState = it) { data ->
+                SnackbarHost(
+                    modifier = Modifier.navigationBarsPadding(),
+                    hostState = it,
+                ) { data ->
                     MegaSnackbar(snackbarData = data)
                 }
             },
             floatingActionButton = floatingActionButton,
             backgroundColor = MegaOriginalTheme.colors.background.pageBackground,
+            contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
             content = { paddingValues ->
                 content.invoke(paddingValues)
                 if (blurContent != null) {
@@ -209,19 +216,22 @@ private fun MegaScaffold(
 
 @Composable
 private fun BarContent(
-    blurContent: (() -> Unit)? = null,
-    content: @Composable () -> Unit = {},
+    blurContent: (() -> Unit)?,
+    content: @Composable () -> Unit,
 ) {
-    Box(modifier = Modifier.height(IntrinsicSize.Min)) {
+    if (blurContent == null) {
         content()
-        if (blurContent != null) {
+    } else {
+        Box(modifier = Modifier.height(IntrinsicSize.Min)) {
+            content()
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color = MegaOriginalTheme.colors.background.blur)
                     .clickable(indication = null,
                         interactionSource = remember { MutableInteractionSource() },
-                        onClick = { blurContent.invoke() }),
+                        onClick = { blurContent.invoke() })
+                    .systemBarsPadding(),
             ) { }
         }
     }

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.login.view
 
-import mega.privacy.android.shared.resources.R as SharedRes
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
@@ -20,7 +19,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -31,7 +29,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -107,6 +104,7 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.Password
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.resources.R as SharedRes
 
 /**
  * Login fragment view.
@@ -176,24 +174,18 @@ fun LoginView(
                     onLoginClicked = onLoginClicked,
                     onForgotPassword = onForgotPassword,
                     onCreateAccount = onCreateAccount,
-                    paddingValues = paddingValues,
                     onChangeApiServer = { showChangeApiServerDialog = true },
                     onReportIssue = onReportIssue,
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .systemBarsPadding()
+                    modifier = Modifier.padding(paddingValues),
                 )
 
                 is2FARequired || multiFactorAuthState != null -> TwoFactorAuthentication(
                     state = this,
-                    paddingValues = paddingValues,
                     on2FAPinChanged = on2FAPinChanged,
                     on2FAChanged = on2FAChanged,
                     onLostAuthenticatorDevice = onLostAuthenticatorDevice,
                     onFirstTime2FAConsumed = onFirstTime2FAConsumed,
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .systemBarsPadding()
+                    modifier = Modifier.padding(paddingValues),
                 )
             }
         }
@@ -226,7 +218,6 @@ private fun RequireLogin(
     onLoginClicked: () -> Unit,
     onForgotPassword: () -> Unit,
     onCreateAccount: () -> Unit,
-    paddingValues: PaddingValues,
     onChangeApiServer: () -> Unit,
     onReportIssue: () -> Unit,
     modifier: Modifier = Modifier,
@@ -235,7 +226,6 @@ private fun RequireLogin(
 
     Column(
         modifier = modifier
-            .padding(paddingValues)
             .verticalScroll(scrollState)
     ) {
         val emailFocusRequester = remember { FocusRequester() }
@@ -541,7 +531,6 @@ private fun LoginInProgressText(
 @Composable
 private fun TwoFactorAuthentication(
     state: LoginState,
-    paddingValues: PaddingValues,
     on2FAPinChanged: (String, Int) -> Unit,
     on2FAChanged: (String) -> Unit,
     onLostAuthenticatorDevice: () -> Unit,
@@ -550,7 +539,6 @@ private fun TwoFactorAuthentication(
 ) = Box(
     modifier = modifier
         .fillMaxWidth()
-        .padding(paddingValues)
 ) {
     val scrollState = rememberScrollState()
     val isChecking2FA = state.multiFactorAuthState == MultiFactorAuthState.Checking
@@ -622,7 +610,6 @@ private fun EmptyLoginViewPreview() {
             onLoginClicked = {},
             onForgotPassword = {},
             onCreateAccount = {},
-            paddingValues = PaddingValues(),
             onChangeApiServer = {},
             onReportIssue = {},
         )
@@ -735,18 +722,9 @@ internal class LoginStateProvider : PreviewParameterProvider<LoginState> {
 internal const val MEGA_LOGO_TEST_TAG = "MEGA_LOGO"
 internal const val REQUEST_STATUS_PROGRESS_TEST_TAG = "login_in_progress:request_status_progress"
 internal const val FETCH_NODES_PROGRESS_TEST_TAG = "FETCH_NODES_PROGRESS"
-internal const val LOGIN_PROGRESS_TEST_TAG = "LOGIN_PROGRESS"
 internal const val TWO_FA_PROGRESS_TEST_TAG = "TWO_FA_PROGRESS"
-internal const val CHECKING_VALIDATION_TAG =
-    "login_in_progress:login_in_progress_text_checking_validation_link"
 internal const val CONNECTING_TO_SERVER_TAG =
     "login_in_progress:login_in_progress_text_connecting_to_the_server"
-internal const val UPDATING_FILE_LIST_TAG =
-    "login_in_progress:login_in_progress_text_updating_file_list"
-internal const val PREPARING_FILE_LIST_TAG =
-    "login_in_progress:login_in_progress_text_preparing_file_list"
-internal const val TEMPORARY_ERROR_TAG =
-    "login_in_progress:login_in_progress_text_temporary_error"
 internal const val LOGIN_TO_MEGA_TAG = "require_login:text_login_to_mega"
 internal const val TEXT_FIELD_LABEL_TAG =
     "require_login:label_text_field_displaying_the_email_address_label"
@@ -758,7 +736,6 @@ internal const val CANCEL_LOGIN_PROGRESS_TAG =
     "require_login:mega_circular_progress_indicator_cancel_login_progress"
 internal const val CANCELLING_LOGIN_TAG = "require_login:text_cancelling_login"
 internal const val TROUBLE_LOGIN_TAG = "require_login:text_trouble_logging_in"
-internal const val REPORT_ISSUE_TAG = "require_login:text_report_issue"
 internal const val NEW_TO_MEGA_TAG = "require_login:text_new_to_mega"
 internal const val CREATE_ACCOUNT_TAG = "require_login:text_mega_button_create_account"
 internal const val ENTER_AUTHENTICATION_CODE_TAG =
