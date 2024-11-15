@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.imagepreview.slideshow.view
 
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +23,6 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,9 +39,7 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.yield
 import me.saket.telephoto.zoomable.DoubleClickToZoomListener
 import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.ZoomableImageState
@@ -59,7 +55,6 @@ import mega.privacy.android.app.presentation.imagepreview.slideshow.model.Slides
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -67,7 +62,6 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
 import mega.privacy.mobile.analytics.event.SlideShowScreenEvent
-import timber.log.Timber
 
 @Composable
 fun SlideshowScreen(
@@ -99,17 +93,18 @@ fun SlideshowScreen(
         }
     }
 
-    if (imageNodes.isNotEmpty()) {
+    val currentImageNodeIndex = viewState.currentImageNodeIndex
+    val currentImageNode = viewState.currentImageNode
+    currentImageNode?.let {
         val zoomableStateMap = remember { mutableMapOf<NodeId, ZoomableState?>() }
 
         val scaffoldState = rememberScaffoldState()
         val coroutineScope = rememberCoroutineScope()
-        val order = viewState.order ?: SlideshowOrder.Shuffle
         val speed = viewState.speed ?: SlideshowSpeed.Normal
         val repeat = viewState.repeat
         val isPlaying = viewState.isPlaying
         val pagerState = rememberPagerState(
-            initialPage = 0,
+            initialPage = currentImageNodeIndex,
             initialPageOffsetFraction = 0f
         ) {
             imageNodes.size
@@ -159,37 +154,6 @@ fun SlideshowScreen(
             )
         }
 
-        LaunchedEffect(isPlaying) {
-            if (isPlaying) {
-                while (true) {
-                    yield()
-                    delay(speed.duration.inWholeMilliseconds)
-                    tween<Float>(600)
-                    try {
-                        pagerState.animateScrollToPage(
-                            page = if (pagerState.canScrollForward) {
-                                pagerState.currentPage + 1
-                            } else {
-                                0
-                            },
-                        )
-                    } catch (e: Exception) {
-                        Timber.d("Slideshow animateScrollToPage+$e")
-                    }
-                }
-            }
-        }
-
-        LaunchedEffect(Unit) {
-            // When order change, restart slideshow
-            snapshotFlow { order }.distinctUntilChanged().collect {
-                if (viewState.shouldPlayFromFirst) {
-                    pagerState.animateScrollToPage(0)
-                    viewModel.shouldPlayFromFirst(shouldPlayFromFirst = false)
-                }
-            }
-        }
-
         LaunchedEffect(pagerState.currentPage) {
             val page = pagerState.currentPage
 
@@ -206,6 +170,19 @@ fun SlideshowScreen(
             // Not repeat and the last one.
             if (!pagerState.canScrollForward && !repeat && isPlaying) {
                 viewModel.updateIsPlaying(false)
+            }
+        }
+
+        LaunchedEffect(isPlaying, currentImageNodeIndex, speed) {
+            if (isPlaying) {
+                delay(speed.duration.inWholeMilliseconds)
+                val nextIndex =
+                    if (pagerState.canScrollForward) currentImageNodeIndex + 1 else 0
+                pagerState.scrollToPage(nextIndex)
+                viewModel.setCurrentImageNodeIndex(nextIndex)
+                viewModel.setCurrentImageNode(imageNodes[nextIndex])
+            } else {
+                pagerState.scrollToPage(currentImageNodeIndex)
             }
         }
     }
@@ -277,7 +254,6 @@ private fun SlideShowContent(
             modifier = Modifier
                 .fillMaxSize(),
             state = pagerState,
-            beyondViewportPageCount = minOf(3, imageNodes.size),
             key = { imageNodes.getOrNull(it)?.id?.longValue ?: -1L }
         ) { index ->
 
@@ -343,7 +319,7 @@ private fun ImageContent(
                     imagePath = errorImagePath
                 }
             )
-            .crossfade(true)
+            .crossfade(2000)
             .build()
 
         ZoomableAsyncImage(

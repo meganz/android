@@ -6,19 +6,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowState
@@ -61,6 +61,9 @@ class SlideshowViewModel @Inject constructor(
     private val params: Bundle
         get() = savedStateHandle[ImagePreviewViewModel.FETCHER_PARAMS] ?: Bundle()
 
+    private val currentImageNodeIdValue: Long
+        get() = savedStateHandle[PARAMS_CURRENT_IMAGE_NODE_ID_VALUE] ?: 0L
+
     /**
      * Slideshow ViewState
      */
@@ -68,38 +71,51 @@ class SlideshowViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     init {
-        monitorOrderSetting()
         monitorSpeedSetting()
         monitorRepeatSetting()
-        monitorImageNodes()
+        monitorSlideshowSettings()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun monitorImageNodes() {
-        val imageFetcher = imageNodeFetchers[imagePreviewFetcherSource] ?: return
-        imageFetcher.monitorImageNodes(params)
-            .catch { Timber.e(it) }
-            .mapLatest { playSlideshow(it) }
-            .launchIn(viewModelScope)
-    }
+    private fun monitorSlideshowSettings() {
+        val orderFlow = monitorSlideshowOrderSettingUseCase().distinctUntilChanged()
+        val imageNodesFlow = imageNodeFetchers[imagePreviewFetcherSource]?.monitorImageNodes(params)
+            ?.catch { Timber.e(it) } ?: flowOf(emptyList())
 
-    private fun playSlideshow(imageNodes: List<ImageNode>) {
-        viewModelScope.launch(ioDispatcher) {
-            val order = _state.value.order ?: SlideshowOrder.Shuffle
+        combine(orderFlow, imageNodesFlow) { order, imageNodes ->
             val filteredImageNodes = imageNodes.filter {
                 it.type !is VideoFileTypeInfo && (it.hasThumbnail || it.hasPreview)
             }
 
-            val sortedItems = sortItems(filteredImageNodes, order)
+            val settingOrder = order ?: SlideshowOrder.Shuffle
+            val sortedItems = sortItems(
+                imageNodes = filteredImageNodes,
+                order = settingOrder
+            )
+            val (currentImageNodeIndex, currentImageNode) = findCurrentImageNode(
+                sortedItems
+            )
+            val finalItems = if (settingOrder == SlideshowOrder.Shuffle) {
+                sortedItems.shuffleStartingWithIndex(currentImageNodeIndex)
+            } else {
+                sortedItems
+            }
+            val isPlaying = if (!_state.value.isInitialized) {
+                true
+            } else {
+                _state.value.isPlaying
+            }
+
             _state.update {
                 it.copy(
                     isInitialized = true,
-                    imageNodes = sortedItems,
-                    isPlaying = true
+                    order = settingOrder,
+                    imageNodes = finalItems,
+                    isPlaying = isPlaying,
+                    currentImageNode = currentImageNode,
+                    currentImageNodeIndex = if (settingOrder == SlideshowOrder.Shuffle) 0 else currentImageNodeIndex,
                 )
-
             }
-        }
+        }.launchIn(viewModelScope)
     }
 
     private fun sortItems(
@@ -107,10 +123,41 @@ class SlideshowViewModel @Inject constructor(
         order: SlideshowOrder,
     ): List<ImageNode> {
         return when (order) {
-            SlideshowOrder.Shuffle -> imageNodes.shuffled()
+            SlideshowOrder.Shuffle -> imageNodes
             SlideshowOrder.Newest -> imageNodes.sortedByDescending { it.modificationTime }
             SlideshowOrder.Oldest -> imageNodes.sortedBy { it.modificationTime }
         }
+    }
+
+    fun List<ImageNode>.shuffleStartingWithIndex(index: Int): List<ImageNode> {
+        if (index !in indices) return this.shuffled()
+
+        val item = this[index]
+
+        val remainingItems = this.filterIndexed { i, _ -> i != index }.shuffled()
+
+        return listOf(item) + remainingItems
+    }
+
+
+    private fun findCurrentImageNode(imageNodes: List<ImageNode>): Pair<Int, ImageNode?> {
+        val currentImageNodeIdValue = if (_state.value.isInitialized) {
+            _state.value.currentImageNode?.id?.longValue ?: currentImageNodeIdValue
+        } else {
+            currentImageNodeIdValue
+        }
+        val index = imageNodes.indexOfFirst { currentImageNodeIdValue == it.id.longValue }
+
+        if (index != -1) {
+            return index to imageNodes[index]
+        }
+
+        // If the image node is not found, calculate the target index based on the current state
+        val currentImageNodeIndex = _state.value.currentImageNodeIndex
+        val targetImageNodeIndex =
+            if (currentImageNodeIndex > imageNodes.lastIndex) imageNodes.lastIndex else currentImageNodeIndex
+
+        return targetImageNodeIndex to imageNodes.getOrNull(targetImageNodeIndex)
     }
 
     suspend fun monitorImageResult(imageNode: ImageNode): Flow<ImageResult> {
@@ -134,18 +181,8 @@ class SlideshowViewModel @Inject constructor(
      * Update Playing status
      */
     fun updateIsPlaying(isPlaying: Boolean) {
-        Timber.d("Slideshow updateIsPlaying isPlaying+$isPlaying")
         _state.update {
             it.copy(isPlaying = isPlaying)
-        }
-    }
-
-    /**
-     * Should play slideshow from the first item
-     */
-    fun shouldPlayFromFirst(shouldPlayFromFirst: Boolean) {
-        _state.update {
-            it.copy(shouldPlayFromFirst = shouldPlayFromFirst)
         }
     }
 
@@ -161,37 +198,8 @@ class SlideshowViewModel @Inject constructor(
         }
     }
 
-    private fun monitorOrderSetting() =
-        monitorSlideshowOrderSettingUseCase()
-            .distinctUntilChanged().onEach { order ->
-                Timber.d("Slideshow monitorOrderSetting order+$order")
-                val isFirstInSlideshow = _state.value.isFirstInSlideshow
-                Timber.d("Slideshow monitorOrderSetting shouldPlayFromFirst+${!isFirstInSlideshow}")
-                if (isFirstInSlideshow) {
-                    _state.update {
-                        it.copy(
-                            order = order ?: SlideshowOrder.Shuffle,
-                            shouldPlayFromFirst = false,
-                            isFirstInSlideshow = false,
-                        )
-                    }
-                } else {
-                    val imageNodes = _state.value.imageNodes
-                    val settingOrder = order ?: SlideshowOrder.Shuffle
-                    val sortedItems = sortItems(imageNodes, settingOrder)
-                    _state.update {
-                        it.copy(
-                            order = settingOrder,
-                            shouldPlayFromFirst = true,
-                            imageNodes = sortedItems
-                        )
-                    }
-                }
-            }.launchIn(viewModelScope)
-
     private fun monitorSpeedSetting() = monitorSlideshowSpeedSettingUseCase()
         .distinctUntilChanged().onEach { speed ->
-            Timber.d("Slideshow monitorSpeedSetting speed+$speed")
             _state.update {
                 it.copy(speed = speed ?: SlideshowSpeed.Normal)
             }
@@ -199,11 +207,26 @@ class SlideshowViewModel @Inject constructor(
 
     private fun monitorRepeatSetting() = monitorSlideshowRepeatSettingUseCase()
         .distinctUntilChanged().onEach { isRepeat ->
-            Timber.d("Slideshow monitorRepeatSetting isRepeat+$isRepeat")
             _state.update {
                 it.copy(repeat = isRepeat ?: false)
             }
         }.launchIn(viewModelScope)
 
     fun clearImageResultCache() = clearImageResultUseCase(true)
+
+    fun setCurrentImageNodeIndex(currentImageNodeIndex: Int) {
+        _state.update {
+            it.copy(
+                currentImageNodeIndex = currentImageNodeIndex,
+            )
+        }
+    }
+
+    fun setCurrentImageNode(currentImageNode: ImageNode) {
+        _state.update {
+            it.copy(
+                currentImageNode = currentImageNode,
+            )
+        }
+    }
 }

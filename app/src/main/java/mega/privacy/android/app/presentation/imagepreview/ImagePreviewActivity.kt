@@ -126,7 +126,6 @@ class ImagePreviewActivity : BaseActivity() {
             val snackbarHostState: SnackbarHostState = remember {
                 SnackbarHostState()
             }
-            val coroutineScope = rememberCoroutineScope()
             OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                 PasscodeContainer(
                     passcodeCryptObjectFactory = passcodeCryptObjectFactory,
@@ -355,6 +354,10 @@ class ImagePreviewActivity : BaseActivity() {
     private fun playSlideshow() {
         Analytics.tracker.trackEvent(PlaySlideshowMenuToolbarEvent)
         val intent = Intent(this, SlideshowActivity::class.java)
+        this@ImagePreviewActivity.intent.putExtra(
+            PARAMS_CURRENT_IMAGE_NODE_ID_VALUE,
+            viewModel.state.value.currentImageNode?.id?.longValue
+        )
         intent.putExtras(this@ImagePreviewActivity.intent)
         startActivity(intent)
     }
