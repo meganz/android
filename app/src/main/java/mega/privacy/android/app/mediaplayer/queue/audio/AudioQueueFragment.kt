@@ -30,6 +30,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
@@ -46,6 +47,7 @@ import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.AudioPlayerQueueReorderedEvent
 import javax.inject.Inject
 
 /**
@@ -231,7 +233,10 @@ class AudioQueueFragment : Fragment() {
                             setupPlayerView(playerView)
                         },
                         onClick = { index, item -> itemClicked(index, item) },
-                        onDragFinished = { playerServiceViewModelGateway?.updatePlaySource() },
+                        onDragFinished = {
+                            Analytics.tracker.trackEvent(AudioPlayerQueueReorderedEvent)
+                            playerServiceViewModelGateway?.updatePlaySource()
+                        },
                         onMove = { from, to ->
                             audioQueueViewModel.updateMediaQueueAfterReorder(from, to)
                             playerServiceViewModelGateway?.swapItems(from, to)

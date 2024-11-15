@@ -38,6 +38,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
@@ -58,6 +59,10 @@ import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYE
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.mobile.analytics.event.AudioPlayerIsActivatedEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerLoopPlayingItemEnabledEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerLoopQueueEnabledEvent
+import mega.privacy.mobile.analytics.event.AudioPlayerShuffleEnabledEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -159,6 +164,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
     override fun onCreate() {
         super.onCreate()
+        Analytics.tracker.trackEvent(AudioPlayerIsActivatedEvent)
         if (!isNotificationCreated) {
             createPlayerControlNotification()
             isNotificationCreated = true
@@ -206,11 +212,21 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                     setShuffleEnabled(shuffleModeEnabled)
 
                     if (shuffleModeEnabled) {
+                        Analytics.tracker.trackEvent(AudioPlayerShuffleEnabledEvent)
                         mediaPlayerGateway.setShuffleOrder(newShuffleOrder())
                     }
                 }
 
                 override fun onRepeatModeChangedCallback(repeatToggleMode: RepeatToggleMode) {
+                    when (repeatToggleMode) {
+                        RepeatToggleMode.REPEAT_ONE ->
+                            Analytics.tracker.trackEvent(AudioPlayerLoopPlayingItemEnabledEvent)
+
+                        RepeatToggleMode.REPEAT_ALL ->
+                            Analytics.tracker.trackEvent(AudioPlayerLoopQueueEnabledEvent)
+
+                        else -> {}
+                    }
                     setAudioRepeatMode(repeatToggleMode)
                 }
 

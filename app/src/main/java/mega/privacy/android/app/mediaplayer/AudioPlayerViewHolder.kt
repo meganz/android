@@ -10,6 +10,7 @@ import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.media3.common.Player
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
@@ -18,6 +19,7 @@ import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.SimpleAnimatorListener
+import mega.privacy.mobile.analytics.event.AudioPlayerQueueButtonPressedEvent
 
 /**
  * A view holder for audio player, implementing the UI logic of audio player.
@@ -149,6 +151,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
         togglePlaylistEnabled(context, playlistItems, shuffleEnabled)
 
         playlist.setOnClickListener {
+            Analytics.tracker.trackEvent(AudioPlayerQueueButtonPressedEvent)
             openPlaylist()
         }
     }
