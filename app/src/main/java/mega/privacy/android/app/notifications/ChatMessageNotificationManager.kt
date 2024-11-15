@@ -101,11 +101,13 @@ class ChatMessageNotificationManager @Inject constructor(
                 Util.getCircleBitmap(it)
             }
 
+        val isNormalTypeMsg = msg.type == ChatMessageType.NORMAL
+
         val messagingStyleContent = NotificationCompat.MessagingStyle(
             Person.Builder().apply { setName(title) }.build()
         ).also {
             it.addMessage(
-                msgContent.toFormattedText(),
+                if (isNormalTypeMsg) msgContent.toFormattedText() else msgContent,
                 msg.timestamp,
                 Person.Builder().apply { setName(senderName) }.build()
             )

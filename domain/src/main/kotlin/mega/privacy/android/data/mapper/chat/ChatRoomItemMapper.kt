@@ -19,7 +19,7 @@ class ChatRoomItemMapper @Inject constructor() {
      */
     operator fun invoke(chatRoom: CombinedChatRoom): ChatRoomItem {
         val hasPermissions = chatRoom.ownPrivilege == ChatRoomPermission.Moderator
-        val isLastMessageVoiceClip = chatRoom.lastMessageType == ChatRoomLastMessage.VoiceClip
+
         val highLight = chatRoom.unreadCount > 0
                 || chatRoom.isCallInProgress
                 || chatRoom.lastMessageType == ChatRoomLastMessage.CallStarted
@@ -30,7 +30,7 @@ class ChatRoomItemMapper @Inject constructor() {
                     isPublic = chatRoom.isPublic,
                     chatId = chatRoom.chatId,
                     title = chatRoom.title,
-                    isLastMessageVoiceClip = isLastMessageVoiceClip,
+                    lastMessageType = chatRoom.lastMessageType,
                     unreadCount = chatRoom.unreadCount,
                     hasPermissions = hasPermissions,
                     isWaitingRoom = chatRoom.isWaitingRoom,
@@ -46,7 +46,7 @@ class ChatRoomItemMapper @Inject constructor() {
                     isPublic = chatRoom.isPublic,
                     chatId = chatRoom.chatId,
                     title = chatRoom.title,
-                    isLastMessageVoiceClip = isLastMessageVoiceClip,
+                    lastMessageType = chatRoom.lastMessageType,
                     unreadCount = chatRoom.unreadCount,
                     hasPermissions = hasPermissions,
                     isActive = chatRoom.isActive,
@@ -61,7 +61,7 @@ class ChatRoomItemMapper @Inject constructor() {
                     peerHandle = chatRoom.peerHandle,
                     chatId = chatRoom.chatId,
                     title = chatRoom.title,
-                    isLastMessageVoiceClip = isLastMessageVoiceClip,
+                    lastMessageType = chatRoom.lastMessageType,
                     unreadCount = chatRoom.unreadCount,
                     hasPermissions = hasPermissions,
                     isActive = chatRoom.isActive,

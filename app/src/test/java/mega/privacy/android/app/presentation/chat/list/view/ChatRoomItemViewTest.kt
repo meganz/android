@@ -7,11 +7,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.core.graphics.toColorInt
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.presentation.chat.list.view.ChatRoomItemView
-import mega.privacy.android.app.presentation.chat.list.view.TEST_TAG_BOTTOM_TEXT
-import mega.privacy.android.app.presentation.chat.list.view.TEST_TAG_BOTTOM_TEXT_CALL_CHRONOMETER
-import mega.privacy.android.app.presentation.chat.list.view.TEST_TAG_MIDDLE_TEXT
-import mega.privacy.android.app.presentation.chat.list.view.TEST_TAG_MIDDLE_TEXT_CALL_CHRONOMETER
+import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
@@ -135,7 +131,7 @@ class ChatRoomItemViewTest {
                     chatId = 123L,
                     title = "Group Chat",
                     lastMessage = "Last message",
-                    isLastMessageVoiceClip = false,
+                    lastMessageType = ChatRoomLastMessage.Normal,
                     currentCallStatus = ChatRoomItemStatus.NotJoined,
                     unreadCount = 0,
                     hasPermissions = false,
