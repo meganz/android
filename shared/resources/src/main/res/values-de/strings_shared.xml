@@ -802,4 +802,23 @@
     <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a larger plan, or clear some space, to upload new files. [A]Learn more[/A].</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">Upgraden</string>
+    <!-- Photos search welcome title -->
+    <string name="photos_search_welcome_title">Find what you’re looking for</string>
+    <!-- Photos search welcome description -->
+    <string name="photos_search_welcome_description">Search for photos, videos, and albums</string>
+    <!-- Photos search empty state title -->
+    <string name="photos_search_empty_state_title">No matching results</string>
+    <!-- Photos search empty state description -->
+    <string name="photos_search_empty_state_description">Try a different search term</string>
+    <!-- Photos search recent search -->
+    <string name="photos_search_recent_search">Kürzlich gesucht</string>
+    <!-- Add to album by image -->
+    <string name="album_add_to_image">Zu Album hinzufügen</string>
+    <!-- Add to album by media -->
+    <string name="album_add_to_media">Hinzufügen zu</string>
+    <!-- Add to album success message -->
+    <plurals name="album_add_to_message">
+        <item quantity="one">Added to “%1$s”</item>
+        <item quantity="other">Added %2$d items to “%1$s”</item>
+    </plurals>
 </resources>

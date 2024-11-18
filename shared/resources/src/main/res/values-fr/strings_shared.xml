@@ -814,4 +814,23 @@
     <string name="dialog_not_enough_space_to_upload_message">Vous avez dépassé votre quota d\’espace de stockage. Passez à un abonnement plus important ou effacez de l\’espace pour le téléversement de nouveaux fichiers. [A]En apprendre davantage[/A].</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">Abonnez-vous</string>
+    <!-- Photos search welcome title -->
+    <string name="photos_search_welcome_title">Trouvez ce que vous recherchez</string>
+    <!-- Photos search welcome description -->
+    <string name="photos_search_welcome_description">Rechercher des photos, des vidéos et des albums</string>
+    <!-- Photos search empty state title -->
+    <string name="photos_search_empty_state_title">Aucun résultat correspondant</string>
+    <!-- Photos search empty state description -->
+    <string name="photos_search_empty_state_description">Essayez un autre terme de recherche</string>
+    <!-- Photos search recent search -->
+    <string name="photos_search_recent_search">Cherché récemment</string>
+    <!-- Add to album by image -->
+    <string name="album_add_to_image">Ajouter à l’album</string>
+    <!-- Add to album by media -->
+    <string name="album_add_to_media">Ajouter à</string>
+    <!-- Add to album success message -->
+    <plurals name="album_add_to_message">
+        <item quantity="one">Added to “%1$s”</item>
+        <item quantity="other">Added %2$d items to “%1$s”</item>
+    </plurals>
 </resources>

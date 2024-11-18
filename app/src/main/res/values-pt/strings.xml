@@ -3619,7 +3619,7 @@
     <!-- Message shown during log file upload-->
     <string name="settings_help_report_issue_uploading_log_file">Fazendo upload do arquivo de log</string>
     <!-- Message shown if user tries to leave report screen without submitting their report-->
-    <string name="settings_help_report_issue_discard_dialog_title">Descartar relatório?</string>
+    <string name="settings_help_report_issue_discard_dialog_title">Descartar informe?</string>
     <!-- Button text for discard dialog option-->
     <string name="settings_help_report_issue_discard_button">Descartar</string>
     <!-- Text shown when editing a chatroom message -->

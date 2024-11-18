@@ -649,7 +649,7 @@
     <!-- The Document Scanning Error Type when the Device has insufficient memory (less than 1.7 GB total RAM) -->
     <string name="document_scanning_error_type_insufficient_ram">Điện&#160;thoại của bạn không đáp&#160;ứng đủ yêu&#160;cầu bộ nhớ tối&#160;thiểu để hoàn&#160;tất quá&#160;trình quét</string>
     <!-- The Document Scanning Error Type for generic errors during Document Scanning -->
-    <string name="document_scanning_error_type_generic_error">We’re having trouble opening the document scanner. Close and re-open the app, and try again.</string>
+    <string name="document_scanning_error_type_generic_error">Chúng&#160;tôi gặp sự cố khi mở máy ảnh quét tài&#160;liệu. Đóng và mở lại ứng&#160;dụng rồi thử lại.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">Đóng</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
@@ -681,7 +681,7 @@
     <!-- Title of the Contact Permission Explanation -->
     <string name="title_enable_access_contact">Bật quyền truy&#160;cập để mời bạn&#160;bè</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">You can also add contacts from your phone’s contact list, if you allow MEGA access to the list.</string>
+    <string name="subtitle_enable_access_contact">Bạn cũng có thể thêm tên liên lạc từ danh&#160;bạ của điện&#160;thoại, nếu bạn cho phép cho MEGA quyền truy&#160;cập.</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">Cho phép quyền truy&#160;cập</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -735,7 +735,7 @@
     <!-- Text for the warning banner displayed if try to create a new backup but storage permission has not been granted. The placeholders are to underline text -->
     <string name="sync_add_new_backup_storage_permission_banner">MEGA cần quyền truy&#160;cập vào bộ nhớ thiết&#160;bị của bạn để sao lưu thư&#160;mục cục&#160;bộ của bạn. [U]Chạm để cấp quyền truy&#160;cập[/U]</string>
     <!--Success message displayed in the Login screen after the account has been activated-->
-    <string name="login_screen_account_confirmed_success_message">Tài&#160;khoản đã được kích&#160;hoạt rồi. Xin đăng&#160;nhập.</string>
+    <string name="login_screen_account_confirmed_success_message">Tài&#160;khoản đã được kích&#160;hoạt rồi. Xin đăng&#160;nhập</string>
     <!-- Title in the files permission screen -->
     <string name="files_permission_screen_title">Cho phép MEGA truy&#160;cập các tệp&#160;tin trong thiết&#160;bị của bạn</string>
     <!-- Context message in the files permission screen -->
@@ -777,17 +777,35 @@
     <!-- Capital letters. Text of the label of a new historic notifications-->
     <string name="notifications_notification_item_new_tag">Mới</string>
     <!-- Title in the display over other apps permission screen -->
-    <string name="display_over_other_apps_permission_screen_title">Allow MEGA to display over other apps</string>
+    <string name="display_over_other_apps_permission_screen_title">Cấp phép cho MEGA hiển&#160;thị nổi&#160;bật trên các app khác</string>
     <!-- Context message in the display over other apps permission screen -->
-    <string name="display_over_other_apps_permission_screen_message">MEGA needs your permission to display over apps. This means that you’ll never miss another incoming call notification.</string>
+    <string name="display_over_other_apps_permission_screen_message">MEGA cần sự cho phép của bạn để hiển&#160;thị ở trên cùng các ứng&#160;dụng. Điều này có nghĩa là bạn sẽ không bao giờ bỏ lỡ thông&#160;báo cuộc gọi đến.</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">Cho phép quyền&#160;hạn</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">Completing operation: %1$d%%</string>
+    <string name="login_completing_operation">Đang hoàn tất hoạt động: %1$d%%</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
-    <string name="dialog_not_enough_space_to_upload_title">Not enough space to upload new files</string>
+    <string name="dialog_not_enough_space_to_upload_title">Không đủ không&#160;gian để tải lên các tệp&#160;tin mới</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a larger plan, or clear some space, to upload new files. [A]Learn more[/A].</string>
+    <string name="dialog_not_enough_space_to_upload_message">Bạn đã vượt quá hạn mức lưu&#160;trữ của mình. Nâng&#160;cấp lên gói lớn hơn hoặc dọn dẹp không&#160;gian để tải lên các tệp&#160;tin mới. [A]Tìm&#160;hiểu thêm[/A].</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
-    <string name="general_upgrade_button">Nâng Cấp</string>
+    <string name="general_upgrade_button">Nâng cấp</string>
+    <!-- Photos search welcome title -->
+    <string name="photos_search_welcome_title">Tìm những thứ bạn muốn</string>
+    <!-- Photos search welcome description -->
+    <string name="photos_search_welcome_description">Tìm kiếm hình ảnh, video, và album</string>
+    <!-- Photos search empty state title -->
+    <string name="photos_search_empty_state_title">Không có kết&#160;quả nào phù&#160;hợp</string>
+    <!-- Photos search empty state description -->
+    <string name="photos_search_empty_state_description">Thử một cụm từ tìm kiếm khác</string>
+    <!-- Photos search recent search -->
+    <string name="photos_search_recent_search">Đã tìm kiếm gần đây</string>
+    <!-- Add to album by image -->
+    <string name="album_add_to_image">Thêm vào album</string>
+    <!-- Add to album by media -->
+    <string name="album_add_to_media">Thêm vào</string>
+    <!-- Add to album success message -->
+    <plurals name="album_add_to_message">
+        <item quantity="other">Đã thêm %2$d mục vào “%1$s”</item>
+    </plurals>
 </resources>
