@@ -19,8 +19,11 @@ import mega.privacy.android.domain.entity.statistics.EndedEmptyCallTimeout
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastJoinedSuccessfullyUseCase
-import mega.privacy.android.domain.usecase.meeting.BroadcastWaitingForOtherParticipantsHasEndedUseCase
+import mega.privacy.android.domain.usecase.chat.IsChatOpeningWithLinkUseCase
+import mega.privacy.android.domain.usecase.chat.RemoveChatOpeningWithLinkUseCase
+import mega.privacy.android.domain.usecase.chat.SetChatOpeningWithLinkUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastLocalVideoChangedDueToProximitySensorUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastWaitingForOtherParticipantsHasEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -49,9 +52,12 @@ class ChatManagement @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val broadcastJoinedSuccessfullyUseCase: BroadcastJoinedSuccessfullyUseCase,
     private val broadcastWaitingForOtherParticipantsHasEndedUseCase: BroadcastWaitingForOtherParticipantsHasEndedUseCase,
-    private val broadcastLocalVideoChangedDueToProximitySensorUseCase: BroadcastLocalVideoChangedDueToProximitySensorUseCase
+    private val broadcastLocalVideoChangedDueToProximitySensorUseCase: BroadcastLocalVideoChangedDueToProximitySensorUseCase,
+    private val setChatOpeningWithLinkUseCase: SetChatOpeningWithLinkUseCase,
+    private val removeChatOpeningWithLinkUseCase: RemoveChatOpeningWithLinkUseCase,
+    private val isChatOpeningWithLinkUseCase: IsChatOpeningWithLinkUseCase,
 
-) {
+    ) {
     private val app: MegaApplication = getInstance()
     private var countDownTimerToEndCall: CountDownTimer? = null
 
@@ -330,11 +336,10 @@ class ChatManagement @Inject constructor(
      * @return True if is opening a meeting link of the chat or false otherwise
      */
     fun isOpeningMeetingLink(chatId: Long) =
-        if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE && hashOpeningMeetingLink.containsKey(
-                chatId
-            ) && hashOpeningMeetingLink[chatId] != null
+        if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE &&
+            (hashOpeningMeetingLink.containsKey(chatId) || isChatOpeningWithLinkUseCase(chatId))
         ) {
-            hashOpeningMeetingLink[chatId]!!
+            hashOpeningMeetingLink[chatId] ?: isChatOpeningWithLinkUseCase(chatId)
         } else {
             false
         }
@@ -348,6 +353,11 @@ class ChatManagement @Inject constructor(
     fun setOpeningMeetingLink(chatId: Long, isOpeningMeetingLink: Boolean) {
         if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
             hashOpeningMeetingLink[chatId] = isOpeningMeetingLink
+            if (isOpeningMeetingLink) {
+                setChatOpeningWithLinkUseCase(chatId)
+            } else {
+                removeChatOpeningWithLinkUseCase(chatId)
+            }
         }
     }
 

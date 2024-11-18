@@ -966,4 +966,22 @@ interface ChatRepository {
      * @return List of archived chat items
      */
     suspend fun getArchivedChatListItems(): List<ChatListItem>
+
+
+    /**
+     * Set chat opening with link
+     */
+    fun setChatOpeningWithLink(chatId: Long)
+
+    /**
+     * Remove chat opening  with link
+     */
+    fun removeChatOpeningWithLink(chatId: Long)
+
+    /**
+     * check if chat is opening with link or not
+     *
+     * @return Boolean
+     */
+    fun isChatOpeningWithLink(chatId: Long): Boolean
 }

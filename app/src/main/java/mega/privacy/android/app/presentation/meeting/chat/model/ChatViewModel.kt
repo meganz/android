@@ -105,6 +105,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUse
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.RecordAudioUseCase
+import mega.privacy.android.domain.usecase.chat.RemoveChatOpeningWithLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
@@ -262,6 +263,7 @@ class ChatViewModel @Inject constructor(
     private val broadcastUpgradeDialogClosedUseCase: BroadcastUpgradeDialogClosedUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
+    private val removeChatOpeningWithLinkUseCase: RemoveChatOpeningWithLinkUseCase,
     private val scannerHandler: ScannerHandler,
     actionFactories: Set<@JvmSuppressWildcards (ChatViewModel) -> MessageAction>,
 ) : ViewModel() {
@@ -521,6 +523,7 @@ class ChatViewModel @Inject constructor(
             runCatching {
                 getChatRoomUseCase(chatId)
             }.onSuccess { chatRoom ->
+                removeChatOpeningWithLinkUseCase(chatId)
                 chatRoom?.let {
                     with(chatRoom) {
                         checkCustomTitle()
@@ -608,7 +611,7 @@ class ChatViewModel @Inject constructor(
 
                                 ChatRoomChange.OwnPrivilege,
                                 ChatRoomChange.Closed,
-                                -> {
+                                    -> {
                                     _state.update { state ->
                                         state.copy(
                                             participantsCount = getNumberParticipants()

@@ -174,6 +174,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val joiningIdsFlow = MutableSharedFlow<MutableSet<Long>>()
     private val leavingIds = mutableSetOf<Long>()
     private val leavingIdsFlow = MutableSharedFlow<MutableSet<Long>>()
+    private val openingChatWithLinkIds = mutableSetOf<Long>()
 
     override suspend fun getChatInitState(): ChatInitState = withContext(ioDispatcher) {
         chatInitStateMapper(megaChatApiGateway.initState)
@@ -1258,4 +1259,14 @@ internal class ChatRepositoryImpl @Inject constructor(
                 MegaChatApi.CHAT_GET_ARCHIVED
             )?.map(chatListItemMapper::invoke) ?: emptyList()
         }
+
+    override fun setChatOpeningWithLink(chatId: Long) {
+        openingChatWithLinkIds.add(chatId)
+    }
+
+    override fun removeChatOpeningWithLink(chatId: Long) {
+        openingChatWithLinkIds.remove(chatId)
+    }
+
+    override fun isChatOpeningWithLink(chatId: Long) = openingChatWithLinkIds.contains(chatId)
 }

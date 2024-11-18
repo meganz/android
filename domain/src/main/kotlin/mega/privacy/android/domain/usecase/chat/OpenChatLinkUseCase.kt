@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.chat
 
+import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -18,6 +19,7 @@ class OpenChatLinkUseCase @Inject constructor(
     private val joinPublicChatUseCase: JoinPublicChatUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val openChatPreviewUseCase: OpenChatPreviewUseCase,
+    private val setChatOpeningWithLinkUseCase: SetChatOpeningWithLinkUseCase,
 ) {
     /**
      * Invoke
@@ -34,7 +36,8 @@ class OpenChatLinkUseCase @Inject constructor(
     ): Long {
         var previouslyJoined = false
         var chatPublicHandle: Long? = null
-        val chatRoom = chatId?.let {
+        val chatRoom: ChatRoom = chatId?.let {
+            setChatOpeningWithLinkUseCase(chatId)
             val chat = getChatRoomUseCase(it)
             if (chat == null || !chat.isActive) {
                 openChatPreviewUseCase(chatLink).let { chatPreview ->
@@ -49,14 +52,15 @@ class OpenChatLinkUseCase @Inject constructor(
             openChatPreviewUseCase(chatLink).let { chatPreview ->
                 previouslyJoined = chatPreview.exist
                 chatPublicHandle = chatPreview.request.userHandle
+                setChatOpeningWithLinkUseCase(chatPreview.request.chatHandle)
                 getChatRoomUseCase(chatPreview.request.chatHandle)
             }
         } ?: throw throw ChatRoomDoesNotExistException()
 
-        if (chatRoom.isPreview && (requireJoin || previouslyJoined)) {
+        if (requireJoin || previouslyJoined) {
             joinPublicChatUseCase(
                 chatId = chatRoom.chatId,
-                chatPublicHandle = chatPublicHandle
+                chatPublicHandle = chatPublicHandle.takeIf { chatRoom.isPreview.not() && chatRoom.isActive.not() }
             )
         }
         return chatRoom.chatId

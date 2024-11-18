@@ -29,6 +29,7 @@ class OpenChatLinkUseCaseTest {
     private val joinPublicChatUseCase = mock<JoinPublicChatUseCase>()
     private val checkChatLinkUseCase = mock<CheckChatLinkUseCase>()
     private val getChatRoomUseCase = mock<GetChatRoomUseCase>()
+    private val setChatOpeningWithLinkUseCase = mock<SetChatOpeningWithLinkUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -37,6 +38,7 @@ class OpenChatLinkUseCaseTest {
             joinPublicChatUseCase = joinPublicChatUseCase,
             checkChatLinkUseCase = checkChatLinkUseCase,
             getChatRoomUseCase = getChatRoomUseCase,
+            setChatOpeningWithLinkUseCase = setChatOpeningWithLinkUseCase,
         )
     }
 
@@ -46,7 +48,8 @@ class OpenChatLinkUseCaseTest {
             openChatPreviewUseCase,
             joinPublicChatUseCase,
             checkChatLinkUseCase,
-            getChatRoomUseCase
+            getChatRoomUseCase,
+            setChatOpeningWithLinkUseCase
         )
     }
 
@@ -84,7 +87,7 @@ class OpenChatLinkUseCaseTest {
             peerPrivilegesList = emptyList(),
             isGroup = false,
             isPublic = true,
-            isPreview = true,
+            isPreview = false,
             authorizationToken = null,
             title = "Chat Room",
             hasCustomTitle = false,
@@ -109,6 +112,7 @@ class OpenChatLinkUseCaseTest {
 
         verify(openChatPreviewUseCase).invoke(chatLink)
         verify(getChatRoomUseCase).invoke(chatId)
+        verify(setChatOpeningWithLinkUseCase).invoke(chatId)
         verify(joinPublicChatUseCase).invoke(chatId, chatPublicHandle)
     }
 

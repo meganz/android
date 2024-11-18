@@ -17,8 +17,8 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.CallCompositionChanges
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatSessionStatus
@@ -26,9 +26,9 @@ import mega.privacy.android.domain.entity.call.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.call.EndCallReason
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
+import mega.privacy.android.domain.usecase.call.GetCallHandleListUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
-import mega.privacy.android.domain.usecase.call.GetCallHandleListUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import nz.mega.sdk.MegaChatApiAndroid
@@ -79,13 +79,13 @@ class CallChangesObserver @Inject constructor(
                             val changes = call.changes.orEmpty()
                             when {
                                 changes.contains(ChatCallChanges.Status)
-                                -> onHandleCallStatusChange(call)
+                                    -> onHandleCallStatusChange(call)
 
                                 changes.contains(ChatCallChanges.RingingStatus)
-                                -> handleCallRinging(call)
+                                    -> handleCallRinging(call)
 
                                 changes.contains(ChatCallChanges.CallComposition)
-                                -> handleCallComposition(call)
+                                    -> handleCallComposition(call)
                             }
                         }
                     }.onFailure {
