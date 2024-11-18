@@ -819,11 +819,32 @@
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">Разрешить</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">Completing operation: %1$d%%</string>
+    <string name="login_completing_operation">Завершение операции: %1$d%%</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
-    <string name="dialog_not_enough_space_to_upload_title">Not enough space to upload new files</string>
+    <string name="dialog_not_enough_space_to_upload_title">Недостаточно места для загрузки новых файлов</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a larger plan, or clear some space, to upload new files. [A]Learn more[/A].</string>
+    <string name="dialog_not_enough_space_to_upload_message">Вы превысили лимит хранения. Перейдите на более вместительный план или освободите место для загрузки новых файлов. [A]Подробнее[/A].</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">Улучшить</string>
+    <!-- Photos search welcome title -->
+    <string name="photos_search_welcome_title">Найдите то, что ищете</string>
+    <!-- Photos search welcome description -->
+    <string name="photos_search_welcome_description">Поиск фото, видео и альбомов</string>
+    <!-- Photos search empty state title -->
+    <string name="photos_search_empty_state_title">Нет подходящих результатов</string>
+    <!-- Photos search empty state description -->
+    <string name="photos_search_empty_state_description">Попробуйте другой поисковый запрос</string>
+    <!-- Photos search recent search -->
+    <string name="photos_search_recent_search">Недавно искали</string>
+    <!-- Add to album by image -->
+    <string name="album_add_to_image">Добавить в альбом</string>
+    <!-- Add to album by media -->
+    <string name="album_add_to_media">Добавить в</string>
+    <!-- Add to album success message -->
+    <plurals name="album_add_to_message">
+        <item quantity="one">Добавлено в «%1$s»</item>
+        <item quantity="few">%2$d элемента добавлено в «%1$s»</item>
+        <item quantity="many">%2$d элементов добавлено в «%1$s»</item>
+        <item quantity="other">%2$d элемента добавлено в «%1$s»</item>
+    </plurals>
 </resources>

@@ -681,7 +681,7 @@
     <!-- Title of the Contact Permission Explanation -->
     <string name="title_enable_access_contact">친구를 초대하려면 접근 허용</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">You can also add contacts from your phone’s contact list, if you allow MEGA access to the list.</string>
+    <string name="subtitle_enable_access_contact">MEGA가 연락처 목록에 접근할 수 있도록 허용했다면, 휴대전화의 연락처 목록에서 연락처를 추가할 수 있습니다.</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">접근 허용</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -777,17 +777,35 @@
     <!-- Capital letters. Text of the label of a new historic notifications-->
     <string name="notifications_notification_item_new_tag">신규</string>
     <!-- Title in the display over other apps permission screen -->
-    <string name="display_over_other_apps_permission_screen_title">Allow MEGA to display over other apps</string>
+    <string name="display_over_other_apps_permission_screen_title">MEGA가 다른 앱 위에 표시할 수 있도록 허용</string>
     <!-- Context message in the display over other apps permission screen -->
-    <string name="display_over_other_apps_permission_screen_message">MEGA needs your permission to display over apps. This means that you’ll never miss another incoming call notification.</string>
+    <string name="display_over_other_apps_permission_screen_message">MEGA가 다른 앱 위에 표시할 수 있도록 당신의 허가가 필요합니다. 이것은 다른 들어오는 전화 알림을 놓치지 않게 되는 것을 의미합니다.</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">권한 허용</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">Completing operation: %1$d%%</string>
+    <string name="login_completing_operation">작업 완료 중: %1$d%%</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
-    <string name="dialog_not_enough_space_to_upload_title">Not enough space to upload new files</string>
+    <string name="dialog_not_enough_space_to_upload_title">새 파일을 업로드할 공간이 충분하지 않습니다</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a larger plan, or clear some space, to upload new files. [A]Learn more[/A].</string>
+    <string name="dialog_not_enough_space_to_upload_message">당신의 저장소 할당량을 초과하였습니다. 새 파일을 업로드하려면 더 큰 요금제로 업그레이드하거나 공간을 확보하세요. [A]더 알아보기[/A]</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">업그레이드</string>
+    <!-- Photos search welcome title -->
+    <string name="photos_search_welcome_title">찾고 있는 것을 찾으세요</string>
+    <!-- Photos search welcome description -->
+    <string name="photos_search_welcome_description">사진, 동영상, 사진첩을 검색</string>
+    <!-- Photos search empty state title -->
+    <string name="photos_search_empty_state_title">일치하는 결과 없음</string>
+    <!-- Photos search empty state description -->
+    <string name="photos_search_empty_state_description">다른 검색어를 시도하세요</string>
+    <!-- Photos search recent search -->
+    <string name="photos_search_recent_search">최근에 검색함</string>
+    <!-- Add to album by image -->
+    <string name="album_add_to_image">사진첩에 추가</string>
+    <!-- Add to album by media -->
+    <string name="album_add_to_media">다음에 추가</string>
+    <!-- Add to album success message -->
+    <plurals name="album_add_to_message">
+        <item quantity="other">“%1$s”에 %2$d개의 항목을 추가함</item>
+    </plurals>
 </resources>
