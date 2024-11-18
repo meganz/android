@@ -339,16 +339,14 @@ private fun SyncCardFooter(
                     text = stringResource(id = R.string.sync_card_sync_issues_info)
                 )
             }
-            if (syncType == SyncType.TYPE_TWOWAY) {
-                MegaButtonWithIconAndText(
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
-                    onClick = onOpenMegaFolderClicked,
-                    icon = iconPackR.drawable.ic_folder_open_medium_regular_outline,
-                    text = stringResource(id = sharedR.string.general_open_button),
-                )
-            }
+            MegaButtonWithIconAndText(
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
+                onClick = onOpenMegaFolderClicked,
+                icon = iconPackR.drawable.ic_folder_open_medium_regular_outline,
+                text = stringResource(id = sharedR.string.general_open_button),
+            )
             MegaButtonWithIconAndText(
                 modifier = Modifier
                     .padding(end = 16.dp)

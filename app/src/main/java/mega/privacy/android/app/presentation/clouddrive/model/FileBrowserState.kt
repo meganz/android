@@ -11,7 +11,6 @@ import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSe
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 
@@ -30,8 +29,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property nodesList list of [NodeUIItem]
  * @property sourceNodesList list of [NodeUIItem]
  * @property isInSelection if list is in selection mode or not
- * @property itemIndex index of item clicked
- * @property currentFileNode [FileNode]
  * @property selectedNodeHandles List of selected node handles
  * @property selectedFileNodes number of selected file [NodeUIItem] on Compose
  * @property selectedFolderNodes number of selected folder [NodeUIItem] on Compose

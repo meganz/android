@@ -254,10 +254,10 @@ class SyncCardTest {
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
             .assertIsNotDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
-            .assertIsNotDisplayed()
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(mega.privacy.android.shared.resources.R.string.sync_stop_backup_button))
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_backup_button))
             .assertIsDisplayed()
     }
 
@@ -304,11 +304,58 @@ class SyncCardTest {
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
             .assertIsNotDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
-            .assertIsNotDisplayed()
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(mega.privacy.android.shared.resources.R.string.sync_stop_backup_button))
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_backup_button))
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that Backup card buttons are clickable`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_BACKUP,
+                    folderPairName = "Sync Name",
+                    status = SyncStatus.SYNCING,
+                    deviceStoragePath = "Device Path",
+                    hasStalledIssues = true,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = false,
+                ),
+                expandClicked = {},
+                pauseRunClicked = { clicked = true },
+                removeFolderClicked = { clicked = true },
+                issuesInfoClicked = { clicked = true },
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = { clicked = true },
+                isLowBatteryLevel = false,
+                isFreeAccount = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_backup_button))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
     }
 
     @Test
