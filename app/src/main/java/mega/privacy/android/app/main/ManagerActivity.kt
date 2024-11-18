@@ -6584,16 +6584,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
             }
 
-            MegaRequest.TYPE_SUBMIT_PURCHASE_RECEIPT -> {
-                if (e.errorCode == MegaError.API_OK) {
-                    Timber.d("PURCHASE CORRECT!")
-                    drawerItem = DrawerItem.CLOUD_DRIVE
-                    selectDrawerItem(drawerItem)
-                } else {
-                    Timber.e("PURCHASE WRONG: %s (%d)", e.errorString, e.errorCode)
-                }
-            }
-
             MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION -> {
                 if (e.errorCode == MegaError.API_OK) {
                     Timber.d("FCM OK TOKEN MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION")
