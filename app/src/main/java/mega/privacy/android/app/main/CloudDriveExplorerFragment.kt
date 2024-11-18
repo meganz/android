@@ -352,7 +352,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         when (modeCloud) {
             FileExplorerActivity.MOVE,
             FileExplorerActivity.COPY,
-            -> {
+                -> {
                 binding.actionText.text = getString(
                     if (modeCloud == FileExplorerActivity.MOVE)
                         R.string.context_move
@@ -450,7 +450,13 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      */
     private fun initOriginalData() =
         lifecycleScope.launch {
-            val chosenNode = withContext(ioDispatcher) { megaApi.getNodeByHandle(parentHandle) }
+            val chosenNode = withContext(ioDispatcher) {
+                megaApi.getNodeByHandle(parentHandle)
+                    .takeIf {
+                        (fileExplorerActivity.mode == FileExplorerActivity.COPY && fileExplorerViewModel.latestCopyTargetPathTab == FileExplorerActivity.CLOUD_TAB)
+                                || (fileExplorerActivity.mode == FileExplorerActivity.MOVE && fileExplorerViewModel.latestMoveTargetPathTab == FileExplorerActivity.CLOUD_TAB)
+                    }
+            }
             ensureActive()
             if (chosenNode != null && chosenNode.type != MegaNode.TYPE_ROOT) {
                 updateChildNodes(chosenNode)
@@ -731,7 +737,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
     /**
      * Update nodes by adapter
      *
-     * @param data original nodes
+     * @param sourceData original nodes
      */
     fun updateNodesByAdapter(sourceData: List<MegaNode?>) {
         val data = if (fileExplorerViewModel.showHiddenItems) {
