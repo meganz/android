@@ -216,6 +216,7 @@ dependencies {
     implementation(androidx.emojiPicker)
     implementation(androidx.exifinterface)
     implementation(androidx.fragment)
+    implementation(androidx.fragment.compose)
     implementation(androidx.legacy.support)
     implementation(androidx.multidex)
     implementation(androidx.palette)

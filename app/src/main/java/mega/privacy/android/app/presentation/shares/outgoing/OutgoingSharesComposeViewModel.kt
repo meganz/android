@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
@@ -83,6 +84,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(OutgoingSharesState())
@@ -277,7 +279,8 @@ class OutgoingSharesComposeViewModel @Inject constructor(
                 nodesList = nodeUIItems,
                 isLoading = false,
                 sortOrder = sortOrder,
-                updateToolbarTitleEvent = triggered
+                updateToolbarTitleEvent = triggered,
+                currentNodeName = getNodeByIdUseCase(NodeId(currentHandle))?.name,
             )
         }
     }

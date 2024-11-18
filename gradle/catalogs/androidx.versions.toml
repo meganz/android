@@ -60,6 +60,7 @@ emoji2 = { module = "androidx.emoji2:emoji2", version.ref = "emoji" }
 emojiPicker = {module = "androidx.emoji2:emoji2-emojipicker", version.ref = "emoji"}
 exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
+fragment-compose = { module = "androidx.fragment:fragment-compose", version.ref = "fragment" }
 fragment-test = { module = "androidx.fragment:fragment-testing", version.ref = "fragment" }
 hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt-android" }
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-android" }
