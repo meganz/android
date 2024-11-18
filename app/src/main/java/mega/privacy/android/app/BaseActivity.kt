@@ -67,7 +67,6 @@ import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
-import mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning
 import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
 import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
@@ -138,8 +137,6 @@ import kotlin.time.Duration.Companion.seconds
  * @property transfersManagement            [TransfersManagement]
  * @property app                            [MegaApplication]
  * @property outMetrics                     [DisplayMetrics]
- * @property isResumeTransfersWarningShown  True if the warning should be shown, false otherwise.
- * @property resumeTransfersWarning         [AlertDialog] for paused transfers.
  * @property getAccountDetailsUseCase
  * @property billingViewModel
  * @property monitorTransferOverQuotaUseCase
@@ -223,8 +220,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     private val uiHandler = Handler(Looper.getMainLooper())
 
     protected val outMetrics: DisplayMetrics by lazy { resources.displayMetrics }
-    var isResumeTransfersWarningShown = false
-    var resumeTransfersWarning: AlertDialog? = null
 
     //Indicates when the activity should finish due to some error
     private var finishActivityAtError = false
@@ -328,30 +323,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         }
     }
 
-    /**
-     * Broadcast to show a warning when it tries to upload files to a chat conversation
-     * and the transfers are paused.
-     */
-    @Deprecated("Use StartTransferComponent Composable instead")
-    private val resumeTransfersReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action != BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS
-                || isResumeTransfersWarningShown || isActivityInBackground
-            ) return
-
-            transfersManagement.hasResumeTransfersWarningAlreadyBeenShown = true
-            showResumeTransfersWarning(this@BaseActivity) {
-                lifecycleScope.launch {
-                    runCatching {
-                        pauseTransfersQueueUseCase(false)
-                    }.onFailure {
-                        Timber.e(it)
-                    }
-                }
-            }
-        }
-    }
-
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             handleGoBack()
@@ -407,11 +378,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             IntentFilter(BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR)
         )
 
-        registerReceiver(
-            resumeTransfersReceiver,
-            IntentFilter(BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS)
-        )
-
         collectFlow(monitorCookieSettingsSavedUseCase()) {
             val view = window.decorView.findViewById<View>(android.R.id.content)
             if (view != null) {
@@ -444,18 +410,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
             if (isGeneralTransferOverQuotaWarningShown) {
                 showGeneralTransferOverQuotaWarning()
-            }
-
-            isResumeTransfersWarningShown = getBoolean(
-                RESUME_TRANSFERS_WARNING_SHOWN, false
-            )
-
-            if (isResumeTransfersWarningShown) {
-                showResumeTransfersWarning(this@BaseActivity) {
-                    lifecycleScope.launch {
-                        pauseTransfersQueueUseCase(false)
-                    }
-                }
             }
 
             if (getBoolean(SET_DOWNLOAD_LOCATION_SHOWN, false)) {
@@ -535,7 +489,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         outState.apply {
             putBoolean(EXPIRED_BUSINESS_ALERT_SHOWN, isExpiredBusinessAlertShown)
             putBoolean(TRANSFER_OVER_QUOTA_WARNING_SHOWN, isGeneralTransferOverQuotaWarningShown)
-            putBoolean(RESUME_TRANSFERS_WARNING_SHOWN, isResumeTransfersWarningShown)
             putBoolean(SET_DOWNLOAD_LOCATION_SHOWN, isAlertDialogShown(setDownloadLocationDialog))
             putBoolean(IS_CONFIRMATION_CHECKED, confirmationChecked)
             putString(DOWNLOAD_LOCATION, downloadLocation)
@@ -582,10 +535,8 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         unregisterReceiver(sslErrorReceiver)
         unregisterReceiver(takenDownFilesReceiver)
         unregisterReceiver(showSnackbarReceiver)
-        unregisterReceiver(resumeTransfersReceiver)
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
         dismissAlertDialogIfExists(transferGeneralOverQuotaWarning)
-        dismissAlertDialogIfExists(resumeTransfersWarning)
         dismissAlertDialogIfExists(setDownloadLocationDialog)
         dismissAlertDialogIfExists(upgradeAlert)
         super.onDestroy()
@@ -1520,7 +1471,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     companion object {
         private const val EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN"
         private const val TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN"
-        private const val RESUME_TRANSFERS_WARNING_SHOWN = "RESUME_TRANSFERS_WARNING_SHOWN"
         private const val SET_DOWNLOAD_LOCATION_SHOWN = "SET_DOWNLOAD_LOCATION_SHOWN"
         private const val IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED"
         private const val DOWNLOAD_LOCATION = "DOWNLOAD_LOCATION"

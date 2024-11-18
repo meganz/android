@@ -8,13 +8,11 @@ import android.net.Uri
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.CheckBox
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
@@ -63,49 +61,6 @@ object AlertsAndWarnings {
     }
 
     /**
-     * Shows a resume transfers warning.
-     * It will be displayed if the queue of transfers is paused and a new chat upload starts.
-     *
-     * @param context current Context.
-     */
-    @JvmStatic
-    @Deprecated("Use ResumeTransfersDialog Composable dialog instead")
-    fun showResumeTransfersWarning(
-        context: Context,
-        onResumePausedTransfers: () -> Unit,
-    ) {
-        if (context is BaseActivity && context.resumeTransfersWarning?.isShowing == true) {
-            return
-        }
-
-        val resumeTransfersDialogBuilder =
-            MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-
-        resumeTransfersDialogBuilder.setTitle(context.getString(R.string.warning_resume_transfers))
-            .setMessage(context.getString(R.string.warning_message_resume_transfers))
-            .setCancelable(false)
-            .setPositiveButton(context.getString(R.string.button_resume_individual_transfer)) { dialog, _ ->
-                onResumePausedTransfers()
-
-                dialog.dismiss()
-            }
-            .setNegativeButton(context.getString(sharedR.string.general_dialog_cancel_button)) { dialog, _ ->
-                dialog.dismiss()
-            }.setOnDismissListener {
-                if (context is BaseActivity) {
-                    context.isResumeTransfersWarningShown = false
-                }
-            }
-
-        if (context is BaseActivity) {
-            context.isResumeTransfersWarningShown = true
-            context.resumeTransfersWarning = resumeTransfersDialogBuilder.create()
-        }
-
-        resumeTransfersDialogBuilder.show()
-    }
-
-    /**
      * Shows a confirm remove link alert dialog.
      *
      * @param context current Context
@@ -146,27 +101,6 @@ object AlertsAndWarnings {
             .setNegativeButton(context.getString(sharedR.string.general_dialog_cancel_button), null)
             .create()
             .show()
-    }
-
-    @JvmStatic
-    fun showSaveToDeviceConfirmDialog(activity: Activity): (message: String, onConfirmed: (Boolean) -> Unit) -> Unit {
-        return { message, onConfirmed ->
-            val customView = LayoutInflater.from(activity)
-                .inflate(R.layout.dialog_confirm_with_not_show_again, null)
-            val notShowAgain = customView.findViewById<CheckBox>(R.id.not_show_again)
-
-            MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-                .setView(customView)
-                .setMessage(message)
-                .setPositiveButton(
-                    activity.getString(R.string.general_save_to_device)
-                ) { _, _ ->
-                    onConfirmed(notShowAgain.isChecked)
-                }
-                .setNegativeButton(activity.getString(sharedR.string.general_dialog_cancel_button)) { _, _ -> }
-                .create()
-                .show()
-        }
     }
 
     /**

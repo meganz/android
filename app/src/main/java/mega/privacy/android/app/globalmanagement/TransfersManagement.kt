@@ -60,7 +60,6 @@ class TransfersManagement @Inject constructor(
     var isOnTransfersSection = false
     var isTransferOverQuotaNotificationShown = false
     var isTransferOverQuotaBannerShown = false
-    var hasResumeTransfersWarningAlreadyBeenShown = false
     var shouldShowNetworkWarning = false
 
     init {
@@ -74,7 +73,6 @@ class TransfersManagement @Inject constructor(
         isOnTransfersSection = false
         isTransferOverQuotaNotificationShown = false
         isTransferOverQuotaBannerShown = false
-        hasResumeTransfersWarningAlreadyBeenShown = false
         shouldShowNetworkWarning = false
     }
 
