@@ -4,7 +4,6 @@ import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.text.InputType
 import android.util.Base64
@@ -34,7 +33,6 @@ import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.isIsHeartBeatAlive
 import mega.privacy.android.app.MegaApplication.Companion.setHeartBeatAlive
 import mega.privacy.android.app.R
-import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -99,7 +97,7 @@ class LoginFragment : Fragment() {
     private var intentAction: String? = null
     private var intentDataString: String? = null
     private var intentParentHandle: Long = -1
-    private var intentShareInfo: ArrayList<ShareInfo>? = null
+    private var intentShareInfo: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -451,19 +449,10 @@ class LoginFragment : Fragment() {
     private fun readyToFinish(uiState: LoginState) {
         (requireActivity() as LoginActivity).intent?.apply {
             @Suppress("UNCHECKED_CAST")
-            intentShareInfo =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    getSerializableExtra(
-                        FileExplorerActivity.EXTRA_SHARE_INFOS,
-                        ArrayList::class.java
-                    )
-                } else {
-                    @Suppress("DEPRECATION")
-                    getSerializableExtra(FileExplorerActivity.EXTRA_SHARE_INFOS)
-                } as ArrayList<ShareInfo>?
+            intentShareInfo = getBooleanExtra(FileExplorerActivity.EXTRA_FROM_SHARE, false)
 
             when {
-                intentShareInfo?.isNotEmpty() == true -> {
+                intentShareInfo -> {
                     toSharePage()
                     return
                 }
@@ -689,11 +678,8 @@ class LoginFragment : Fragment() {
      */
     private fun toSharePage() = with(requireActivity()) {
         startActivity(
-            this.intent.setClass(requireContext(), FileExplorerActivity::class.java).apply {
-                putExtra(FileExplorerActivity.EXTRA_SHARE_INFOS, intentShareInfo)
-                action = intent?.getStringExtra(FileExplorerActivity.EXTRA_SHARE_ACTION)
-                type = intent?.getStringExtra(FileExplorerActivity.EXTRA_SHARE_TYPE)
-            })
+            this.intent.setClass(requireContext(), FileExplorerActivity::class.java)
+        )
         finish()
     }
 

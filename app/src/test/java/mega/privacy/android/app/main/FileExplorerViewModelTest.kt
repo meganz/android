@@ -6,17 +6,14 @@ import android.os.Bundle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.main.FileExplorerViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
@@ -115,7 +112,7 @@ class FileExplorerViewModelTest {
     fun `test that toDoAfter is invoked`() = runTest {
         val toDoAfter = mock<() -> Unit>()
 
-        underTest.uploadFilesToChatIfFeatureFlagIsTrue(
+        underTest.uploadFilesToChat(
             emptyList(),
             emptyList(),
             emptyList(),
@@ -130,9 +127,7 @@ class FileExplorerViewModelTest {
         val filePaths = listOf("path1", "path2")
         val filesWithNames = filePaths.associateWith { null }
 
-        val flow = mock<Flow<MultiTransferEvent>>()
-
-        underTest.uploadFilesToChatIfFeatureFlagIsTrue(
+        underTest.uploadFilesToChat(
             chatIds = chatIds,
             filePaths = filePaths,
             emptyList(),
@@ -157,7 +152,7 @@ class FileExplorerViewModelTest {
         whenever(getNodeByIdUseCase(nodeId1)) doReturn fileNode1
         whenever(getNodeByIdUseCase(nodeId2)) doReturn fileNode2
 
-        underTest.uploadFilesToChatIfFeatureFlagIsTrue(
+        underTest.uploadFilesToChat(
             chatIds = chatIds,
             emptyList(),
             nodeIds = nodeIds,

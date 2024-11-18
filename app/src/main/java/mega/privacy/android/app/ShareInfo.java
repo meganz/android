@@ -239,7 +239,7 @@ public class ShareInfo implements Serializable {
      * Get info from Uri
      * action is Intent.getAction()
      */
-    protected boolean processUri(String action, Uri uri, Context context) {
+    public boolean processUri(String action, Uri uri, Context context) {
         if (isPathFromExternalAppMalformed(action, uri.getPath())) {
             Timber.e("processUri: Uri from external app is malformed: %s", uri);
             return false;

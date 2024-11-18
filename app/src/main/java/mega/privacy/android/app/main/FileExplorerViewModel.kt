@@ -33,10 +33,12 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
@@ -83,7 +85,7 @@ class FileExplorerViewModel @Inject constructor(
     var latestCopyTargetPathTab: Int = 0
     var latestMoveTargetPath: Long? = null
     var latestMoveTargetPathTab: Int = 0
-    private val _filesInfo = MutableLiveData<List<ShareInfo>>()
+    private val _filesDocuments = MutableLiveData<List<DocumentEntity>>()
     private val _textInfo = MutableLiveData<ShareTextInfo>()
 
     /**
@@ -95,7 +97,7 @@ class FileExplorerViewModel @Inject constructor(
     /**
      * Notifies observers about filesInfo changes.
      */
-    val filesInfo: LiveData<List<ShareInfo>> = _filesInfo
+    val filesDocuments: LiveData<List<DocumentEntity>> = _filesDocuments
 
     /**
      * Notifies observers about textInfo updates.
@@ -213,39 +215,40 @@ class FileExplorerViewModel @Inject constructor(
         intent: Intent,
         context: Context?,
     ) {
-        context?.let { getPathsAndNames(intent, it) }
-        val shareInfo: List<ShareInfo> =
-            getShareInfoList(intent, context) ?: emptyList()
-        val nameMap =
-            intent.serializable<HashMap<String, String>>(UploadDestinationActivity.EXTRA_NAME_MAP)
-                ?: getShareInfoFileNamesMap(shareInfo)
-        setFileNames(nameMap)
-        _filesInfo.postValue(shareInfo)
+        viewModelScope.launch {
+            context?.let { getPathsAndNames(intent, it) }
+            val shareInfo: List<DocumentEntity> =
+                getShareInfoList(intent, context) ?: emptyList()
+            val nameMap =
+                intent.serializable<HashMap<String, String>>(UploadDestinationActivity.EXTRA_NAME_MAP)
+                    ?: getFileNamesMap(shareInfo)
+            setFileNames(nameMap)
+            _filesDocuments.postValue(shareInfo)
+        }
     }
 
     @SuppressLint("Recycle")
     @Suppress("DEPRECATION")
-    private fun getPathsAndNames(intent: Intent, context: Context) {
-        viewModelScope.launch {
-            with(intent) {
-                (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java)
-                } else {
-                    getParcelableArrayListExtra(Intent.EXTRA_STREAM)
-                })?.let { uris ->
-                    Timber.d("Multiple files")
-                    grantUriPermission(context, uris)
-                    setUrisAndNames(uris.associateWith { uri -> getFileName(uri, context) })
-                    uris
-                } ?: (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
-                } else {
-                    getParcelableExtra(Intent.EXTRA_STREAM)
-                })?.let { uri ->
-                    Timber.d("Single file")
-                    grantUriPermission(context, listOf(uri))
-                    setUrisAndNames(mapOf(uri to getFileName(uri, context)))
-                }
+    private suspend fun getPathsAndNames(intent: Intent, context: Context) {
+
+        with(intent) {
+            (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java)
+            } else {
+                getParcelableArrayListExtra(Intent.EXTRA_STREAM)
+            })?.let { uris ->
+                Timber.d("Multiple files")
+                grantUriPermission(context, uris)
+                setUrisAndNames(uris.associateWith { uri -> getFileName(uri, context) })
+                uris
+            } ?: (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+            } else {
+                getParcelableExtra(Intent.EXTRA_STREAM)
+            })?.let { uri ->
+                Timber.d("Single file")
+                grantUriPermission(context, listOf(uri))
+                setUrisAndNames(mapOf(uri to getFileName(uri, context)))
             }
         }
     }
@@ -296,14 +299,21 @@ class FileExplorerViewModel @Inject constructor(
     private fun getShareInfoList(
         intent: Intent,
         context: Context?,
-    ): List<ShareInfo>? = (intent.serializable(FileExplorerActivity.EXTRA_SHARE_INFOS)
-        ?: ShareInfo.processIntent(intent, context))
+    ): List<DocumentEntity>? =
+        ShareInfo.processIntent(intent, context)
+            ?.map {
+                DocumentEntity(
+                    name = it.title.takeUnless { it.isNullOrBlank() } ?: it.originalFileName,
+                    size = it.size,
+                    lastModified = it.lastModified,
+                    uri = UriPath(it.fileAbsolutePath),
+                )
+            }
 
-    private fun getShareInfoFileNamesMap(shareInfo: List<ShareInfo>?) =
+
+    private fun getFileNamesMap(shareInfo: List<DocumentEntity>?) =
         shareInfo?.map { info ->
-            info.getTitle().takeUnless {
-                it.isNullOrBlank()
-            } ?: info.originalFileName ?: ""
+            info.name
         }?.associateWith { it } ?: emptyMap()
 
     /**
@@ -458,10 +468,10 @@ class FileExplorerViewModel @Inject constructor(
     }
 
     /**
-     * Upload files and nodes to the specified chats if the NewChatActivity feature flag is true, otherwise it invokes [toDoIfFalse]
-     * In both cases, it will call [toDoAfter] after starting the upload
+     * Upload files and nodes to the specified chats
+     * It will call [toDoAfter] after starting the upload
      */
-    fun uploadFilesToChatIfFeatureFlagIsTrue(
+    fun uploadFilesToChat(
         chatIds: List<Long>,
         filePaths: List<String>,
         nodeIds: List<NodeId>,

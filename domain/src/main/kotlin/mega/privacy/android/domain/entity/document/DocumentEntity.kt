@@ -22,7 +22,12 @@ data class DocumentEntity(
     val isFolder: Boolean = false,
     val numFiles: Int = 0,
     val numFolders: Int = 0,
-)
+){
+    /**
+     * get uri value for java access, it should be removed once ImportFilesAdapter.java is removed
+     */
+    fun getUriString() = uri.value
+}
 
 /**
  * Creates DocumentEntity from file

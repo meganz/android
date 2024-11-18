@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
-import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
 import mega.privacy.android.app.databinding.FragmentImportFilesBinding
 import mega.privacy.android.app.extensions.navigateToAppSettings
@@ -21,6 +20,7 @@ import mega.privacy.android.app.main.adapters.ImportFilesAdapter.OnImportFilesAd
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ShareTextInfo
+import mega.privacy.android.domain.entity.document.DocumentEntity
 
 /**
  * Fragment for importing files.
@@ -72,7 +72,7 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
 
     private fun setupObservers() {
         with(viewModel) {
-            filesInfo.observe(viewLifecycleOwner) { info: List<ShareInfo>? ->
+            filesDocuments.observe(viewLifecycleOwner) { info: List<DocumentEntity>? ->
                 info?.let { showFilesInfo(it) }
             }
             textInfo.observe(viewLifecycleOwner) { info: ShareTextInfo? ->
@@ -106,18 +106,22 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
     /**
      * Shows the view when it is importing files.
      *
-     * @param info List of ShareInfo containing all the required info to share the files.
+     * @param documents List of DocumentEntity containing all the required info to share the files.
      */
-    private fun showFilesInfo(info: List<ShareInfo>) {
+    private fun showFilesInfo(documents: List<DocumentEntity>) {
         var setNames = true
 
         if (adapter == null) {
-            adapter = ImportFilesAdapter(requireActivity(), info, nameFiles)
+            adapter = ImportFilesAdapter(
+                requireActivity(),
+                documents,
+                nameFiles
+            )
             setNames = false
         }
 
         val headerText =
-            resources.getQuantityString(R.plurals.general_num_files, info.size)
+            resources.getQuantityString(R.plurals.general_num_files, documents.size)
         setupAdapter(setNames, headerText)
     }
 
