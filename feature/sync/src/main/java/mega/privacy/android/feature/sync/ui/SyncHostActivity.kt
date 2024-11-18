@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -65,6 +66,9 @@ class SyncHostActivity : AppCompatActivity() {
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
+            startActivity(Intent(Intent.ACTION_VIEW).apply {
+                data = "https://mega.nz/devicecenter".toUri()
+            })
             finish()
         }
     }

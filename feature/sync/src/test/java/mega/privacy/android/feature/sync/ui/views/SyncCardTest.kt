@@ -51,6 +51,7 @@ class SyncCardTest {
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
                 isFreeAccount = false,
                 errorRes = null,
@@ -72,6 +73,8 @@ class SyncCardTest {
             .assertIsNotDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
             .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_sync_button))
@@ -98,6 +101,7 @@ class SyncCardTest {
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
                 isFreeAccount = false,
                 errorRes = null,
@@ -119,10 +123,59 @@ class SyncCardTest {
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
             .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_sync_button))
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that Sync card buttons are clickable`() {
+        var clicked = false
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_TWOWAY,
+                    folderPairName = "Sync Name",
+                    status = SyncStatus.SYNCING,
+                    deviceStoragePath = "Device Path",
+                    hasStalledIssues = true,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = false,
+                ),
+                expandClicked = {},
+                pauseRunClicked = { clicked = true },
+                removeFolderClicked = { clicked = true },
+                issuesInfoClicked = { clicked = true },
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = { clicked = true },
+                isLowBatteryLevel = false,
+                isFreeAccount = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_sync_button))
+            .assertIsDisplayed().performClick()
+        assertThat(clicked).isTrue()
+        clicked = false
     }
 
     @Test
@@ -147,6 +200,7 @@ class SyncCardTest {
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = { clicked = true },
+                onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
                 isFreeAccount = false,
                 errorRes = null,
@@ -177,6 +231,7 @@ class SyncCardTest {
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
                 isFreeAccount = false,
                 errorRes = null,
@@ -197,6 +252,8 @@ class SyncCardTest {
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.info_total_size))
             .assertIsNotDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
             .assertIsNotDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
             .assertIsDisplayed()
@@ -224,6 +281,7 @@ class SyncCardTest {
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
                 isFreeAccount = false,
                 errorRes = null,
@@ -244,6 +302,8 @@ class SyncCardTest {
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.info_total_size))
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
+            .assertIsNotDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
             .assertIsNotDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
             .assertIsDisplayed()
@@ -273,6 +333,7 @@ class SyncCardTest {
                 removeFolderClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = { clicked = true },
+                onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
                 isFreeAccount = false,
                 errorRes = null,

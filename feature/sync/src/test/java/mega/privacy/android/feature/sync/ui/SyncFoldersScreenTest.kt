@@ -274,6 +274,7 @@ class SyncFoldersScreenTest {
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
                 isFreeAccount = false,
                 isLoading = true,

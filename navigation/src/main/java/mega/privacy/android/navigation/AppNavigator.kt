@@ -40,11 +40,13 @@ interface AppNavigator {
      * @param nodeHandle The Node Handle to view the selected Node. The Root Node will be accessed
      * if no Node Handle is specified
      * @param errorMessage The [StringRes] of the message to display in the error banner
+     * @param isFromSyncFolders Indicates if the node is from Sync Folders. False by default.
      */
     fun openNodeInCloudDrive(
         activity: Activity,
         nodeHandle: Long = -1L,
         @StringRes errorMessage: Int?,
+        isFromSyncFolders: Boolean = false,
     )
 
     /**

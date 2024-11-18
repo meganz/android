@@ -56,6 +56,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property storageCapacity the storage capacity
  * @property isBusinessAccountExpired if the business or pro flexi is expired
  * @property hiddenNodeEnabled if hidden node is enabled
+ * @property isSyncFolderOpen Indicates if the node to open is from Sync Folders. False by default.
  */
 data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -90,6 +91,7 @@ data class FileBrowserState(
     val storageCapacity: StorageOverQuotaCapacity = DEFAULT,
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
+    val isSyncFolderOpen: Boolean = false,
 ) {
     val hasNoOpenedFolders get() = openedFolderNodeHandles.isEmpty()
 }

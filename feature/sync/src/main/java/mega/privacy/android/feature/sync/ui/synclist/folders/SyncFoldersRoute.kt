@@ -61,6 +61,11 @@ internal fun SyncFoldersRoute(
                 }
             )
         },
+        onOpenMegaFolderClicked = { syncUiItem ->
+            context.startActivity(Intent(Intent.ACTION_VIEW).apply {
+                data = "https://mega.nz/opensync#${syncUiItem.megaStorageNodeId.longValue}".toUri()
+            })
+        },
         isLowBatteryLevel = state.isLowBatteryLevel,
         isFreeAccount = state.isFreeAccount,
         isLoading = state.isLoading,

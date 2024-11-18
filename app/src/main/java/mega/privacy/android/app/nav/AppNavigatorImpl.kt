@@ -26,12 +26,14 @@ internal interface AppNavigatorImpl : AppNavigator {
         activity: Activity,
         nodeHandle: Long,
         @StringRes errorMessage: Int?,
+        isFromSyncFolders: Boolean,
     ) {
         if (activity is ManagerActivity) {
             activity.selectDrawerItem(
                 item = DrawerItem.CLOUD_DRIVE,
                 cloudDriveNodeHandle = nodeHandle,
                 errorMessage = errorMessage,
+                isFromSyncFolders = isFromSyncFolders,
             )
         }
     }

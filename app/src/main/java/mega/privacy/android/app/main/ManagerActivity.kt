@@ -3855,6 +3855,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * [INVALID_HANDLE] by default
      * The value is set to -1 by default if no other Backups Node Handle is passed
      * @param errorMessage The [StringRes] of the error message to display
+     * @param isFromSyncFolders Indicates if the Node to immediately access is from Sync Folders. False by default.
      */
     @SuppressLint("NewApi")
     @JvmOverloads
@@ -3864,6 +3865,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         cloudDriveNodeHandle: Long = INVALID_HANDLE,
         backupsHandle: Long = INVALID_HANDLE,
         @StringRes errorMessage: Int? = null,
+        isFromSyncFolders: Boolean = false,
     ) {
         Timber.d("Selected DrawerItem: ${item?.name}. Current drawerItem is ${drawerItem?.name}")
         if (!this::drawerLayout.isInitialized) {
@@ -3902,6 +3904,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 // Synchronize the setting of different operations
                 lifecycleScope.launch {
                     if (cloudDriveNodeHandle != INVALID_HANDLE) {
+                        fileBrowserViewModel.setSyncFolderVisibility(isFromSyncFolders)
                         // Set the specific Folder to Cloud Drive
                         fileBrowserViewModel.openFileBrowserWithSpecificNode(
                             cloudDriveNodeHandle,
@@ -5066,49 +5069,73 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * from the Cloud Drive hierarchy
      */
     fun handleCloudDriveBackNavigation(performBackNavigation: Boolean) {
-        // User is in Media Discovery
-        if (fileBrowserViewModel.isMediaDiscoveryOpen()) {
-            // Use lifecycleScope.launch to synchronize separate operations. Update the Cloud Drive
-            // UI State first, then remove Media Discovery, and go back to the previous Fragment
-            lifecycleScope.launch {
-                fileBrowserViewModel.exitMediaDiscovery(performBackNavigation = performBackNavigation)
-                ensureActive()
-                lifecycle.withStarted {
-                    removeFragment(mediaDiscoveryFragment)
-                    if (performBackNavigation) {
-                        checkCloudDriveAccessFromNotification(isNotFromNotificationAction = {
-                            if (fileBrowserViewModel.isAccessedFolderExited()) {
-                                fileBrowserViewModel.resetIsAccessedFolderExited()
-                                // Go back to Device Center
-                                selectDrawerItem(DrawerItem.DEVICE_CENTER)
+        with(fileBrowserViewModel) {
+            when {
+                // User is exploring a Sync Folder
+                isSyncFolderOpen() -> {
+                    lifecycleScope.launch {
+                        if (isAtAccessedFolder()) {
+                            resetSyncFolderVisibility()
+                            // Remove Cloud Drive and go back to Syncs
+                            removeFragment(fileBrowserComposeFragment)
+                            navigator.openSyncs(this@ManagerActivity)
+                            goBackToRootLevel()
+                        } else {
+                            if (isMediaDiscoveryOpen()) {
+                                exitMediaDiscovery(performBackNavigation = performBackNavigation)
+                                removeFragment(mediaDiscoveryFragment)
                             } else {
-                                goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-                            }
-                        })
-                    } else {
-                        goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-                    }
-                }
-            }
-        } else {
-            // User is in Cloud Drive
-            checkCloudDriveAccessFromNotification(isNotFromNotificationAction = {
-                // Use lifecycleScope.launch to synchronize separate Back operations
-                lifecycleScope.launch {
-                    with(fileBrowserViewModel) {
-                        performBackNavigation()
-                        ensureActive()
-                        lifecycle.withStarted {
-                            if (isAccessedFolderExited()) {
-                                resetIsAccessedFolderExited()
-                                // Remove Cloud Drive and go back to Device Center
-                                removeFragment(fileBrowserComposeFragment)
-                                selectDrawerItem(DrawerItem.DEVICE_CENTER)
+                                performBackNavigation()
                             }
                         }
                     }
                 }
-            })
+
+                // User is in Media Discovery
+                isMediaDiscoveryOpen() -> {
+                    // Use lifecycleScope.launch to synchronize separate operations. Update the Cloud Drive
+                    // UI State first, then remove Media Discovery, and go back to the previous Fragment
+                    lifecycleScope.launch {
+                        exitMediaDiscovery(performBackNavigation = performBackNavigation)
+                        ensureActive()
+                        lifecycle.withStarted {
+                            removeFragment(mediaDiscoveryFragment)
+                            if (performBackNavigation) {
+                                checkCloudDriveAccessFromNotification(isNotFromNotificationAction = {
+                                    if (isAccessedFolderExited()) {
+                                        resetIsAccessedFolderExited()
+                                        // Go back to Device Center
+                                        selectDrawerItem(DrawerItem.DEVICE_CENTER)
+                                    } else {
+                                        goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+                                    }
+                                })
+                            } else {
+                                goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+                            }
+                        }
+                    }
+                }
+
+                // User is in Cloud Drive
+                else -> {
+                    checkCloudDriveAccessFromNotification(isNotFromNotificationAction = {
+                        // Use lifecycleScope.launch to synchronize separate Back operations
+                        lifecycleScope.launch {
+                            performBackNavigation()
+                            ensureActive()
+                            lifecycle.withStarted {
+                                if (isAccessedFolderExited()) {
+                                    resetIsAccessedFolderExited()
+                                    // Remove Cloud Drive and go back to Device Center
+                                    removeFragment(fileBrowserComposeFragment)
+                                    selectDrawerItem(DrawerItem.DEVICE_CENTER)
+                                }
+                            }
+                        }
+                    })
+                }
+            }
         }
     }
 
@@ -5991,6 +6018,17 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         } else if (Constants.ACTION_SHOW_TRANSFERS == intent.action) {
             openTransfers()
             return
+        } else if (Constants.ACTION_OPEN_DEVICE_CENTER == intent.action) {
+            selectDrawerItem(DrawerItem.DEVICE_CENTER)
+        } else if (Constants.ACTION_OPEN_SYNC_MEGA_FOLDER == intent.action) {
+            intent.dataString?.split("#")?.get(1)?.toLong()?.let { handle ->
+                navigator.openNodeInCloudDrive(
+                    activity = this,
+                    nodeHandle = handle,
+                    errorMessage = null,
+                    isFromSyncFolders = true,
+                )
+            }
         }
         setIntent(intent)
     }

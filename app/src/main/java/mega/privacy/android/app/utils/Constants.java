@@ -161,6 +161,8 @@ public class Constants {
     public static final String ACTION_SHOW_SETTINGS_STORAGE = "ACTION_SHOW_SETTINGS_STORAGE";
     public static final String ACTION_PRE_OVERQUOTA_STORAGE = "PRE_OVERQUOTA_STORAGE";
     public static final String ACTION_LOG_IN = "ACTION_LOG_IN";
+    public static final String ACTION_OPEN_DEVICE_CENTER = "ACTION_OPEN_DEVICE_CENTER";
+    public static final String ACTION_OPEN_SYNC_MEGA_FOLDER = "ACTION_OPEN_SYNC_MEGA_FOLDER";
 
     public static final String OPENED_FROM_CHAT = "OPENED_FROM_CHAT";
     public static final String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";

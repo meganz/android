@@ -57,6 +57,7 @@ internal fun SyncCard(
     removeFolderClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
     onOpenDeviceFolderClicked: (String) -> Unit,
+    onOpenMegaFolderClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
     isFreeAccount: Boolean,
     @StringRes errorRes: Int?,
@@ -104,6 +105,7 @@ internal fun SyncCard(
                 pauseRunClicked = pauseRunClicked,
                 removeFolderClicked = removeFolderClicked,
                 issuesInfoClicked = issuesInfoClicked,
+                onOpenMegaFolderClicked = onOpenMegaFolderClicked,
                 isLowBatteryLevel = isLowBatteryLevel,
                 isError = errorRes != null,
                 isFreeAccount = isFreeAccount,
@@ -305,6 +307,7 @@ private fun SyncCardFooter(
     pauseRunClicked: () -> Unit,
     removeFolderClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
+    onOpenMegaFolderClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
     isError: Boolean,
     isFreeAccount: Boolean,
@@ -334,6 +337,16 @@ private fun SyncCardFooter(
                     iconColor = StatusColor.Error.getStatusIconColor(),
                     textColor = StatusColor.Error.getStatusTextColor(),
                     text = stringResource(id = R.string.sync_card_sync_issues_info)
+                )
+            }
+            if (syncType == SyncType.TYPE_TWOWAY) {
+                MegaButtonWithIconAndText(
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
+                    onClick = onOpenMegaFolderClicked,
+                    icon = iconPackR.drawable.ic_folder_open_medium_regular_outline,
+                    text = stringResource(id = sharedR.string.general_open_button),
                 )
             }
             MegaButtonWithIconAndText(
@@ -394,6 +407,7 @@ private fun SyncCardExpandedPreview(
             removeFolderClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
+            onOpenMegaFolderClicked = {},
             isLowBatteryLevel = false,
             isFreeAccount = false,
             errorRes = null,
@@ -428,6 +442,7 @@ private fun SyncCardExpandedWithBannerPreview(
             removeFolderClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
+            onOpenMegaFolderClicked = {},
             isLowBatteryLevel = false,
             isFreeAccount = false,
             errorRes = sharedR.string.general_sync_active_sync_below_path,
@@ -462,6 +477,7 @@ private fun SyncCardCollapsedPreview(
             removeFolderClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
+            onOpenMegaFolderClicked = {},
             isLowBatteryLevel = false,
             isFreeAccount = false,
             errorRes = null,
@@ -496,6 +512,7 @@ private fun SyncCardCollapsedWithBannerPreview(
             removeFolderClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
+            onOpenMegaFolderClicked = {},
             isLowBatteryLevel = false,
             isFreeAccount = false,
             errorRes = sharedR.string.general_sync_active_sync_below_path,

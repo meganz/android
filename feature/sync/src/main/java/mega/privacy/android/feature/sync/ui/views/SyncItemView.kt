@@ -16,6 +16,7 @@ internal fun SyncItemView(
     removeFolderClicked: (SyncUiItem) -> Unit,
     issuesInfoClicked: () -> Unit,
     onOpenDeviceFolderClicked: (String) -> Unit,
+    onOpenMegaFolderClicked: (SyncUiItem) -> Unit,
     isLowBatteryLevel: Boolean,
     isFreeAccount: Boolean,
     deviceName: String,
@@ -36,6 +37,9 @@ internal fun SyncItemView(
         },
         issuesInfoClicked = issuesInfoClicked,
         onOpenDeviceFolderClicked = onOpenDeviceFolderClicked,
+        onOpenMegaFolderClicked = {
+            onOpenMegaFolderClicked(sync)
+        },
         isLowBatteryLevel = isLowBatteryLevel,
         isFreeAccount = isFreeAccount,
         errorRes = errorRes,

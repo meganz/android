@@ -490,6 +490,27 @@ class FileBrowserViewModel @Inject constructor(
     }
 
     /**
+     * Checks if file browser is to open a Sync Folder or not
+     *
+     * @return True if file browser is to open a Sync Folder or False otherwise
+     */
+    fun isSyncFolderOpen() = _state.value.isSyncFolderOpen
+
+    /**
+     * Sets the Sync Folder Visibility
+     *
+     * @param isSyncFolderOpen True if file browser is to open a Sync Folder or False otherwise
+     */
+    fun setSyncFolderVisibility(isSyncFolderOpen: Boolean) =
+        _state.update { it.copy(isSyncFolderOpen = isSyncFolderOpen) }
+
+    /**
+     * Resets the Sync Folder Visibility
+     */
+    fun resetSyncFolderVisibility() =
+        _state.update { it.copy(isSyncFolderOpen = false) }
+
+    /**
      * Navigate back to the Cloud Drive Root Level hierarchy
      */
     suspend fun goBackToRootLevel() {
@@ -498,6 +519,7 @@ class FileBrowserViewModel @Inject constructor(
                 accessedFolderHandle = null,
                 isMediaDiscoveryOpen = false,
                 isMediaDiscoveryOpenedByIconClick = false,
+                isSyncFolderOpen = false,
             )
         }
         getRootNodeUseCase()?.id?.longValue?.let { rootHandle ->
@@ -864,6 +886,13 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun resetIsAccessedFolderExited() =
         _state.update { it.copy(isAccessedFolderExited = false) }
+
+    /**
+     * Checks if the User is in the Folder that was immediately accessed
+     *
+     * @return true if the User is at the accessed Folder
+     */
+    fun isAtAccessedFolder() = _state.value.fileBrowserHandle == _state.value.accessedFolderHandle
 
     /**
      * Hide or unhide the node

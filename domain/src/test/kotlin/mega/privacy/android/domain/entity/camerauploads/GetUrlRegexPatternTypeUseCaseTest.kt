@@ -61,5 +61,15 @@ class GetUrlRegexPatternTypeUseCaseTest {
         Arguments.of("Play Store", PLAY_STORE_URL, RegexPatternType.WHITELISTED_URL),
         Arguments.of("Upgrade Page", "https://mega.nz/pro", RegexPatternType.UPGRADE_PAGE_LINK),
         Arguments.of("Upgrade Page", "https://mega.co.nz/pro", RegexPatternType.UPGRADE_PAGE_LINK),
+        Arguments.of(
+            "Open Device Center Link",
+            "https://mega.nz/devicecenter",
+            RegexPatternType.OPEN_DEVICE_CENTER_LINK
+        ),
+        Arguments.of(
+            "Open Sync Folder Link",
+            "https://mega.nz/opensync#1234567890",
+            RegexPatternType.OPEN_SYNC_MEGA_FOLDER_LINK
+        )
     )
 }

@@ -42,9 +42,11 @@ import mega.privacy.android.app.utils.Constants.ACTION_EXPORT_MASTER_KEY
 import mega.privacy.android.app.utils.Constants.ACTION_IPC
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_CHAT_LINK
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_CONTACTS_SECTION
+import mega.privacy.android.app.utils.Constants.ACTION_OPEN_DEVICE_CENTER
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_HANDLE_NODE
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK
+import mega.privacy.android.app.utils.Constants.ACTION_OPEN_SYNC_MEGA_FOLDER
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS
 import mega.privacy.android.app.utils.Constants.ALBUM_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.BUSINESS_INVITE_LINK_REGEXS
@@ -445,6 +447,23 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 openWebLink(url)
             }
 
+            // Open Sync folder link
+            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.OPEN_SYNC_MEGA_FOLDER_LINK -> {
+                if (isLoggedIn) {
+                    Timber.d("Open sync folder link")
+                    startActivity(
+                        Intent(this, ManagerActivity::class.java)
+                            .setAction(ACTION_OPEN_SYNC_MEGA_FOLDER)
+                            .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                            .setData(Uri.parse(url))
+                    )
+                    finish()
+                } else {
+                    Timber.w("Not logged in")
+                    setError(getString(R.string.alert_not_logged_in))
+                }
+            }
+
             matchRegexs(url, HANDLE_LINK_REGEXS) -> {
                 Timber.d("Handle link url")
                 startActivity(
@@ -499,6 +518,22 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         Timber.w("Not logged in")
                         setError(getString(R.string.alert_not_logged_in))
                     }
+                }
+            }
+
+            // Open Device Center Link
+            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.OPEN_DEVICE_CENTER_LINK -> {
+                if (isLoggedIn) {
+                    Timber.d("Open device center link")
+                    startActivity(
+                        Intent(this, ManagerActivity::class.java)
+                            .setAction(ACTION_OPEN_DEVICE_CENTER)
+                            .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                    )
+                    finish()
+                } else {
+                    Timber.w("Not logged in")
+                    setError(getString(R.string.alert_not_logged_in))
                 }
             }
 
