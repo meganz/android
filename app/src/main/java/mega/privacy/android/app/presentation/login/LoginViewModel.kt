@@ -86,6 +86,7 @@ import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.CheckIfTransfersShouldBePausedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.mobile.analytics.event.AccountRegistrationEvent
@@ -138,6 +139,7 @@ class LoginViewModel @Inject constructor(
     private val getHistoricalProcessExitReasonsUseCase: GetHistoricalProcessExitReasonsUseCase,
     private val enableRequestStatusMonitorUseCase: EnableRequestStatusMonitorUseCase,
     private val monitorRequestStatusProgressEventUseCase: MonitorRequestStatusProgressEventUseCase,
+    private val checkIfTransfersShouldBePausedUseCase: CheckIfTransfersShouldBePausedUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -777,6 +779,7 @@ class LoginViewModel @Inject constructor(
                     startDownloadWorkerUseCase()
                     startChatUploadsWorkerUseCase()
                     startUploadsWorkerUseCase()
+                    checkIfTransfersShouldBePausedUseCase()
                     //Login check resumed pending transfers
                     transfersManagement.checkResumedPendingTransfers()
                 } else {

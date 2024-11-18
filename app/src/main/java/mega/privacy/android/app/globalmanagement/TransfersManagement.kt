@@ -20,8 +20,6 @@ import mega.privacy.android.domain.entity.transfer.getSDCardDownloadAppData
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferIfNotExistUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.DeleteSdTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.GetAllSdTransfersUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -39,13 +37,11 @@ import javax.inject.Singleton
 class TransfersManagement @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val addCompletedTransferIfNotExistUseCase: AddCompletedTransferIfNotExistUseCase,
     private val deleteSdTransferByTagUseCase: DeleteSdTransferByTagUseCase,
     private val getAllSdTransfersUseCase: GetAllSdTransfersUseCase,
     private val getTransferByTagUseCase: GetTransferByTagUseCase,
     private val completedTransferMapper: CompletedTransferMapper,
-    private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
 ) {
 
     companion object {
@@ -166,17 +162,6 @@ class TransfersManagement @Inject constructor(
             applicationScope.launch {
                 val completedTransfers = checkSDCardCompletedTransfers()
                 addCompletedTransferIfNotExistUseCase(completedTransfers)
-            }
-        }
-
-        if (areTransfersPausedUseCase()) {
-            //Queue of transfers should be paused.
-            applicationScope.launch {
-                runCatching {
-                    pauseTransfersQueueUseCase(true)
-                }.onFailure {
-                    Timber.e(it)
-                }
             }
         }
     }

@@ -61,6 +61,7 @@ import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
+import mega.privacy.android.domain.usecase.transfers.paused.CheckIfTransfersShouldBePausedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.AfterEach
@@ -126,6 +127,8 @@ internal class LoginViewModelTest {
     private val requestStatusProgressFakeFlow = MutableSharedFlow<Progress>()
     private val monitorRequestStatusProgressEventUseCase =
         mock<MonitorRequestStatusProgressEventUseCase>()
+    private val checkIfTransfersShouldBePausedUseCase =
+        mock<CheckIfTransfersShouldBePausedUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -171,7 +174,8 @@ internal class LoginViewModelTest {
             startUploadsWorkerUseCase = startUploadsWorkerUseCase,
             getHistoricalProcessExitReasonsUseCase = getHistoricalProcessExitReasonsUseCase,
             enableRequestStatusMonitorUseCase = enableRequestStatusMonitorUseCase,
-            monitorRequestStatusProgressEventUseCase = monitorRequestStatusProgressEventUseCase
+            monitorRequestStatusProgressEventUseCase = monitorRequestStatusProgressEventUseCase,
+            checkIfTransfersShouldBePausedUseCase = checkIfTransfersShouldBePausedUseCase,
         )
     }
 
@@ -186,7 +190,10 @@ internal class LoginViewModelTest {
 
     @AfterEach
     fun resetMocks() {
-        reset(monitorRequestStatusProgressEventUseCase)
+        reset(
+            monitorRequestStatusProgressEventUseCase,
+            checkIfTransfersShouldBePausedUseCase,
+        )
     }
 
     @Test
