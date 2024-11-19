@@ -73,7 +73,8 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/user_attribute.cpp \
     sdk/src/user_attribute_definition.cpp \
     sdk/src/user_attribute_manager.cpp \
-    sdk/src/transferstats.cpp
+    sdk/src/transferstats.cpp \
+    sdk/src/tlv.cpp
 
 C_SOURCES = sdk/src/mega_glob.c
 
@@ -143,7 +144,8 @@ HEADERS= sdk/include/mega.h \
         sdk/include/mega/user_attribute_definition.h \
         sdk/include/mega/user_attribute_manager.h \
         sdk/include/mega/user_attribute_types.h \
-        sdk/include/mega/transferstats.h
+        sdk/include/mega/transferstats.h \
+        sdk/include/mega/tlv.h
 
 # FUSE (Common headers.)
 HEADERS += \
