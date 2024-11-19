@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import org.junit.After
 import org.junit.Before
@@ -32,6 +33,7 @@ class ActiveTransferDaoTest {
                 isFolderTransfer = false,
                 isAlreadyTransferred = false,
                 isCancelled = true,
+                appData = emptyList(),
             )
         }
     }
@@ -63,6 +65,9 @@ class ActiveTransferDaoTest {
             isPaused = false,
             isAlreadyTransferred = false,
             isCancelled = true,
+            appData = listOf(
+                TransferAppData.CameraUpload, TransferAppData.OriginalContentUri("content://uri"),
+            ),
         )
         activeTransferDao.insertOrUpdateActiveTransfer(newEntity)
         val actual = activeTransferDao.getActiveTransferByTag(newEntity.tag)

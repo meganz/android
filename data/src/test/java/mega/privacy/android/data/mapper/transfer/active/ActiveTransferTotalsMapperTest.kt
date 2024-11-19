@@ -138,6 +138,7 @@ class ActiveTransferTotalsMapperTest {
             isPaused = false,
             isAlreadyTransferred = tag.rem(9) == 0,
             isCancelled = tag.rem(7) == 0,
+            appData = emptyList(),
         )
     }
 }

@@ -3,7 +3,7 @@ package mega.privacy.android.domain.entity.transfer
 /**
  * Represents an active transfer.
  */
-interface ActiveTransfer : TypedTransfer {
+interface ActiveTransfer : TypedTransfer, AppDataOwner {
 
     /**
      * [TransferType] of this transfer.
