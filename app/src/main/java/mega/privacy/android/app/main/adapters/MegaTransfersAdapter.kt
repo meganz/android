@@ -124,6 +124,8 @@ class MegaTransfersAdapter(
                 holder.document = transfer.nodeHandle
                 if (!isItemChecked) {
                     holder.iconDownloadUploadView.setImageResource(R.drawable.ic_download_transfers)
+                    holder.thumbnailIcon.isVisible = true
+                    holder.defaultIcon.isVisible = false
                     holder.thumbnailIcon.load(ThumbnailRequest(NodeId(transfer.nodeHandle))) {
                         crossfade(false)
                         transformations(

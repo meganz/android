@@ -26,7 +26,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaTransfersAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.adapters.SelectModeInterface
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.TextUtil
@@ -139,8 +139,9 @@ internal class LegacyTransfersFragment : TransfersBaseFragment(), SelectModeInte
         getSelectedItemsCount() == itemCount
     } == true
 
-    override fun hideTabs(hide: Boolean) =
-        (requireActivity() as ManagerActivity).hideTabs(hide, TransfersTab.PENDING_TAB)
+    override fun hideTabs(hide: Boolean) {
+        (parentFragment as? TransferPageFragment)?.hideTab(hide)
+    }
 
     override fun destroyActionMode() {
         actionMode?.finish()

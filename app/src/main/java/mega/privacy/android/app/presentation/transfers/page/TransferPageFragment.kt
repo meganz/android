@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuProvider
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -399,6 +400,14 @@ internal class TransferPageFragment : Fragment() {
         }
 
         transfersViewModel.completedTransferRemoved(transfer, false)
+    }
+
+    /**
+     * Hide or show the tab.
+     */
+    fun hideTab(hide: Boolean) {
+        binding.slidingTabsTransfers.isGone = hide
+        binding.transfersTabsPager.disableSwipe(hide)
     }
 
     companion object {
