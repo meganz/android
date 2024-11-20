@@ -36,7 +36,6 @@ import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
-import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
@@ -45,6 +44,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFileLinkNodeContentUriUseCase
+import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
@@ -72,7 +72,7 @@ class FileLinkViewModel @Inject constructor(
     private val getFileLinkNodeContentUriUseCase: GetFileLinkNodeContentUriUseCase,
     private val megaNavigator: MegaNavigator,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
-    private val getLocalFileForNodeUseCase: GetLocalFileForNodeUseCase,
+    private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileLinkState())
@@ -447,7 +447,7 @@ class FileLinkViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             val typedFileNode = fileNode as? TypedFileNode ?: return@launch
-            getLocalFileForNodeUseCase(fileNode)?.let { localFile ->
+            getNodePreviewFileUseCase(fileNode)?.let { localFile ->
                 if (fileNode.type is ZipFileTypeInfo) {
                     openZipFile(
                         context = context,
@@ -463,7 +463,7 @@ class FileLinkViewModel @Inject constructor(
                         showSnackBar = showSnackBar
                     )
                 }
-            } ?: updateNodesToDownload(listOf(fileNode))
+            } ?: updateNodeToPreview(fileNode)
         }
     }
 
@@ -520,22 +520,19 @@ class FileLinkViewModel @Inject constructor(
         }
     }
 
-
     /**
      * Update nodes to download
      */
-    private suspend fun updateNodesToDownload(nodes: List<TypedNode>) {
-        val linkNodes = nodes.mapNotNull {
-            runCatching {
-                mapNodeToPublicLinkUseCase(it as UnTypedNode, null)
-            }.onFailure {
-                Timber.e(it)
-            }.getOrNull()
+    private suspend fun updateNodeToPreview(node: TypedNode) =
+        runCatching {
+            mapNodeToPublicLinkUseCase(node as UnTypedNode, null)
+        }.onSuccess { linkNode ->
+            _state.update {
+                it.copy(
+                    downloadEvent = triggered(TransferTriggerEvent.StartDownloadForPreview(linkNode))
+                )
+            }
+        }.onFailure {
+            Timber.e(it)
         }
-        _state.update {
-            it.copy(
-                downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(linkNodes))
-            )
-        }
-    }
 }

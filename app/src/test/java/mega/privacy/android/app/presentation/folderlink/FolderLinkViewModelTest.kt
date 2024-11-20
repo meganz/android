@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCase
+import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -108,6 +109,7 @@ class FolderLinkViewModelTest {
     private val getFolderLinkNodeContentUriUseCase: GetFolderLinkNodeContentUriUseCase = mock()
     private val megaNavigator: MegaNavigator = mock()
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper = mock()
+    private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase = mock()
 
 
     @BeforeEach
@@ -149,7 +151,8 @@ class FolderLinkViewModelTest {
             checkNodesNameCollisionUseCase,
             getFolderLinkNodeContentUriUseCase,
             megaNavigator,
-            nodeContentUriIntentMapper
+            nodeContentUriIntentMapper,
+            getNodePreviewFileUseCase
         )
     }
 
@@ -185,7 +188,8 @@ class FolderLinkViewModelTest {
             checkNodesNameCollisionUseCase,
             getFolderLinkNodeContentUriUseCase,
             megaNavigator,
-            nodeContentUriIntentMapper
+            nodeContentUriIntentMapper,
+            getNodePreviewFileUseCase
         )
     }
 
@@ -696,12 +700,12 @@ class FolderLinkViewModelTest {
     }
 
     @Test
-    fun `test that downloadEvent is triggered when updateNodesToDownload is invoked`() =
+    fun `test that downloadEvent is triggered when updateNodeToPreview is invoked`() =
         runTest {
             val node = mock<TypedFileNode>()
             val link = mock<PublicLinkFile>()
             whenever(mapNodeToPublicLinkUseCase(node, null)).thenReturn(link)
-            whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
+            whenever(getNodePreviewFileUseCase(node)).thenReturn(null)
             underTest.openOtherTypeFile(mock(), node)
             underTest.state.test {
                 val res = awaitItem()
