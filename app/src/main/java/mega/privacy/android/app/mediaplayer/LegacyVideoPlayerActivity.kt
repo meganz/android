@@ -211,6 +211,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
             coroutineScope = lifecycleScope,
             dragActivated = this::onDragActivated
         ) {
+            showToolbar(animate = false)
             finish()
             overridePendingTransition(0, android.R.anim.fade_out)
         }
