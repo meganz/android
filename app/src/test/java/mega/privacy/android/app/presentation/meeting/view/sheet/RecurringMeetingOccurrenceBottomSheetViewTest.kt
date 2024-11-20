@@ -85,7 +85,7 @@ class RecurringMeetingOccurrenceBottomSheetViewTest {
     ) {
         composeTestRule.setContent {
             val sheetState = ModalBottomSheetState(
-                initialValue = ModalBottomSheetValue.Hidden,
+                initialValue = ModalBottomSheetValue.Expanded,
                 isSkipHalfExpanded = false,
                 density = LocalDensity.current,
             )

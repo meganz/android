@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.view.sheet
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
@@ -35,12 +34,15 @@ import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoS
 import mega.privacy.android.app.presentation.meeting.view.RecurringMeetingAvatarView
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
-import mega.privacy.android.shared.original.core.ui.theme.black
+import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import java.time.Instant
 import java.time.temporal.ChronoField
 import kotlin.random.Random
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Recurring Meeting Occurrence bottom sheet view
@@ -53,21 +55,22 @@ internal fun RecurringMeetingOccurrenceBottomSheetView(
     occurrence: ChatScheduledMeetingOccurr?,
     onCancelClick: () -> Unit = {},
     onEditClick: () -> Unit = {},
+    content: (@Composable () -> Unit)? = null,
 ) {
-    ModalBottomSheetLayout(
-        sheetState = modalSheetState,
-        scrimColor = black.copy(alpha = 0.32f),
-        sheetContent = {
+    BottomSheet(
+        modalSheetState = modalSheetState,
+        sheetBody = {
             BottomSheetContent(
                 modalSheetState = modalSheetState,
                 coroutineScope = coroutineScope,
                 meetingState = meetingState,
                 occurrence = occurrence,
                 onCancelClick = onCancelClick,
-                onEditClick = onEditClick
+                onEditClick = onEditClick,
             )
-        }
-    ) {}
+        },
+        content = content,
+    )
 }
 
 @Composable
@@ -168,37 +171,39 @@ internal const val CANCEL_OCCURRENCE_TAG =
     "recurring_meeting_occurrence_bottom_sheet:cancel_occurrence"
 
 
-@Preview
+@CombinedThemePreviews
 @Composable
 private fun PreviewRecurringMeetingOccurrenceBottomSheetView() {
     val schedId = Random.nextLong()
     val density = LocalDensity.current
-    RecurringMeetingOccurrenceBottomSheetView(
-        modalSheetState = ModalBottomSheetState(ModalBottomSheetValue.Expanded, density),
-        coroutineScope = rememberCoroutineScope(),
-        meetingState = RecurringMeetingInfoState(
-            finish = false,
-            chatId = Random.nextLong(),
-            schedId = schedId,
-            schedTitle = "Book Club - Breast&Eggs",
-            schedUntil = 0L,
-            typeOccurs = OccurrenceFrequencyType.Weekly,
-            occurrencesList = emptyList(),
-            firstParticipant = null,
-            secondParticipant = null,
-            showSeeMoreButton = false,
-            is24HourFormat = false,
-        ),
-        occurrence = ChatScheduledMeetingOccurr(
-            schedId = schedId,
-            parentSchedId = -1,
-            isCancelled = false,
-            timezone = null,
-            startDateTime = Instant.parse("2023-05-30T10:00:00.00Z")
-                .getLong(ChronoField.INSTANT_SECONDS),
-            endDateTime = Instant.parse("2023-05-30T11:00:00.00Z")
-                .getLong(ChronoField.INSTANT_SECONDS),
-            overrides = null,
-        ),
-    )
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        RecurringMeetingOccurrenceBottomSheetView(
+            modalSheetState = ModalBottomSheetState(ModalBottomSheetValue.Expanded, density),
+            coroutineScope = rememberCoroutineScope(),
+            meetingState = RecurringMeetingInfoState(
+                finish = false,
+                chatId = Random.nextLong(),
+                schedId = schedId,
+                schedTitle = "Book Club - Breast&Eggs",
+                schedUntil = 0L,
+                typeOccurs = OccurrenceFrequencyType.Weekly,
+                occurrencesList = emptyList(),
+                firstParticipant = null,
+                secondParticipant = null,
+                showSeeMoreButton = false,
+                is24HourFormat = false,
+            ),
+            occurrence = ChatScheduledMeetingOccurr(
+                schedId = schedId,
+                parentSchedId = -1,
+                isCancelled = false,
+                timezone = null,
+                startDateTime = Instant.parse("2023-05-30T10:00:00.00Z")
+                    .getLong(ChronoField.INSTANT_SECONDS),
+                endDateTime = Instant.parse("2023-05-30T11:00:00.00Z")
+                    .getLong(ChronoField.INSTANT_SECONDS),
+                overrides = null,
+            ),
+        )
+    }
 }
