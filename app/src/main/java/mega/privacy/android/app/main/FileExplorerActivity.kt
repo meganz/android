@@ -28,6 +28,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -633,8 +634,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     private fun setupObservers() {
-        viewModel.filesDocuments.observe(this) { info: List<DocumentEntity>? ->
-            onProcessAsyncInfo(info)
+        collectFlow(viewModel.uiState.mapNotNull { it.documents.takeIf { it.isNotEmpty() } }) {
+            onProcessAsyncInfo(it)
         }
         viewModel.textInfo.observe(this) { dismissAlertDialogIfExists(statusDialog) }
 
@@ -1464,9 +1465,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         val chatIds = chatListItems.map { it.chatId }
         val nodeHandles = attachNodes.map { it.handle }
         val nodeIds = nodeHandles.map { NodeId(it) }
-        val files = documentsToShare?.map { it.uri.value } ?: emptyList()
         checkNotificationsPermission(this)
-        viewModel.uploadFilesToChat(chatIds, files, nodeIds,
+        viewModel.uploadFilesToChat(chatIds, documentsToShare ?: emptyList(), nodeIds,
             toDoAfter = {
                 openManagerAndFinish()
             }
@@ -1715,10 +1715,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 if (viewModel.isImportingText(intent)) {
                     val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
                     val info = viewModel.textInfoContent
-                    val names = viewModel.uiState.value.fileNames
 
                     if (info != null) {
-                        val name = names[info.subject]
+                        val name =
+                            viewModel.uiState.value.namesByOriginalName[info.subject]
+                                ?: info.subject
                         createFile(name, info.fileContent, parentNode, info.isUrl)
                     }
 

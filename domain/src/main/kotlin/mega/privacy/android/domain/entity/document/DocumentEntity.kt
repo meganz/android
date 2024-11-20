@@ -6,13 +6,14 @@ import java.io.File
 /**
  * Document entity
  *
- * @property name
+ * @property name the name of this document, it can be the original name or modified name if the user changed it
  * @property size
  * @property lastModified
  * @property uri
  * @property isFolder
  * @property numFiles
  * @property numFolders
+ * @property originalName the original name of this document
  */
 data class DocumentEntity(
     val name: String,
@@ -22,6 +23,7 @@ data class DocumentEntity(
     val isFolder: Boolean = false,
     val numFiles: Int = 0,
     val numFolders: Int = 0,
+    val originalName: String = name,
 ){
     /**
      * get uri value for java access, it should be removed once ImportFilesAdapter.java is removed
@@ -33,6 +35,7 @@ data class DocumentEntity(
  * Creates DocumentEntity from file
  */
 fun File.toDocumentEntity(customName: String? = null) = DocumentEntity(
+    originalName = name,
     name = customName ?: name,
     size = length(),
     lastModified = lastModified(),

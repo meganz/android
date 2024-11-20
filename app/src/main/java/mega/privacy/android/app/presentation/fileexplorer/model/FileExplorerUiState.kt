@@ -1,9 +1,10 @@
 package mega.privacy.android.app.presentation.fileexplorer.model
 
-import android.net.Uri
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.domain.entity.document.DocumentEntity
+import kotlin.collections.associate
 
 /**
  * File explorer view state
@@ -14,6 +15,26 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
  */
 data class FileExplorerUiState(
     val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload> = consumed(),
-    val urisAndNames: Map<Uri, String?> = emptyMap(),
-    val fileNames: Map<String, String> = emptyMap(),
-)
+    val documents: List<DocumentEntity> = emptyList(),
+){
+    /**
+     * Documents associated by its uri value
+     */
+    val documentsByUriPathValue by lazy {
+        documents.associateBy { it.uri.value }
+    }
+
+    /**
+     * File names associated by its uri value
+     */
+    val namesByUriPathValues by lazy {
+            documents.associate { it.uri.value to it.name }
+    }
+
+    /**
+     * File names associated by its original file name
+     */
+    val namesByOriginalName by lazy {
+        documents.associate { it.originalName to it.name }
+    }
+}

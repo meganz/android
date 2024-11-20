@@ -11,7 +11,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.flow.mapNotNull
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
 import mega.privacy.android.app.databinding.FragmentImportFilesBinding
 import mega.privacy.android.app.extensions.navigateToAppSettings
@@ -72,8 +74,8 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
 
     private fun setupObservers() {
         with(viewModel) {
-            filesDocuments.observe(viewLifecycleOwner) { info: List<DocumentEntity>? ->
-                info?.let { showFilesInfo(it) }
+            collectFlow(viewModel.uiState.mapNotNull { it.documents.takeIf { it.isNotEmpty() } }) {
+                showFilesInfo(it)
             }
             textInfo.observe(viewLifecycleOwner) { info: ShareTextInfo? ->
                 info?.let { showImportingTextInfo(it) }
@@ -212,7 +214,7 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
     }
 
     private val nameFiles: HashMap<String, String>
-        get() = HashMap(viewModel.uiState.value.fileNames)
+        get() = HashMap(viewModel.uiState.value.namesByOriginalName)
 
     /**
      * Handle clicking cloud drive option

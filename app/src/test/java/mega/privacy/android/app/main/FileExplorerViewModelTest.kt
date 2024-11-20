@@ -12,14 +12,17 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUris
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -44,6 +47,7 @@ class FileExplorerViewModelTest {
     private val attachNodeUseCase = mock<AttachNodeUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val sendChatAttachmentsUseCase = mock<SendChatAttachmentsUseCase>()
+    private val getDocumentsFromSharedUris = mock<GetDocumentsFromSharedUris>()
 
     @BeforeAll
     fun setUp() {
@@ -60,6 +64,7 @@ class FileExplorerViewModelTest {
             sendChatAttachmentsUseCase = sendChatAttachmentsUseCase,
             monitorAccountDetailUseCase = mock(),
             monitorShowHiddenItemsUseCase = mock(),
+            getDocumentsFromSharedUris = getDocumentsFromSharedUris,
         )
     }
 
@@ -72,6 +77,7 @@ class FileExplorerViewModelTest {
         attachNodeUseCase,
         getNodeByIdUseCase,
         sendChatAttachmentsUseCase,
+        getDocumentsFromSharedUris,
     )
 
     /**
@@ -125,11 +131,12 @@ class FileExplorerViewModelTest {
     @Test
     fun `test that files are attached`() = runTest {
         val filePaths = listOf("path1", "path2")
-        val filesWithNames = filePaths.associateWith { null }
+        val documents = filePaths.map { DocumentEntity(it, 3L, 89L, UriPath(it)) }
+        val filesWithNames = filePaths.associateWith { it }
 
         underTest.uploadFilesToChat(
             chatIds = chatIds,
-            filePaths = filePaths,
+            documents = documents,
             emptyList(),
             {},
         )
@@ -187,23 +194,21 @@ class FileExplorerViewModelTest {
     @Test
     fun `test that state is updated correctly if upload files without renaming`() = runTest {
         val fileName = "name"
+        val uriPath = UriPath("/path/$fileName")
         val uri = mock<Uri> {
-            on { toString() } doReturn "/path/$fileName"
+            on { toString() } doReturn uriPath.value
         }
-        val urisAndNames = mapOf(uri to fileName)
+        val documents = listOf(DocumentEntity(fileName, 656L,454L, uriPath))
         val parentHandle = 123L
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
-                mapOf(uri.toString() to null),
+                mapOf(uri.toString() to fileName),
                 NodeId(parentHandle)
             )
         )
 
         with(underTest) {
-            setUrisAndNames(urisAndNames)
-            uiState.map { it.urisAndNames }.test {
-                assertThat(awaitItem()).isEqualTo(urisAndNames)
-            }
+            setDocuments(documents)
             uploadFiles(parentHandle)
             uiState.map { it.uploadEvent }.test {
                 assertThat(awaitItem()).isEqualTo(expected)
@@ -214,13 +219,13 @@ class FileExplorerViewModelTest {
     @Test
     fun `test that state is updated correctly if upload files renaming`() = runTest {
         val fileName = "name"
+        val uriPath = UriPath("/path/$fileName")
         val renamedName = "newName"
+        val documents = listOf(DocumentEntity(renamedName, 656L,454L, uriPath, originalName = fileName))
         val uri = mock<Uri> {
             on { toString() } doReturn "/path/$fileName"
         }
-        val urisAndNames = mapOf(uri to fileName)
         val parentHandle = 123L
-        val fileNames = mapOf(fileName to renamedName)
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
                 mapOf(uri.toString() to renamedName),
@@ -229,15 +234,7 @@ class FileExplorerViewModelTest {
         )
 
         with(underTest) {
-            setUrisAndNames(urisAndNames)
-            uiState.map { it.urisAndNames }.test {
-                assertThat(awaitItem()).isEqualTo(urisAndNames)
-            }
-
-            setFileNames(fileNames)
-            uiState.map { it.fileNames }.test {
-                assertThat(awaitItem()).isEqualTo(fileNames)
-            }
+            setDocuments(documents)
 
             uploadFiles(parentHandle)
             uiState.map { it.uploadEvent }.test {
