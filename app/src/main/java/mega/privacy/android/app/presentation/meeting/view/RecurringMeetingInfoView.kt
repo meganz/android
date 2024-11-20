@@ -111,46 +111,55 @@ fun RecurringMeetingInfoView(
         action = { modalSheetState.show() }
     )
 
-    MegaScaffold(
-        modifier = modifier.navigationBarsPadding(),
-        scaffoldState = scaffoldState,
-        topBar = {
-            RecurringMeetingInfoAppBar(
-                state = state,
-                onBackPressed = onBackPressed,
-            )
-        },
-        scrollableContentState = listState
-    ) { paddingValues ->
-        LazyColumn(
-            state = listState,
-            modifier = Modifier
-                .padding(paddingValues)
-                .testTag("Occurrence_list_view")
-        ) {
-            item(key = "Occurrences list") {
-                state.occurrencesList.indices.forEach { i ->
-                    OccurrenceItemView(
-                        modifier = Modifier.testTag("Occurrence_item_view"),
-                        state = state,
-                        occurrence = state.occurrencesList[i],
-                        onOccurrenceClicked = onOccurrenceClicked
-                    )
-                }
-                if (state.showSeeMoreButton) {
-                    SeeMoreOccurrencesButton(
-                        onSeeMoreClicked = onSeeMoreClicked
-                    )
+    RecurringMeetingOccurrenceBottomSheetView(
+        modalSheetState = modalSheetState,
+        coroutineScope = coroutineScope,
+        meetingState = state,
+        occurrence = managementState.selectedOccurrence,
+        onCancelClick = onCancelOccurrenceClicked,
+        onEditClick = onEditOccurrenceClicked
+    ) {
+        MegaScaffold(
+            modifier = modifier.navigationBarsPadding(),
+            scaffoldState = scaffoldState,
+            topBar = {
+                RecurringMeetingInfoAppBar(
+                    state = state,
+                    onBackPressed = onBackPressed,
+                )
+            },
+            scrollableContentState = listState
+        ) { paddingValues ->
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .testTag("Occurrence_list_view")
+            ) {
+                item(key = "Occurrences list") {
+                    state.occurrencesList.indices.forEach { i ->
+                        OccurrenceItemView(
+                            modifier = Modifier.testTag("Occurrence_item_view"),
+                            state = state,
+                            occurrence = state.occurrencesList[i],
+                            onOccurrenceClicked = onOccurrenceClicked
+                        )
+                    }
+                    if (state.showSeeMoreButton) {
+                        SeeMoreOccurrencesButton(
+                            onSeeMoreClicked = onSeeMoreClicked
+                        )
+                    }
                 }
             }
         }
+    }
 
-        EventEffect(
-            event = managementState.snackbarMessageContent,
-            onConsumed = onResetSnackbarMessage
-        ) {
-            scaffoldState.snackbarHostState.showAutoDurationSnackbar(it)
-        }
+    EventEffect(
+        event = managementState.snackbarMessageContent,
+        onConsumed = onResetSnackbarMessage
+    ) {
+        scaffoldState.snackbarHostState.showAutoDurationSnackbar(it)
     }
 
     if (managementState.editOccurrenceTapped) {
@@ -202,15 +211,6 @@ fun RecurringMeetingInfoView(
             onDismiss = onDismissDialog,
         )
     }
-
-    RecurringMeetingOccurrenceBottomSheetView(
-        modalSheetState = modalSheetState,
-        coroutineScope = coroutineScope,
-        meetingState = state,
-        occurrence = managementState.selectedOccurrence,
-        onCancelClick = onCancelOccurrenceClicked,
-        onEditClick = onEditOccurrenceClicked
-    )
 }
 
 /**
