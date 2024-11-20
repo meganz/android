@@ -28,6 +28,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.call.GetCallHandleListUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
+import mega.privacy.android.domain.usecase.chat.RemoveChatOpeningWithLinkUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
@@ -60,6 +61,7 @@ class CallChangesObserver @Inject constructor(
     private val getCallHandleListUseCase: GetCallHandleListUseCase,
     private val isChatNotifiableUseCase: IsChatNotifiableUseCase,
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
+    private val removeChatOpeningWithLinkUseCase: RemoveChatOpeningWithLinkUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @MainImmediateDispatcher private val mainImmediateDispatcher: CoroutineDispatcher,
 ) {
@@ -330,6 +332,13 @@ class CallChangesObserver @Inject constructor(
         }
         val chatRoom = megaChatApi.getChatRoom(incomingCallChatId) ?: run {
             Timber.w("Chat room is null")
+            return
+        }
+        if (!CallUtil.isOneToOneCall(chatRoom) && chatManagement.isOpeningMeetingLink(
+                incomingCallChatId
+            )
+        ) {
+            removeChatOpeningWithLinkUseCase(incomingCallChatId)
             return
         }
         if (!CallUtil.isOneToOneCall(chatRoom) && callToLaunch.status == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging

@@ -263,7 +263,6 @@ class ChatViewModel @Inject constructor(
     private val broadcastUpgradeDialogClosedUseCase: BroadcastUpgradeDialogClosedUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
-    private val removeChatOpeningWithLinkUseCase: RemoveChatOpeningWithLinkUseCase,
     private val scannerHandler: ScannerHandler,
     actionFactories: Set<@JvmSuppressWildcards (ChatViewModel) -> MessageAction>,
 ) : ViewModel() {
@@ -523,7 +522,6 @@ class ChatViewModel @Inject constructor(
             runCatching {
                 getChatRoomUseCase(chatId)
             }.onSuccess { chatRoom ->
-                removeChatOpeningWithLinkUseCase(chatId)
                 chatRoom?.let {
                     with(chatRoom) {
                         checkCustomTitle()

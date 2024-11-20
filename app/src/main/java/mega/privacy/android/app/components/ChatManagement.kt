@@ -335,14 +335,16 @@ class ChatManagement @Inject constructor(
      * @param chatId The chat ID to check
      * @return True if is opening a meeting link of the chat or false otherwise
      */
-    fun isOpeningMeetingLink(chatId: Long) =
+    fun isOpeningMeetingLink(chatId: Long): Boolean {
         if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE &&
             (hashOpeningMeetingLink.containsKey(chatId) || isChatOpeningWithLinkUseCase(chatId))
         ) {
-            hashOpeningMeetingLink[chatId] ?: isChatOpeningWithLinkUseCase(chatId)
+            if (isChatOpeningWithLinkUseCase(chatId)) return true
+            return hashOpeningMeetingLink[chatId] == true
         } else {
-            false
+            return false
         }
+    }
 
     /**
      * Set if is opening a meeting link of a chat

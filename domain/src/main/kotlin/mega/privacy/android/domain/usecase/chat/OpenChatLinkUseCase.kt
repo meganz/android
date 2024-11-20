@@ -37,7 +37,6 @@ class OpenChatLinkUseCase @Inject constructor(
         var previouslyJoined = false
         var chatPublicHandle: Long? = null
         val chatRoom: ChatRoom = chatId?.let {
-            setChatOpeningWithLinkUseCase(chatId)
             val chat = getChatRoomUseCase(it)
             if (chat == null || !chat.isActive) {
                 openChatPreviewUseCase(chatLink).let { chatPreview ->
@@ -52,12 +51,12 @@ class OpenChatLinkUseCase @Inject constructor(
             openChatPreviewUseCase(chatLink).let { chatPreview ->
                 previouslyJoined = chatPreview.exist
                 chatPublicHandle = chatPreview.request.userHandle
-                setChatOpeningWithLinkUseCase(chatPreview.request.chatHandle)
                 getChatRoomUseCase(chatPreview.request.chatHandle)
             }
         } ?: throw throw ChatRoomDoesNotExistException()
 
         if (requireJoin || previouslyJoined) {
+            setChatOpeningWithLinkUseCase(chatRoom.chatId)
             joinPublicChatUseCase(
                 chatId = chatRoom.chatId,
                 chatPublicHandle = chatPublicHandle.takeIf { chatRoom.isPreview.not() && chatRoom.isActive.not() }

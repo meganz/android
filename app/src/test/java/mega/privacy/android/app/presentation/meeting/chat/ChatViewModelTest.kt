@@ -112,7 +112,6 @@ import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUse
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
 import mega.privacy.android.domain.usecase.chat.RecordAudioUseCase
-import mega.privacy.android.domain.usecase.chat.RemoveChatOpeningWithLinkUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
@@ -324,7 +323,6 @@ internal class ChatViewModelTest {
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val pauseTransfersQueueUseCase = mock<PauseTransfersQueueUseCase>()
     private val scannerHandler = mock<ScannerHandler>()
-    private val removeChatOpeningWithLinkUseCase: RemoveChatOpeningWithLinkUseCase = mock()
 
     @BeforeEach
     fun resetMocks() {
@@ -393,7 +391,6 @@ internal class ChatViewModelTest {
             areTransfersPausedUseCase,
             pauseTransfersQueueUseCase,
             scannerHandler,
-            removeChatOpeningWithLinkUseCase,
         )
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -516,7 +513,6 @@ internal class ChatViewModelTest {
             broadcastUpgradeDialogClosedUseCase = broadcastUpgradeDialogClosedUseCase,
             areTransfersPausedUseCase = areTransfersPausedUseCase,
             pauseTransfersQueueUseCase = pauseTransfersQueueUseCase,
-            removeChatOpeningWithLinkUseCase = removeChatOpeningWithLinkUseCase,
             actionFactories = setOf(),
             scannerHandler = scannerHandler,
         )
@@ -2213,7 +2209,6 @@ internal class ChatViewModelTest {
         underTest.state.test {
             assertThat(awaitItem().chatId).isEqualTo(chatId)
         }
-        verify(removeChatOpeningWithLinkUseCase).invoke(chatId)
     }
 
     @Test
