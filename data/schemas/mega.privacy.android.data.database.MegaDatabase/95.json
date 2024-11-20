@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 94,
-    "identityHash": "2b3f5063848b1f79f94b07abdce30c1b",
+    "version": 95,
+    "identityHash": "7a67b2ecae0b290498c89a98fe67d456",
     "entities": [
       {
         "tableName": "contacts",
@@ -240,7 +240,7 @@
       },
       {
         "tableName": "active_transfers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tag` INTEGER NOT NULL, `transfer_type` TEXT NOT NULL, `total_bytes` INTEGER NOT NULL, `is_finished` INTEGER NOT NULL, `is_folder_transfer` INTEGER NOT NULL DEFAULT 0, `is_paused` INTEGER NOT NULL DEFAULT 0, `is_already_downloaded` INTEGER NOT NULL DEFAULT 0, `is_cancelled` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`tag`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tag` INTEGER NOT NULL, `transfer_type` TEXT NOT NULL, `total_bytes` INTEGER NOT NULL, `is_finished` INTEGER NOT NULL, `is_folder_transfer` INTEGER NOT NULL DEFAULT 0, `is_paused` INTEGER NOT NULL DEFAULT 0, `is_already_downloaded` INTEGER NOT NULL DEFAULT 0, `is_cancelled` INTEGER NOT NULL DEFAULT 0, `transferappdata` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`tag`))",
         "fields": [
           {
             "fieldPath": "tag",
@@ -293,6 +293,13 @@
             "affinity": "INTEGER",
             "notNull": true,
             "defaultValue": "0"
+          },
+          {
+            "fieldPath": "appData",
+            "columnName": "transferappdata",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
           }
         ],
         "primaryKey": {
@@ -900,7 +907,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2b3f5063848b1f79f94b07abdce30c1b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7a67b2ecae0b290498c89a98fe67d456')"
     ]
   }
 }
