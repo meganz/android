@@ -533,7 +533,7 @@ if [ ! -f ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready ]; then
 fi
 echo "* crashlytics is ready"
 
-echo "* Setting up cURL with c-ares"
+echo "* Setting up cURL"
 if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
     echo "* Setting up cURL"
     downloadCheckAndUnpack ${CURL_DOWNLOAD_URL} ${CURL}/${CURL_SOURCE_FILE} ${CURL_SHA1} ${CURL}
@@ -543,13 +543,13 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
     downloadCheckAndUnpack ${ARES_DOWNLOAD_URL} ${CURL}/${ARES_SOURCE_FILE} ${ARES_SHA1} ${CURL}
     ln -sf ${ARES_SOURCE_FOLDER} ${CURL}/ares
 
-    echo "* Patching c-ares to include crashlytics"
-    if ! patch -R -p0 -s -f --dry-run ${CURL}/ares/src/lib/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}; then
-        patch -p0 ${CURL}/ares/src/lib/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}
-    fi
+#    echo "* Patching c-ares to include crashlytics"
+#    if ! patch -R -p0 -s -f --dry-run ${CURL}/ares/src/lib/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}; then
+#        patch -p0 ${CURL}/ares/src/lib/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}
+#    fi
 
     for ABI in ${BUILD_ARCHS}; do
-        echo "* Prebuilding cURL with c-ares for ${ABI}"
+        echo "* Prebuilding cURL for ${ABI}"
 
         setupEnv "${ABI}"
 
@@ -576,7 +576,7 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
         ln -s ${BASE_PATH}/megachat/webrtc/libwebrtc_${WEBRTC_SUFFIX}.a boringssl/lib/libssl.a
 
         LIBS=-lc++ ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}/${CURL}"/curl-android-${ABI} --with-ssl="${PWD}"/boringssl/ \
-        --enable-ares="${BASE_PATH}/${CURL}"/ares/ares-android-${ABI} ${CURL_EXTRA} &>> ${LOG_FILE}
+        --disable-ares --enable-threaded-resolver ${CURL_EXTRA} &>> ${LOG_FILE}
         make clean &>> ${LOG_FILE}
         make -j${JOBS} &>> ${LOG_FILE}
         make install &>> ${LOG_FILE}
@@ -587,7 +587,7 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
 
     touch ${CURL}/${CURL_SOURCE_FILE}.ready
 fi
-echo "* cURL with c-ares is ready"
+echo "* cURL is ready"
 
 echo "* Setting up libwebsockets"
 if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
