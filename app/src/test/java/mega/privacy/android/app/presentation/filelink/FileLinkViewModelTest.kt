@@ -21,7 +21,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.exception.PublicNodeException
-import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
@@ -30,6 +29,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFileLinkNodeContentUriUseCase
+import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
@@ -65,7 +65,7 @@ class FileLinkViewModelTest {
     private val getFileLinkNodeContentUriUseCase = mock<GetFileLinkNodeContentUriUseCase>()
     private val megaNavigator = mock<MegaNavigator>()
     private val nodeContentUriIntentMapper = mock<NodeContentUriIntentMapper>()
-    private val getLocalFileForNodeUseCase = mock<GetLocalFileForNodeUseCase>()
+    private val getNodePreviewFileUseCase = mock<GetNodePreviewFileUseCase>()
 
     private val url = "https://mega.co.nz/abc"
     private val filePreviewPath = "data/cache/xyz.jpg"
@@ -90,7 +90,7 @@ class FileLinkViewModelTest {
             getFileLinkNodeContentUriUseCase,
             megaNavigator,
             nodeContentUriIntentMapper,
-            getLocalFileForNodeUseCase
+            getNodePreviewFileUseCase
         )
         initViewModel()
     }
@@ -111,7 +111,7 @@ class FileLinkViewModelTest {
             getFileLinkNodeContentUriUseCase = getFileLinkNodeContentUriUseCase,
             megaNavigator = megaNavigator,
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
-            getLocalFileForNodeUseCase = getLocalFileForNodeUseCase
+            getNodePreviewFileUseCase = getNodePreviewFileUseCase,
         )
     }
 
@@ -441,13 +441,13 @@ class FileLinkViewModelTest {
     }
 
     @Test
-    fun `test that downloadEvent is triggered when updateNodesToDownload is invoked`() =
+    fun `test that downloadEvent is triggered when updateNodeToPreview is invoked`() =
         runTest {
             val node = mock<TypedFileNode>()
             val link = mock<PublicLinkFile>()
             whenever(mapNodeToPublicLinkUseCase(node, null)).thenReturn(link)
-            whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
-            underTest.openOtherTypeFile(mock(), node, {})
+            whenever(getNodePreviewFileUseCase(node)).thenReturn(null)
+            underTest.openOtherTypeFile(mock(), node) {}
             underTest.state.test {
                 val res = awaitItem()
                 assertThat(res.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)

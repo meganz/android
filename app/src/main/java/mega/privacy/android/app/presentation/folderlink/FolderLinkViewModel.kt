@@ -74,6 +74,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCase
+import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -118,6 +119,7 @@ class FolderLinkViewModel @Inject constructor(
     private val getFolderLinkNodeContentUriUseCase: GetFolderLinkNodeContentUriUseCase,
     private val megaNavigator: MegaNavigator,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
+    private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
 ) : ViewModel() {
 
     /**
@@ -742,7 +744,7 @@ class FolderLinkViewModel @Inject constructor(
     internal fun openOtherTypeFile(context: Context, fileNode: TypedNode) {
         viewModelScope.launch {
             val typedFileNode = fileNode as? TypedFileNode ?: return@launch
-            getLocalFileForNodeUseCase(fileNode)?.let { localFile ->
+            getNodePreviewFileUseCase(typedFileNode)?.let { localFile ->
                 if (fileNode.type is ZipFileTypeInfo) {
                     openZipFile(
                         context = context,
@@ -756,7 +758,7 @@ class FolderLinkViewModel @Inject constructor(
                         currentFileNode = fileNode,
                     )
                 }
-            } ?: updateNodesToDownload(listOf(fileNode))
+            } ?: updateNodeToPreview(fileNode)
         }
     }
 
@@ -811,20 +813,18 @@ class FolderLinkViewModel @Inject constructor(
     /**
      * Update nodes to download
      */
-    private suspend fun updateNodesToDownload(nodes: List<TypedNode>) {
-        val linkNodes = nodes.mapNotNull {
-            runCatching {
-                mapNodeToPublicLinkUseCase(it as UnTypedNode, null)
-            }.onFailure {
-                Timber.e(it)
-            }.getOrNull()
+    private suspend fun updateNodeToPreview(node: TypedNode) =
+        runCatching {
+            mapNodeToPublicLinkUseCase(node as UnTypedNode, null)
+        }.onSuccess { linkNode ->
+            _state.update {
+                it.copy(
+                    downloadEvent = triggered(TransferTriggerEvent.StartDownloadForPreview(linkNode))
+                )
+            }
+        }.onFailure {
+            Timber.e(it)
         }
-        _state.update {
-            it.copy(
-                downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(linkNodes))
-            )
-        }
-    }
 
     private suspend fun setStreamingIntentParams(
         intent: Intent,
