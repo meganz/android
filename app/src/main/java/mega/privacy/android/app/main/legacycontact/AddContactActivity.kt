@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.legacycontact
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.DialogInterface
@@ -32,7 +31,6 @@ import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -57,7 +55,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener
 import mega.privacy.android.app.components.twemoji.EmojiEditText
-import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
+import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.main.PhoneContactInfo
 import mega.privacy.android.app.main.ShareContactInfo
 import mega.privacy.android.app.main.adapters.AddContactsAdapter
@@ -100,6 +98,7 @@ import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Add contact activity
@@ -965,6 +964,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
 
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
@@ -1051,7 +1051,6 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         addContactActivity = this
 
         checkChatChanges()
-        enableEdgeToEdge()
         setContentView(R.layout.activity_add_contact)
 
         val tB = findViewById<Toolbar>(R.id.add_contact_toolbar)
@@ -1062,7 +1061,6 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
 
         tB.visibility = View.VISIBLE
         setSupportActionBar(tB)
-        consumeInsetsWithToolbar(customToolbar = tB)
         supportActionBar?.let {
             it.setHomeButtonEnabled(true)
             it.setDisplayHomeAsUpEnabled(true)
