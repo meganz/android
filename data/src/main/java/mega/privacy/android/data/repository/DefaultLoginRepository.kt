@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -29,6 +30,7 @@ import mega.privacy.android.data.mapper.login.FetchNodesUpdateMapper
 import mega.privacy.android.data.mapper.login.TemporaryWaitingErrorMapper
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
+import mega.privacy.android.domain.entity.login.TemporaryWaitingError
 import mega.privacy.android.domain.exception.ChatLoggingOutException
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.ChatNotInitializedUnknownStatus
@@ -43,6 +45,7 @@ import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.security.LoginRepository
@@ -74,6 +77,7 @@ internal class DefaultLoginRepository @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val setLogoutFlagWrapper: SetLogoutFlagWrapper,
     private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>,
+    private val crashReporter: CrashReporter
 ) : LoginRepository {
 
     override suspend fun initMegaChat(session: String) =
@@ -233,6 +237,9 @@ internal class DefaultLoginRepository @Inject constructor(
                             val temporaryError = megaApiGateway.getWaitingReason().let {
                                 Timber.w("Waiting, retry reason for ${request.requestString}: $it")
                                 temporaryWaitingErrorMapper(it)
+                            }
+                            if (this.isActive && temporaryError == TemporaryWaitingError.ConnectivityIssues) {
+                                crashReporter.report(Throwable("Connection issue occurred during login. Error code: ${error.errorCode}, waiting reason: MegaApiJava.RETRY_CONNECTIVITY"))
                             }
                             trySend(LoginStatus.LoginWaiting(temporaryError))
                         }

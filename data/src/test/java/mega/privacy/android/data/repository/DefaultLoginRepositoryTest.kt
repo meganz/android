@@ -37,6 +37,7 @@ import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
+import mega.privacy.android.domain.monitoring.CrashReporter
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
@@ -69,6 +70,7 @@ class DefaultLoginRepositoryTest {
     private val temporaryWaitingErrorMapper = mock<TemporaryWaitingErrorMapper>()
     private val setLogoutFlagWrapper = mock<SetLogoutFlagWrapper>()
     private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
+    private val crashReporter = mock<CrashReporter>()
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val email = "test@email.com"
@@ -89,7 +91,8 @@ class DefaultLoginRepositoryTest {
             temporaryWaitingErrorMapper = temporaryWaitingErrorMapper,
             applicationScope = testScope,
             setLogoutFlagWrapper = setLogoutFlagWrapper,
-            credentialsPreferencesGateway = { credentialsPreferencesGateway }
+            credentialsPreferencesGateway = { credentialsPreferencesGateway },
+            crashReporter = crashReporter
         )
     }
 
@@ -528,6 +531,32 @@ class DefaultLoginRepositoryTest {
                 assertThat((result as LoginStatus.LoginWaiting).error).isEqualTo(
                     TemporaryWaitingError.ServerIssues
                 )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+
+    @Test
+    fun `test that log is sent to Crashlytics when login fails with connectiviing issue`() =
+        runTest {
+            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
+            val request = mock<MegaRequest>()
+            val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EAGAIN) }
+
+            whenever(megaApiGateway.getWaitingReason()).thenReturn(1)
+            whenever(temporaryWaitingErrorMapper(1)).thenReturn(
+                TemporaryWaitingError.ConnectivityIssues
+            )
+
+            underTest.fastLoginFlow(session).test {
+                verify(megaApiGateway).fastLogin(any(), listenerCaptor.capture())
+                listenerCaptor.firstValue.onRequestTemporaryError(mock(), request, error)
+                val result = awaitItem()
+                assertThat(result).isInstanceOf(LoginStatus.LoginWaiting::class.java)
+                assertThat((result as LoginStatus.LoginWaiting).error).isEqualTo(
+                    TemporaryWaitingError.ConnectivityIssues
+                )
+                verify(crashReporter).report(any())
                 cancelAndIgnoreRemainingEvents()
             }
         }
