@@ -367,4 +367,5 @@
     <color name="color_component_toastBackground">#FFC1C2C4</color>
     <color name="color_text_inverse">#FF303233</color>
     <color name="color_background_surface_1">#FF303233</color>
+    <color name="color_background_pageBackground">#FF18191A</color>
 </resources>
