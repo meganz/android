@@ -132,11 +132,9 @@ import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.ActionNodeCallback
-import mega.privacy.android.app.interfaces.ChatManagementCallback
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
-import mega.privacy.android.app.listeners.RemoveFromChatRoomListener
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.ClearRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.Enable2FADialogFragment
@@ -353,7 +351,6 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaFolderInfo
 import nz.mega.sdk.MegaNode
@@ -370,8 +367,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     NavigationView.OnNavigationItemSelectedListener,
-    BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
-    ChatManagementCallback, ActionNodeCallback, SnackbarShower,
+    BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, ActionNodeCallback, SnackbarShower,
     MeetingBottomSheetDialogActionListener, NotificationNavigationHandler,
     ParentNodeManager, CameraPermissionManager, NavigationDrawerManager, FileBrowserActionListener,
     SharesActionListener {
@@ -5811,20 +5807,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         nodes.orEmpty().filterNotNull().map { NodeId(it.handle) }.let {
             nodeAttachmentViewModel.startAttachNodes(it)
         }
-    }
-
-    override fun confirmLeaveChat(chatId: Long) {
-        megaChatApi.leaveChat(chatId, RemoveFromChatRoomListener(this))
-    }
-
-    override fun confirmLeaveChats(chats: List<MegaChatListItem>) {
-        for (chat in chats) {
-            megaChatApi.leaveChat(chat.chatId, RemoveFromChatRoomListener(this))
-        }
-    }
-
-    override fun leaveChatSuccess() {
-        // No update needed.
     }
 
     private fun cameraUploadsClicked() {
