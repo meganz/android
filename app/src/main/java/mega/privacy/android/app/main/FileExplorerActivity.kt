@@ -1474,8 +1474,14 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     private fun openManagerAndFinish() {
-        val intent = Intent(this, ManagerActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        val intent = Intent(this, ManagerActivity::class.java).apply {
+            if (isFromUploadDestinationActivity) {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            } else {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+        }
         startActivity(intent)
         finish()
     }
@@ -1829,8 +1835,14 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun backToCloud(handle: Long, numberUploads: Int, message: String?) {
         Timber.d("handle: %s", handle)
 
-        val startIntent = Intent(this, ManagerActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        val startIntent = Intent(this, ManagerActivity::class.java).apply {
+            if (isFromUploadDestinationActivity) {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            } else {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
+        }
 
         if (handle != INVALID_HANDLE) {
             startIntent.action = Constants.ACTION_OPEN_FOLDER

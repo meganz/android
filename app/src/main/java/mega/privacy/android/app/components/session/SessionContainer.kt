@@ -61,7 +61,9 @@ internal fun SessionContainer(
 private fun navigateToLogin(context: Context, shouldFinish: Boolean) {
     context.findActivity()?.let { activity ->
         val intent = Intent(context, LoginActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            if (shouldFinish) {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }
             putExtra(Constants.LAUNCH_INTENT, activity.intent)
         }
         context.startActivity(intent)
