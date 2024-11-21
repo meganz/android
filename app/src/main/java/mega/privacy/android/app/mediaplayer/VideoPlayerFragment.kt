@@ -1,16 +1,23 @@
 package mega.privacy.android.app.mediaplayer
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.graphics.Bitmap
-import android.graphics.Color
+import android.graphics.Matrix
+import android.graphics.SurfaceTexture
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Environment.getExternalStoragePublicDirectory
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
+import android.view.Surface
+import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
@@ -46,7 +53,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
@@ -115,6 +121,13 @@ class VideoPlayerFragment : Fragment() {
 
     private var retryFailedDialog: AlertDialog? = null
 
+    private lateinit var scaleGestureDetector: ScaleGestureDetector
+    private lateinit var gestureDetector: GestureDetector
+    private var zoomLevel = 1.0f
+    private val maxZoom = 10.0f
+    private var translationX = 0f
+    private var translationY = 0f
+
     private val playerListener = object : Player.Listener {
         override fun onPlaybackStateChanged(state: Int) {
             updateLoadingAnimation(state)
@@ -162,7 +175,6 @@ class VideoPlayerFragment : Fragment() {
         binding.root
     }
 
-
     /**
      * onViewCreated
      */
@@ -170,6 +182,52 @@ class VideoPlayerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         legacyVideoPlayerActivity?.updateToolbarTitleBasedOnOrientation(viewModel.metadataState.value)
         observeFlow()
+
+        scaleGestureDetector = ScaleGestureDetector(
+            requireContext(),
+            object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                override fun onScale(detector: ScaleGestureDetector): Boolean {
+                    if (!viewModel.screenLockState.value) {
+                        zoomLevel = (zoomLevel * detector.scaleFactor).coerceIn(1.0f, maxZoom)
+                        updateTransformations()
+                    }
+                    return true
+                }
+            })
+
+        gestureDetector =
+            GestureDetector(requireContext(), object : GestureDetector.SimpleOnGestureListener() {
+                override fun onScroll(
+                    e1: MotionEvent?,
+                    e2: MotionEvent,
+                    distanceX: Float,
+                    distanceY: Float,
+                ): Boolean {
+                    if (zoomLevel > 1 && !viewModel.screenLockState.value) {
+                        translationX -= distanceX
+                        translationY -= distanceY
+                        enforceBoundaries()
+                        updateTransformations()
+                    }
+                    return true
+                }
+
+                @OptIn(UnstableApi::class)
+                override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                    if (toolbarVisible) {
+                        hideToolbar()
+                        videoPlayerView?.hideController()
+                    } else {
+                        delayHideToolbarCanceled = true
+                        showToolbar()
+                        videoPlayerView?.showController()
+                        if (viewModel.screenLockState.value) {
+                            delayHideToolbar()
+                        }
+                    }
+                    return true
+                }
+            })
     }
 
     /**
@@ -398,6 +456,33 @@ class VideoPlayerFragment : Fragment() {
         }
     }
 
+    @OptIn(UnstableApi::class)
+    private fun updateTransformations() {
+        videoPlayerView?.let { playerView ->
+            val matrix = Matrix()
+            matrix.postScale(zoomLevel, zoomLevel, playerView.width / 2f, playerView.height / 2f)
+            matrix.postTranslate(translationX, translationY)
+
+            (playerView.videoSurfaceView as? TextureView)?.apply {
+                setTransform(matrix)
+                if (!mediaPlayerGateway.mediaPlayerIsPlaying()) {
+                    invalidate()
+                    requestLayout()
+                }
+            }
+        }
+    }
+
+    private fun enforceBoundaries() {
+        videoPlayerView?.let { playerView ->
+            val maxTranslationX = (zoomLevel - 1) * playerView.width / 2
+            val maxTranslationY = (zoomLevel - 1) * playerView.height / 2
+
+            translationX = translationX.coerceIn(-maxTranslationX, maxTranslationX)
+            translationY = translationY.coerceIn(-maxTranslationY, maxTranslationY)
+        }
+    }
+
     private fun lockButtonClicked(isLock: Boolean) {
         viewModel.updateLockStatus(isLock)
         if (isLock) {
@@ -526,6 +611,7 @@ class VideoPlayerFragment : Fragment() {
         layout.startAnimation(anim)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @OptIn(UnstableApi::class)
     private fun setupPlayerView(playerView: PlayerView) {
         mediaPlayerGateway.setupPlayerView(
@@ -535,17 +621,24 @@ class VideoPlayerFragment : Fragment() {
             showShuffleButton = false,
         )
 
-        playerView.setOnClickListener {
-            if (toolbarVisible) {
-                hideToolbar()
-                playerView.hideController()
-            } else {
-                delayHideToolbarCanceled = true
-                showToolbar()
-                playerView.showController()
-                if (viewModel.screenLockState.value) {
-                    delayHideToolbar()
+        playerView.setOnTouchListener { _, event ->
+            scaleGestureDetector.onTouchEvent(event)
+            gestureDetector.onTouchEvent(event)
+        }
+        (playerView.videoSurfaceView as? TextureView)?.let { textureView ->
+            textureView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
+
+                override fun onSurfaceTextureAvailable(p0: SurfaceTexture, p1: Int, p2: Int) {
+                    Timber.d("ScreenShotTesting onSurfaceTextureAvailable")
+                    val surface = Surface(p0)
+                    mediaPlayerGateway.setSurface(surface)
                 }
+
+                override fun onSurfaceTextureSizeChanged(p0: SurfaceTexture, p1: Int, p2: Int) {}
+
+                override fun onSurfaceTextureDestroyed(p0: SurfaceTexture): Boolean = true
+
+                override fun onSurfaceTextureUpdated(p0: SurfaceTexture) {}
             }
         }
         updateLoadingAnimation(mediaPlayerGateway.getPlaybackState())
@@ -587,57 +680,6 @@ class VideoPlayerFragment : Fragment() {
         } else {
             legacyVideoPlayerActivity?.showToolbar()
         }
-    }
-
-    /**
-     * Run the enter animation
-     *
-     * @param dragToExit DragToExitSupport
-     */
-    fun runEnterAnimation(dragToExit: DragToExitSupport) {
-        videoPlayerView?.let { playerView ->
-            dragToExit.runEnterAnimation(requireActivity().intent, playerView) {
-                if (it) {
-                    updateViewForAnimation()
-                } else if (isResumed) {
-                    showToolbar()
-                    playerViewHolder?.showController()
-
-                    binding.root.setBackgroundColor(Color.BLACK)
-
-                    delayHideToolbar()
-                }
-            }
-        }
-    }
-
-    /**
-     * On drag activated
-     *
-     * @param dragToExit DragToExitSupport
-     * @param activated true is activated, otherwise is false
-     */
-    @OptIn(UnstableApi::class)
-    fun onDragActivated(dragToExit: DragToExitSupport, activated: Boolean) {
-        if (activated) {
-            delayHideToolbarCanceled = true
-            updateViewForAnimation()
-
-            binding.playerView.videoSurfaceView.let { videoSurfaceView ->
-                dragToExit.setCurrentView(videoSurfaceView)
-            }
-        } else {
-            RunOnUIThreadUtils.runDelay(300L) {
-                binding.root.setBackgroundColor(Color.BLACK)
-            }
-        }
-    }
-
-    private fun updateViewForAnimation() {
-        hideToolbar(animate = false)
-        playerViewHolder?.hideController()
-
-        binding.root.setBackgroundColor(Color.TRANSPARENT)
     }
 
     private fun initSpeedPlaybackPopup(composeView: ComposeView) {

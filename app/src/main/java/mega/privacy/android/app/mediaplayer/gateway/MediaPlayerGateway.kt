@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.gateway
 
+import android.view.Surface
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -242,4 +243,11 @@ interface MediaPlayerGateway {
      * @return mediaNotAllowPlayState
      */
     fun monitorMediaNotAllowPlayState(): Flow<Boolean>
+
+    /**
+     * Set surface to ExoPlayer
+     *
+     * @param surface Surface
+     */
+    fun setSurface(surface: Surface)
 }

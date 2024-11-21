@@ -1,6 +1,7 @@
 package mega.privacy.android.app.mediaplayer
 
 import mega.privacy.android.shared.resources.R as sharedR
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.BroadcastReceiver
@@ -61,11 +62,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityVideoPlayerBinding
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -127,7 +126,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util.isDarkMode
-import mega.privacy.android.app.utils.getFragmentFromNavHost
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -205,18 +203,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         }
     }
 
-    private val dragToExit by lazy {
-        DragToExitSupport(
-            context = this,
-            coroutineScope = lifecycleScope,
-            dragActivated = this::onDragActivated
-        ) {
-            showToolbar(animate = false)
-            finish()
-            overridePendingTransition(0, android.R.anim.fade_out)
-        }
-    }
-
     /**
      * Handle events when a Back Press is detected
      */
@@ -278,10 +264,9 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
 
         binding = ActivityVideoPlayerBinding.inflate(layoutInflater)
 
-        setContentView(dragToExit.wrapContentView(binding.root))
+        setContentView(binding.root)
         addStartDownloadTransferView(binding.root)
         addNodeAttachmentView(binding.root)
-        dragToExit.observeThumbnailLocation(this, intent)
 
         binding.toolbar.apply {
             collapseIcon =
@@ -304,16 +289,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         setupNavDestListener()
         setupObserver()
         initMediaData()
-
-        if (savedInstanceState == null) {
-            // post to next UI cycle so that MediaPlayerFragment's onCreateView is called
-            RunOnUIThreadUtils.post {
-                getFragmentFromNavHost(
-                    navHostId = R.id.nav_host_fragment,
-                    fragmentClass = VideoPlayerFragment::class.java
-                )?.runEnterAnimation(dragToExit)
-            }
-        }
 
         if (CallUtil.participatingInACall()) {
             showNotAllowPlayAlert()
@@ -803,11 +778,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                 if (navController.currentDestination?.id == R.id.video_main_player) {
                     updateToolbarTitleBasedOnOrientation(metadata)
                 }
-
-                dragToExit.nodeChanged(
-                    lifecycleOwner = this@LegacyVideoPlayerActivity,
-                    handle = getCurrentPlayingHandle()
-                )
             }
 
             // Put in the Activity to avoid Fragment recreate to cause the state changes when the screen rotated
@@ -1012,7 +982,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         if (isFinishing) {
             mediaPlayerGateway.playerStop()
             mediaPlayerGateway.playerRelease()
-            dragToExit.showPreviousHiddenThumbnail()
             AudioPlayerService.resumeAudioPlayer(this)
         }
         unregisterReceiver(headsetPlugReceiver)
@@ -1579,16 +1548,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
         }
     }
 
-    override fun setDraggable(draggable: Boolean) {
-        dragToExit.setDraggable(draggable)
-    }
-
-    private fun onDragActivated(activated: Boolean) {
-        getFragmentFromNavHost(
-            navHostId = R.id.nav_host_fragment,
-            fragmentClass = VideoPlayerFragment::class.java
-        )?.onDragActivated(dragToExit = dragToExit, activated = activated)
-    }
+    override fun setDraggable(draggable: Boolean) {}
 
     private fun onError(megaException: mega.privacy.android.domain.exception.MegaException) {
         when (megaException) {

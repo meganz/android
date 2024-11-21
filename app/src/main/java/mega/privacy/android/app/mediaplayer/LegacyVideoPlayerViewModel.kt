@@ -12,7 +12,8 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.view.PixelCopy
-import android.view.SurfaceView
+import android.view.Surface
+import android.view.TextureView
 import android.view.View
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -598,6 +599,11 @@ class LegacyVideoPlayerViewModel @Inject constructor(
         captureView: View,
         successCallback: (bitmap: Bitmap) -> Unit,
     ) {
+        val textureView = captureView as? TextureView
+        if (textureView == null || !textureView.isAvailable) {
+            Timber.d("Capture screenshot error: TextureView is not available")
+            return
+        }
         // Using video size for the capture size to ensure the screenshot is complete.
         val (captureWidth, captureHeight) = currentPlayingVideoSize?.let { (width, height) ->
             width to height
@@ -608,8 +614,9 @@ class LegacyVideoPlayerViewModel @Inject constructor(
                 captureHeight,
                 Bitmap.Config.ARGB_8888
             )
+            val surfaceView = Surface(textureView.surfaceTexture)
             PixelCopy.request(
-                captureView as SurfaceView,
+                surfaceView,
                 Rect(0, 0, captureWidth, captureHeight),
                 screenshotBitmap,
                 { copyResult ->
@@ -778,7 +785,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
                     FROM_IMAGE_VIEWER,
                     FROM_ALBUM_SHARING,
                     FAVOURITES_ADAPTER,
-                    -> {
+                        -> {
                         val parentHandle =
                             intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
                         val order = getSortOrderFromIntent(intent)
@@ -1307,7 +1314,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
             FROM_CHAT,
             FILE_LINK_ADAPTER,
             PHOTO_SYNC_ADAPTER,
-            -> {
+                -> {
                 return oldType == type
             }
 
@@ -1319,7 +1326,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
             OUTGOING_SHARES_ADAPTER,
             CONTACT_FILE_ADAPTER,
             FOLDER_LINK_ADAPTER,
-            -> {
+                -> {
                 val oldParentHandle =
                     oldIntent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
                 val newParentHandle =

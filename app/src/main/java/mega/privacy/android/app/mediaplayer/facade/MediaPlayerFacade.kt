@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.view.Surface
 import androidx.annotation.OptIn
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -461,6 +462,10 @@ class MediaPlayerFacade @Inject constructor(
 
     override fun monitorMediaNotAllowPlayState() =
         player?.monitorMediaNotAllowPlayState() ?: flowOf(false)
+
+    override fun setSurface(surface: Surface) {
+        exoPlayer.setVideoSurface(surface)
+    }
 
     companion object {
         private const val INCREMENT_TIME_IN_MS = 15000L
