@@ -6598,30 +6598,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish: %s_%d", request.requestString, e.errorCode)
         when (request.type) {
-            MegaRequest.TYPE_GET_CANCEL_LINK -> {
-                Timber.d("TYPE_GET_CANCEL_LINK")
-                Util.hideKeyboard(this, 0)
-                if (e.errorCode == MegaError.API_OK) {
-                    Timber.d("Cancellation link received!")
-                    Util.showAlert(
-                        this,
-                        getString(R.string.email_verification_text),
-                        getString(R.string.email_verification_title)
-                    )
-                } else {
-                    Timber.e(
-                        "Error when asking for the cancellation link: %s___%s",
-                        e.errorCode,
-                        e.errorString
-                    )
-                    Util.showAlert(
-                        this,
-                        getString(R.string.general_text_error),
-                        getString(R.string.general_error_word)
-                    )
-                }
-            }
-
             MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION -> {
                 if (e.errorCode == MegaError.API_OK) {
                     Timber.d("FCM OK TOKEN MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION")
