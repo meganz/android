@@ -214,23 +214,36 @@ private fun SyncNewFolderScreenContent(
         AnimatedVisibility(showSyncPermissionBanner) {
             WarningBanner(
                 textComponent = {
-                    MegaSpannedClickableText(
-                        value = when (syncType) {
-                            SyncType.TYPE_BACKUP -> stringResource(id = sharedResR.string.sync_add_new_backup_storage_permission_banner)
-                            else -> stringResource(id = R.string.sync_storage_permission_banner)
-                        },
-                        styles = mapOf(
-                            SpanIndicator('U') to MegaSpanStyleWithAnnotation(
-                                megaSpanStyle = MegaSpanStyle(spanStyle = SpanStyle(textDecoration = TextDecoration.Underline)),
-                                annotation = "Tap to grant access",
+                    when (syncType) {
+                        SyncType.TYPE_BACKUP -> {
+                            MegaSpannedClickableText(
+                                value = stringResource(id = sharedResR.string.sync_add_new_backup_storage_permission_banner),
+                                styles = mapOf(
+                                    SpanIndicator('U') to MegaSpanStyleWithAnnotation(
+                                        megaSpanStyle = MegaSpanStyle(
+                                            spanStyle = SpanStyle(
+                                                textDecoration = TextDecoration.Underline
+                                            )
+                                        ),
+                                        annotation = "Tap to grant access",
+                                    )
+                                ),
+                                color = TextColor.Primary,
+                                onAnnotationClick = {
+                                    syncPermissionsManager.launchAppSettingFileStorageAccess()
+                                    showSyncPermissionBanner = false
+                                },
                             )
-                        ),
-                        color = TextColor.Primary,
-                        onAnnotationClick = {
-                            syncPermissionsManager.launchAppSettingFileStorageAccess()
-                            showSyncPermissionBanner = false
-                        },
-                    )
+                        }
+
+                        else -> {
+                            MegaText(
+                                text = stringResource(id = R.string.sync_storage_permission_banner),
+                                textColor = TextColor.Primary,
+                            )
+                        }
+                    }
+
                 },
                 onCloseClick = null,
                 modifier = Modifier.clickable {

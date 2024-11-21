@@ -51,13 +51,13 @@ class SyncPermissionsManager @Inject constructor(@ApplicationContext private val
         else
             ContextCompat.checkSelfPermission(
                 context,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED
 
     /**
      * Get manage external storage permission intent
      */
-    fun getManageExternalStoragePermissionIntent() =
+    private fun getManageExternalStoragePermissionIntent() =
         Intent(
             if (isSDKAboveOrEqualToR())
                 Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
@@ -65,14 +65,16 @@ class SyncPermissionsManager @Inject constructor(@ApplicationContext private val
         )
             .addCategory("android.intent.category.DEFAULT")
             .setData(Uri.parse("package:${context.packageName}"))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
     /**
-     * Get disable batter optimisation  intent
+     * Get disable batter optimisation intent
      */
     @SuppressLint("BatteryLife")
     fun getDisableBatteryOptimizationsIntent(): Intent =
         Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
             .setData(Uri.parse("package:${context.packageName}"))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
     /**
      * Check whether the permission to send notifications is granted
