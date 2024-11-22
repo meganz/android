@@ -13,7 +13,6 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -28,7 +27,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.Chronometer
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -82,7 +80,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
-import androidx.viewpager2.widget.ViewPager2
 import androidx.work.WorkManager
 import com.anggrayudi.storage.file.getAbsolutePath
 import com.google.android.gms.ads.AdListener
@@ -95,8 +92,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.CoroutineDispatcher
@@ -150,6 +145,8 @@ import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment
 import mega.privacy.android.app.main.mapper.ManagerRedirectIntentMapper
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
+import mega.privacy.android.app.main.share.SharesFragment
+import mega.privacy.android.app.main.share.SharesViewModel
 import mega.privacy.android.app.main.view.OngoingCallBanner
 import mega.privacy.android.app.main.view.OngoingCallViewModel
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
@@ -189,7 +186,6 @@ import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
-import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
@@ -229,15 +225,9 @@ import mega.privacy.android.app.presentation.settings.startscreen.util.StartScre
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.shouldCloseApp
 import mega.privacy.android.app.presentation.shares.SharesActionListener
-import mega.privacy.android.app.presentation.shares.SharesPageAdapter
-import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesComposeFragment
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesComposeViewModel
-import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
-import mega.privacy.android.app.presentation.shares.links.LinksComposeFragment
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel
-import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeFragment
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeViewModel
-import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
@@ -337,11 +327,8 @@ import mega.privacy.mobile.analytics.event.ChatRoomDNDMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatRoomsBottomNavigationItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveBottomNavigationItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveSearchMenuToolbarEvent
-import mega.privacy.mobile.analytics.event.IncomingSharesTabEvent
 import mega.privacy.mobile.analytics.event.JoinMeetingPressedEvent
-import mega.privacy.mobile.analytics.event.LinkSharesTabEvent
 import mega.privacy.mobile.analytics.event.OpenLinkMenuItemEvent
-import mega.privacy.mobile.analytics.event.OutgoingSharesTabEvent
 import mega.privacy.mobile.analytics.event.SharedItemsScreenEvent
 import mega.privacy.mobile.analytics.event.StartMeetingNowPressedEvent
 import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetDismissedEvent
@@ -393,6 +380,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
     private val transfersViewModel: TransfersViewModel by viewModels()
     private val syncPromotionViewModel: SyncPromotionViewModel by viewModels()
+    val sharesViewModel: SharesViewModel by viewModels()
 
     /**
      * [MegaNavigator]
@@ -517,7 +505,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private lateinit var fragmentContainer: FragmentContainerView
     private lateinit var toolbar: MaterialToolbar
-    private lateinit var appBarLayout: AppBarLayout
+    lateinit var appBarLayout: AppBarLayout
 
     private var selectedAccountType = 0
 
@@ -559,15 +547,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private var miniAudioPlayerController: MiniAudioPlayerController? = null
     private lateinit var cameraUploadViewTypes: LinearLayout
 
-    private var currentSharesTab: SharesTab? = null
-
-    //Tabs in Shares
-    private lateinit var tabLayoutShares: TabLayout
-    private val sharesPageAdapter: SharesPageAdapter by lazy {
-        SharesPageAdapter(activity = this)
-    }
-    private lateinit var viewPagerShares: ViewPager2
-
     @JvmField
     var firstTimeAfterInstallation = true
     var searchView: SearchView? = null
@@ -582,9 +561,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     // Fragments
     private var fileBrowserComposeFragment: FileBrowserComposeFragment? = null
     private var rubbishBinComposeFragment: RubbishBinComposeFragment? = null
-    private var incomingSharesComposeFragment: IncomingSharesComposeFragment? = null
-    private var outgoingSharesComposeFragment: OutgoingSharesComposeFragment? = null
-    private var linksComposeFragment: LinksComposeFragment? = null
     private var photosFragment: PhotosFragment? = null
     private var albumContentFragment: Fragment? = null
     private var photosFilterFragment: PhotosFilterFragment? = null
@@ -1054,8 +1030,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         fabButton = findViewById(R.id.floating_button)
         fragmentContainer = findViewById(R.id.fragment_container)
         cameraUploadViewTypes = findViewById(R.id.cu_view_type)
-        tabLayoutShares = findViewById(R.id.sliding_tabs_shares)
-        viewPagerShares = findViewById(R.id.shares_tabs_pager)
         navHostView = findViewById(R.id.nav_host_fragment)
     }
 
@@ -1089,8 +1063,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     @SuppressLint("UnrememberedMutableState")
     @OptIn(ExperimentalComposeUiApi::class)
     private fun setInitialViewProperties() {
-        viewPagerShares.offscreenPageLimit = 3
-
         waitingRoomComposeView.apply {
             isVisible = true
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -1278,6 +1250,13 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
+    fun onShareTabChanged() {
+        supportInvalidateOptionsMenu()
+        checkScrollElevation()
+        setToolbarTitle()
+        showFabButton()
+    }
+
     private fun setViewListeners() {
         bottomNavigationView.setOnNavigationItemSelectedListener(this)
         addDrawerListener(object : DrawerLayout.DrawerListener {
@@ -1303,74 +1282,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
         })
         fabButton.setOnClickListener(FabButtonListener(this))
-        viewPagerShares.setPageTransformer { _: View?, _: Float -> }
-        viewPagerShares.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int,
-            ) {
-            }
-
-            override fun onPageSelected(position: Int) {
-                Timber.d("selectDrawerItemSharedItems - TabId: %s", position)
-
-                supportInvalidateOptionsMenu()
-                checkScrollElevation()
-                currentSharesTab = SharesTab.fromPosition(position)
-                when (currentSharesTab) {
-                    SharesTab.INCOMING_TAB -> {
-                        Analytics.tracker.trackEvent(IncomingSharesTabEvent)
-                        if (isOutgoingAdded) {
-                            outgoingSharesComposeFragment?.disableSelectMode()
-                        } else if (isLinksAdded) {
-                            linksComposeFragment?.disableSelectMode()
-                        }
-                    }
-
-                    SharesTab.OUTGOING_TAB -> {
-                        Analytics.tracker.trackEvent(OutgoingSharesTabEvent)
-                        if (isIncomingAdded) {
-                            incomingSharesComposeFragment?.disableSelectMode()
-                        } else if (isLinksAdded) {
-                            linksComposeFragment?.disableSelectMode()
-                        }
-                    }
-
-                    SharesTab.LINKS_TAB -> {
-                        Analytics.tracker.trackEvent(LinkSharesTabEvent)
-                        if (isIncomingAdded) {
-                            incomingSharesComposeFragment?.disableSelectMode()
-                        } else if (isOutgoingAdded) {
-                            outgoingSharesComposeFragment?.disableSelectMode()
-                        }
-                    }
-
-                    else -> {}
-                }
-                setToolbarTitle()
-                showFabButton()
-            }
-
-            override fun onPageScrollStateChanged(state: Int) {}
-        })
-        tabLayoutShares.addOnTabSelectedListener(
-            object : TabLayout.OnTabSelectedListener {
-                override fun onTabSelected(tab: TabLayout.Tab) {
-                    val tabIconColor =
-                        ContextCompat.getColor(applicationContext, R.color.color_border_interactive)
-                    tab.icon?.setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN)
-                }
-
-                override fun onTabUnselected(tab: TabLayout.Tab) {
-                    val tabIconColor =
-                        ContextCompat.getColor(applicationContext, R.color.color_icon_secondary)
-                    tab.icon?.setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN)
-                }
-
-                override fun onTabReselected(tab: TabLayout.Tab) {}
-            }
-        )
         (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment)?.let {
             setupNavDestListener(it)
         }
@@ -2094,23 +2005,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     }
                 }
             }
-        }
-
-        this.collectFlow(
-            incomingSharesViewModel.state,
-            Lifecycle.State.STARTED
-        ) { incomingSharesState: IncomingSharesState ->
-            addUnverifiedIncomingCountBadge(
-                incomingSharesState.nodesList.count { it.node.shareData?.isUnverifiedDistinctNode == true })
-        }
-
-        this.collectFlow(
-            outgoingSharesViewModel.state,
-            Lifecycle.State.STARTED
-        ) { outgoingSharesState: OutgoingSharesState ->
-            addUnverifiedOutgoingCountBadge(
-                outgoingSharesState.nodesList.count { it.node.shareData?.isUnverifiedDistinctNode == true },
-            )
         }
 
         this.collectFlow(
@@ -3081,9 +2975,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun selectDrawerItemCloudDrive() {
         Timber.d("selectDrawerItemCloudDrive")
         setAppBarVisibility(true)
-        tabLayoutShares.visibility = View.GONE
-        viewPagerShares.visibility = View.GONE
-        fragmentContainer.visibility = View.VISIBLE
 
         fileBrowserComposeFragment =
             (supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE_COMPOSE.tag) as? FileBrowserComposeFragment
@@ -3203,10 +3094,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
             }
 
-            DrawerItem.SHARED_ITEMS -> {
-                setToolbarForSharedItemsDrawerItem()
-            }
-
             DrawerItem.NOTIFICATIONS -> {
                 supportActionBar?.subtitle = null
                 supportActionBar?.title =
@@ -3275,66 +3162,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
         }
         viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON)
-    }
-
-    private fun setToolbarForSharedItemsDrawerItem() {
-        Timber.d("Shared Items SECTION")
-        supportActionBar?.subtitle = null
-        val indexShares: SharesTab = tabItemShares
-        if (indexShares === SharesTab.NONE) return
-        when (indexShares) {
-            SharesTab.INCOMING_TAB -> {
-                if (isIncomingAdded) {
-                    if (getHandleFromIncomingSharesViewModel() != -1L) {
-                        val node =
-                            megaApi.getNodeByHandle(getHandleFromIncomingSharesViewModel())
-                        if (node == null) {
-                            supportActionBar?.setTitle(resources.getString(R.string.title_shared_items))
-                        } else {
-                            supportActionBar?.setTitle(node.name)
-                        }
-                        viewModel.setIsFirstNavigationLevel(false)
-                    } else {
-                        supportActionBar?.title = resources.getString(R.string.title_shared_items)
-                        viewModel.setIsFirstNavigationLevel(true)
-                    }
-                } else {
-                    Timber.d("selectDrawerItemSharedItems: inSFLol == null")
-                }
-            }
-
-            SharesTab.OUTGOING_TAB -> {
-                Timber.d("setToolbarTitle: OUTGOING TAB")
-                if (isOutgoingAdded) {
-                    if (getHandleFromOutgoingSharesViewModel() != -1L) {
-                        val node =
-                            megaApi.getNodeByHandle(getHandleFromOutgoingSharesViewModel())
-                        supportActionBar?.title = node?.name
-                        viewModel.setIsFirstNavigationLevel(false)
-                    } else {
-                        supportActionBar?.title = resources.getString(R.string.title_shared_items)
-                        viewModel.setIsFirstNavigationLevel(true)
-                    }
-                }
-            }
-
-            SharesTab.LINKS_TAB -> if (isLinksAdded) {
-                if (getHandleFromLinksViewModel() == INVALID_HANDLE) {
-                    supportActionBar?.title = resources.getString(R.string.title_shared_items)
-                    viewModel.setIsFirstNavigationLevel(true)
-                } else {
-                    val node =
-                        megaApi.getNodeByHandle(getHandleFromLinksViewModel())
-                    supportActionBar?.title = node?.name
-                    viewModel.setIsFirstNavigationLevel(false)
-                }
-            }
-
-            else -> {
-                supportActionBar?.title = resources.getString(R.string.title_shared_items)
-                viewModel.setIsFirstNavigationLevel(true)
-            }
-        }
     }
 
     fun setToolbarTitleFromFullscreenOfflineFragment(
@@ -3530,46 +3357,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
-    private fun selectDrawerItemSharedItems() {
-        Timber.d("selectDrawerItemSharedItems")
-        setAppBarVisibility(true)
-        try {
-            val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.cancel(Constants.NOTIFICATION_PUSH_CLOUD_DRIVE)
-        } catch (e: Exception) {
-            Timber.e(e, "Exception NotificationManager - remove contact notification")
-        }
-
-        if (viewPagerShares.adapter == null) {
-            viewPagerShares.adapter = sharesPageAdapter
-        }
-        TabLayoutMediator(
-            tabLayoutShares,
-            viewPagerShares
-        ) { tab: TabLayout.Tab, position: Int ->
-            when (position) {
-                SharesTab.INCOMING_TAB.position -> {
-                    tab.setText(R.string.tab_incoming_shares)
-                    tab.setIcon(R.drawable.ic_folder_incoming_medium_regular_selector)
-                }
-
-                SharesTab.OUTGOING_TAB.position -> {
-                    tab.setText(R.string.tab_outgoing_shares)
-                    tab.setIcon(R.drawable.ic_folder_outgoing_medium_regular_selector)
-                }
-
-                SharesTab.LINKS_TAB.position -> {
-                    tab.setText(R.string.tab_links_shares)
-                    tab.setIcon(R.drawable.ic_link01_medium_regular_selector)
-                }
-            }
-        }.attach()
-        updateSharesTab()
-        setToolbarTitle()
-        closeDrawer()
-    }
-
     private fun selectDrawerItemNotifications() {
         Timber.d("selectDrawerItemNotifications")
         setAppBarVisibility(true)
@@ -3639,8 +3426,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     private fun setTabsVisibility() {
-        tabLayoutShares.visibility = View.GONE
-        viewPagerShares.visibility = View.GONE
         fragmentContainer.visibility = View.GONE
         navHostView.visibility = View.GONE
         updatePsaViewVisibility()
@@ -3650,67 +3435,12 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             return
         }
         when (drawerItem) {
-            DrawerItem.SHARED_ITEMS -> {
-                val tabItemShares: SharesTab = tabItemShares
-                if (tabItemShares === SharesTab.INCOMING_TAB
-                    && getHandleFromIncomingSharesViewModel() != INVALID_HANDLE
-                    || tabItemShares === SharesTab.OUTGOING_TAB
-                    && getHandleFromOutgoingSharesViewModel() != INVALID_HANDLE
-                    || tabItemShares === SharesTab.LINKS_TAB
-                    && getHandleFromLinksViewModel() != INVALID_HANDLE
-                ) {
-                    tabLayoutShares.visibility = View.GONE
-                    viewPagerShares.isUserInputEnabled = false
-                } else {
-                    tabLayoutShares.visibility = View.VISIBLE
-                    viewPagerShares.isUserInputEnabled = true
-                }
-                viewPagerShares.visibility = View.VISIBLE
-            }
-
             DrawerItem.HOMEPAGE -> navHostView.visibility = View.VISIBLE
             else -> {
                 fragmentContainer.visibility = View.VISIBLE
             }
         }
         closeDrawer()
-    }
-
-    /**
-     * Hides or shows tabs of a section depending on the navigation level
-     * and if select mode is enabled or not.
-     *
-     * @param hide       If true, hides the tabs, else shows them.
-     * @param currentTab The current tab where the action happens.
-     */
-    fun hideTabs(hide: Boolean, currentTab: Tab) {
-        if (currentTab != currentSharesTab)
-            return
-        val visibility = if (hide) View.GONE else View.VISIBLE
-        when (drawerItem) {
-            DrawerItem.SHARED_ITEMS -> {
-                if (currentTab !is SharesTab) return
-                when (currentTab) {
-                    SharesTab.INCOMING_TAB -> if (!isIncomingAdded || !hide && getHandleFromIncomingSharesViewModel() != INVALID_HANDLE) {
-                        return
-                    }
-
-                    SharesTab.OUTGOING_TAB -> if (!isOutgoingAdded || !hide && getHandleFromOutgoingSharesViewModel() != INVALID_HANDLE) {
-                        return
-                    }
-
-                    SharesTab.LINKS_TAB -> if (!isLinksAdded || !hide && getHandleFromLinksViewModel() != INVALID_HANDLE) {
-                        return
-                    }
-
-                    else -> {}
-                }
-                tabLayoutShares.visibility = visibility
-                viewPagerShares.isUserInputEnabled = !hide
-            }
-
-            else -> {}
-        }
     }
 
     /**
@@ -3887,6 +3617,9 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             //remove recent chat fragment as its life cycle get triggered unexpectedly, e.g. rotate device while not on recent chat page
             removeFragment(chatsFragment)
         }
+        if (item !== DrawerItem.SHARED_ITEMS) {
+            removeFragment(supportFragmentManager.findFragmentByTag(SharesFragment.TAG))
+        }
         if (item !== DrawerItem.PHOTOS) {
             resetCUFragment()
             isInAlbumContent = false
@@ -4047,8 +3780,22 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
 
             DrawerItem.SHARED_ITEMS -> {
-                onSelectSharedItemsDrawerItem()
+                showHideBottomNavigationView(false)
+                setAppBarVisibility(false)
+                setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV)
+                supportInvalidateOptionsMenu()
+                showFabButton()
                 hideAdsView()
+                updateSharesTab()
+                val fragment = supportFragmentManager.findFragmentByTag(SharesFragment.TAG)
+                    ?: SharesFragment.newInstance()
+                replaceFragment(
+                    fragment = fragment,
+                    fragmentTag = SharesFragment.TAG
+                )
+                if (!comesFromNotifications) {
+                    bottomNavigationCurrentItem = SHARED_ITEMS_BNV
+                }
             }
 
             DrawerItem.NOTIFICATIONS -> {
@@ -4129,33 +3876,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         )
 
         searchResultLauncher.launch(searchActivityIntent)
-    }
-
-    private fun onSelectSharedItemsDrawerItem() {
-        Analytics.tracker.trackEvent(SharedItemsScreenEvent)
-        lifecycleScope.launch {
-            if (isSharesTabComposeEnabled()) {
-                showFabButton()
-                showHideBottomNavigationView(false)
-                if (!comesFromNotifications) {
-                    bottomNavigationCurrentItem = SHARED_ITEMS_BNV
-                }
-                setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV)
-            } else {
-                selectDrawerItemSharedItems()
-                if (openFolderRefresh) {
-                    onNodesSharedUpdate()
-                    openFolderRefresh = false
-                }
-                supportInvalidateOptionsMenu()
-                showFabButton()
-                showHideBottomNavigationView(false)
-                if (!comesFromNotifications) {
-                    bottomNavigationCurrentItem = SHARED_ITEMS_BNV
-                }
-                setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV)
-            }
-        }
     }
 
     private fun navigateToSettingsActivity(targetPreference: TargetPreference?) {
@@ -4274,24 +3994,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE_COMPOSE.tag) as? FileBrowserComposeFragment
             return fileBrowserComposeFragment != null && fileBrowserComposeFragment?.isAdded == true
         }
-    private val isIncomingAdded: Boolean
-        get() {
-            incomingSharesComposeFragment =
-                sharesPageAdapter.getFragment(SharesTab.INCOMING_TAB.position) as? IncomingSharesComposeFragment
-            return incomingSharesComposeFragment != null && incomingSharesComposeFragment?.isAdded == true
-        }
-    private val isOutgoingAdded: Boolean
-        get() {
-            outgoingSharesComposeFragment =
-                sharesPageAdapter.getFragment(SharesTab.OUTGOING_TAB.position) as? OutgoingSharesComposeFragment
-            return outgoingSharesComposeFragment != null && outgoingSharesComposeFragment?.isAdded == true
-        }
-    private val isLinksAdded: Boolean
-        get() {
-            linksComposeFragment =
-                sharesPageAdapter.getFragment(SharesTab.LINKS_TAB.position) as? LinksComposeFragment
-            return linksComposeFragment != null && linksComposeFragment?.isAdded == true
-        }
 
     private val transferPageFragment: TransferPageFragment?
         get() = supportFragmentManager.findFragmentByTag(FragmentTag.TRANSFERS_PAGE.tag) as? TransferPageFragment
@@ -4346,10 +4048,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 backupsFragment?.checkScroll()
             }
 
-            DrawerItem.SHARED_ITEMS -> {
-                checkScrollOnSharedItemsDrawerItem()
-            }
-
             DrawerItem.CHAT -> {
                 chatTabsFragment = chatsFragment
             }
@@ -4359,22 +4057,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
 
             else -> {}
-        }
-    }
-
-    private fun checkScrollOnSharedItemsDrawerItem() {
-        when {
-            tabItemShares === SharesTab.INCOMING_TAB && isIncomingAdded -> {
-                incomingSharesComposeFragment?.checkScroll(true)
-            }
-
-            tabItemShares === SharesTab.OUTGOING_TAB && isOutgoingAdded -> {
-                outgoingSharesComposeFragment?.checkScroll(true)
-            }
-
-            tabItemShares === SharesTab.LINKS_TAB && isLinksAdded -> {
-                linksComposeFragment?.checkScroll(true)
-            }
         }
     }
 
@@ -4618,22 +4300,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
 
                 DrawerItem.SHARED_ITEMS -> {
-                    moreMenuItem.isVisible = !isFirstNavigationLevel
-                    if (tabItemShares === SharesTab.INCOMING_TAB && isIncomingAdded) {
-                        if (isIncomingAdded &&
-                            (incomingSharesViewModel.getNodeCount() > 0)
-                        ) {
-                            searchMenuItem?.isVisible = true
-                        }
-                    } else if (tabItemShares === SharesTab.OUTGOING_TAB && isOutgoingAdded) {
-                        if (isOutgoingAdded && outgoingSharesViewModel.getNodeCount() > 0) {
-                            searchMenuItem?.isVisible = true
-                        }
-                    } else if (tabItemShares === SharesTab.LINKS_TAB && isLinksAdded) {
-                        if (isLinksAdded && linksViewModel.getNodeCount() > 0) {
-                            searchMenuItem?.isVisible = true
-                        }
-                    }
+                    moreMenuItem.isVisible = false
                 }
 
                 DrawerItem.TRANSFERS -> if (transferPageViewModel.transferTab == TransfersTab.PENDING_TAB
@@ -4667,7 +4334,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         return super.onCreateOptionsMenu(menu)
     }
 
-    private fun openSearchOnHomepage() {
+    fun openSearchOnHomepage() {
         viewModel.setIsFirstNavigationLevel(true)
         Util.resetActionBar(supportActionBar)
         nodeSourceType = nodeSourceTypeMapper(drawerItem = drawerItem, sharesTab = tabItemShares)
@@ -4748,14 +4415,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     } else if (drawerItem == DrawerItem.RUBBISH_BIN) {
                         rubbishBinComposeFragment = getRubbishBinComposeFragment()
                         rubbishBinComposeFragment?.onBackPressed()
-                    } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
-                        if (tabItemShares == SharesTab.INCOMING_TAB && isIncomingAdded) {
-                            incomingSharesComposeFragment?.onBackPressed()
-                        } else if (tabItemShares == SharesTab.OUTGOING_TAB && isOutgoingAdded) {
-                            outgoingSharesViewModel.performBackNavigation()
-                        } else if (tabItemShares == SharesTab.LINKS_TAB && isLinksAdded) {
-                            linksViewModel.performBackNavigation()
-                        }
                     } else if (drawerItem == DrawerItem.PHOTOS) {
                         if (getPhotosFragment() != null) {
                             if (canPhotosEnableCUViewBack()) {
@@ -4900,15 +4559,15 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         lifecycleScope.launch {
             if (!isSharesTabComposeEnabled()) {
                 when (tabItemShares) {
-                    SharesTab.INCOMING_TAB -> if (isIncomingAdded) {
+                    SharesTab.INCOMING_TAB -> {
                         incomingSharesViewModel.selectAllNodes()
                     }
 
-                    SharesTab.OUTGOING_TAB -> if (isOutgoingAdded) {
+                    SharesTab.OUTGOING_TAB -> {
                         outgoingSharesViewModel.selectAllNodes()
                     }
 
-                    SharesTab.LINKS_TAB -> if (isLinksAdded) {
+                    SharesTab.LINKS_TAB -> {
                         linksViewModel.selectAllNodes()
                     }
 
@@ -5010,7 +4669,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             handleSuperBackPressed()
             goBackToBottomNavigationItem(bottomNavigationCurrentItem)
         } else if (drawerItem == DrawerItem.SHARED_ITEMS) {
-            onBackPressedInSharedItemsDrawerItem()
+            handleSuperBackPressed()
         } else if (drawerItem == DrawerItem.CHAT) {
             performOnBack()
         } else if (drawerItem == DrawerItem.PHOTOS) {
@@ -5148,28 +4807,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             restoreFileBrowserAfterComingFromNotification()
         } else {
             isNotFromNotificationAction.invoke()
-        }
-    }
-
-    private fun onBackPressedInSharedItemsDrawerItem() {
-        lifecycleScope.launch {
-            if (!isSharesTabComposeEnabled()) {
-                when (tabItemShares) {
-                    SharesTab.INCOMING_TAB -> if (!isIncomingAdded || isIncomingSharesBackPressPerformed()) {
-                        performOnBack()
-                    }
-
-                    SharesTab.OUTGOING_TAB -> if (!isOutgoingAdded || isOutgoingSharesBackPressPerformed()) {
-                        performOnBack()
-                    }
-
-                    SharesTab.LINKS_TAB -> if (!isLinksAdded || isLinksBackPressPerformed()) {
-                        performOnBack()
-                    }
-
-                    else -> performOnBack()
-                }
-            }
         }
     }
 
@@ -5339,7 +4976,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     } else if (tabItemShares == SharesTab.LINKS_TAB && getHandleFromLinksViewModel() != INVALID_HANDLE) {
                         linksViewModel.resetToRoot()
                     }
-                    refreshSharesPageAdapter()
                 } else {
                     drawerItem = DrawerItem.SHARED_ITEMS
                     setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV)
@@ -5432,17 +5068,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         refreshAfterMovingToRubbish()
     }
 
-    /*
-     * Display keyboard
-     */
-    private fun showKeyboardDelayed(view: View) {
-        Timber.d("showKeyboardDelayed")
-        handler.postDelayed({
-            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
-        }, 50)
-    }
-
     fun showShareBackupsFolderWarningDialog(node: MegaNode, nodeType: Int) {
         fileBackupManager.shareBackupsFolder(
             nodeController = nodeController,
@@ -5491,9 +5116,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             incomingSharesViewModel.setCurrentHandle(
                                 if (incomingSharesViewModel.incomingTreeDepth() == 0) INVALID_HANDLE else oldParentHandle
                             )
-                            if (getHandleFromIncomingSharesViewModel() == INVALID_HANDLE) {
-                                hideTabs(false, SharesTab.INCOMING_TAB)
-                            }
                             refreshIncomingShares()
                         }
 
@@ -5501,17 +5123,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             outgoingSharesViewModel.setCurrentHandle(
                                 if (outgoingSharesViewModel.outgoingTreeDepth() == 0) INVALID_HANDLE else oldParentHandle
                             )
-
-                            if (getHandleFromOutgoingSharesViewModel() == INVALID_HANDLE) {
-                                hideTabs(false, SharesTab.OUTGOING_TAB)
-                            }
                             refreshOutgoingShares()
-                        }
-
-                        SharesTab.LINKS_TAB -> {
-                            if (getHandleFromLinksViewModel() == INVALID_HANDLE) {
-                                hideTabs(false, SharesTab.LINKS_TAB)
-                            }
                         }
 
                         else -> {}
@@ -5683,15 +5295,15 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     }
                 } else if (drawerItem === DrawerItem.SHARED_ITEMS) {
                     when (tabItemShares) {
-                        SharesTab.INCOMING_TAB -> if (isIncomingAdded) {
+                        SharesTab.INCOMING_TAB -> {
                             incomingSharesViewModel.setCurrentHandle(node.longValue)
                         }
 
-                        SharesTab.OUTGOING_TAB -> if (isOutgoingAdded) {
+                        SharesTab.OUTGOING_TAB -> {
                             outgoingSharesViewModel.setCurrentHandle(node.longValue)
                         }
 
-                        SharesTab.LINKS_TAB -> if (isLinksAdded) {
+                        SharesTab.LINKS_TAB -> {
                             linksViewModel.openFolderByHandleWithRetry(node.longValue)
                         }
 
@@ -5952,9 +5564,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     private fun refreshSharesPageAdapter() {
-        sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.position)
-        sharesPageAdapter.refreshFragment(SharesTab.OUTGOING_TAB.position)
-        sharesPageAdapter.refreshFragment(SharesTab.LINKS_TAB.position)
+        refreshFragment(SharesFragment.TAG)
     }
 
     /**
@@ -6662,13 +6272,11 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             else -> {
                 //Incoming Shares
                 drawerItem = DrawerItem.SHARED_ITEMS
-                comesFromNotificationSharedIndex =
-                    SharesTab.fromPosition(viewPagerShares.currentItem)
+                comesFromNotificationSharedIndex = sharesViewModel.state.value.currentTab
                 viewModel.setSharesTab(SharesTab.INCOMING_TAB)
                 comesFromNotificationDeepBrowserTreeIncoming = deepBrowserTreeIncoming
-                comesFromNotificationHandleSaved =
-                    getHandleFromIncomingSharesViewModel()
-                currentSharesTab = SharesTab.INCOMING_TAB
+                comesFromNotificationHandleSaved = getHandleFromIncomingSharesViewModel()
+                sharesViewModel.onTabSelected(SharesTab.INCOMING_TAB)
                 if (parent != null) {
                     val depth: Int = MegaApiUtils.calculateDeepBrowserTreeIncoming(node, this)
                     incomingSharesViewModel.setCurrentHandle(
@@ -6735,12 +6343,8 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     val deepBrowserTreeOutgoing: Int
         get() = outgoingSharesViewModel.outgoingTreeDepth()
 
-    var tabItemShares: SharesTab
-        get() = viewPagerShares.currentItem.takeUnless { it == -1 }
-            ?.let { SharesTab.fromPosition(it) } ?: SharesTab.NONE
-        set(index) {
-            viewPagerShares.currentItem = index.position
-        }
+    val tabItemShares: SharesTab
+        get() = sharesViewModel.state.value.currentTab
 
     /**
      * Methods for incoming shares
@@ -6748,40 +6352,16 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun getHandleFromIncomingSharesViewModel() =
         incomingSharesViewModel.getCurrentNodeHandle()
 
-    private fun isIncomingSharesBackPressPerformed() =
-        if (incomingSharesViewModel.getCurrentNodeHandle() == INVALID_HANDLE)
-            true
-        else {
-            incomingSharesComposeFragment?.onBackPressed()
-            false
-        }
-
     /**
      * Methods for outgoing shares
      */
     private fun getHandleFromOutgoingSharesViewModel() =
         outgoingSharesViewModel.getCurrentNodeHandle()
 
-    private fun isOutgoingSharesBackPressPerformed() =
-        if (outgoingSharesViewModel.getCurrentNodeHandle() == INVALID_HANDLE)
-            true
-        else {
-            outgoingSharesViewModel.performBackNavigation()
-            false
-        }
-
     /**
      * Returns the current node handle from links viewmodel
      */
     fun getHandleFromLinksViewModel() = linksViewModel.getCurrentNodeHandle()
-
-    private fun isLinksBackPressPerformed() =
-        if (linksViewModel.getCurrentNodeHandle() == INVALID_HANDLE)
-            true
-        else {
-            linksViewModel.performBackNavigation()
-            false
-        }
 
     fun hideFabButton() {
         initFabButtonShow = false
@@ -6811,9 +6391,9 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             DrawerItem.SHARED_ITEMS -> when (tabItemShares) {
                 SharesTab.INCOMING_TAB -> {
-                    if (!isIncomingAdded) return@launch
+                    val handle = getHandleFromIncomingSharesViewModel()
                     val parentNodeInSF: MegaNode? = withContext(ioDispatcher) {
-                        megaApi.getNodeByHandle(getHandleFromIncomingSharesViewModel())
+                        megaApi.getNodeByHandle(handle)
                     }
                     if (deepBrowserTreeIncoming <= 0 || parentNodeInSF == null) {
                         hideFabButton()
@@ -6826,8 +6406,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
 
                 SharesTab.OUTGOING_TAB -> {
-                    if (!isOutgoingAdded) return@launch
-
                     // If the user is in the main page of Outgoing Shares, hide the Fab Button
                     if (deepBrowserTreeOutgoing <= 0) {
                         hideFabButton()
@@ -6846,8 +6424,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
 
                 SharesTab.LINKS_TAB -> {
-                    if (!isLinksAdded) return@launch
-
                     // If the user is in the main page of Links, hide the Fab Button
                     if (getHandleFromLinksViewModel() <= 0) {
                         hideFabButton()
@@ -7203,9 +6779,9 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             selectDrawerItem(DrawerItem.RUBBISH_BIN)
         } else if (parentNode.isInShare) {
             incomingSharesViewModel.setCurrentHandle(parentNode.handle)
-            sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.position)
+            incomingSharesViewModel.refreshNodes()
             viewModel.setSharesTab(SharesTab.INCOMING_TAB)
-            viewPagerShares.currentItem = viewModel.state().sharesTab.position
+            sharesViewModel.onTabSelected(SharesTab.INCOMING_TAB)
             refreshSharesPageAdapter()
             selectDrawerItem(DrawerItem.SHARED_ITEMS)
         } else if (parentNode.handle == megaApi.inboxNode?.handle) {
@@ -7446,7 +7022,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             return
         }
         Timber.d("The index of the TAB Shares is: %s", viewModel.state().sharesTab)
-        viewPagerShares.setCurrentItem(viewModel.state().sharesTab.position, false)
+        sharesViewModel.onTabSelected(viewModel.state().sharesTab)
         viewModel.setSharesTab(SharesTab.NONE)
     }
 
@@ -7509,34 +7085,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         get() = megaApi.isBusinessAccount && myAccountInfo.accountType == Constants.BUSINESS
     private val isProFlexiAccount: Boolean
         get() = megaApi.isBusinessAccount && myAccountInfo.accountType == Constants.PRO_FLEXI
-
-    /**
-     * Function to add unverified incoming count on tabs
-     */
-    private fun addUnverifiedIncomingCountBadge(unverifiedNodesCount: Int) {
-        val incomingSharesTab = tabLayoutShares.getTabAt(0)
-        if (incomingSharesTab != null) {
-            if (unverifiedNodesCount > 0) {
-                incomingSharesTab.orCreateBadge.number = unverifiedNodesCount
-            } else {
-                incomingSharesTab.removeBadge()
-            }
-        }
-    }
-
-    /**
-     * Function to add unverified outgoing count on tabs
-     */
-    private fun addUnverifiedOutgoingCountBadge(unverifiedNodesCount: Int) {
-        val outgoingSharesTab = tabLayoutShares.getTabAt(1)
-        if (outgoingSharesTab != null) {
-            if (unverifiedNodesCount > 0) {
-                outgoingSharesTab.orCreateBadge.number = unverifiedNodesCount
-            } else {
-                outgoingSharesTab.removeBadge()
-            }
-        }
-    }
 
     private fun handleCameraUploadFolderIconUpdate() {
         if (drawerItem === DrawerItem.PHOTOS) {

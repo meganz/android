@@ -36,40 +36,12 @@
                         android:layout_height="wrap_content"
                         android:minHeight="?attr/actionBarSize" />
 
-                    <com.google.android.material.tabs.TabLayout
-                        android:id="@+id/sliding_tabs_shares"
-                        style="@style/Widget.Mega.TabLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <com.google.android.material.tabs.TabItem
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/tab_incoming_shares" />
-
-                        <com.google.android.material.tabs.TabItem
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/tab_outgoing_shares" />
-
-                        <com.google.android.material.tabs.TabItem
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/tab_links_shares" />
-                    </com.google.android.material.tabs.TabLayout>
-
                 </com.google.android.material.appbar.AppBarLayout>
 
                 <androidx.compose.ui.platform.ComposeView
                     android:id="@+id/call_in_progress_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
-
-                <androidx.viewpager2.widget.ViewPager2
-                    android:id="@+id/shares_tabs_pager"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
 
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/nav_host_fragment"

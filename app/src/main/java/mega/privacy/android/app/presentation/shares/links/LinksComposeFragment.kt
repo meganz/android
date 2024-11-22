@@ -111,10 +111,9 @@ class LinksComposeFragment : Fragment() {
     private var actionMode: ActionMode? = null
 
     /**
-     * Flag to restore elevation when checkScroll() is called
-     * This should be removed when the Links tabs page is refactored to Compose
+     * Toggle the elevation of the app bar
      */
-    private var appBarElevationEnabled = false
+    var toggleAppBarElevation: (Boolean) -> Unit = {}
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -186,7 +185,7 @@ class LinksComposeFragment : Fragment() {
                                 ?: R.string.sortby_name
                         ),
                         onSortOrderClick = ::showSortByPanel,
-                        onToggleAppBarElevation = ::toggleAppBarElevation,
+                        onToggleAppBarElevation = toggleAppBarElevation,
                         fileTypeIconMapper = fileTypeIconMapper,
                     )
                     LegacySnackBarWrapper(snackbarHostState = snackbarHostState, activity)
@@ -301,14 +300,6 @@ class LinksComposeFragment : Fragment() {
     }
 
     /**
-     * Display the elevation of the app bar or not
-     */
-    private fun toggleAppBarElevation(withElevation: Boolean) {
-        appBarElevationEnabled = withElevation
-        (activity as? ManagerActivity)?.changeAppBarElevation(withElevation)
-    }
-
-    /**
      * Shows Options menu for item clicked
      */
     private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem<PublicLinkNode>) {
@@ -336,7 +327,6 @@ class LinksComposeFragment : Fragment() {
             .map { it.parentNode != null }
             .distinctUntilChanged()) {
             toggleAppBarElevation(false)
-            hideTabs(it)
         }
     }
 
@@ -372,15 +362,6 @@ class LinksComposeFragment : Fragment() {
     }
 
     /**
-     * Hide/Show shares tab
-     *
-     * @param hide true if needs to hide shares tabs
-     */
-    private fun hideTabs(hide: Boolean) {
-        (activity as ManagerActivity?)?.hideTabs(hide, SharesTab.LINKS_TAB)
-    }
-
-    /**
      *
      */
     override fun onAttach(context: Context) {
@@ -399,21 +380,6 @@ class LinksComposeFragment : Fragment() {
                 }
             }
         )
-    }
-
-    /**
-     * Check elevation
-     *
-     * @param allowDisable true if allowed to disable elevation
-     */
-    fun checkScroll(allowDisable: Boolean = false) {
-        if (appBarElevationEnabled) {
-            toggleAppBarElevation(true)
-        } else {
-            if (allowDisable) {
-                toggleAppBarElevation(false)
-            }
-        }
     }
 
     private fun performItemOptionsClick(optionsItemInfo: OptionsItemInfo?) {
@@ -548,7 +514,6 @@ class LinksComposeFragment : Fragment() {
             val inflater = mode.menuInflater
             inflater.inflate(R.menu.cloud_storage_action, menu)
             (requireActivity() as ManagerActivity).let {
-                it.hideTabs(true, currentTab)
                 it.hideFabButton()
                 it.showHideBottomNavigationView(true)
             }
@@ -598,7 +563,6 @@ class LinksComposeFragment : Fragment() {
         override fun onDestroyActionMode(mode: ActionMode) {
             viewModel.clearAllNodesSelection()
             (activity as? ManagerActivity)?.let {
-                it.hideTabs(false, currentTab)
                 it.showFabButton()
                 it.showHideBottomNavigationView(false)
                 actionMode = null

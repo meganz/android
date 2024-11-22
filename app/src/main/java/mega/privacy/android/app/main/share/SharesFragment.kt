@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.getValue
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.compose.content
@@ -79,12 +80,13 @@ class SharesFragment : Fragment() {
 
         OriginalTempTheme(isDark = isDark) {
             SharesScreen(
+                statusBarPadding = managerActivity.appBarLayout.paddingTop,
                 uiState = uiState,
                 incomingUiState = incomingUiState,
                 outgoingUiState = outgoingUiState,
                 linksUiState = linksUiState,
                 onSearchClick = {
-                    // TODO: Implement search
+                    managerActivity.openSearchOnHomepage()
                 },
                 onMoreClick = {
                     managerActivity.showNodeOptionsPanel(
@@ -96,6 +98,7 @@ class SharesFragment : Fragment() {
                     )
                 },
                 onPageSelected = {
+                    managerActivity.onShareTabChanged()
                     viewModel.onTabSelected(it)
                     when (it) {
                         SharesTab.INCOMING_TAB -> {
@@ -115,5 +118,28 @@ class SharesFragment : Fragment() {
                 },
             )
         }
+    }.also {
+        // remove appbar to make SharesFragment full screen
+        managerActivity.appBarLayout.isVisible = false
+    }
+
+    /**
+     * On Destroy
+     */
+    override fun onDestroyView() {
+        super.onDestroyView()
+        managerActivity.appBarLayout.isVisible = true
+    }
+
+    companion object {
+        /**
+         * Creates a new instance of the fragment.
+         */
+        fun newInstance() = SharesFragment()
+
+        /**
+         * Tag of the fragment.
+         */
+        const val TAG = "SharesFragment"
     }
 }

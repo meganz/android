@@ -50,7 +50,6 @@ import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetD
 import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
@@ -124,10 +123,9 @@ class IncomingSharesComposeFragment : Fragment() {
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
     /**
-     * Flag to restore elevation when checkScroll() is called
-     * This should be removed when the Links tabs page is refactored to Compose
+     * Toggle the elevation of the app bar
      */
-    private var appBarElevationEnabled = false
+    var toggleAppBarElevation: (Boolean) -> Unit = {}
 
     /**
      * onAttach
@@ -218,7 +216,7 @@ class IncomingSharesComposeFragment : Fragment() {
                         onSortOrderClick = { showSortByPanel() },
                         onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
                         onLinkClicked = ::navigateToLink,
-                        onToggleAppBarElevation = ::toggleAppBarElevation,
+                        onToggleAppBarElevation = toggleAppBarElevation,
                         fileTypeIconMapper = fileTypeIconMapper,
                     )
 
@@ -250,7 +248,6 @@ class IncomingSharesComposeFragment : Fragment() {
                     if (!uiState.isInRootLevel) {
                         toggleAppBarElevation(false)
                     }
-                    hideTabs(!uiState.isInRootLevel)
                 }
                 LaunchedEffect(uiState.nodesList.isEmpty()) {
                     sharesActionListener?.updateSharesPageToolbarTitleAndFAB(
@@ -285,38 +282,6 @@ class IncomingSharesComposeFragment : Fragment() {
                 IncomingSharesExitEffect(uiState.exitIncomingSharesEvent) {
                     viewModel.consumeExitIncomingSharesEvent()
                 }
-            }
-        }
-    }
-
-    /**
-     * Display the elevation of the app bar or not
-     */
-    private fun toggleAppBarElevation(withElevation: Boolean) {
-        appBarElevationEnabled = withElevation
-        (activity as? ManagerActivity)?.changeAppBarElevation(withElevation)
-    }
-
-    /**
-     * Hide/Show shares tab
-     *
-     * @param hide true if needs to hide shares tabs
-     */
-    private fun hideTabs(hide: Boolean) {
-        (activity as ManagerActivity?)?.hideTabs(hide, SharesTab.INCOMING_TAB)
-    }
-
-    /**
-     * Check elevation
-     *
-     * @param allowDisable true if allowed to disable elevation
-     */
-    fun checkScroll(allowDisable: Boolean = false) {
-        if (appBarElevationEnabled) {
-            toggleAppBarElevation(true)
-        } else {
-            if (allowDisable) {
-                toggleAppBarElevation(false)
             }
         }
     }
@@ -476,7 +441,6 @@ class IncomingSharesComposeFragment : Fragment() {
             (requireActivity() as ManagerActivity).let {
                 it.hideFabButton()
                 it.showHideBottomNavigationView(true)
-                it.hideTabs(true, SharesTab.INCOMING_TAB)
             }
             return true
         }
@@ -541,7 +505,6 @@ class IncomingSharesComposeFragment : Fragment() {
             (activity as? ManagerActivity)?.let {
                 it.showFabButton()
                 it.showHideBottomNavigationView(false)
-                it.hideTabs(false, SharesTab.INCOMING_TAB)
                 actionMode = null
             }
         }

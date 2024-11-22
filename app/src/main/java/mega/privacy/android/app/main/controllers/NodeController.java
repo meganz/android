@@ -318,7 +318,7 @@ public class NodeController {
                             ((ManagerActivity) context).setDeepBrowserTreeIncoming(deepBrowserTreeIncoming, parentIntentN.getHandle());
                             Timber.d("After calculating deepBrowserTreeIncoming: %s", deepBrowserTreeIncoming);
                         }
-                        ((ManagerActivity) context).setTabItemShares(SharesTab.Companion.fromPosition(0));
+                        ((ManagerActivity) context).getSharesViewModel().onTabSelected(SharesTab.Companion.fromPosition(0));
                         break;
                     }
                     default: {
@@ -335,7 +335,7 @@ public class NodeController {
                 drawerItem = DrawerItem.SHARED_ITEMS;
                 ((ManagerActivity) context).setDeepBrowserTreeIncoming(0, -1L);
                 firstNavigationLevel = true;
-                ((ManagerActivity) context).setTabItemShares(SharesTab.Companion.fromPosition(0));
+                ((ManagerActivity) context).getSharesViewModel().onTabSelected(SharesTab.Companion.fromPosition(0));
             }
             ((ManagerActivity) context).setFirstNavigationLevel(firstNavigationLevel);
             ((ManagerActivity) context).setDrawerItem(drawerItem);

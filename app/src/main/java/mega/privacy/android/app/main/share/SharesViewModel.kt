@@ -10,7 +10,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
 
 @HiltViewModel
-internal class SharesViewModel @Inject constructor(
+class SharesViewModel @Inject constructor(
     getThemeMode: GetThemeMode,
 ) : ViewModel() {
     private val _state = MutableStateFlow(SharesUiState())

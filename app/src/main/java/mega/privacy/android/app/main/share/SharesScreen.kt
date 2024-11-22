@@ -9,27 +9,40 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.AppBarDefaults
+import androidx.compose.material.Badge
+import androidx.compose.material.BadgedBox
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Tab
 import androidx.compose.material.TabPosition
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.testTag
@@ -38,6 +51,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -50,10 +65,7 @@ import mega.privacy.android.app.presentation.shares.links.LinksComposeFragment
 import mega.privacy.android.app.presentation.shares.links.model.LinksUiState
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeFragment
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
-import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
-import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.shared.original.core.ui.controls.appbar.TEST_TAG_APP_BAR
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
@@ -61,6 +73,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun SharesScreen(
+    statusBarPadding: Int = 0,
     uiState: SharesUiState = SharesUiState(),
     incomingUiState: IncomingSharesState = IncomingSharesState(),
     outgoingUiState: OutgoingSharesState = OutgoingSharesState(),
@@ -72,10 +85,16 @@ internal fun SharesScreen(
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val view = LocalView.current
     val pagerState = rememberPagerState(initialPage = uiState.currentTab.position) { 3 }
+    val unverifiedIncoming =
+        incomingUiState.nodesList.count { it.node.shareData?.isUnverifiedDistinctNode == true }
+    val unVerifiedOutgoing =
+        outgoingUiState.nodesList.count { it.node.shareData?.isUnverifiedDistinctNode == true }
+    val elevationState by remember { mutableStateOf(BooleanArray(3)) }
+    var isScrolled by remember { mutableStateOf(false) }
     val isTabShown = when (uiState.currentTab) {
-        SharesTab.INCOMING_TAB -> incomingUiState.isInRootLevel
-        SharesTab.OUTGOING_TAB -> outgoingUiState.isInRootLevel
-        SharesTab.LINKS_TAB -> linksUiState.isInRootLevel
+        SharesTab.INCOMING_TAB -> incomingUiState.isInRootLevel && !incomingUiState.isInSelection
+        SharesTab.OUTGOING_TAB -> outgoingUiState.isInRootLevel && !outgoingUiState.isInSelection
+        SharesTab.LINKS_TAB -> linksUiState.isInRootLevel && !linksUiState.isInSelection
         else -> true
     }
     val titleName = when (uiState.currentTab) {
@@ -84,110 +103,156 @@ internal fun SharesScreen(
         SharesTab.LINKS_TAB -> linksUiState.parentNode?.name
         else -> stringResource(R.string.title_shared_items)
     } ?: stringResource(R.string.title_shared_items)
-    val actions = when (uiState.currentTab) {
-        SharesTab.INCOMING_TAB -> {
-            if (incomingUiState.isInRootLevel) {
-                listOf(SharesActionMenu.Search)
-            } else {
-                listOf(SharesActionMenu.More, SharesActionMenu.Search)
-            }
-        }
-
-        SharesTab.OUTGOING_TAB -> {
-            if (outgoingUiState.isInRootLevel) {
-                listOf(SharesActionMenu.Search)
-            } else {
-                listOf(SharesActionMenu.More, SharesActionMenu.Search)
-            }
-        }
-
-        SharesTab.LINKS_TAB -> {
-            if (linksUiState.isInRootLevel) {
-                listOf(SharesActionMenu.Search)
-            } else {
-                listOf(SharesActionMenu.More, SharesActionMenu.Search)
-            }
-        }
-
-        else -> emptyList()
+    val isShowMore = when (uiState.currentTab) {
+        SharesTab.INCOMING_TAB -> !incomingUiState.isInRootLevel
+        SharesTab.OUTGOING_TAB -> !outgoingUiState.isInRootLevel
+        SharesTab.LINKS_TAB -> !linksUiState.isInRootLevel
+        else -> false
     }
 
     LaunchedEffect(uiState.currentTab) {
         if (uiState.currentTab != SharesTab.NONE) {
             pagerState.animateScrollToPage(uiState.currentTab.position)
+            isScrolled = elevationState[uiState.currentTab.position]
         }
     }
     LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
         if (pagerState.currentPage != uiState.currentTab.position && !pagerState.isScrollInProgress) {
             onPageSelected(SharesTab.fromPosition(pagerState.currentPage))
+            isScrolled = elevationState[pagerState.currentPage]
         }
     }
 
     MegaScaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
         topBar = {
-            MegaAppBar(
-                appBarType = AppBarType.BACK_NAVIGATION,
-                title = titleName,
-                modifier = Modifier,
-                actions = actions,
-                onActionPressed = {
-                    when (it) {
-                        SharesActionMenu.More -> onMoreClick()
-                        SharesActionMenu.Search -> onSearchClick()
-                    }
-                },
-                onNavigationPressed = {
-                    onBackPressedDispatcher?.onBackPressed()
-                }
-            )
-        },
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            if (isTabShown) {
-                TabRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag(TAB_ROW_TEST_TAG),
-                    selectedTabIndex = pagerState.currentPage,
-                    backgroundColor = MaterialTheme.colors.surface,
-                    contentColor = colorResource(R.color.color_border_interactive),
-                    indicator = { tabPositions ->
-                        Box(
-                            modifier = Modifier
-                                .tabIndicatorOffset(tabPositions[pagerState.currentPage])
-                                .height(2.dp)
-                                .background(color = colorResource(R.color.color_border_interactive))
-                        )
-                    }
-                ) {
-                    SharesTab.entries.filter { it != SharesTab.NONE }
-                        .forEachIndexed { index, item ->
-                            Tab(
-                                text = {
-                                    Text(
-                                        text = stringResource(item.stringRes),
-                                        style = MaterialTheme.typography.subtitle1,
-                                    )
-                                },
-                                icon = {
-                                    Icon(
-                                        painter = painterResource(id = item.getIcon(pagerState.currentPage == index)),
-                                        contentDescription = "Tab Icon"
-                                    )
-                                },
-                                selected = pagerState.currentPage == index,
-                                unselectedContentColor = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
-                                onClick = {
-                                    onPageSelected(item)
-                                }
+            Surface(
+                modifier = Modifier
+                    .background(MaterialTheme.colors.surface),
+                elevation = if (isScrolled) AppBarDefaults.TopAppBarElevation else 0.dp,
+            ) {
+                Column {
+                    TopAppBar(
+                        modifier = Modifier.testTag(TEST_TAG_APP_BAR),
+                        windowInsets = WindowInsets(top = statusBarPadding),
+                        title = {
+                            Text(
+                                text = titleName,
+                                style = MaterialTheme.typography.subtitle1,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
                             )
+                        },
+                        navigationIcon = {
+                            IconButton(
+                                onClick = {
+                                    onBackPressedDispatcher?.onBackPressed()
+                                },
+                            ) {
+                                Icon(
+                                    painter = painterResource(mega.privacy.android.core.R.drawable.ic_back),
+                                    contentDescription = "Back button",
+                                    tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
+                                )
+                            }
+                        },
+                        elevation = 0.dp,
+                        backgroundColor = MaterialTheme.colors.surface,
+                        actions = {
+                            IconButton(
+                                modifier = Modifier.testTag(MENU_SEARCH_TEST_TAG),
+                                onClick = onSearchClick,
+                            ) {
+                                Icon(
+                                    painter = painterResource(mega.privacy.android.legacy.core.ui.R.drawable.ic_search),
+                                    contentDescription = "Search button",
+                                    tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
+                                )
+                            }
+                            if (isShowMore) {
+                                IconButton(
+                                    modifier = Modifier.testTag(MENU_MORE_TEST_TAG),
+                                    onClick = onMoreClick,
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_more),
+                                        contentDescription = "More button",
+                                        tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
+                                    )
+                                }
+                            }
                         }
+                    )
+                    if (isTabShown) {
+                        TabRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag(TAB_ROW_TEST_TAG),
+                            selectedTabIndex = pagerState.currentPage,
+                            backgroundColor = MaterialTheme.colors.surface,
+                            contentColor = colorResource(R.color.color_border_interactive),
+                            indicator = { tabPositions ->
+                                Box(
+                                    modifier = Modifier
+                                        .tabIndicatorOffset(tabPositions[pagerState.currentPage])
+                                        .height(2.dp)
+                                        .background(color = colorResource(R.color.color_border_interactive))
+                                )
+                            }
+                        ) {
+                            SharesTab.entries.filter { it != SharesTab.NONE }
+                                .forEachIndexed { index, item ->
+                                    Tab(
+                                        text = {
+                                            Text(
+                                                text = stringResource(item.stringRes),
+                                                style = MaterialTheme.typography.subtitle1,
+                                            )
+                                        },
+                                        icon = {
+                                            BadgedBox(
+                                                badge = {
+                                                    if (item == SharesTab.INCOMING_TAB && unverifiedIncoming > 0) {
+                                                        Badge {
+                                                            Text("$unverifiedIncoming")
+                                                        }
+                                                    } else if (item == SharesTab.OUTGOING_TAB && unVerifiedOutgoing > 0) {
+                                                        Badge {
+                                                            Text("$unVerifiedOutgoing")
+                                                        }
+                                                    }
+                                                }
+                                            ) {
+                                                Icon(
+                                                    painter = painterResource(
+                                                        id = item.getIcon(
+                                                            pagerState.currentPage == index
+                                                        )
+                                                    ),
+                                                    contentDescription = "Tab Icon"
+                                                )
+                                            }
+                                        },
+                                        selected = pagerState.currentPage == index,
+                                        unselectedContentColor = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
+                                        onClick = {
+                                            onPageSelected(item)
+                                        }
+                                    )
+                                }
+                        }
+                    }
                 }
             }
-
-            MegaDivider(dividerType = DividerType.FullSize)
-
+        },
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background)
+                .padding(innerPadding)
+        ) {
             // AndroidFragment can't be previewed
             if (!view.isInEditMode) {
                 HorizontalPager(
@@ -203,15 +268,30 @@ internal fun SharesScreen(
                         when (page) {
                             SharesTab.INCOMING_TAB.position -> AndroidFragment(
                                 IncomingSharesComposeFragment::class.java
-                            )
+                            ) {
+                                it.toggleAppBarElevation = { value ->
+                                    elevationState[page] = value
+                                    isScrolled = value
+                                }
+                            }
 
                             SharesTab.OUTGOING_TAB.position -> AndroidFragment(
                                 OutgoingSharesComposeFragment::class.java
-                            )
+                            ) {
+                                it.toggleAppBarElevation = { value ->
+                                    elevationState[page] = value
+                                    isScrolled = value
+                                }
+                            }
 
                             SharesTab.LINKS_TAB.position -> AndroidFragment(
                                 LinksComposeFragment::class.java
-                            )
+                            ) {
+                                it.toggleAppBarElevation = { value ->
+                                    elevationState[page] = value
+                                    isScrolled = value
+                                }
+                            }
                         }
                     }
                 }
@@ -282,3 +362,5 @@ private fun SharesScreenPreview() {
  * Tab row test tag
  */
 const val TAB_ROW_TEST_TAG = "shares_screen:tab_row"
+const val MENU_SEARCH_TEST_TAG = "shares_view:action_search"
+const val MENU_MORE_TEST_TAG = "shares_view:action_more"
