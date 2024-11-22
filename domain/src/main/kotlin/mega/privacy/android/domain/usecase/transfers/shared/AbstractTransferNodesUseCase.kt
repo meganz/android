@@ -17,7 +17,10 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.entity.transfer.TransferStage
+import mega.privacy.android.domain.entity.transfer.isAlreadyTransferredEvent
+import mega.privacy.android.domain.entity.transfer.isFileTransfer
+import mega.privacy.android.domain.entity.transfer.isFinishScanningEvent
+import mega.privacy.android.domain.entity.transfer.isTransferUpdated
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
@@ -175,39 +178,4 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                 }
         }
 
-    /**
-     * This event indicates that the transfer was not done due to being already transferred.
-     */
-    private val TransferEvent.isAlreadyTransferredEvent: Boolean
-        get() = with(this.transfer) {
-            !isFolderTransfer && isAlreadyTransferred
-        }
-
-    /**
-     * This event is related to a file transfer, not a folder.
-     */
-    private val TransferEvent.isFileTransfer: Boolean
-        get() = !this.transfer.isFolderTransfer
-
-    private val TransferEvent.isFolderTransfer: Boolean
-        get() = this.transfer.isFolderTransfer
-
-    /**
-     * return true if this event represents a finish processing event (or already finished)
-     */
-    private val TransferEvent.isFinishScanningEvent: Boolean
-        get() = when {
-            (this as? TransferEvent.FolderTransferUpdateEvent)?.stage == TransferStage.STAGE_TRANSFERRING_FILES -> true
-            this is TransferEvent.TransferFinishEvent -> true
-            this is TransferEvent.TransferStartEvent && isFileTransfer -> true
-            this is TransferEvent.TransferUpdateEvent && isFileTransfer -> true
-            else -> false
-        }
-
-    private val TransferEvent.isTransferUpdated: Boolean
-        get() = when {
-            isFileTransfer && this !is TransferEvent.TransferStartEvent -> true
-            isFolderTransfer && isFinishScanningEvent -> true
-            else -> false
-        }
 }

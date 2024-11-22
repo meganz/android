@@ -7,19 +7,21 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.lastOrNull
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.isAlreadyTransferredEvent
+import mega.privacy.android.domain.entity.transfer.isFinishScanningEvent
+import mega.privacy.android.domain.entity.transfer.isTransferUpdated
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdateScanningFoldersData
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodesUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
 import javax.inject.Inject
 
 /**
@@ -30,7 +32,7 @@ class StartAllPendingDownloadsUseCase @Inject constructor(
     private val getPendingTransfersByTypeAndStateUseCase: GetPendingTransfersByTypeAndStateUseCase,
     private val updatePendingTransferStateUseCase: UpdatePendingTransferStateUseCase,
     private val getTypedNodeFromPendingTransferUseCase: GetTypedNodeFromPendingTransferUseCase,
-    private val downloadNodesUseCase: DownloadNodesUseCase,
+    private val downloadNodeUseCase: DownloadNodeUseCase,
     private val updatePendingTransferStartedCountUseCase: UpdatePendingTransferStartedCountUseCase,
 ) {
     /**
@@ -61,46 +63,54 @@ class StartAllPendingDownloadsUseCase @Inject constructor(
                                 errorOnStartingPendingTransfer(pendingTransfer, null, it)
                                 return@launch
                             } ?: run {
-                                errorOnStartingPendingTransfer(pendingTransfer, null,
-                                    NodeDoesNotExistsException())
+                                errorOnStartingPendingTransfer(
+                                    pendingTransfer = pendingTransfer,
+                                    node = null,
+                                    exception = NodeDoesNotExistsException()
+                                )
                                 return@launch
                             }
-                            downloadNodesUseCase(
-                                nodes = listOfNotNull(node),
+                            downloadNodeUseCase(
+                                node = node,
                                 destinationPath = pendingTransfer.path,
                                 appData = pendingTransfer.appData,
                                 isHighPriority = pendingTransfer.isHighPriority,
-                            )
-                                .onEach { transferEvent ->
-                                    // Wait for SDK scanning process to be finished. In the meanwhile update the state. At the end delete the pending transfers.
-                                    (transferEvent as? MultiTransferEvent.SingleTransferEvent)?.let { singleTransferEvent ->
-                                        if (singleTransferEvent.allTransfersUpdated) {
-                                            updatePendingTransferStartedCountUseCase(
-                                                pendingTransfer,
-                                                singleTransferEvent.startedFiles,
-                                                singleTransferEvent.alreadyTransferred,
-                                            )
-                                        } else {
-                                            if (singleTransferEvent.scanningFinished) {
-                                                updatePendingTransferStateUseCase(
-                                                    listOf(pendingTransfer),
-                                                    PendingTransferState.SdkScanned
-                                                )
-                                            }
-                                            (singleTransferEvent.transferEvent as? TransferEvent.FolderTransferUpdateEvent)?.let {
-                                                transferRepository.updatePendingTransfer(
-                                                    UpdateScanningFoldersData(
-                                                        pendingTransfer.pendingTransferId,
-                                                        stage = it.stage,
-                                                        fileCount = it.fileCount.toInt(),
-                                                        folderCount = it.folderCount.toInt(),
-                                                        createdFolderCount = it.createdFolderCount.toInt(),
-                                                    )
-                                                )
-                                            }
-                                        }
-                                    }
+                            ).takeWhile { transferEvent ->
+                                if (transferEvent is TransferEvent.TransferStartEvent) {
+                                    //to be sure that the active transfer is added before deleting the pending transfer. DownloadsWorker use collectChunked to monitor transfer events
+                                    transferRepository.insertOrUpdateActiveTransfer(
+                                        transferEvent.transfer
+                                    )
                                 }
+                                // Wait for SDK scanning process to be finished. In the meanwhile update the state.
+                                if (transferEvent.isTransferUpdated) {
+                                    updatePendingTransferStartedCountUseCase(
+                                        pendingTransfer,
+                                        1,
+                                        if (transferEvent.isAlreadyTransferredEvent) 1 else 0,
+                                    )
+                                    return@takeWhile false // worker will keep monitoring events, no need to monitor anything else regarding pending transfers for this node
+                                } else {
+                                    if (transferEvent.isFinishScanningEvent) {
+                                        updatePendingTransferStateUseCase(
+                                            listOf(pendingTransfer),
+                                            PendingTransferState.SdkScanned
+                                        )
+                                    }
+                                    (transferEvent as? TransferEvent.FolderTransferUpdateEvent)?.let {
+                                        transferRepository.updatePendingTransfer(
+                                            UpdateScanningFoldersData(
+                                                pendingTransfer.pendingTransferId,
+                                                stage = it.stage,
+                                                fileCount = it.fileCount.toInt(),
+                                                folderCount = it.folderCount.toInt(),
+                                                createdFolderCount = it.createdFolderCount.toInt(),
+                                            )
+                                        )
+                                    }
+                                    return@takeWhile true //scanning finished. Waiting to check if there are any Already transferred. Corresponding view model could wait a bit for it to update the UI.
+                                }
+                            }
                                 .catch {
                                     errorOnStartingPendingTransfer(pendingTransfer, node, it)
                                 }
