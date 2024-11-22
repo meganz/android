@@ -8,6 +8,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.LocalFolderSelected
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.NextClicked
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.mobile.analytics.event.AndroidSyncLocalFolderSelectedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncStartSyncButtonEvent
 import mega.privacy.mobile.analytics.event.SyncNewFolderScreenBackNavigationEvent
 
@@ -25,7 +26,10 @@ internal fun SyncNewFolderScreenRoute(
     SyncNewFolderScreen(
         selectedLocalFolder = state.value.selectedLocalFolder,
         selectedMegaFolder = state.value.selectedMegaFolder,
-        localFolderSelected = { viewModel.handleAction(LocalFolderSelected(it)) },
+        localFolderSelected = {
+            Analytics.tracker.trackEvent(AndroidSyncLocalFolderSelectedEvent)
+            viewModel.handleAction(LocalFolderSelected(it))
+        },
         selectMegaFolderClicked = openSelectMegaFolderScreen,
         syncClicked = {
             Analytics.tracker.trackEvent(AndroidSyncStartSyncButtonEvent)

@@ -37,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -60,6 +61,8 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.mobile.analytics.event.AndroidSyncAllFilesAccessDialogDisplayedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncSelectDeviceFolderButtonPressedEvent
 
 @Composable
 internal fun SyncNewFolderScreen(
@@ -292,6 +295,7 @@ private fun SyncNewFolderScreenContent(
             syncType = syncType,
             deviceName = deviceName,
             selectDeviceFolderClicked = {
+                Analytics.tracker.trackEvent(AndroidSyncSelectDeviceFolderButtonPressedEvent)
                 if (syncPermissionsManager.isManageExternalStoragePermissionGranted()) {
                     runCatching {
                         folderPicker.launch(null)
@@ -307,6 +311,9 @@ private fun SyncNewFolderScreenContent(
                     } else {
                         if (syncPermissionsManager.isSDKAboveOrEqualToR()) {
                             showAllowAppAccessDialog = true
+                            Analytics.tracker.trackEvent(
+                                AndroidSyncAllFilesAccessDialogDisplayedEvent
+                            )
                         } else {
                             launcher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         }

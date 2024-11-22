@@ -35,6 +35,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.resources.R as sharedResR
+import androidx.compose.ui.platform.testTag
 
 @Composable
 internal fun InputSyncInformationView(
@@ -68,7 +69,9 @@ internal fun InputSyncInformationView(
                     },
                     bottomText = selectedDeviceFolder.substring(selectedDeviceFolder.lastIndexOf('/') + 1),
                     bottomDefaultText = stringResource(R.string.sync_general_select),
-                    modifier = Modifier.clickable { selectDeviceFolderClicked() }
+                    modifier = Modifier
+                        .clickable { selectDeviceFolderClicked() }
+                        .testTag(SELECT_DEVICE_FOLDER_OPTION_TEST_TAG)
                 )
 
                 MegaDivider(dividerType = DividerType.Centered)
@@ -211,3 +214,8 @@ private fun InputSyncInformationViewPreview(
 internal class SyncTypePreviewProvider : PreviewParameterProvider<SyncType> {
     override val values = sequenceOf(SyncType.TYPE_TWOWAY, SyncType.TYPE_BACKUP)
 }
+
+/**
+ * Multi FAB main button's test tag
+ */
+const val SELECT_DEVICE_FOLDER_OPTION_TEST_TAG = "input_sync_info_view:select_device_folder_option"

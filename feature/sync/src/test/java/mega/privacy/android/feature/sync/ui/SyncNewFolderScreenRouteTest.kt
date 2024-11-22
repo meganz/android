@@ -21,6 +21,8 @@ import mega.privacy.android.feature.sync.ui.newfolderpair.TAG_SYNC_NEW_FOLDER_SC
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.shared.original.core.ui.controls.appbar.APP_BAR_BACK_BUTTON_TAG
 import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.feature.sync.ui.views.SELECT_DEVICE_FOLDER_OPTION_TEST_TAG
+import mega.privacy.mobile.analytics.event.AndroidSyncSelectDeviceFolderButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncNewFolderScreenBackNavigationEvent
 import org.junit.Rule
 import org.junit.Test
@@ -318,5 +320,32 @@ class SyncNewFolderScreenRouteTest {
         composeTestRule.onNodeWithTag(APP_BAR_BACK_BUTTON_TAG).assertExists().assertIsDisplayed()
             .performClick()
         assertThat(analyticsTestRule.events).contains(SyncNewFolderScreenBackNavigationEvent)
+    }
+
+    @Test
+    fun `test that click on select device folder option send the right analytics tracker event`() {
+        whenever(state.value).thenReturn(
+            SyncNewFolderState(
+                syncType = SyncType.TYPE_BACKUP,
+                deviceName = "Device Name",
+            )
+        )
+        whenever(viewModel.state).thenReturn(state)
+        composeTestRule.setContent {
+            SyncNewFolderScreenRoute(
+                viewModel,
+                syncPermissionsManager = syncPermissionsManager,
+                openNextScreen = {},
+                openSelectMegaFolderScreen = {},
+                openUpgradeAccount = {},
+                onBackClicked = {}
+            )
+        }
+
+        composeTestRule.onNodeWithTag(SELECT_DEVICE_FOLDER_OPTION_TEST_TAG).assertExists()
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsTestRule.events).contains(
+            AndroidSyncSelectDeviceFolderButtonPressedEvent
+        )
     }
 }

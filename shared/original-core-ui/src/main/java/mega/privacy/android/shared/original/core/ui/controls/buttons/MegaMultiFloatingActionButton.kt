@@ -299,7 +299,15 @@ private fun MegaMultiFloatingActionButtonExpandedPreview(
     }
 }
 
-internal const val MULTI_FAB_MAIN_FAB_TEST_TAG = "multi_fab:main_fab"
-internal const val MULTI_FAB_OPTION_ROW_TEST_TAG = "multi_fab:option_row"
+/**
+ * Multi FAB main button's test tag
+ */
+const val MULTI_FAB_MAIN_FAB_TEST_TAG = "multi_fab:main_fab"
+
+/**
+ * Multi FAB option row's test tag
+ */
+const val MULTI_FAB_OPTION_ROW_TEST_TAG = "multi_fab:option_row"
+
 internal const val MULTI_FAB_OPTION_LABEL_TEST_TAG = "multi_fab:option_label"
 internal const val MULTI_FAB_OPTION_FAB_TEST_TAG = "multi_fab:option_fab"

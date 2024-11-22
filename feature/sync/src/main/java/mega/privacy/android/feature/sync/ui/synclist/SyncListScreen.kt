@@ -70,6 +70,8 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
+import mega.privacy.mobile.analytics.event.AndroidBackupFABButtonPressedEvent
+import mega.privacy.mobile.analytics.event.AndroidSyncMultiFABButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SyncListBannerUpgradeButtonPressedEvent
 
 @Composable
@@ -181,12 +183,24 @@ internal fun SyncListScreen(
                                     MultiFloatingActionButtonItem(
                                         icon = painterResource(id = iconPackR.drawable.ic_database),
                                         label = stringResource(id = sharedResR.string.sync_add_new_backup_toolbar_title),
-                                        onClicked = onBackupFolderClicked,
+                                        onClicked = {
+                                            Analytics.tracker.trackEvent(
+                                                AndroidBackupFABButtonPressedEvent
+                                            )
+                                            onBackupFolderClicked()
+                                        },
                                     ),
                                 ),
                                 modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB),
                                 multiFabState = multiFabState,
-                                onStateChanged = { state -> multiFabState.value = state }
+                                onStateChanged = { state ->
+                                    if (state == MultiFloatingActionButtonState.EXPANDED) {
+                                        Analytics.tracker.trackEvent(
+                                            AndroidSyncMultiFABButtonPressedEvent
+                                        )
+                                    }
+                                    multiFabState.value = state
+                                }
                             )
                         }
                     }
