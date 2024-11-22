@@ -5766,7 +5766,10 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     )
                     dialogBuilder.setSingleChoiceItems(items, -1) { _, item ->
                         permissionsDialog?.dismiss()
-                        nodeController.shareFolders(nodeHandles, contactsData, item)
+                        lifecycleScope.launch {
+                            viewModel.initShareKeys(nodeHandles)
+                            nodeController.shareFolders(nodeHandles, contactsData, item)
+                        }
                     }
                     dialogBuilder.setTitle(getString(R.string.dialog_select_permissions))
                     permissionsDialog = dialogBuilder.create()

@@ -68,6 +68,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -1554,53 +1555,57 @@ class ManagerViewModelTest {
     }
 
     @Test
-    fun `test that the new ML document kit scanner is initialized and used for scanning documents`() = runTest {
-        val handleScanDocumentResult = HandleScanDocumentResult.UseNewImplementation(mock())
-        whenever(scannerHandler.handleScanDocument()).thenReturn(handleScanDocumentResult)
+    fun `test that the new ML document kit scanner is initialized and used for scanning documents`() =
+        runTest {
+            val handleScanDocumentResult = HandleScanDocumentResult.UseNewImplementation(mock())
+            whenever(scannerHandler.handleScanDocument()).thenReturn(handleScanDocumentResult)
 
-        underTest.handleScanDocument()
-        testScheduler.advanceUntilIdle()
+            underTest.handleScanDocument()
+            testScheduler.advanceUntilIdle()
 
-        underTest.state.test {
-            assertThat(awaitItem().handleScanDocumentResult).isEqualTo(handleScanDocumentResult)
+            underTest.state.test {
+                assertThat(awaitItem().handleScanDocumentResult).isEqualTo(handleScanDocumentResult)
+            }
         }
-    }
 
     @Test
-    fun `test that an insufficient RAM to launch error is returned when initializing the ML document kit scanner with low device RAM`() = runTest {
-        whenever(scannerHandler.handleScanDocument()).thenAnswer {
-            throw InsufficientRAMToLaunchDocumentScanner()
-        }
+    fun `test that an insufficient RAM to launch error is returned when initializing the ML document kit scanner with low device RAM`() =
+        runTest {
+            whenever(scannerHandler.handleScanDocument()).thenAnswer {
+                throw InsufficientRAMToLaunchDocumentScanner()
+            }
 
-        assertDoesNotThrow { underTest.handleScanDocument() }
-        testScheduler.advanceUntilIdle()
+            assertDoesNotThrow { underTest.handleScanDocument() }
+            testScheduler.advanceUntilIdle()
 
-        underTest.state.test {
-            assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.InsufficientRAM)
+            underTest.state.test {
+                assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.InsufficientRAM)
+            }
         }
-    }
 
     @Test
-    fun `test that a generic error is returned when initializing the ML document kit scanner results in an error`() = runTest {
-        whenever(scannerHandler.handleScanDocument()).thenThrow(RuntimeException())
+    fun `test that a generic error is returned when initializing the ML document kit scanner results in an error`() =
+        runTest {
+            whenever(scannerHandler.handleScanDocument()).thenThrow(RuntimeException())
 
-        assertDoesNotThrow { underTest.handleScanDocument() }
-        testScheduler.advanceUntilIdle()
+            assertDoesNotThrow { underTest.handleScanDocument() }
+            testScheduler.advanceUntilIdle()
 
-        underTest.state.test {
-            assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.GenericError)
+            underTest.state.test {
+                assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.GenericError)
+            }
         }
-    }
 
     @Test
-    fun `test that a generic error is returned when opening the ML document kit scanner results in an error`() = runTest {
-        underTest.onNewDocumentScannerFailedToOpen()
-        testScheduler.advanceUntilIdle()
+    fun `test that a generic error is returned when opening the ML document kit scanner results in an error`() =
+        runTest {
+            underTest.onNewDocumentScannerFailedToOpen()
+            testScheduler.advanceUntilIdle()
 
-        underTest.state.test {
-            assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.GenericError)
+            underTest.state.test {
+                assertThat(awaitItem().documentScanningError).isEqualTo(DocumentScanningError.GenericError)
+            }
         }
-    }
 
     @Test
     fun `test that the handle scan document result is reset`() = runTest {
@@ -1638,6 +1643,24 @@ class ManagerViewModelTest {
         verify(deleteNodeVersionsUseCase).invoke(NodeId(nodeHandle))
         verify(versionHistoryRemoveMessageMapper).invoke(anyOrNull())
     }
+
+    @Test
+    fun `test that initShareKeys invokes the use case`() = runTest {
+        val nodeHandle = 123L
+        val megaNode = mock<TypedFolderNode> {
+            on { id } doReturn NodeId(nodeHandle)
+        }
+        whenever(getNodeByIdUseCase.invoke(NodeId(nodeHandle))).thenReturn(megaNode)
+        underTest.initShareKeys(longArrayOf(nodeHandle))
+        verify(createShareKeyUseCase).invoke(megaNode)
+    }
+
+    @Test
+    fun `test that create share key use case is not triggered when null is passed to initShareKeys`() =
+        runTest {
+            underTest.initShareKeys(null)
+            verifyNoInteractions(createShareKeyUseCase)
+        }
 
     companion object {
         @JvmField

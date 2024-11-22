@@ -58,6 +58,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -870,6 +871,23 @@ class ManagerViewModel @Inject constructor(
         Timber.e(it)
     }
 
+
+    /**
+     * Init share key for sharing folders
+     *
+     * @param nodeHandles
+     */
+    suspend fun initShareKeys(nodeHandles: LongArray?) = runCatching {
+        require(nodeHandles != null) { "Cannot create a share key for a null node" }
+        nodeHandles.toList().mapAsync { nodeId ->
+            val typedNode = getNodeByIdUseCase(NodeId(nodeId))
+            require(typedNode is FolderNode) { "Cannot create a share key for a non-folder node" }
+            createShareKeyUseCase(typedNode)
+        }
+    }.onFailure {
+        Timber.e(it)
+    }
+
     /**
      * Consume chat archive event
      */
@@ -1209,7 +1227,7 @@ class ManagerViewModel @Inject constructor(
                     ChatCallStatus.Connecting,
                     ChatCallStatus.Joining,
                     ChatCallStatus.InProgress,
-                    -> ScheduledMeetingStatus.Joined(call.duration)
+                        -> ScheduledMeetingStatus.Joined(call.duration)
 
                     else -> ScheduledMeetingStatus.NotStarted
                 }
