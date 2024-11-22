@@ -33,6 +33,8 @@ import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_SYNC_ITEM_VIEW
+import mega.privacy.mobile.analytics.event.SyncCardExpandedEvent
+import mega.privacy.mobile.analytics.event.SyncFoldersListDisplayedEvent
 import mega.privacy.mobile.analytics.event.SyncListEmptyStateUpgradeButtonPressedEvent
 import org.junit.Rule
 import org.junit.Test
@@ -341,5 +343,130 @@ class SyncFoldersScreenTest {
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.general_dialog_cancel_button))
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that display the list of Sync Folders send the right analytics tracker event`() {
+        composeTestRule.setContent {
+            SyncFoldersScreen(
+                syncUiItems = listOf(
+                    SyncUiItem(
+                        id = 1L,
+                        syncType = SyncType.TYPE_TWOWAY,
+                        folderPairName = "Sync Name",
+                        status = SyncStatus.SYNCING,
+                        deviceStoragePath = "Device Path",
+                        hasStalledIssues = false,
+                        megaStoragePath = "MEGA Path",
+                        megaStorageNodeId = NodeId(1111L),
+                        expanded = false,
+                    ),
+                    SyncUiItem(
+                        id = 2L,
+                        syncType = SyncType.TYPE_BACKUP,
+                        folderPairName = "Backup Name",
+                        status = SyncStatus.SYNCING,
+                        deviceStoragePath = "Device Path",
+                        hasStalledIssues = false,
+                        megaStoragePath = "MEGA Path",
+                        megaStorageNodeId = NodeId(2222L),
+                        expanded = false,
+                    )
+                ),
+                cardExpanded = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                addFolderClicked = {},
+                upgradeAccountClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                isLowBatteryLevel = false,
+                isFreeAccount = false,
+                isLoading = false,
+                showSyncsPausedErrorDialog = false,
+                onShowSyncsPausedErrorDialogDismissed = {},
+                deviceName = "Device Name",
+                isBackupForAndroidEnabled = false,
+            )
+        }
+        assertThat(analyticsRule.events).contains(SyncFoldersListDisplayedEvent)
+    }
+
+    @Test
+    fun `test that expand a Sync card sends the right analytics tracker event`() {
+        composeTestRule.setContent {
+            SyncFoldersScreen(
+                syncUiItems = listOf(
+                    SyncUiItem(
+                        id = 1L,
+                        syncType = SyncType.TYPE_TWOWAY,
+                        folderPairName = "Sync Name",
+                        status = SyncStatus.SYNCING,
+                        deviceStoragePath = "Device Path",
+                        hasStalledIssues = false,
+                        megaStoragePath = "MEGA Path",
+                        megaStorageNodeId = NodeId(1111L),
+                        expanded = false,
+                    ),
+                ),
+                cardExpanded = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                addFolderClicked = {},
+                upgradeAccountClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                isLowBatteryLevel = false,
+                isFreeAccount = false,
+                isLoading = false,
+                showSyncsPausedErrorDialog = false,
+                onShowSyncsPausedErrorDialogDismissed = {},
+                deviceName = "Device Name",
+                isBackupForAndroidEnabled = false,
+            )
+        }
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW).assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardExpandedEvent)
+    }
+
+    @Test
+    fun `test that collapse a Sync card does not send any analytics tracker event `() {
+        composeTestRule.setContent {
+            SyncFoldersScreen(
+                syncUiItems = listOf(
+                    SyncUiItem(
+                        id = 1L,
+                        syncType = SyncType.TYPE_TWOWAY,
+                        folderPairName = "Sync Name",
+                        status = SyncStatus.SYNCING,
+                        deviceStoragePath = "Device Path",
+                        hasStalledIssues = false,
+                        megaStoragePath = "MEGA Path",
+                        megaStorageNodeId = NodeId(1111L),
+                        expanded = true,
+                    ),
+                ),
+                cardExpanded = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                addFolderClicked = {},
+                upgradeAccountClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                isLowBatteryLevel = false,
+                isFreeAccount = false,
+                isLoading = false,
+                showSyncsPausedErrorDialog = false,
+                onShowSyncsPausedErrorDialogDismissed = {},
+                deviceName = "Device Name",
+                isBackupForAndroidEnabled = false,
+            )
+        }
+        analyticsRule.events.clear()
+        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW).assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).isEmpty()
     }
 }

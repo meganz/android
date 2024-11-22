@@ -15,6 +15,11 @@ import mega.privacy.android.feature.sync.R
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.performClick
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.mobile.analytics.event.SyncCardIssuesInfoButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncCardOpenDeviceFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncCardOpenMegaFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncCardPauseRunButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncCardStopButtonPressedEvent
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -176,6 +181,51 @@ class SyncCardTest {
             .assertIsDisplayed().performClick()
         assertThat(clicked).isTrue()
         clicked = false
+    }
+
+    @Test
+    fun `test that tap Sync card buttons send the right analytics tracker event`() {
+        val deviceStoragePath = "Device Path"
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_TWOWAY,
+                    folderPairName = "Sync Name",
+                    status = SyncStatus.SYNCING,
+                    deviceStoragePath = deviceStoragePath,
+                    hasStalledIssues = true,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = true,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                isLowBatteryLevel = false,
+                isFreeAccount = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(deviceStoragePath).performClick()
+        assertThat(analyticsRule.events).contains(SyncCardOpenDeviceFolderButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardIssuesInfoButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardOpenMegaFolderButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardPauseRunButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_sync_button))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardStopButtonPressedEvent)
     }
 
     @Test
@@ -356,6 +406,51 @@ class SyncCardTest {
             .assertIsDisplayed().performClick()
         assertThat(clicked).isTrue()
         clicked = false
+    }
+
+    @Test
+    fun `test that tap Backup card buttons send the right analytics tracker event`() {
+        val deviceStoragePath = "Device Path"
+        composeTestRule.setContent {
+            SyncCard(
+                sync = SyncUiItem(
+                    id = 1L,
+                    syncType = SyncType.TYPE_BACKUP,
+                    folderPairName = "Sync Name",
+                    status = SyncStatus.SYNCING,
+                    deviceStoragePath = deviceStoragePath,
+                    hasStalledIssues = true,
+                    megaStoragePath = "MEGA Path",
+                    megaStorageNodeId = NodeId(1111L),
+                    expanded = true,
+                ),
+                expandClicked = {},
+                pauseRunClicked = {},
+                removeFolderClicked = {},
+                issuesInfoClicked = {},
+                onOpenDeviceFolderClicked = {},
+                onOpenMegaFolderClicked = {},
+                isLowBatteryLevel = false,
+                isFreeAccount = false,
+                errorRes = null,
+                deviceName = "Device Name",
+            )
+        }
+
+        composeTestRule.onNodeWithText(deviceStoragePath).performClick()
+        assertThat(analyticsRule.events).contains(SyncCardOpenDeviceFolderButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_sync_issues_info))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardIssuesInfoButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_open_button))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardOpenMegaFolderButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_card_pause_sync))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardPauseRunButtonPressedEvent)
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_stop_backup_button))
+            .assertIsDisplayed().performClick()
+        assertThat(analyticsRule.events).contains(SyncCardStopButtonPressedEvent)
     }
 
     @Test

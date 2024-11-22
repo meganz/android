@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.domain.entity.node.NodeId
@@ -48,6 +49,11 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.mobile.analytics.event.SyncCardIssuesInfoButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncCardOpenDeviceFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncCardOpenMegaFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncCardPauseRunButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SyncCardStopButtonPressedEvent
 
 @Composable
 internal fun SyncCard(
@@ -202,7 +208,10 @@ private fun SyncCardDetailedInfo(
                 MegaText(
                     text = deviceStoragePath,
                     textColor = TextColor.Accent,
-                    modifier = Modifier.clickable { onOpenDeviceFolderClicked(deviceStoragePath) },
+                    modifier = Modifier.clickable {
+                        Analytics.tracker.trackEvent(SyncCardOpenDeviceFolderButtonPressedEvent)
+                        onOpenDeviceFolderClicked(deviceStoragePath)
+                    },
                     style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Medium)
                 )
             }, modifier = Modifier.padding(bottom = 8.dp)
@@ -332,7 +341,10 @@ private fun SyncCardFooter(
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
-                    onClick = issuesInfoClicked,
+                    onClick = {
+                        Analytics.tracker.trackEvent(SyncCardIssuesInfoButtonPressedEvent)
+                        issuesInfoClicked()
+                    },
                     icon = coreR.drawable.ic_info,
                     iconColor = StatusColor.Error.getStatusIconColor(),
                     textColor = StatusColor.Error.getStatusTextColor(),
@@ -343,7 +355,10 @@ private fun SyncCardFooter(
                 modifier = Modifier
                     .padding(end = 8.dp)
                     .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
-                onClick = onOpenMegaFolderClicked,
+                onClick = {
+                    Analytics.tracker.trackEvent(SyncCardOpenMegaFolderButtonPressedEvent)
+                    onOpenMegaFolderClicked()
+                },
                 icon = iconPackR.drawable.ic_folder_open_medium_regular_outline,
                 text = stringResource(id = sharedR.string.general_open_button),
             )
@@ -351,7 +366,10 @@ private fun SyncCardFooter(
                 modifier = Modifier
                     .padding(end = 16.dp)
                     .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
-                onClick = pauseRunClicked,
+                onClick = {
+                    Analytics.tracker.trackEvent(SyncCardPauseRunButtonPressedEvent)
+                    pauseRunClicked()
+                },
                 icon = if (isSyncRunning) {
                     coreR.drawable.ic_pause
                 } else {
@@ -368,7 +386,10 @@ private fun SyncCardFooter(
                 modifier = Modifier
                     .padding(end = 8.dp)
                     .defaultMinSize(minWidth = 56.dp, minHeight = 32.dp),
-                onClick = removeFolderClicked,
+                onClick = {
+                    Analytics.tracker.trackEvent(SyncCardStopButtonPressedEvent)
+                    removeFolderClicked()
+                },
                 icon = coreR.drawable.ic_minus_circle,
                 text = when (syncType) {
                     SyncType.TYPE_BACKUP -> stringResource(sharedR.string.sync_stop_backup_button)

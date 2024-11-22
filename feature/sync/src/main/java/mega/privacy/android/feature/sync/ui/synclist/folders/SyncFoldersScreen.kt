@@ -17,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -47,6 +48,8 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.mobile.analytics.event.SyncCardExpandedEvent
+import mega.privacy.mobile.analytics.event.SyncFoldersListDisplayedEvent
 import mega.privacy.mobile.analytics.event.SyncListEmptyStateUpgradeButtonPressedEvent
 
 @Composable
@@ -102,6 +105,9 @@ internal fun SyncFoldersScreen(
                         syncUiItems = syncUiItems,
                         itemIndex = itemIndex,
                         cardExpanded = { syncUiItem, expanded ->
+                            if (expanded) {
+                                Analytics.tracker.trackEvent(SyncCardExpandedEvent)
+                            }
                             cardExpanded(CardExpanded(syncUiItem, expanded))
                         },
                         pauseRunClicked = pauseRunClicked,
@@ -128,6 +134,12 @@ internal fun SyncFoldersScreen(
                 onDismiss = onShowSyncsPausedErrorDialogDismissed,
                 bodyTextColor = TextColor.Primary,
             )
+        }
+    }
+
+    LaunchedEffect(syncUiItems) {
+        if (syncUiItems.isNotEmpty()) {
+            Analytics.tracker.trackEvent(SyncFoldersListDisplayedEvent)
         }
     }
 }
