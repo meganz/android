@@ -1,5 +1,6 @@
 package mega.privacy.android.app.textEditor
 
+import android.content.Intent
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -15,6 +16,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -37,6 +39,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -399,6 +403,26 @@ internal class TextEditorViewModelTest {
             }
         }
 
+    @ParameterizedTest(name = "when the file name is {0}")
+    @MethodSource("provideIsMarkDownFileTestData")
+    fun `test the isMarkDownFile is updated correctly`(fileName: String?, expectedResult: Boolean) =
+        runTest {
+            val testIntent = mock<Intent> {
+                on { getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) }.thenReturn(fileName)
+            }
+
+            underTest.setInitialValues(testIntent, mock())
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.isMarkDownFile).isEqualTo(expectedResult)
+            }
+        }
+
+    private fun provideIsMarkDownFileTestData() = listOf(
+        arrayOf("file.md", true),
+        arrayOf("file.txt", false),
+        arrayOf(null, false),
+    )
 
     companion object {
         @JvmField

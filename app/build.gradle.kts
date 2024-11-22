@@ -309,6 +309,7 @@ dependencies {
     implementation(lib.mega.analytics)
     implementation(lib.kotlin.serialisation)
     implementation(lib.zoomable.image.coil)
+    implementation(lib.commonmark.java)
 
     // Debug
     debugImplementation(lib.nocturn)

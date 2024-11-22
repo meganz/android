@@ -41,6 +41,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.featuretoggle.ApiFeatures
@@ -104,6 +105,8 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaShare
+import org.commonmark.parser.Parser
+import org.commonmark.renderer.html.HtmlRenderer
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -614,6 +617,13 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             setOnClickListener { if (viewModel.isViewMode()) animateUI() }
         }
 
+        binding.contentWebView.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                if (viewModel.isViewMode()) animateUI()
+            }
+            return@setOnTouchListener false
+        }
+
         if (savedInstanceState != null && viewModel.thereIsNoErrorSettingContent()
             && !viewModel.needsReadOrIsReadingContent()
         ) {
@@ -724,6 +734,10 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         viewModel.onFatalError().observe(this) {
             showFatalErrorWarningAndFinish()
         }
+        collectFlow(viewModel.uiState.map { it.isMarkDownFile }) { isMarkDownFile ->
+            binding.contentText.isVisible = !isMarkDownFile
+            binding.contentWebView.isVisible = isMarkDownFile
+        }
     }
 
     /**
@@ -753,8 +767,16 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             }
 
             binding.contentText.apply {
-                isVisible = true
+                isVisible = !viewModel.uiState.value.isMarkDownFile
                 text = binding.contentEditText.text
+            }
+
+            binding.contentWebView.apply {
+                isVisible = viewModel.uiState.value.isMarkDownFile
+                viewModel.getPagination()?.getEditedText()?.let {
+                    val markdownHtml = convertMarkDownToHtml(it)
+                    loadDataWithBaseURL(null, markdownHtml, "text/html", "UTF-8", null)
+                }
             }
 
             if (viewModel.canShowEditFab() && currentUIState == STATE_SHOWN) {
@@ -764,6 +786,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             supportActionBar?.title = viewModel.getNameOfFile()
             binding.nameText.isVisible = false
             binding.contentText.isVisible = false
+            binding.contentWebView.isVisible = false
 
             binding.contentEditText.apply {
                 isVisible = true
@@ -772,6 +795,11 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             binding.editFab.hide()
         }
+    }
+
+    private fun convertMarkDownToHtml(content: String?): String {
+        val htmlContent = Parser.builder().build().parse(content)
+        return HtmlRenderer.builder().build().render(htmlContent)
     }
 
     /**
@@ -815,6 +843,10 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         val firstLineNumber = content.getFirstLineNumber()
         binding.contentText.setText(currentContent, firstLineNumber)
         binding.contentEditText.setText(currentContent, firstLineNumber)
+        binding.contentWebView.apply {
+            val markdownHtml = convertMarkDownToHtml(content.getEditedText())
+            loadDataWithBaseURL(null, markdownHtml, "text/html", "UTF-8", null)
+        }
         binding.fileEditorScrollView.isVisible = true
         binding.fileEditorScrollView.smoothScrollTo(0, 0)
         binding.loadingLayout.isVisible = false

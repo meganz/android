@@ -425,6 +425,8 @@ class TextEditorViewModel @Inject constructor(
         setEditableAdapter()
 
         fileName.value = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: getNode()?.name ?: ""
+        val isMarkDownFile = fileName.value?.endsWith(".md", ignoreCase = true) ?: false
+        _uiState.update { it.copy(isMarkDownFile = isMarkDownFile) }
 
         this.preferences = preferences
         showLineNumbers = preferences.getBoolean(SHOW_LINE_NUMBERS, false)
