@@ -37,13 +37,12 @@
             android:id="@+id/empty_hint_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@{context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? @drawable/empty_folder_landscape : @drawable/empty_folder_portrait}"
+            android:src="@drawable/ic_empty_folder_glass"
             app:layout_constraintBottom_toTopOf="@id/empty_hint_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:src="@drawable/empty_folder_portrait" />
+            app:layout_constraintVertical_chainStyle="packed" />
 
         <TextView
             android:id="@+id/empty_hint_text"

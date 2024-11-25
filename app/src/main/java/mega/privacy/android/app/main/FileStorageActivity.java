@@ -11,7 +11,6 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.isAndroid11OrUpper;
-import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
@@ -245,7 +244,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
 
         emptyImageView = findViewById(R.id.file_storage_empty_image);
         emptyTextView = findViewById(R.id.file_storage_empty_text);
-        emptyImageView.setImageResource(isScreenInPortrait(this) ? R.drawable.empty_folder_portrait : R.drawable.empty_folder_landscape);
+        emptyImageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_empty_folder_glass);
 
         String textToShow = getString(R.string.file_browser_empty_folder_new);
         try {
@@ -400,9 +399,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
         super.onConfigurationChanged(newConfig);
 
         if (emptyImageView != null) {
-            emptyImageView.setImageResource(isScreenInPortrait(this)
-                    ? R.drawable.empty_folder_portrait
-                    : R.drawable.empty_folder_landscape);
+            emptyImageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_empty_folder_glass);
         }
     }
 

@@ -9,12 +9,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
@@ -44,11 +42,10 @@ fun LegacyMegaEmptyView(
     text: Spanned,
 ) {
     LegacyMegaEmptyView(modifier, text) {
-        Icon(
+        Image(
             imageVector = imageVector,
             contentDescription = "Empty Icon",
             modifier = Modifier.padding(bottom = 30.dp),
-            tint = getIconTint()
         )
     }
 }
@@ -67,11 +64,10 @@ fun LegacyMegaEmptyView(
     text: Spanned,
 ) {
     LegacyMegaEmptyView(modifier, text) {
-        Icon(
+        Image(
             bitmap = imageBitmap,
             contentDescription = "Empty Icon",
             modifier = Modifier.padding(bottom = 30.dp),
-            tint = getIconTint()
         )
     }
 }
@@ -90,11 +86,10 @@ fun LegacyMegaEmptyView(
     text: Spanned,
 ) {
     LegacyMegaEmptyView(modifier, text) {
-        Icon(
+        Image(
             painter = imagePainter,
             contentDescription = "Empty Icon",
             modifier = Modifier.padding(bottom = 30.dp),
-            tint = getIconTint()
         )
     }
 }
@@ -142,15 +137,6 @@ private fun LegacyMegaEmptyView(modifier: Modifier, text: Spanned, Icon: @Compos
     }
 }
 
-@Composable
-private fun getIconTint(): Color {
-    return if (MaterialTheme.colors.isLight) {
-        Color.Unspecified
-    } else {
-        Color.Gray
-    }
-}
-
 /**
  * Reusable EmptyView with Icon & Text
  * Pass imageVector using ImageVector.vectorResource(id = R.drawable.ic_xyz)
@@ -165,11 +151,10 @@ fun LegacyMegaEmptyView(
     modifier: Modifier = Modifier,
 ) {
     LegacyMegaEmptyView(modifier, text) {
-        Icon(
+        Image(
             painter = imagePainter,
             contentDescription = "Empty Icon",
             modifier = Modifier.padding(bottom = 30.dp),
-            tint = getIconTint()
         )
     }
 }

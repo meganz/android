@@ -50,6 +50,7 @@ import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.util.Stack
 import javax.inject.Inject
+import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * The fragment for incoming shares explorer
@@ -449,11 +450,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
                     R.drawable.incoming_empty_landscape
                 }
             } else {
-                if (isScreenInPortrait(requireContext())) {
-                    R.drawable.ic_zero_portrait_empty_folder
-                } else {
-                    R.drawable.ic_zero_landscape_empty_folder
-                }
+                iconPackR.drawable.ic_empty_folder_glass
             }
         )
         binding.fileListEmptyTextFirst.text =

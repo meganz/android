@@ -67,6 +67,7 @@ import timber.log.Timber
 import java.io.File
 import java.util.Stack
 import javax.inject.Inject
+import mega.privacy.android.icon.pack.R as iconPackR
 
 @AndroidEntryPoint
 class ContactFileListFragment : ContactFileBaseFragment() {
@@ -503,14 +504,10 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                 emptyImageView!!.visibility = View.VISIBLE
                 emptyTextView!!.visibility = View.VISIBLE
                 if (megaApi.rootNode!!.handle == _parentHandle) {
-                    emptyImageView!!.setImageResource(R.drawable.ic_empty_cloud_drive)
+                    emptyImageView!!.setImageResource(iconPackR.drawable.ic_empty_cloud_glass)
                     emptyTextView!!.setText(R.string.file_browser_empty_cloud_drive)
                 } else {
-                    if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        emptyImageView!!.setImageResource(R.drawable.incoming_empty_landscape)
-                    } else {
-                        emptyImageView!!.setImageResource(R.drawable.incoming_shares_empty)
-                    }
+                    emptyImageView!!.setImageResource(iconPackR.drawable.ic_empty_folder_glass)
                     var textToShow =
                         String.format(context.getString(R.string.context_empty_incoming))
                     try {

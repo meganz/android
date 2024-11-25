@@ -1,10 +1,8 @@
 package mega.privacy.android.app.presentation.clouddrive
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -90,6 +88,8 @@ import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
 import timber.log.Timber
 import javax.inject.Inject
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * A Fragment for File Browser
@@ -445,21 +445,9 @@ class FileBrowserComposeFragment : Fragment() {
      */
     private fun getEmptyFolderDrawable(isCloudDriveEmpty: Boolean): Pair<Int, Int> {
         return if (isCloudDriveEmpty) {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.ic_empty_cloud_drive
-                } else {
-                    R.drawable.ic_empty_cloud_drive
-                }, R.string.context_empty_cloud_drive
-            )
+            Pair(iconPackR.drawable.ic_empty_cloud_glass, R.string.context_empty_cloud_drive)
         } else {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.ic_zero_landscape_empty_folder
-                } else {
-                    R.drawable.ic_zero_portrait_empty_folder
-                }, R.string.file_browser_empty_folder_new
-            )
+            Pair(iconPackR.drawable.ic_empty_folder_glass, R.string.file_browser_empty_folder_new)
         }
     }
 

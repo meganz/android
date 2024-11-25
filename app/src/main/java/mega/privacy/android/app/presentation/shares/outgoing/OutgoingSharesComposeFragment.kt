@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.shares.outgoing
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -74,6 +73,8 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import javax.inject.Inject
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * A Fragment for Out going shares
@@ -381,13 +382,7 @@ class OutgoingSharesComposeFragment : Fragment() {
                 }, R.string.context_empty_outgoing
             )
         } else {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.ic_zero_landscape_empty_folder
-                } else {
-                    R.drawable.ic_zero_portrait_empty_folder
-                }, R.string.file_browser_empty_folder_new
-            )
+            Pair(iconPackR.drawable.ic_empty_folder_glass, R.string.file_browser_empty_folder_new)
         }
     }
 

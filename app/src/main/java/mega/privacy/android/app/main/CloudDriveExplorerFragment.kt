@@ -37,13 +37,10 @@ import mega.privacy.android.app.main.adapters.MegaExplorerAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.search.callback.SearchCallback
-import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util.getPreferences
-import mega.privacy.android.app.utils.Util.isScreenInPortrait
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
@@ -59,6 +56,7 @@ import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.util.Stack
 import javax.inject.Inject
+import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * The fragment for cloud drive explorer
@@ -497,17 +495,9 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         megaApi.rootNode?.handle.let { rootHandle ->
             binding.fileListEmptyImage.setImageResource(
                 if (rootHandle == parentHandle) {
-                    if (isScreenInPortrait(requireContext())) {
-                        R.drawable.ic_empty_cloud_drive
-                    } else {
-                        R.drawable.cloud_empty_landscape
-                    }
+                    iconPackR.drawable.ic_empty_cloud_glass
                 } else {
-                    if (isScreenInPortrait(requireContext())) {
-                        R.drawable.ic_zero_portrait_empty_folder
-                    } else {
-                        R.drawable.ic_zero_landscape_empty_folder
-                    }
+                    iconPackR.drawable.ic_empty_folder_glass
                 }
             )
             binding.fileListEmptyTextFirst.text = if (rootHandle == parentHandle) {
@@ -515,11 +505,6 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             } else {
                 emptyGeneralText
             }
-            ColorUtils.setImageViewAlphaIfDark(
-                requireContext(),
-                binding.fileListEmptyImage,
-                DARK_IMAGE_ALPHA
-            )
         }
     }
 

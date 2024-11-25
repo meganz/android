@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.backups
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -74,6 +73,7 @@ import timber.log.Timber
 import java.io.File
 import java.util.Stack
 import javax.inject.Inject
+import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * An instance of [RotatableFragment] that displays all content that were backed up by the user
@@ -838,31 +838,17 @@ class BackupsFragment : RotatableFragment() {
             if (getNodeCount() == 0) {
                 backupsRecyclerView.visibility = View.GONE
                 backupsNoItemsGroup.visibility = View.VISIBLE
+                backupsNoItemsImageView.setImageResource(iconPackR.drawable.ic_empty_folder_glass)
                 if (viewModel.isUserInRootBackupsFolderLevel()) {
                     setEmptyFolderTextContent(
                         title = getString(R.string.backups_empty_state_title),
                         description = getString(R.string.backups_empty_state_body)
-                    )
-                    backupsNoItemsImageView.setImageResource(
-                        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            R.drawable.ic_zero_landscape_empty_folder
-                        } else {
-                            R.drawable.ic_zero_portrait_empty_folder
-                        }
                     )
                 } else {
                     setEmptyFolderTextContent(
                         title = getString(R.string.file_browser_empty_folder_new),
                         description = "",
                     )
-                    backupsNoItemsImageView.setImageResource(
-                        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            R.drawable.empty_folder_landscape
-                        } else {
-                            R.drawable.empty_folder_portrait
-                        }
-                    )
-
                 }
             } else {
                 backupsRecyclerView.visibility = View.VISIBLE

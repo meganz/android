@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.folderlink.view
 import mega.privacy.android.icon.pack.R as iconPackR
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -45,7 +44,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -440,11 +438,7 @@ internal fun EmptyFolderLinkView(
     emptyViewString: String,
     isNodesFetched: Boolean,
 ) {
-    val orientation = LocalConfiguration.current.orientation
-    val imageResource = if (orientation == Configuration.ORIENTATION_LANDSCAPE)
-        R.drawable.ic_zero_landscape_empty_folder
-    else
-        R.drawable.ic_zero_portrait_empty_folder
+    val imageResource = iconPackR.drawable.ic_empty_folder_glass
     if (isNodesFetched) {
         Column(
             modifier = modifier,

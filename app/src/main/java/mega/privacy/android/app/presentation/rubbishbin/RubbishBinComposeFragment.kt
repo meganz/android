@@ -58,6 +58,7 @@ import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
+import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * Fragment is for Rubbish Bin
@@ -234,13 +235,7 @@ class RubbishBinComposeFragment : Fragment() {
                 }, R.string.context_empty_rubbish_bin
             )
         } else {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.ic_zero_landscape_empty_folder
-                } else {
-                    R.drawable.ic_zero_portrait_empty_folder
-                }, R.string.file_browser_empty_folder_new
-            )
+            Pair(iconPackR.drawable.ic_empty_folder_glass, R.string.file_browser_empty_folder_new)
         }
     }
 

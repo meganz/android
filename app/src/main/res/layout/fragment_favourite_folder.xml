@@ -41,7 +41,7 @@
             android:layout_width="144dp"
             android:layout_height="144dp"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/ic_zero_landscape_empty_folder"
+            android:src="@drawable/ic_empty_folder_glass"
             tools:ignore="ContentDescription" />
 
         <TextView
