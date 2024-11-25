@@ -179,7 +179,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun handleUrlRedirection(isLoggedIn: Boolean, needsRefreshSession: Boolean) {
         when {
-            // If is not a MEGA link, is not a supported link
+            // Check if it is a supported link
             !url.isURLSanitized() -> {
                 Timber.d("OpenLinkActivity: URL doesn't match regex pattern or whitelisted $url")
                 setError(getString(R.string.open_link_not_valid_link))
@@ -495,6 +495,17 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     setError(getString(R.string.alert_not_logged_in))
                 }
             }
+
+            getUrlRegexPatternTypeUseCase(url) == RegexPatternType.INSTALLER_DOWNLOAD_LINK -> {
+                Timber.d("INSTALLER_DOWNLOAD_LINK $url")
+                openWebLinkInBrowser(url)
+            }
+
+            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.PURCHASE_LINK -> {
+                Timber.d("PURCHASE_LINK $url")
+                openWebLinkInBrowser(url)
+            }
+
             //Upgrade Account link
             getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_PAGE_LINK
                     || getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_LINK -> {

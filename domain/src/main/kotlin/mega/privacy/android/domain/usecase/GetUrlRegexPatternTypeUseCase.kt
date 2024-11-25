@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.RegexPatternType.EXPORT_MASTER_KEY_LIN
 import mega.privacy.android.domain.entity.RegexPatternType.FILE_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.FOLDER_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.HANDLE_LINK
+import mega.privacy.android.domain.entity.RegexPatternType.INSTALLER_DOWNLOAD_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.MEGA_BLOG_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.MEGA_DROP_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.MEGA_FILE_REQUEST_LINK
@@ -22,6 +23,7 @@ import mega.privacy.android.domain.entity.RegexPatternType.OPEN_DEVICE_CENTER_LI
 import mega.privacy.android.domain.entity.RegexPatternType.OPEN_SYNC_MEGA_FOLDER_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.PASSWORD_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.PENDING_CONTACTS_LINK
+import mega.privacy.android.domain.entity.RegexPatternType.PURCHASE_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.RESET_PASSWORD_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.RESTRICTED
 import mega.privacy.android.domain.entity.RegexPatternType.REVERT_CHANGE_PASSWORD_LINK
@@ -80,6 +82,8 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             isUrlMatchesRegexUseCase(url, WEB_SESSION_LINK_REGEX) -> WEB_SESSION_LINK
             isUrlMatchesRegexUseCase(url, BUSINESS_INVITE_LINK_REGEX) -> BUSINESS_INVITE_LINK
             isUrlMatchesRegexUseCase(url, UPGRADE_PAGE_LINK_REGEX) -> UPGRADE_PAGE_LINK
+            isUrlMatchesRegexUseCase(url, INSTALLER_DOWNLOAD_LINK_REGEX) -> INSTALLER_DOWNLOAD_LINK
+            isUrlMatchesRegexUseCase(url, PURCHASE_LINK_REGEX) -> PURCHASE_LINK
             isUrlMatchesRegexUseCase(url, UPGRADE_LINK_REGEX) -> UPGRADE_LINK
             isUrlMatchesRegexUseCase(
                 url,
@@ -100,14 +104,13 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          * This Regex Pattern will check for the existence of:
          * 1. Domain with HTTPS protocol
          * 2. Followed by either: Mega.co.nz, Mega.nz, Mega.io, Megaad.nz
-         * 3. No words are allowed after the domain name, for example; [...](https://mega.co.nzxxx) is not allowed
-         * 4. Backslashes (/) or Question Mark (?) are allowed to allow path and query parameters after the MEGA domain, for example; [...](https://mega.nz/home)
-         * 5. Any words after Backslashes (/) or Question Mark (?) are allowed
-         * 6. No dot (.) after the domain name, for example; [...](https://mega.co.nz//@attacker.com) is not allowed
+         * 3. No words are allowed after the domain name, for example; <a href="https://mega.co.nzxxx">...</a> is not allowed
+         * 4. Backslashes (/) or Question Mark (?) are allowed to allow path and query parameters after the MEGA domain, for example; <a href="https://mega.nz/home">...</a>
+         * 5. Any characters after Backslashes (/) or Question Mark (?) are allowed, except At Sign(@)
          */
         private val MEGA_REGEX = arrayOf(
-            "^https://mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz)(?!\\w)((?:\\/|\\?)?)([^.]?)+$",
-            "^https://([a-z0-9]+\\.)+mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz)(?!\\w)((?:\\/|\\?)?)([^.]?)+$"
+            "^https://mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz)(\\/|\\?)[^@]*$",
+            "^https://([a-z0-9]+\\.)+mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz)(\\/|\\?)[^@]*$"
         )
 
         /**
@@ -320,9 +323,35 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          * - https://mega.co.nz
          * - https://mega.nz
          * Followed by /pro and then ? for query parameters or / for additional path
+         * or /pro without any additional characters.
          */
         private val UPGRADE_PAGE_LINK_REGEX = arrayOf(
-            "^https:\\/\\/mega(?:\\.co\\.nz|\\.nz)\\/pro[/?]?([^.]?)+$",
+            "^https:\\/\\/mega(?:\\.co\\.nz|\\.nz)\\/(pro[/?].*|pro)$",
+        )
+
+        /**
+         * Regex pattern for installer download link
+         * Checks for a url that starts with, either:
+         * - https://mega.co.nz
+         * - https://mega.nz
+         * Example links:
+         * - https://mega.nz/MEGAvpnSetup64.exe?__hstc=254534871.de5fc61c
+         * - https://mega.nz/linux/repo/xUbuntu_24.04/amd64/megacmd-xUbuntu_24.04_amd64.deb
+         */
+        private val INSTALLER_DOWNLOAD_LINK_REGEX = arrayOf(
+            "^https:\\/\\/mega(?:\\.co\\.nz|\\.nz)\\/MEGA(.?)+\\.(exe|dmg)[?]?.*$",
+            "^https:\\/\\/mega(?:\\.co\\.nz|\\.nz)\\/linux/repo/(.?)+$"
+        )
+
+        /**
+         * Regex pattern for purchase link
+         * Checks for a url that starts with, either:
+         * - https://mega.co.nz
+         * - https://mega.nz
+         * Followed by /propay_1 or /propay_2 or /propay_vpn and then other characters.
+         */
+        private val PURCHASE_LINK_REGEX = arrayOf(
+            "^https:\\/\\/mega(?:\\.co\\.nz|\\.nz)\\/propay_.+$",
         )
 
         /**
