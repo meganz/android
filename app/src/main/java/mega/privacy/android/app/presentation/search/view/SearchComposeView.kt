@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberScaffoldState
@@ -46,7 +44,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewForSearch
-import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnackbar
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 
 /**
@@ -129,7 +127,7 @@ fun SearchComposeView(
 
         }
     }
-    Scaffold(
+    MegaScaffold(
         modifier = modifier.semantics { testTagsAsResourceId = true },
         topBar = {
             SearchToolBar(
@@ -147,11 +145,7 @@ fun SearchComposeView(
                 navigationLevel = state.navigationLevel
             )
         },
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState) { data ->
-                MegaSnackbar(snackbarData = data)
-            }
-        }
+        scaffoldState = scaffoldState,
     ) { padding ->
         Column(modifier = Modifier.padding(top = topBarPadding)) {
             if ((state.nodeSourceType == NodeSourceType.CLOUD_DRIVE || state.nodeSourceType == NodeSourceType.HOME) && state.navigationLevel.isEmpty()) {
