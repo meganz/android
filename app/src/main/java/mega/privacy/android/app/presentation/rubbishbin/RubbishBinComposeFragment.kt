@@ -227,13 +227,7 @@ class RubbishBinComposeFragment : Fragment() {
 
     private fun getEmptyFolderDrawable(isRubbishBinEmpty: Boolean): Pair<Int, Int> {
         return if (isRubbishBinEmpty) {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.rubbish_bin_empty_landscape
-                } else {
-                    R.drawable.rubbish_bin_empty
-                }, R.string.context_empty_rubbish_bin
-            )
+            Pair(iconPackR.drawable.ic_empty_trash_glass, R.string.context_empty_rubbish_bin)
         } else {
             Pair(iconPackR.drawable.ic_empty_folder_glass, R.string.file_browser_empty_folder_new)
         }
