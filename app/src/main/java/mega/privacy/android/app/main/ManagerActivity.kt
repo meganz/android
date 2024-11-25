@@ -6,7 +6,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationManager
-import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -271,7 +270,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAva
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessFileDialog
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.UploadUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -5332,6 +5330,9 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     override fun onCreateMeeting() {
         Analytics.tracker.trackEvent(StartMeetingNowPressedEvent)
+        if (chatsFragment == null) {
+            selectDrawerItem(DrawerItem.CHAT)
+        }
         chatsFragment?.onCreateMeeting()
     }
 
