@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.CLOUD_DRIVE_MODE
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_RECENTLY_WATCHED_MODE
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_SECTION_MODE
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
@@ -98,7 +99,7 @@ internal fun VideoSectionNavHost(
                 videoSectionViewModel = viewModel,
                 onClick = viewModel::onItemClicked,
                 onSortOrderClick = onSortOrderClick,
-                onMenuClick = { onMenuClick(it, CLOUD_DRIVE_MODE) },
+                onMenuClick = { onMenuClick(it, VIDEO_SECTION_MODE) },
                 onLongClick = viewModel::onItemLongClicked,
                 onPlaylistItemClick = { playlist, index ->
                     if (state.isInSelection) {

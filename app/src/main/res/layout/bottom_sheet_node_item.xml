@@ -230,8 +230,13 @@
                     tools:drawableRight="@drawable/ic_circle_label"
                     tools:text="@string/label_red"
                     tools:textColor="@color/salmon_400_salmon_300" />
-
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/option_add_video_to_playlist"
+                style="@style/BottomSheetOption"
+                android:text="@string/video_section_bottom_sheet_option_title_add_to_playlist"
+                app:drawableStartCompat="@drawable/ic_player_queue"/>
 
             <LinearLayout
                 android:id="@+id/label_separator"

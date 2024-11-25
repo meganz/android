@@ -38,6 +38,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -233,6 +234,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val separatorModify = contentView.findViewById<LinearLayout>(R.id.separator_modify_options)
         val optionRemoveRecentlyWatchedItem =
             contentView.findViewById<View>(R.id.remove_recently_watched_item_option)
+        val optionAddVideoToPlaylistItem =
+            contentView.findViewById<View>(R.id.option_add_video_to_playlist)
         if (!Util.isScreenInPortrait(requireContext())) {
             Timber.d("Landscape configuration")
             nodeName.maxWidth = Util.scaleWidthPx(275, resources.displayMetrics)
@@ -541,7 +544,11 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     mapDrawerItemToMode(state.nodeDeviceCenterInformation)
                 }
                 when (mode) {
-                    CLOUD_DRIVE_MODE, SEARCH_MODE, VIDEO_RECENTLY_WATCHED_MODE -> {
+                    CLOUD_DRIVE_MODE,
+                    SEARCH_MODE,
+                    VIDEO_RECENTLY_WATCHED_MODE,
+                    VIDEO_SECTION_MODE,
+                        -> {
                         Timber.d("show Cloud bottom sheet")
                         optionRemove.visibility = View.GONE
                         optionLeaveShares.visibility = View.GONE
@@ -549,12 +556,25 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         optionOpenFolder.visibility = View.GONE
                         counterModify--
                         optionRestoreFromRubbish.visibility = View.GONE
+
                         optionRemoveRecentlyWatchedItem.visibility =
                             if (mode == VIDEO_RECENTLY_WATCHED_MODE) {
                                 View.VISIBLE
                             } else {
                                 View.GONE
                             }
+
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            optionAddVideoToPlaylistItem.visibility =
+                                if (mode == VIDEO_SECTION_MODE && getFeatureFlagValueUseCase(
+                                        AppFeatures.AddVideoToPlaylistFromVideoSection
+                                    )
+                                ) {
+                                    View.VISIBLE
+                                } else {
+                                    View.GONE
+                                }
+                        }
                     }
 
                     BACKUPS_MODE -> {
@@ -1655,7 +1675,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             args.putLong(NODE_ID_KEY, nodeId.longValue)
             args.putInt(
                 MODE_KEY,
-                mode?.takeIf { it in DEFAULT_MODE..VIDEO_RECENTLY_WATCHED_MODE } ?: DEFAULT_MODE)
+                mode?.takeIf { it in DEFAULT_MODE..VIDEO_SECTION_MODE } ?: DEFAULT_MODE)
             shareData?.let {
                 val shareInfo = NodeShareInformation(
                     user = it.user,
@@ -1726,5 +1746,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
          * For Video Recently Watched
          */
         const val VIDEO_RECENTLY_WATCHED_MODE = 9
+
+        /**
+         * For Video Section
+         */
+        const val VIDEO_SECTION_MODE = 10
     }
 }

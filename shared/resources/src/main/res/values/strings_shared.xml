@@ -823,4 +823,6 @@
     </plurals>
     <!-- Name for a general button which action is "Open" something -->
     <string name="general_open_button">Open</string>
+    <!-- Bottom sheet option title for add the video to playlist from video section -->
+    <string name="video_section_bottom_sheet_option_title_add_to_playlist">Add to playlist</string>
 </resources>
