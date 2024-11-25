@@ -67,12 +67,14 @@ class CallChangesObserver @Inject constructor(
 ) {
     private var wakeLock: PowerManager.WakeLock? = null
     private var openCallChatId: Long = -1
+    private var chatIdFromPushNotification: Long? = null
 
     /**
      * listen all call status observer
      */
     fun init() {
         applicationScope.launch {
+            Timber.d("Monitor chat call updates")
             monitorChatCallUpdatesUseCase()
                 .catch { e -> Timber.e(e, "Error listening call updates") }
                 .collect { call ->
@@ -129,7 +131,8 @@ class CallChangesObserver @Inject constructor(
             Timber.e("Error in chatId or callId")
             return
         }
-        Timber.d("Call status is ${callStatus}, chat id is $chatId, call id is $callId")
+
+        Timber.d("Handle call status change: chatId ${call.chatId}, callStatus ${call.status}, isRinging ${call.isRinging}, chatIdFromPushNotification $chatIdFromPushNotification")
         when (call.status) {
             ChatCallStatus.Connecting -> {
                 if (isOutgoing && chatManagement.isRequestSent(callId)) {
@@ -140,8 +143,8 @@ class CallChangesObserver @Inject constructor(
             ChatCallStatus.UserNoPresent -> {
                 val listAllCalls =
                     megaChatApi.chatCalls?.takeIf { it.size() > 0 } ?: return
-                if (isRinging) {
-                    Timber.d("Is incoming call")
+                if (isRinging || (chatIdFromPushNotification == chatId)) {
+                    Timber.d("Handle call status change: is incoming call")
                     incomingCall(listAllCalls, chatId, callStatus)
                 } else {
                     val chatRoom = megaChatApi.getChatRoom(chatId)
@@ -191,13 +194,15 @@ class CallChangesObserver @Inject constructor(
     private suspend fun handleCallRinging(call: ChatCall) {
         val callStatus = call.status
         val isRinging = call.isRinging
+        Timber.d("Handle call ringing change: chatId ${call.chatId}, callStatus ${call.status}, isRinging ${call.isRinging}, chatIdFromPushNotification $chatIdFromPushNotification")
+
         val listAllCalls = megaChatApi.chatCalls
         if (listAllCalls == null || listAllCalls.size() == 0L) {
             Timber.e("Calls not found")
             return
         }
-        if (isRinging) {
-            Timber.d("Is incoming call")
+        if (isRinging || (chatIdFromPushNotification == call.chatId)) {
+            Timber.d("Handle call ringing change: is incoming call")
             incomingCall(listAllCalls, call.chatId, callStatus)
         } else {
             CallUtil.clearIncomingCallNotification(call.callId)
@@ -221,6 +226,17 @@ class CallChangesObserver @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Handle a incoming call received in a push  notification
+     *
+     * @param chatId    Chat id
+     */
+    fun handleIncomingCallByPushNotification(chatId: Long) {
+        Timber.d("Handle a incoming call received in a push  notification, chatId $chatId")
+        chatIdFromPushNotification = chatId
+        checkOneCall(chatId)
     }
 
     /**
@@ -314,7 +330,7 @@ class CallChangesObserver @Inject constructor(
      *
      * @param incomingCallChatId
      */
-    fun checkOneCall(incomingCallChatId: Long) {
+    private fun checkOneCall(incomingCallChatId: Long) {
         Timber.d("One call : Chat ID is $incomingCallChatId, openCall Chat ID is $openCallChatId")
         if (openCallChatId == incomingCallChatId) {
             Timber.d("The call is already opened")
@@ -348,6 +364,8 @@ class CallChangesObserver @Inject constructor(
             showOneCallNotification(callToLaunch)
             return
         }
+
+        Timber.d("Check the one-to-one call")
         checkOneToOneIncomingCall(callToLaunch)
     }
 

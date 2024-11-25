@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
+import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.notifications.ChatMessageNotificationManager
 import mega.privacy.android.app.notifications.PromoPushNotificationManager
 import mega.privacy.android.app.notifications.ScheduledMeetingPushMessageNotificationManager
@@ -84,6 +85,7 @@ class PushMessageWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
     private val pushReceivedUseCase: PushReceivedUseCase,
+    private val callChangesObserver: CallChangesObserver,
     private val retryPendingConnectionsUseCase: RetryPendingConnectionsUseCase,
     private val pushMessageMapper: PushMessageMapper,
     private val initialiseMegaChatUseCase: InitialiseMegaChatUseCase,
@@ -108,6 +110,7 @@ class PushMessageWorker @AssistedInject constructor(
 
     @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
+        Timber.d("Push message worker - do work")
         // legacy support, other places need to know logging in happen
         if (loginMutex.isLocked) {
             Timber.w("Logging already running.")
@@ -117,6 +120,7 @@ class PushMessageWorker @AssistedInject constructor(
         getPushMessageFromWorkerData(inputData)?.let {
             if (it is CallPushMessage) {
                 runCatching {
+                    Timber.d("Call push message - monitor chat call updates")
                     monitorChatCallUpdatesJob = monitorChatCallUpdates(it.chatId)
                 }
             }
@@ -125,13 +129,13 @@ class PushMessageWorker @AssistedInject constructor(
         val loginResult = runCatching {
             backgroundFastLoginUseCase()
         }
-
+        Timber.d("Login result $loginResult")
         if (loginResult.isSuccess) {
             Timber.d("Fast login success.")
             runCatching { retryPendingConnectionsUseCase(disconnect = false) }
                 .recoverCatching { error ->
                     if (error is ChatNotInitializedErrorStatus) {
-                        Timber.d("chat engine not ready. try to initialise megachat.")
+                        Timber.d("chat engine not ready. try to initialise MEGAChat")
                         initialiseMegaChatUseCase(loginResult.getOrDefault(""))
                     } else {
                         Timber.w(error)
@@ -148,6 +152,12 @@ class PushMessageWorker @AssistedInject constructor(
         }
 
         when (val pushMessage = getPushMessageFromWorkerData(inputData)) {
+            is CallPushMessage -> {
+                Timber.d("Call push message with chatId ${pushMessage.chatId} ")
+                callChangesObserver.handleIncomingCallByPushNotification(pushMessage.chatId)
+                return@withContext Result.success()
+            }
+
             is ChatPushMessage -> {
                 with(pushMessage) {
                     Timber.d("Should beep: $shouldBeep, Chat: $chatId, message: $msgId")
@@ -218,7 +228,6 @@ class PushMessageWorker @AssistedInject constructor(
             }
         }
 
-        cancelJobs()
         return@withContext Result.success()
     }
 
@@ -304,6 +313,7 @@ class PushMessageWorker @AssistedInject constructor(
             .filter { it.chatId == chatIdPushMessage }
             .distinctUntilChanged().collectLatest {
                 Timber.d("Call updated")
+                cancelJobs()
             }
     }
 

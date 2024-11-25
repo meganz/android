@@ -17,9 +17,11 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.notifications.ChatMessageNotificationManager
 import mega.privacy.android.app.notifications.PromoPushNotificationManager
 import mega.privacy.android.app.notifications.ScheduledMeetingPushMessageNotificationManager
@@ -43,13 +45,16 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -79,6 +84,7 @@ class PushMessageWorkerTest {
     private val getChatMessageNotificationDataUseCase =
         mock<GetChatMessageNotificationDataUseCase>()
     private val fileDurationMapper = mock<FileDurationMapper>()
+    private val callChangesObserver = mock<CallChangesObserver>()
     private val ioDispatcher = UnconfinedTestDispatcher()
 
 
@@ -124,6 +130,7 @@ class PushMessageWorkerTest {
             promoPushNotificationManager = promoPushNotificationManager,
             getChatMessageNotificationDataUseCase = getChatMessageNotificationDataUseCase,
             chatMessageNotificationManager = chatMessageNotificationManager,
+            callChangesObserver = callChangesObserver,
             ioDispatcher = ioDispatcher,
             loginMutex = mock()
         )
@@ -133,6 +140,9 @@ class PushMessageWorkerTest {
         whenever(notificationManager.areNotificationsEnabled()).thenReturn(false)
         whenever(callsPreferencesGateway.getCallsMeetingRemindersPreference())
             .thenReturn(flowOf(CallsMeetingReminders.Disabled))
+        monitorChatCallUpdatesUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
+
+        doNothing().`when`(callChangesObserver).handleIncomingCallByPushNotification(chatId = 123L)
     }
 
     @Test
