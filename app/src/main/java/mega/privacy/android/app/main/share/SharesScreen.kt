@@ -42,7 +42,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.testTag
@@ -230,7 +229,7 @@ internal fun SharesScreen(
                                                             pagerState.currentPage == index
                                                         )
                                                     ),
-                                                    contentDescription = "Tab Icon"
+                                                    contentDescription = stringResource(item.stringRes)
                                                 )
                                             }
                                         },
