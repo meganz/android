@@ -305,7 +305,7 @@ private fun EmptyContactsView(onInviteContactsClicked: () -> Unit) {
                 modifier = Modifier
                     .padding(vertical = 10.dp)
                     .size(120.dp),
-                painter = painterResource(id = if (isDark) IconR.drawable.ic_empty_user_dark else IconR.drawable.ic_empty_user),
+                painter = painterResource(id =  IconR.drawable.ic_user_glass),
                 contentDescription = "Empty contacts image",
             )
         }

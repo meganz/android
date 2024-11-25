@@ -125,7 +125,6 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 import mega.privacy.mobile.analytics.event.InviteContactsButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ScanQRCodeButtonPressedEvent
 import timber.log.Timber
-import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -582,7 +581,7 @@ private fun ContactChipBar(
                     .padding(start = 10.dp)
                     .testTag(SELECTED_CONTACT_CHIP_TAG + it.getContactName()),
                 style = TransparentChipStyle,
-                trailingIcon = IconPackR.drawable.ic_x_circle_medium_regular_solid
+                trailingIcon = iconPackR.drawable.ic_x_circle_medium_regular_solid
             ) { onClick(it) }
         }
     }
@@ -804,7 +803,7 @@ private fun ContactsPermissionDeniedBody(
                 modifier = Modifier
                     .padding(vertical = 10.dp)
                     .size(120.dp),
-                painter = painterResource(id = if (isDarkMode) mega.privacy.android.icon.pack.R.drawable.ic_empty_user_dark else mega.privacy.android.icon.pack.R.drawable.ic_empty_user),
+                painter = painterResource(id = iconPackR.drawable.ic_user_glass),
                 contentDescription = "Empty contacts image",
             )
         }

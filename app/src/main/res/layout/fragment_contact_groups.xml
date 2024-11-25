@@ -27,7 +27,7 @@
         android:layout_gravity="center"
         android:text="@string/context_empty_groups"
         android:visibility="gone"
-        app:drawableTopCompat="@drawable/ic_zero_groups"
+        app:drawableTopCompat="@drawable/ic_message_chat_glass"
         tools:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

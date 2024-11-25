@@ -29,7 +29,7 @@
         android:layout_gravity="center"
         android:text="@string/context_empty_contacts"
         android:visibility="gone"
-        app:drawableTopCompat="@drawable/ic_zero_contacts"
+        app:drawableTopCompat="@drawable/ic_user_glass"
         tools:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
