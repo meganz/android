@@ -6194,18 +6194,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish: %s_%d", request.requestString, e.errorCode)
         when (request.type) {
-            MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION -> {
-                if (e.errorCode == MegaError.API_OK) {
-                    Timber.d("FCM OK TOKEN MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION")
-                } else {
-                    Timber.e(
-                        "FCM ERROR TOKEN TYPE_REGISTER_PUSH_NOTIFICATION: %d__%s",
-                        e.errorCode,
-                        e.errorString
-                    )
-                }
-            }
-
             MegaRequest.TYPE_FOLDER_INFO -> {
                 if (e.errorCode == MegaError.API_OK) {
                     val info: MegaFolderInfo = request.megaFolderInfo
