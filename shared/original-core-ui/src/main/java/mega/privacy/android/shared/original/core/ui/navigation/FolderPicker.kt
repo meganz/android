@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 
 /**
  * Launches a native Android Folder Picker
@@ -20,12 +21,24 @@ fun launchFolderPicker(
     initialUri: Uri? = null,
     onCancel: () -> Unit = {},
     onFolderSelected: (Uri) -> Unit,
-): ActivityResultLauncher<Uri?> =
-    rememberLauncherForActivityResult(object : ActivityResultContracts.OpenDocumentTree() {
+): ActivityResultLauncher<Uri?> {
+    val context = LocalContext.current
+
+    return rememberLauncherForActivityResult(object : ActivityResultContracts.OpenDocumentTree() {
         override fun createIntent(context: Context, input: Uri?): Intent =
-            super.createIntent(context, initialUri)
+            super.createIntent(context, initialUri).also {
+                it.addFlags(
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            and Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                )
+            }
     }) { directoryUri ->
         directoryUri?.let {
+            context.contentResolver.takePersistableUriPermission(
+                directoryUri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
             onFolderSelected(it)
         } ?: onCancel()
     }
+}
