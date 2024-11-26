@@ -19,8 +19,9 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedTex
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * Composable for when Recent Actions is empty
@@ -37,7 +38,7 @@ fun RecentActionsEmptyView(
         val (image, text) = createRefs()
 
         Image(
-            painter = painterResource(R.drawable.ic_recents),
+            painter = painterResource(iconPackR.drawable.ic_clock_glass),
             contentDescription = "Recent Actions Icon",
             modifier = Modifier
                 .constrainAs(image) {

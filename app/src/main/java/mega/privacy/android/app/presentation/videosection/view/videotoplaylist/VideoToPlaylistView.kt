@@ -121,7 +121,7 @@ internal fun VideoToPlaylistView(
                 items.isEmpty() -> LegacyMegaEmptyViewWithImage(
                     modifier = Modifier.testTag(VIDEO_TO_PLAYLIST_EMPTY_VIEW_TEST_TAG),
                     text = stringResource(id = sharedR.string.video_section_playlists_empty_hint_playlist),
-                    imagePainter = painterResource(id = iconPackR.drawable.ic_homepage_empty_playlists)
+                    imagePainter = painterResource(id = iconPackR.drawable.ic_playlist_glass)
                 )
 
                 else -> LazyColumn(

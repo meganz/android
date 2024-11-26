@@ -99,6 +99,7 @@ import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import javax.inject.Inject
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * Add contact activity
@@ -1171,13 +1172,11 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
 
         emptyImageView = findViewById<View>(R.id.add_contact_list_empty_image) as ImageView
         emptyTextView = findViewById<View>(R.id.add_contact_list_empty_text) as TextView
-        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            emptyImageView?.setImageResource(R.drawable.empty_contacts_portrait)
-        } else {
+        emptyImageView?.setImageResource(iconPackR.drawable.ic_user_glass)
+        if (resources.configuration.orientation != Configuration.ORIENTATION_PORTRAIT) {
             // auto scroll to the bottom to show the invite button
             val scrollView = findViewById<ScrollView>(R.id.scroller)
             Handler().postDelayed({ scrollView.fullScroll(View.FOCUS_DOWN) }, 100)
-            emptyImageView?.setImageResource(R.drawable.empty_contacts_landscape)
         }
         emptyTextView?.setText(R.string.contacts_list_empty_text_loading_share)
         emptySubTextView = findViewById<View>(R.id.add_contact_list_empty_subtext) as TextView

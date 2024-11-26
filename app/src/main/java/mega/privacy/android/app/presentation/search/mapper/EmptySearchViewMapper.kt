@@ -71,17 +71,17 @@ class EmptySearchViewMapper @Inject constructor(
                 )
 
                 category == ALL_DOCUMENTS -> Pair(
-                    R.drawable.ic_homepage_empty_document,
+                    iconPackR.drawable.ic_files_glass,
                     context.getString(R.string.search_empty_screen_no_documents)
                 )
 
                 category == AUDIO -> Pair(
-                    R.drawable.ic_homepage_empty_audio,
+                    iconPackR.drawable.ic_audio_glass,
                     context.getString(R.string.search_empty_screen_no_audio)
                 )
 
                 category == VIDEO -> Pair(
-                    R.drawable.ic_homepage_empty_video,
+                    iconPackR.drawable.ic_video_glass,
                     context.getString(R.string.search_empty_screen_no_video)
                 )
 

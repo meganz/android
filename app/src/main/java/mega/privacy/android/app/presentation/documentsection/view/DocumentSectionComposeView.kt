@@ -99,7 +99,7 @@ internal fun DocumentSectionComposeView(
                 items.isEmpty() -> LegacyMegaEmptyView(
                     modifier = Modifier.testTag(DOCUMENT_SECTION_EMPTY_VIEW_TEST_TAG),
                     text = stringResource(id = R.string.homepage_empty_hint_documents),
-                    imagePainter = painterResource(id = R.drawable.ic_homepage_empty_document)
+                    imagePainter = painterResource(id = iconPackR.drawable.ic_files_glass)
                 )
 
                 else -> {
