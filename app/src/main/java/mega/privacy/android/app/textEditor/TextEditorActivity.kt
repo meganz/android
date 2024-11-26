@@ -100,7 +100,21 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificati
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.TextEditorCloseMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.TextEditorCopyMenuItemEvent
+import mega.privacy.mobile.analytics.event.TextEditorDownloadMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.TextEditorEditButtonPressedEvent
+import mega.privacy.mobile.analytics.event.TextEditorExportFileMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.TextEditorHideLineNumbersMenuItemEvent
 import mega.privacy.mobile.analytics.event.TextEditorHideNodeMenuItemEvent
+import mega.privacy.mobile.analytics.event.TextEditorMoveMenuItemEvent
+import mega.privacy.mobile.analytics.event.TextEditorMoveToTheRubbishBinMenuItemEvent
+import mega.privacy.mobile.analytics.event.TextEditorRenameMenuItemEvent
+import mega.privacy.mobile.analytics.event.TextEditorSaveEditMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.TextEditorScreenEvent
+import mega.privacy.mobile.analytics.event.TextEditorSendToChatMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.TextEditorShareLinkMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.TextEditorShowLineNumbersMenuItemEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -186,6 +200,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         binding = ActivityTextFileEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
         consumeInsetsWithToolbar(customToolbar = binding.fileEditorToolbar)
+        Analytics.tracker.trackEvent(TextEditorScreenEvent)
 
         lifecycleScope.launch {
             runCatching {
@@ -298,27 +313,48 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> onBackPressedDispatcher.onBackPressed()
-            R.id.action_save -> viewModel.saveFile(
-                this,
-                intent.getBooleanExtra(FROM_HOME_PAGE, false)
-            )
+            android.R.id.home -> {
+                Analytics.tracker.trackEvent(TextEditorCloseMenuToolbarEvent)
+                onBackPressedDispatcher.onBackPressed()
+            }
+
+            R.id.action_save -> {
+                Analytics.tracker.trackEvent(TextEditorSaveEditMenuToolbarEvent)
+                viewModel.saveFile(
+                    this,
+                    intent.getBooleanExtra(FROM_HOME_PAGE, false)
+                )
+            }
 
             R.id.action_download -> {
+                Analytics.tracker.trackEvent(TextEditorDownloadMenuToolbarEvent)
                 checkNotificationsPermission(this)
                 viewModel.downloadFile()
             }
 
-            R.id.action_get_link, R.id.action_remove_link -> viewModel.manageLink(this)
-            R.id.action_send_to_chat -> viewModel.getNode()?.let { node ->
-                nodeAttachmentViewModel.startAttachNodes(listOf(NodeId(node.handle)))
+            R.id.action_get_link -> {
+                Analytics.tracker.trackEvent(TextEditorShareLinkMenuToolbarEvent)
+                viewModel.manageLink(this)
+            }
+
+            R.id.action_remove_link -> viewModel.manageLink(this)
+            R.id.action_send_to_chat -> {
+                Analytics.tracker.trackEvent(TextEditorSendToChatMenuToolbarEvent)
+                viewModel.getNode()?.let { node ->
+                    nodeAttachmentViewModel.startAttachNodes(listOf(NodeId(node.handle)))
+                }
             }
 
             R.id.action_share -> {
+                Analytics.tracker.trackEvent(TextEditorExportFileMenuToolbarEvent)
                 viewModel.share(this, intent.getStringExtra(URL_FILE_LINK) ?: "")
             }
 
-            R.id.action_rename -> renameNode()
+            R.id.action_rename -> {
+                Analytics.tracker.trackEvent(TextEditorRenameMenuItemEvent)
+                renameNode()
+            }
+
             R.id.action_hide -> {
                 Analytics.tracker.trackEvent(TextEditorHideNodeMenuItemEvent)
                 handleHideNodeClick(handle = viewModel.getNode()?.handle ?: 0)
@@ -331,14 +367,28 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 )
             }
 
-            R.id.action_move -> selectFolderToMove(this, longArrayOf(viewModel.getNode()!!.handle))
-            R.id.action_copy -> selectFolderToCopy(this, longArrayOf(viewModel.getNode()!!.handle))
-            R.id.action_line_numbers -> updateLineNumbers()
-            R.id.action_move_to_trash, R.id.action_remove -> moveToRubbishOrRemove(
-                viewModel.getNode()!!.handle,
-                this,
-                this
-            )
+            R.id.action_move -> {
+                Analytics.tracker.trackEvent(TextEditorMoveMenuItemEvent)
+                selectFolderToMove(this, longArrayOf(viewModel.getNode()!!.handle))
+            }
+
+            R.id.action_copy -> {
+                Analytics.tracker.trackEvent(TextEditorCopyMenuItemEvent)
+                selectFolderToCopy(this, longArrayOf(viewModel.getNode()!!.handle))
+            }
+
+            R.id.action_line_numbers -> {
+                updateLineNumbers()
+            }
+
+            R.id.action_move_to_trash, R.id.action_remove -> {
+                Analytics.tracker.trackEvent(TextEditorMoveToTheRubbishBinMenuItemEvent)
+                moveToRubbishOrRemove(
+                    viewModel.getNode()!!.handle,
+                    this,
+                    this
+                )
+            }
 
             R.id.chat_action_import -> importNode()
             R.id.chat_action_save_for_offline -> {
@@ -658,6 +708,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             hide()
 
             setOnClickListener {
+                Analytics.tracker.trackEvent(TextEditorEditButtonPressedEvent)
                 viewModel.setEditMode()
                 binding.previous.hide()
                 binding.next.hide()
@@ -922,6 +973,13 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
     private fun updateLineNumbers() {
         val enabled = viewModel.setShowLineNumbers()
+        Analytics.tracker.trackEvent(
+            if (enabled) {
+                TextEditorShowLineNumbersMenuItemEvent
+            } else {
+                TextEditorHideLineNumbersMenuItemEvent
+            }
+        )
         menu?.findItem(R.id.action_line_numbers)?.let { updateLineNumbersMenuOption(it) }
         binding.contentText.setLineNumberEnabled(enabled)
         binding.contentEditText.setLineNumberEnabled(enabled)
