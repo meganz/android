@@ -337,7 +337,6 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaFolderInfo
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
@@ -6193,21 +6192,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     @SuppressLint("NewApi")
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish: %s_%d", request.requestString, e.errorCode)
-        when (request.type) {
-            MegaRequest.TYPE_FOLDER_INFO -> {
-                if (e.errorCode == MegaError.API_OK) {
-                    val info: MegaFolderInfo = request.megaFolderInfo
-                    val numVersions: Int = info.numVersions
-                    Timber.d("Num versions: %s", numVersions)
-                    val previousVersions: Long = info.versionsSize
-                    Timber.d("Previous versions: %s", previousVersions)
-                    myAccountInfo.numVersions = numVersions
-                    myAccountInfo.previousVersionsSize = previousVersions
-                } else {
-                    Timber.e("ERROR requesting version info of the account")
-                }
-            }
-        }
     }
 
     override fun onRequestTemporaryError(
