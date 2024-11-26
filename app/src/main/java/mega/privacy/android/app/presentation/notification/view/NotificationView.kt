@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.notification.view
 
-import android.content.res.Configuration
 import android.text.format.DateFormat
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.imageResource
@@ -34,6 +32,7 @@ import mega.privacy.android.shared.original.core.ui.controls.notifications.Notif
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
+import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * Notification View in Compose
@@ -132,11 +131,8 @@ private fun NotificationListView(
 @Composable
 private fun NotificationEmptyView(modifier: Modifier) {
     val context = LocalContext.current
-    val isPortrait =
-        LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
 
-    val emptyImgResId =
-        if (isPortrait) R.drawable.empty_notification_portrait else R.drawable.empty_notification_landscape
+    val emptyImgResId = iconPackR.drawable.ic_bell_glass
 
     Surface(modifier.testTag("NotificationEmptyView")) {
         LegacyMegaEmptyView(
@@ -153,10 +149,12 @@ private fun NotificationEmptyView(modifier: Modifier) {
 @CombinedThemePreviews
 @Composable
 private fun EmptyNotificationViewPreview() {
-    NotificationView(
-        state = NotificationState(emptyList()),
-        onNotificationClick = {},
-        onPromoNotificationClick = {})
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        NotificationView(
+            state = NotificationState(emptyList()),
+            onNotificationClick = {},
+            onPromoNotificationClick = {})
+    }
 }
 
 @CombinedThemePreviews
