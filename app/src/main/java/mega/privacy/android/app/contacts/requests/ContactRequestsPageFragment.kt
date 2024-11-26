@@ -59,7 +59,6 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionLis
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import javax.inject.Inject
-import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * Child fragment that represents the UI showing list of incoming/outgoing contact requests.
@@ -279,10 +278,10 @@ class ContactRequestsPageFragment : Fragment() {
 
             if (isOutgoing) {
                 textRes = R.string.sent_requests_empty
-                drawableRes = iconPackR.drawable.ic_user_left_glass
+                drawableRes = IconPack.ic_user_arrow_out_glass
             } else {
                 textRes = R.string.received_requests_empty
-                drawableRes = iconPackR.drawable.ic_user_right_glass
+                drawableRes = IconPack.ic_user_arrow_in_glass
             }
 
             binding.viewEmpty.setCompoundDrawablesWithIntrinsicBounds(0, drawableRes, 0, 0)
