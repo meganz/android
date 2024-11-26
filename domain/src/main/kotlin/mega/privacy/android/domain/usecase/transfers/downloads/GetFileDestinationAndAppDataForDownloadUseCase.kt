@@ -27,16 +27,17 @@ class GetFileDestinationAndAppDataForDownloadUseCase @Inject constructor(
      * @param uriPathFolderDestination the uriPath that represents the download destination, it can be a content uri or a file path
      */
     suspend operator fun invoke(uriPathFolderDestination: UriPath): DestinationAndAppDataForDownloadResult {
+        val downloadDestination: String?
         val folderDestination: UriPath?
         val appData: TransferAppData.SdCardDownload?
         when {
-            fileSystemRepository.isSDCardPath(uriPathFolderDestination.value) -> {
-                folderDestination =
-                    transferRepository.getOrCreateSDCardTransfersCacheFolder()?.path
-                        ?.let { UriPath(it) }
+            fileSystemRepository.isSDCardPathOrUri(uriPathFolderDestination.value) -> {
+                downloadDestination = transferRepository.getOrCreateSDCardTransfersCacheFolder()
+                    ?.path
+                folderDestination = downloadDestination?.let { UriPath(it) }
                 appData =
                     TransferAppData.SdCardDownload(
-                        uriPathFolderDestination.value,
+                        downloadDestination ?: "",
                         uriPathFolderDestination.value
                     )
             }
@@ -50,12 +51,13 @@ class GetFileDestinationAndAppDataForDownloadUseCase @Inject constructor(
             }
 
             fileSystemRepository.isContentUri(uriPathFolderDestination.value) -> {
-                folderDestination = cacheRepository.getCacheFolder(
+                downloadDestination = cacheRepository.getCacheFolder(
                     cacheRepository.getCacheFolderNameForTransfer(false)
-                )?.path?.let { UriPath(it) }
+                )?.path
+                folderDestination = downloadDestination?.let { UriPath(it) }
                 appData =
                     TransferAppData.SdCardDownload(
-                        uriPathFolderDestination.value,
+                        downloadDestination ?: "",
                         uriPathFolderDestination.value
                     )
             }

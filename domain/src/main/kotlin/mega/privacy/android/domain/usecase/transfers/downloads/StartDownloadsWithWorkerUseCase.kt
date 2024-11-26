@@ -59,12 +59,15 @@ class StartDownloadsWithWorkerUseCase @Inject constructor(
             val appData: TransferAppData?
             val destinationPathForSdk: String?
             when {
-                fileSystemRepository.isSDCardPath(destinationPathOrUri)
+                fileSystemRepository.isSDCardPathOrUri(destinationPathOrUri)
                         || fileSystemRepository.isContentUri(destinationPathOrUri) -> {
                     destinationPathForSdk =
                         transferRepository.getOrCreateSDCardTransfersCacheFolder()?.path?.ensureEndsWithFileSeparator()
                     appData =
-                        TransferAppData.SdCardDownload(destinationPathOrUri, destinationPathOrUri)
+                        TransferAppData.SdCardDownload(
+                            destinationPathForSdk ?: "",
+                            destinationPathOrUri
+                        )
                 }
 
                 isExternalStorageContentUriUseCase(destinationPathOrUri) -> {

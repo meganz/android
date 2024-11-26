@@ -292,7 +292,7 @@ interface FileSystemRepository {
     /**
      * @return true if the [localPath] points to a SD card
      */
-    suspend fun isSDCardPath(localPath: String): Boolean
+    suspend fun isSDCardPathOrUri(localPath: String): Boolean
 
     /**
      * @return true if the [localPath] points to a SD card cache

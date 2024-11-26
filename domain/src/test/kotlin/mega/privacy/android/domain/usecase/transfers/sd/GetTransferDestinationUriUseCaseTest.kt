@@ -86,11 +86,10 @@ class GetTransferDestinationUriUseCaseTest {
             val parentTransfer = mock<SdTransfer> {
                 on { it.appData } doReturn listOf(
                     TransferAppData.SdCardDownload(
-                        expected,
+                        cachePath,
                         expected
                     )
                 )
-                on { it.path } doReturn cachePath
             }
             whenever(transferRepository.getSdTransferByTag(folderTag)) doReturn parentTransfer
             val actual = underTest(transfer)

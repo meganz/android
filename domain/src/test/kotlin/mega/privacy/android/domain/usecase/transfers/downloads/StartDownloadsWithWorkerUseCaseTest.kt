@@ -88,7 +88,7 @@ class StartDownloadsWithWorkerUseCaseTest {
     }
 
     private suspend fun commonStub() {
-        whenever(fileSystemRepository.isSDCardPath(any())).thenReturn(false)
+        whenever(fileSystemRepository.isSDCardPathOrUri(any())).thenReturn(false)
         whenever(fileSystemRepository.isContentUri(any())).thenReturn(false)
         whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(true)
         whenever(isExternalStorageContentUriUseCase(any())).thenReturn(false)
@@ -274,7 +274,7 @@ class StartDownloadsWithWorkerUseCaseTest {
         whenever(
             downloadNodesUseCase(any(), any(), anyOrNull(), any())
         ).thenAnswer { emptyFlow<MultiTransferEvent>() }
-        whenever(fileSystemRepository.isSDCardPath(DESTINATION_PATH_FOLDER)).thenReturn(true)
+        whenever(fileSystemRepository.isSDCardPathOrUri(DESTINATION_PATH_FOLDER)).thenReturn(true)
         whenever(transferRepository.getOrCreateSDCardTransfersCacheFolder())
             .thenReturn(File(cachePath))
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
@@ -306,11 +306,11 @@ class StartDownloadsWithWorkerUseCaseTest {
         runTest {
             val cachePath = "cachePath/"
             val expectedAppData =
-                TransferAppData.SdCardDownload(DESTINATION_PATH_FOLDER, DESTINATION_PATH_FOLDER)
+                TransferAppData.SdCardDownload(cachePath, DESTINATION_PATH_FOLDER)
             whenever(
                 downloadNodesUseCase(any(), any(), anyOrNull(), any())
             ).thenAnswer { emptyFlow<MultiTransferEvent>() }
-            whenever(fileSystemRepository.isSDCardPath(DESTINATION_PATH_FOLDER)).thenReturn(true)
+            whenever(fileSystemRepository.isSDCardPathOrUri(DESTINATION_PATH_FOLDER)).thenReturn(true)
             whenever(transferRepository.getOrCreateSDCardTransfersCacheFolder())
                 .thenReturn(File(cachePath))
             underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {

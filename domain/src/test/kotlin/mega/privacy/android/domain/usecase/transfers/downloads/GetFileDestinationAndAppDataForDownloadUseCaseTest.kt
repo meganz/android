@@ -53,7 +53,7 @@ class GetFileDestinationAndAppDataForDownloadUseCaseTest {
             isExternalStorageContentUriUseCase,
             getExternalPathByContentUriUseCase,
         )
-        whenever(fileSystemRepository.isSDCardPath(any())) doReturn false
+        whenever(fileSystemRepository.isSDCardPathOrUri(any())) doReturn false
         whenever(fileSystemRepository.isContentUri(any())) doReturn false
         whenever(isExternalStorageContentUriUseCase(any())) doReturn false
     }
@@ -74,10 +74,10 @@ class GetFileDestinationAndAppDataForDownloadUseCaseTest {
         runTest {
             val cachePath = "Cache"
             val cacheFolder = File(cachePath)
-            whenever(fileSystemRepository.isSDCardPath(PATH_STRING)) doReturn true
+            whenever(fileSystemRepository.isSDCardPathOrUri(PATH_STRING)) doReturn true
             whenever(transferRepository.getOrCreateSDCardTransfersCacheFolder()) doReturn cacheFolder
             val expectedUri = UriPath(cachePath)
-            val expectedAppData = TransferAppData.SdCardDownload(PATH_STRING, PATH_STRING)
+            val expectedAppData = TransferAppData.SdCardDownload(cachePath, PATH_STRING)
 
             val (actualUri, actualAppData) = underTest(UriPath(PATH_STRING))
 
@@ -96,7 +96,7 @@ class GetFileDestinationAndAppDataForDownloadUseCaseTest {
             whenever(cacheRepository.getCacheFolderNameForTransfer(false)) doReturn "temp"
             whenever(cacheRepository.getCacheFolder(any())) doReturn cacheFolder
             val expectedUri = UriPath(cachePath)
-            val expectedAppData = TransferAppData.SdCardDownload(PATH_STRING, PATH_STRING)
+            val expectedAppData = TransferAppData.SdCardDownload(cachePath, PATH_STRING)
 
             val (actualUri, actualAppData) = underTest(UriPath(PATH_STRING))
 

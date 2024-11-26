@@ -438,9 +438,22 @@ internal class FileSystemRepositoryImplTest {
     inner class SDCard {
         @ParameterizedTest
         @ValueSource(booleans = [true, false])
-        fun `test that isSDCardPath returns gateway value`(expected: Boolean) = runTest {
+        fun `test that isSDCardPath returns correctly as per doesFolderExists gateway value`(
+            expected: Boolean,
+        ) = runTest {
             whenever(sdCardGateway.doesFolderExists(any())).thenReturn(expected)
-            assertThat(underTest.isSDCardPath("something")).isEqualTo(expected)
+            whenever(sdCardGateway.isSDCardUri(any())).thenReturn(false)
+            assertThat(underTest.isSDCardPathOrUri("something")).isEqualTo(expected)
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = [true, false])
+        fun `test that isSDCardPath returns correctly as per isSDCardUri gateway value`(
+            expected: Boolean,
+        ) = runTest {
+            whenever(sdCardGateway.doesFolderExists(any())).thenReturn(false)
+            whenever(sdCardGateway.isSDCardUri(any())).thenReturn(expected)
+            assertThat(underTest.isSDCardPathOrUri("something")).isEqualTo(expected)
         }
 
         @ParameterizedTest

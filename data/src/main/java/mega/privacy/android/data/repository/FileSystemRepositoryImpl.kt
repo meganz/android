@@ -448,8 +448,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun isSDCardPath(localPath: String) = withContext(ioDispatcher) {
-        sdCardGateway.doesFolderExists(localPath)
+    override suspend fun isSDCardPathOrUri(localPath: String) = withContext(ioDispatcher) {
+        sdCardGateway.doesFolderExists(localPath) || sdCardGateway.isSDCardUri(localPath)
     }
 
     override suspend fun isSDCardCachePath(localPath: String) = withContext(ioDispatcher) {
