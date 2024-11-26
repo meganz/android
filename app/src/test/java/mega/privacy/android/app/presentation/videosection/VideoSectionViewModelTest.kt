@@ -1796,6 +1796,39 @@ class VideoSectionViewModelTest {
             }
         }
 
+    @Test
+    fun `test that addToPlaylistHandle and isLaunchVideoToPlaylistActivity are updated as expected`() =
+        runTest {
+            val testVideoHandle = 12345L
+            initUnderTest()
+            underTest.state.test {
+                awaitItem().let {
+                    assertThat(it.isLaunchVideoToPlaylistActivity).isFalse()
+                    assertThat(it.addToPlaylistHandle).isNull()
+                }
+                underTest.launchVideoToPlaylistActivity(testVideoHandle)
+                awaitItem().let {
+                    assertThat(it.isLaunchVideoToPlaylistActivity).isTrue()
+                    assertThat(it.addToPlaylistHandle).isEqualTo(testVideoHandle)
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isLaunchVideoToPlaylistActivity is updated as expected after resetIsLaunchVideoToPlaylistActivity is invoked`() =
+        runTest {
+            val testVideoHandle = 12345L
+            initUnderTest()
+            underTest.launchVideoToPlaylistActivity(testVideoHandle)
+            underTest.state.test {
+                assertThat(awaitItem().isLaunchVideoToPlaylistActivity).isTrue()
+                underTest.resetIsLaunchVideoToPlaylistActivity()
+                assertThat(awaitItem().isLaunchVideoToPlaylistActivity).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     companion object {
         @JvmField
         @RegisterExtension

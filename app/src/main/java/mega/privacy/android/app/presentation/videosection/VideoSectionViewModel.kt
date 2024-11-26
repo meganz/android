@@ -1234,6 +1234,17 @@ class VideoSectionViewModel @Inject constructor(
             it.copy(removeRecentlyWatchedItemSuccess = consumed)
         }
 
+    internal fun launchVideoToPlaylistActivity(videoHandle: Long) = _state.update {
+        it.copy(
+            isLaunchVideoToPlaylistActivity = true,
+            addToPlaylistHandle = videoHandle
+        )
+    }
+
+    internal fun resetIsLaunchVideoToPlaylistActivity() = _state.update {
+        it.copy(isLaunchVideoToPlaylistActivity = false)
+    }
+
     companion object {
         private const val ERROR_MESSAGE_REPEATED_TITLE = 0
     }

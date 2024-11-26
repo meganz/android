@@ -48,6 +48,8 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property groupedVideoRecentlyWatchedItems map of video recently watched items, grouped by timestamp for sticky header
  * @property clearRecentlyWatchedVideosSuccess State Event which notifies that clear recently watched videos is successful
  * @property removeRecentlyWatchedItemSuccess State Event which notifies that remove recently watched item is successful
+ * @property addToPlaylistHandle the handle of the video to be added to playlist
+ * @property isLaunchVideoToPlaylistActivity true if launching the VideoToPlaylistActivity
  */
 data class VideoSectionState(
     val allVideos: List<VideoUIEntity> = emptyList(),
@@ -88,4 +90,6 @@ data class VideoSectionState(
     val groupedVideoRecentlyWatchedItems: Map<Long, List<VideoUIEntity>> = emptyMap(),
     val clearRecentlyWatchedVideosSuccess: StateEvent = consumed,
     val removeRecentlyWatchedItemSuccess: StateEvent = consumed,
+    val addToPlaylistHandle: Long? = null,
+    val isLaunchVideoToPlaylistActivity: Boolean = false,
 )

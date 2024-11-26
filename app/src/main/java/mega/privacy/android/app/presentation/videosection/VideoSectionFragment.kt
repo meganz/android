@@ -44,6 +44,7 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionFeatureScreen
 import mega.privacy.android.app.presentation.videosection.view.videoSectionRoute
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.Constants.ORDER_VIDEO_PLAYLIST
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
@@ -94,7 +95,19 @@ class VideoSectionFragment : Fragment() {
                                 currentPlaylist.id,
                                 items.map { NodeId(it.toLong()) })
                         }
+                    }
+                }
+            }
+        }
 
+    private val videoToPlaylistActivityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                Activity.RESULT_OK -> {
+                    result.data?.getStringArrayListExtra(
+                        VideoToPlaylistActivity.INTENT_SUCCEED_ADDED_PLAYLIST_TITLES
+                    )?.let {
+                        // Will implement in the ticket - CC-8463
                     }
                 }
             }
@@ -278,6 +291,18 @@ class VideoSectionFragment : Fragment() {
                 openVideoFileFromPlaylist(it)
             }
         }
+
+        viewLifecycleOwner.collectFlow(
+            videoSectionViewModel.state.map { it.isLaunchVideoToPlaylistActivity }
+                .distinctUntilChanged()
+        ) { isLaunch ->
+            if (isLaunch) {
+                videoSectionViewModel.state.value.addToPlaylistHandle?.let {
+                    launchAddToPlaylistActivity(it)
+                }
+                videoSectionViewModel.resetIsLaunchVideoToPlaylistActivity()
+            }
+        }
     }
 
     private fun openVideoFileFromAllVideos(node: TypedFileNode) {
@@ -338,6 +363,14 @@ class VideoSectionFragment : Fragment() {
                 Timber.e(it)
             }
         }
+    }
+
+    private fun launchAddToPlaylistActivity(videoHandle: Long) {
+        videoToPlaylistActivityLauncher.launch(
+            Intent(requireContext(), VideoToPlaylistActivity::class.java).apply {
+                putExtra(INTENT_EXTRA_KEY_HANDLE, videoHandle)
+            }
+        )
     }
 
     private fun showOptionsMenuForItem(item: VideoUIEntity, mode: Int) {

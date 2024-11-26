@@ -360,6 +360,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     videoSectionViewModel.removeRecentlyWatchedItem(node.handle)
                     setStateBottomSheetBehaviorHidden()
                 }
+                optionAddVideoToPlaylistItem.setOnClickListener {
+                    videoSectionViewModel.launchVideoToPlaylistActivity(node.handle)
+                    setStateBottomSheetBehaviorHidden()
+                }
 
                 val isTakenDown = node.isTakenDown
                 val accessLevel = megaApi.getAccess(node)
