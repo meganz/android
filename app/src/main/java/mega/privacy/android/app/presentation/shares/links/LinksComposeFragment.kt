@@ -1,8 +1,9 @@
 package mega.privacy.android.app.presentation.shares.links
 
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -73,8 +74,6 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * OfflineFileInfoFragment with Compose
@@ -244,13 +243,7 @@ class LinksComposeFragment : Fragment() {
      */
     private fun getEmptyFolderDrawable(isLinksEmpty: Boolean): Pair<Int, Int> {
         return if (isLinksEmpty) {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.ic_zero_data_public_links
-                } else {
-                    R.drawable.ic_zero_data_public_links
-                }, R.string.context_empty_links
-            )
+            Pair(iconPackR.drawable.ic_link_glass, R.string.context_empty_links)
         } else {
             Pair(iconPackR.drawable.ic_empty_folder_glass, R.string.file_browser_empty_folder_new)
         }

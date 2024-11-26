@@ -1,10 +1,9 @@
 package mega.privacy.android.app.presentation.shares.incoming
 
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -391,13 +390,7 @@ class IncomingSharesComposeFragment : Fragment() {
      */
     private fun getEmptyFolderDrawable(isPageEmpty: Boolean): Pair<Int, Int> {
         return if (isPageEmpty) {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.incoming_shares_empty
-                } else {
-                    R.drawable.incoming_empty_landscape
-                }, R.string.context_empty_incoming
-            )
+            Pair(iconPackR.drawable.ic_folder_arrow_up_glass, R.string.context_empty_incoming)
         } else {
             Pair(iconPackR.drawable.ic_empty_folder_glass, R.string.file_browser_empty_folder_new)
         }

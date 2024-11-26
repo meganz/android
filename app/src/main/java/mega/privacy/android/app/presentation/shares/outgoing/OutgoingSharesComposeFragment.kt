@@ -374,13 +374,7 @@ class OutgoingSharesComposeFragment : Fragment() {
      */
     private fun getEmptyFolderDrawable(isPageEmpty: Boolean): Pair<Int, Int> {
         return if (isPageEmpty) {
-            Pair(
-                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.outgoing_shares_empty
-                } else {
-                    R.drawable.outgoing_empty_landscape
-                }, R.string.context_empty_outgoing
-            )
+            Pair(iconPackR.drawable.ic_folder_arrow_down_glass, R.string.context_empty_outgoing)
         } else {
             Pair(iconPackR.drawable.ic_empty_folder_glass, R.string.file_browser_empty_folder_new)
         }

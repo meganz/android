@@ -15,6 +15,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.robolectric.annotation.Config
+import mega.privacy.android.icon.pack.R as iconPackR
 
 @Config(sdk = [Build.VERSION_CODES.Q])
 @RunWith(AndroidJUnit4::class)
@@ -37,7 +38,7 @@ class IncomingSharesViewTest {
             IncomingSharesView(
                 uiState = uiState,
                 emptyState = Pair(
-                    R.drawable.outgoing_shares_empty,
+                    iconPackR.drawable.ic_folder_arrow_down_glass,
                     R.string.context_empty_outgoing
                 ),
                 onToggleAppBarElevation = {},
@@ -72,7 +73,7 @@ class IncomingSharesViewTest {
             IncomingSharesView(
                 uiState = uiState,
                 emptyState = Pair(
-                    R.drawable.outgoing_shares_empty,
+                    iconPackR.drawable.ic_folder_arrow_down_glass,
                     R.string.context_empty_outgoing
                 ),
                 onToggleAppBarElevation = {},

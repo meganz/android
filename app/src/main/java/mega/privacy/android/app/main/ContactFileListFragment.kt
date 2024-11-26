@@ -82,9 +82,6 @@ class ContactFileListFragment : ContactFileBaseFragment() {
     var currNodePosition: Int = -1
 
     @Inject
-    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
-
-    @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
 
     /**
@@ -389,12 +386,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                 emptyImageView!!.visibility = View.VISIBLE
                 emptyTextView!!.visibility = View.VISIBLE
                 listView!!.visibility = View.GONE
-
-                if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    emptyImageView!!.setImageResource(R.drawable.incoming_empty_landscape)
-                } else {
-                    emptyImageView!!.setImageResource(R.drawable.incoming_shares_empty)
-                }
+                emptyImageView!!.setImageResource(iconPackR.drawable.ic_folder_arrow_up_glass)
                 var textToShow = String.format(context.getString(R.string.context_empty_incoming))
                 try {
                     textToShow = textToShow.replace(
@@ -724,11 +716,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
             emptyImageView!!.visibility = View.VISIBLE
             emptyTextView!!.visibility = View.VISIBLE
 
-            if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                emptyImageView!!.setImageResource(R.drawable.incoming_empty_landscape)
-            } else {
-                emptyImageView!!.setImageResource(R.drawable.incoming_shares_empty)
-            }
+            emptyImageView!!.setImageResource(iconPackR.drawable.ic_folder_arrow_up_glass)
             var textToShow = String.format(context.getString(R.string.context_empty_incoming))
             try {
                 textToShow = textToShow.replace(

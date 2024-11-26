@@ -505,11 +505,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
                 emptyTextViewFirst.setVisibility(View.VISIBLE);
 
                 if (parentHandle == -1) {
-                    if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
-                    } else {
-                        emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
-                    }
+                    emptyImageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_folder_arrow_up_glass);
                     String textToShow = String.format(context.getString(R.string.context_empty_incoming));
                     try {
                         textToShow = textToShow.replace(

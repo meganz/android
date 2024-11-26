@@ -444,11 +444,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
     private fun updateEmptyScreen() {
         binding.fileListEmptyImage.setImageResource(
             if (parentHandle == INVALID_HANDLE) {
-                if (isScreenInPortrait(requireContext())) {
-                    R.drawable.incoming_shares_empty
-                } else {
-                    R.drawable.incoming_empty_landscape
-                }
+                iconPackR.drawable.ic_folder_arrow_up_glass
             } else {
                 iconPackR.drawable.ic_empty_folder_glass
             }
