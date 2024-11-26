@@ -41,12 +41,10 @@ fun OfflineEmptyView(
         val (image, text) = createRefs()
 
         Image(
-            painter = painterResource(IconPackR.drawable.ic_arrow_down_circle_medium_regular_outline),
+            painter = painterResource(IconPackR.drawable.ic_arrow_circle_down_glass),
             contentScale = ContentScale.FillBounds,
             contentDescription = "Download Icon",
             modifier = Modifier
-                .height(108.dp)
-                .width(108.dp)
                 .constrainAs(image) {
                     bottom.linkTo(text.top, 20.dp)
                     start.linkTo(parent.start)
