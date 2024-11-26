@@ -165,7 +165,7 @@ public class TextUtil {
      */
     public static Spanned formatEmptyScreenText(Context context, String textToShow) {
         String colorStart = ColorUtils.getColorHexString(context, R.color.grey_900_grey_100);
-        String colorEnd = ColorUtils.getColorHexString(context, R.color.grey_300_grey_600);
+        String colorEnd = ColorUtils.getColorHexString(context, R.color.grey_900_grey_100);
         return replaceFormatText(textToShow, colorStart, colorEnd);
     }
 

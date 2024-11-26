@@ -127,6 +127,7 @@ import mega.privacy.mobile.analytics.event.ScanQRCodeButtonPressedEvent
 import timber.log.Timber
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+import androidx.compose.ui.text.SpanStyle
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -627,17 +628,14 @@ private fun EmptyContactResultBody(
     ) {
         EmptyContactsImage(isDarkMode)
 
+        val emptySpan = MegaSpanStyle(spanStyle = SpanStyle())
         MegaSpannedText(
             modifier = Modifier.testTag(NO_CONTACTS_TEXT_TAG),
             value = stringResource(id = R.string.context_empty_contacts),
-            baseStyle = MaterialTheme.typography.body2,
+            baseStyle = MaterialTheme.typography.subtitle2,
             styles = mapOf(
-                SpanIndicator('A') to MegaSpanStyle(
-                    color = TextColor.Primary
-                ),
-                SpanIndicator('B') to MegaSpanStyle(
-                    color = TextColor.Disabled
-                )
+                SpanIndicator('A') to emptySpan,
+                SpanIndicator('B') to emptySpan,
             ),
             color = TextColor.Disabled
         )

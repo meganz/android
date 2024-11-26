@@ -46,7 +46,7 @@ fun RecentActionsHiddenView(
             contentDescription = "Recent Actions Icon",
             modifier = Modifier
                 .constrainAs(image) {
-                    bottom.linkTo(text.top, 20.dp)
+                    bottom.linkTo(text.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
@@ -57,10 +57,7 @@ fun RecentActionsHiddenView(
             baseStyle = MaterialTheme.typography.body2,
             styles = mapOf(
                 SpanIndicator('B') to MegaSpanStyle(
-                    spanStyle = SpanStyle(
-                        fontWeight = FontWeight.Normal
-                    ),
-                    color = TextColor.Secondary
+                    spanStyle = SpanStyle(),
                 ),
             ),
             color = TextColor.Primary,

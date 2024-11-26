@@ -62,7 +62,7 @@
             android:layout_below="@+id/empty_hint_image"
             android:layout_centerHorizontal="true"
             android:text="@string/homepage_empty_hint_favourites"
-            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
+            android:textAppearance="@style/TextAppearance.Mega.Body2" />
     </RelativeLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

@@ -287,7 +287,7 @@ class ContactRequestsPageFragment : Fragment() {
             binding.viewEmpty.setCompoundDrawablesWithIntrinsicBounds(0, drawableRes, 0, 0)
             binding.viewEmpty.text = getString(textRes)
                 .formatColorTag(requireContext(), 'A', R.color.grey_900_grey_100)
-                .formatColorTag(requireContext(), 'B', R.color.grey_300_grey_600)
+                .formatColorTag(requireContext(), 'B', R.color.grey_900_grey_100)
                 .toSpannedHtmlText()
             binding.viewEmpty.isVisible = true
         }

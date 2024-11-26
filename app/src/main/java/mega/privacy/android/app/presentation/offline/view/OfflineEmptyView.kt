@@ -46,7 +46,7 @@ fun OfflineEmptyView(
             contentDescription = "Download Icon",
             modifier = Modifier
                 .constrainAs(image) {
-                    bottom.linkTo(text.top, 20.dp)
+                    bottom.linkTo(text.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
@@ -54,19 +54,13 @@ fun OfflineEmptyView(
         )
         MegaSpannedText(
             value = stringResource(id = R.string.context_empty_offline),
-            baseStyle = MaterialTheme.typography.body2,
+            baseStyle = MaterialTheme.typography.subtitle2,
             styles = mapOf(
                 SpanIndicator('A') to MegaSpanStyle(
-                    spanStyle = SpanStyle(
-                        fontWeight = FontWeight.Normal
-                    ),
-                    color = TextColor.Primary
+                    spanStyle = SpanStyle(),
                 ),
                 SpanIndicator('B') to MegaSpanStyle(
-                    spanStyle = SpanStyle(
-                        fontWeight = FontWeight.Normal
-                    ),
-                    color = TextColor.Secondary
+                    spanStyle = SpanStyle(),
                 ),
             ),
             color = TextColor.Primary,

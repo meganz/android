@@ -760,8 +760,6 @@
     </style>
 
     <style name="Widget.Mega.EmptyTextView" parent="Widget.MaterialComponents.TextView">
-        <item name="android:textAllCaps">true</item>
-        <item name="android:drawablePadding">12dp</item>
         <item name="android:gravity">center</item>
         <item name="android:textAppearance">@style/TextAppearance.Mega.Body2</item>
     </style>

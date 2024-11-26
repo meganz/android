@@ -176,9 +176,6 @@ internal fun AlbumContentScreen(
                 FavouriteAlbum -> LegacyMegaEmptyView(
                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_favourite_album),
                     text = stringResource(id = R.string.empty_hint_favourite_album)
-                        .formatColorTag(context, 'A', R.color.grey_900_grey_100)
-                        .formatColorTag(context, 'B', R.color.grey_300_grey_600)
-                        .toSpannedHtmlText()
                 )
 
                 GifAlbum -> Back()
@@ -188,9 +185,6 @@ internal fun AlbumContentScreen(
                 is UserAlbum -> LegacyMegaEmptyView(
                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_user_album_empty),
                     text = stringResource(id = R.string.photos_user_album_empty_album)
-                        .formatColorTag(context, 'A', R.color.grey_900_grey_100)
-                        .formatColorTag(context, 'B', R.color.grey_300_grey_600)
-                        .toSpannedHtmlText()
                 )
 
                 null -> Back()

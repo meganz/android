@@ -541,10 +541,7 @@ private fun AlbumImportContent(
         LegacyMegaEmptyView(
             modifier = modifier,
             imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_user_album_empty),
-            text = stringResource(id = R.string.photos_user_album_empty_album)
-                .formatColorTag(context, 'A', R.color.grey_900_grey_100)
-                .formatColorTag(context, 'B', R.color.grey_300_grey_600)
-                .toSpannedHtmlText(),
+            text = stringResource(id = R.string.photos_user_album_empty_album),
         )
     } else if (isLocalAlbumsLoaded && isAvailableStorageCollected && album != null) {
         AlbumImportList(
