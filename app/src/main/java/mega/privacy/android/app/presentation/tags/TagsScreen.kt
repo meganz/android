@@ -2,12 +2,12 @@ package mega.privacy.android.app.presentation.tags
 
 import mega.privacy.android.core.R as CoreR
 import mega.privacy.android.shared.resources.R as sharedR
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -27,11 +27,11 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.collections.immutable.persistentListOf
@@ -41,9 +41,9 @@ import mega.privacy.android.app.presentation.tags.TagsActivity.Companion.MAX_TAG
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
-import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericDescriptionTextField
 import mega.privacy.android.shared.original.core.ui.controls.textfields.transformations.PrefixTransformation
@@ -182,17 +182,19 @@ private fun TagsContent(
             uiState.isError.not() &&
             uiState.tags.contains(tag).not()
         ) {
-            TextMegaButton(
-                modifier = Modifier.testTag(TAGS_SCREEN_ADD_TAGS_BUTTON),
-                contentPadding = PaddingValues(vertical = 8.dp),
+            MenuActionListTile(
+                modifier = Modifier
+                    .testTag(TAGS_SCREEN_ADD_TAGS_BUTTON)
+                    .padding(vertical = 8.dp)
+                    .clickable {
+                        addTag(selectedTag = tag, newTag = true)
+                    },
                 text = stringResource(
                     id = sharedR.string.add_tags_button_label_add,
                     tag
                 ),
-                onClick = {
-                    addTag(selectedTag = tag, newTag = true)
-                },
-                textAlign = TextAlign.Start
+                icon = painterResource(id = CoreR.drawable.ic_plus),
+                dividerType = null,
             )
         }
 
