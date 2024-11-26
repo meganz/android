@@ -59,6 +59,7 @@ class UploadDestinationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        grantUriPermissions(intent)
         setContent {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -95,6 +96,30 @@ class UploadDestinationActivity : AppCompatActivity() {
                     )
                 }
             }
+        }
+    }
+
+    private fun grantUriPermissions(intent: Intent) {
+        with(intent) {
+            parcelableArrayList<Parcelable>(Intent.EXTRA_STREAM)?.let {
+                it.mapNotNull { item -> item as? Uri }.let { uris ->
+                    uris.forEach { uri -> uri.grantUriPermissions() }
+                    uris.ifEmpty { null }
+                }
+            } ?: (intent.parcelable<Parcelable>(Intent.EXTRA_STREAM) as? Uri)
+                ?.also { uri -> uri.grantUriPermissions() }
+        }
+    }
+
+    private fun Uri.grantUriPermissions() {
+        runCatching {
+            grantUriPermission(
+                packageName,
+                this,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+        }.onFailure {
+            Timber.e(it, "Error granting uri permission")
         }
     }
 

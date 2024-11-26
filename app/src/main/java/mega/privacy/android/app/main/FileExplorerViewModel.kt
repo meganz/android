@@ -1,12 +1,10 @@
 package mega.privacy.android.app.main
 
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
+import android.os.Parcelable
 import android.webkit.URLUtil
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,6 +22,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.app.presentation.extensions.parcelable
+import mega.privacy.android.app.presentation.extensions.parcelableArrayList
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.fileexplorer.model.FileExplorerUiState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -53,7 +53,6 @@ import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
-import kotlin.collections.associate
 
 /**
  * ViewModel class responsible for preparing and managing the data for FileExplorerActivity.
@@ -232,12 +231,16 @@ class FileExplorerViewModel @Inject constructor(
     }
 
     private fun grantUriPermission(context: Context, uris: List<Uri>) {
-        uris.forEach {
-            context.grantUriPermission(
-                context.packageName,
-                it,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION
-            )
+        uris.forEach { uri ->
+            runCatching {
+                context.grantUriPermission(
+                    context.packageName,
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            }.onFailure {
+                Timber.e(it, "Error granting uri permission")
+            }
         }
     }
 
@@ -253,7 +256,7 @@ class FileExplorerViewModel @Inject constructor(
      */
     private suspend fun getDocuments(
         intent: Intent,
-        context: Context
+        context: Context,
     ): List<DocumentEntity>? =
         getSharedUrisFromIntent(intent, context)?.let { uriPaths ->
             return getDocumentsFromSharedUris(intent.action, uriPaths)
@@ -261,25 +264,18 @@ class FileExplorerViewModel @Inject constructor(
 
     private fun getSharedUrisFromIntent(intent: Intent, context: Context): List<UriPath>? =
         with(intent) {
-            (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java)
-            } else {
-                @Suppress("DEPRECATION")
-                getParcelableArrayListExtra(Intent.EXTRA_STREAM)
-            })?.let { uris ->
-                Timber.d("Multiple files")
-                grantUriPermission(context, uris)
-                return@with uris.map { UriPath(it.toString()) }
-            } ?: (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
-            } else {
-                @Suppress("DEPRECATION")
-                getParcelableExtra(Intent.EXTRA_STREAM)
-            })?.let { uri ->
-                Timber.d("Single file")
-                grantUriPermission(context, listOf(uri))
-                return@with listOf(UriPath(uri.toString()))
-            }
+            parcelableArrayList<Parcelable>(Intent.EXTRA_STREAM)?.let {
+                it.mapNotNull { item -> item as? Uri }.let { uris ->
+                    Timber.d("Multiple files")
+                    grantUriPermission(context, uris)
+                    uris.map { uri -> UriPath(uri.toString()) }.ifEmpty { null }
+                }
+            } ?: (intent.parcelable<Parcelable>(Intent.EXTRA_STREAM) as? Uri)
+                ?.let { uri ->
+                    Timber.d("Single file")
+                    grantUriPermission(context, listOf(uri))
+                    listOf(UriPath(uri.toString()))
+                }
         }
 
     /**
