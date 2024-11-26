@@ -41,13 +41,6 @@ class DecodeLinkUseCase @Inject constructor() {
             url = url.substring(0, url.length - 1)
         }
 
-        url = removeQueryParametersIfAny(url)
-
         return url
-    }
-
-    private fun removeQueryParametersIfAny(url: String): String {
-        return url.indexOf('?').takeIf { it != -1 }
-            ?.let { url.substring(0, it) } ?: url
     }
 }
