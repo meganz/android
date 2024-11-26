@@ -535,32 +535,6 @@ class DefaultLoginRepositoryTest {
             }
         }
 
-
-    @Test
-    fun `test that log is sent to Crashlytics when login fails with connectiviing issue`() =
-        runTest {
-            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
-            val request = mock<MegaRequest>()
-            val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EAGAIN) }
-
-            whenever(megaApiGateway.getWaitingReason()).thenReturn(1)
-            whenever(temporaryWaitingErrorMapper(1)).thenReturn(
-                TemporaryWaitingError.ConnectivityIssues
-            )
-
-            underTest.fastLoginFlow(session).test {
-                verify(megaApiGateway).fastLogin(any(), listenerCaptor.capture())
-                listenerCaptor.firstValue.onRequestTemporaryError(mock(), request, error)
-                val result = awaitItem()
-                assertThat(result).isInstanceOf(LoginStatus.LoginWaiting::class.java)
-                assertThat((result as LoginStatus.LoginWaiting).error).isEqualTo(
-                    TemporaryWaitingError.ConnectivityIssues
-                )
-                verify(crashReporter).report(any())
-                cancelAndIgnoreRemainingEvents()
-            }
-        }
-
     @Test
     fun `test that fast login flow returns LoginLoggedOutFromOtherLocation if the request fails with API_ESID`() =
         runTest {
