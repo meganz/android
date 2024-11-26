@@ -148,14 +148,10 @@ internal object DataStoreModule {
     fun provideTransfersPreferencesDataStore(
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
-        passcodeDatastoreMigration: PasscodeDatastoreMigration,
     ): DataStore<Preferences> =
         PreferenceDataStoreFactory.create(
             corruptionHandler = ReplaceFileCorruptionHandler(
                 produceNewData = { emptyPreferences() }
-            ),
-            migrations = listOf(
-                passcodeDatastoreMigration
             ),
             scope = CoroutineScope(ioDispatcher),
             produceFile = { context.preferencesDataStoreFile(transfersPreferencesDataStoreName) }

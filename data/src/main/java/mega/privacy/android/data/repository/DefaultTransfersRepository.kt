@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import android.os.Build
 import androidx.work.WorkInfo
+import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -113,7 +114,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val deviceGateway: DeviceGateway,
     private val inProgressTransferMapper: InProgressTransferMapper,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
-    private val transfersPreferencesGateway: TransfersPreferencesGateway,
+    private val transfersPreferencesGateway: Lazy<TransfersPreferencesGateway>,
 ) : TransferRepository {
 
     private val monitorPausedTransfers = MutableStateFlow(false)
@@ -808,14 +809,15 @@ internal class DefaultTransfersRepository @Inject constructor(
     ) = megaLocalRoomGateway.updatePendingTransfers(updatePendingTransferRequest)
 
     override suspend fun setRequestFilesPermissionDenied() = withContext(ioDispatcher) {
-        transfersPreferencesGateway.setRequestFilesPermissionDenied()
+        transfersPreferencesGateway.get().setRequestFilesPermissionDenied()
     }
 
-    override fun monitorRequestFilesPermissionDenied() =
-        transfersPreferencesGateway.monitorRequestFilesPermissionDenied()
+    override fun monitorRequestFilesPermissionDenied() = flow {
+        emitAll(transfersPreferencesGateway.get().monitorRequestFilesPermissionDenied())
+    }.flowOn(ioDispatcher)
 
     override suspend fun clearPreferences() = withContext(ioDispatcher) {
-        transfersPreferencesGateway.clearPreferences()
+        transfersPreferencesGateway.get().clearPreferences()
     }
 }
 

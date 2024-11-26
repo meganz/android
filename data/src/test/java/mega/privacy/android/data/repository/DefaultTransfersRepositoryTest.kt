@@ -143,7 +143,7 @@ class DefaultTransfersRepositoryTest {
             deviceGateway = deviceGateway,
             inProgressTransferMapper = inProgressTransferMapper,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
-            transfersPreferencesGateway = transfersPreferencesGateway,
+            transfersPreferencesGateway = { transfersPreferencesGateway },
         )
     }
 
@@ -1701,7 +1701,10 @@ class DefaultTransfersRepositoryTest {
             val flow = flowOf(true)
             whenever(transfersPreferencesGateway.monitorRequestFilesPermissionDenied())
                 .thenReturn(flow)
-            assertThat(underTest.monitorRequestFilesPermissionDenied()).isEqualTo(flow)
+            underTest.monitorRequestFilesPermissionDenied().test {
+                assertThat(awaitItem()).isEqualTo(true)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test
