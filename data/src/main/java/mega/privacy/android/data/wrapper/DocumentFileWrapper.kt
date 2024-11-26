@@ -17,4 +17,13 @@ interface DocumentFileWrapper {
      * @return A potentially nullable [DocumentFile]
      */
     fun fromTreeUri(uri: Uri): DocumentFile?
+
+    /**
+     * Gets the [DocumentFile] id.
+     *
+     * @see android.provider.DocumentsContract.getDocumentId
+     * @param documentFile the [DocumentFile] to get the id from
+     * @return the id of the [DocumentFile]
+     */
+    fun getDocumentId(documentFile: DocumentFile): String
 }
