@@ -3,8 +3,8 @@ package mega.privacy.android.domain.usecase.transfers.sd
 import mega.privacy.android.domain.entity.transfer.DestinationUriAndSubFolders
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.entity.transfer.getSDCardTransferPath
-import mega.privacy.android.domain.entity.transfer.getSDCardTransferUri
+import mega.privacy.android.domain.entity.transfer.getSDCardFinalTransferUri
+import mega.privacy.android.domain.entity.transfer.getSDCardTransferPathForSDK
 import mega.privacy.android.domain.repository.TransferRepository
 import java.io.File
 import javax.inject.Inject
@@ -28,7 +28,7 @@ class GetTransferDestinationUriUseCase @Inject constructor(
             transfer.isSyncTransfer -> null
 
             transfer.isRootTransfer -> {
-                transfer.getSDCardTransferUri()?.let {
+                transfer.getSDCardFinalTransferUri()?.let {
                     DestinationUriAndSubFolders(it)
                 }
             }
@@ -36,12 +36,12 @@ class GetTransferDestinationUriUseCase @Inject constructor(
             else -> {
                 transfer.folderTransferTag?.let { rootTag ->
                     transferRepository.getSdTransferByTag(rootTag)?.let { rootSdTransfer ->
-                        val downloadPath = rootSdTransfer.getSDCardTransferPath() ?: ""
+                        val downloadPath = rootSdTransfer.getSDCardTransferPathForSDK() ?: ""
                         val missingFolders = transfer.parentPath
                             .removePrefix(downloadPath)
                             .split(File.separator)
                             .filter { it.isNotBlank() }
-                        rootSdTransfer.getSDCardTransferUri()?.let {
+                        rootSdTransfer.getSDCardFinalTransferUri()?.let {
                             DestinationUriAndSubFolders(it, missingFolders)
                         }
                     }

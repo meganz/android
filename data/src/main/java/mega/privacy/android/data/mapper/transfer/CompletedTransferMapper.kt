@@ -9,7 +9,7 @@ import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.entity.transfer.getSDCardTransferPath
+import mega.privacy.android.domain.entity.transfer.getSDCardTransferPathForSDK
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -47,7 +47,7 @@ class CompletedTransferMapper @Inject constructor(
     suspend operator fun invoke(
         transfer: Transfer,
         error: MegaException?,
-        transferPath: String? = transfer.getSDCardTransferPath(),
+        transferPath: String? = transfer.getSDCardTransferPathForSDK(),
     ) =
         withContext(ioDispatcher) {
             val isOffline = isOffline(transfer)

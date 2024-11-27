@@ -187,7 +187,7 @@ class TransfersManagement @Inject constructor(
             if (isFinalDownloadFileExist(
                     sdtransfer,
                     originalDownload,
-                    sdCardDownload?.targetPath
+                    sdCardDownload?.targetPathForSDK
                 )
             ) {
                 continue
@@ -195,8 +195,8 @@ class TransfersManagement @Inject constructor(
             Timber.w("Movement incomplete")
             moveSdTransferToTargetPath(
                 originalDownload,
-                sdCardDownload?.targetPath,
-                sdCardDownload?.targetUri,
+                sdCardDownload?.targetPathForSDK,
+                sdCardDownload?.finalTargetUri,
                 sdtransfer
             )
             transfer?.let { completedTransfers.add(completedTransferMapper(it, null)) }
