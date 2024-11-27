@@ -699,7 +699,7 @@ if [ ! -f ${ICU}/${ICU_SOURCE_FILE}.ready ]; then
         export PATH=$ANDROID_TOOLCHAIN/bin:$PATH
 
         rm -rf ${ANDROID_TOOLCHAIN} &>> ${LOG_FILE}
-        $NDK_ROOT/build/tools/make-standalone-toolchain.sh --arch=${ARCH} --platform=${APP_PLATFORM} --install-dir=${ANDROID_TOOLCHAIN} &>> ${LOG_FILE}
+        $NDK_ROOT/build/tools/make_standalone_toolchain.py --arch=${ARCH} --api=${API_LEVEL} --install-dir=${ANDROID_TOOLCHAIN} &>> ${LOG_FILE}
 
         CONFIGURE_ANDROID_OPTIONS="--host=${HOST} --enable-static --enable-shared=no --enable-extras=no --enable-strict=no --enable-icuio=no --enable-layout=no --enable-layoutex=no --enable-tools=no --enable-tests=no --enable-samples=no --enable-dyload=no -with-cross-build=$CROSS_BUILD_DIR"
 

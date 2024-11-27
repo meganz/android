@@ -2303,7 +2303,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Imposta MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA ha bisogno del tuo permesso per accedere ai tuoi contenuti multimediali e ai tuoi file per la condivisione. Potrebbero essere necessarie altre autorizzazioni di accesso per utilizzare le funzionalità e i servizi forniti da questa app.</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your files for uploading or sharing with others. Other optional access permissions may be needed to use features and services that this app provides.\n\nIf you choose not to grant these permissions, you can still use the app, except for the functions requiring the specific permissions.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Permetti l’accesso a foto, media e file</string>
     <!-- Subtitle of the screen asking permissions for files -->

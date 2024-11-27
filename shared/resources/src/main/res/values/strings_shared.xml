@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
@@ -799,7 +799,7 @@
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
     <string name="dialog_not_enough_space_to_upload_title">Not enough space to upload new files</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a larger plan, or clear some space, to upload new files. [A]Learn more[/A].</string>
+    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a higher plan, or free up some space, to upload new files. [A]Learn more[/A].</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">Upgrade</string>
     <!-- Photos search welcome title -->
@@ -825,6 +825,8 @@
     <string name="general_open_button">Open</string>
     <!-- Message of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_text">To stop backing up this folder, you need to either move it or delete it.</string>
+    <!-- Bottom sheet option title for add the video to playlist from video section -->
+    <string name="video_section_bottom_sheet_option_title_add_to_playlist">Add to playlist</string>
     <!-- Move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option">Move folder</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
@@ -839,6 +841,4 @@
     <string name="sync_stop_backup_confirm_dialog_delete_option_text">Folder will be deleted from MEGA. It won’t be deleted from your device.</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">Confirm</string>
-    <!-- Bottom sheet option title for add the video to playlist from video section -->
-    <string name="video_section_bottom_sheet_option_title_add_to_playlist">Add to playlist</string>
 </resources>

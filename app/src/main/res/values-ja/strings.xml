@@ -2197,7 +2197,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGAをセットアップ</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGAは、共有するメディアやファイルにアクセスするためにあなたの許可を必要とします。このアプリがご提供する機能やサービスをご利用いただくには、他のアクセス許可が必要になる場合がございます。&#160;</string>
+    <string name="setup_mega_explanation">MEGAは、アップロードしたり、他者と共有するあなたのファイルにアクセスするのにあなたの許可を必要とします。本アプリがご提供する機能やサービスをご使用いただくには、その他のオプションのアクセス権限が必要になる場合があります。\n\nこれらの権限を付与しないことを選択された場合でも、特定の権限が必要な機能を除き、本アプリを引き続きご使用いただけます。</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">写真、メディア、ファイルへのアクセスを許可します</string>
     <!-- Subtitle of the screen asking permissions for files -->

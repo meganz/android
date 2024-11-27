@@ -25,7 +25,7 @@ git clone --recursive https://github.com/meganz/android.git
 
 #### 3.1 Linux
 
-Install in the system the **[Android NDK](https://dl.google.com/android/repository/android-ndk-r21d-linux-x86_64.zip) [21](https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip)** (latest version tested: NDK r21d, version number: 21.3.6528147).
+Install in the system the **[Android NDK 27b](https://dl.google.com/android/repository/android-ndk-r27b-linux.zip)** (latest version tested: NDK r27b, version number: 27.1.12297006).
 
 Export  `NDK_ROOT`  variable or create a symbolic link at  `${HOME}/android-ndk`  to point to your Android NDK installation path.
 
@@ -35,11 +35,11 @@ Export  `NDK_ROOT`  variable or create a symbolic link at  `${HOME}/android-ndk`
 
 #### 3.2 MacOS
 
-Install NDK r21d by Android Studio following [these instructions](https://developer.android.com/studio/projects/install-ndk#specific-version) (pay attention to the bottom-right `Show Package Details` checkbox to display the available versions. Latest version tested: NDK r21d, version number: 21.3.6528147)
+Install NDK r27b by Android Studio following [these instructions](https://developer.android.com/studio/projects/install-ndk#specific-version) (pay attention to the bottom-right `Show Package Details` checkbox to display the available versions. Latest version tested: NDK r27b, version number: 27.1.12297006)
 
 Export  `NDK_ROOT`  variable or create a symbolic link at  `${HOME}/android-ndk`  to point to your Android NDK installation path.
 
-Default macOS path:  `export NDK_ROOT="/Users/${USER}/Library/Android/sdk/ndk/21.3.6528147"`
+Default macOS path:  `export NDK_ROOT="/Users/${USER}/Library/Android/sdk/ndk/27.1.12297006"`
 
 `ln -s /path/to/ndk ${HOME}/android-ndk`
 

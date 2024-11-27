@@ -847,4 +847,24 @@
         <item quantity="many">%2$d элементов добавлено в «%1$s»</item>
         <item quantity="other">%2$d элемента добавлено в «%1$s»</item>
     </plurals>
+    <!-- Name for a general button which action is "Open" something -->
+    <string name="general_open_button">Открыть</string>
+    <!-- Bottom sheet option title for add the video to playlist from video section -->
+    <string name="video_section_bottom_sheet_option_title_add_to_playlist">Добавить в плейлист</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_text">Чтобы прекратить резервное копирование этой папки, вам нужно либо переместить ее, либо удалить.</string>
+    <!-- Move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option">Переместить папку</string>
+    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_text">Переместить эту папку в другое расположение, чтобы получить полный доступ к данным.</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_destination_label">Переместить в:</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination_button">Облачный диск</string>
+    <!-- Delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option">Удалить папку безвозвратно</string>
+    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option_text">Папка будет удалена из MEGA. Она не будет удалена с вашего устройства.</string>
+    <!-- Name for a general button which action is "Confirm" something -->
+    <string name="general_confirm_button">Подтвердить</string>
 </resources>

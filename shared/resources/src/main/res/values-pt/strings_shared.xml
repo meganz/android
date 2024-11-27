@@ -834,4 +834,24 @@
         <item quantity="many">%2$d de itens foram adicionados a “%1$s”</item>
         <item quantity="other">%2$d itens foram adicionados a “%1$s”</item>
     </plurals>
+    <!-- Name for a general button which action is "Open" something -->
+    <string name="general_open_button">Abrir</string>
+    <!-- Bottom sheet option title for add the video to playlist from video section -->
+    <string name="video_section_bottom_sheet_option_title_add_to_playlist">Adicionar à lista de reprodução</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_text">Para parar de fazer backup desta pasta, você precisa movê-la ou excluí-la.</string>
+    <!-- Move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option">Mover pasta</string>
+    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_text">Mova esta pasta para outra localização para obter acesso total aos seus dados.º</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_destination_label">Mover para:</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination_button">Nuvem de arquivos</string>
+    <!-- Delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option">Deletar pasta permanentemente</string>
+    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option_text">A pasta será deletada do MEGA, mas não do seu dispositivo.</string>
+    <!-- Name for a general button which action is "Confirm" something -->
+    <string name="general_confirm_button">Confirmar</string>
 </resources>

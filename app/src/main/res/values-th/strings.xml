@@ -2197,7 +2197,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">ตั้งค่า MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your files for uploading or sharing with others. Other optional access permissions may be needed to use features and services that this app provides.\n\nIf you choose not to grant these permissions, you can still use the app, except for the functions requiring the specific permissions.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">อนุญาตให้เข้าถึงรูปภาพ มีเดียและไฟล์</string>
     <!-- Subtitle of the screen asking permissions for files -->

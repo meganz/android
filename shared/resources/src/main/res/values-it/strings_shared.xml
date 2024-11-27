@@ -810,7 +810,7 @@
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
     <string name="dialog_not_enough_space_to_upload_title">Not enough space to upload new files</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a larger plan, or clear some space, to upload new files. [A]Learn more[/A].</string>
+    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a higher plan, or free up some space, to upload new files. [A]Learn more[/A].</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">Effettua l’upgrade</string>
     <!-- Photos search welcome title -->
@@ -832,4 +832,24 @@
         <item quantity="one">Added to “%1$s”</item>
         <item quantity="other">Added %2$d items to “%1$s”</item>
     </plurals>
+    <!-- Name for a general button which action is "Open" something -->
+    <string name="general_open_button">Apri</string>
+    <!-- Bottom sheet option title for add the video to playlist from video section -->
+    <string name="video_section_bottom_sheet_option_title_add_to_playlist">Aggiungi alla playlist</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_text">Per terminare il backup di questa cartella, devi spostarla o eliminarla.</string>
+    <!-- Move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option">Sposta cartella</string>
+    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_text">Move this folder to another location to get full access to your data.</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_destination_label">Sposta in:</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination_button">Cloud drive</string>
+    <!-- Delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option">Elimina cartella permanentemente</string>
+    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option_text">Folder will be deleted from MEGA. It won’t be deleted from your device.</string>
+    <!-- Name for a general button which action is "Confirm" something -->
+    <string name="general_confirm_button">Conferma</string>
 </resources>

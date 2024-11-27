@@ -717,7 +717,7 @@
     <!-- Title of the Contact Permission Explanation -->
     <string name="title_enable_access_contact">Włącz dostęp do zapraszania znajomych</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">You can also add contacts from your phone’s contact list, if you allow MEGA access to the list.</string>
+    <string name="subtitle_enable_access_contact">Możesz także dodać kontakty z listy kontaktów telefonu, jeśli zezwalasz na dostęp MEGA do listy.</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">Udostępnik</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -813,17 +813,17 @@
     <!-- Capital letters. Text of the label of a new historic notifications-->
     <string name="notifications_notification_item_new_tag">Nowy</string>
     <!-- Title in the display over other apps permission screen -->
-    <string name="display_over_other_apps_permission_screen_title">Allow MEGA to display over other apps</string>
+    <string name="display_over_other_apps_permission_screen_title">Zezwalaj na wyświetlanie MEGA w innych aplikacjach</string>
     <!-- Context message in the display over other apps permission screen -->
-    <string name="display_over_other_apps_permission_screen_message">MEGA needs your permission to display over apps. This means that you’ll never miss another incoming call notification.</string>
+    <string name="display_over_other_apps_permission_screen_message">MEGA potrzebuje twojej uprawnień do wyświetlania w aplikacjach. Oznacza to, że nigdy nie przegapisz kolejnego powiadomienia o połączeniu przychodzącym.</string>
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">Zezwól</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">Completing operation: %1$d%%</string>
+    <string name="login_completing_operation">Zakończenie operacji: %1$d%%</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
-    <string name="dialog_not_enough_space_to_upload_title">Not enough space to upload new files</string>
+    <string name="dialog_not_enough_space_to_upload_title">Za mało miejsca na wgrywanie nowych plik</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a larger plan, or clear some space, to upload new files. [A]Learn more[/A].</string>
+    <string name="dialog_not_enough_space_to_upload_message">Przekroczyłeś limit pamięci. Uaktualnij do wyższego planu lub zwolnij trochę miejsca, aby wgrać nowe pliki. [A]Dowiedz się więcej[/A].</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">Zmień</string>
     <!-- Photos search welcome title -->
@@ -842,7 +842,29 @@
     <string name="album_add_to_media">Dodaj do</string>
     <!-- Add to album success message -->
     <plurals name="album_add_to_message">
-        <item quantity="one">Added to “%1$s”</item>
-        <item quantity="other">Added %2$d items to “%1$s”</item>
+        <item quantity="one">Dodano do ”%1$s”</item>
+        <item quantity="few">Dodano %2$d element do ”%1$s”</item>
+        <item quantity="many">Dodano %2$d element do ”%1$s”</item>
+        <item quantity="other">Dodano %2$d element do ”%1$s”</item>
     </plurals>
+    <!-- Name for a general button which action is "Open" something -->
+    <string name="general_open_button">Otwórz</string>
+    <!-- Bottom sheet option title for add the video to playlist from video section -->
+    <string name="video_section_bottom_sheet_option_title_add_to_playlist">Dodaj do listy odtwarzania</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_text">Aby przestać tworzyć kopie zapasowe tego katalogu, należy go przenieść lub usunąć.</string>
+    <!-- Move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option">Przenieś katalog</string>
+    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_text">Przenieś ten katalog do innej lokalizacji, aby uzyskać pełny dostęp do danych.</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_destination_label">Przenieś do:</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination_button">Dysk</string>
+    <!-- Delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option">Usuń katalog na stałe</string>
+    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option_text">Katalog zostanie usunięty z MEGA. Nie zostanie usunięty z urządzenia.</string>
+    <!-- Name for a general button which action is "Confirm" something -->
+    <string name="general_confirm_button">Potwierdź</string>
 </resources>

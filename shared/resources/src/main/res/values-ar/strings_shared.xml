@@ -843,21 +843,21 @@
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">منح إذن الوصول</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">Completing operation: %1$d%%</string>
+    <string name="login_completing_operation">إكمال العملية: %1$d%%</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
-    <string name="dialog_not_enough_space_to_upload_title">Not enough space to upload new files</string>
+    <string name="dialog_not_enough_space_to_upload_title">لا توجد مساحة كافية لترفيع ملفات جديدة</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a larger plan, or clear some space, to upload new files. [A]Learn more[/A].</string>
+    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a higher plan, or free up some space, to upload new files. [A]Learn more[/A].</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">ترقية</string>
     <!-- Photos search welcome title -->
-    <string name="photos_search_welcome_title">Find what you’re looking for</string>
+    <string name="photos_search_welcome_title">اوجد عن ما تبحث عنه</string>
     <!-- Photos search welcome description -->
-    <string name="photos_search_welcome_description">Search for photos, videos, and albums</string>
+    <string name="photos_search_welcome_description">ابحث عن الصور ومقاطع الفيديو والألبومات</string>
     <!-- Photos search empty state title -->
-    <string name="photos_search_empty_state_title">No matching results</string>
+    <string name="photos_search_empty_state_title">لا توجد نتائج مطابقة</string>
     <!-- Photos search empty state description -->
-    <string name="photos_search_empty_state_description">Try a different search term</string>
+    <string name="photos_search_empty_state_description">جرب مصطلح بحث مختلف</string>
     <!-- Photos search recent search -->
     <string name="photos_search_recent_search">بحثت مؤخراً</string>
     <!-- Add to album by image -->
@@ -866,7 +866,31 @@
     <string name="album_add_to_media">إضافة إلى</string>
     <!-- Add to album success message -->
     <plurals name="album_add_to_message">
-        <item quantity="one">Added to “%1$s”</item>
-        <item quantity="other">Added %2$d items to “%1$s”</item>
+        <item quantity="zero">تمت إضافة %2$d عنصر إلى ”%1$s“</item>
+        <item quantity="one">تمت الإضافة إلى »%1$s»</item>
+        <item quantity="two">تمت إضافة %2$d عنصرين إلى ”%1$s“</item>
+        <item quantity="few">تمت إضافة %2$d عناصر إلى ”%1$s“</item>
+        <item quantity="many">تمت إضافة %2$d عنصراً إلى ”%1$s“</item>
+        <item quantity="other">تمت إضافة %2$d عنصر إلى ”%1$s“</item>
     </plurals>
+    <!-- Name for a general button which action is "Open" something -->
+    <string name="general_open_button">فتح</string>
+    <!-- Bottom sheet option title for add the video to playlist from video section -->
+    <string name="video_section_bottom_sheet_option_title_add_to_playlist">إضافة إلى قائمة التشغيل</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_text">لإيقاف النسخ الاحتياطي لهذا المجلد، تحتاج إما إلى نقله أو حذفه.</string>
+    <!-- Move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option">انقل المجلد</string>
+    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_text">Move this folder to another location to get full access to your data.</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_destination_label">نقل إلى:</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination_button">سحابة التخزين</string>
+    <!-- Delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option">احذف المجلد بشكل نهائي</string>
+    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option_text">Folder will be deleted from MEGA. It won’t be deleted from your device.</string>
+    <!-- Name for a general button which action is "Confirm" something -->
+    <string name="general_confirm_button">تأكيد</string>
 </resources>

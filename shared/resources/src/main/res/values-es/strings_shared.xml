@@ -705,7 +705,7 @@
     <!-- Title of the Contact Permission Explanation -->
     <string name="title_enable_access_contact">Activa el acceso para invitar a tus amigos</string>
     <!-- Sub title of the Contact Permission Explanation -->
-    <string name="subtitle_enable_access_contact">You can also add contacts from your phone’s contact list, if you allow MEGA access to the list.</string>
+    <string name="subtitle_enable_access_contact">También puedes añadir contactos de la lista de contactos de tu teléfono, si permites que MEGA acceda a la lista.</string>
     <!-- Button text of Contact Permission Explanation -->
     <string name="grant_permission">Permitir acceso</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
@@ -789,13 +789,13 @@
     <!-- Title of Favourites video playlist in the video section -->
     <string name="video_section_title_favourite_playlist">Favoritos</string>
     <!-- Title of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_title">No connections are set up</string>
+    <string name="device_center_sync_backup_list_empty_state_title">No se ha configurado ninguna conexión</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_message">Sync or back up a folder on your device with a folder on MEGA</string>
+    <string name="device_center_sync_backup_list_empty_state_message">Sincroniza o haz un backup de una carpeta en tu dispositivo con una carpeta de MEGA</string>
     <!-- Message of the synced folder list empty state for free accounts -->
-    <string name="device_center_sync_backup_list_empty_state_message_free_account">Upgrade to a premium account to keep your important information safe and up-to-date with sync and backup</string>
+    <string name="device_center_sync_backup_list_empty_state_message_free_account">Amplía a una cuenta premium para mantener tu información segura y actualizada con sincronización y backup</string>
     <!-- Synced folder list empty state "See upgrade options" button label -->
-    <string name="device_center_sync_backup_see_upgrade_options_button_label">See upgrade options</string>
+    <string name="device_center_sync_backup_see_upgrade_options_button_label">Ver opciones de ampliación</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA puede ver el nombre y la descripción de tu reunión, pero los mantenemos privados</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
@@ -807,21 +807,21 @@
     <!-- Positive action button when permission is not granted and it's required for some feature. Clicking it will redirect to settings screen of device -->
     <string name="general_allow_permission_positive_button">Permitir</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
-    <string name="login_completing_operation">Completing operation: %1$d%%</string>
+    <string name="login_completing_operation">Completando operación: %1$d%%</string>
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
-    <string name="dialog_not_enough_space_to_upload_title">Not enough space to upload new files</string>
+    <string name="dialog_not_enough_space_to_upload_title">No hay espacio suficiente para subir más archivos</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a larger plan, or clear some space, to upload new files. [A]Learn more[/A].</string>
+    <string name="dialog_not_enough_space_to_upload_message">Has superado tu cuota de almacenamiento. Amplía a un plan superior o libera espacio para subir nuevos archivos. [A]Obtén más información[/A].</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">Ampliar</string>
     <!-- Photos search welcome title -->
-    <string name="photos_search_welcome_title">Find what you’re looking for</string>
+    <string name="photos_search_welcome_title">Encuentra lo que buscas</string>
     <!-- Photos search welcome description -->
-    <string name="photos_search_welcome_description">Search for photos, videos, and albums</string>
+    <string name="photos_search_welcome_description">Busca fotos, vídeos y álbumes</string>
     <!-- Photos search empty state title -->
-    <string name="photos_search_empty_state_title">No matching results</string>
+    <string name="photos_search_empty_state_title">No hay resultados</string>
     <!-- Photos search empty state description -->
-    <string name="photos_search_empty_state_description">Try a different search term</string>
+    <string name="photos_search_empty_state_description">Prueba con otro término de búsqueda</string>
     <!-- Photos search recent search -->
     <string name="photos_search_recent_search">Buscado recientemente</string>
     <!-- Add to album by image -->
@@ -830,7 +830,28 @@
     <string name="album_add_to_media">Añadir a</string>
     <!-- Add to album success message -->
     <plurals name="album_add_to_message">
-        <item quantity="one">Added to “%1$s”</item>
-        <item quantity="other">Added %2$d items to “%1$s”</item>
+        <item quantity="one">Añadido a “%1$s”</item>
+        <item quantity="many">Se han añadido %2$d elementos a “%1$s”</item>
+        <item quantity="other">Se han añadido %2$d elementos a “%1$s”</item>
     </plurals>
+    <!-- Name for a general button which action is "Open" something -->
+    <string name="general_open_button">Abrir</string>
+    <!-- Bottom sheet option title for add the video to playlist from video section -->
+    <string name="video_section_bottom_sheet_option_title_add_to_playlist">Añadir a la lista de reproducción</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_text">Para dejar de tener un backup de esta carpeta, necesitas moverla o eliminarla.</string>
+    <!-- Move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option">Mover carpeta</string>
+    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_text">Mueve esta carpeta a otra ubicación para tener acceso completo a tus datos.</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_destination_label">Mover a:</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination_button">Nube</string>
+    <!-- Delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option">Eliminar carpeta permanentemente</string>
+    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option_text">La carpeta se eliminará de MEGA. No se eliminará de tu dispositivo.</string>
+    <!-- Name for a general button which action is "Confirm" something -->
+    <string name="general_confirm_button">Confirmar</string>
 </resources>

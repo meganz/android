@@ -97,7 +97,7 @@
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_vpn">使用我們的高速VPN保持線上隱私。</string>
     <!-- Title for chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_chat">無限制的通話和會議</string>
+    <string name="dialog_onboarding_feature_title_chat">不受限制的通話和會議</string>
     <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_chat">訊息、視訊通話，以及無限制與會人數的完全私密會議。</string>
     <!-- Search drop down chips filter type file type -->
@@ -787,7 +787,7 @@
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
     <string name="dialog_not_enough_space_to_upload_title">空間不足，無法上傳新檔案</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">您已超出儲存配額。升級到更大空間的方案，或清理一些空間來上傳新檔案。瞭解更多。</string>
+    <string name="dialog_not_enough_space_to_upload_message">您已超出儲存配額。升級到更高的方案，或釋放一些空間來上傳新的檔案。[A]瞭解更多[/A]。</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">升級</string>
     <!-- Photos search welcome title -->
@@ -808,4 +808,24 @@
     <plurals name="album_add_to_message">
         <item quantity="other">已新增%2$d個項目到「%1$s」</item>
     </plurals>
+    <!-- Name for a general button which action is "Open" something -->
+    <string name="general_open_button">開啟</string>
+    <!-- Bottom sheet option title for add the video to playlist from video section -->
+    <string name="video_section_bottom_sheet_option_title_add_to_playlist">新增到播放列表</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_text">要停止備份此資料夾，您需要移動或刪除它。</string>
+    <!-- Move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option">移動資料夾</string>
+    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_text">將此資料夾移到另一個位置以獲得對您的資料的完全存取權限。</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_destination_label">移動到：</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination_button">雲端硬碟</string>
+    <!-- Delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option">永久刪除資料夾</string>
+    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option_text">資料夾將從MEGA中刪除。它不會從您的裝置中刪除。</string>
+    <!-- Name for a general button which action is "Confirm" something -->
+    <string name="general_confirm_button">確認</string>
 </resources>

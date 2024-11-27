@@ -787,7 +787,7 @@
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
     <string name="dialog_not_enough_space_to_upload_title">새 파일을 업로드할 공간이 충분하지 않습니다</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">당신의 저장소 할당량을 초과하였습니다. 새 파일을 업로드하려면 더 큰 요금제로 업그레이드하거나 공간을 확보하세요. [A]더 알아보기[/A]</string>
+    <string name="dialog_not_enough_space_to_upload_message">당신의 저장소 할당량을 초과하였습니다. 새 파일을 업로드하려면 더 높은 요금제로 업그레이드하거나 공간을 확보하세요. [A]더 알아보기[/A]</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">업그레이드</string>
     <!-- Photos search welcome title -->
@@ -808,4 +808,24 @@
     <plurals name="album_add_to_message">
         <item quantity="other">“%1$s”에 %2$d개의 항목을 추가함</item>
     </plurals>
+    <!-- Name for a general button which action is "Open" something -->
+    <string name="general_open_button">열기</string>
+    <!-- Bottom sheet option title for add the video to playlist from video section -->
+    <string name="video_section_bottom_sheet_option_title_add_to_playlist">재생목록에 추가</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_text">이 폴더의 백업을 중단하시려면, 폴더를 이동하거나 삭제해야 합니다.</string>
+    <!-- Move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option">폴더 이동</string>
+    <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_text">당신의 데이터에 대한 완전한 접근을 얻으려면 이 폴더를 다른 위치로 옮기세요.</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_destination_label">여기로 이동:</string>
+    <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination_button">클라우드 드라이브</string>
+    <!-- Delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option">폴더 영구 삭제</string>
+    <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_delete_option_text">폴더는 MEGA에서 삭제됩니다. 당신의 장치에서는 삭제되지 않습니다.</string>
+    <!-- Name for a general button which action is "Confirm" something -->
+    <string name="general_confirm_button">확인</string>
 </resources>

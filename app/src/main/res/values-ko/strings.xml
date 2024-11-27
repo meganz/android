@@ -2197,7 +2197,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGA 설정</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">공유를 하려면 MEGA에 미디어와 파일 접근 권한이 필요합니다. 이 앱이 제공하는 기능과 서비스를 이용하려면 다른 접근 권한이 필요할 수도 있습니다.</string>
+    <string name="setup_mega_explanation">MEGA는 업로드 또는 다른 사람과의 공유를 위해 당신의 파일에 접근할 수 있도록 허가가 필요합니다. 다른 선택적 접근 권한은 이 앱이 제공하는 기능과 서비스를 이용하기 위해 필요할 수도 있습니다.\n\n만약 이러한 권한을 승인하지 않도록 선택하였더라도, 이 앱을 이용할 수 있지만, 특정 권한이 필요한 기능은 이용할 수 없습니다.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">사진, 미디어 그리고 파일에 대한 접근 허용</string>
     <!-- Subtitle of the screen asking permissions for files -->

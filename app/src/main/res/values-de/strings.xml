@@ -2250,7 +2250,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGA konfigurieren</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">Zum Freigeben muss MEGA auf Ihre Medien und Dateien zugreifen können. Für die Nutzung der Leistungsmerkmale und Services dieser App können weitere Berechtigungen erforderlich sein.</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your files for uploading or sharing with others. Other optional access permissions may be needed to use features and services that this app provides.\n\nIf you choose not to grant these permissions, you can still use the app, except for the functions requiring the specific permissions.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Zugriff auf Fotos und (Medien-)dateien erlauben</string>
     <!-- Subtitle of the screen asking permissions for files -->

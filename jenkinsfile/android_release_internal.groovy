@@ -46,7 +46,7 @@ pipeline {
         LC_ALL = 'en_US.UTF-8'
         LANG = 'en_US.UTF-8'
 
-        NDK_ROOT = '/opt/buildtools/android-sdk/ndk/21.3.6528147'
+        NDK_ROOT = '/opt/buildtools/android-sdk/ndk/27.1.12297006'
         JAVA_HOME = '/opt/buildtools/zulu17.42.19-ca-jdk17.0.7-macosx'
         ANDROID_HOME = '/opt/buildtools/android-sdk'
 

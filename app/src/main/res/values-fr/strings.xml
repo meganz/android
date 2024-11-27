@@ -2303,7 +2303,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Configurer MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA a besoin de votre autorisation pour accéder à vos médias et fichiers afin de les partager. D’autres permissions d’accès pourraient être nécessaires pour utiliser les fonctions et services fournis par cette appli.</string>
+    <string name="setup_mega_explanation">MEGA a besoin de votre autorisation pour accéder à vos fichiers à des fins de téléversement ou de partage avec d\’autres personnes. D\’autres autorisations d\’accès facultatives peuvent être nécessaires pour utiliser les fonctions et les services fournis par cette application.\n\nSi vous choisissez de ne pas accorder ces autorisations, vous pouvez toujours utiliser l\’application, à l\’exception des fonctions nécessitant des autorisations spécifiques.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Autoriser l’accès aux photos, aux médias et aux fichiers</string>
     <!-- Subtitle of the screen asking permissions for files -->
