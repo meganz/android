@@ -34,6 +34,7 @@ import mega.privacy.android.app.main.CreateAccountFragment
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.toConstant
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragment
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountComposeFragment
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.onboarding.TourFragment
 import mega.privacy.android.app.presentation.login.reportissue.ReportIssueViaEmailFragment
@@ -264,16 +265,26 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
             Constants.CREATE_ACCOUNT_FRAGMENT -> {
                 Timber.d("Show CREATE_ACCOUNT_FRAGMENT")
-                if (createAccountFragment == null || cancelledConfirmationProcess) {
-                    createAccountFragment = CreateAccountFragment()
-                    cancelledConfirmationProcess = false
+                lifecycleScope.launch {
+                    val isNewCreateAccountFragmentEnabled =
+                        viewModel.isNewCreateAccountFragmentEnabled()
+                    val createActFragment = if (isNewCreateAccountFragmentEnabled) {
+                        CreateAccountComposeFragment()
+                    } else {
+                        createAccountFragment ?: CreateAccountFragment().also {
+                            createAccountFragment = it
+                        }
+                    }
+                    if (cancelledConfirmationProcess) {
+                        cancelledConfirmationProcess = false
+                    }
+
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container_login, createActFragment)
+                        .commitNowAllowingStateLoss()
+
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
                 }
-
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container_login, createAccountFragment ?: return)
-                    .commitNowAllowingStateLoss()
-
-                window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
             }
 
             Constants.TOUR_FRAGMENT -> {

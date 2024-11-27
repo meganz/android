@@ -987,6 +987,10 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    internal suspend fun isNewCreateAccountFragmentEnabled(): Boolean = runCatching {
+        getFeatureFlagValueUseCase(AppFeatures.NewCreateAccountFragment)
+    }.getOrDefault(false)
+
     companion object {
         /**
          * Intent action for showing the login fetching nodes.
