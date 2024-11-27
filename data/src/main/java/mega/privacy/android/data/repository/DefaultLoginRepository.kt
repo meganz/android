@@ -229,8 +229,10 @@ internal class DefaultLoginRepository @Inject constructor(
     /**
      * A temporary method get IP address using DNS resolver, and perform HTTP call to check internet connectivity
      * @param address domain address to ping, eg mega.io
+     * @return Pair<Boolean, String> isHttpRequestSuccess, message with IP and response code
      */
     private suspend fun pingDomainAddress(address: String) = withContext(ioDispatcher) {
+        var isHttpRequestSuccess = true
         val hostAddress = runCatching {
             InetAddress.getByName(address).hostAddress
         }.getOrElse {
@@ -242,16 +244,17 @@ internal class DefaultLoginRepository @Inject constructor(
             connection.apply {
                 setRequestProperty("User-Agent", "MegaAndroid")
                 setRequestProperty("Connection", "close")
-                connectTimeout = 5000
-                readTimeout = 5000
+                connectTimeout = 2500
+                readTimeout = 2500
                 connect()
             }
             connection.responseCode
         }.getOrElse {
+            isHttpRequestSuccess = false
             "Failed due to ${it.message}"
         }
 
-        "Ping: $address: $hostAddress, HTTP Status: $httpStatusCode"
+        isHttpRequestSuccess to "Ping: $address: $hostAddress, HTTP Status: $httpStatusCode"
     }
 
     /**
@@ -260,21 +263,32 @@ internal class DefaultLoginRepository @Inject constructor(
      */
     private fun reportLogToCrashlytics(error: MegaError) {
         applicationScope.launch(ioDispatcher) {
-            val googlePing = async {
+            val googlePingDeferred = async {
                 pingDomainAddress("google.com")
             }
-            val megaPing = async {
+            val megaPingDeferred = async {
                 pingDomainAddress("g.api.mega.co.nz")
             }
-            val throwable = Throwable(
-                """Connection issue occurred during login. 
+            val googlePing = googlePingDeferred.await()
+            val megaPing = megaPingDeferred.await()
+
+            // So don't send log if user doesn't a valid internet connectivity
+            // even though Mobile Data or WiFi is enabled
+            if (!googlePing.first && !megaPing.first) {
+                Timber.w("Ping to mega and google has failed, user may not have valid internet connectivity")
+                return@launch
+            }
+
+            crashReporter.report(
+                Throwable(
+                    """Connection issue occurred during login. 
                     Error code: ${error.errorCode},
                     Error value: ${error.value.toInt()},
                     Waiting reason: RETRY_CONNECTIVITY,
-                    ${googlePing.await()},
-                    ${megaPing.await()}""".trimIndent()
+                    ${googlePing.second},
+                    ${megaPing.second}""".trimIndent()
+                )
             )
-            crashReporter.report(throwable)
         }
     }
 
