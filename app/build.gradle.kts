@@ -34,6 +34,7 @@ plugins {
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.de.mannodermaus.android.junit5)
     id("kotlin-parcelize")
+    id("kotlin-kapt")
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.firebase.appdistribution")
     id("androidx.baselineprofile")
@@ -281,7 +282,7 @@ dependencies {
     implementation(androidx.hilt.navigation)
 
     if (shouldApplyDefaultConfiguration(project)) {
-        kaptTest(google.hilt.android.compiler)
+        kspTest(google.hilt.android.compiler)
     }
 
     // Fresco
@@ -355,7 +356,7 @@ dependencies {
     androidTestImplementation(testlib.espresso.intents)
     androidTestImplementation(testlib.compose.junit)
 
-    kaptAndroidTest(google.hilt.android.compiler)
+    kspAndroidTest(google.hilt.android.compiler)
     debugImplementation(androidx.fragment.test)
     debugImplementation(testlib.compose.manifest)
     debugImplementation(testlib.test.monitor)

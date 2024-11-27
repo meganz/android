@@ -6,13 +6,12 @@ import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.manager.ManagerUseCases
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetBackupsChildrenNodes
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
-import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.HasBackupsChildren
+import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
 import nz.mega.sdk.MegaNode
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -23,11 +22,6 @@ import org.mockito.kotlin.mock
 )
 @Module(includes = [TestGetNodeModule::class])
 object TestManagerUseCases {
-
-    @Provides
-    fun provideGetNumUnreadUserAlerts() = mock<GetNumUnreadUserAlertsUseCase> {
-        on { runBlocking { invoke() } }.thenReturn(0)
-    }
 
     @Provides
     fun provideHasBackupsChildren() = mock<HasBackupsChildren> {
@@ -49,4 +43,8 @@ object TestManagerUseCases {
         onBlocking { invoke() }.thenReturn(MegaNode())
     }
 
+    @Provides
+    fun provideMonitorUserAlertUpdates() = mock<MonitorUserAlertUpdates> {
+        onBlocking { invoke() }.thenReturn(flowOf(emptyList()))
+    }
 }

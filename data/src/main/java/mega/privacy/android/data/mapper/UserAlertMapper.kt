@@ -41,32 +41,25 @@ import nz.mega.sdk.MegaUserAlert
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
-
-/**
- * Map [MegaUserAlert] to [UserAlert]
- */
-typealias UserAlertMapper = @JvmSuppressWildcards suspend (@JvmSuppressWildcards MegaUserAlert, @JvmSuppressWildcards UserAlertContactProvider, @JvmSuppressWildcards UserAlertScheduledMeetingProvider, @JvmSuppressWildcards UserAlertScheduledMeetingOccurrProvider, @JvmSuppressWildcards NodeProvider) -> @JvmSuppressWildcards UserAlert
-
-
-/**
- * Provide the [Contact] associated with an alert
- */
-typealias UserAlertContactProvider = suspend (@JvmSuppressWildcards Long, @JvmSuppressWildcards String?) -> @JvmSuppressWildcards Contact
-
-/**
- * Provide the Scheduled meeting associated with an alert
- */
-typealias UserAlertScheduledMeetingProvider = suspend (@JvmSuppressWildcards Long, @JvmSuppressWildcards Long) -> @JvmSuppressWildcards ChatScheduledMeeting?
-
-/**
- * Provide the Scheduled meeting occurrence associated with an alert
- */
-typealias UserAlertScheduledMeetingOccurrProvider = suspend (@JvmSuppressWildcards Long) -> @JvmSuppressWildcards List<ChatScheduledMeetingOccurr>?
-
-
-typealias NodeProvider = suspend (@JvmSuppressWildcards Long) -> @JvmSuppressWildcards MegaNode?
+import javax.inject.Inject
 
 private const val CREATED_TIME_INDEX = 0L
+
+internal class UserAlertMapper @Inject constructor() {
+    suspend operator fun invoke(
+        megaUserAlert: MegaUserAlert,
+        contactProvider: suspend (Long, String?) -> Contact,
+        scheduledMeetingProvider: suspend (Long, Long) -> ChatScheduledMeeting?,
+        scheduledMeetingOccurrProvider: suspend (Long) -> List<ChatScheduledMeetingOccurr>?,
+        nodeProvider: suspend (Long) -> MegaNode?,
+    ): UserAlert = toUserAlert(
+        megaUserAlert,
+        contactProvider,
+        scheduledMeetingProvider,
+        scheduledMeetingOccurrProvider,
+        nodeProvider,
+    )
+}
 
 /**
  * Map [MegaUserAlert] to [UserAlert]
@@ -77,10 +70,10 @@ private const val CREATED_TIME_INDEX = 0L
  */
 internal suspend fun toUserAlert(
     megaUserAlert: MegaUserAlert,
-    contactProvider: UserAlertContactProvider,
-    scheduledMeetingProvider: UserAlertScheduledMeetingProvider,
-    scheduledMeetingOccurrProvider: UserAlertScheduledMeetingOccurrProvider,
-    nodeProvider: NodeProvider,
+    contactProvider: suspend (Long, String?) -> Contact,
+    scheduledMeetingProvider: suspend (Long, Long) -> ChatScheduledMeeting?,
+    scheduledMeetingOccurrProvider: suspend (Long) -> List<ChatScheduledMeetingOccurr>?,
+    nodeProvider: suspend (Long) -> MegaNode?,
 ): UserAlert = when (megaUserAlert.type) {
     MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REQUEST -> {
         IncomingPendingContactRequestAlert(
@@ -91,6 +84,7 @@ internal suspend fun toUserAlert(
             contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
         )
     }
+
     MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_CANCELLED -> {
         IncomingPendingContactCancelledAlert(
             id = megaUserAlert.id,
@@ -100,6 +94,7 @@ internal suspend fun toUserAlert(
             contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
         )
     }
+
     MegaUserAlert.TYPE_INCOMINGPENDINGCONTACT_REMINDER -> {
         IncomingPendingContactReminderAlert(
             id = megaUserAlert.id,
@@ -109,6 +104,7 @@ internal suspend fun toUserAlert(
             contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
         )
     }
+
     MegaUserAlert.TYPE_CONTACTCHANGE_DELETEDYOU -> {
         ContactChangeDeletedYouAlert(
             id = megaUserAlert.id,
@@ -118,6 +114,7 @@ internal suspend fun toUserAlert(
             contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
         )
     }
+
     MegaUserAlert.TYPE_CONTACTCHANGE_CONTACTESTABLISHED -> {
         ContactChangeContactEstablishedAlert(
             id = megaUserAlert.id,
@@ -127,6 +124,7 @@ internal suspend fun toUserAlert(
             contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
         )
     }
+
     MegaUserAlert.TYPE_CONTACTCHANGE_ACCOUNTDELETED -> {
         ContactChangeAccountDeletedAlert(
             id = megaUserAlert.id,
@@ -136,6 +134,7 @@ internal suspend fun toUserAlert(
             contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
         )
     }
+
     MegaUserAlert.TYPE_CONTACTCHANGE_BLOCKEDYOU -> {
         ContactChangeBlockedYouAlert(
             id = megaUserAlert.id,
@@ -145,6 +144,7 @@ internal suspend fun toUserAlert(
             contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
         )
     }
+
     MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_IGNORED -> {
         UpdatedPendingContactIncomingIgnoredAlert(
             id = megaUserAlert.id,
@@ -154,6 +154,7 @@ internal suspend fun toUserAlert(
             contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
         )
     }
+
     MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_ACCEPTED -> {
         UpdatedPendingContactIncomingAcceptedAlert(
             id = megaUserAlert.id,
@@ -163,6 +164,7 @@ internal suspend fun toUserAlert(
             contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
         )
     }
+
     MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTINCOMING_DENIED -> {
         UpdatedPendingContactIncomingDeniedAlert(
             id = megaUserAlert.id,
@@ -172,6 +174,7 @@ internal suspend fun toUserAlert(
             contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
         )
     }
+
     MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_ACCEPTED -> {
         UpdatedPendingContactOutgoingAcceptedAlert(
             id = megaUserAlert.id,
@@ -181,6 +184,7 @@ internal suspend fun toUserAlert(
             contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
         )
     }
+
     MegaUserAlert.TYPE_UPDATEDPENDINGCONTACTOUTGOING_DENIED -> {
         UpdatedPendingContactOutgoingDeniedAlert(
             id = megaUserAlert.id,
@@ -190,6 +194,7 @@ internal suspend fun toUserAlert(
             contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
         )
     }
+
     MegaUserAlert.TYPE_NEWSHARE -> {
         NewShareAlert(
             id = megaUserAlert.id,
@@ -200,6 +205,7 @@ internal suspend fun toUserAlert(
             nodeId = getNode(megaUserAlert, nodeProvider)?.handle,
         )
     }
+
     MegaUserAlert.TYPE_DELETEDSHARE -> {
         val deletionReasonIndex: Long = 0
         val removedByOwner: Long = 1
@@ -230,6 +236,7 @@ internal suspend fun toUserAlert(
 
 
     }
+
     MegaUserAlert.TYPE_NEWSHAREDNODES -> {
         val folderIndex: Long = 0
         val fileIndex: Long = 1
@@ -245,6 +252,7 @@ internal suspend fun toUserAlert(
             contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
         )
     }
+
     MegaUserAlert.TYPE_REMOVEDSHAREDNODES -> {
         val itemCountIndex: Long = 0
         RemovedSharedNodesAlert(
@@ -257,6 +265,7 @@ internal suspend fun toUserAlert(
             contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
         )
     }
+
     MegaUserAlert.TYPE_PAYMENT_SUCCEEDED -> {
         PaymentSucceededAlert(
             id = megaUserAlert.id,
@@ -267,6 +276,7 @@ internal suspend fun toUserAlert(
             title = megaUserAlert.title,
         )
     }
+
     MegaUserAlert.TYPE_PAYMENT_FAILED -> {
         PaymentFailedAlert(
             id = megaUserAlert.id,
@@ -277,6 +287,7 @@ internal suspend fun toUserAlert(
             title = megaUserAlert.title,
         )
     }
+
     MegaUserAlert.TYPE_PAYMENTREMINDER -> {
         PaymentReminderAlert(
             id = megaUserAlert.id,
@@ -287,6 +298,7 @@ internal suspend fun toUserAlert(
             title = megaUserAlert.title,
         )
     }
+
     MegaUserAlert.TYPE_TAKEDOWN -> {
         TakeDownAlert(
             id = megaUserAlert.id,
@@ -299,6 +311,7 @@ internal suspend fun toUserAlert(
             path = megaUserAlert.path,
         )
     }
+
     MegaUserAlert.TYPE_TAKEDOWN_REINSTATED -> {
         TakeDownReinstatedAlert(
             id = megaUserAlert.id,
@@ -311,6 +324,7 @@ internal suspend fun toUserAlert(
             path = megaUserAlert.path,
         )
     }
+
     MegaUserAlert.TYPE_SCHEDULEDMEETING_NEW -> {
         val meeting = scheduledMeetingProvider(megaUserAlert.nodeHandle, megaUserAlert.schedId)
         if (!megaUserAlert.pcrHandle.isValid()) {
@@ -332,6 +346,7 @@ internal suspend fun toUserAlert(
             megaUserAlert.getUpdatedMeetingAlert(meeting, scheduledMeetingOccurrProvider)
         }
     }
+
     MegaUserAlert.TYPE_SCHEDULEDMEETING_DELETED -> {
         val meeting = scheduledMeetingProvider(megaUserAlert.nodeHandle, megaUserAlert.schedId)
         DeletedScheduledMeetingAlert(
@@ -349,10 +364,12 @@ internal suspend fun toUserAlert(
             scheduledMeeting = meeting,
         )
     }
+
     MegaUserAlert.TYPE_SCHEDULEDMEETING_UPDATED -> {
         val meeting = scheduledMeetingProvider(megaUserAlert.nodeHandle, megaUserAlert.schedId)
         megaUserAlert.getUpdatedMeetingAlert(meeting, scheduledMeetingOccurrProvider)
     }
+
     else -> {
         UnknownAlert(
             id = megaUserAlert.id,
@@ -366,7 +383,7 @@ internal suspend fun toUserAlert(
 
 private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
     meeting: ChatScheduledMeeting?,
-    scheduledMeetingOccurrProvider: UserAlertScheduledMeetingOccurrProvider,
+    scheduledMeetingOccurrProvider: suspend (Long) -> List<ChatScheduledMeetingOccurr>?,
 ): UserAlert {
     val createdTime = getTimestamp(CREATED_TIME_INDEX)
     val isRecurring = meeting?.rules != null
@@ -451,6 +468,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     scheduledMeeting = meeting?.takeIf { !isRecurring },
                 )
             }
+
             UserAlertChange.Description -> {
                 UpdatedScheduledMeetingDescriptionAlert(
                     id = id,
@@ -467,6 +485,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     scheduledMeeting = meeting,
                 )
             }
+
             UserAlertChange.StartDate, UserAlertChange.EndDate -> {
                 val dateTimeChanges = getDateTimeChanges()
                 UpdatedScheduledMeetingDateTimeAlert(
@@ -486,6 +505,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     scheduledMeeting = meeting,
                 )
             }
+
             UserAlertChange.Canceled -> {
                 UpdatedScheduledMeetingCancelAlert(
                     id = id,
@@ -502,6 +522,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     scheduledMeeting = meeting,
                 )
             }
+
             else -> {
                 UpdatedScheduledMeetingFieldsAlert(
                     id = id,
@@ -567,14 +588,14 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
 
 private suspend fun getNode(
     megaUserAlert: MegaUserAlert,
-    nodeProvider: NodeProvider,
+    nodeProvider: suspend (Long) -> MegaNode?,
 ) = megaUserAlert.nodeHandle
     .takeIf { it.isValid() }
     ?.let { nodeProvider(it) }
 
 private suspend fun getRootNodeId(
     megaUserAlert: MegaUserAlert,
-    nodeProvider: NodeProvider,
+    nodeProvider: suspend (Long) -> MegaNode?,
 ) = getNode(megaUserAlert, nodeProvider)
     ?.let {
         if (it.isFile) it.parentHandle else it.handle
@@ -591,7 +612,7 @@ private fun getChildNodes(megaUserAlert: MegaUserAlert) =
     }
 
 private fun MegaUserAlert.getScheduledMeetingChanges(): List<UserAlertChange> =
-    UserAlertChange.values().filter { alertChange ->
+    UserAlertChange.entries.filter { alertChange ->
         hasSchedMeetingChanged(UserAlertChangesMapper.userAlertChanges[alertChange] as Long)
     }
 
