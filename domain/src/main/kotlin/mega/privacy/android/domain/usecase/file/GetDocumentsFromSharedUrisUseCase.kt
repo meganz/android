@@ -8,7 +8,7 @@ import javax.inject.Inject
 /**
  * Use case to get a list of [DocumentEntity]s from an action and a list of [UriPath]s
  */
-class GetDocumentsFromSharedUris @Inject constructor(
+class GetDocumentsFromSharedUrisUseCase @Inject constructor(
     private val filePrepareUseCase: FilePrepareUseCase,
     private val isMalformedPathFromExternalAppUseCase: IsMalformedPathFromExternalAppUseCase,
 ) {
@@ -20,5 +20,7 @@ class GetDocumentsFromSharedUris @Inject constructor(
      * @return a list of the [DocumentEntity]s represented by the [uriPaths]. Malformed uris will be filtered out.
      */
     suspend operator fun invoke(action: String?, uriPaths: List<UriPath>) =
-        filePrepareUseCase(uriPaths.filterNot { isMalformedPathFromExternalAppUseCase(action, it.value) })
+        filePrepareUseCase(uriPaths.filterNot {
+            isMalformedPathFromExternalAppUseCase(action, it.value)
+        })
 }

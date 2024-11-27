@@ -22,7 +22,7 @@ import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUris
+import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUrisUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -47,7 +47,7 @@ class FileExplorerViewModelTest {
     private val attachNodeUseCase = mock<AttachNodeUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val sendChatAttachmentsUseCase = mock<SendChatAttachmentsUseCase>()
-    private val getDocumentsFromSharedUris = mock<GetDocumentsFromSharedUris>()
+    private val getDocumentsFromSharedUrisUseCase = mock<GetDocumentsFromSharedUrisUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -64,7 +64,7 @@ class FileExplorerViewModelTest {
             sendChatAttachmentsUseCase = sendChatAttachmentsUseCase,
             monitorAccountDetailUseCase = mock(),
             monitorShowHiddenItemsUseCase = mock(),
-            getDocumentsFromSharedUris = getDocumentsFromSharedUris,
+            getDocumentsFromSharedUrisUseCase = getDocumentsFromSharedUrisUseCase,
         )
     }
 
@@ -77,7 +77,7 @@ class FileExplorerViewModelTest {
         attachNodeUseCase,
         getNodeByIdUseCase,
         sendChatAttachmentsUseCase,
-        getDocumentsFromSharedUris,
+        getDocumentsFromSharedUrisUseCase,
     )
 
     /**

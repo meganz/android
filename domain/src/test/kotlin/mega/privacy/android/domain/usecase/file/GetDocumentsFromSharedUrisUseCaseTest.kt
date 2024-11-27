@@ -19,9 +19,9 @@ import kotlin.test.Test
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetDocumentsFromSharedUrisTest {
+class GetDocumentsFromSharedUrisUseCaseTest {
 
-    private lateinit var underTest: GetDocumentsFromSharedUris
+    private lateinit var underTest: GetDocumentsFromSharedUrisUseCase
 
     private val filePrepareUseCase = mock<FilePrepareUseCase>()
     private val isMalformedPathFromExternalAppUseCase =
@@ -30,7 +30,7 @@ class GetDocumentsFromSharedUrisTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = GetDocumentsFromSharedUris(
+        underTest = GetDocumentsFromSharedUrisUseCase(
             filePrepareUseCase,
             isMalformedPathFromExternalAppUseCase,
         )

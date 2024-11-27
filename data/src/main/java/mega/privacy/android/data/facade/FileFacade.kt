@@ -720,14 +720,15 @@ internal class FileFacade @Inject constructor(
 
     override suspend fun getDocumentEntities(uris: List<Uri>): List<DocumentEntity> {
         return uris.mapNotNull { uri ->
-            if (DocumentsContract.isTreeUri(uri)) {
-                DocumentFile.fromTreeUri(context, uri)
-            } else {
-                DocumentFile.fromSingleUri(context, uri)
-            }?.let { it ->
-                val childFiles = if (it.isDirectory) it.listFiles() else emptyArray()
+            val file = uri.takeIf { (uri.scheme == "file") }?.path?.let { File(it) }
+            when {
+                file?.exists() == true -> DocumentFile.fromFile(file)
+                DocumentsContract.isTreeUri(uri) -> DocumentFile.fromTreeUri(context, uri)
+                else -> DocumentFile.fromSingleUri(context, uri)
+            }?.let { doc ->
+                val childFiles = if (doc.isDirectory) doc.listFiles() else emptyArray()
                 documentFileMapper(
-                    file = it,
+                    file = doc,
                     numFiles = childFiles.count { it.isFile },
                     numFolders = childFiles.count { it.isDirectory },
                 )
@@ -753,7 +754,8 @@ internal class FileFacade @Inject constructor(
                     isExternalStorageUri() -> {
                         val docId = DocumentsContract.getDocumentId(uri)
                         val split = docId.split(":")
-                        return Environment.getExternalStorageDirectory().toString() + "/" + split[1]
+                        return Environment.getExternalStorageDirectory()
+                            .toString() + "/" + split[1]
                     }
 
                     isDownloadDocumentUri() -> {

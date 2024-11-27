@@ -47,7 +47,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUris
+import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUrisUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import timber.log.Timber
@@ -74,7 +74,7 @@ class FileExplorerViewModel @Inject constructor(
     private val sendChatAttachmentsUseCase: SendChatAttachmentsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
-    private val getDocumentsFromSharedUris: GetDocumentsFromSharedUris,
+    private val getDocumentsFromSharedUrisUseCase: GetDocumentsFromSharedUrisUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileExplorerUiState())
@@ -259,7 +259,7 @@ class FileExplorerViewModel @Inject constructor(
         context: Context,
     ): List<DocumentEntity>? =
         getSharedUrisFromIntent(intent, context)?.let { uriPaths ->
-            return getDocumentsFromSharedUris(intent.action, uriPaths)
+            return getDocumentsFromSharedUrisUseCase(intent.action, uriPaths)
         }
 
     private fun getSharedUrisFromIntent(intent: Intent, context: Context): List<UriPath>? =
