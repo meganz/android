@@ -227,7 +227,6 @@ import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesComposeViewModel
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeViewModel
-import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
@@ -5835,37 +5834,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     }
                 } else {
                     Timber.w("TAKE_PHOTO_CODE--->ERROR!")
-                }
-            }
-
-            requestCode == Constants.REQUEST_CREATE_CHAT && resultCode == Activity.RESULT_OK -> {
-                Timber.d("REQUEST_CREATE_CHAT OK")
-                if (intent == null) {
-                    Timber.w("Intent NULL")
-                    return
-                }
-                val isNewMeeting =
-                    intent.getBooleanExtra(StartConversationActivity.EXTRA_NEW_MEETING, false)
-                if (isNewMeeting) {
-                    onCreateMeeting()
-                    return
-                }
-                val isJoinMeeting =
-                    intent.getBooleanExtra(StartConversationActivity.EXTRA_JOIN_MEETING, false)
-                if (isJoinMeeting) {
-                    onJoinMeeting()
-                    return
-                }
-                val chatId = intent.getLongExtra(
-                    StartConversationActivity.EXTRA_NEW_CHAT_ID,
-                    MEGACHAT_INVALID_HANDLE
-                )
-                if (chatId != MEGACHAT_INVALID_HANDLE) {
-                    navigator.openChat(
-                        context = this,
-                        chatId = chatId,
-                        action = Constants.ACTION_CHAT_SHOW_MESSAGES
-                    )
                 }
             }
 

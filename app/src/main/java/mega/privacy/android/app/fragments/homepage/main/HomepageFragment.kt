@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -52,7 +54,7 @@ import mega.privacy.android.app.presentation.startconversation.StartConversation
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
-import mega.privacy.android.app.utils.Constants.REQUEST_CREATE_CHAT
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
@@ -60,6 +62,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.mobile.analytics.event.HomeFABClosedEvent
 import mega.privacy.mobile.analytics.event.HomeFABExpandedEvent
 import mega.privacy.mobile.analytics.event.HomeFABPressedEvent
@@ -104,6 +107,9 @@ class HomepageFragment : Fragment() {
     @Inject
     lateinit var userChatStatusIconMapper: UserChatStatusIconMapper
 
+    @Inject
+    lateinit var navigator: MegaNavigator
+
     private val viewModel: HomePageViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by activityViewModels()
     private val callInProgressViewModel: OngoingCallViewModel by activityViewModels()
@@ -142,6 +148,34 @@ class HomepageFragment : Fragment() {
     private var startScreenDialog: AlertDialog? = null
 
     var isFabExpanded = false
+
+    private val openNewChatLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val data = it.data
+            if (it.resultCode == Activity.RESULT_OK && data != null) {
+                val isNewMeeting =
+                    data.getBooleanExtra(StartConversationActivity.EXTRA_NEW_MEETING, false)
+                val isJoinMeeting =
+                    data.getBooleanExtra(StartConversationActivity.EXTRA_JOIN_MEETING, false)
+                if (isNewMeeting) {
+                    (activity as? ManagerActivity)?.onCreateMeeting()
+                } else if (isJoinMeeting) {
+                    (activity as? ManagerActivity)?.onJoinMeeting()
+                } else {
+                    val chatId = data.getLongExtra(
+                        StartConversationActivity.EXTRA_NEW_CHAT_ID,
+                        MEGACHAT_INVALID_HANDLE
+                    )
+                    if (chatId != MEGACHAT_INVALID_HANDLE) {
+                        navigator.openChat(
+                            context = requireActivity(),
+                            chatId = chatId,
+                            action = Constants.ACTION_CHAT_SHOW_MESSAGES
+                        )
+                    }
+                }
+            }
+        }
 
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
@@ -690,10 +724,7 @@ class HomepageFragment : Fragment() {
 
     @Suppress("deprecation")
     private fun openNewChatActivity() = doIfOnline(true) {
-        activity?.startActivityForResult(
-            Intent(activity, StartConversationActivity::class.java),
-            REQUEST_CREATE_CHAT
-        )
+        openNewChatLauncher.launch(Intent(activity, StartConversationActivity::class.java))
     }
 
     private fun showUploadPanel() = doIfOnline(true) {
