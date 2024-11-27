@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ButtonDefaults
@@ -101,39 +100,37 @@ fun MegaMultiFloatingActionButton(
         onStateChanged?.invoke(currentState)
     }
 
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
-        Column(
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.Bottom,
-        ) {
-            items.forEach { item ->
-                AnimatedVisibility(visible = isExpanded) {
-                    MultiFloatingActionButtonItem(
-                        item = item,
-                        showLabel = showLabels,
-                    )
-                }
+    Column(
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.Bottom,
+    ) {
+        items.forEach { item ->
+            AnimatedVisibility(visible = isExpanded) {
+                MultiFloatingActionButtonItem(
+                    item = item,
+                    showLabel = showLabels,
+                )
             }
-            Box(
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .size(max(mainButtonCollapsedStyle.size, mainButtonExpandedStyle.size)),
-                contentAlignment = Alignment.Center
+        }
+        Box(
+            modifier = modifier
+                .padding(top = 16.dp)
+                .size(max(mainButtonCollapsedStyle.size, mainButtonExpandedStyle.size)),
+            contentAlignment = Alignment.Center
+        ) {
+            MegaFloatingActionButton(
+                onClick = { stateChange() },
+                modifier = Modifier.testTag(tag = MULTI_FAB_MAIN_FAB_TEST_TAG),
+                style = if (isExpanded) mainButtonExpandedStyle else mainButtonCollapsedStyle,
+                enabled = enabled,
+                backgroundColor = if (isExpanded) MegaOriginalTheme.colors.button.secondary else MegaOriginalTheme.colors.button.primary
             ) {
-                MegaFloatingActionButton(
-                    onClick = { stateChange() },
-                    modifier = Modifier.testTag(tag = MULTI_FAB_MAIN_FAB_TEST_TAG),
-                    style = if (isExpanded) mainButtonExpandedStyle else mainButtonCollapsedStyle,
-                    enabled = enabled,
-                    backgroundColor = if (isExpanded) MegaOriginalTheme.colors.button.secondary else MegaOriginalTheme.colors.button.primary
-                ) {
-                    Icon(
-                        painter = icon,
-                        contentDescription = null,
-                        tint = if (isExpanded) MegaOriginalTheme.colors.icon.primary else MegaOriginalTheme.colors.icon.inverse,
-                        modifier = Modifier.rotate(rotation)
-                    )
-                }
+                Icon(
+                    painter = icon,
+                    contentDescription = null,
+                    tint = if (isExpanded) MegaOriginalTheme.colors.icon.primary else MegaOriginalTheme.colors.icon.inverse,
+                    modifier = Modifier.rotate(rotation)
+                )
             }
         }
     }

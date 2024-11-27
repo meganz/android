@@ -8,7 +8,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -21,9 +20,13 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
-import mega.privacy.android.feature.sync.ui.synclist.folders.REMOVE_BACKUP_FOLDER_CONFIRM_DIALOG_TEST_TAG
-import mega.privacy.android.feature.sync.ui.synclist.folders.REMOVE_SYNC_FOLDER_CONFIRM_DIALOG_TEST_TAG
-import mega.privacy.android.feature.sync.ui.synclist.folders.RemoveSyncFolderConfirmDialog
+import mega.privacy.android.feature.sync.ui.stopbackup.STOP_BACKUP_CONFIRMATION_DIALOG_BODY_TEST_TAG
+import mega.privacy.android.feature.sync.ui.stopbackup.STOP_BACKUP_CONFIRMATION_DIALOG_DELETE_OPTION_ROW_TEST_TAG
+import mega.privacy.android.feature.sync.ui.stopbackup.STOP_BACKUP_CONFIRMATION_DIALOG_MOVE_OPTION_ROW_TEST_TAG
+import mega.privacy.android.feature.sync.ui.stopbackup.StopBackupConfirmationDialog
+import mega.privacy.android.feature.sync.ui.synclist.folders.STOP_SYNC_CONFIRM_DIALOG_TEST_TAG
+
+import mega.privacy.android.feature.sync.ui.synclist.folders.StopSyncConfirmDialog
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersScreen
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
@@ -33,6 +36,9 @@ import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_LOADING_STATE
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import mega.privacy.android.feature.sync.ui.views.TEST_TAG_SYNC_ITEM_VIEW
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CANCEL_TAG
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CONFIRM_TAG
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.TITLE_TAG
 import mega.privacy.mobile.analytics.event.SyncCardExpandedEvent
 import mega.privacy.mobile.analytics.event.SyncFoldersListDisplayedEvent
 import mega.privacy.mobile.analytics.event.SyncListEmptyStateUpgradeButtonPressedEvent
@@ -290,16 +296,15 @@ class SyncFoldersScreenTest {
     }
 
     @Test
-    fun `test that remove sync folder confirm dialog is properly displayed `() {
+    fun `test that stop sync confirm dialog is properly displayed `() {
         composeTestRule.setContent {
-            RemoveSyncFolderConfirmDialog(
-                syncType = SyncType.TYPE_TWOWAY,
+            StopSyncConfirmDialog(
                 onConfirm = {},
-                onDismiss = {}
+                onDismiss = {},
             )
         }
 
-        composeTestRule.onNodeWithTag(REMOVE_SYNC_FOLDER_CONFIRM_DIALOG_TEST_TAG)
+        composeTestRule.onNodeWithTag(STOP_SYNC_CONFIRM_DIALOG_TEST_TAG)
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_sync_confirm_dialog_title))
             .assertIsDisplayed()
@@ -312,37 +317,22 @@ class SyncFoldersScreenTest {
     }
 
     @Test
-    fun `test that remove backup folder confirm dialog is properly displayed `() {
+    fun `test that stop backup confirm dialog is properly displayed `() {
         composeTestRule.setContent {
-            RemoveSyncFolderConfirmDialog(
-                syncType = SyncType.TYPE_BACKUP,
+            StopBackupConfirmationDialog(
                 onConfirm = {},
-                onDismiss = {}
+                onDismiss = {},
             )
         }
-        val syncStopBackupConfirmDialogTitle =
-            composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_confirm_dialog_title)
-        val syncStopBackupButton =
-            composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_button)
-        if (syncStopBackupConfirmDialogTitle == syncStopBackupButton) {
-            composeTestRule.onAllNodesWithText(syncStopBackupConfirmDialogTitle).let { nodes ->
-                nodes[0].assertIsDisplayed()
-                nodes[1].assertIsDisplayed()
-            }
-        } else {
-            composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_confirm_dialog_title))
-                .assertIsDisplayed()
-            composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_button))
-                .assertIsDisplayed()
-        }
-
-        composeTestRule.onNodeWithTag(REMOVE_BACKUP_FOLDER_CONFIRM_DIALOG_TEST_TAG)
+        composeTestRule.onNodeWithTag(TITLE_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(STOP_BACKUP_CONFIRMATION_DIALOG_BODY_TEST_TAG)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.sync_stop_backup_confirm_dialog_message))
+        composeTestRule.onNodeWithTag(STOP_BACKUP_CONFIRMATION_DIALOG_MOVE_OPTION_ROW_TEST_TAG)
             .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(STOP_BACKUP_CONFIRMATION_DIALOG_DELETE_OPTION_ROW_TEST_TAG)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedResR.string.general_dialog_cancel_button))
-            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(CANCEL_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(CONFIRM_TAG).assertIsDisplayed()
     }
 
     @Test

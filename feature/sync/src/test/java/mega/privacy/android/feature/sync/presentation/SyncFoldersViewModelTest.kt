@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
+import mega.privacy.android.domain.usecase.node.RemoveDeconfiguredBackupNodesUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
@@ -37,6 +38,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.RemoveFolderPairUse
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPausedSyncUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
+import mega.privacy.android.feature.sync.ui.model.StopBackupOption
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
@@ -73,6 +75,7 @@ class SyncFoldersViewModelTest {
     private val isProAccountUseCase: IsProAccountUseCase = mock()
     private val getRootNodeUseCase: GetRootNodeUseCase = mock()
     private val moveDeconfiguredBackupNodesUseCase: MoveDeconfiguredBackupNodesUseCase = mock()
+    private val removeDeconfiguredBackupNodesUseCase: RemoveDeconfiguredBackupNodesUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private lateinit var underTest: SyncFoldersViewModel
 
@@ -226,14 +229,14 @@ class SyncFoldersViewModelTest {
         initViewModel()
         underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItem))
         underTest.handleAction(
-            SyncFoldersAction.OnRemoveFolderDialogConfirmed
+            SyncFoldersAction.OnRemoveSyncFolderDialogConfirmed
         )
 
         verify(removeFolderPairUseCase).invoke(folderPairId = syncUiItem.id)
     }
 
     @Test
-    fun `test that confirm the remove action for a Backup removes folder pair and moves folder to Cloud Drive`() =
+    fun `test that confirm the remove action for a Backup with move option removes folder pair and moves remote folder to Cloud Drive`() =
         runTest {
             val rootFolder: FolderNode = mock {
                 on { id } doReturn NodeId(123456L)
@@ -245,13 +248,31 @@ class SyncFoldersViewModelTest {
             initViewModel()
             underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItem))
             underTest.handleAction(
-                SyncFoldersAction.OnRemoveFolderDialogConfirmed
+                SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed(StopBackupOption.MOVE)
             )
 
             verify(removeFolderPairUseCase).invoke(folderPairId = syncUiItem.id)
             verify(moveDeconfiguredBackupNodesUseCase).invoke(
                 deconfiguredBackupRoot = syncUiItem.megaStorageNodeId,
                 backupDestination = rootFolder.id
+            )
+        }
+
+    @Test
+    fun `test that confirm the remove action for a Backup with delete option removes folder pair and delete remote folder`() =
+        runTest {
+            whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
+            val syncUiItem = syncUiItems.first { it.syncType == SyncType.TYPE_BACKUP }
+            whenever(removeFolderPairUseCase(syncUiItem.id)).thenReturn(Unit)
+            initViewModel()
+            underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItem))
+            underTest.handleAction(
+                SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed(StopBackupOption.DELETE)
+            )
+
+            verify(removeFolderPairUseCase).invoke(folderPairId = syncUiItem.id)
+            verify(removeDeconfiguredBackupNodesUseCase).invoke(
+                deconfiguredBackupRoot = syncUiItem.megaStorageNodeId,
             )
         }
 
@@ -381,6 +402,7 @@ class SyncFoldersViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getRootNodeUseCase = getRootNodeUseCase,
             moveDeconfiguredBackupNodesUseCase = moveDeconfiguredBackupNodesUseCase,
+            removeDeconfiguredBackupNodesUseCase = removeDeconfiguredBackupNodesUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }

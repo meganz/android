@@ -33,10 +33,11 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPause
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.shared.resources.R as sharedResR
-import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
+import mega.privacy.android.domain.usecase.node.RemoveDeconfiguredBackupNodesUseCase
+import mega.privacy.android.feature.sync.ui.model.StopBackupOption
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
 import javax.inject.Inject
@@ -59,6 +60,7 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val moveDeconfiguredBackupNodesUseCase: MoveDeconfiguredBackupNodesUseCase,
+    private val removeDeconfiguredBackupNodesUseCase: RemoveDeconfiguredBackupNodesUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
@@ -238,34 +240,54 @@ internal class SyncFoldersViewModel @Inject constructor(
                 }
             }
 
-            is SyncFoldersAction.OnRemoveFolderDialogConfirmed -> {
+            is SyncFoldersAction.OnRemoveSyncFolderDialogConfirmed -> {
+                viewModelScope.launch {
+                    uiState.value.syncUiItemToRemove?.let { syncUiItemToRemove ->
+                        runCatching {
+                            removeFolderPairUseCase(syncUiItemToRemove.id)
+                        }.onSuccess {
+                            _uiState.update { state -> state.copy(snackbarMessage = sharedResR.string.sync_snackbar_message_confirm_sync_stopped) }
+                        }.onFailure {
+                            Timber.e(it)
+                        }
+                    }
+                }
+                dismissConfirmRemoveSyncFolderDialog()
+            }
+
+            is SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed -> {
                 viewModelScope.launch {
                     uiState.value.syncUiItemToRemove?.let { syncUiItemToRemove ->
                         runCatching {
                             removeFolderPairUseCase(syncUiItemToRemove.id)
                         }.onSuccess {
                             syncUiItemToRemove.apply {
-                                if (syncType == SyncType.TYPE_BACKUP) {
-                                    getRootNodeUseCase()?.let { rootNode ->
+                                when (action.stopBackupOption) {
+                                    StopBackupOption.MOVE -> {
+                                        getRootNodeUseCase()?.let { rootNode ->
+                                            runCatching {
+                                                moveDeconfiguredBackupNodesUseCase(
+                                                    deconfiguredBackupRoot = megaStorageNodeId,
+                                                    backupDestination = rootNode.id,
+                                                )
+                                            }.onFailure {
+                                                Timber.e(it)
+                                            }
+                                        }
+                                    }
+
+                                    StopBackupOption.DELETE -> {
                                         runCatching {
-                                            moveDeconfiguredBackupNodesUseCase(
+                                            removeDeconfiguredBackupNodesUseCase(
                                                 deconfiguredBackupRoot = megaStorageNodeId,
-                                                backupDestination = rootNode.id,
                                             )
                                         }.onFailure {
                                             Timber.e(it)
                                         }
                                     }
                                 }
-                                _uiState.update { state ->
-                                    state.copy(
-                                        snackbarMessage = when (syncType) {
-                                            SyncType.TYPE_BACKUP -> sharedResR.string.sync_snackbar_message_confirm_backup_stopped
-                                            else -> sharedResR.string.sync_snackbar_message_confirm_sync_stopped
-                                        }
-                                    )
-                                }
                             }
+                            _uiState.update { state -> state.copy(snackbarMessage = sharedResR.string.sync_snackbar_message_confirm_backup_stopped) }
                         }.onFailure {
                             Timber.e(it)
                         }
