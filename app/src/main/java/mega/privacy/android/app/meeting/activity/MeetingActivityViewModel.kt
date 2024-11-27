@@ -36,6 +36,8 @@ import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
@@ -590,7 +592,7 @@ class MeetingActivityViewModel @Inject constructor(
 
                         ChatCallStatus.TerminatingUserParticipation,
                         ChatCallStatus.Destroyed,
-                        -> finishMeetingActivity()
+                            -> finishMeetingActivity()
 
                         else -> {
                             checkIfPresenting(it)
@@ -1761,57 +1763,99 @@ class MeetingActivityViewModel @Inject constructor(
     }
 
     /**
-     * Answer chat call
+     * Check if should answer the call
      *
-     * @param enableVideo The video should be enabled
-     * @param enableAudio The audio should be enabled
-     * @param speakerAudio The speaker should be enabled
-     * @return Result of the call
+     * @param chatId Chat id
+     * @param enableAudio If audio is on
+     * @param enableVideo if video is on
+     * @param speakerAudio if speaker is on
      */
-    fun answerCall(
+    fun checkAndAnswerCall(
+        chatId: Long,
         enableVideo: Boolean,
         enableAudio: Boolean,
         speakerAudio: Boolean,
-    ): LiveData<AnswerCallResult> {
+    ) {
 
-        val result = MutableLiveData<AnswerCallResult>()
-        _state.value.chatId.let { chatId ->
-            if (CallUtil.amIParticipatingInThisMeeting(chatId)) {
-                Timber.d("Already participating in this call")
-                return result
-            }
-
-            if (MegaApplication.getChatManagement().isAlreadyJoiningCall(chatId)) {
-                Timber.d("The call has been answered")
-                return result
-            }
-
-            chatManagement.addJoiningCallChatId(chatId)
-
-            viewModelScope.launch {
-                runCatching {
-                    setChatVideoInDeviceUseCase()
-                    answerChatCallUseCase(chatId = chatId, video = enableVideo, audio = enableAudio)
-                }.onSuccess { call ->
-                    chatManagement.removeJoiningCallChatId(chatId)
-                    rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-                    if (call == null) {
-                        finishMeetingActivity()
-                    } else {
-                        chatManagement.setSpeakerStatus(call.chatId, speakerAudio)
-                        chatManagement.setRequestSentCall(call.callId, false)
-                        CallUtil.clearIncomingCallNotification(call.callId)
-
-                        result.value =
-                            AnswerCallResult(chatId, call.hasLocalVideo, call.hasLocalAudio)
-                    }
-                }.onFailure {
-                    Timber.w("Exception answering call: $it")
+        viewModelScope.launch {
+            runCatching {
+                getChatCallUseCase(chatId)
+            }.onSuccess { call ->
+                call?.apply {
+                    Timber.d("Answer call")
+                    answerCall(
+                        chatId = this.chatId,
+                        enableAudio = enableAudio,
+                        enableVideo = enableVideo,
+                        speakerAudio = speakerAudio
+                    )
                 }
+            }.onFailure { exception ->
+                Timber.e(exception)
             }
         }
+    }
 
-        return result
+    /**
+     * Answer call
+     *
+     * @param chatId Chat id
+     * @param enableAudio If audio is on
+     * @param enableVideo if video is on
+     * @param speakerAudio if speaker is on
+     */
+    fun answerCall(
+        chatId: Long,
+        enableVideo: Boolean,
+        enableAudio: Boolean,
+        speakerAudio: Boolean,
+    ) {
+        if (CallUtil.amIParticipatingInThisMeeting(chatId)) {
+            Timber.d("Already participating in this call")
+            return
+        }
+
+        if (MegaApplication.getChatManagement().isAlreadyJoiningCall(chatId)) {
+            Timber.d("The call has been answered")
+            return
+        }
+
+        chatManagement.addJoiningCallChatId(chatId)
+        viewModelScope.launch {
+            runCatching {
+                setChatVideoInDeviceUseCase()
+                answerChatCallUseCase(chatId = chatId, video = enableVideo, audio = enableAudio)
+            }.onSuccess { call ->
+                chatManagement.removeJoiningCallChatId(chatId)
+                rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                if (call == null) {
+                    finishMeetingActivity()
+                } else {
+                    chatManagement.setSpeakerStatus(call.chatId, speakerAudio)
+                    chatManagement.setRequestSentCall(call.callId, false)
+                    CallUtil.clearIncomingCallNotification(call.callId)
+
+                    val actionString = if (enableVideo) {
+                        Timber.d("Call answered with video ON and audio ON")
+                        MEETING_ACTION_RINGING_VIDEO_ON
+                    } else {
+                        Timber.d("Call answered with video OFF and audio ON")
+                        MEETING_ACTION_RINGING_VIDEO_OFF
+                    }
+
+                    _state.update { state ->
+                        state.copy(
+                            answerResult = AnswerCallResult(
+                                chatHandle = chatId,
+                                actionString = actionString
+                            )
+                        )
+                    }
+                }
+            }.onFailure {
+                Timber.w("Exception answering call: $it")
+            }
+        }
     }
 
     /**

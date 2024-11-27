@@ -562,6 +562,13 @@ class ChatManagement @Inject constructor(
             Timber.d("Opening meeting link, don't show notification")
             return
         }
+
+        val hasScheduledMeeting = megaChatApi.getScheduledMeetingsByChat(chatId)
+        if(hasScheduledMeeting != null) {
+            Timber.d("Scheduled meeting, don't show notification")
+            return
+        }
+
         Timber.d("Show incoming call notification")
         app.showOneCallNotification(call)
     }

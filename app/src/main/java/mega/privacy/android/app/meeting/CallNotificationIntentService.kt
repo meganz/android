@@ -16,6 +16,7 @@ import mega.privacy.android.app.meeting.listeners.HangChatCallListener
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener.OnCallHungUpCallback
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
+import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification
 import mega.privacy.android.app.utils.CallUtil.openMeetingInProgress
 import mega.privacy.android.app.utils.CallUtil.openMeetingRinging
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.HoldChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.meeting.StartScheduledMeetingUseCase
@@ -46,6 +48,7 @@ import javax.inject.Inject
  * @property startScheduledMeetingUseCase           [StartScheduledMeetingUseCase]
  * @property startMeetingInWaitingRoomChatUseCase   [StartMeetingInWaitingRoomChatUseCase]
  * @property getChatRoomUseCase                     [GetChatRoomUseCase]
+ * @property getChatCallUseCase                     [GetChatCallUseCase]
  * @property notificationManager                    [NotificationManagerCompat]
  * @property ioDispatcher                           [CoroutineDispatcher]
  * @property coroutineScope                         [CoroutineScope]
@@ -76,6 +79,9 @@ class CallNotificationIntentService : Service(),
 
     @Inject
     lateinit var getChatRoomUseCase: GetChatRoomUseCase
+
+    @Inject
+    lateinit var getChatCallUseCase: GetChatCallUseCase
 
     @Inject
     lateinit var holdChatCallUseCase: HoldChatCallUseCase
@@ -274,8 +280,26 @@ class CallNotificationIntentService : Service(),
                 val chatRoom = getChatRoomUseCase(chatIdIncomingCall)
                 val isWaitingRoom = chatRoom?.isWaitingRoom ?: false
                 val isHost = chatRoom?.ownPrivilege == ChatRoomPermission.Moderator
+                val call = getChatCallUseCase(chatIdIncomingCall)
+                val audioPermission = hasPermissions(
+                    this@CallNotificationIntentService,
+                    Manifest.permission.RECORD_AUDIO
+                )
+
                 if (isWaitingRoom && !isHost) {
                     openWaitingRoom(chatIdIncomingCall)
+                } else if (audioPermission.not()) {
+                    if (call == null) {
+                        openChatRoom(chatId = chatIdIncomingCall)
+                    } else {
+                        openMeetingRinging(
+                            this@CallNotificationIntentService,
+                            chatIdIncomingCall,
+                            passcodeManagement
+                        )
+                    }
+
+                    stopSelf()
                 } else {
                     runCatching {
                         if (isWaitingRoom) {
@@ -297,11 +321,11 @@ class CallNotificationIntentService : Service(),
                                 )
                             )
                         }
-                    }.onSuccess { call ->
-                        if (call.chatId != megaChatApiGateway.getChatInvalidHandle()) {
+                    }.onSuccess { meeting ->
+                        if (meeting.chatId != megaChatApiGateway.getChatInvalidHandle()) {
                             openMeetingInProgress(
                                 this@CallNotificationIntentService,
-                                call.chatId,
+                                meeting.chatId,
                                 true,
                                 passcodeManagement
                             )
@@ -329,6 +353,20 @@ class CallNotificationIntentService : Service(),
     private fun openWaitingRoom(chatId: Long) {
         val intent = Intent(applicationContext, WaitingRoomActivity::class.java).apply {
             putExtra(WaitingRoomActivity.EXTRA_CHAT_ID, chatId)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        applicationContext.startActivity(intent)
+    }
+
+    /**
+     * Open the waiting room
+     *
+     * @param chatId    Meeting's Chat ID
+     */
+    private fun openChatRoom(chatId: Long) {
+        val intent = Intent(applicationContext, ChatHostActivity::class.java).apply {
+            putExtra(Constants.CHAT_ID, chatId)
+            action = Constants.ACTION_CHAT_SHOW_MESSAGES
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
         applicationContext.startActivity(intent)

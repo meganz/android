@@ -769,9 +769,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             updateLocalAudio(it)
         }
 
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.answerResult }
+            .distinctUntilChanged()) {
+            it?.apply {
+                checkCallStarted(chatHandle)
+            }
+        }
+
         viewLifecycleOwner.collectFlow(sharedModel.state.map { it.handRaisedSnackbarMsg }
             .distinctUntilChanged()) {
-            if(it == consumed()) {
+            if (it == consumed()) {
                 binding.snackbarComposeView.apply {
                     isVisible = false
                 }
@@ -2976,10 +2983,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
         }
 
-        sharedModel.answerCall(video, audio, speakerIsEnable)
-            .observe(viewLifecycleOwner) { (chatHandle) ->
-                checkCallStarted(chatHandle)
-            }
+        sharedModel.answerCall(
+            chatId = inMeetingViewModel.getChatId(),
+            enableVideo = video,
+            enableAudio = audio,
+            speakerAudio = speakerIsEnable
+        )
+
     }
 
     /**

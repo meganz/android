@@ -19,8 +19,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.databinding.MeetingRingingFragmentBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
-import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor
@@ -49,7 +47,6 @@ class RingingMeetingFragment : MeetingBaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         arguments?.let {
             chatId = it.getLong(MEETING_CHAT_ID)
         }
@@ -87,12 +84,12 @@ class RingingMeetingFragment : MeetingBaseFragment() {
 
         binding.answerVideoFab.setOnClickListener {
             inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.getChatId())
-            answerCall(enableVideo = true)
+            checkAndAnswerCall(enableVideo = true)
         }
 
         binding.answerAudioFab.setOnClickListener {
             inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.getChatId())
-            answerCall(enableVideo = false)
+            checkAndAnswerCall(enableVideo = false)
         }
 
         binding.rejectFab.setOnClickListener {
@@ -102,11 +99,11 @@ class RingingMeetingFragment : MeetingBaseFragment() {
     }
 
     /**
-     * Method to answer the call with audio enabled
+     * Method to answer the call with audio enabled or start the meeting
      *
      * @param enableVideo True, if it should be answered with video on. False, if it should be answered with video off
      */
-    private fun answerCall(enableVideo: Boolean) {
+    private fun checkAndAnswerCall(enableVideo: Boolean) {
         val audio =
             PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
 
@@ -119,22 +116,12 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             video = PermissionUtils.hasPermissions(requireContext(), Manifest.permission.CAMERA)
         }
 
-        sharedModel.answerCall(enableVideo = enableVideo, enableAudio = true, speakerAudio = video)
-            .observe(viewLifecycleOwner) { (chatHandle, enableVideo, _) ->
-                val actionString = if (enableVideo) {
-                    Timber.d("Call answered with video ON and audio ON")
-                    MEETING_ACTION_RINGING_VIDEO_ON
-                } else {
-                    Timber.d("Call answered with video OFF and audio ON")
-                    MEETING_ACTION_RINGING_VIDEO_OFF
-                }
-
-                val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
-                    actionString,
-                    chatHandle
-                )
-                findNavController().navigate(action)
-            }
+        sharedModel.checkAndAnswerCall(
+            chatId = chatId,
+            enableVideo = enableVideo,
+            enableAudio = true,
+            speakerAudio = video
+        )
     }
 
     /**
@@ -232,6 +219,17 @@ class RingingMeetingFragment : MeetingBaseFragment() {
                 if (callStatus == ChatCallStatus.Destroyed) {
                     requireActivity().finish()
                 }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(sharedModel.state.map { it.answerResult }
+            .distinctUntilChanged()) {
+            it?.apply {
+                val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
+                    actionString,
+                    chatHandle
+                )
+                findNavController().navigate(action)
             }
         }
     }
