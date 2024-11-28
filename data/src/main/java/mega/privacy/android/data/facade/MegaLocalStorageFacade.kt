@@ -131,13 +131,23 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getChatFilesFolderHandle() = dbHandler.get().myChatFilesFolderHandle
 
-    override suspend fun setLastPublicHandle(handle: Long) = dbHandler.get().setLastPublicHandle(handle)
+    override suspend fun setLastPublicHandle(handle: Long) =
+        dbHandler.get().setLastPublicHandle(handle)
 
-    override suspend fun setLastPublicHandleTimeStamp() = dbHandler.get().setLastPublicHandleTimeStamp()
+    override suspend fun setLastPublicHandleTimeStamp() =
+        dbHandler.get().setLastPublicHandleTimeStamp()
 
     override suspend fun setLastPublicHandleType(type: Int) {
         dbHandler.get().lastPublicHandleType = type
     }
+
+    override suspend fun getLastPublicHandle(): Long? = dbHandler.get().attributes?.lastPublicHandle
+
+    override suspend fun getLastPublicHandleType(): Int? =
+        dbHandler.get().attributes?.lastPublicHandleType
+
+    override suspend fun getLastPublicHandleTimeStamp(): Long? =
+        dbHandler.get().attributes?.lastPublicHandleTimeStamp
 
     override suspend fun getChatSettings(): ChatSettings? = dbHandler.get().chatSettings
 

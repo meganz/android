@@ -248,3 +248,7 @@ src/com/mega/android/Preferences.java:hashicorp-tf-password:35
 src/com/mega/android/Preferences.java:hashicorp-tf-password:18
 jni/mega/sqlite3.c:generic-api-key:94219
 jni/mega/sqlite3.c:generic-api-key:94374
+domain/src/test/kotlin/mega/privacy/android/domain/usecase/account/CreateAccountUseCaseTest.kt:hashicorp-tf-password:46
+domain/src/test/kotlin/mega/privacy/android/domain/usecase/account/CreateAccountUseCaseTest.kt:hashicorp-tf-password:100
+domain/src/test/kotlin/mega/privacy/android/domain/usecase/account/CreateAccountUseCaseTest.kt:hashicorp-tf-password:149
+domain/src/test/kotlin/mega/privacy/android/domain/usecase/account/CreateAccountUseCaseTest.kt:hashicorp-tf-password:186

@@ -73,6 +73,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun getInvalidHandle(): Long = MegaApiAndroid.INVALID_HANDLE
 
+    override fun getInvalidAffiliateType(): Int = MegaApiAndroid.AFFILIATE_TYPE_INVALID
+
     override fun getInvalidBackupType() = MegaApiAndroid.BACKUP_TYPE_INVALID
 
     override fun multiFactorAuthAvailable(): Boolean = megaApi.multiFactorAuthAvailable()
@@ -1566,4 +1568,36 @@ internal class MegaApiFacade @Inject constructor(
     }
 
     override fun enableRequestStatusMonitor() = megaApi.enableRequestStatusMonitor()
+
+    override fun createAccount(
+        email: String,
+        password: String,
+        firstName: String,
+        lastName: String,
+        listener: MegaRequestListenerInterface,
+    ) {
+        megaApi.createAccount(email, password, firstName, lastName, listener)
+    }
+
+    override fun createAccount(
+        email: String,
+        password: String,
+        firstName: String,
+        lastName: String,
+        lastPublicHandle: Long,
+        lastPublicHandleType: Int,
+        lastAccessTimestamp: Long,
+        listener: MegaRequestListenerInterface,
+    ) {
+        megaApi.createAccount(
+            email,
+            password,
+            firstName,
+            lastName,
+            lastPublicHandle,
+            lastPublicHandleType,
+            lastAccessTimestamp,
+            listener
+        )
+    }
 }

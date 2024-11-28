@@ -85,6 +85,7 @@ import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.exception.ResetPasswordLinkException
 import mega.privacy.android.domain.exception.account.ConfirmCancelAccountException
 import mega.privacy.android.domain.exception.account.ConfirmChangeEmailException
+import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.exception.account.QueryCancelLinkException
 import mega.privacy.android.domain.exception.account.QueryChangeEmailLinkException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -1359,6 +1360,130 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override fun monitorAlmostFullStorageBannerClosingTimestamp(): Flow<Long?> =
         uiPreferencesGateway.monitorAlmostFullStorageBannerClosingTimestamp().flowOn(ioDispatcher)
+
+    override suspend fun createAccount(
+        email: String, password: String, firstName: String, lastName: String,
+    ): EphemeralCredentials = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> {
+                            continuation.resumeWith(
+                                Result.success(
+                                    EphemeralCredentials(
+                                        request.email,
+                                        request.password,
+                                        request.sessionKey,
+                                        request.name,
+                                        request.text
+                                    )
+                                )
+                            )
+                        }
+
+                        MegaError.API_EEXIST -> {
+                            continuation.resumeWith(
+                                Result.failure(CreateAccountException.AccountAlreadyExists)
+                            )
+                        }
+
+                        else -> {
+                            continuation.resumeWith(
+                                Result.failure(
+                                    CreateAccountException.Unknown(error.toException("createAccount"))
+                                )
+                            )
+                        }
+                    }
+                }
+            )
+            megaApiGateway.createAccount(
+                email = email,
+                password = password,
+                firstName = firstName,
+                lastName = lastName,
+                listener = listener
+            )
+        }
+    }
+
+    override suspend fun createAccount(
+        email: String,
+        password: String,
+        firstName: String,
+        lastName: String,
+        lastPublicHandle: Long,
+        lastPublicHandleType: Int,
+        lastPublicHandleTimeStamp: Long,
+    ): EphemeralCredentials = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> {
+                            continuation.resumeWith(
+                                Result.success(
+                                    EphemeralCredentials(
+                                        request.email,
+                                        request.password,
+                                        request.sessionKey,
+                                        request.name,
+                                        request.text
+                                    )
+                                )
+                            )
+                        }
+
+                        MegaError.API_EEXIST -> {
+                            continuation.resumeWith(
+                                Result.failure(CreateAccountException.AccountAlreadyExists)
+                            )
+                        }
+
+                        else -> {
+                            continuation.resumeWith(
+                                Result.failure(
+                                    CreateAccountException.Unknown(error.toException("createAccount"))
+                                )
+                            )
+                        }
+                    }
+                }
+            )
+            megaApiGateway.createAccount(
+                email = email,
+                password = password,
+                firstName = firstName,
+                lastName = lastName,
+                lastPublicHandle = lastPublicHandle,
+                lastPublicHandleType = lastPublicHandleType,
+                lastAccessTimestamp = lastPublicHandleTimeStamp,
+                listener = listener
+            )
+        }
+    }
+
+    override suspend fun getLastPublicHandle(): Long =
+        withContext(ioDispatcher) {
+            localStorageGateway.getLastPublicHandle() ?: megaApiGateway.getInvalidHandle()
+        }
+
+    override suspend fun getLastPublicHandleType(): Int =
+        withContext(ioDispatcher) {
+            localStorageGateway.getLastPublicHandleType()
+                ?: megaApiGateway.getInvalidAffiliateType()
+        }
+
+    override suspend fun getLastPublicHandleTimeStamp(): Long =
+        withContext(ioDispatcher) {
+            localStorageGateway.getLastPublicHandleTimeStamp()
+                ?: -1L
+        }
+
+    override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
+
+    override fun getInvalidAffiliateType(): Int = megaApiGateway.getInvalidAffiliateType()
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
