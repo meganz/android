@@ -106,8 +106,8 @@ class VideoSectionFragment : Fragment() {
                 Activity.RESULT_OK -> {
                     result.data?.getStringArrayListExtra(
                         VideoToPlaylistActivity.INTENT_SUCCEED_ADDED_PLAYLIST_TITLES
-                    )?.let {
-                        // Will implement in the ticket - CC-8463
+                    )?.let { titles ->
+                        videoSectionViewModel.updateAddToPlaylistTitles(titles)
                     }
                 }
             }

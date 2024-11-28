@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.videosection.view
 
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -34,7 +33,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun VideoSectionComposeView(
     videoSectionViewModel: VideoSectionViewModel,
@@ -182,7 +181,12 @@ internal fun VideoSectionComposeView(
                     onSortOrderClick = onSortOrderClick,
                     onClick = onClick,
                     onLongClick = onLongClick,
-                    onMenuClick = onMenuClick
+                    onMenuClick = onMenuClick,
+                    addToPlaylistsTitles = uiState.addToPlaylistTitles,
+                    clearAddToPlaylistsTitles = {
+                        videoSectionViewModel.updateAddToPlaylistHandle(null)
+                        videoSectionViewModel.updateAddToPlaylistTitles(null)
+                    }
                 )
             },
             playlistsView = {
@@ -201,7 +205,7 @@ internal fun VideoSectionComposeView(
                                 SortOrder.ORDER_FAV_DESC,
                                 SortOrder.ORDER_LABEL_ASC,
                                 SortOrder.ORDER_LABEL_DESC,
-                                -> SortOrder.ORDER_DEFAULT_ASC
+                                    -> SortOrder.ORDER_DEFAULT_ASC
 
                                 else -> uiState.sortOrder
                             }

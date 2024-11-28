@@ -1829,6 +1829,32 @@ class VideoSectionViewModelTest {
             }
         }
 
+    @Test
+    fun `test that addToPlaylistHandle is updated as expected`() =
+        runTest {
+            val testVideoHandle = 12345L
+            initUnderTest()
+            underTest.state.test {
+                assertThat(awaitItem().addToPlaylistHandle).isNull()
+                underTest.updateAddToPlaylistHandle(testVideoHandle)
+                assertThat(awaitItem().addToPlaylistHandle).isEqualTo(testVideoHandle)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that addToPlaylistTitles is updated as expected`() =
+        runTest {
+            val testTitles = listOf("title1", "title2", "title3")
+            initUnderTest()
+            underTest.state.test {
+                assertThat(awaitItem().addToPlaylistTitles).isNull()
+                underTest.updateAddToPlaylistTitles(testTitles)
+                assertThat(awaitItem().addToPlaylistTitles).isEqualTo(testTitles)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     companion object {
         @JvmField
         @RegisterExtension

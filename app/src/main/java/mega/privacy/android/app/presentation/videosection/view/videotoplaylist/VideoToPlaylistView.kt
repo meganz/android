@@ -162,7 +162,7 @@ internal fun VideoToPlaylistView(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .testTag(VIDEO_TO_PLAYLIST_DONE_BUTTON_TEST_TAG),
                 enabled = hasSelectedItems,
-                textId = sharedR.string.video_to_playlist_done_button,
+                textId = sharedR.string.video_to_playlist_add_button,
                 onClick = onDoneButtonClicked
             )
         }
@@ -197,6 +197,27 @@ private fun provideTestItems() = (0..20).map {
         title = "Video Playlist Set $it",
         isSelected = it % 2 == 0
     )
+}
+
+@CombinedThemePreviews
+@Composable
+private fun VideoToPlaylistViewPreviewWithEmptyItems() {
+    OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+        VideoToPlaylistView(
+            items = emptyList(),
+            searchState = SearchWidgetState.COLLAPSED,
+            query = "",
+            hasSelectedItems = true,
+            isLoading = false,
+            isInputTitleValid = true,
+            showCreateVideoPlaylistDialog = false,
+            inputPlaceHolderText = "",
+            setShouldCreateVideoPlaylist = {},
+            onCreateDialogPositiveButtonClicked = {},
+            setInputValidity = {},
+            setDialogInputPlaceholder = {}
+        )
+    }
 }
 
 /**

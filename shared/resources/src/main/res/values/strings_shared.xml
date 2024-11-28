@@ -841,4 +841,13 @@
     <string name="sync_stop_backup_confirm_dialog_delete_option_text">Folder will be deleted from MEGA. It won’t be deleted from your device.</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">Confirm</string>
+    <!-- The failed Message when adding the video to the playlists from the video section. -->
+    <string name="video_section_playlists_add_to_playlists_failed_message">Unable to add item</string>
+    <!-- Text of the add button in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_add_button">Add</string>
+    <!-- The success Message when adding the video to the playlists from the video section. -->
+    <plurals name="video_section_playlists_add_to_playlists_successfully_message">
+        <item quantity="one">Added 1 item to “%1$s”</item>
+        <item quantity="other">Added 1 item to %1$d playlists</item>
+    </plurals>
 </resources>

@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -36,11 +34,12 @@ import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
+import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import nz.mega.sdk.MegaNode
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun AllVideosView(
     items: List<VideoUIEntity>,
@@ -58,6 +57,8 @@ internal fun AllVideosView(
     onClick: (item: VideoUIEntity, index: Int) -> Unit,
     onMenuClick: (VideoUIEntity) -> Unit,
     onSortOrderClick: () -> Unit,
+    addToPlaylistsTitles: List<String>?,
+    clearAddToPlaylistsTitles: () -> Unit,
     onLongClick: ((item: VideoUIEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -70,6 +71,24 @@ internal fun AllVideosView(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true
     )
+
+    val context = LocalContext.current
+    val scaffoldState = rememberScaffoldState()
+
+    LaunchedEffect(addToPlaylistsTitles) {
+        addToPlaylistsTitles?.let { titles ->
+            if (titles.isNotEmpty()) {
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                    context.resources.getQuantityString(
+                        sharedR.plurals.video_section_playlists_add_to_playlists_successfully_message,
+                        titles.size,
+                        if (titles.size == 1) titles.first() else titles.size
+                    )
+                )
+                clearAddToPlaylistsTitles()
+            }
+        }
+    }
 
     LaunchedEffect(items) {
         if (scrollToTop) {
@@ -89,9 +108,9 @@ internal fun AllVideosView(
         }
     }
 
-    Scaffold(
+    MegaScaffold(
         modifier = modifier,
-        scaffoldState = rememberScaffoldState(),
+        scaffoldState = scaffoldState,
     ) { paddingValue ->
         val locationTitle =
             stringResource(id = sharedR.string.video_section_videos_location_filter_title)
@@ -275,6 +294,8 @@ private fun AllVideosViewPreview() {
             selectedDurationFilterOption = DurationFilterOption.MoreThan20,
             onLocationFilterItemClicked = { },
             onDurationFilterItemClicked = { },
+            addToPlaylistsTitles = null,
+            clearAddToPlaylistsTitles = { }
         )
     }
 }

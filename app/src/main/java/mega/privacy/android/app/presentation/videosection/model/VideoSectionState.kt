@@ -50,6 +50,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property removeRecentlyWatchedItemSuccess State Event which notifies that remove recently watched item is successful
  * @property addToPlaylistHandle the handle of the video to be added to playlist
  * @property isLaunchVideoToPlaylistActivity true if launching the VideoToPlaylistActivity
+ * @property addToPlaylistTitles the titles of the playlists to add the video to
  */
 data class VideoSectionState(
     val allVideos: List<VideoUIEntity> = emptyList(),
@@ -92,4 +93,5 @@ data class VideoSectionState(
     val removeRecentlyWatchedItemSuccess: StateEvent = consumed,
     val addToPlaylistHandle: Long? = null,
     val isLaunchVideoToPlaylistActivity: Boolean = false,
+    val addToPlaylistTitles: List<String>? = null,
 )
