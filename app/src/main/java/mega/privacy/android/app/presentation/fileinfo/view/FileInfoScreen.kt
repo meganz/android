@@ -10,7 +10,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.SnackbarHost
@@ -55,7 +54,6 @@ import kotlin.time.Duration.Companion.days
 /**
  * View to render the File Info Screen, including toolbar, content, etc.
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun FileInfoScreen(
     viewState: FileInfoViewState,
@@ -78,7 +76,6 @@ internal fun FileInfoScreen(
     onMenuActionClick: (FileInfoMenuAction) -> Unit,
     onVerifyContactClick: (String) -> Unit,
     onAddTagClick: () -> Unit,
-    onUpgradeAccountClick: () -> Unit,
     onShareContactOptionsDismissed: () -> Unit,
     modifier: Modifier = Modifier,
     getAddress: suspend (Context, Double, Double) -> Address?,
@@ -195,7 +192,6 @@ internal fun FileInfoScreen(
                 onVerifyContactClick = onVerifyContactClick,
                 onSetDescriptionClick = onSetDescriptionClick,
                 onAddTagClick = onAddTagClick,
-                onUpgradeAccountClick = onUpgradeAccountClick,
                 getAddress = getAddress,
             )
             viewState.jobInProgressState?.progressMessage?.let {
@@ -252,7 +248,6 @@ private fun FileInfoScreenPreview(
             },
             onVerifyContactClick = {},
             onAddTagClick = {},
-            onUpgradeAccountClick = {},
             modifier = Modifier.background(color = MaterialTheme.colors.background),
             getAddress = { _, _, _ -> null },
             onShareContactOptionsDismissed = {},

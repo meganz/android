@@ -57,9 +57,8 @@ internal fun FileInfoContent(
     onVerifyContactClick: (String) -> Unit,
     onSetDescriptionClick: (String) -> Unit,
     onAddTagClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    onUpgradeAccountClick: () -> Unit,
     getAddress: suspend (Context, Double, Double) -> Address?,
+    modifier: Modifier = Modifier,
 ) {
     var isShareContactExpanded by remember { mutableStateOf(false) }
     Column(
@@ -233,10 +232,7 @@ internal fun FileInfoContent(
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                     tags = tags,
-                    isProAccount = isProAccount,
-                    isBusinessAccountActive = isBusinessAccountActive,
                     onAddTagClick = onAddTagClick,
-                    onUpgradeAccountClick = onUpgradeAccountClick
                 )
             }
 
@@ -299,7 +295,6 @@ private fun FileInfoContentPreview(
             onVerifyContactClick = {},
             onSetDescriptionClick = {},
             onAddTagClick = {},
-            onUpgradeAccountClick = {},
             modifier = Modifier.verticalScroll(scrollState),
             getAddress = { _, _, _ -> null }
         )

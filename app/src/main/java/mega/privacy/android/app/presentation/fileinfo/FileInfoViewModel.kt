@@ -13,7 +13,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -37,7 +36,6 @@ import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -65,12 +63,10 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetImageNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
@@ -147,8 +143,6 @@ class FileInfoViewModel @Inject constructor(
     private val monitorOfflineFileAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-    private val isBusinessAccountActive: IsBusinessAccountActive,
     private val getImageNodeByNodeId: GetImageNodeByIdUseCase,
     @IoDispatcher private val iODispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -184,33 +178,11 @@ class FileInfoViewModel @Inject constructor(
     init {
         checkMapLocationFeatureFlag()
         checkTagsFeatureFlag()
-        checkAccountStatus()
         viewModelScope.launch {
             val isRemindersForContactVerificationEnabled =
                 getContactVerificationWarningUseCase()
             _uiState.update { it.copy(isRemindersForContactVerificationEnabled = isRemindersForContactVerificationEnabled) }
         }
-    }
-
-    private fun checkAccountStatus() = viewModelScope.launch {
-        monitorAccountDetailUseCase()
-            .catch {
-                Timber.e("Monitor account detail failed $it")
-            }.collect { accountDetail ->
-                val accountType = accountDetail.levelDetail?.accountType
-                if (accountType == AccountType.PRO_FLEXI || accountType == AccountType.BUSINESS) {
-                    runCatching {
-                        isBusinessAccountActive()
-                    }.onSuccess { isBusinessAccountActive ->
-                        _uiState.update { it.copy(isBusinessAccountActive = isBusinessAccountActive) }
-                    }.onFailure {
-                        Timber.e("Get isBusinessAccountActive failed with error: $it")
-                    }
-                } else {
-                    _uiState.update { it.copy(isProAccount = accountType != AccountType.FREE) }
-                }
-            }
-
     }
 
     private fun checkTagsFeatureFlag() = viewModelScope.launch {

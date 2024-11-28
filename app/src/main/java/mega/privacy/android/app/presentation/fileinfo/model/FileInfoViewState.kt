@@ -50,8 +50,6 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
  * @param requiredExtraAction an initiated action that needs to be confirmed by the user or more data needs to be specified (typically by an alert dialog)
  * @param isRemindersForContactVerificationEnabled checks if reminders for contact verification is enabled
  * @param tagsEnabled checks if tags are enabled
- * @param isProAccount checks if the user is a PRO account
- * @param isBusinessAccountActive checks if the Business account user is currently active
  * @param tags list of tags for the node
  * @param mapLocationEnabled checks if GIS location is enabled
  * @param longitude the longitude of the node
@@ -95,8 +93,6 @@ internal data class FileInfoViewState(
     val requiredExtraAction: FileInfoExtraAction? = null,
     val isRemindersForContactVerificationEnabled: Boolean = false,
     val tagsEnabled: Boolean = false,
-    val isProAccount: Boolean = false,
-    val isBusinessAccountActive: Boolean? = null,
     val tags: List<String> = emptyList(),
     val mapLocationEnabled: Boolean = false,
     val longitude: Double = 0.0,

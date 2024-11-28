@@ -49,7 +49,6 @@ import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
@@ -172,7 +171,6 @@ class FileInfoActivity : BaseActivity() {
                     onMenuActionClick = { handleAction(it, uiState) },
                     onVerifyContactClick = this::navigateToVerifyContacts,
                     onAddTagClick = this::navigateToTags,
-                    onUpgradeAccountClick = this::navigateToUpgradeAccountScreen,
                     modifier = Modifier.semantics {
                         testTagsAsResourceId = true
                     },
@@ -222,10 +220,6 @@ class FileInfoActivity : BaseActivity() {
                 }
             }
         }
-    }
-
-    private fun navigateToUpgradeAccountScreen() {
-        startActivity(Intent(this, UpgradeAccountActivity::class.java))
     }
 
     private fun navigateToTags() {
