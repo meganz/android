@@ -4,23 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.mapNotNull
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
 import mega.privacy.android.app.databinding.FragmentImportFilesBinding
-import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.adapters.ImportFilesAdapter
 import mega.privacy.android.app.main.adapters.ImportFilesAdapter.OnImportFilesAdapterFooterListener
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 
@@ -36,22 +31,6 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
     private var adapter: ImportFilesAdapter? = null
     private var uploadFragment: Int = -1
 
-    private val permissions = arrayOf(
-        PermissionUtils.getImagePermissionByVersion(),
-        PermissionUtils.getAudioPermissionByVersion(),
-        PermissionUtils.getVideoPermissionByVersion()
-    )
-
-    private val permissionsLauncher: ActivityResultLauncher<Array<String>> =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
-            val notGrantedPermissions = map.filter { !it.value }
-            if (notGrantedPermissions.isNotEmpty()) {
-                showAccessDeniedDialog()
-            } else {
-                confirmImport(uploadFragment)
-            }
-        }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,12 +40,18 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
         return binding.root
     }
 
+    /**
+     * Sets up the view and observers.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupObservers()
         setupView()
         super.onViewCreated(view, savedInstanceState)
     }
 
+    /**
+     * Sets the elevation of the action bar.
+     */
     override fun onResume() {
         super.onResume()
         changeActionBarElevation()
@@ -220,45 +205,16 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
      * Handle clicking cloud drive option
      */
     override fun onClickCloudDriveButton() {
-        if (checkPermission())
-            confirmImport(FileExplorerActivity.CLOUD_FRAGMENT)
-        else
-            uploadFragment = FileExplorerActivity.CLOUD_FRAGMENT
+        confirmImport(FileExplorerActivity.CLOUD_FRAGMENT)
     }
 
     /**
      * Handle clicking chat option
      */
     override fun onClickChatButton() {
-        if (checkPermission())
-            confirmImport(FileExplorerActivity.CHAT_FRAGMENT)
-        else
-            uploadFragment = FileExplorerActivity.CHAT_FRAGMENT
+        confirmImport(FileExplorerActivity.CHAT_FRAGMENT)
     }
 
-    private fun checkPermission(): Boolean {
-        val readStorageGranted = PermissionUtils.hasPermissions(requireContext(), *permissions)
-        if (!readStorageGranted) {
-            permissionsLauncher.launch(permissions)
-        }
-        return readStorageGranted
-    }
-
-    private fun showAccessDeniedDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
-        builder.apply {
-            setTitle(R.string.dialog_title_media_permissions_denied)
-            setMessage(R.string.dialog_content_media_permissions_denied)
-            setPositiveButton(R.string.dialog_positive_button_allow_permission) { dialog, _ ->
-                requireContext().navigateToAppSettings()
-                dialog.dismiss()
-            }
-            setNegativeButton(R.string.dialog_negative_button_do_not_allow) { dialog, _ ->
-                dialog.dismiss()
-            }
-            show()
-        }
-    }
 
     companion object {
         /**
