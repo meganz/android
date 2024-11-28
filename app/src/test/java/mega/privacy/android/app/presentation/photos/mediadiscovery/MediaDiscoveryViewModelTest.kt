@@ -208,7 +208,7 @@ class MediaDiscoveryViewModelTest {
                 storageState = any(),
                 isFullStorageOverQuotaBannerEnabled = any(),
                 isAlmostFullStorageQuotaBannerEnabled = any(),
-                isDismissiblePeriodOver = any()
+                shouldShow = any()
             )
         ).thenReturn(
             StorageOverQuotaCapacity.DEFAULT
@@ -618,7 +618,7 @@ class MediaDiscoveryViewModelTest {
                 storageState = storageState,
                 isFullStorageOverQuotaBannerEnabled = true,
                 isAlmostFullStorageQuotaBannerEnabled = true,
-                isDismissiblePeriodOver = isDismissiblePeriodOver
+                shouldShow = isDismissiblePeriodOver
             )
         ).thenReturn(
             storageOverQuotaCapacity

@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -51,7 +50,6 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -162,14 +160,15 @@ class MediaDiscoveryViewModel @Inject constructor(
             combine(
                 flow { emit(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)) },
                 flow { emit(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)) },
-                monitorStorageStateUseCase()
+                monitorStorageStateUseCase(),
+                monitorAlmostFullStorageBannerClosingTimestampUseCase()
             )
-            { isFullStorageOverQuotaBannerEnabled: Boolean, isAlmostFullStorageQuotaBannerEnabled: Boolean, storageState: StorageState ->
+            { isFullStorageOverQuotaBannerEnabled, isAlmostFullStorageQuotaBannerEnabled, storageState, shouldShow  ->
                 storageCapacityMapper(
-                    storageState,
-                    isFullStorageOverQuotaBannerEnabled,
-                    isAlmostFullStorageQuotaBannerEnabled,
-                    isDismissiblePeriodOver = checkForDismissiblePeriodForAlmostFullStorage()
+                    storageState = storageState,
+                    isFullStorageOverQuotaBannerEnabled = isFullStorageOverQuotaBannerEnabled,
+                    isAlmostFullStorageQuotaBannerEnabled = isAlmostFullStorageQuotaBannerEnabled,
+                    shouldShow = shouldShow
                 )
             }.catch { Timber.e(it) }
                 .collectLatest { storageCapacity ->
@@ -178,18 +177,6 @@ class MediaDiscoveryViewModel @Inject constructor(
                     }
                 }
         }
-    }
-
-    /**
-     * Check if dismissible period for almost full storage banner is over
-     * @return true if dismissible period is over
-     */
-    private suspend fun checkForDismissiblePeriodForAlmostFullStorage(): Boolean {
-        return runCatching {
-            monitorAlmostFullStorageBannerClosingTimestampUseCase().firstOrNull()
-        }.onFailure {
-            Timber.e(it)
-        }.getOrNull() ?: false
     }
 
     private suspend fun isHiddenNodesActive(): Boolean {

@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.clouddrive
 
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -88,8 +90,6 @@ import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * A Fragment for File Browser
@@ -290,7 +290,6 @@ class FileBrowserComposeFragment : Fragment() {
                 ExitFileBrowser(uiState.exitFileBrowserEvent) {
                     fileBrowserViewModel.consumeExitFileBrowserEvent()
                 }
-                fileBrowserViewModel.updateStorageCapacityIfNeeded()
                 clickedFile?.let {
                     HandleNodeAction(
                         typedFileNode = it,

@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -176,15 +175,16 @@ class FileBrowserViewModel @Inject constructor(
             combine(
                 flow { emit(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)) },
                 flow { emit(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)) },
-                monitorStorageStateUseCase()
+                monitorStorageStateUseCase(),
+                monitorAlmostFullStorageBannerClosingTimestampUseCase()
             )
-            { isFullStorageOverQuotaBannerEnabled: Boolean, isAlmostFullStorageQuotaBannerEnabled: Boolean, storageState: StorageState ->
+            { isFullStorageOverQuotaBannerEnabled: Boolean, isAlmostFullStorageQuotaBannerEnabled: Boolean, storageState: StorageState, shouldShow: Boolean ->
                 cachedStorageState = storageState
                 storageCapacityMapper(
-                    storageState,
-                    isFullStorageOverQuotaBannerEnabled,
-                    isAlmostFullStorageQuotaBannerEnabled,
-                    isDismissiblePeriodOver = checkForDismissiblePeriodForAlmostFullStorage()
+                    storageState = storageState,
+                    isFullStorageOverQuotaBannerEnabled = isFullStorageOverQuotaBannerEnabled,
+                    isAlmostFullStorageQuotaBannerEnabled = isAlmostFullStorageQuotaBannerEnabled,
+                    shouldShow = shouldShow
                 )
             }.catch { Timber.e(it) }
                 .collectLatest { storageCapacity ->
@@ -193,36 +193,6 @@ class FileBrowserViewModel @Inject constructor(
                     }
                 }
         }
-    }
-
-    /**
-     * Update storage capacity if needed
-     */
-    fun updateStorageCapacityIfNeeded() {
-        viewModelScope.launch {
-            val isDismissiblePeriodOver = checkForDismissiblePeriodForAlmostFullStorage()
-            val currentStorageCapacity = _state.value.storageCapacity
-            if (currentStorageCapacity == StorageOverQuotaCapacity.DEFAULT
-                && isDismissiblePeriodOver
-                && cachedStorageState == StorageState.Orange
-            ) {
-                _state.update { it.copy(storageCapacity = StorageOverQuotaCapacity.ALMOST_FULL) }
-            } else if (currentStorageCapacity == StorageOverQuotaCapacity.ALMOST_FULL && !isDismissiblePeriodOver) {
-                _state.update { it.copy(storageCapacity = StorageOverQuotaCapacity.DEFAULT) }
-            }
-        }
-    }
-
-    /**
-     * Check if dismissible period for almost full storage banner is over
-     * @return true if dismissible period is over
-     */
-    private suspend fun checkForDismissiblePeriodForAlmostFullStorage(): Boolean {
-        return runCatching {
-            monitorAlmostFullStorageBannerClosingTimestampUseCase().firstOrNull()
-        }.onFailure {
-            Timber.e(it)
-        }.getOrNull() ?: false
     }
 
     private fun monitorConnectivity() {

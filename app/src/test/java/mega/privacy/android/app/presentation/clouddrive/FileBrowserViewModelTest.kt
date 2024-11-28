@@ -241,7 +241,7 @@ class FileBrowserViewModelTest {
                     storageState = storageState,
                     isFullStorageOverQuotaBannerEnabled = true,
                     isAlmostFullStorageQuotaBannerEnabled = true,
-                    isDismissiblePeriodOver = isDismissiblePeriodOver
+                    shouldShow = isDismissiblePeriodOver
                 )
             ).thenReturn(
                 storageOverQuotaCapacity
@@ -740,7 +740,7 @@ class FileBrowserViewModelTest {
                 storageState = any(),
                 isFullStorageOverQuotaBannerEnabled = any(),
                 isAlmostFullStorageQuotaBannerEnabled = any(),
-                isDismissiblePeriodOver = any()
+                shouldShow = any()
             )
         ).thenReturn(
             StorageOverQuotaCapacity.DEFAULT
