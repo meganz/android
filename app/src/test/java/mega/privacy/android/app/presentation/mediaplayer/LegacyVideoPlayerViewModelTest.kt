@@ -22,6 +22,7 @@ import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtens
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -75,6 +76,7 @@ internal class LegacyVideoPlayerViewModelTest {
     private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
     private val saveVideoRecentlyWatchedUseCase = mock<SaveVideoRecentlyWatchedUseCase>()
     private val getFileUriUseCase = mock<GetFileUriUseCase>()
+    private val megaApiGateway = mock<MegaApiGateway>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -156,6 +158,7 @@ internal class LegacyVideoPlayerViewModelTest {
             saveVideoRecentlyWatchedUseCase = saveVideoRecentlyWatchedUseCase,
             getFileUriUseCase = getFileUriUseCase,
             applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
+            megaApiGateway = megaApiGateway,
         )
         savedStateHandle[underTest.subtitleDialogShowKey] = false
         savedStateHandle[underTest.subtitleShowKey] = false

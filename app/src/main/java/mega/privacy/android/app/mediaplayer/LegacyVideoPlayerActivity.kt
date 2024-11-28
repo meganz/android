@@ -1,7 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
 import mega.privacy.android.shared.resources.R as sharedR
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.BroadcastReceiver
@@ -51,6 +50,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -184,6 +184,8 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
     private var playbackPositionDialog: Dialog? = null
 
     private var tempNodeId: NodeId? = null
+
+    private var refreshMenuOptionsJob: Job? = null
 
     private val nameCollisionActivityContract = registerForActivityResult(
         NameCollisionActivityContract()
@@ -424,6 +426,7 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                 }
 
                 override fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int) {
+                    if (videoWidth == 0 || videoHeight == 0) return
                     videoViewModel.setCurrentPlayingVideoSize(videoWidth to videoHeight)
                     updateOrientationBasedOnVideoSize(videoWidth, videoHeight)
                 }
@@ -1084,12 +1087,10 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
             return
         }
 
-        intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE).let { adapterType ->
-            val isInSharedItems = adapterType in listOf(
-                INCOMING_SHARES_ADAPTER,
-                OUTGOING_SHARES_ADAPTER,
-                LINKS_ADAPTER
-            )
+        val adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
+        refreshMenuOptionsJob?.cancel()
+        refreshMenuOptionsJob = lifecycleScope.launch {
+            val node = videoViewModel.getCurrentPlayingNode()
             when (currentFragmentId) {
                 R.id.video_main_player -> {
                     when {
@@ -1103,17 +1104,13 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                                 currentFragmentId == R.id.video_main_player
                         }
 
-                        adapterType == RUBBISH_BIN_ADAPTER || megaApi.isInRubbish(
-                            megaApi.getNodeByHandle(
-                                videoViewModel.getCurrentPlayingHandle()
-                            )
-                        ) -> {
+                        adapterType == RUBBISH_BIN_ADAPTER || megaApi.isInRubbish(node) -> {
                             menu.toggleAllMenuItemsVisibility(false)
 
                             menu.findItem(R.id.properties).isVisible =
                                 currentFragmentId == R.id.video_main_player
 
-                            val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
+                            val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return@launch
                             moveToTrash.isVisible = true
                             moveToTrash.title = getString(R.string.context_remove)
                         }
@@ -1155,66 +1152,21 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                             menu.findItem(R.id.save_to_device).isVisible = true
                         }
 
-                        adapterType == FROM_IMAGE_VIEWER -> {
-                            menu.toggleAllMenuItemsVisibility(false)
-                            menu.findItem(R.id.save_to_device).isVisible = true
-                            val node =
-                                megaApi.getNodeByHandle(videoViewModel.getCurrentPlayingHandle())
-
-                            if (node == null) {
-                                Timber.d("refreshMenuOptionsVisibility node is null")
-
-                                menu.toggleAllMenuItemsVisibility(false)
-                                return
-                            }
-
-                            val parentNode = megaApi.getParentNode(node)
-                            val isSensitiveInherited =
-                                parentNode?.let { megaApi.isSensitiveInherited(it) } == true
-                            val isRootParentInShare = megaApi.getRootParentNode(node).isInShare
-                            val accountType = viewModel.state.value.accountType
-                            val isPaidAccount = accountType?.isPaid == true
-                            val isBusinessAccountExpired =
-                                viewModel.state.value.isBusinessAccountExpired
-                            val isNodeInBackup = megaApi.isInInbox(node)
-
-                            val shouldShowHideNode = when {
-                                !isHiddenNodesEnabled || isInSharedItems || isRootParentInShare || isNodeInBackup -> false
-                                isPaidAccount && !isBusinessAccountExpired && (node.isMarkedSensitive || isSensitiveInherited) -> false
-                                else -> true
-                            }
-
-                            val shouldShowUnhideNode = isHiddenNodesEnabled
-                                    && !isInSharedItems
-                                    && !isRootParentInShare
-                                    && node.isMarkedSensitive
-                                    && isPaidAccount
-                                    && !isBusinessAccountExpired
-                                    && !isSensitiveInherited
-                                    && !isNodeInBackup
-
-                            menu.findItem(R.id.hide)?.apply {
-                                isVisible = shouldShowHideNode
-                                setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
-                            }
-
-                            menu.findItem(R.id.unhide)?.apply {
-                                isVisible = shouldShowUnhideNode
-                                setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
-                            }
-                        }
-
                         else -> {
-                            val node =
-                                megaApi.getNodeByHandle(videoViewModel.getCurrentPlayingHandle())
                             if (node == null) {
                                 Timber.d("refreshMenuOptionsVisibility node is null")
 
                                 menu.toggleAllMenuItemsVisibility(false)
-                                return
+                                return@launch
                             }
 
-                            menu.toggleAllMenuItemsVisibility(true)
+                            menu.toggleAllMenuItemsVisibility(adapterType != FROM_IMAGE_VIEWER)
+                            refreshHideNodeAndUnhideNodeOptions(node, adapterType, menu)
+                            if (adapterType == FROM_IMAGE_VIEWER) {
+                                menu.findItem(R.id.save_to_device).isVisible = true
+                                return@launch
+                            }
+
                             searchMenuItem?.isVisible = false
 
                             menu.findItem(R.id.save_to_device).isVisible = true
@@ -1224,41 +1176,6 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
 
                             menu.findItem(R.id.properties).isVisible =
                                 currentFragmentId == R.id.video_main_player
-
-                            val parentNode = megaApi.getParentNode(node)
-                            val isSensitiveInherited =
-                                parentNode?.let { megaApi.isSensitiveInherited(it) } == true
-                            val isRootParentInShare = megaApi.getRootParentNode(node).isInShare
-                            val accountType = viewModel.state.value.accountType
-                            val isPaidAccount = accountType?.isPaid == true
-                            val isBusinessAccountExpired =
-                                viewModel.state.value.isBusinessAccountExpired
-                            val isNodeInBackup = megaApi.isInInbox(node)
-
-                            val shouldShowHideNode = when {
-                                !isHiddenNodesEnabled || isInSharedItems || isRootParentInShare || isNodeInBackup -> false
-                                isPaidAccount && !isBusinessAccountExpired && (node.isMarkedSensitive || isSensitiveInherited) -> false
-                                else -> true
-                            }
-
-                            val shouldShowUnhideNode = isHiddenNodesEnabled
-                                    && !isInSharedItems
-                                    && !isRootParentInShare
-                                    && node.isMarkedSensitive
-                                    && isPaidAccount
-                                    && !isBusinessAccountExpired
-                                    && !isSensitiveInherited
-                                    && !isNodeInBackup
-
-                            menu.findItem(R.id.hide)?.apply {
-                                isVisible = shouldShowHideNode
-                                setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
-                            }
-
-                            menu.findItem(R.id.unhide)?.apply {
-                                isVisible = shouldShowUnhideNode
-                                setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
-                            }
 
                             menu.findItem(R.id.share).isVisible =
                                 currentFragmentId == R.id.video_main_player
@@ -1310,11 +1227,57 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
                 }
             }
             // After establishing the Options menu, check if read-only properties should be applied
-            checkIfShouldApplyReadOnlyState(menu)
+            checkIfShouldApplyReadOnlyState(menu, node)
+            menu.findItem(R.id.add_to).isVisible = intent.getBooleanExtra(
+                INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM, false
+            )
         }
-        menu.findItem(R.id.add_to).isVisible = intent.getBooleanExtra(
-            INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM, false
+    }
+
+    private fun refreshHideNodeAndUnhideNodeOptions(
+        node: MegaNode,
+        adapterType: Int,
+        menu: Menu,
+    ) {
+        val isInSharedItems = adapterType in listOf(
+            INCOMING_SHARES_ADAPTER,
+            OUTGOING_SHARES_ADAPTER,
+            LINKS_ADAPTER
         )
+        val parentNode = megaApi.getParentNode(node)
+        val isSensitiveInherited =
+            parentNode?.let { megaApi.isSensitiveInherited(it) } == true
+        val isRootParentInShare = megaApi.getRootParentNode(node).isInShare
+        val accountType = viewModel.state.value.accountType
+        val isPaidAccount = accountType?.isPaid == true
+        val isBusinessAccountExpired =
+            viewModel.state.value.isBusinessAccountExpired
+        val isNodeInBackup = megaApi.isInInbox(node)
+
+        val shouldShowHideNode = when {
+            !isHiddenNodesEnabled || isInSharedItems || isRootParentInShare || isNodeInBackup -> false
+            isPaidAccount && !isBusinessAccountExpired && (node.isMarkedSensitive || isSensitiveInherited) -> false
+            else -> true
+        }
+
+        val shouldShowUnhideNode = isHiddenNodesEnabled
+                && !isInSharedItems
+                && !isRootParentInShare
+                && node.isMarkedSensitive
+                && isPaidAccount
+                && !isBusinessAccountExpired
+                && !isSensitiveInherited
+                && !isNodeInBackup
+
+        menu.findItem(R.id.hide)?.apply {
+            isVisible = shouldShowHideNode
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+        }
+
+        menu.findItem(R.id.unhide)?.apply {
+            isVisible = shouldShowUnhideNode
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+        }
     }
 
     /**
@@ -1322,17 +1285,14 @@ class LegacyVideoPlayerActivity : MediaPlayerActivity() {
      * on the Options toolbar if the [MegaNode] is a Backup node.
      *
      * @param menu The Options Menu
+     * @param node The [MegaNode] to check
      */
-    private fun checkIfShouldApplyReadOnlyState(menu: Menu) {
-        videoViewModel.getCurrentPlayingHandle().let { playingHandle ->
-            megaApi.getNodeByHandle(playingHandle)?.let { node ->
-                if (megaApi.isInInbox(node)) {
-                    with(menu) {
-                        findItem(R.id.move_to_trash).isVisible = false
-                        findItem(R.id.move).isVisible = false
-                        findItem(R.id.rename).isVisible = false
-                    }
-                }
+    private fun checkIfShouldApplyReadOnlyState(menu: Menu, node: MegaNode?) {
+        if (node != null && megaApi.isInInbox(node)) {
+            with(menu) {
+                findItem(R.id.move_to_trash).isVisible = false
+                findItem(R.id.move).isVisible = false
+                findItem(R.id.rename).isVisible = false
             }
         }
     }

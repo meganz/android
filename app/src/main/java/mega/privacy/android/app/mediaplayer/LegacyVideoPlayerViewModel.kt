@@ -103,6 +103,7 @@ import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -183,6 +184,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     @VideoPlayer private val mediaPlayerGateway: MediaPlayerGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    private val megaApiGateway: MegaApiGateway,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val playlistItemMapper: PlaylistItemMapper,
     private val trackPlaybackPositionUseCase: TrackPlaybackPositionUseCase,
@@ -1949,6 +1951,10 @@ class LegacyVideoPlayerViewModel @Inject constructor(
         super.onCleared()
         cancelSearch()
         clear()
+    }
+
+    internal suspend fun getCurrentPlayingNode() = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(playingHandle)
     }
 
     companion object {
