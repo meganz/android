@@ -236,7 +236,9 @@
                 android:id="@+id/option_add_video_to_playlist"
                 style="@style/BottomSheetOption"
                 android:text="@string/video_section_bottom_sheet_option_title_add_to_playlist"
-                app:drawableStartCompat="@drawable/ic_player_queue"/>
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_player_queue"
+                tools:visibility="visible"/>
 
             <LinearLayout
                 android:id="@+id/label_separator"
