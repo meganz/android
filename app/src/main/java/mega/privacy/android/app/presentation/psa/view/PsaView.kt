@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
@@ -210,12 +211,14 @@ private fun PsaViewPreview(
 @CombinedThemePreviews
 @Composable
 private fun InfoPsaViewPreview(
-    @PreviewParameter(ImagePainterProvider::class) imagePainter: () -> Painter?,
+    @PreviewParameter(ImagePainterProvider::class) imagePainter: @Composable () -> Painter?,
 ) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         Box(modifier = Modifier.fillMaxSize()) {
             PsaViewContent(
-                modifier = Modifier,
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .align(Alignment.BottomCenter),
                 title = "Title",
                 text = "Text",
                 painter = imagePainter(),
@@ -230,11 +233,14 @@ private fun InfoPsaViewPreview(
 @Composable
 private fun ButtonRowPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
-        ButtonRow(
-            positiveButton = { TextMegaButton(text = "Positive", onClick = {}) },
-            onDismiss = {},
-            modifier = Modifier,
-        )
+        Box(Modifier.fillMaxSize()) {
+            ButtonRow(
+                positiveButton = { TextMegaButton(text = "Positive", onClick = {}) },
+                onDismiss = {},
+                modifier = Modifier.navigationBarsPadding()
+                    .align(Alignment.BottomCenter),
+            )
+        }
     }
 }
 

@@ -28,6 +28,7 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.app.presentation.psa.view.InfoPsaView
 import mega.privacy.android.app.presentation.psa.view.PsaView
+import mega.privacy.android.app.presentation.psa.view.WebPsaView
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetContainer
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -71,8 +72,11 @@ internal fun PsaContainerContent(
         }
 
         is PsaState.WebPsa -> {
-            // Web Psa not yet supported
-            content()
+            WebPsaView(
+                psa = state,
+                content = content,
+                markAsSeen = { markAsSeen(state.id) }
+            )
         }
 
         is PsaState.StandardPsa -> {

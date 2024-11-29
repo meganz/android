@@ -10,6 +10,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.app.presentation.psa.view.PsaInfoViewTag
 import mega.privacy.android.app.presentation.psa.view.PsaViewTag
+import mega.privacy.android.app.presentation.psa.view.WebPsaTag
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,6 +33,7 @@ class PsaContainerKtTest {
         }
 
         composeTestRule.onNodeWithTag(contentTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(WebPsaTag).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PsaViewTag).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PsaInfoViewTag).assertDoesNotExist()
     }
@@ -54,6 +56,7 @@ class PsaContainerKtTest {
         }
 
         composeTestRule.onNodeWithTag(contentTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(WebPsaTag).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PsaViewTag).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PsaInfoViewTag).assertIsDisplayed()
     }
@@ -78,7 +81,28 @@ class PsaContainerKtTest {
         }
 
         composeTestRule.onNodeWithTag(contentTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(WebPsaTag).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PsaViewTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(PsaInfoViewTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that web psa displays the correct view`() {
+        val contentTag = "Content tag"
+        composeTestRule.setContent {
+            PsaContainerContent(
+                state = PsaState.WebPsa(
+                    id = 0,
+                    url = "https://www.mega.nz"
+                ),
+                content = { Text("This is the content", Modifier.testTag(contentTag)) },
+                markAsSeen = {},
+                navigateToPsaPage = {}
+            )
+        }
+
+        composeTestRule.onNodeWithTag(WebPsaTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(PsaViewTag).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PsaInfoViewTag).assertDoesNotExist()
     }
 }
