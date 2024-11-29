@@ -29,6 +29,7 @@ internal fun VideoSectionFeatureScreen(
     onSortOrderClick: () -> Unit,
     onMenuClick: (VideoUIEntity, index: Int) -> Unit,
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
+    retryActionCallback: () -> Unit,
 ) {
     val navHostController = rememberNavController()
 
@@ -40,6 +41,7 @@ internal fun VideoSectionFeatureScreen(
         onMenuClick = onMenuClick,
         onAddElementsClicked = onAddElementsClicked,
         onMenuAction = onMenuAction,
+        retryActionCallback = retryActionCallback
     )
 }
 
@@ -51,6 +53,7 @@ internal fun VideoSectionNavHost(
     onAddElementsClicked: () -> Unit,
     modifier: Modifier,
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
+    retryActionCallback: () -> Unit,
     viewModel: VideoSectionViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
@@ -117,7 +120,8 @@ internal fun VideoSectionNavHost(
                     } else {
                         onMenuAction(action)
                     }
-                }
+                },
+                retryActionCallback = retryActionCallback
             )
         }
         composable(

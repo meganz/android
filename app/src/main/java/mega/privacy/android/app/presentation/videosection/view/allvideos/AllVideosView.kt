@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -59,6 +60,7 @@ internal fun AllVideosView(
     onSortOrderClick: () -> Unit,
     addToPlaylistsTitles: List<String>?,
     clearAddToPlaylistsTitles: () -> Unit,
+    retryActionCallback: () -> Unit,
     onLongClick: ((item: VideoUIEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -85,8 +87,16 @@ internal fun AllVideosView(
                         if (titles.size == 1) titles.first() else titles.size
                     )
                 )
-                clearAddToPlaylistsTitles()
+            } else {
+                val result = scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                    message = context.getString(sharedR.string.video_section_playlists_add_to_playlists_failed_message),
+                    actionLabel = context.getString(R.string.message_option_retry)
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    retryActionCallback()
+                }
             }
+            clearAddToPlaylistsTitles()
         }
     }
 
@@ -295,7 +305,8 @@ private fun AllVideosViewPreview() {
             onLocationFilterItemClicked = { },
             onDurationFilterItemClicked = { },
             addToPlaylistsTitles = null,
-            clearAddToPlaylistsTitles = { }
+            clearAddToPlaylistsTitles = { },
+            retryActionCallback = { }
         )
     }
 }

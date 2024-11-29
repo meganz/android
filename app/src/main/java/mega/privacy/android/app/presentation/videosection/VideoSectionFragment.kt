@@ -156,7 +156,12 @@ class VideoSectionFragment : Fragment() {
                         onAddElementsClicked = {
                             navigateToVideoSelectedActivity()
                         },
-                        onMenuAction = ::handleVideoSectionMenuAction
+                        onMenuAction = ::handleVideoSectionMenuAction,
+                        retryActionCallback = {
+                            videoSectionViewModel.state.value.addToPlaylistHandle?.let {
+                                launchAddToPlaylistActivity(it)
+                            }
+                        }
                     )
                 }
             }

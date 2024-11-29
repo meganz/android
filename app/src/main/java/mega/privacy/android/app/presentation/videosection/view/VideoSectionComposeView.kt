@@ -45,6 +45,7 @@ internal fun VideoSectionComposeView(
     onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit,
     onDeleteDialogButtonClicked: () -> Unit,
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
+    retryActionCallback: () -> Unit,
 ) {
     val uiState by videoSectionViewModel.state.collectAsStateWithLifecycle()
     val tabState by videoSectionViewModel.tabState.collectAsStateWithLifecycle()
@@ -186,7 +187,8 @@ internal fun VideoSectionComposeView(
                     clearAddToPlaylistsTitles = {
                         videoSectionViewModel.updateAddToPlaylistHandle(null)
                         videoSectionViewModel.updateAddToPlaylistTitles(null)
-                    }
+                    },
+                    retryActionCallback = retryActionCallback
                 )
             },
             playlistsView = {
