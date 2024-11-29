@@ -36,7 +36,6 @@ import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.getPreferences
-import mega.privacy.android.app.utils.Util.isScreenInPortrait
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
@@ -323,6 +322,14 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             isMultiselect() -> {
                 binding.actionText.text = getString(R.string.context_send)
                 activateButton(adapter.getSelectedItemCount() > 0)
+            }
+
+            modeCloud == MOVE -> {
+                binding.actionText.text = getString(R.string.context_move)
+            }
+
+            modeCloud == COPY -> {
+                binding.actionText.text = getString(R.string.context_copy)
             }
 
             modeCloud == FileExplorerActivity.SELECT ->
