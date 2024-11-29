@@ -46,7 +46,7 @@ import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.BroadcastAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.BroadcastMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
-import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
+import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInAppUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.chat.link.IsRichPreviewsEnabledUseCase
@@ -80,7 +80,7 @@ class GlobalListener @Inject constructor(
     private val getPaymentMethodUseCase: GetPaymentMethodUseCase,
     private val getPricing: GetPricing,
     private val getNumberOfSubscription: GetNumberOfSubscription,
-    private val setSecurityUpgradeInApp: SetSecurityUpgradeInApp,
+    private val setSecurityUpgradeInAppUseCase: SetSecurityUpgradeInAppUseCase,
     private val broadcastMyAccountUpdateUseCase: BroadcastMyAccountUpdateUseCase,
     private val getNotificationCountUseCase: GetNotificationCountUseCase,
     private val broadcastHomeBadgeCountUseCase: BroadcastHomeBadgeCountUseCase,
@@ -285,7 +285,7 @@ class GlobalListener @Inject constructor(
             MegaEvent.EVENT_MISC_FLAGS_READY -> getInstance().checkEnabledCookies()
             MegaEvent.EVENT_RELOADING -> showLoginFetchingNodes()
             MegaEvent.EVENT_UPGRADE_SECURITY -> applicationScope.launch {
-                setSecurityUpgradeInApp(true)
+                setSecurityUpgradeInAppUseCase(true)
             }
         }
     }

@@ -18,7 +18,6 @@ import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.ResetAccountInfoUseCase
-import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.UpgradeSecurity
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
@@ -102,9 +101,6 @@ object TestAccountModule {
 
     @Provides
     fun provideUpgradeSecurity() = mock<UpgradeSecurity>()
-
-    @Provides
-    fun provideSetSecurityUpgradeInApp() = mock<SetSecurityUpgradeInApp>()
 
     @Provides
     fun provideMonitorSecurityUpgradeInApp() = mock<MonitorSecurityUpgradeInApp>()

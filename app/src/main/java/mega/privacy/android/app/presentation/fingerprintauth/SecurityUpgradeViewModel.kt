@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.fingerprintauth.model.SecurityUpgradeState
 import mega.privacy.android.domain.usecase.account.UpgradeSecurity
-import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
+import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInAppUseCase
 import javax.inject.Inject
 
 /**
@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SecurityUpgradeViewModel @Inject constructor(
     private val upgradeSecurity: UpgradeSecurity,
-    private val setSecurityUpgradeInApp: SetSecurityUpgradeInApp,
+    private val setSecurityUpgradeInAppUseCase: SetSecurityUpgradeInAppUseCase,
 ) : ViewModel() {
 
     /** private UI state */
@@ -35,9 +35,9 @@ class SecurityUpgradeViewModel @Inject constructor(
             val result = runCatching {
                 upgradeSecurity()
             }.onSuccess {
-                setSecurityUpgradeInApp(false)
+                setSecurityUpgradeInAppUseCase(false)
             }.onFailure {
-                setSecurityUpgradeInApp(true)
+                setSecurityUpgradeInAppUseCase(true)
             }
             setShouldFinishScreen(result.isSuccess)
         }
