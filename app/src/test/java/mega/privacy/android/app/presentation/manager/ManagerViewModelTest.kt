@@ -83,6 +83,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
+import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInAppUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RenameRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
@@ -175,7 +176,9 @@ class ManagerViewModelTest {
     private val monitorUserAlertUpdates = mutableMonitorUserAlertUpdates.asSharedFlow()
     private lateinit var monitorNodeUpdatesFakeFlow: MutableSharedFlow<NodeUpdate>
     private val monitorContactUpdates = MutableSharedFlow<UserUpdate>()
-    private val monitorSecurityUpgradeInApp = MutableStateFlow(false)
+    private val monitorSecurityUpgradeInAppUseCase = mock<MonitorSecurityUpgradeInAppUseCase> {
+        onBlocking { invoke() }.thenReturn(flowOf(false))
+    }
     private val getNumUnreadUserAlertsUseCase =
         mock<GetNumUnreadUserAlertsUseCase> { onBlocking { invoke() }.thenReturn(0) }
     private val getNumUnreadPromoNotificationsUseCase =
@@ -379,7 +382,7 @@ class ManagerViewModelTest {
             requireTwoFactorAuthenticationUseCase = requireTwoFactorAuthenticationUseCase,
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
-            monitorSecurityUpgradeInApp = { monitorSecurityUpgradeInApp },
+            monitorSecurityUpgradeInAppUseCase = monitorSecurityUpgradeInAppUseCase,
             monitorUserUpdates = monitorUserUpdates,
             establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
             startCameraUploadUseCase = startCameraUploadUseCase,

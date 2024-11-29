@@ -72,7 +72,7 @@ import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
-import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
+import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInAppUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RenameRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
@@ -153,7 +153,7 @@ import javax.inject.Inject
  * @property requireTwoFactorAuthenticationUseCase Use case for requiring two factor authentication.
  * @property setCopyLatestTargetPathUseCase Use case for setting the latest target path for copy operations.
  * @property setMoveLatestTargetPathUseCase Use case for setting the latest target path for move operations.
- * @property monitorSecurityUpgradeInApp Use case for monitoring security upgrade in app.
+ * @property monitorSecurityUpgradeInAppUseCase Use case for monitoring security upgrade in app.
  * @property monitorUserUpdates Use case for monitoring user updates.
  * @property establishCameraUploadsSyncHandlesUseCase Use case for establishing camera uploads sync handles.
  * @property startCameraUploadUseCase Use case for starting camera uploads.
@@ -219,7 +219,7 @@ class ManagerViewModel @Inject constructor(
     private val requireTwoFactorAuthenticationUseCase: RequireTwoFactorAuthenticationUseCase,
     private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
     private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
-    private val monitorSecurityUpgradeInApp: MonitorSecurityUpgradeInApp,
+    private val monitorSecurityUpgradeInAppUseCase: MonitorSecurityUpgradeInAppUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
@@ -389,7 +389,7 @@ class ManagerViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            monitorSecurityUpgradeInApp().collect {
+            monitorSecurityUpgradeInAppUseCase().collect {
                 if (it) {
                     setShouldAlertUserAboutSecurityUpgrade(true)
                 }
