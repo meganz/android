@@ -12,7 +12,6 @@ import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.account.ChangeEmail
-import mega.privacy.android.domain.usecase.account.UpgradeSecurity
 
 /**
  * Account module.
@@ -55,9 +54,5 @@ internal abstract class InternalAccountModule {
         @Provides
         fun provideChangeEmail(accountRepository: AccountRepository): ChangeEmail =
             ChangeEmail(accountRepository::changeEmail)
-
-        @Provides
-        fun provideUpgradeSecurity(accountRepository: AccountRepository): UpgradeSecurity =
-            UpgradeSecurity(accountRepository::upgradeSecurity)
     }
 }

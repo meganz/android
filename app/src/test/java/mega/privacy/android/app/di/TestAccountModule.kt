@@ -17,7 +17,6 @@ import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.ResetAccountInfoUseCase
-import mega.privacy.android.domain.usecase.account.UpgradeSecurity
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
@@ -97,9 +96,6 @@ object TestAccountModule {
 
     @Provides
     fun provideLocalLogoutAppUseCase() = mock<LocalLogoutAppUseCase>()
-
-    @Provides
-    fun provideUpgradeSecurity() = mock<UpgradeSecurity>()
 
     @Provides
     fun providesMonitorAccountDetail() = mock<MonitorAccountDetailUseCase>()
