@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
@@ -823,10 +823,10 @@
     </plurals>
     <!-- Name for a general button which action is "Open" something -->
     <string name="general_open_button">Open</string>
-    <!-- Message of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_text">To stop backing up this folder, you need to either move it or delete it.</string>
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">Add to playlist</string>
+    <!-- Message of the dialog to confirm stop a backup -->
+    <string name="sync_stop_backup_confirm_dialog_text">To stop backing up this folder, you need to either move it or delete it.</string>
     <!-- Move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option">Move folder</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
@@ -850,4 +850,10 @@
         <item quantity="one">Added 1 item to “%1$s”</item>
         <item quantity="other">Added 1 item to %1$d playlists</item>
     </plurals>
+    <!-- Name for a general label which action is "Select" something -->
+    <string name="general_select">Select</string>
+    <!-- Name for a general label which action is "Select folder" -->
+    <string name="general_select_folder">Select folder</string>
+    <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">Move to: [B]%1s[/B]</string>
 </resources>

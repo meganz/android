@@ -39,6 +39,7 @@ import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
 
 @Composable
@@ -52,6 +53,7 @@ internal fun MegaPickerScreen(
     errorMessageShown: () -> Unit,
     isSelectEnabled: Boolean,
     onCreateNewFolderDialogSuccess: (String) -> Unit = {},
+    isStopBackupMegaPicker: Boolean = false,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -71,11 +73,15 @@ internal fun MegaPickerScreen(
             MegaAppBar(
                 appBarType = AppBarType.BACK_NAVIGATION,
                 title = currentFolder?.name?.takeIf { showCurrentFolderName }
-                    ?: stringResource(R.string.sync_toolbar_title),
-                subtitle = if (showCurrentFolderName) {
+                    ?: if (isStopBackupMegaPicker) {
+                        stringResource(sharedR.string.general_select_folder)
+                    } else {
+                        stringResource(R.string.sync_toolbar_title)
+                    },
+                subtitle = if (isStopBackupMegaPicker || showCurrentFolderName) {
                     null
                 } else {
-                    "Select folder"
+                    stringResource(sharedR.string.general_select_folder)
                 },
                 elevation = 0.dp,
                 onNavigationPressed = {
@@ -98,6 +104,7 @@ internal fun MegaPickerScreen(
                 fileTypeIconMapper = fileTypeIconMapper,
                 modifier = Modifier.padding(paddingValues),
                 isSelectEnabled = isSelectEnabled,
+                isStopBackupMegaPicker = isStopBackupMegaPicker,
             )
         },
         snackbarHost = {
@@ -137,6 +144,7 @@ private fun MegaPickerScreenContent(
     currentFolderSelected: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
     isSelectEnabled: Boolean,
+    isStopBackupMegaPicker: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
@@ -164,7 +172,11 @@ private fun MegaPickerScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 24.dp, top = 8.dp, end = 24.dp, bottom = 8.dp),
-                textId = R.string.sync_general_select_to_download,
+                textId = if (isStopBackupMegaPicker) {
+                    sharedR.string.general_select
+                } else {
+                    sharedR.string.general_select_folder
+                },
                 onClick = {
                     currentFolderSelected()
                 },

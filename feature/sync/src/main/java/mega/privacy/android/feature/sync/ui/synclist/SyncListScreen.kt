@@ -85,6 +85,7 @@ internal fun SyncListScreen(
     syncPermissionsManager: SyncPermissionsManager,
     actions: List<MenuAction>,
     onActionPressed: (MenuAction) -> Unit,
+    onSelectStopBackupDestinationClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
@@ -242,6 +243,7 @@ internal fun SyncListScreen(
                     },
                     addFolderClicked = onSyncFolderClicked,
                     syncPermissionsManager = syncPermissionsManager,
+                    onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
                     onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
                     syncFoldersViewModel = syncFoldersViewModel,
                     syncStalledIssuesViewModel = syncStalledIssuesViewModel,
@@ -265,6 +267,7 @@ private fun SyncListScreenContent(
     moreClicked: (StalledIssueUiItem) -> Unit,
     addFolderClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
+    onSelectStopBackupDestinationClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
@@ -334,6 +337,7 @@ private fun SyncListScreenContent(
         ) {
             SelectedChipScreen(
                 addFolderClicked = addFolderClicked,
+                onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
                 upgradeAccountClicked = onOpenUpgradeAccountClicked,
                 stalledIssueDetailsClicked = stalledIssuesDetailsClicked,
                 moreClicked = moreClicked,
@@ -388,6 +392,7 @@ private fun HeaderChips(
 @Composable
 private fun SelectedChipScreen(
     addFolderClicked: () -> Unit,
+    onSelectStopBackupDestinationClicked: () -> Unit,
     upgradeAccountClicked: () -> Unit,
     stalledIssueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
@@ -405,6 +410,7 @@ private fun SelectedChipScreen(
         SYNC_FOLDERS -> {
             SyncFoldersRoute(
                 addFolderClicked = addFolderClicked,
+                onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
                 upgradeAccountClicked = upgradeAccountClicked,
                 issuesInfoClicked = issuesInfoClicked,
                 viewModel = syncFoldersViewModel,

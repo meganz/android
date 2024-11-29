@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.stopbackup
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,22 +20,54 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.ui.model.StopBackupOption
+import mega.privacy.android.feature.sync.ui.stopbackup.model.StopBackupState
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaRadioButton
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
+import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnotation
+import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.feature.sync.ui.model.StopBackupOption
 
 @Composable
 internal fun StopBackupConfirmationDialog(
-    onConfirm: (option: StopBackupOption) -> Unit,
+    onConfirm: (option: StopBackupOption, selectedFolder: RemoteFolder?) -> Unit,
     onDismiss: () -> Unit,
+    onSelectStopBackupDestinationClicked: () -> Unit,
+    viewModel: StopBackupViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier,
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    StopBackupConfirmationDialogBody(
+        state = state,
+        onConfirm = onConfirm,
+        onDismiss = {
+            viewModel.resetSelectedMegaFolder()
+            onDismiss()
+        },
+        onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
+        modifier = modifier,
+    )
+}
+
+@Composable
+internal fun StopBackupConfirmationDialogBody(
+    state: StopBackupState,
+    onConfirm: (option: StopBackupOption, selectedFolder: RemoteFolder?) -> Unit,
+    onDismiss: () -> Unit,
+    onSelectStopBackupDestinationClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var selectedOption by rememberSaveable { mutableStateOf(StopBackupOption.MOVE) }
@@ -80,22 +113,32 @@ internal fun StopBackupConfirmationDialog(
                             modifier = modifier.padding(top = 4.dp),
                             style = MaterialTheme.typography.body2,
                         )
-                        Row(modifier = modifier.padding(top = 8.dp)) {
-                            MegaText(
-                                text = stringResource(id = sharedR.string.sync_stop_backup_confirm_dialog_move_option_destination_label),
-                                textColor = TextColor.Primary,
-                                modifier = modifier.padding(end = 4.dp),
-                                style = MaterialTheme.typography.body2,
-                            )
-                            MegaText(
-                                text = stringResource(id = sharedR.string.sync_stop_backup_confirm_dialog_move_option_select_destination_button),
-                                textColor = TextColor.Primary,
-                                modifier = modifier.testTag(
+                        MegaSpannedClickableText(
+                            value = stringResource(
+                                id = sharedR.string.sync_stop_backup_confirm_dialog_move_option_select_destination,
+                                state.selectedMegaFolder?.name
+                                    ?: stringResource(id = sharedR.string.sync_stop_backup_confirm_dialog_move_option_select_destination_button)
+                            ),
+                            styles = mapOf(
+                                SpanIndicator('B') to MegaSpanStyleWithAnnotation(
+                                    megaSpanStyle = MegaSpanStyle(
+                                        spanStyle = SpanStyle(
+                                            fontWeight = FontWeight.Medium
+                                        ),
+                                        color = TextColor.Accent,
+                                    ),
+                                    annotation = stringResource(id = sharedR.string.general_select_folder),
+                                )
+                            ),
+                            color = TextColor.Primary,
+                            onAnnotationClick = { onSelectStopBackupDestinationClicked() },
+                            modifier = modifier
+                                .padding(top = 8.dp)
+                                .testTag(
                                     STOP_BACKUP_CONFIRMATION_DIALOG_MOVE_OPTION_SELECT_DESTINATION_TEST_TAG
                                 ),
-                                style = MaterialTheme.typography.body2medium,
-                            )
-                        }
+                            baseStyle = MaterialTheme.typography.body2,
+                        )
                     }
                 }
                 Row(
@@ -130,19 +173,21 @@ internal fun StopBackupConfirmationDialog(
         },
         confirmButtonText = stringResource(id = sharedR.string.general_confirm_button),
         cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
-        onConfirm = { onConfirm(selectedOption) },
+        onConfirm = { onConfirm(selectedOption, state.selectedMegaFolder) },
         onDismiss = onDismiss,
     )
 }
 
 @CombinedThemePreviews
 @Composable
-private fun StopBackupConfirmationDialogPreview() {
+private fun StopBackupConfirmationDialogBodyPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MegaScaffold {
-            StopBackupConfirmationDialog(
-                onConfirm = {},
+            StopBackupConfirmationDialogBody(
+                state = StopBackupState(),
+                onConfirm = { _, _ -> },
                 onDismiss = {},
+                onSelectStopBackupDestinationClicked = {},
             )
         }
     }

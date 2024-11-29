@@ -33,6 +33,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPause
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MoveDeconfiguredBackupNodesUseCase
@@ -264,14 +265,25 @@ internal class SyncFoldersViewModel @Inject constructor(
                             syncUiItemToRemove.apply {
                                 when (action.stopBackupOption) {
                                     StopBackupOption.MOVE -> {
-                                        getRootNodeUseCase()?.let { rootNode ->
+                                        action.selectedFolder?.let { selectedFolder ->
                                             runCatching {
                                                 moveDeconfiguredBackupNodesUseCase(
                                                     deconfiguredBackupRoot = megaStorageNodeId,
-                                                    backupDestination = rootNode.id,
+                                                    backupDestination = NodeId(selectedFolder.id),
                                                 )
                                             }.onFailure {
                                                 Timber.e(it)
+                                            }
+                                        } ?: run {
+                                            getRootNodeUseCase()?.let { rootNode ->
+                                                runCatching {
+                                                    moveDeconfiguredBackupNodesUseCase(
+                                                        deconfiguredBackupRoot = megaStorageNodeId,
+                                                        backupDestination = rootNode.id,
+                                                    )
+                                                }.onFailure {
+                                                    Timber.e(it)
+                                                }
                                             }
                                         }
                                     }

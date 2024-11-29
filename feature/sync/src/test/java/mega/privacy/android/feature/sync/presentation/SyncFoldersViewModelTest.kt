@@ -248,13 +248,39 @@ class SyncFoldersViewModelTest {
             initViewModel()
             underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItem))
             underTest.handleAction(
-                SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed(StopBackupOption.MOVE)
+                SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed(
+                    stopBackupOption = StopBackupOption.MOVE,
+                    selectedFolder = null,
+                )
             )
 
             verify(removeFolderPairUseCase).invoke(folderPairId = syncUiItem.id)
             verify(moveDeconfiguredBackupNodesUseCase).invoke(
                 deconfiguredBackupRoot = syncUiItem.megaStorageNodeId,
                 backupDestination = rootFolder.id
+            )
+        }
+
+    @Test
+    fun `test that confirm the remove action for a Backup with move option removes folder pair and moves remote folder to selected folder`() =
+        runTest {
+            val remoteFolder = RemoteFolder(123L, "Selected Folder")
+            whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
+            val syncUiItem = syncUiItems.first { it.syncType == SyncType.TYPE_BACKUP }
+            whenever(removeFolderPairUseCase(syncUiItem.id)).thenReturn(Unit)
+            initViewModel()
+            underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItem))
+            underTest.handleAction(
+                SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed(
+                    stopBackupOption = StopBackupOption.MOVE,
+                    selectedFolder = remoteFolder,
+                )
+            )
+
+            verify(removeFolderPairUseCase).invoke(folderPairId = syncUiItem.id)
+            verify(moveDeconfiguredBackupNodesUseCase).invoke(
+                deconfiguredBackupRoot = syncUiItem.megaStorageNodeId,
+                backupDestination = NodeId(remoteFolder.id)
             )
         }
 
@@ -267,7 +293,10 @@ class SyncFoldersViewModelTest {
             initViewModel()
             underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItem))
             underTest.handleAction(
-                SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed(StopBackupOption.DELETE)
+                SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed(
+                    stopBackupOption = StopBackupOption.DELETE,
+                    selectedFolder = null,
+                )
             )
 
             verify(removeFolderPairUseCase).invoke(folderPairId = syncUiItem.id)

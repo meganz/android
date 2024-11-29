@@ -29,7 +29,8 @@ internal fun MegaPickerRoute(
     syncPermissionsManager: SyncPermissionsManager,
     folderSelected: () -> Unit,
     backClicked: () -> Unit,
-    fileTypeIconMapper: FileTypeIconMapper
+    fileTypeIconMapper: FileTypeIconMapper,
+    isStopBackupMegaPicker: Boolean = false,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
@@ -58,7 +59,8 @@ internal fun MegaPickerRoute(
                     parentNode = state.value.currentFolder
                 )
             },
-            isSelectEnabled = state.value.isSelectEnabled,
+            isSelectEnabled = isStopBackupMegaPicker || state.value.isSelectEnabled,
+            isStopBackupMegaPicker = isStopBackupMegaPicker,
         )
     }
 

@@ -28,6 +28,7 @@ import mega.privacy.android.feature.sync.ui.stopbackup.StopBackupConfirmationDia
 @Composable
 internal fun SyncFoldersRoute(
     addFolderClicked: () -> Unit,
+    onSelectStopBackupDestinationClicked: () -> Unit,
     upgradeAccountClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
     viewModel: SyncFoldersViewModel,
@@ -81,16 +82,18 @@ internal fun SyncFoldersRoute(
             when (syncUiItemToRemove.syncType) {
                 SyncType.TYPE_BACKUP -> {
                     StopBackupConfirmationDialog(
-                        onConfirm = { selectedOption ->
+                        onConfirm = { selectedOption, selectedFolder ->
                             viewModel.handleAction(
                                 SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed(
-                                    selectedOption
+                                    stopBackupOption = selectedOption,
+                                    selectedFolder = selectedFolder,
                                 )
                             )
                         },
                         onDismiss = {
                             viewModel.handleAction(OnRemoveFolderDialogDismissed)
-                        }
+                        },
+                        onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
                     )
                 }
 

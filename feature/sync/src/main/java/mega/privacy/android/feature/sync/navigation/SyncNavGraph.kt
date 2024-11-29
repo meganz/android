@@ -101,6 +101,11 @@ fun getSyncNewFolderRoute(syncType: SyncType, deviceName: String? = null): Strin
  */
 private const val syncMegaPicker = "$syncRoute/mega-picker"
 
+/**
+ * Route to the Stop Backup MEGA folder picker screen
+ */
+private const val stopBackupMegaPicker = "$syncRoute/stop-backup-mega-picker"
+
 internal fun NavGraphBuilder.syncNavGraph(
     navController: NavController,
     fileTypeIconMapper: FileTypeIconMapper,
@@ -184,10 +189,25 @@ internal fun NavGraphBuilder.syncNavGraph(
                 syncPermissionsManager,
                 folderSelected = {
                     navController.popBackStack()
-                }, backClicked = {
+                },
+                backClicked = {
                     navController.popBackStack()
                 },
-                fileTypeIconMapper = fileTypeIconMapper
+                fileTypeIconMapper = fileTypeIconMapper,
+            )
+        }
+        composable(route = stopBackupMegaPicker) {
+            MegaPickerRoute(
+                hiltViewModel(),
+                syncPermissionsManager,
+                folderSelected = {
+                    navController.popBackStack()
+                },
+                backClicked = {
+                    navController.popBackStack()
+                },
+                fileTypeIconMapper = fileTypeIconMapper,
+                isStopBackupMegaPicker = true,
             )
         }
         composable(
@@ -238,6 +258,7 @@ internal fun NavGraphBuilder.syncNavGraph(
                         )
                     )
                 },
+                onSelectStopBackupDestinationClicked = { navController.navigate(stopBackupMegaPicker) },
                 onOpenUpgradeAccountClicked = { openUpgradeAccountPage() },
                 title = deviceName,
                 syncFoldersViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),

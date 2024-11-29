@@ -41,6 +41,7 @@ internal fun SyncListRoute(
     syncPermissionsManager: SyncPermissionsManager,
     onSyncFolderClicked: () -> Unit,
     onBackupFolderClicked: () -> Unit,
+    onSelectStopBackupDestinationClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
@@ -136,6 +137,7 @@ internal fun SyncListRoute(
                 }
             }
         },
+        onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
         onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
         title = title,
         syncFoldersViewModel = syncFoldersViewModel,

@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.feature.sync.ui.stopbackup.model.StopBackupState
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CANCEL_TAG
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CONFIRM_TAG
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.TITLE_TAG
@@ -20,9 +21,11 @@ class StopBackupConfirmationDialogTest {
 
     private fun initComposeRuleContent() {
         composeRule.setContent {
-            StopBackupConfirmationDialog(
-                onConfirm = {},
+            StopBackupConfirmationDialogBody(
+                state = StopBackupState(),
+                onConfirm = { _, _ -> },
                 onDismiss = {},
+                onSelectStopBackupDestinationClicked = {},
             )
         }
     }
@@ -36,9 +39,9 @@ class StopBackupConfirmationDialogTest {
         composeRule.onNodeWithTag(STOP_BACKUP_CONFIRMATION_DIALOG_MOVE_OPTION_ROW_TEST_TAG)
             .assertIsDisplayed().assertHasClickAction()
         composeRule.onNodeWithTag(
-            STOP_BACKUP_CONFIRMATION_DIALOG_MOVE_OPTION_SELECT_DESTINATION_TEST_TAG,
+            testTag = STOP_BACKUP_CONFIRMATION_DIALOG_MOVE_OPTION_SELECT_DESTINATION_TEST_TAG,
             useUnmergedTree = true,
-        ).assertIsDisplayed().assertHasNoClickAction()
+        ).assertIsDisplayed()
         composeRule.onNodeWithTag(STOP_BACKUP_CONFIRMATION_DIALOG_DELETE_OPTION_ROW_TEST_TAG)
             .assertIsDisplayed().assertHasClickAction()
         composeRule.onNodeWithTag(CANCEL_TAG).assertIsDisplayed().assertHasClickAction()

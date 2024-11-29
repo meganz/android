@@ -23,7 +23,8 @@ import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.stopbackup.STOP_BACKUP_CONFIRMATION_DIALOG_BODY_TEST_TAG
 import mega.privacy.android.feature.sync.ui.stopbackup.STOP_BACKUP_CONFIRMATION_DIALOG_DELETE_OPTION_ROW_TEST_TAG
 import mega.privacy.android.feature.sync.ui.stopbackup.STOP_BACKUP_CONFIRMATION_DIALOG_MOVE_OPTION_ROW_TEST_TAG
-import mega.privacy.android.feature.sync.ui.stopbackup.StopBackupConfirmationDialog
+import mega.privacy.android.feature.sync.ui.stopbackup.StopBackupConfirmationDialogBody
+import mega.privacy.android.feature.sync.ui.stopbackup.model.StopBackupState
 import mega.privacy.android.feature.sync.ui.synclist.folders.STOP_SYNC_CONFIRM_DIALOG_TEST_TAG
 
 import mega.privacy.android.feature.sync.ui.synclist.folders.StopSyncConfirmDialog
@@ -89,6 +90,7 @@ class SyncFoldersScreenTest {
         composeTestRule.setContent {
             SyncFoldersRoute(
                 viewModel = viewModel,
+                onSelectStopBackupDestinationClicked = {},
                 addFolderClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
@@ -111,6 +113,7 @@ class SyncFoldersScreenTest {
             SyncFoldersRoute(
                 viewModel = viewModel,
                 addFolderClicked = {},
+                onSelectStopBackupDestinationClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
                 state = SyncFoldersState(emptyList()),
@@ -139,6 +142,7 @@ class SyncFoldersScreenTest {
             SyncFoldersRoute(
                 viewModel = viewModel,
                 addFolderClicked = {},
+                onSelectStopBackupDestinationClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
                 state = SyncFoldersState(emptyList()),
@@ -171,6 +175,7 @@ class SyncFoldersScreenTest {
             SyncFoldersRoute(
                 viewModel = viewModel,
                 addFolderClicked = {},
+                onSelectStopBackupDestinationClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
                 state = SyncFoldersState(
@@ -203,6 +208,7 @@ class SyncFoldersScreenTest {
             SyncFoldersRoute(
                 viewModel = viewModel,
                 addFolderClicked = {},
+                onSelectStopBackupDestinationClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
                 state = SyncFoldersState(
@@ -230,6 +236,7 @@ class SyncFoldersScreenTest {
             SyncFoldersRoute(
                 viewModel = viewModel,
                 addFolderClicked = {},
+                onSelectStopBackupDestinationClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
                 state = SyncFoldersState(emptyList()),
@@ -255,6 +262,7 @@ class SyncFoldersScreenTest {
             SyncFoldersRoute(
                 viewModel = viewModel,
                 addFolderClicked = {},
+                onSelectStopBackupDestinationClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
                 state = SyncFoldersState(
@@ -319,9 +327,11 @@ class SyncFoldersScreenTest {
     @Test
     fun `test that stop backup confirm dialog is properly displayed `() {
         composeTestRule.setContent {
-            StopBackupConfirmationDialog(
-                onConfirm = {},
+            StopBackupConfirmationDialogBody(
+                state = StopBackupState(),
+                onConfirm = { _, _ -> },
                 onDismiss = {},
+                onSelectStopBackupDestinationClicked = {},
             )
         }
         composeTestRule.onNodeWithTag(TITLE_TAG).assertIsDisplayed()

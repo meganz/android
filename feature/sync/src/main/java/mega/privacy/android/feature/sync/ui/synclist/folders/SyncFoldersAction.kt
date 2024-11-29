@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.ui.model.StopBackupOption
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 
@@ -13,8 +14,10 @@ internal sealed interface SyncFoldersAction {
 
     data object OnRemoveSyncFolderDialogConfirmed : SyncFoldersAction
 
-    data class OnRemoveBackupFolderDialogConfirmed(val stopBackupOption: StopBackupOption) :
-        SyncFoldersAction
+    data class OnRemoveBackupFolderDialogConfirmed(
+        val stopBackupOption: StopBackupOption,
+        val selectedFolder: RemoteFolder?,
+    ) : SyncFoldersAction
 
     data object OnRemoveFolderDialogDismissed : SyncFoldersAction
 

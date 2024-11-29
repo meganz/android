@@ -101,6 +101,7 @@ class SyncListRouteTest {
                 syncPermissionsManager = syncPermissionsManager,
                 onSyncFolderClicked = {},
                 onBackupFolderClicked = {},
+                onSelectStopBackupDestinationClicked = {},
                 onOpenUpgradeAccountClicked = {},
                 syncFoldersViewModel = syncFoldersViewModel,
                 syncStalledIssuesViewModel = syncStalledIssuesViewModel,
