@@ -381,26 +381,26 @@ class PasscodeLockActivity : BaseActivity() {
                     isVisible = true
                     requestFocus()
 
-                    doAfterTextChanged {
-                        isEnabled = if (this.text.toString().isNotEmpty()) {
+                    doAfterTextChanged { text ->
+                        val isValid = text.isNullOrEmpty().not()
+                        if (isValid) {
                             binding.passSecondInput.requestFocus()
-                            false
-                        } else {
-                            true
                         }
+                        isFocusable = !isValid
+                        isFocusableInTouchMode = !isValid
                     }
                 }
 
                 binding.passSecondInput.apply {
                     isVisible = true
 
-                    doAfterTextChanged {
-                        isEnabled = if (this.text.toString().isNotEmpty()) {
+                    doAfterTextChanged { text ->
+                        val isValid = text.isNullOrEmpty().not()
+                        if (isValid) {
                             binding.passThirdInput.requestFocus()
-                            false
-                        } else {
-                            true
                         }
+                        isFocusable = !isValid
+                        isFocusableInTouchMode = !isValid
                     }
 
                     previousDigitEditText = binding.passFirstInput
@@ -410,13 +410,13 @@ class PasscodeLockActivity : BaseActivity() {
                 binding.passThirdInput.apply {
                     isVisible = true
 
-                    doAfterTextChanged {
-                        isEnabled = if (this.text.toString().isNotEmpty()) {
+                    doAfterTextChanged { text ->
+                        val isValid = text.isNullOrEmpty().not()
+                        if (isValid) {
                             binding.passFourthInput.requestFocus()
-                            false
-                        } else {
-                            true
                         }
+                        isFocusable = !isValid
+                        isFocusableInTouchMode = !isValid
                     }
 
                     previousDigitEditText = binding.passSecondInput
@@ -425,7 +425,7 @@ class PasscodeLockActivity : BaseActivity() {
                 binding.passFourthInput.apply {
                     isVisible = true
 
-                    doAfterTextChanged {
+                    doAfterTextChanged { text ->
                         if (passcodeType == PIN_4) {
                             if (this.text.toString().isNotEmpty()) {
                                 binding.passFirstInput.apply {
@@ -436,12 +436,12 @@ class PasscodeLockActivity : BaseActivity() {
                                 checkPasscode()
                             }
                         } else {
-                            isEnabled = if (this.text.toString().isNotEmpty()) {
+                            val isValid = text.isNullOrEmpty().not()
+                            if (isValid) {
                                 binding.passFifthInput.requestFocus()
-                                false
-                            } else {
-                                true
                             }
+                            isFocusable = !isValid
+                            isFocusableInTouchMode = !isValid
                         }
                     }
 
@@ -465,13 +465,13 @@ class PasscodeLockActivity : BaseActivity() {
                     binding.passFifthInput.apply {
                         isVisible = true
 
-                        doAfterTextChanged {
-                            isEnabled = if (this.text.toString().isNotEmpty()) {
+                        doAfterTextChanged { text ->
+                            val isValid = text.isNullOrEmpty().not()
+                            if (isValid) {
                                 binding.passSixthInput.requestFocus()
-                                false
-                            } else {
-                                true
                             }
+                            isFocusable = !isValid
+                            isFocusableInTouchMode = !isValid
                         }
 
                         previousDigitEditText = binding.passFourthInput
