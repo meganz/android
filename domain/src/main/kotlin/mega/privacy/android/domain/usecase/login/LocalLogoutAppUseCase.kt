@@ -11,6 +11,7 @@ import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.StopAudioService
+import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInAppUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.psa.ClearPsaUseCase
 import mega.privacy.android.domain.usecase.transfers.filespermission.ClearTransfersPreferencesUseCase
@@ -34,6 +35,7 @@ class LocalLogoutAppUseCase @Inject constructor(
     private val clearPsaUseCase: ClearPsaUseCase,
     private val settingsRepository: SettingsRepository,
     private val clearTransfersPreferencesUseCase: ClearTransfersPreferencesUseCase,
+    private val setSecurityUpgradeInAppUseCase: SetSecurityUpgradeInAppUseCase,
 ) {
 
     /**
@@ -66,5 +68,6 @@ class LocalLogoutAppUseCase @Inject constructor(
         )
         stopAudioService()
         clearPsaUseCase()
+        setSecurityUpgradeInAppUseCase(false)
     }
 }
