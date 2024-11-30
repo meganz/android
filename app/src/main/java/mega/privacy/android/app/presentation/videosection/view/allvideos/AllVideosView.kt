@@ -121,7 +121,7 @@ internal fun AllVideosView(
     MegaScaffold(
         modifier = modifier,
         scaffoldState = scaffoldState,
-    ) { paddingValue ->
+    ) {
         val locationTitle =
             stringResource(id = sharedR.string.video_section_videos_location_filter_title)
         val durationTitle =
@@ -170,9 +170,7 @@ internal fun AllVideosView(
                 else -> {
                     LazyColumn(
                         state = lazyListState,
-                        modifier = Modifier
-                            .padding(paddingValue)
-                            .testTag(VIDEOS_LIST_TEST_TAG)
+                        modifier = Modifier.testTag(VIDEOS_LIST_TEST_TAG)
                     ) {
                         if (!searchMode) {
                             item(
