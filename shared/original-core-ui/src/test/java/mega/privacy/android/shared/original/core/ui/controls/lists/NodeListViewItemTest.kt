@@ -47,6 +47,7 @@ class NodeListViewItemTest {
                     showVersion = true,
                     labelColor = MegaOriginalTheme.colors.indicator.pink,
                     showLink = true,
+                    isTakenDown = true,
                     showFavourite = true,
                     onMoreClicked = {},
                 )
@@ -120,6 +121,10 @@ class NodeListViewItemTest {
 
         //Check that permission icon is displayed
         composeTestRule.onNodeWithTag(PERMISSION_ICON_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+
+        //Check that taken down icon is displayed
+        composeTestRule.onNodeWithTag(TAKEN_DOWN_ICON_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
 
     }

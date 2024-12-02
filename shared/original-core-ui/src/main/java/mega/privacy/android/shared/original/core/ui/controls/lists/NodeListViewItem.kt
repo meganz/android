@@ -174,6 +174,14 @@ fun NodeListViewItem(
                     modifier = Modifier.testTag(LINK_ICON_TAG)
                 )
             }
+            if (isTakenDown) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_alert_triangle),
+                    contentDescription = "Dispute taken down",
+                    modifier = Modifier.testTag(TAKEN_DOWN_ICON_TAG),
+                    tint = MegaOriginalTheme.colors.support.error
+                )
+            }
         },
         subTitlePrefixIcons = {
             if (showVersion) {
@@ -391,6 +399,7 @@ internal const val SUBTITLE_TAG = "node_list_view_item:subtitle"
 internal const val ICON_TAG = "node_list_view_item:icon"
 internal const val FAVOURITE_ICON_TAG = "node_list_view_item:favourite_icon"
 internal const val LINK_ICON_TAG = "node_list_view_item:link_icon"
+internal const val TAKEN_DOWN_ICON_TAG = "node_list_view_item:taken_down_icon"
 internal const val OFFLINE_ICON_TAG = "node_list_view_item:offline_icon"
 internal const val VERSION_ICON_TAG = "node_list_view_item:version_icon"
 internal const val PERMISSION_ICON_TAG = "node_list_view_item:permission_icon"
