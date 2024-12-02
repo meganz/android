@@ -4,16 +4,16 @@ import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
 
 /**
- * The use case for getting the Backups node
+ * Use Case to retrieve the Backups node of the account
  */
 class GetBackupsNodeUseCase @Inject constructor(
-    private val nodeRepository: NodeRepository
+    private val nodeRepository: NodeRepository,
 ) {
 
     /**
      * Invocation function
      *
-     * @return the Backups Node
+     * @return the Backups node, or null if it cannot be retrieved
      */
     suspend operator fun invoke() = nodeRepository.getBackupsNode()
 }

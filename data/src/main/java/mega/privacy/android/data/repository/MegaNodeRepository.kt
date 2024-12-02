@@ -49,13 +49,6 @@ interface MegaNodeRepository {
     suspend fun getRootNode(): MegaNode?
 
     /**
-     * Get the Backups node
-     *
-     * @return A node corresponding to the Backups node, null if cannot be retrieved
-     */
-    suspend fun getBackupsNode(): MegaNode?
-
-    /**
      * check whether the node is in Backups or not
      *
      * @return true if the Node is in Backups, and false if otherwise

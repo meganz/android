@@ -134,10 +134,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         megaApiGateway.getRootNode()
     }
 
-    override suspend fun getBackupsNode(): MegaNode? = withContext(ioDispatcher) {
-        megaApiGateway.getBackupsNode()
-    }
-
     override suspend fun isNodeInBackups(megaNode: MegaNode) = withContext(ioDispatcher) {
         megaApiGateway.isInBackups(megaNode)
     }

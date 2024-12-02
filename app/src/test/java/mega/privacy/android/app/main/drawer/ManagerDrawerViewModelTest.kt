@@ -6,13 +6,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.HasBackupsChildren
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
@@ -24,7 +26,6 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.GetEnabledNotificationsUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
-import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -39,6 +40,9 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 
+/**
+ * Test class for [ManagerDrawerViewModel]
+ */
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ManagerDrawerViewModelTest {
@@ -49,7 +53,7 @@ internal class ManagerDrawerViewModelTest {
         onBlocking { invoke() }.thenReturn(UserChatStatus.Invalid)
     }
     private val hasBackupsChildren: HasBackupsChildren = mock()
-    private val getBackupsNode: GetBackupsNode = mock()
+    private val getBackupsNodeUseCase: GetBackupsNodeUseCase = mock()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val monitorMyChatOnlineStatusUseCase: MonitorMyChatOnlineStatusUseCase = mock()
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
@@ -63,7 +67,7 @@ internal class ManagerDrawerViewModelTest {
         reset(
             isConnectedToInternetUseCase,
             hasBackupsChildren,
-            getBackupsNode,
+            getBackupsNodeUseCase,
             rootNodeExistsUseCase,
             monitorMyAccountUpdateUseCase,
             monitorVerificationStatus,
@@ -103,7 +107,7 @@ internal class ManagerDrawerViewModelTest {
             monitorStorageStateEventUseCase,
             getCurrentUserChatStatusUseCase,
             hasBackupsChildren,
-            getBackupsNode,
+            getBackupsNodeUseCase,
             monitorNodeUpdatesUseCase,
             monitorMyChatOnlineStatusUseCase,
             monitorVerificationStatus,
@@ -116,7 +120,7 @@ internal class ManagerDrawerViewModelTest {
 
     @ParameterizedTest(name = "with isRootNodeExist {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that isRootNodeExist update correctly when call checkRootNode`(exist: Boolean) =
+    fun `test that isRootNodeExist updates correctly when calling checkRootNode`(exist: Boolean) =
         runTest {
             whenever(rootNodeExistsUseCase()).thenReturn(exist)
 
@@ -129,7 +133,7 @@ internal class ManagerDrawerViewModelTest {
 
     @ParameterizedTest(name = "with hasBackupsChildren {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that hasBackupsChildren update correctly when call checkBackupChildren`(hasChild: Boolean) =
+    fun `test that hasBackupsChildren updates correctly when calling checkBackupChildren`(hasChild: Boolean) =
         runTest {
             whenever(hasBackupsChildren()).thenReturn(hasChild)
 
@@ -155,7 +159,7 @@ internal class ManagerDrawerViewModelTest {
 
     @ParameterizedTest(name = "with monitorCurrentUserStatus emit {0}")
     @EnumSource(UserChatStatus::class)
-    fun `test that userStatus update correctly when call monitorCurrentUserStatus emit`(status: UserChatStatus) =
+    fun `test that userStatus updates correctly when calling monitorCurrentUserStatus emit`(status: UserChatStatus) =
         runTest {
             whenever(monitorMyChatOnlineStatusUseCase()).thenReturn(
                 flow {
@@ -171,17 +175,18 @@ internal class ManagerDrawerViewModelTest {
         }
 
     @Test
-    fun `test that backUpNodeHandle update correctly when call loadBackupNode`() =
+    fun `test that backupsNodeHandle updates correctly when calling loadBackupNode`() =
         runTest {
-            val node = mock<MegaNode> {
-                on { handle }.thenReturn(1L)
+            val expectedNodeId = NodeId(1L)
+            val backupsNode = mock<FileNode> {
+                on { id }.thenReturn(expectedNodeId)
             }
-            whenever(getBackupsNode()).thenReturn(node)
+            whenever(getBackupsNodeUseCase()).thenReturn(backupsNode)
 
             initTestClass()
 
             underTest.state.test {
-                assertThat(awaitItem().backUpNodeHandle).isEqualTo(node.handle)
+                assertThat(awaitItem().backupsNodeHandle).isEqualTo(expectedNodeId)
             }
         }
 
