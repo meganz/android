@@ -422,7 +422,6 @@ class CallService : LifecycleService() {
                                 notificationId,
                                 newNotification,
                                 ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
-                                        or ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
                             )
                         else // Before API 29, just start foreground service.
                             startForeground(notificationId, newNotification)
