@@ -929,12 +929,18 @@ class FileInfoViewModel @Inject constructor(
         }
     }
 
-    private fun updateTypedNode() {
-        updateState {
+    private fun updateTypedNode() = viewModelScope.launch {
+        runCatching {
+            tempMegaNodeRepository.getNodeByHandle(typedNode.id.longValue)?.let {
+                node = it
+            }
             getNodeByIdUseCase(typedNode.id)?.let { updateTypedNode ->
                 typedNode = updateTypedNode
             }
-            it.copyWithTypedNode(typedNode = typedNode)
+        }.onSuccess {
+            updateState {
+                it.copyWithTypedNode(typedNode = typedNode)
+            }
         }
     }
 
