@@ -13,7 +13,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
@@ -1726,20 +1725,6 @@ class VideoSectionViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
-
-    @Test
-    fun `test that isRecentlyWatchedEnabled function returns true`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.VideoRecentlyWatched)).thenReturn(true)
-        initVideosReturned()
-        assertThat(underTest.isRecentlyWatchedEnabled()).isTrue()
-    }
-
-    @Test
-    fun `test that isRecentlyWatchedEnabled function returns false`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.VideoRecentlyWatched)).thenReturn(false)
-        initVideosReturned()
-        assertThat(underTest.isRecentlyWatchedEnabled()).isFalse()
-    }
 
     @Test
     fun `test that the state is updated correctly after the clearRecentlyWatchedVideos is invoked`() =

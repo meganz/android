@@ -1220,15 +1220,13 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     }
 
     internal fun saveVideoWatchedTime() = viewModelScope.launch {
-        if (getFeatureFlagValueUseCase(AppFeatures.VideoRecentlyWatched)) {
-            mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong()?.let {
-                saveVideoRecentlyWatchedUseCase(
-                    it,
-                    Instant.now().toEpochMilli() / 1000,
-                    collectionId ?: 0L,
-                    collectionTitle
-                )
-            }
+        mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong()?.let {
+            saveVideoRecentlyWatchedUseCase(
+                it,
+                Instant.now().toEpochMilli() / 1000,
+                collectionId ?: 0L,
+                collectionTitle
+            )
         }
     }
 

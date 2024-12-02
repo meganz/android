@@ -48,14 +48,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enable video recently watched feature
-     */
-    VideoRecentlyWatched(
-        "Enable video recently watched feature",
-        true
-    ),
-
-    /**
      * Compose passcode settings
      */
     ComposePasscodeSettings(

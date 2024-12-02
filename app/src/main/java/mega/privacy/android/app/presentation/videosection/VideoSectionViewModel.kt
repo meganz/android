@@ -27,7 +27,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
@@ -1190,9 +1189,6 @@ class VideoSectionViewModel @Inject constructor(
             }
         }
     }
-
-    internal suspend fun isRecentlyWatchedEnabled() =
-        getFeatureFlagValueUseCase(AppFeatures.VideoRecentlyWatched)
 
     internal fun clearRecentlyWatchedVideos() {
         viewModelScope.launch {

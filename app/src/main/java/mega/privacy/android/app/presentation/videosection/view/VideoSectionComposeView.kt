@@ -63,11 +63,6 @@ internal fun VideoSectionComposeView(
         tabState.tabs.size
     }
 
-    var isRecentlyWatchedEnabled by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(isRecentlyWatchedEnabled) {
-        isRecentlyWatchedEnabled = videoSectionViewModel.isRecentlyWatchedEnabled()
-    }
-
     var showDeleteVideoPlaylist by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(pagerState.currentPage) {
@@ -152,7 +147,6 @@ internal fun VideoSectionComposeView(
                 isHideMenuActionVisible = uiState.isHideMenuActionVisible,
                 isUnhideMenuActionVisible = uiState.isUnhideMenuActionVisible,
                 isRemoveLinkMenuActionVisible = uiState.isRemoveLinkMenuActionVisible,
-                isRecentlyWatchedEnabled = isRecentlyWatchedEnabled,
             )
         }
     ) { paddingValues ->
