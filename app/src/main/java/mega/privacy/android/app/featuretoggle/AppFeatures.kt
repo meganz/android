@@ -20,7 +20,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     AddVideoToPlaylistFromVideoSection(
         "Enable add video to playlist from video section",
-        false
+        true
     ),
 
     /**
