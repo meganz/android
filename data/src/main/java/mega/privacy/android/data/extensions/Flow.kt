@@ -7,6 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -146,3 +147,19 @@ suspend fun <T> Flow<T>.collectChunked(
             }
         }
     }.collect(collector)
+
+/**
+ * Returns a flow that invokes the given [action] before the first value of the upstream matching the given [predicate] is emitted
+ */
+fun <T> Flow<T>.onFirst(
+    predicate: (T) -> Boolean,
+    action: suspend (T) -> Unit,
+): Flow<T> {
+    var consumed = false
+    return this.onEach { value ->
+        if (!consumed && predicate(value)) {
+            consumed = true
+            action(value)
+        }
+    }
+}

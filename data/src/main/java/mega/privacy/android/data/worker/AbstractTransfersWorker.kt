@@ -18,14 +18,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transform
-import kotlinx.coroutines.flow.withIndex
+import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.collectChunked
+import mega.privacy.android.data.extensions.onFirst
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
-import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.monitoring.CrashReporter
@@ -100,10 +101,50 @@ abstract class AbstractTransfersWorker(
      */
     open suspend fun onTransferEventReceived(event: TransferEvent) {}
 
+    open suspend fun onComplete() {}
+
     /**
      * @return a flow with updates of MonitorOngoingActiveTransfersResult to track the progress of the ongoing work. It will be sampled to avoid too much updates.
      */
-    abstract fun monitorProgress(): Flow<MonitorOngoingActiveTransfersResult>
+    internal abstract fun monitorProgress(): Flow<MonitorProgressResult>
+
+    internal fun consumeProgress() = monitorProgress()
+        .onFirst({ it.pendingWork }) {
+            // Signal to not kill the worker if the app is killed
+            val foregroundInfo = getForegroundInfo(
+                it.monitorOngoingActiveTransfersResult.activeTransferTotals,
+                areTransfersPausedUseCase()
+            )
+            foregroundSetter?.setForeground(foregroundInfo) ?: run {
+                crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} start foreground")
+                setForeground(foregroundInfo)
+            }
+        }
+        .transformWhile {
+            emit(it.monitorOngoingActiveTransfersResult)
+            Timber.d("Progress emitted: $it.pendingWork ${it.monitorOngoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers()}")
+            return@transformWhile it.pendingWork
+        }
+        .onEachSampled(
+            notificationSamplePeriod ?: ON_TRANSFER_UPDATE_REFRESH_MILLIS
+        ) { (transferTotals, paused, transferOverQuota, storageOverQuota) ->
+            if (storageOverQuota || transferOverQuota) {
+                showOverQuotaNotification(storageOverQuota = storageOverQuota)
+            }
+            //set progress percent as worker progress
+            setProgress(workDataOf(PROGRESS to transferTotals.transferProgress.floatValue))
+            //update the notification
+            updateProgressNotification(createUpdateNotification(transferTotals, paused))
+            Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}${if (paused) "(paused) " else ""} Notification update (${transferTotals.transferProgress.intValue}):${transferTotals.hasOngoingTransfers()}")
+        }
+        .onCompletion {
+            Timber.d("Worker monitor progress finished $it")
+            onComplete()
+        }
+        .catch {
+            Timber.e("${this@AbstractTransfersWorker::class.java.simpleName}error: $it")
+            crashReporter.report(it)
+        }
 
     /**
      * @return true if the work is completed, false otherwise
@@ -120,31 +161,7 @@ abstract class AbstractTransfersWorker(
             doWorkInternal(this)
         }
         onStart()
-        val lastMonitorOngoingActiveTransfersResult = monitorProgress()
-            .catch { Timber.e("${this@AbstractTransfersWorker::class.java.simpleName}error: $it") }
-            .onFirst {
-                if (!hasCompleted(it.activeTransferTotals)) {
-                    // Signal to not kill the worker if the app is killed
-                    val foregroundInfo =
-                        getForegroundInfo(it.activeTransferTotals, areTransfersPausedUseCase())
-                    foregroundSetter?.setForeground(foregroundInfo) ?: run {
-                        crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} start foreground")
-                        setForeground(foregroundInfo)
-                    }
-                }
-            }
-            .onEachSampled(
-                notificationSamplePeriod ?: ON_TRANSFER_UPDATE_REFRESH_MILLIS
-            ) { (transferTotals, paused, transferOverQuota, storageOverQuota) ->
-                if (storageOverQuota || transferOverQuota) {
-                    showOverQuotaNotification(storageOverQuota = storageOverQuota)
-                }
-                //set progress percent as worker progress
-                setProgress(workDataOf(PROGRESS to transferTotals.transferProgress.floatValue))
-                //update the notification
-                updateProgressNotification(createUpdateNotification(transferTotals, paused))
-                Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}${if (paused) "(paused) " else ""} Notification update (${transferTotals.transferProgress.intValue}):${transferTotals.hasOngoingTransfers()}")
-            }.lastOrNull()
+        val lastMonitorOngoingActiveTransfersResult = consumeProgress().lastOrNull()
 
         stopWork(doWorkJob)
         lastMonitorOngoingActiveTransfersResult?.let { (lastActiveTransferTotals, _, transferOverQuota, storageOverQuota) ->
@@ -167,12 +184,6 @@ abstract class AbstractTransfersWorker(
         crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} Finished")
         Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Finished")
     }
-
-    private fun <T> Flow<T>.onFirst(action: suspend (T) -> Unit): Flow<T> =
-        this.withIndex().transform { (index, value) ->
-            if (index == 0) action(value)
-            return@transform emit(value)
-        }
 
     /**
      * Similar to onEach but it will run the action only if periodMillis time has passed since last time action was run

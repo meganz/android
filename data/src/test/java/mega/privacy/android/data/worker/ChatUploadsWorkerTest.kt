@@ -299,13 +299,14 @@ class ChatUploadsWorkerTest {
     @Test
     fun `test that monitorOngoingActiveTransfers does complete if there are no ongoing transfers or pending messages`() =
         runTest {
+            commonStub()
             val monitorOngoingActiveTransfersUseFlow = monitorOngoingActiveTransfersFlow(false)
             whenever(monitorPendingMessagesByStateUseCase(anyVararg())) doReturn
                     flowOf(emptyList())
             whenever(monitorOngoingActiveTransfersUseCase(TransferType.CHAT_UPLOAD)) doReturn
                     monitorOngoingActiveTransfersUseFlow
 
-            underTest.monitorProgress().test {
+            underTest.consumeProgress().test {
                 awaitItem() //first value
                 awaitComplete()
             }
@@ -352,13 +353,14 @@ class ChatUploadsWorkerTest {
     @Test
     fun `test that pending messages compression progress is cleared when the work is finished`() =
         runTest {
+            commonStub()
             val monitorOngoingActiveTransfersUseFlow = monitorOngoingActiveTransfersFlow(false)
             whenever(monitorPendingMessagesByStateUseCase(anyVararg())) doReturn
                     flowOf(emptyList())
             whenever(monitorOngoingActiveTransfersUseCase(TransferType.CHAT_UPLOAD)) doReturn
                     monitorOngoingActiveTransfersUseFlow
 
-            underTest.monitorProgress().test {
+            underTest.consumeProgress().test {
                 awaitItem() //first value
                 awaitComplete()
                 verify(clearPendingMessagesCompressionProgressUseCase).invoke()

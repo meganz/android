@@ -38,7 +38,7 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUntilFinishedUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import org.junit.jupiter.api.AfterAll
@@ -74,8 +74,8 @@ class UploadsWorkerTest {
 
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val handleTransferEventUseCase = mock<HandleTransferEventUseCase>()
-    private val monitorOngoingActiveTransfersUntilFinishedUseCase =
-        mock<MonitorOngoingActiveTransfersUntilFinishedUseCase>()
+    private val monitorOngoingActiveTransfersUseCase =
+        mock<MonitorOngoingActiveTransfersUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
     private val transfersNotificationMapper = mock<TransfersNotificationMapper>()
@@ -125,7 +125,7 @@ class UploadsWorkerTest {
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             handleTransferEventUseCase = handleTransferEventUseCase,
             areTransfersPausedUseCase = areTransfersPausedUseCase,
-            monitorOngoingActiveTransfersUntilFinishedUseCase = monitorOngoingActiveTransfersUntilFinishedUseCase,
+            monitorOngoingActiveTransfersUseCase = monitorOngoingActiveTransfersUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
             transfersNotificationMapper = transfersNotificationMapper,
             overQuotaNotificationBuilder = overQuotaNotificationBuilder,
@@ -196,7 +196,7 @@ class UploadsWorkerTest {
         runTest {
             commonStub()
             underTest.doWork()
-            verify(monitorOngoingActiveTransfersUntilFinishedUseCase).invoke(TransferType.GENERAL_UPLOAD)
+            verify(monitorOngoingActiveTransfersUseCase).invoke(TransferType.GENERAL_UPLOAD)
         }
 
     @Test
@@ -207,11 +207,11 @@ class UploadsWorkerTest {
                 inOrder(
                     monitorTransferEventsUseCase,
                     correctActiveTransfersUseCase,
-                    monitorOngoingActiveTransfersUntilFinishedUseCase
+                    monitorOngoingActiveTransfersUseCase
                 )
             underTest.doWork()
             inOrder.verify(correctActiveTransfersUseCase).invoke(TransferType.GENERAL_UPLOAD)
-            inOrder.verify(monitorOngoingActiveTransfersUntilFinishedUseCase)
+            inOrder.verify(monitorOngoingActiveTransfersUseCase)
                 .invoke(TransferType.GENERAL_UPLOAD)
         }
 
@@ -376,7 +376,7 @@ class UploadsWorkerTest {
             .thenReturn(false)
         whenever(monitorTransferEventsUseCase())
             .thenReturn(flowOf(transferEvent))
-        whenever(monitorOngoingActiveTransfersUntilFinishedUseCase(TransferType.GENERAL_UPLOAD))
+        whenever(monitorOngoingActiveTransfersUseCase(TransferType.GENERAL_UPLOAD))
             .thenReturn(flow {
                 emit(
                     MonitorOngoingActiveTransfersResult(

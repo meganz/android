@@ -85,27 +85,16 @@ class DownloadsWorker @AssistedInject constructor(
     override val finalNotificationId = DOWNLOAD_FINAL_NOTIFICATION_ID
     override val updateNotificationId = DOWNLOAD_UPDATE_NOTIFICATION_ID
 
-    override fun monitorProgress(): Flow<MonitorOngoingActiveTransfersResult> =
+    override fun monitorProgress(): Flow<MonitorProgressResult> =
         combine(
             monitorOngoingActiveTransfersUseCase(type),
             getPendingTransfersByTypeUseCase(type),
-        ) { monitorOngoingActiveTransfersResult, pendingTransfersNotSend ->
-            monitorOngoingActiveTransfersResult to pendingTransfersNotSend.size
+        ) { ongoingActiveTransfersResult, pendingTransfersNotSend ->
+            //keep monitoring if and only if there are pending transfers or transfers in progress
+            val pendingWork =
+                pendingTransfersNotSend.isNotEmpty() || ongoingActiveTransfersResult.hasPendingWork(type)
+            MonitorProgressResult(ongoingActiveTransfersResult, pendingWork)
         }
-            .distinctUntilChanged()
-            .transformWhile { (ongoingActiveTransfersResult, notSendPendingTransfers) ->
-                emit(ongoingActiveTransfersResult)
-                Timber.d("Download progress emitted: $notSendPendingTransfers ${ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers()}")
-                //keep monitoring if and only if there are pending transfers or transfers in progress
-                return@transformWhile notSendPendingTransfers > 0 || (ongoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers() && !ongoingActiveTransfersResult.transfersOverQuota)
-            }
-            .catch {
-                crashReporter.report(it)
-                Timber.e("Error monitoring Downloads", it)
-            }
-            .onCompletion {
-                Timber.d("DownloadWorker monitor progress finished $it")
-            }
 
 
     override suspend fun doWorkInternal(scope: CoroutineScope) {

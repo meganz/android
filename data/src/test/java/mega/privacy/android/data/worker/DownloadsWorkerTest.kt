@@ -368,7 +368,7 @@ class DownloadsWorkerTest {
     }
 
     @Test
-    fun `test that monitorProgress does complete if there are no ongoing transfers or pending transfers`() =
+    fun `test that consumeProgress does complete if there are no ongoing transfers or pending transfers`() =
         runTest {
             commonStub()
             val monitorOngoingActiveTransfersUseFlow = monitorOngoingActiveTransfersFlow(false)
@@ -377,7 +377,7 @@ class DownloadsWorkerTest {
             whenever(monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD)) doReturn
                     monitorOngoingActiveTransfersUseFlow
 
-            underTest.monitorProgress().test {
+            underTest.consumeProgress().test {
                 awaitItem() //first value
                 awaitComplete()
             }
