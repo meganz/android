@@ -6,7 +6,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.di.GetNodeModule
-import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.HasBackupsChildren
@@ -31,9 +30,5 @@ abstract class ManagerUseCases {
         @Provides
         fun provideMonitorUserAlerts(notificationsRepository: NotificationsRepository): MonitorUserAlertUpdates =
             MonitorUserAlertUpdates(notificationsRepository::monitorUserAlerts)
-
-        @Provides
-        fun provideAuthorizeNode(megaNodeRepository: MegaNodeRepository): AuthorizeNode =
-            AuthorizeNode(megaNodeRepository::authorizeNode)
     }
 }

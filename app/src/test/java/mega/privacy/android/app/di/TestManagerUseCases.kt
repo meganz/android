@@ -7,11 +7,8 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.flow.flowOf
 import mega.privacy.android.app.di.manager.ManagerUseCases
-import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.domain.usecase.HasBackupsChildren
 import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
-import nz.mega.sdk.MegaNode
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -24,11 +21,6 @@ object TestManagerUseCases {
     @Provides
     fun provideHasBackupsChildren() = mock<HasBackupsChildren> {
         onBlocking { invoke() }.thenReturn(false)
-    }
-
-    @Provides
-    fun provideAuthorizeNode() = mock<AuthorizeNode> {
-        onBlocking { invoke(any()) }.thenReturn(MegaNode())
     }
 
     @Provides

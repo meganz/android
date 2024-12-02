@@ -183,10 +183,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
             megaApiGateway.getUserFromInShare(node, recursive)
         }
 
-    override suspend fun authorizeNode(handle: Long): MegaNode? = withContext(ioDispatcher) {
-        megaApiFolderGateway.authorizeNode(handle)
-    }
-
     @Deprecated(
         message = "getPublicLinks MegaNode implementation has been deprecated. Use untyped node implementation",
         replaceWith = ReplaceWith("mega.privacy.android.domain.repository.filemanagement.ShareRepository#getPublicLinks(SortOrder)")

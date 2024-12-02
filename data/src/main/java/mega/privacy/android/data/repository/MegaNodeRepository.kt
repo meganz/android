@@ -128,15 +128,6 @@ interface MegaNodeRepository {
     suspend fun getUserFromInShare(node: MegaNode, recursive: Boolean): MegaUser?
 
     /**
-     * Authorize and return a MegaNode can be downloaded with any instance of MegaApi
-     *
-     * @param handle the handle of the node to authorize
-     * @return a MegaNode that can be downloaded with any instance of MegaApi,
-     *         null if can't be authorized
-     */
-    suspend fun authorizeNode(handle: Long): MegaNode?
-
-    /**
      * Get a list with all public links
      *
      * Valid value for order are: MegaApi::ORDER_NONE, MegaApi::ORDER_DEFAULT_ASC,
