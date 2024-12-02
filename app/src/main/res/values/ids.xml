@@ -2,4 +2,5 @@
 <resources>
     <item name="psa_web_browser_container" type="id" />
     <item name="pass_code" type="id" />
+    <item name="legacy_psa" type="id" />
 </resources>
