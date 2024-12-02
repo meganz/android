@@ -391,7 +391,6 @@ class ChatUploadsWorkerTest {
         yield() //to wait for the doWork to start
         verify(
             notificationManager,
-            times(2) //twice because we are not sampling in tests
         ).notify(any(), eq(firstNotification))
         verifyNoMoreInteractions(notificationManager)
 

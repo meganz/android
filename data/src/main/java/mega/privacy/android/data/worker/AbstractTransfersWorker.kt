@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.collectChunked
 import mega.privacy.android.data.extensions.onFirst
+import mega.privacy.android.data.extensions.skipUnstable
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -41,7 +42,6 @@ import java.time.Instant
 import java.time.Instant.MIN
 import java.time.Instant.now
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Abstract CoroutineWorker to share common implementation of transfers workers
@@ -109,6 +109,11 @@ abstract class AbstractTransfersWorker(
     internal abstract fun monitorProgress(): Flow<MonitorProgressResult>
 
     internal fun consumeProgress() = monitorProgress()
+        .skipUnstable(eventsChunkDuration) {
+            // If there are no pending work the worker will finish, but as we are using `collectChunked` to monitor the events,
+            // the pendingWork may not be updated, specifically after app restart. `skipUnstable` help to ensure we don't finish too soon.
+            it.pendingWork
+        }
         .onFirst({ it.pendingWork }) {
             // Signal to not kill the worker if the app is killed
             val foregroundInfo = getForegroundInfo(
@@ -223,7 +228,7 @@ abstract class AbstractTransfersWorker(
         monitorTransferEventsUseCase()
             .filter { it.transfer.transferType == type }
             .collectChunked(
-                chunkDuration = 2.seconds,
+                chunkDuration = eventsChunkDuration,
                 flushOnIdleDuration = 200.milliseconds
             ) { transferEvents ->
                 transferEvents.forEach {
@@ -317,6 +322,11 @@ abstract class AbstractTransfersWorker(
          * Milliseconds to sample the transfer progress updates
          */
         const val ON_TRANSFER_UPDATE_REFRESH_MILLIS = 2000L
+
+        /**
+         * To improve performance, and avoid too much database transactions, transfer events are chunked this duration
+         */
+        private val eventsChunkDuration = ON_TRANSFER_UPDATE_REFRESH_MILLIS.milliseconds
     }
 }
 

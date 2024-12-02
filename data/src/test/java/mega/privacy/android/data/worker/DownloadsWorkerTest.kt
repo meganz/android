@@ -384,6 +384,30 @@ class DownloadsWorkerTest {
         }
 
     @Test
+    fun `test that consumeProgress only completes when there are no pending transfers for more than sample duration`() =
+        runTest {
+            commonStub()
+            val monitorOngoingActiveTransfersUseFlow = monitorOngoingActiveTransfersFlow(false)
+            whenever(getPendingTransfersByTypeUseCase(TransferType.DOWNLOAD)) doReturn
+                    flow {
+                        emit(emptyList())
+                        delay(ON_TRANSFER_UPDATE_REFRESH_MILLIS / 2)
+                        emit(listOf(mock())) //second value
+                        emit(emptyList())
+                        delay(ON_TRANSFER_UPDATE_REFRESH_MILLIS + 100)
+                        emit(listOf(mock())) //third value
+                    }
+            whenever(monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD)) doReturn
+                    monitorOngoingActiveTransfersUseFlow
+
+            underTest.consumeProgress().test {
+                awaitItem() //first value
+                awaitItem() //second value
+                awaitComplete() //third value not received
+            }
+        }
+
+    @Test
     fun `test that monitorProgress does not complete if there are ongoing transfers`() =
         runTest {
             commonStub()

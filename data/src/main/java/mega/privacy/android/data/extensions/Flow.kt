@@ -1,11 +1,14 @@
 package mega.privacy.android.data.extensions
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -161,5 +164,18 @@ fun <T> Flow<T>.onFirst(
             consumed = true
             action(value)
         }
+    }
+}
+
+/**
+ * Returns a new flow where values not validated by [validator] will be skip if a new value is emitted before the delay
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+fun <T> Flow<T>.skipUnstable(timeout: Duration, validator: (T) -> Boolean): Flow<T> {
+    return this.mapLatest { value ->
+        if (validator(value).not()) {
+            delay(timeout)
+        }
+        value
     }
 }

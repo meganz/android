@@ -34,11 +34,10 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         transferRepository.updateTransferredBytes(inProgressTransfers)
 
         //set not-in-progress active transfers as finished, this can happen if we missed a finish event from SDK
-        val notInProgressActiveTransfersTags = activeTransfers
-            .filter { activeTransfer ->
-                !activeTransfer.isFinished && !inProgressTransfers.map { it.tag }
-                    .contains(activeTransfer.tag)
-            }
+        val notInProgressActiveTransfersTags = activeTransfers.filter { activeTransfer ->
+            !activeTransfer.isFinished
+                    && activeTransfer.tag !in inProgressTransfers.map { it.tag }
+        }
             .map {
                 it.tag
             }
@@ -52,9 +51,10 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         val inProgressNotInActiveTransfers = inProgressTransfers.filterNot { transfer ->
             activeTransfers.map { it.tag }.contains(transfer.tag)
         }
-
-        transferRepository.updateInProgressTransfers(inProgressNotInActiveTransfers)
-        transferRepository.insertOrUpdateActiveTransfers(inProgressNotInActiveTransfers)
+        if (inProgressNotInActiveTransfers.isNotEmpty()) {
+            transferRepository.updateInProgressTransfers(inProgressNotInActiveTransfers)
+            transferRepository.insertOrUpdateActiveTransfers(inProgressNotInActiveTransfers)
+        }
 
         val pendingTransfersWaitingSdkScanning = if (transferType == null) {
             transferRepository.getPendingTransfersByState(PendingTransferState.SdkScanning)
