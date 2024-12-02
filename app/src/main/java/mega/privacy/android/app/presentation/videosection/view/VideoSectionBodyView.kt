@@ -33,7 +33,6 @@ import androidx.compose.ui.text.font.FontWeight
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun VideoSectionBodyView(
     modifier: Modifier,
@@ -49,7 +48,7 @@ internal fun VideoSectionBodyView(
 ) {
     val isBarVisibleAll by remember(allLazyListState) {
         derivedStateOf {
-            allLazyListState.firstVisibleItemIndex == 0
+            allLazyListState.firstVisibleItemIndex <= 1
         }
     }
     val isScrollingDownAll by allLazyListState.isScrollingDown()
@@ -67,10 +66,10 @@ internal fun VideoSectionBodyView(
         VideoSectionTabs(tabs = tabs, selectedTab = selectedTab, onTabSelected = onTabSelected) {
             when (selectedTab) {
                 VideoSectionTab.All ->
-                    isBarVisibleAll || (!isScrollingDownAll && !isScrollingToEndAll)
+                    (isBarVisibleAll || (!isScrollingDownAll && !isScrollingToEndAll)) && swipeEnabled
 
                 VideoSectionTab.Playlists ->
-                    isBarVisiblePlaylists || (!isScrollingDownPlaylists && !isScrollingToEndPlaylists)
+                    (isBarVisiblePlaylists || (!isScrollingDownPlaylists && !isScrollingToEndPlaylists)) && swipeEnabled
             }
         }
         PagerView(

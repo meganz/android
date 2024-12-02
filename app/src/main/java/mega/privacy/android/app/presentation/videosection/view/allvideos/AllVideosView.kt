@@ -172,25 +172,23 @@ internal fun AllVideosView(
                         state = lazyListState,
                         modifier = Modifier.testTag(VIDEOS_LIST_TEST_TAG)
                     ) {
-                        if (!searchMode) {
-                            item(
-                                key = "header"
-                            ) {
-                                HeaderViewItem(
-                                    modifier = Modifier.padding(
-                                        vertical = 10.dp,
-                                        horizontal = 8.dp
-                                    ),
-                                    onSortOrderClick = onSortOrderClick,
-                                    onChangeViewTypeClick = {},
-                                    onEnterMediaDiscoveryClick = {},
-                                    sortOrder = sortOrder,
-                                    isListView = true,
-                                    showSortOrder = true,
-                                    showChangeViewType = false,
-                                    showMediaDiscoveryButton = false,
-                                )
-                            }
+                        item(
+                            key = "header"
+                        ) {
+                            HeaderViewItem(
+                                modifier = Modifier.padding(
+                                    vertical = 10.dp,
+                                    horizontal = 8.dp
+                                ),
+                                onSortOrderClick = onSortOrderClick,
+                                onChangeViewTypeClick = {},
+                                onEnterMediaDiscoveryClick = {},
+                                sortOrder = sortOrder,
+                                isListView = true,
+                                showSortOrder = true,
+                                showChangeViewType = false,
+                                showMediaDiscoveryButton = false,
+                            )
                         }
 
                         items(count = items.size, key = { items[it].id.longValue }) {

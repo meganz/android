@@ -137,7 +137,7 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">Older</string>
     <!-- All videos tab title of the video section  -->
-    <string name="video_section_tab_title_all_videos">Videos</string>
+    <string name="video_section_tab_title_all_videos">All videos</string>
     <!-- Playlists tab title of the video section  -->
     <string name="video_section_tab_title_playlists">Playlists</string>
     <!-- Location filter title of the video section  -->
