@@ -140,6 +140,17 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         private const val STATE = "STATE"
         private const val STATE_SHOWN = 0
         private const val STATE_HIDDEN = 1
+
+        private val BLOCKQUOTE_STYLE = """
+            blockquote {
+                margin: 16px 0;
+                padding: 10px 20px;
+                background-color: #f9f9f9;
+                border-left: 5px solid #ccc;
+                font-style: italic;
+                color: #555;
+            }
+        """.trimIndent()
     }
 
     /**
@@ -825,8 +836,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             binding.contentWebView.apply {
                 isVisible = viewModel.uiState.value.isMarkDownFile
                 viewModel.getPagination()?.getEditedText()?.let {
-                    val markdownHtml = convertMarkDownToHtml(it)
-                    loadDataWithBaseURL(null, markdownHtml, "text/html", "UTF-8", null)
+                    val styledMarkdownHtml = convertMarkDownToHtml(it)
+                    loadDataWithBaseURL(null, styledMarkdownHtml, "text/html", "UTF-8", null)
                 }
             }
 
@@ -849,9 +860,24 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     }
 
     private fun convertMarkDownToHtml(content: String?): String {
-        val htmlContent = Parser.builder().build().parse(content)
-        return HtmlRenderer.builder().build().render(htmlContent)
+        val document = Parser.builder().build().parse(content)
+        val htmlContent = HtmlRenderer.builder().build().render(document)
+        return generateHtmlContent(htmlContent)
     }
+
+    private fun generateHtmlContent(content: String) =
+        """
+            <html>
+                <head>
+                    <style>
+                        $BLOCKQUOTE_STYLE
+                    </style>
+                </head>
+                <body>
+                    $content
+                </body>
+            </html>
+        """.trimIndent()
 
     /**
      * Shows the loading view.
