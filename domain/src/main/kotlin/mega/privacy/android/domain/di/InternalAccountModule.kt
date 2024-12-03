@@ -4,10 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
-import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.BusinessRepository
 import mega.privacy.android.domain.usecase.DefaultIsUserLoggedIn
-import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 
@@ -34,12 +32,5 @@ internal abstract class InternalAccountModule {
         @Provides
         fun provideIsBusinessAccountActive(repository: BusinessRepository): IsBusinessAccountActive =
             IsBusinessAccountActive(repository::isBusinessAccountActive)
-
-        /**
-         * Provides the Use Case [GetMyCredentials]
-         */
-        @Provides
-        fun provideGetMyCredentials(accountRepository: AccountRepository): GetMyCredentials =
-            GetMyCredentials(accountRepository::getMyCredentials)
     }
 }

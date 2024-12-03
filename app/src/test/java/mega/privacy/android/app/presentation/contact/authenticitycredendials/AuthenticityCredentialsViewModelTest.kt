@@ -8,12 +8,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetContactCredentials
-import mega.privacy.android.domain.usecase.GetMyCredentials
+import mega.privacy.android.domain.usecase.account.GetMyCredentialsUseCase
 import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.VerifyCredentials
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
@@ -54,7 +53,7 @@ class AuthenticityCredentialsViewModelTest {
 
     private val getContactCredentials = mock<GetContactCredentials>()
     private val areCredentialsVerifiedUseCase = mock<AreCredentialsVerifiedUseCase>()
-    private val getMyCredentials = mock<GetMyCredentials>()
+    private val getMyCredentialsUseCase = mock<GetMyCredentialsUseCase>()
     private val verifyCredentials = mock<VerifyCredentials>()
     private val resetCredentials = mock<ResetCredentials>()
     private var connectivityFlow = MutableSharedFlow<Boolean>()
@@ -65,7 +64,7 @@ class AuthenticityCredentialsViewModelTest {
         reset(
             getContactCredentials,
             areCredentialsVerifiedUseCase,
-            getMyCredentials,
+            getMyCredentialsUseCase,
             verifyCredentials,
             resetCredentials
         )
@@ -77,7 +76,7 @@ class AuthenticityCredentialsViewModelTest {
         underTest = AuthenticityCredentialsViewModel(
             getContactCredentials = getContactCredentials,
             areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
-            getMyCredentials = getMyCredentials,
+            getMyCredentialsUseCase = getMyCredentialsUseCase,
             verifyCredentials = verifyCredentials,
             resetCredentials = resetCredentials,
             monitorConnectivityUseCase = monitorConnectivityUseCase,

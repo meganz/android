@@ -7,9 +7,7 @@ import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.data.mapper.ReferralBonusAchievementsMapper
 import mega.privacy.android.domain.di.AccountModule
-import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.usecase.GetAccountAchievements
-import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
@@ -45,10 +43,6 @@ object TestAccountModule {
         on { runBlocking { invoke(mock(), -1) } }.thenReturn(mock())
     }
 
-    private val getMyCredentials = mock<GetMyCredentials> {
-        on { runBlocking { invoke() } }.thenReturn(mock<AccountCredentials.MyAccountCredentials>())
-    }
-
     private val getAccountAchievementsOverviewUseCase =
         mock<GetAccountAchievementsOverviewUseCase>()
 
@@ -68,9 +62,6 @@ object TestAccountModule {
 
     @Provides
     fun provideGetAccountAchievementsOverview() = getAccountAchievementsOverviewUseCase
-
-    @Provides
-    fun provideGetMyCredentials() = getMyCredentials
 
     @Provides
     fun provideMonitorUserUpdate() = mock<MonitorUserUpdates>()
