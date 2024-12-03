@@ -337,8 +337,6 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
@@ -348,8 +346,7 @@ import javax.inject.Inject
 
 @Suppress("KDocMissingDocumentation")
 @AndroidEntryPoint
-class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
-    NavigationView.OnNavigationItemSelectedListener,
+class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelectedListener,
     BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, ActionNodeCallback, SnackbarShower,
     MeetingBottomSheetDialogActionListener, NotificationNavigationHandler,
     ParentNodeManager, CameraPermissionManager, NavigationDrawerManager, FileBrowserActionListener,
@@ -892,7 +889,7 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             handler.postDelayed({ changeAppBarElevation(true, elevationCause) }, 100)
         }
         setupAudioPlayerController()
-        megaApi.getAccountAchievements(this)
+        userInfoViewModel.getUserAchievements()
         if (!viewModel.isConnected) {
             Timber.d("No network -> SHOW OFFLINE MODE")
             if (drawerItem == null) {
@@ -2814,7 +2811,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     override fun onDestroy() {
         Timber.d("onDestroy()")
         dbH.removeSentPendingMessages()
-        megaApi.removeRequestListener(this)
         reconnectDialog?.cancel()
         dismissAlertDialogIfExists(processFileDialog)
         cookieDialogHandler.onDestroy()
@@ -6147,26 +6143,6 @@ class ManagerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 )
             }
         }
-    }
-
-    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("onRequestStart: %s", request.requestString)
-    }
-
-    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("onRequestUpdate: %s", request.requestString)
-    }
-
-    @SuppressLint("NewApi")
-    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        Timber.d("onRequestFinish: %s_%d", request.requestString, e.errorCode)
-    }
-
-    override fun onRequestTemporaryError(
-        api: MegaApiJava, request: MegaRequest,
-        e: MegaError,
-    ) {
-        Timber.w("onRequestTemporaryError: ${request.requestString}__${e.errorCode}__${e.errorString}")
     }
 
     /**

@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.UpdateMyAvatarWithNewEmail
+import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
@@ -44,6 +45,7 @@ internal class UserInfoViewModel @Inject constructor(
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val avatarContentMapper: AvatarContentMapper,
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
+    private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
@@ -178,6 +180,18 @@ internal class UserInfoViewModel @Inject constructor(
                 .onSuccess { show ->
                     _state.update { it.copy(isTestPasswordRequired = show) }
                 }.onFailure {
+                    Timber.e(it)
+                }
+        }
+    }
+
+    /**
+     * Get user achievements
+     */
+    fun getUserAchievements() {
+        viewModelScope.launch {
+            runCatching { getAccountAchievementsOverviewUseCase() }
+                .onFailure {
                     Timber.e(it)
                 }
         }
