@@ -2,15 +2,11 @@ package mega.privacy.android.app.globalmanagement
 
 import android.os.CountDownTimer
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.SDCardOperator
-import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.data.mapper.transfer.CompletedTransferMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.SdTransfer
@@ -46,7 +42,6 @@ class TransfersManagement @Inject constructor(
 
     companion object {
         private const val WAIT_TIME_TO_SHOW_WARNING = 60000L
-        private const val WAIT_TIME_TO_SHOW_NETWORK_WARNING = 30000L
     }
 
     private var networkTimer: CountDownTimer? = null
@@ -56,7 +51,6 @@ class TransfersManagement @Inject constructor(
     var isOnTransfersSection = false
     var isTransferOverQuotaNotificationShown = false
     var isTransferOverQuotaBannerShown = false
-    var shouldShowNetworkWarning = false
 
     init {
         resetTransferOverQuotaTimestamp()
@@ -69,7 +63,6 @@ class TransfersManagement @Inject constructor(
         isOnTransfersSection = false
         isTransferOverQuotaNotificationShown = false
         isTransferOverQuotaBannerShown = false
-        shouldShowNetworkWarning = false
     }
 
     /**
@@ -118,36 +111,6 @@ class TransfersManagement @Inject constructor(
      */
     fun setHasNotToBeShowDueToTransferOverQuota(hasNotToBeShowDueToTransferOverQuota: Boolean) {
         isTransferOverQuotaBannerShown = hasNotToBeShowDueToTransferOverQuota
-    }
-
-    /**
-     * Starts a CountDownTimer after show warnings related to no internet connection.
-     * If the timer finishes, launches a Broadcast to update the widget.
-     */
-    suspend fun startNetworkTimer() = withContext(Dispatchers.Main) {
-        networkTimer = object : CountDownTimer(
-            WAIT_TIME_TO_SHOW_NETWORK_WARNING,
-            WAIT_TIME_TO_SHOW_NETWORK_WARNING
-        ) {
-            override fun onTick(millisUntilFinished: Long) {}
-            override fun onFinish() {
-                if (isOnline(MegaApplication.getInstance())) {
-                    return
-                }
-
-                shouldShowNetworkWarning = true
-            }
-        }.start()
-    }
-
-    /**
-     * Cancels the CountDownTimer to show warnings related to no internet connection.
-     */
-    suspend fun resetNetworkTimer() = withContext(Dispatchers.Main) {
-        networkTimer?.let { timer ->
-            timer.cancel()
-            shouldShowNetworkWarning = false
-        }
     }
 
     /**

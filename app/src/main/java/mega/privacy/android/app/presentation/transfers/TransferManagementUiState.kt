@@ -18,4 +18,5 @@ data class TransferManagementUiState(
     val hideTransfersWidget: Boolean = false,
     val lastTransfersCancelled: Boolean = false,
     val isTransferError: Boolean = false,
+    val isOnline: Boolean = false,
 )

@@ -3,15 +3,20 @@ package mega.privacy.android.app.presentation.transfers
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel.Companion.waitTimeToShowOffline
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.TransfersStatusInfo
@@ -22,6 +27,7 @@ import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCa
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -34,7 +40,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -58,6 +63,7 @@ class TransfersManagementViewModelTest {
 
     @BeforeAll
     fun setup() = runTest {
+        Dispatchers.setMain(ioDispatcher)
         commonStub()
         initTest()
     }
@@ -91,6 +97,11 @@ class TransfersManagementViewModelTest {
         commonStub()
     }
 
+    @AfterAll
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     @Test
     fun `test ui state is updated with correct values when there's a new emission of monitorTransfersSize`() =
         runTest {
@@ -118,6 +129,7 @@ class TransfersManagementViewModelTest {
                     totalSizeTransferred = eq(totalSizeTransferred),
                     areTransfersPaused = eq(false),
                     isTransferError = eq(false),
+                    isOnline = eq(true),
                     isTransferOverQuota = eq(false),
                     isStorageOverQuota = eq(false),
                     lastTransfersCancelled = any(),
@@ -135,23 +147,22 @@ class TransfersManagementViewModelTest {
         }
 
     @Test
-    fun `test that when monitorConnectivityUseCase turns to true it calls transfersManagement resetNetworkTimer`() =
+    fun `test that isOnline ui state is updated when monitorConnectivityUseCase emits, skipping unstable offline`() =
         runTest {
             initTest()
-
-            monitorConnectivityUseCaseFlow.emit(true)
-
-            verify(transfersManagement).resetNetworkTimer()
-        }
-
-    @Test
-    fun `test that when monitorConnectivityUseCase turns to false it calls transfersManagement startNetworkTimer`() =
-        runTest {
-            initTest()
-
-            monitorConnectivityUseCaseFlow.emit(false)
-
-            verify(transfersManagement).startNetworkTimer()
+            underTest.state.test {
+                monitorConnectivityUseCaseFlow.emit(true)
+                assertThat(awaitItem().isOnline).isTrue()
+                monitorConnectivityUseCaseFlow.emit(false)
+                delay(waitTimeToShowOffline / 2)
+                monitorConnectivityUseCaseFlow.emit(true)
+                expectNoEvents() //short offline is skipped
+                monitorConnectivityUseCaseFlow.emit(false)
+                delay(waitTimeToShowOffline * 1.1)
+                assertThat(awaitItem().isOnline).isFalse() // long offline is not skipped
+                monitorConnectivityUseCaseFlow.emit(true)
+                assertThat(awaitItem().isOnline).isTrue() // online is updated immediately
+            }
         }
 
     @Test
@@ -220,6 +231,7 @@ class TransfersManagementViewModelTest {
                     totalSizeTransferred = eq(totalSizeTransferred),
                     areTransfersPaused = eq(false),
                     isTransferError = eq(true),
+                    isOnline = eq(true),
                     isTransferOverQuota = eq(false),
                     isStorageOverQuota = eq(false),
                     lastTransfersCancelled = any(),
@@ -273,6 +285,7 @@ class TransfersManagementViewModelTest {
                     totalSizeTransferred = eq(totalSizeTransferred),
                     areTransfersPaused = eq(false),
                     isTransferError = eq(true),
+                    isOnline = eq(true),
                     isTransferOverQuota = eq(false),
                     isStorageOverQuota = eq(false),
                     lastTransfersCancelled = any(),
@@ -325,6 +338,7 @@ class TransfersManagementViewModelTest {
                     totalSizeTransferred = eq(totalSizeTransferred),
                     areTransfersPaused = eq(false),
                     isTransferError = eq(true),
+                    isOnline = eq(true),
                     isTransferOverQuota = eq(false),
                     isStorageOverQuota = eq(false),
                     lastTransfersCancelled = any(),
@@ -350,8 +364,7 @@ class TransfersManagementViewModelTest {
         }
 
     private fun commonStub() {
-        monitorConnectivityUseCaseFlow = MutableStateFlow(false)
-        whenever(transfersManagement.shouldShowNetworkWarning) doReturn false
+        monitorConnectivityUseCaseFlow = MutableStateFlow(true)
         whenever(monitorConnectivityUseCase()) doReturn monitorConnectivityUseCaseFlow
         whenever(monitorLastTransfersHaveBeenCancelledUseCase()) doReturn monitorLastTransfersHaveBeenCancelledUseCaseFlow
         whenever(
@@ -362,6 +375,7 @@ class TransfersManagementViewModelTest {
                 totalSizeTransferred = any(),
                 areTransfersPaused = any(),
                 isTransferError = any(),
+                isOnline = any(),
                 isTransferOverQuota = any(),
                 isStorageOverQuota = any(),
                 lastTransfersCancelled = any(),

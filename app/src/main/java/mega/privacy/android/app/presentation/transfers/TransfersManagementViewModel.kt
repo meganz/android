@@ -7,16 +7,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.sample
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.data.extensions.skipUnstable
 import mega.privacy.android.domain.entity.TransfersStatusInfo
 import mega.privacy.android.domain.entity.transfer.CompletedTransferState
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -29,6 +28,7 @@ import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedT
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * ViewModel for managing transfers data.
@@ -54,11 +54,6 @@ class TransfersManagementViewModel @Inject constructor(
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransferManagementUiState())
     private val shouldShowCompletedTab = SingleLiveEvent<Boolean>()
-
-    /**
-     * is network connected
-     */
-    val online = monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     /**
      * Transfers info
@@ -88,13 +83,14 @@ class TransfersManagementViewModel @Inject constructor(
                 }
         }
         viewModelScope.launch(ioDispatcher) {
-            online.collect { online ->
-                if (online) {
-                    transfersManagement.resetNetworkTimer()
-                } else {
-                    transfersManagement.startNetworkTimer()
+            monitorConnectivityUseCase()
+                .skipUnstable(waitTimeToShowOffline) { it }
+                .catch { Timber.e(it) }
+                .collect { online ->
+                    _state.update {
+                        it.copy(isOnline = online)
+                    }
                 }
-            }
         }
         monitorFailedTransfers()
     }
@@ -150,7 +146,8 @@ class TransfersManagementViewModel @Inject constructor(
         val newTransferInfo = transfersInfoMapper(
             numPendingDownloadsNonBackground = transfersStatusInfo.pendingDownloads,
             numPendingUploads = transfersStatusInfo.pendingUploads,
-            isTransferError = transfersManagement.shouldShowNetworkWarning || state.value.isTransferError,
+            isTransferError = state.value.isTransferError,
+            isOnline = state.value.isOnline,
             isTransferOverQuota = transfersStatusInfo.transferOverQuota,
             isStorageOverQuota = transfersStatusInfo.storageOverQuota,
             areTransfersPaused = transfersStatusInfo.paused,
@@ -198,5 +195,6 @@ class TransfersManagementViewModel @Inject constructor(
 
     companion object {
         private const val DEFAULT_SAMPLE_PERIOD = 500L
+        internal val waitTimeToShowOffline = 30_000L.milliseconds
     }
 }

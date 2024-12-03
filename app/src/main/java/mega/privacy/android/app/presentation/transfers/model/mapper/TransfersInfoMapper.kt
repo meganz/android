@@ -20,6 +20,7 @@ class TransfersInfoMapper @Inject constructor() {
         totalSizeTransferred: Long,
         areTransfersPaused: Boolean,
         isTransferError: Boolean,
+        isOnline: Boolean,
         isTransferOverQuota: Boolean,
         isStorageOverQuota: Boolean,
         lastTransfersCancelled: Boolean,
@@ -27,7 +28,7 @@ class TransfersInfoMapper @Inject constructor() {
         if (numPendingUploads + numPendingDownloadsNonBackground <= 0) {
             return TransfersInfo(
                 when {
-                    isTransferError -> TransfersStatus.TransferError
+                    isTransferError || !isOnline -> TransfersStatus.TransferError
                     lastTransfersCancelled -> TransfersStatus.Cancelled
                     else -> TransfersStatus.Completed
                 }

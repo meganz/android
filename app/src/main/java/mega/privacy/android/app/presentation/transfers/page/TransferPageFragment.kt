@@ -309,7 +309,7 @@ internal class TransferPageFragment : Fragment() {
 
             else -> {
                 binding.transfersTabsPager.currentItem = TransfersTab.PENDING_TAB.position
-                if (transfersManagement.shouldShowNetworkWarning) {
+                if (!transfersManagementViewModel.state.value.isOnline) {
                     (activity as BaseActivity).showSnackbar(
                         Constants.SNACKBAR_TYPE,
                         binding.root,
