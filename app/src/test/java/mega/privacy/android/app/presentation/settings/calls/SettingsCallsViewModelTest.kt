@@ -66,9 +66,6 @@ class SettingsCallsViewModelTest {
             getFeatureFlagValue,
         )
 
-        whenever(getFeatureFlagValue(AppFeatures.MeetingNotificationSettings)).thenReturn(
-            true
-        )
         whenever(getCallsSoundNotifications()).thenReturn(emptyFlow())
         whenever(getCallsMeetingInvitations()).thenReturn(emptyFlow())
         whenever(getCallsMeetingReminders()).thenReturn(emptyFlow())

@@ -122,11 +122,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     AppTest("This is a test toggle. It does nothing", false),
 
     /**
-     * Meeting notification settings
-     */
-    MeetingNotificationSettings("Enable Meeting notification settings", false),
-
-    /**
      * To enable search by node description
      */
     SearchWithDescription(

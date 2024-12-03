@@ -51,11 +51,6 @@ class SettingsCallsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getFeatureFlagValue(AppFeatures.MeetingNotificationSettings).let { flag ->
-                _uiState.update { it.copy(meetingNotificationEnabled = flag) }
-            }
-        }
-        viewModelScope.launch {
             getCallsSoundNotifications().collectLatest { result ->
                 _uiState.update { it.copy(soundNotifications = result) }
             }

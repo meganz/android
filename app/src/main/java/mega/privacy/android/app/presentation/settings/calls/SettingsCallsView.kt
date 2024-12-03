@@ -38,20 +38,6 @@ fun SettingsCallsView(
             settingsCallsState.soundNotifications == CallsSoundNotifications.Enabled,
             onCheckedChange = onSoundNotificationsChanged
         )
-        if (settingsCallsState.meetingNotificationEnabled) {
-            CallSettingItem(
-                R.string.settings_calls_preferences_meeting_invitations,
-                R.string.settings_calls_preferences_meeting_invitations_text,
-                settingsCallsState.callsMeetingInvitations == CallsMeetingInvitations.Enabled,
-                onCheckedChange = onMeetingInvitationsChanged
-            )
-            CallSettingItem(
-                R.string.settings_calls_preferences_meeting_reminders,
-                R.string.settings_calls_preferences_meeting_reminders_text,
-                settingsCallsState.callsMeetingReminders == CallsMeetingReminders.Enabled,
-                onCheckedChange = onMeetingRemindersChanged
-            )
-        }
     }
 }
 
