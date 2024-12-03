@@ -200,12 +200,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         megaApiGateway.getBackupsNode()?.let { megaApiGateway.hasChildren(it) } ?: false
     }
 
-
-    override suspend fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaException =
-        withContext(ioDispatcher) {
-            megaExceptionMapper(megaApiGateway.checkAccessErrorExtended(node, level))
-        }
-
     override suspend fun createShareKey(megaNode: MegaNode) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener =

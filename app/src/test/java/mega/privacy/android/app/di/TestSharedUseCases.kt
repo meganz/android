@@ -5,8 +5,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
-import mega.privacy.android.app.di.SharedUseCaseModule
-import mega.privacy.android.app.domain.usecase.CheckAccessErrorExtended
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
@@ -17,7 +15,7 @@ import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
-    replaces = [SharedUseCaseModule::class, DomainSharedUseCaseModule::class],
+    replaces = [DomainSharedUseCaseModule::class],
     components = [SingletonComponent::class]
 )
 @Module
@@ -25,9 +23,6 @@ object TestSharedUseCases {
 
     @Provides
     fun provideIsDatabaseEntryStale() = mock<IsDatabaseEntryStale>()
-
-    @Provides
-    fun provideCheckAccessErrorExtended() = mock<CheckAccessErrorExtended>()
 
     @Provides
     fun provideGetExtendedAccountDetail() = mock<GetExtendedAccountDetail>()

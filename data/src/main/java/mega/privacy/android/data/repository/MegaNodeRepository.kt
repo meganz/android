@@ -156,22 +156,6 @@ interface MegaNodeRepository {
     suspend fun hasBackupsChildren(): Boolean
 
     /**
-     * Check access error extended
-     *
-     * @param node
-     * @param level
-     *
-     * - [MegaShare.ACCESS_UNKNOWN]
-     * - [MegaShare.ACCESS_READ]
-     * - [MegaShare.ACCESS_READWRITE]
-     * - [MegaShare.ACCESS_FULL]
-     * - [MegaShare.ACCESS_OWNER]
-     *
-     * @return success or failed
-     */
-    suspend fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaException
-
-    /**
      * Get a list with the active and pending outbound sharings for a MegaNode
      * @param nodeId the [NodeId] of the node to get the outbound sharings
      * @return a list of [MegaShare] of the outbound sharings of the node
