@@ -141,15 +141,19 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
             long nodeSize = node.getSize();
             nodeInfo.setText(getSizeString(nodeSize, requireContext()));
             nodeIconLayout.setVisibility(View.GONE);
-            Coil.imageLoader(requireContext()).enqueue(
-                    new ImageRequest.Builder(requireContext())
-                            .placeholder(MimeTypeList.typeForName(node.getName()).getIconResourceId())
-                            .data(ThumbnailRequest.fromHandle(node.getHandle()))
-                            .crossfade(true)
-                            .target(nodeThumb)
-                            .transformations(new RoundedCornersTransformation(getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
-                            .build()
-            );
+            if (node.hasThumbnail()) {
+                Coil.imageLoader(requireContext()).enqueue(
+                        new ImageRequest.Builder(requireContext())
+                                .placeholder(MimeTypeList.typeForName(node.getName()).getIconResourceId())
+                                .data(ThumbnailRequest.fromHandle(node.getHandle()))
+                                .crossfade(true)
+                                .target(nodeThumb)
+                                .transformations(new RoundedCornersTransformation(getResources().getDimensionPixelSize(R.dimen.thumbnail_corner_radius)))
+                                .build()
+                );
+            } else {
+                nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+            }
             optionLeave.setVisibility(View.GONE);
 
             if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())

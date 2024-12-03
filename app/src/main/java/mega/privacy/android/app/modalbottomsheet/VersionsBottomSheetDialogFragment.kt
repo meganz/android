@@ -138,14 +138,18 @@ class VersionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     node = node,
                     context = requireContext(),
                 )
-                versionsFileThumbnail.load(ThumbnailRequest(NodeId(node.handle))) {
-                    placeholder(typeForName(node.name).iconResourceId)
-                    crossfade(true)
-                    transformations(
-                        RoundedCornersTransformation(
-                            dp2px(THUMB_CORNER_RADIUS_DP).toFloat()
+                if (node.hasThumbnail()) {
+                    versionsFileThumbnail.load(ThumbnailRequest(NodeId(node.handle))) {
+                        placeholder(typeForName(node.name).iconResourceId)
+                        crossfade(true)
+                        transformations(
+                            RoundedCornersTransformation(
+                                dp2px(THUMB_CORNER_RADIUS_DP).toFloat()
+                            )
                         )
-                    )
+                    }
+                } else {
+                    versionsFileThumbnail.setImageResource(typeForName(node.name).iconResourceId)
                 }
                 optionDelete.isVisible = uiState.canDeleteVersion
                 separatorDelete.isVisible = uiState.canDeleteVersion
