@@ -21,7 +21,7 @@ import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.feature.sync.ui.synclist.SyncListState
 import mega.privacy.android.feature.sync.ui.synclist.SyncListViewModel
 import mega.privacy.android.feature.sync.ui.synclist.TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG
-import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_FAB
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesState
@@ -62,7 +62,7 @@ class SyncListRouteTest {
     private val syncPermissionsManager: SyncPermissionsManager = mock()
 
     private val syncFoldersViewModel: SyncFoldersViewModel = mock()
-    private val syncFoldersState: StateFlow<SyncFoldersState> = mock()
+    private val syncFoldersUiState: StateFlow<SyncFoldersUiState> = mock()
     private val syncStalledIssuesViewModel: SyncStalledIssuesViewModel = mock()
     private val syncStalledIssuesState: StateFlow<SyncStalledIssuesState> = mock()
     private val syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel = mock()
@@ -86,8 +86,8 @@ class SyncListRouteTest {
     fun setupMock(): Unit = runBlocking {
         whenever(state.value).thenReturn(SyncListState())
         whenever(viewModel.state).thenReturn(state)
-        whenever(syncFoldersState.value).thenReturn(SyncFoldersState(syncUiItems = synUiItems))
-        whenever(syncFoldersViewModel.uiState).thenReturn(syncFoldersState)
+        whenever(syncFoldersUiState.value).thenReturn(SyncFoldersUiState(syncUiItems = synUiItems))
+        whenever(syncFoldersViewModel.uiState).thenReturn(syncFoldersUiState)
         whenever(syncStalledIssuesState.value).thenReturn(SyncStalledIssuesState(emptyList()))
         whenever(syncStalledIssuesViewModel.state).thenReturn(syncStalledIssuesState)
         whenever(syncSolvedIssuesState.value).thenReturn(SyncSolvedIssuesState())
@@ -187,8 +187,8 @@ class SyncListRouteTest {
             )
         )
         whenever(viewModel.state).thenReturn(state)
-        whenever(syncFoldersState.value).thenReturn(
-            SyncFoldersState(
+        whenever(syncFoldersUiState.value).thenReturn(
+            SyncFoldersUiState(
                 syncUiItems = emptyList(),
                 isFreeAccount = false,
                 enabledFlags = setOf(SyncFeatures.BackupForAndroid),
@@ -208,8 +208,8 @@ class SyncListRouteTest {
             )
         )
         whenever(viewModel.state).thenReturn(state)
-        whenever(syncFoldersState.value).thenReturn(
-            SyncFoldersState(
+        whenever(syncFoldersUiState.value).thenReturn(
+            SyncFoldersUiState(
                 syncUiItems = emptyList(),
                 isFreeAccount = false,
                 enabledFlags = setOf(SyncFeatures.BackupForAndroid),

@@ -43,7 +43,7 @@ import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SOLVED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.STALLED_ISSUES
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip.SYNC_FOLDERS
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
-import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_FAB
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesRoute
@@ -277,12 +277,12 @@ private fun SyncListScreenContent(
 ) {
     var checkedChip by rememberSaveable { mutableStateOf(selectedChip) }
 
-    val syncFoldersState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
+    val syncFoldersUiState by syncFoldersViewModel.uiState.collectAsStateWithLifecycle()
     val syncStalledIssuesState by syncStalledIssuesViewModel.state.collectAsStateWithLifecycle()
     val syncSolvedIssuesState by syncSolvedIssuesViewModel.state.collectAsStateWithLifecycle()
 
     val pullToRefreshState = rememberPullRefreshState(
-        refreshing = syncFoldersState.isRefreshing,
+        refreshing = syncFoldersUiState.isRefreshing,
         onRefresh = {
             syncFoldersViewModel.onSyncRefresh()
         })
@@ -291,7 +291,7 @@ private fun SyncListScreenContent(
         SyncPermissionWarningBanner(
             syncPermissionsManager = syncPermissionsManager
         )
-        if (syncFoldersState.isFreeAccount && syncFoldersState.syncUiItems.isNotEmpty()) {
+        if (syncFoldersUiState.isFreeAccount && syncFoldersUiState.syncUiItems.isNotEmpty()) {
             ActionBanner(
                 mainText = stringResource(id = sharedR.string.sync_error_banner_free_user),
                 leftActionText = stringResource(sharedR.string.general_upgrade_button),
@@ -305,7 +305,7 @@ private fun SyncListScreenContent(
                 dividerType = DividerType.FullSize,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-        } else if (syncFoldersState.isStorageOverQuota) {
+        } else if (syncFoldersUiState.isStorageOverQuota) {
             ActionBanner(
                 mainText = stringResource(sharedR.string.sync_error_storage_over_quota_banner_title),
                 leftActionText = stringResource(sharedR.string.general_upgrade_button),
@@ -316,7 +316,7 @@ private fun SyncListScreenContent(
                 dividerType = DividerType.FullSize,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-        } else if (syncFoldersState.syncUiItems.isNotEmpty() && syncFoldersState.isLowBatteryLevel) {
+        } else if (syncFoldersUiState.syncUiItems.isNotEmpty() && syncFoldersUiState.isLowBatteryLevel) {
             WarningBanner(
                 textString = stringResource(id = mega.privacy.android.shared.resources.R.string.general_message_sync_paused_low_battery_level),
                 onCloseClick = null
@@ -348,14 +348,14 @@ private fun SyncListScreenContent(
                 syncStalledIssuesViewModel = syncStalledIssuesViewModel,
                 syncFoldersViewModel = syncFoldersViewModel,
                 syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
-                syncFoldersState = syncFoldersState,
+                syncFoldersUiState = syncFoldersUiState,
                 snackBarHostState = snackBarHostState,
                 deviceName = deviceName,
-                isBackupForAndroidEnabled = syncFoldersState.enabledFlags.contains(SyncFeatures.BackupForAndroid),
+                isBackupForAndroidEnabled = syncFoldersUiState.enabledFlags.contains(SyncFeatures.BackupForAndroid),
             )
             PullRefreshIndicator(
                 modifier = Modifier.align(Alignment.TopCenter),
-                refreshing = syncFoldersState.isRefreshing,
+                refreshing = syncFoldersUiState.isRefreshing,
                 state = pullToRefreshState
             )
         }
@@ -401,7 +401,7 @@ private fun SelectedChipScreen(
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
-    syncFoldersState: SyncFoldersState,
+    syncFoldersUiState: SyncFoldersUiState,
     snackBarHostState: SnackbarHostState,
     deviceName: String,
     isBackupForAndroidEnabled: Boolean,
@@ -414,7 +414,7 @@ private fun SelectedChipScreen(
                 upgradeAccountClicked = upgradeAccountClicked,
                 issuesInfoClicked = issuesInfoClicked,
                 viewModel = syncFoldersViewModel,
-                state = syncFoldersState,
+                uiState = syncFoldersUiState,
                 snackBarHostState = snackBarHostState,
                 deviceName = deviceName,
                 isBackupForAndroidEnabled = isBackupForAndroidEnabled,

@@ -65,8 +65,8 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SyncFoldersState(emptyList()))
-    val uiState: StateFlow<SyncFoldersState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(SyncFoldersUiState(emptyList()))
+    val uiState: StateFlow<SyncFoldersUiState> = _uiState.asStateFlow()
 
     private var showSyncsPausedErrorDialogShown = false
 

@@ -41,7 +41,7 @@ import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.StopBackupOption
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction
-import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import org.junit.jupiter.api.AfterEach
@@ -171,7 +171,7 @@ class SyncFoldersViewModelTest {
     fun `test that viewmodel fetches all folder pairs upon initialization`() = runTest {
         whenever(isStorageOverQuotaUseCase()).thenReturn(false)
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
-        val expectedState = SyncFoldersState(syncUiItems, isFreeAccount = false)
+        val expectedState = SyncFoldersUiState(syncUiItems, isFreeAccount = false)
 
         initViewModel()
 
@@ -185,7 +185,7 @@ class SyncFoldersViewModelTest {
         whenever(isStorageOverQuotaUseCase()).thenReturn(false)
         whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(emptyList()))
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
-        val expectedState = SyncFoldersState(
+        val expectedState = SyncFoldersUiState(
             syncUiItems.map { if (it == syncUiItems.first()) it.copy(expanded = true) else it },
             isFreeAccount = false
         )
@@ -205,7 +205,7 @@ class SyncFoldersViewModelTest {
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
         val syncUiItem = syncUiItems.first()
         val expectedState =
-            SyncFoldersState(
+            SyncFoldersUiState(
                 syncUiItems = syncUiItems,
                 isFreeAccount = false,
                 showConfirmRemoveSyncFolderDialog = true,
@@ -310,7 +310,7 @@ class SyncFoldersViewModelTest {
         runTest {
             whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
             val expectedState =
-                SyncFoldersState(
+                SyncFoldersUiState(
                     syncUiItems = syncUiItems,
                     isFreeAccount = false,
                     showConfirmRemoveSyncFolderDialog = false,
@@ -353,7 +353,7 @@ class SyncFoldersViewModelTest {
         runTest {
             whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
             whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(stalledIssues))
-            val expectedState = SyncFoldersState(
+            val expectedState = SyncFoldersUiState(
                 syncUiItems.map { if (it == syncUiItems.first()) it.copy(hasStalledIssues = true) else it },
                 isFreeAccount = false
             )

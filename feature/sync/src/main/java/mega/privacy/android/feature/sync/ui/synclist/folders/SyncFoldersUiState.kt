@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 
-internal data class SyncFoldersState(
+internal data class SyncFoldersUiState(
     val syncUiItems: List<SyncUiItem>,
     val isRefreshing: Boolean = false,
     val isLowBatteryLevel: Boolean = false,

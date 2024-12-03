@@ -32,7 +32,7 @@ internal fun SyncFoldersRoute(
     upgradeAccountClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
     viewModel: SyncFoldersViewModel,
-    state: SyncFoldersState,
+    uiState: SyncFoldersUiState,
     snackBarHostState: SnackbarHostState,
     deviceName: String,
     isBackupForAndroidEnabled: Boolean,
@@ -40,7 +40,7 @@ internal fun SyncFoldersRoute(
     val context = LocalContext.current
 
     SyncFoldersScreen(
-        syncUiItems = state.syncUiItems,
+        syncUiItems = uiState.syncUiItems,
         cardExpanded = viewModel::handleAction,
         pauseRunClicked = {
             viewModel.handleAction(PauseRunClicked(it))
@@ -66,10 +66,10 @@ internal fun SyncFoldersRoute(
                 data = "https://mega.nz/opensync#${syncUiItem.megaStorageNodeId.longValue}".toUri()
             })
         },
-        isLowBatteryLevel = state.isLowBatteryLevel,
-        isFreeAccount = state.isFreeAccount,
-        isLoading = state.isLoading,
-        showSyncsPausedErrorDialog = state.showSyncsPausedErrorDialog,
+        isLowBatteryLevel = uiState.isLowBatteryLevel,
+        isFreeAccount = uiState.isFreeAccount,
+        isLoading = uiState.isLoading,
+        showSyncsPausedErrorDialog = uiState.showSyncsPausedErrorDialog,
         onShowSyncsPausedErrorDialogDismissed = {
             viewModel.handleAction(OnSyncsPausedErrorDialogDismissed)
         },
@@ -77,8 +77,8 @@ internal fun SyncFoldersRoute(
         isBackupForAndroidEnabled = isBackupForAndroidEnabled,
     )
 
-    state.syncUiItemToRemove?.let { syncUiItemToRemove ->
-        if (state.showConfirmRemoveSyncFolderDialog) {
+    uiState.syncUiItemToRemove?.let { syncUiItemToRemove ->
+        if (uiState.showConfirmRemoveSyncFolderDialog) {
             when (syncUiItemToRemove.syncType) {
                 SyncType.TYPE_BACKUP -> {
                     StopBackupConfirmationDialog(
@@ -111,8 +111,8 @@ internal fun SyncFoldersRoute(
         }
     }
 
-    val message = state.snackbarMessage?.let { stringResource(id = it) }
-    LaunchedEffect(key1 = state.snackbarMessage) {
+    val message = uiState.snackbarMessage?.let { stringResource(id = it) }
+    LaunchedEffect(key1 = uiState.snackbarMessage) {
         message?.let {
             snackBarHostState.showAutoDurationSnackbar(it)
             viewModel.handleAction(SnackBarShown)

@@ -30,7 +30,7 @@ import mega.privacy.android.feature.sync.ui.synclist.folders.STOP_SYNC_CONFIRM_D
 import mega.privacy.android.feature.sync.ui.synclist.folders.StopSyncConfirmDialog
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersScreen
-import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON
 import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS
@@ -63,12 +63,12 @@ class SyncFoldersScreenTest {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
     private val viewModel: SyncFoldersViewModel = Mockito.mock()
-    private val state: StateFlow<SyncFoldersState> = Mockito.mock()
+    private val state: StateFlow<SyncFoldersUiState> = Mockito.mock()
 
     @Test
     fun `test that folders list is displayed when there are folders`() {
         val folderName = "Folder name"
-        val syncFoldersState = SyncFoldersState(
+        val syncFoldersUiState = SyncFoldersUiState(
             listOf(
                 SyncUiItem(
                     id = 1L,
@@ -84,7 +84,7 @@ class SyncFoldersScreenTest {
             )
         )
         whenever(state.value).thenReturn(
-            syncFoldersState
+            syncFoldersUiState
         )
         whenever(viewModel.uiState).thenReturn(state)
         composeTestRule.setContent {
@@ -94,7 +94,7 @@ class SyncFoldersScreenTest {
                 addFolderClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
-                state = syncFoldersState,
+                uiState = syncFoldersUiState,
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = false,
@@ -107,7 +107,7 @@ class SyncFoldersScreenTest {
 
     @Test
     fun `test that folders list empty state is properly displayed when there are no synced folders (free account)`() {
-        whenever(state.value).thenReturn(SyncFoldersState(emptyList()))
+        whenever(state.value).thenReturn(SyncFoldersUiState(emptyList()))
         whenever(viewModel.uiState).thenReturn(state)
         composeTestRule.setContent {
             SyncFoldersRoute(
@@ -116,7 +116,7 @@ class SyncFoldersScreenTest {
                 onSelectStopBackupDestinationClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
-                state = SyncFoldersState(emptyList()),
+                uiState = SyncFoldersUiState(emptyList()),
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = false,
@@ -136,7 +136,7 @@ class SyncFoldersScreenTest {
 
     @Test
     fun `test that folders list empty state is properly displayed when backup feature is enabled (free account)`() {
-        whenever(state.value).thenReturn(SyncFoldersState(emptyList()))
+        whenever(state.value).thenReturn(SyncFoldersUiState(emptyList()))
         whenever(viewModel.uiState).thenReturn(state)
         composeTestRule.setContent {
             SyncFoldersRoute(
@@ -145,7 +145,7 @@ class SyncFoldersScreenTest {
                 onSelectStopBackupDestinationClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
-                state = SyncFoldersState(emptyList()),
+                uiState = SyncFoldersUiState(emptyList()),
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = true,
@@ -166,7 +166,7 @@ class SyncFoldersScreenTest {
     @Test
     fun `test that folders list empty state is properly displayed when there are no synced folders (non free account)`() {
         whenever(state.value).thenReturn(
-            SyncFoldersState(
+            SyncFoldersUiState(
                 syncUiItems = emptyList(), isFreeAccount = false
             )
         )
@@ -178,7 +178,7 @@ class SyncFoldersScreenTest {
                 onSelectStopBackupDestinationClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
-                state = SyncFoldersState(
+                uiState = SyncFoldersUiState(
                     syncUiItems = emptyList(), isFreeAccount = false
                 ),
                 snackBarHostState = SnackbarHostState(),
@@ -199,7 +199,7 @@ class SyncFoldersScreenTest {
     @Test
     fun `test that folders list empty state is properly displayed when backup feature is enabled (non free account)`() {
         whenever(state.value).thenReturn(
-            SyncFoldersState(
+            SyncFoldersUiState(
                 syncUiItems = emptyList(), isFreeAccount = false
             )
         )
@@ -211,7 +211,7 @@ class SyncFoldersScreenTest {
                 onSelectStopBackupDestinationClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
-                state = SyncFoldersState(
+                uiState = SyncFoldersUiState(
                     syncUiItems = emptyList(), isFreeAccount = false
                 ),
                 snackBarHostState = SnackbarHostState(),
@@ -230,7 +230,7 @@ class SyncFoldersScreenTest {
 
     @Test
     fun `test that click the empty state button on a free account sends the right analytics tracker event`() {
-        whenever(state.value).thenReturn(SyncFoldersState(emptyList()))
+        whenever(state.value).thenReturn(SyncFoldersUiState(emptyList()))
         whenever(viewModel.uiState).thenReturn(state)
         composeTestRule.setContent {
             SyncFoldersRoute(
@@ -239,7 +239,7 @@ class SyncFoldersScreenTest {
                 onSelectStopBackupDestinationClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
-                state = SyncFoldersState(emptyList()),
+                uiState = SyncFoldersUiState(emptyList()),
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = false,
@@ -253,7 +253,7 @@ class SyncFoldersScreenTest {
     @Test
     fun `test that click the empty state button on a non free account doesn't send any analytics tracker event`() {
         whenever(state.value).thenReturn(
-            SyncFoldersState(
+            SyncFoldersUiState(
                 syncUiItems = emptyList(), isFreeAccount = false
             )
         )
@@ -265,7 +265,7 @@ class SyncFoldersScreenTest {
                 onSelectStopBackupDestinationClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
-                state = SyncFoldersState(
+                uiState = SyncFoldersUiState(
                     syncUiItems = emptyList(), isFreeAccount = false
                 ),
                 snackBarHostState = SnackbarHostState(),
