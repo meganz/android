@@ -84,14 +84,14 @@ import mega.privacy.android.domain.usecase.IsUrlMatchesRegexUseCase
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
-import mega.privacy.android.domain.usecase.account.LegacyCancelSubscriptionsUseCase
-import mega.privacy.android.domain.usecase.account.ChangeEmail
+import mega.privacy.android.domain.usecase.account.ChangeEmailUseCase
 import mega.privacy.android.domain.usecase.account.CheckVersionsUseCase
 import mega.privacy.android.domain.usecase.account.ConfirmCancelAccountUseCase
 import mega.privacy.android.domain.usecase.account.ConfirmChangeEmailUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
+import mega.privacy.android.domain.usecase.account.LegacyCancelSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.QueryCancelLinkUseCase
 import mega.privacy.android.domain.usecase.account.QueryChangeEmailLinkUseCase
@@ -143,7 +143,7 @@ import javax.inject.Inject
  * @property getPaymentMethodUseCase
  * @property getCurrentUserFullName
  * @property monitorUserUpdates
- * @property changeEmail
+ * @property changeEmailUseCase
  * @property updateCurrentUserName
  * @property getCurrentUserEmail
  * @property monitorVerificationStatus
@@ -178,7 +178,7 @@ class MyAccountViewModel @Inject constructor(
     private val getPaymentMethodUseCase: GetPaymentMethodUseCase,
     private val getCurrentUserFullName: GetCurrentUserFullName,
     private val monitorUserUpdates: MonitorUserUpdates,
-    private val changeEmail: ChangeEmail,
+    private val changeEmailUseCase: ChangeEmailUseCase,
     private val updateCurrentUserName: UpdateCurrentUserName,
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val monitorVerificationStatus: MonitorVerificationStatus,
@@ -975,7 +975,7 @@ class MyAccountViewModel @Inject constructor(
 
             else -> {
                 viewModelScope.launch {
-                    val changeEmailResult = runCatching { changeEmail(newEmail) }
+                    val changeEmailResult = runCatching { changeEmailUseCase(newEmail) }
                     _state.update { it.copy(changeEmailResult = changeEmailResult) }
                 }
                 null
@@ -1386,7 +1386,7 @@ class MyAccountViewModel @Inject constructor(
             AccountType.PRO_I,
             AccountType.PRO_II,
             AccountType.PRO_III,
-            -> {
+                -> {
                 if (subscriptionList?.size == 1) {
                     planDetail.accountType == subscriptionList.firstOrNull()?.subscriptionLevel
                 } else {

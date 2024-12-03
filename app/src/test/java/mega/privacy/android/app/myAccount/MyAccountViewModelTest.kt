@@ -47,14 +47,14 @@ import mega.privacy.android.domain.usecase.IsUrlMatchesRegexUseCase
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
-import mega.privacy.android.domain.usecase.account.LegacyCancelSubscriptionsUseCase
-import mega.privacy.android.domain.usecase.account.ChangeEmail
+import mega.privacy.android.domain.usecase.account.ChangeEmailUseCase
 import mega.privacy.android.domain.usecase.account.CheckVersionsUseCase
 import mega.privacy.android.domain.usecase.account.ConfirmCancelAccountUseCase
 import mega.privacy.android.domain.usecase.account.ConfirmChangeEmailUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
+import mega.privacy.android.domain.usecase.account.LegacyCancelSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.QueryCancelLinkUseCase
 import mega.privacy.android.domain.usecase.account.QueryChangeEmailLinkUseCase
@@ -121,7 +121,7 @@ internal class MyAccountViewModelTest {
     private val getPaymentMethodUseCase: GetPaymentMethodUseCase = mock()
     private val getCurrentUserFullName: GetCurrentUserFullName = mock()
     private val monitorUserUpdates: MonitorUserUpdates = mock()
-    private val changeEmail: ChangeEmail = mock()
+    private val changeEmailUseCase: ChangeEmailUseCase = mock()
     private val updateCurrentUserName: UpdateCurrentUserName = mock()
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
     private val monitorVerificationStatus: MonitorVerificationStatus = mock()
@@ -204,7 +204,7 @@ internal class MyAccountViewModelTest {
             getPaymentMethodUseCase = getPaymentMethodUseCase,
             getCurrentUserFullName = getCurrentUserFullName,
             monitorUserUpdates = monitorUserUpdates,
-            changeEmail = changeEmail,
+            changeEmailUseCase = changeEmailUseCase,
             updateCurrentUserName = updateCurrentUserName,
             getCurrentUserEmail = getCurrentUserEmail,
             monitorVerificationStatus = monitorVerificationStatus,
@@ -862,7 +862,7 @@ internal class MyAccountViewModelTest {
             getPaymentMethodUseCase,
             getCurrentUserFullName,
             monitorUserUpdates,
-            changeEmail,
+            changeEmailUseCase,
             updateCurrentUserName,
             getCurrentUserEmail,
             monitorVerificationStatus,

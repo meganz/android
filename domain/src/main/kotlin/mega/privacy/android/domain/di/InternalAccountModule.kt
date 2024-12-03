@@ -11,7 +11,6 @@ import mega.privacy.android.domain.usecase.DeleteContactLink
 import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
-import mega.privacy.android.domain.usecase.account.ChangeEmail
 
 /**
  * Account module.
@@ -50,9 +49,5 @@ internal abstract class InternalAccountModule {
         @Provides
         fun provideDeleteContactLink(accountRepository: AccountRepository): DeleteContactLink =
             DeleteContactLink(accountRepository::deleteContactLink)
-
-        @Provides
-        fun provideChangeEmail(accountRepository: AccountRepository): ChangeEmail =
-            ChangeEmail(accountRepository::changeEmail)
     }
 }
