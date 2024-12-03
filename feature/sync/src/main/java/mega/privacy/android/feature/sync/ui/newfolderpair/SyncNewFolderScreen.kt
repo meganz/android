@@ -21,6 +21,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -333,6 +334,7 @@ private fun SyncNewFolderScreenContent(
                 .testTag(TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON),
             contentAlignment = Alignment.Center
         ) {
+            var buttonClicked by remember { mutableStateOf(false) }
             val buttonEnabled = when (syncType) {
                 SyncType.TYPE_BACKUP -> selectedLocalFolder.isNotBlank() && syncPermissionsManager.isManageExternalStoragePermissionGranted()
                 else -> selectedLocalFolder.isNotBlank() && selectedMegaFolder != null && syncPermissionsManager.isManageExternalStoragePermissionGranted()
@@ -346,8 +348,11 @@ private fun SyncNewFolderScreenContent(
                     SyncType.TYPE_BACKUP -> sharedResR.string.sync_add_new_backup_proceed_button_label
                     else -> R.string.sync_button_label
                 },
-                onClick = syncClicked,
-                enabled = buttonEnabled
+                onClick = {
+                    buttonClicked = true
+                    syncClicked()
+                },
+                enabled = buttonEnabled && buttonClicked.not()
             )
         }
     }
