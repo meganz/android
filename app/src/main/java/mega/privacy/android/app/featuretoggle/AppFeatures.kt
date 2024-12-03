@@ -192,7 +192,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     AlmostFullStorageOverQuotaBanner(
         "Enable almost full storage quota banner",
-        false
+        true
     ),
 
     /**
