@@ -18,6 +18,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.status.MegaStatusIndicator
 import mega.privacy.android.shared.original.core.ui.controls.status.StatusColor
+import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
@@ -71,6 +72,7 @@ fun StatusListViewItem(
                 text = name,
                 textColor = nameColor,
                 modifier = Modifier.testTag(TITLE_TAG),
+                overflow = LongTextBehaviour.Ellipsis(maxLines = 1),
             )
         },
         subtitle = {
