@@ -137,7 +137,7 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">أقدم</string>
     <!-- All videos tab title of the video section  -->
-    <string name="video_section_tab_title_all_videos">مقاطع الفيديو</string>
+    <string name="video_section_tab_title_all_videos">كل مقاطع الفيديو</string>
     <!-- Playlists tab title of the video section  -->
     <string name="video_section_tab_title_playlists">قائمة تشغيل</string>
     <!-- Location filter title of the video section  -->
@@ -893,4 +893,19 @@
     <string name="sync_stop_backup_confirm_dialog_delete_option_text">Folder will be deleted from MEGA. It won’t be deleted from your device.</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">تأكيد</string>
+    <!-- The failed Message when adding the video to the playlists from the video section. -->
+    <string name="video_section_playlists_add_to_playlists_failed_message">غير قادر على إضافة عنصر</string>
+    <!-- Text of the add button in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_add_button">اضافة</string>
+    <!-- The success Message when adding the video to the playlists from the video section. -->
+    <plurals name="video_section_playlists_add_to_playlists_successfully_message">
+        <item quantity="one">Added 1 item to “%1$s”</item>
+        <item quantity="other">Added 1 item to %1$d playlists</item>
+    </plurals>
+    <!-- Name for a general label which action is "Select" something -->
+    <string name="general_select">تحديد</string>
+    <!-- Name for a general label which action is "Select folder" -->
+    <string name="general_select_folder">حدد المجلد</string>
+    <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">Move to: [B]%1s[/B]</string>
 </resources>

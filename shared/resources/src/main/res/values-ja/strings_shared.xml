@@ -137,7 +137,7 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">それ以前</string>
     <!-- All videos tab title of the video section  -->
-    <string name="video_section_tab_title_all_videos">動画</string>
+    <string name="video_section_tab_title_all_videos">すべての動画</string>
     <!-- Playlists tab title of the video section  -->
     <string name="video_section_tab_title_playlists">プレイリスト</string>
     <!-- Location filter title of the video section  -->
@@ -828,4 +828,18 @@
     <string name="sync_stop_backup_confirm_dialog_delete_option_text">MEGAからフォルダが削除されます。お使いのデバイスからは削除されません。</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">確認</string>
+    <!-- The failed Message when adding the video to the playlists from the video section. -->
+    <string name="video_section_playlists_add_to_playlists_failed_message">項目を追加できません</string>
+    <!-- Text of the add button in the page that adds the video to the video playlist -->
+    <string name="video_to_playlist_add_button">追加</string>
+    <!-- The success Message when adding the video to the playlists from the video section. -->
+    <plurals name="video_section_playlists_add_to_playlists_successfully_message">
+        <item quantity="other">1項目を%1$d個のプレイリストに追加しました</item>
+    </plurals>
+    <!-- Name for a general label which action is "Select" something -->
+    <string name="general_select">選択</string>
+    <!-- Name for a general label which action is "Select folder" -->
+    <string name="general_select_folder">フォルダを選択</string>
+    <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">[B]%1s[/B]に移動</string>
 </resources>
