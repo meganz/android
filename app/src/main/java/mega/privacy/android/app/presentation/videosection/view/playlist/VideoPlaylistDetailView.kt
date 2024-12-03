@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
@@ -49,6 +48,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
@@ -73,7 +73,7 @@ import nz.mega.sdk.MegaNode
 /**
  * Video playlist detail view
  */
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun VideoPlaylistDetailView(
     playlist: VideoPlaylistUIEntity?,
@@ -281,6 +281,7 @@ fun VideoPlaylistDetailView(
                 title = playlist?.title,
                 totalDuration = playlist?.totalDuration,
                 numberOfVideos = playlist?.numberOfVideos,
+                isFavouritePlaylist = playlist?.isSystemVideoPlayer == true,
                 onPlayAllClicked = {},
                 modifier = Modifier.testTag(
                     VIDEO_PLAYLIST_DETAIL_EMPTY_VIEW_TEST_TAG
@@ -362,6 +363,7 @@ internal fun VideoPlaylistEmptyView(
     title: String?,
     totalDuration: String?,
     numberOfVideos: Int?,
+    isFavouritePlaylist: Boolean,
     onPlayAllClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -382,8 +384,21 @@ internal fun VideoPlaylistEmptyView(
         }
         LegacyMegaEmptyViewWithImage(
             modifier = Modifier.fillMaxSize(),
-            text = stringResource(id = sharedR.string.video_section_playlist_detail_empty_hint_videos),
-            imagePainter = painterResource(id = iconPackR.drawable.ic_video_section_empty_video)
+            text = stringResource(
+                id = if (isFavouritePlaylist) {
+                    R.string.homepage_empty_hint_favourites
+                } else {
+                    sharedR.string.video_section_playlist_detail_empty_hint_videos
+                }
+            ),
+            imagePainter = painterResource(
+                id = if (isFavouritePlaylist) {
+                    iconPackR.drawable.ic_hearts_glass
+                } else {
+                    iconPackR.drawable.ic_video_glass
+                }
+
+            )
         )
     }
 }
@@ -530,7 +545,18 @@ internal fun PlayAllButtonView(
 private fun VideoPlaylistDetailViewPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         VideoPlaylistDetailView(
-            playlist = null,
+            playlist = VideoPlaylistUIEntity(
+                id = NodeId(0),
+                thumbnailList = null,
+                title = "New Playlist",
+                totalDuration = "00:00:00",
+                numberOfVideos = 0,
+                videos = emptyList(),
+                isSystemVideoPlayer = true,
+                cover = null,
+                creationTime = 0L,
+                modificationTime = 0L
+            ),
             selectedSize = 0,
             shouldApplySensitiveMode = false,
             isHideMenuActionVisible = true,

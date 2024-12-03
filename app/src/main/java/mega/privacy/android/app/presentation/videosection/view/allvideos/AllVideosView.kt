@@ -164,7 +164,7 @@ internal fun AllVideosView(
                 items.isEmpty() -> LegacyMegaEmptyViewWithImage(
                     modifier = Modifier.testTag(VIDEOS_EMPTY_VIEW_TEST_TAG),
                     text = stringResource(id = R.string.homepage_empty_hint_video),
-                    imagePainter = painterResource(id = iconPackR.drawable.ic_video_section_empty_video)
+                    imagePainter = painterResource(id = iconPackR.drawable.ic_video_glass)
                 )
 
                 else -> {

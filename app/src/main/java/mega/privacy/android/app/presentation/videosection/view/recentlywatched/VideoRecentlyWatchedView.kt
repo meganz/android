@@ -129,7 +129,7 @@ fun VideoRecentlyWatchedView(
                 group.isEmpty() -> LegacyMegaEmptyViewWithImage(
                     modifier = Modifier.testTag(VIDEO_RECENTLY_WATCHED_EMPTY_TEST_TAG),
                     text = stringResource(id = shareR.string.video_section_empty_hint_no_recently_activity),
-                    imagePainter = painterResource(id = iconPackR.drawable.ic_empty_recently_watched)
+                    imagePainter = painterResource(id = iconPackR.drawable.ic_clock_glass)
                 )
 
                 else -> {
