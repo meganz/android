@@ -160,21 +160,26 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             finish()
         }
 
-        collectFlow(viewModel.state) { openLinkState: OpenLinkState ->
-            with(openLinkState) {
+        collectFlow(viewModel.uiState) {
+            with(it) {
                 url = decodedUrl
-                isLoggedIn?.let {
-                    handleUrlRedirection(isLoggedIn, needsRefreshSession = needsRefreshSession)
+                if (urlRedirectionEvent && isLoggedIn != null) {
+                    handleUrlRedirection(
+                        isLoggedIn = isLoggedIn,
+                        needsRefreshSession = needsRefreshSession
+                    )
+                    viewModel.onUrlRedirectionEventConsumed()
                 }
-                if (isLogoutCompleted) {
+
+                if (logoutCompletedEvent) {
                     handleLoggedOutState()
                     handleAccountInvitationEmailState(accountInvitationEmail)
+                    viewModel.onLogoutCompletedEventConsumed()
                 }
             }
         }
-        url?.let {
-            viewModel.decodeUrl(it)
-        }
+
+        url?.let { viewModel.decodeUrl(it) }
     }
 
     private fun handleUrlRedirection(isLoggedIn: Boolean, needsRefreshSession: Boolean) {
@@ -569,7 +574,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     /**
-     * Handle the isLoggedOut state from [OpenLinkState]
+     * Handle the isLoggedOut state from [OpenLinkUiState]
      *
      * Navigates to [LoginActivity] if the user logged out
      */
@@ -588,7 +593,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * Navigates to [LoginActivity] if the user navigated from the new signup link
      *
      * Need to check if the email is NULL as the base case which indicates that the user
-     * is not from the new signup link, because NULL is the default state in [OpenLinkState]
+     * is not from the new signup link, because NULL is the default state in [OpenLinkUiState]
      */
     private fun handleAccountInvitationEmailState(email: String?) {
         email?.let {
