@@ -21,12 +21,16 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -634,8 +638,14 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     private fun setupObservers() {
-        collectFlow(viewModel.uiState.mapNotNull { it.documents.takeIf { it.isNotEmpty() } }) {
-            onProcessAsyncInfo(it)
+        this.lifecycleScope.launch {
+            val documents = viewModel.uiState
+                .mapNotNull { it.documents.takeIf { it.isNotEmpty() } }
+                .flowWithLifecycle(this@FileExplorerActivity.lifecycle, Lifecycle.State.STARTED)
+                .catch {
+                    Timber.e(it)
+                }.first()
+            onProcessAsyncInfo(documents)
         }
         viewModel.textInfo.observe(this) { dismissAlertDialogIfExists(statusDialog) }
 
