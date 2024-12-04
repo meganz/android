@@ -1,10 +1,7 @@
 package mega.privacy.android.app.presentation.folderlink.view
 
 import mega.privacy.android.icon.pack.R as IconPackR
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,12 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +19,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -40,13 +31,15 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.images.ThumbnailView
+import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
-import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
+import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun FolderLinkBottomSheetView(
     modalSheetState: ModalBottomSheetState,
@@ -75,7 +68,6 @@ internal fun FolderLinkBottomSheetView(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun BottomSheetContent(
     modalSheetState: ModalBottomSheetState,
@@ -125,78 +117,43 @@ private fun BottomSheetContent(
                 )
             }
             Column(verticalArrangement = Arrangement.Center) {
-                Text(
+                MegaText(
                     text = nodeUIItem?.name ?: "",
-                    style = MaterialTheme.typography.subtitle1,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    textColor = TextColor.Primary,
+                    overflow = LongTextBehaviour.Ellipsis(1)
                 )
-                Text(
+                MegaText(
                     text = infoText,
-                    style = MaterialTheme.typography.subtitle1,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    textColor = TextColor.Secondary,
+                    overflow = LongTextBehaviour.Ellipsis(1)
                 )
             }
         }
-        Divider(
-            modifier = Modifier.padding(start = 16.dp),
-            color = if (MaterialTheme.colors.isLight) grey_alpha_012 else white_alpha_012,
-            thickness = 1.dp
+        MegaDivider(
+            modifier = Modifier.fillMaxWidth(),
+            dividerType = DividerType.SmallStartPadding,
+            strong = true,
         )
-        MenuItem(
+
+        MenuActionListTile(
             modifier = Modifier.testTag(Constants.BOTTOM_SHEET_SAVE),
-            res = IconPackR.drawable.ic_download_medium_regular_outline,
-            text = R.string.general_save_to_device,
-            description = "Save",
-            onClick = {
+            icon = painterResource(IconPackR.drawable.ic_download_medium_regular_outline),
+            text = stringResource(R.string.general_save_to_device),
+            onActionClicked = {
                 coroutineScope.launch { modalSheetState.hide() }
                 onSaveToDeviceClicked(nodeUIItem)
             }
         )
         if (showImport) {
-            MenuItem(
+            MenuActionListTile(
                 modifier = Modifier.testTag(Constants.BOTTOM_SHEET_IMPORT),
-                res = R.drawable.ic_cloud_upload_medium_regular_outline,
-                text = R.string.add_to_cloud,
-                description = "Import",
-                onClick = {
+                icon = painterResource(R.drawable.ic_cloud_upload_medium_regular_outline),
+                text = stringResource(R.string.add_to_cloud),
+                onActionClicked = {
                     coroutineScope.launch { modalSheetState.hide() }
                     onImportClicked(nodeUIItem)
                 }
             )
         }
-    }
-}
-
-@Composable
-private fun MenuItem(
-    modifier: Modifier,
-    @DrawableRes res: Int,
-    @StringRes text: Int,
-    description: String,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .clickable(onClick = onClick)
-    ) {
-        Icon(
-            modifier = Modifier
-                .padding(start = 16.dp)
-                .align(Alignment.CenterVertically),
-            painter = painterResource(id = res),
-            contentDescription = description,
-            tint = MaterialTheme.colors.textColorSecondary
-        )
-        Text(
-            modifier = Modifier
-                .padding(horizontal = 36.dp, vertical = 2.dp)
-                .align(Alignment.CenterVertically),
-            text = stringResource(id = text),
-            style = MaterialTheme.typography.subtitle1
-        )
     }
 }
