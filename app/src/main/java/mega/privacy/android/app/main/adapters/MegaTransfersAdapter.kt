@@ -15,7 +15,6 @@ import coil.load
 import coil.transform.RoundedCornersTransformation
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -24,6 +23,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -55,6 +55,19 @@ class MegaTransfersAdapter(
                 notifyDataSetChanged()
             }
         }
+
+    /**
+     * Restore the selected items when configuration changes
+     */
+    fun restoreSelectedItem(selectedItems: Set<Int>) {
+        if (selectedItems.isNotEmpty()) {
+            this.selectedItems.clear()
+            this.selectedItems.addAll(selectedItems)
+            multipleSelect = true
+            selectModeInterface.notifyItemChanged()
+            notifyDataSetChanged()
+        }
+    }
 
     override fun submitList(list: List<Transfer>?) {
         super.submitList(list)
@@ -205,11 +218,11 @@ class MegaTransfersAdapter(
                 TransferState.STATE_COMPLETING,
                 TransferState.STATE_RETRYING,
                 TransferState.STATE_QUEUED,
-                -> {
+                    -> {
                     when {
                         (transfer.transferType == TransferType.DOWNLOAD && transfersViewModel.isOnTransferOverQuota())
                                 || (transfer.transferType.isUploadType() && getStorageState() == StorageState.Red)
-                        -> {
+                            -> {
                             holder.progressText.setTextColor(
                                 ContextCompat.getColor(
                                     context,
