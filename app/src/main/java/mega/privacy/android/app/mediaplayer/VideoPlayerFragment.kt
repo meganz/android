@@ -41,8 +41,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
-import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
-import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
+import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -351,11 +350,7 @@ class VideoPlayerFragment : Fragment() {
                 ) { isFullScreen ->
                     playerViewHolder?.updateFullScreenUI(isFullScreen)
                     binding.playerView.resizeMode = if (isFullScreen) {
-                        if (resources.configuration.orientation == ORIENTATION_LANDSCAPE) {
-                            RESIZE_MODE_FIXED_WIDTH
-                        } else {
-                            RESIZE_MODE_FIXED_HEIGHT
-                        }
+                        RESIZE_MODE_ZOOM
                     } else {
                         RESIZE_MODE_FIT
                     }
@@ -458,17 +453,14 @@ class VideoPlayerFragment : Fragment() {
 
     @OptIn(UnstableApi::class)
     private fun updateTransformations() {
-        videoPlayerView?.let { playerView ->
+        (videoPlayerView?.videoSurfaceView as? TextureView)?.let { textureView ->
             val matrix = Matrix()
-            matrix.postScale(zoomLevel, zoomLevel, playerView.width / 2f, playerView.height / 2f)
+            matrix.postScale(zoomLevel, zoomLevel, textureView.width / 2f, textureView.height / 2f)
             matrix.postTranslate(translationX, translationY)
-
-            (playerView.videoSurfaceView as? TextureView)?.apply {
-                setTransform(matrix)
-                if (!mediaPlayerGateway.mediaPlayerIsPlaying()) {
-                    invalidate()
-                    requestLayout()
-                }
+            textureView.setTransform(matrix)
+            if (!mediaPlayerGateway.mediaPlayerIsPlaying()) {
+                textureView.invalidate()
+                textureView.requestLayout()
             }
         }
     }
