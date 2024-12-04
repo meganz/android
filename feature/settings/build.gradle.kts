@@ -21,4 +21,11 @@ dependencies {
     implementation(androidx.bundles.compose.bom)
     implementation(androidx.material3)
 
+    //test
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.ui.test)
+    testImplementation(testlib.bundles.unit.test)
+    testImplementation(testlib.bundles.junit5.api)
+    testImplementation(google.hilt.android.test)
+    testRuntimeOnly(testlib.junit.jupiter.engine)
 }
