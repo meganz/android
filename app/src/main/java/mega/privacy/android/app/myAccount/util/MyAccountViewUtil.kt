@@ -9,6 +9,7 @@ import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.domain.entity.StorageState
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 
@@ -31,6 +32,7 @@ object MyAccountViewUtil {
      */
     fun MyAccountUsageContainerBinding.update(
         context: Context,
+        storageState: StorageState,
         isFreeAccount: Boolean,
         totalStorage: String,
         totalTransfer: String,
@@ -56,28 +58,25 @@ object MyAccountViewUtil {
                     R.string.used_storage_transfer_percentage,
                     usedStoragePercentage.toString()
                 )
+            }
 
-                setTextAppearance(
-                    if (isStorageOverQuota) {
-                        R.style.TextAppearance_Mega_Body2_Medium_Red600Red300
-                    } else {
-                        R.style.TextAppearance_Mega_Body2_Medium_Accent
-                    }
+            storageProgressBar.progress = usedStoragePercentage
+
+            val colors = when (storageState) {
+                StorageState.Red -> ContextCompat.getColorStateList(
+                    context,
+                    R.color.color_text_error
                 )
-            }
 
-            storageProgressBar.apply {
-                progress = usedStoragePercentage
-                progressDrawable =
-                    ContextCompat.getDrawable(
-                        context,
-                        if (isStorageOverQuota) {
-                            R.drawable.storage_transfer_circular_progress_bar_warning
-                        } else {
-                            R.drawable.storage_transfer_circular_progress_bar
-                        }
-                    )
+                StorageState.Orange -> ContextCompat.getColorStateList(
+                    context,
+                    R.color.color_support_warning
+                )
+
+                else -> ContextCompat.getColorStateList(context, R.color.teal_300_teal_200)
             }
+            storageProgressBar.progressTintList = colors
+            storageProgressPercentage.setTextColor(colors)
 
             storageProgress.text = context.getString(
                 R.string.used_storage_transfer,
@@ -85,7 +84,7 @@ object MyAccountViewUtil {
                 totalStorage
             ).let { text ->
                 if (isStorageOverQuota) {
-                    text.formatColorTag(storageProgress.context, 'A', R.color.red_600_red_300)
+                    text.formatColorTag(storageProgress.context, 'A', R.color.color_text_error)
                         .toSpannedHtmlText()
                 } else {
                     text.replace("[A]", "")

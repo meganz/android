@@ -53,6 +53,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -113,6 +114,7 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRAN
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.legacy.core.ui.controls.lists.ImageIconItem
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
@@ -512,6 +514,7 @@ private fun AccountInfoSection(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(start = 14.dp, end = 14.dp, top = 12.dp, bottom = 8.dp),
+            storageState = uiState.storageState,
             usedStorage = uiState.usedStorage,
             usedTransfer = uiState.usedTransfer,
             totalStorage = uiState.totalStorage,
@@ -733,6 +736,7 @@ internal fun AccountTypeSection(
 internal fun UsageMeterSection(
     showTransfer: Boolean,
     showProgressBar: Boolean,
+    storageState: StorageState,
     usedStoragePercentage: Int,
     usedStorage: Long,
     totalStorage: Long,
@@ -742,7 +746,12 @@ internal fun UsageMeterSection(
     onUsageMeterClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isStorageOverQuota = remember { usedStoragePercentage > 100 }
+    val isStorageOverQuota = storageState == StorageState.Red
+    val color = when(storageState) {
+        StorageState.Red -> colorResource(R.color.color_text_error)
+        StorageState.Orange -> colorResource(R.color.color_support_warning)
+        else -> colorResource(R.color.teal_300_teal_200)
+    }
     if (showProgressBar) {
         //Layout to show Storage/Transfer usage for Free/Pro accounts except Pro Flexi
         ConstraintLayout(
@@ -774,7 +783,7 @@ internal fun UsageMeterSection(
                         .size(50.dp)
                         .align(Alignment.Center),
                     backgroundColor = MaterialTheme.colors.grey_100_grey_600,
-                    color = if (isStorageOverQuota) MaterialTheme.colors.red_600_red_300 else MaterialTheme.colors.secondary,
+                    color = color,
                     strokeWidth = 5.dp,
                     progress = (usedStoragePercentage.toFloat() / 100).coerceAtMost(1f)
                 )
@@ -783,7 +792,7 @@ internal fun UsageMeterSection(
                     modifier = Modifier.align(Alignment.Center),
                     text = "$usedStoragePercentage%",
                     style = MaterialTheme.typography.body2medium,
-                    color = if (isStorageOverQuota) MaterialTheme.colors.red_600_red_300 else MaterialTheme.colors.secondary
+                    color = color
                 )
             }
 
@@ -802,7 +811,7 @@ internal fun UsageMeterSection(
                 },
                 text = buildAnnotatedString {
                     if (isStorageOverQuota) {
-                        withStyle(style = SpanStyle(MaterialTheme.colors.red_600_red_300)) {
+                        withStyle(style = SpanStyle(colorResource(R.color.color_text_error))) {
                             append(formatSize(size = usedStorage))
                         }
                     } else {

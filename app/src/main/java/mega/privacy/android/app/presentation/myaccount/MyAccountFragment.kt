@@ -128,7 +128,11 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
         findNavController().navigate(R.id.action_my_account_to_edit_profile)
 
     override fun onClickUsageMeter() =
-        findNavController().navigate(R.id.action_my_account_to_my_account_usage)
+        findNavController().navigate(
+            MyAccountFragmentDirections.actionMyAccountToMyAccountUsage(
+                storageState = viewModel.uiState.value.storageState
+            )
+        )
 
     override fun onUpgradeAccount() {
         Analytics.tracker.trackEvent(UpgradeMyAccountEvent)

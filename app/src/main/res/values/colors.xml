@@ -560,4 +560,5 @@
     <color name="color_text_inverse">#FFFAFAFA</color>
     <color name="color_background_surface_1">#FFFAFAFA</color>
     <color name="color_background_pageBackground">#FFFFFFFF</color>
+    <color name="color_support_warning">#FFF7A308</color>
 </resources>
