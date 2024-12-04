@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
-import mega.privacy.android.domain.usecase.IsBusinessAccountActive
+import mega.privacy.android.domain.usecase.business.IsBusinessAccountActiveUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,19 +29,19 @@ internal class CheckEnableCameraUploadsStatusUseCaseTest {
     private lateinit var underTest: CheckEnableCameraUploadsStatusUseCase
 
     private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase>()
-    private val isBusinessAccountActive = mock<IsBusinessAccountActive>()
+    private val isBusinessAccountActiveUseCase = mock<IsBusinessAccountActiveUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = CheckEnableCameraUploadsStatusUseCase(
             getAccountDetailsUseCase = getAccountDetailsUseCase,
-            isBusinessAccountActive = isBusinessAccountActive,
+            isBusinessAccountActiveUseCase = isBusinessAccountActiveUseCase,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(getAccountDetailsUseCase, isBusinessAccountActive)
+        reset(getAccountDetailsUseCase, isBusinessAccountActiveUseCase)
     }
 
     @Test
@@ -90,7 +90,7 @@ internal class CheckEnableCameraUploadsStatusUseCaseTest {
         }
 
         whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(userAccount)
-        whenever(isBusinessAccountActive()).thenReturn(isBusinessAccountActive)
+        whenever(isBusinessAccountActiveUseCase()).thenReturn(isBusinessAccountActive)
 
         assertThat(underTest()).isEqualTo(expectedCameraUploadsStatus)
     }

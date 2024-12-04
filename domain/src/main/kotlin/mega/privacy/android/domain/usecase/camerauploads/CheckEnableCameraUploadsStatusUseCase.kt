@@ -3,19 +3,19 @@ package mega.privacy.android.domain.usecase.camerauploads
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
-import mega.privacy.android.domain.usecase.IsBusinessAccountActive
+import mega.privacy.android.domain.usecase.business.IsBusinessAccountActiveUseCase
 import javax.inject.Inject
 
 /**
  * Use Case that returns the Camera Uploads status when attempting to enable the feature
  *
  * @property getAccountDetailsUseCase Retrieves the User's Account details
- * @property isBusinessAccountActive If the User is on a Master Business or Business Account, this
+ * @property isBusinessAccountActiveUseCase If the User is on a Master Business or Business Account, this
  * checks if his/her subscription is currently active or not
  */
 class CheckEnableCameraUploadsStatusUseCase @Inject constructor(
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
-    private val isBusinessAccountActive: IsBusinessAccountActive,
+    private val isBusinessAccountActiveUseCase: IsBusinessAccountActiveUseCase,
 ) {
 
     /**
@@ -27,7 +27,7 @@ class CheckEnableCameraUploadsStatusUseCase @Inject constructor(
         val userAccount = getAccountDetailsUseCase(forceRefresh = true)
 
         return if (userAccount.isBusinessAccount && userAccount.accountTypeIdentifier == AccountType.BUSINESS) {
-            val isBusinessAccountActive = isBusinessAccountActive()
+            val isBusinessAccountActive = isBusinessAccountActiveUseCase()
             val isMasterBusinessAccount = userAccount.isMasterBusinessAccount
 
             if (isMasterBusinessAccount) {

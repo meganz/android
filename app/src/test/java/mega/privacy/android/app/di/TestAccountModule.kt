@@ -8,7 +8,6 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.data.mapper.ReferralBonusAchievementsMapper
 import mega.privacy.android.domain.di.AccountModule
 import mega.privacy.android.domain.usecase.GetAccountAchievements
-import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
@@ -35,9 +34,6 @@ object TestAccountModule {
     private val retryPendingConnectionsUseCase = mock<RetryPendingConnectionsUseCase> {
         on { runBlocking { invoke(false) } }.thenReturn(Unit)
     }
-    private val isBusinessAccountActive = mock<IsBusinessAccountActive> {
-        on { runBlocking { invoke() } }.thenReturn(false)
-    }
 
     private val getAccountAchievements = mock<GetAccountAchievements> {
         on { runBlocking { invoke(mock(), -1) } }.thenReturn(mock())
@@ -53,9 +49,6 @@ object TestAccountModule {
 
     @Provides
     fun bindRetryPendingConnections() = retryPendingConnectionsUseCase
-
-    @Provides
-    fun bindIsBusinessAccountActive() = isBusinessAccountActive
 
     @Provides
     fun provideGetAccountAchievements() = getAccountAchievements
