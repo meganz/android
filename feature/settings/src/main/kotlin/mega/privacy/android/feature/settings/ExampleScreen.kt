@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.example_new_components
+package mega.privacy.android.feature.settings
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
