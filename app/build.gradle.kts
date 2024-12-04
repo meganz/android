@@ -188,6 +188,7 @@ dependencies {
     implementation(project(":feature:sync"))
     implementation(project(":feature:devicecenter"))
     implementation(project(":shared:resources"))
+    implementation(project(":feature:settings"))
     preBuiltSdkDependency(rootProject.extra)
 
     //Test Modules
