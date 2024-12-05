@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -59,6 +60,8 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.AllVideosTabEvent
+import mega.privacy.mobile.analytics.event.PlaylistsTabEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -306,6 +309,15 @@ class VideoSectionFragment : Fragment() {
                     launchAddToPlaylistActivity(it)
                 }
                 videoSectionViewModel.resetIsLaunchVideoToPlaylistActivity()
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(
+            videoSectionViewModel.tabState.map { it.selectedTab }.distinctUntilChanged()
+        ) { tab ->
+            when (tab) {
+                VideoSectionTab.All -> Analytics.tracker.trackEvent(AllVideosTabEvent)
+                VideoSectionTab.Playlists -> Analytics.tracker.trackEvent(PlaylistsTabEvent)
             }
         }
     }

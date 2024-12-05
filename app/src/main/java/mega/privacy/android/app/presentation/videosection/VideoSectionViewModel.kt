@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.ApiFeatures
@@ -76,6 +77,7 @@ import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseC
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.mobile.analytics.event.PlaylistCreatedSuccessfullyEvent
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -777,6 +779,7 @@ class VideoSectionViewModel @Inject constructor(
                             )
                         }
                         loadVideoPlaylists()
+                        Analytics.tracker.trackEvent(PlaylistCreatedSuccessfullyEvent)
                         Timber.d("Current video playlist: ${(videoPlaylist as? UserVideoPlaylist)?.title}")
                     }.onFailure { exception ->
                         Timber.e(exception)

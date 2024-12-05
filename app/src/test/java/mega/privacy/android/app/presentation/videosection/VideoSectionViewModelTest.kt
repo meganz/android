@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.AnalyticsTestExtension
 import mega.privacy.android.app.TimberJUnit5Extension
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
@@ -64,6 +65,7 @@ import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseC
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.mobile.analytics.event.PlaylistCreatedSuccessfullyEvent
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -794,6 +796,7 @@ class VideoSectionViewModelTest {
                 val actual = awaitItem()
                 assertThat(actual.currentVideoPlaylist?.title).isEqualTo(expectedTitle)
                 assertThat(actual.isVideoPlaylistCreatedSuccessfully).isTrue()
+                assertThat(analyticsExtension.events).contains(PlaylistCreatedSuccessfullyEvent)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -1844,5 +1847,9 @@ class VideoSectionViewModelTest {
         @JvmField
         @RegisterExtension
         val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
     }
 }

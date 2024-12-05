@@ -7,12 +7,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAppBar
+import mega.privacy.mobile.analytics.event.VideoSectionSearchButtonPressedEvent
 
 @Composable
 internal fun VideoSectionTopBar(
@@ -67,7 +69,10 @@ internal fun VideoSectionTopBar(
             onSearchTextChange = onSearchTextChanged,
             onCloseClicked = onCloseClicked,
             onBackPressed = onBackPressed,
-            onSearchClicked = onSearchClicked,
+            onSearchClicked = {
+                Analytics.tracker.trackEvent(VideoSectionSearchButtonPressedEvent)
+                onSearchClicked()
+            },
             elevation = false,
             title = title,
             hintId = R.string.hint_action_search,

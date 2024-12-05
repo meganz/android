@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -42,6 +41,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionLoadingView
@@ -56,8 +56,8 @@ import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.mobile.analytics.event.VideoPlaylistCreationButtonPressedEvent
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun VideoPlaylistsView(
     items: List<VideoPlaylistUIEntity>,
@@ -185,6 +185,7 @@ internal fun VideoPlaylistsView(
                         setInputValidity(true)
                     },
                     onDialogPositiveButtonClicked = { titleOfNewVideoPlaylist ->
+                        Analytics.tracker.trackEvent(VideoPlaylistCreationButtonPressedEvent)
                         onCreateDialogPositiveButtonClicked(titleOfNewVideoPlaylist)
                     },
                 ) {

@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
@@ -39,6 +40,16 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.mobile.analytics.event.DurationFilterAllDurationsClickedEvent
+import mega.privacy.mobile.analytics.event.DurationFilterBetween10and60SecondsClickedEvent
+import mega.privacy.mobile.analytics.event.DurationFilterBetween1and4MinutesClickedEvent
+import mega.privacy.mobile.analytics.event.DurationFilterBetween4and20MinutesClickedEvent
+import mega.privacy.mobile.analytics.event.DurationFilterLessThan10SecondsClickedEvent
+import mega.privacy.mobile.analytics.event.DurationFilterMoreThan20MinutesClickedEvent
+import mega.privacy.mobile.analytics.event.LocationFilterAllLocationsClickedEvent
+import mega.privacy.mobile.analytics.event.LocationFilterCameraUploadClickedEvent
+import mega.privacy.mobile.analytics.event.LocationFilterCloudDriveClickedEvent
+import mega.privacy.mobile.analytics.event.LocationFilterSharedItemClickedEvent
 import nz.mega.sdk.MegaNode
 
 @Composable
@@ -246,6 +257,19 @@ internal fun AllVideosView(
                     } else {
                         LocationFilterOption.AllLocations
                     }
+                when (locationOption) {
+                    LocationFilterOption.AllLocations ->
+                        Analytics.tracker.trackEvent(LocationFilterAllLocationsClickedEvent)
+
+                    LocationFilterOption.CloudDrive ->
+                        Analytics.tracker.trackEvent(LocationFilterCloudDriveClickedEvent)
+
+                    LocationFilterOption.CameraUploads ->
+                        Analytics.tracker.trackEvent(LocationFilterCameraUploadClickedEvent)
+
+                    LocationFilterOption.SharedItems ->
+                        Analytics.tracker.trackEvent(LocationFilterSharedItemClickedEvent)
+                }
                 onLocationFilterItemClicked(locationOption)
             }
         )
@@ -273,6 +297,26 @@ internal fun AllVideosView(
                     } else {
                         DurationFilterOption.AllDurations
                     }
+
+                when (durationOption) {
+                    DurationFilterOption.AllDurations ->
+                        Analytics.tracker.trackEvent(DurationFilterAllDurationsClickedEvent)
+
+                    DurationFilterOption.LessThan10Seconds ->
+                        Analytics.tracker.trackEvent(DurationFilterLessThan10SecondsClickedEvent)
+
+                    DurationFilterOption.Between10And60Seconds ->
+                        Analytics.tracker.trackEvent(DurationFilterBetween10and60SecondsClickedEvent)
+
+                    DurationFilterOption.Between1And4 ->
+                        Analytics.tracker.trackEvent(DurationFilterBetween1and4MinutesClickedEvent)
+
+                    DurationFilterOption.Between4And20 ->
+                        Analytics.tracker.trackEvent(DurationFilterBetween4and20MinutesClickedEvent)
+
+                    DurationFilterOption.MoreThan20 ->
+                        Analytics.tracker.trackEvent(DurationFilterMoreThan20MinutesClickedEvent)
+                }
                 onDurationFilterItemClicked(durationOption)
             }
         )

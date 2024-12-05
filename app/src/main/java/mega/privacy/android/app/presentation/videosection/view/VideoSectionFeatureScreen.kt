@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.CLOUD_DRIVE_MODE
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_RECENTLY_WATCHED_MODE
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_SECTION_MODE
@@ -20,6 +21,7 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPla
 import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.VideoRecentlyWatchedView
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.videoRecentlyWatchedRoute
+import mega.privacy.mobile.analytics.event.RecentlyWatchedOpenedButtonPressedEvent
 
 @Composable
 internal fun VideoSectionFeatureScreen(
@@ -116,6 +118,7 @@ internal fun VideoSectionNavHost(
                 onDeleteDialogButtonClicked = viewModel::clearAllSelectedVideoPlaylists,
                 onMenuAction = { action ->
                     if (action is VideoSectionMenuAction.VideoRecentlyWatchedAction) {
+                        Analytics.tracker.trackEvent(RecentlyWatchedOpenedButtonPressedEvent)
                         navHostController.navigate(route = videoRecentlyWatchedRoute)
                     } else {
                         onMenuAction(action)
