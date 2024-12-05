@@ -6,10 +6,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.contact.MonitorMyChatOnlineStatusUseCase
@@ -19,6 +21,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorHomeBadgeCountUseCase
 import nz.mega.sdk.MegaBanner
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -54,7 +57,8 @@ class HomePageViewModel @Inject constructor(
     /**
      * Monitor Internet Connectivity
      */
-    val monitorConnectivity = monitorConnectivityUseCase()
+    @OptIn(FlowPreview::class)
+    val monitorConnectivity = monitorConnectivityUseCase().debounce(TimeUnit.SECONDS.toMillis(1))
 
     init {
         viewModelScope.launch {
