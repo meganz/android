@@ -63,11 +63,14 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetImageNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.IsMasterBusinessAccountUseCase
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.business.IsBusinessAccountActiveUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
@@ -144,6 +147,9 @@ class FileInfoViewModel @Inject constructor(
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val getImageNodeByNodeId: GetImageNodeByIdUseCase,
+    private val isBusinessAccountActiveUseCase: IsBusinessAccountActiveUseCase,
+    private val isMasterBusinessAccountUseCase: IsMasterBusinessAccountUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     @IoDispatcher private val iODispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -178,10 +184,35 @@ class FileInfoViewModel @Inject constructor(
     init {
         checkMapLocationFeatureFlag()
         checkTagsFeatureFlag()
+        monitorBusinessAccountExpiry()
         viewModelScope.launch {
             val isRemindersForContactVerificationEnabled =
                 getContactVerificationWarningUseCase()
             _uiState.update { it.copy(isRemindersForContactVerificationEnabled = isRemindersForContactVerificationEnabled) }
+        }
+    }
+
+    private fun monitorBusinessAccountExpiry() {
+        viewModelScope.launch {
+            monitorAccountDetailUseCase().filter { it.levelDetail?.accountType?.isBusinessAccount == true }
+                .collect {
+                    runCatching {
+                        isBusinessAccountActiveUseCase().let { active ->
+                            if (!active) {
+                                isMasterBusinessAccountUseCase().let { isMaster ->
+                                    _uiState.update {
+                                        it.copy(
+                                            isMasterBusinessAccount = isMaster,
+                                            inactiveBusinessAccount = true
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }.onFailure {
+                        Timber.e("Monitor business account expiry failed $it")
+                    }
+                }
         }
     }
 

@@ -52,11 +52,14 @@ import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetImageNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.IsMasterBusinessAccountUseCase
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.business.IsBusinessAccountActiveUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
@@ -149,6 +152,9 @@ internal class FileInfoViewModelTest {
     private val checkNodesNameCollisionWithActionUseCase =
         mock<CheckNodesNameCollisionWithActionUseCase>()
     private val fileTypeIconMapper = FileTypeIconMapper()
+    private val monitorAccountDetailsUseCase = mock<MonitorAccountDetailUseCase>()
+    private val isMasterBusinessAccountUseCase = mock<IsMasterBusinessAccountUseCase>()
+    private val isBusinessAccountActiveUseCase = mock<IsBusinessAccountActiveUseCase>()
 
     private val typedFileNode: TypedFileNode = mock()
 
@@ -204,6 +210,9 @@ internal class FileInfoViewModelTest {
             getContactVerificationWarningUseCase,
             typedFileNode,
             previewFile,
+            isMasterBusinessAccountUseCase,
+            isBusinessAccountActiveUseCase,
+            monitorAccountDetailsUseCase
         )
     }
 
@@ -248,6 +257,9 @@ internal class FileInfoViewModelTest {
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
             getImageNodeByNodeId = getImageNodeByIdUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailsUseCase,
+            isMasterBusinessAccountUseCase = isMasterBusinessAccountUseCase,
+            isBusinessAccountActiveUseCase = isBusinessAccountActiveUseCase,
             iODispatcher = UnconfinedTestDispatcher()
         )
     }
@@ -288,6 +300,7 @@ internal class FileInfoViewModelTest {
                 extension = "jpg"
             )
         )
+        whenever(monitorAccountDetailsUseCase()).thenReturn(emptyFlow())
     }
 
     @Test

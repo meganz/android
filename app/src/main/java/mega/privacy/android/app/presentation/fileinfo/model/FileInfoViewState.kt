@@ -98,6 +98,8 @@ internal data class FileInfoViewState(
     val longitude: Double = 0.0,
     val latitude: Double = 0.0,
     val isPhoto: Boolean = false,
+    val inactiveBusinessAccount: Boolean = false,
+    val isMasterBusinessAccount: Boolean = false,
 ) {
 
     /**
