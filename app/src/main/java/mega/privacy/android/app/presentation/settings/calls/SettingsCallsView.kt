@@ -18,7 +18,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.calls.model.SettingsCallsState
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
-import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
@@ -35,7 +35,7 @@ fun SettingsCallsView(
         CallSettingItem(
             R.string.settings_calls_preferences_sound_notifications,
             R.string.settings_calls_preferences_sound_notifications_text,
-            settingsCallsState.soundNotifications == CallsSoundNotifications.Enabled,
+            settingsCallsState.soundNotifications == CallsSoundEnabledState.Enabled,
             onCheckedChange = onSoundNotificationsChanged
         )
     }
@@ -88,7 +88,7 @@ private fun PreviewSettingsCallsView() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SettingsCallsView(
             settingsCallsState = SettingsCallsState(
-                soundNotifications = CallsSoundNotifications.Enabled,
+                soundNotifications = CallsSoundEnabledState.Enabled,
                 callsMeetingInvitations = CallsMeetingInvitations.Enabled,
                 callsMeetingReminders = CallsMeetingReminders.Enabled,
             )

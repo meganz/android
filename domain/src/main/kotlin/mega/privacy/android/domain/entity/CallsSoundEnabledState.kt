@@ -3,7 +3,7 @@ package mega.privacy.android.domain.entity
 /**
  * Enum class defining call sound notifications settings.
  */
-enum class CallsSoundNotifications {
+enum class CallsSoundEnabledState {
     /**
      * Sound notifications enabled
      */

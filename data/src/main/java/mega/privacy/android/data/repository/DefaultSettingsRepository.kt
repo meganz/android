@@ -33,7 +33,7 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
-import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
@@ -280,10 +280,10 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setChatImageQuality(quality: ChatImageQuality) =
         withContext(ioDispatcher) { chatPreferencesGateway.setChatImageQualityPreference(quality) }
 
-    override fun getCallsSoundNotifications(): Flow<CallsSoundNotifications> =
+    override fun getCallsSoundNotifications(): Flow<CallsSoundEnabledState> =
         callsPreferencesGateway.getCallsSoundNotificationsPreference()
 
-    override suspend fun setCallsSoundNotifications(soundNotifications: CallsSoundNotifications) =
+    override suspend fun setCallsSoundNotifications(soundNotifications: CallsSoundEnabledState) =
         withContext(ioDispatcher) {
             callsPreferencesGateway.setCallsSoundNotificationsPreference(soundNotifications)
         }

@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.settings.calls.model
 
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
-import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.CallsSoundEnabledState
 
 /**
  * Data class representing the state of the calls settings.
@@ -12,7 +12,7 @@ import mega.privacy.android.domain.entity.CallsSoundNotifications
  * @property callsMeetingReminders      Current meeting reminders status.
  */
 data class SettingsCallsState(
-    val soundNotifications: CallsSoundNotifications? = null,
+    val soundNotifications: CallsSoundEnabledState? = null,
     val callsMeetingInvitations: CallsMeetingInvitations? = null,
     val callsMeetingReminders: CallsMeetingReminders? = null,
 )

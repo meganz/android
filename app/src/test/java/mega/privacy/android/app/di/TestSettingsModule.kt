@@ -27,8 +27,8 @@ import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
-import mega.privacy.android.domain.usecase.call.GetCallsSoundNotifications
-import mega.privacy.android.domain.usecase.call.SetCallsSoundNotifications
+import mega.privacy.android.domain.usecase.call.MonitorCallSoundEnabledUseCase
+import mega.privacy.android.domain.usecase.call.SetCallsSoundEnabledStateUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -56,9 +56,9 @@ object TestSettingsModule {
         mock<MonitorMediaDiscoveryView> { on { invoke() }.thenReturn(emptyFlow()) }
     val getChatImageQuality = mock<GetChatImageQuality> { on { invoke() }.thenReturn(emptyFlow()) }
     val setChatImageQuality = mock<SetChatImageQuality>()
-    val getCallsSoundNotifications =
-        mock<GetCallsSoundNotifications> { on { invoke() }.thenReturn(emptyFlow()) }
-    val setCallsSoundNotifications = mock<SetCallsSoundNotifications>()
+    val monitorCallSoundEnabledUseCase =
+        mock<MonitorCallSoundEnabledUseCase> { on { invoke() }.thenReturn(emptyFlow()) }
+    val setCallsSoundEnabledStateUseCase = mock<SetCallsSoundEnabledStateUseCase>()
 
     @Provides
     fun provideCanDeleteAccount(): CanDeleteAccount = canDeleteAccount
@@ -111,10 +111,10 @@ object TestSettingsModule {
     fun provideSetChatImageQuality(): SetChatImageQuality = setChatImageQuality
 
     @Provides
-    fun provideGetCallsSoundNotifications(): GetCallsSoundNotifications = getCallsSoundNotifications
+    fun provideGetCallsSoundNotifications(): MonitorCallSoundEnabledUseCase = monitorCallSoundEnabledUseCase
 
     @Provides
-    fun provideSetCallsSoundNotifications(): SetCallsSoundNotifications = setCallsSoundNotifications
+    fun provideSetCallsSoundNotifications(): SetCallsSoundEnabledStateUseCase = setCallsSoundEnabledStateUseCase
 
     @Provides
     fun providePutStringPreference(): PutPreference<String> =

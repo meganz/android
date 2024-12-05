@@ -3,7 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
-import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
@@ -203,7 +203,7 @@ interface SettingsRepository {
      *
      * @return Sound notifications status.
      */
-    fun getCallsSoundNotifications(): Flow<CallsSoundNotifications>
+    fun getCallsSoundNotifications(): Flow<CallsSoundEnabledState>
 
     /**
      * Enabling or disabling call notification sounds.
@@ -211,7 +211,7 @@ interface SettingsRepository {
      * @param soundNotifications New Sound notifications status.
      * @return Sound notifications status.
      */
-    suspend fun setCallsSoundNotifications(soundNotifications: CallsSoundNotifications)
+    suspend fun setCallsSoundNotifications(soundNotifications: CallsSoundEnabledState)
 
     /**
      * Get calls meeting invitations

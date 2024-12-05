@@ -3,7 +3,7 @@ package mega.privacy.android.data.gateway.preferences
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
-import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 
@@ -17,7 +17,7 @@ interface CallsPreferencesGateway {
      *
      * @return If notification sounds are enabled or disabled.
      */
-    fun getCallsSoundNotificationsPreference(): Flow<CallsSoundNotifications>
+    fun getCallsSoundNotificationsPreference(): Flow<CallsSoundEnabledState>
 
     /**
      * Get calls meeting invitations preference
@@ -52,7 +52,7 @@ interface CallsPreferencesGateway {
      *
      * @param soundNotifications True, if must be enabled. False, if must be disabled.
      */
-    suspend fun setCallsSoundNotificationsPreference(soundNotifications: CallsSoundNotifications)
+    suspend fun setCallsSoundNotificationsPreference(soundNotifications: CallsSoundEnabledState)
 
     /**
      * Enable or disable calls meeting invitations preference

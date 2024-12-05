@@ -10,20 +10,17 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.presentation.settings.calls.SettingsCallsViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
-import mega.privacy.android.domain.entity.CallsSoundNotifications
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.entity.CallsSoundEnabledState
+import mega.privacy.android.domain.usecase.call.MonitorCallSoundEnabledUseCase
+import mega.privacy.android.domain.usecase.call.SetCallsSoundEnabledStateUseCase
 import mega.privacy.android.domain.usecase.meeting.GetCallsMeetingInvitationsUseCase
 import mega.privacy.android.domain.usecase.meeting.GetCallsMeetingRemindersUseCase
-import mega.privacy.android.domain.usecase.call.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.SetCallsMeetingInvitationsUseCase
 import mega.privacy.android.domain.usecase.meeting.SetCallsMeetingRemindersUseCase
-import mega.privacy.android.domain.usecase.call.SetCallsSoundNotifications
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -38,10 +35,10 @@ class SettingsCallsViewModelTest {
 
     private lateinit var underTest: SettingsCallsViewModel
 
-    private val getCallsSoundNotifications = mock<GetCallsSoundNotifications> {
+    private val monitorCallSoundEnabledUseCase = mock<MonitorCallSoundEnabledUseCase> {
         on { invoke() }.thenReturn(emptyFlow())
     }
-    private val setCallsSoundNotifications = mock<SetCallsSoundNotifications>()
+    private val setCallsSoundEnabledStateUseCase = mock<SetCallsSoundEnabledStateUseCase>()
     private val getCallsMeetingInvitations = mock<GetCallsMeetingInvitationsUseCase> {
         on { invoke() }.thenReturn(emptyFlow())
     }
@@ -51,22 +48,20 @@ class SettingsCallsViewModelTest {
     }
     private val setCallsMeetingReminders = mock<SetCallsMeetingRemindersUseCase>()
 
-    private val getFeatureFlagValue = mock<GetFeatureFlagValueUseCase>()
     private val sendStatisticsMeetings = mock<SendStatisticsMeetingsUseCase>()
 
-    private suspend fun stubCommon() {
+    private fun stubCommon() {
         reset(
-            getCallsSoundNotifications,
-            setCallsSoundNotifications,
+            monitorCallSoundEnabledUseCase,
+            setCallsSoundEnabledStateUseCase,
             getCallsMeetingInvitations,
             setCallsMeetingInvitations,
             getCallsMeetingReminders,
             setCallsMeetingReminders,
             sendStatisticsMeetings,
-            getFeatureFlagValue,
         )
 
-        whenever(getCallsSoundNotifications()).thenReturn(emptyFlow())
+        whenever(monitorCallSoundEnabledUseCase()).thenReturn(emptyFlow())
         whenever(getCallsMeetingInvitations()).thenReturn(emptyFlow())
         whenever(getCallsMeetingReminders()).thenReturn(emptyFlow())
 
@@ -78,14 +73,13 @@ class SettingsCallsViewModelTest {
     private suspend fun setupUnderTest() {
         stubCommon()
         underTest = SettingsCallsViewModel(
-            getCallsSoundNotifications = getCallsSoundNotifications,
-            setCallsSoundNotifications = setCallsSoundNotifications,
+            monitorCallSoundEnabledUseCase = monitorCallSoundEnabledUseCase,
+            setCallsSoundEnabledStateUseCase = setCallsSoundEnabledStateUseCase,
             getCallsMeetingInvitations = getCallsMeetingInvitations,
             setCallsMeetingInvitations = setCallsMeetingInvitations,
             getCallsMeetingReminders = getCallsMeetingReminders,
             setCallsMeetingReminders = setCallsMeetingReminders,
             sendStatisticsMeetingsUseCase = sendStatisticsMeetings,
-            getFeatureFlagValue = getFeatureFlagValue,
         )
     }
 
@@ -104,12 +98,12 @@ class SettingsCallsViewModelTest {
     fun `test that the option returned by getCallsSoundNotifications is set the status of call notification sounds`() =
         runTest {
             setupUnderTest()
-            whenever(getCallsSoundNotifications()).thenReturn(flowOf(CallsSoundNotifications.Enabled))
+            whenever(monitorCallSoundEnabledUseCase()).thenReturn(flowOf(CallsSoundEnabledState.Enabled))
 
             underTest.uiState.map { it.soundNotifications }.distinctUntilChanged().test {
                 Truth.assertThat(awaitItem()).isNull()
                 scheduler.advanceUntilIdle()
-                Truth.assertThat(awaitItem()).isEqualTo(CallsSoundNotifications.Enabled)
+                Truth.assertThat(awaitItem()).isEqualTo(CallsSoundEnabledState.Enabled)
             }
         }
 
@@ -117,9 +111,9 @@ class SettingsCallsViewModelTest {
     fun `test that status of call notification sounds is updated when a new value is emitted`() =
         runTest {
             setupUnderTest()
-            whenever(getCallsSoundNotifications()).thenReturn(
+            whenever(monitorCallSoundEnabledUseCase()).thenReturn(
                 flowOf(
-                    CallsSoundNotifications.Enabled, CallsSoundNotifications.Disabled
+                    CallsSoundEnabledState.Enabled, CallsSoundEnabledState.Disabled
                 )
             )
 
@@ -127,9 +121,9 @@ class SettingsCallsViewModelTest {
                 Truth.assertThat(awaitItem()).isNull()
                 scheduler.advanceUntilIdle()
                 underTest.setNewCallsSoundNotifications(true)
-                Truth.assertThat(awaitItem()).isEqualTo(CallsSoundNotifications.Enabled)
+                Truth.assertThat(awaitItem()).isEqualTo(CallsSoundEnabledState.Enabled)
                 underTest.setNewCallsSoundNotifications(false)
-                Truth.assertThat(awaitItem()).isEqualTo(CallsSoundNotifications.Disabled)
+                Truth.assertThat(awaitItem()).isEqualTo(CallsSoundEnabledState.Disabled)
             }
         }
 
@@ -139,7 +133,7 @@ class SettingsCallsViewModelTest {
             setupUnderTest()
             underTest.setNewCallsSoundNotifications(false)
             scheduler.advanceUntilIdle()
-            verify(setCallsSoundNotifications).invoke(CallsSoundNotifications.Disabled)
+            verify(setCallsSoundEnabledStateUseCase).invoke(CallsSoundEnabledState.Disabled)
         }
 
     @Test

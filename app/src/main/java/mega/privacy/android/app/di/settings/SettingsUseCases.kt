@@ -27,8 +27,6 @@ import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
-import mega.privacy.android.domain.usecase.call.GetCallsSoundNotifications
-import mega.privacy.android.domain.usecase.call.SetCallsSoundNotifications
 
 /**
  * Settings use cases module
@@ -81,14 +79,6 @@ abstract class SettingsUseCases {
         @Provides
         fun provideSetChatImageQuality(settingsRepository: SettingsRepository): SetChatImageQuality =
             SetChatImageQuality(settingsRepository::setChatImageQuality)
-
-        @Provides
-        fun provideGetCallsSoundNotifications(settingsRepository: SettingsRepository): GetCallsSoundNotifications =
-            GetCallsSoundNotifications(settingsRepository::getCallsSoundNotifications)
-
-        @Provides
-        fun provideSetCallsSoundNotifications(settingsRepository: SettingsRepository): SetCallsSoundNotifications =
-            SetCallsSoundNotifications(settingsRepository::setCallsSoundNotifications)
 
         /**
          * Provide SetMediaDiscoveryView implementation
