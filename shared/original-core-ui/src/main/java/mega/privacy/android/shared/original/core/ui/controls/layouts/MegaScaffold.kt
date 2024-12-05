@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -83,6 +84,7 @@ import mega.privacy.android.shared.original.core.ui.utils.accumulateDirectionalS
 fun MegaScaffold(
     modifier: Modifier = Modifier,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
+    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
@@ -127,6 +129,7 @@ fun MegaScaffold(
             MegaScaffold(
                 modifier = modifier,
                 scaffoldState = scaffoldState,
+                contentWindowInsets = contentWindowInsets,
                 topBar = topBar,
                 bottomBar = bottomBar,
                 floatingActionButton = {
@@ -149,6 +152,7 @@ fun MegaScaffold(
             MegaScaffold(
                 modifier = modifier,
                 scaffoldState = scaffoldState,
+                contentWindowInsets = contentWindowInsets,
                 topBar = topBar,
                 bottomBar = bottomBar,
                 floatingActionButton = floatingActionButton,
@@ -164,6 +168,7 @@ fun MegaScaffold(
 private fun MegaScaffold(
     modifier: Modifier = Modifier,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
+    contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
@@ -196,7 +201,7 @@ private fun MegaScaffold(
             },
             floatingActionButton = floatingActionButton,
             backgroundColor = MegaOriginalTheme.colors.background.pageBackground,
-            contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
+            contentWindowInsets = contentWindowInsets,
             content = { paddingValues ->
                 content.invoke(paddingValues)
                 if (blurContent != null) {

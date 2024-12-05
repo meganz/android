@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.photos.timeline.view
 
 import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -43,6 +44,7 @@ import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.isDownloadPreview
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_grey_700
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -229,8 +231,8 @@ private fun PhotoImageView(
             .crossfade(true)
             .build(),
         contentDescription = null,
-        placeholder = painterResource(id = IconPackR.drawable.ic_image_medium_solid),
-        error = painterResource(id = IconPackR.drawable.ic_image_medium_solid),
+        placeholder = ColorPainter(MaterialTheme.colors.grey_050_grey_700),
+        error = ColorPainter(MaterialTheme.colors.grey_050_grey_700),
         contentScale = ContentScale.Crop,
         modifier = Modifier
             .fillMaxWidth()

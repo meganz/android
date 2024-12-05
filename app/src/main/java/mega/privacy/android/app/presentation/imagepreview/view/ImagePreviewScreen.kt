@@ -18,11 +18,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.pager.HorizontalPager
@@ -70,7 +77,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.request.ImageRequest
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
@@ -155,14 +161,6 @@ internal fun ImagePreviewScreen(
 
         val inFullScreenMode = viewState.inFullScreenMode
         val isMagnifierMode = viewState.isMagnifierMode
-        val systemUiController = rememberSystemUiController()
-        LaunchedEffect(systemUiController, inFullScreenMode) {
-            systemUiController.setStatusBarColor(
-                color = if (inFullScreenMode) Color.Black else Color.Transparent,
-                darkIcons = inFullScreenMode
-            )
-        }
-
         val scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState)
         val context = LocalContext.current
         val pagerState = rememberPagerState(
@@ -280,9 +278,9 @@ internal fun ImagePreviewScreen(
 
         MegaScaffold(
             modifier = Modifier
-                .systemBarsPadding()
                 .semantics { testTagsAsResourceId = true },
             scaffoldState = scaffoldState,
+            contentWindowInsets = WindowInsets.ime,
             content = { innerPadding ->
                 ImagePreviewContent(
                     modifier = Modifier
@@ -333,6 +331,8 @@ internal fun ImagePreviewScreen(
                                         modalSheetState.show()
                                     }
                                 },
+                                modifier = Modifier
+                                    .windowInsetsPadding(WindowInsets.statusBars),
                             )
                         }
                     },
@@ -351,149 +351,154 @@ internal fun ImagePreviewScreen(
                             ImagePreviewBottomBar(
                                 imageName = currentImageNode.name,
                                 imageIndex = photoIndexText.orEmpty(),
+                                modifier = Modifier
+                                    .windowInsetsPadding(WindowInsets.navigationBars),
                             )
                         }
                     },
                     onCacheImageState = { node, zoomState ->
                         zoomableStateMap[node.id] = zoomState
-                    }
+                    },
                 )
 
                 if (modalSheetState.isVisible) {
-                    ImagePreviewBottomSheet(
-                        modalSheetState = modalSheetState,
-                        imageNode = currentImageNode,
-                        isAvailableOffline = isCurrentImageNodeAvailableOffline,
-                        accountType = accountType,
-                        isBusinessAccountExpired = isBusinessAccountExpired,
-                        isHiddenNodesEnabled = isHiddenNodesEnabled,
-                        isHiddenNodesOnboarded = isHiddenNodesOnboarded,
-                        showInfoMenu = viewModel::isInfoMenuVisible,
-                        showFavouriteMenu = viewModel::isFavouriteMenuVisible,
-                        showLabelMenu = viewModel::isLabelMenuVisible,
-                        showDisputeMenu = viewModel::isDisputeMenuVisible,
-                        showOpenWithMenu = viewModel::isOpenWithMenuVisible,
-                        showForwardMenu = viewModel::isForwardMenuVisible,
-                        showSaveToDeviceMenu = viewModel::isSaveToDeviceMenuVisible,
-                        showImportMenu = viewModel::isImportMenuVisible,
-                        showGetLinkMenu = viewModel::isGetLinkMenuVisible,
-                        showSendToChatMenu = viewModel::isSendToChatMenuVisible,
-                        showShareMenu = viewModel::isShareMenuVisible,
-                        showRenameMenu = viewModel::isRenameMenuVisible,
-                        showHideMenu = viewModel::isHideMenuVisible,
-                        showUnhideMenu = viewModel::isUnhideMenuVisible,
-                        forceHideHiddenMenus = viewModel::forceHideHiddenMenus,
-                        showMoveMenu = viewModel::isMoveMenuVisible,
-                        showCopyMenu = viewModel::isCopyMenuVisible,
-                        showRestoreMenu = viewModel::isRestoreMenuVisible,
-                        showRemoveMenu = viewModel::isRemoveMenuVisible,
-                        showAvailableOfflineMenu = viewModel::isAvailableOfflineMenuVisible,
-                        showRemoveOfflineMenu = viewModel::isRemoveOfflineMenuVisible,
-                        showMoveToRubbishBin = viewModel::isMoveToRubbishBinMenuVisible,
-                        showAddToAlbum = viewModel::isAddToAlbumMenuVisible,
-                        downloadImage = viewModel::monitorImageResult,
-                        getImageThumbnailPath = viewModel::getLowestResolutionImagePath,
-                        onClickInfo = {
-                            onClickInfo(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickFavourite = {
-                            onClickFavourite(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickLabel = {
-                            onClickLabel(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickDispute = {},
-                        onClickOpenWith = {
-                            onClickOpenWith(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickForward = {
-                            onClickSendTo(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickSaveToDevice = {
-                            onClickSaveToDevice()
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickImport = {
-                            onClickImport(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onSwitchAvailableOffline = { checked ->
-                            onSwitchAvailableOffline?.invoke(checked, currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickGetLink = {
-                            onClickGetLink(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickRemoveLink = {
-                            if (!currentImageNode.isTakenDown) {
-                                showRemoveLinkDialog = true
-                            }
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickSendToChat = {
-                            onClickSendTo(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickShare = {
-                            onClickShare(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickRename = {
-                            onClickRename(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickHide = {
-                            Analytics.tracker.trackEvent(ImagePreviewHideNodeMenuToolBarEvent)
-                            onClickHide(
-                                currentImageNode,
-                                accountType,
-                                isBusinessAccountExpired,
-                                isHiddenNodesOnboarded
-                            )
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickHideHelp = {
-                            onClickHideHelp()
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickUnhide = {
-                            onClickUnhide(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickMove = {
-                            onClickMove(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickCopy = {
-                            onClickCopy(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickRestore = {
-                            onClickRestore(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickRemove = {
-                            showRemoveDialog = true
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickMoveToRubbishBin = {
-                            showMoveToRubbishBinDialog = true
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                        onClickAddToAlbum = {
-                            onClickAddToAlbum(currentImageNode)
-                            hideBottomSheet(coroutineScope, modalSheetState)
-                        },
-                    )
+                    Box(modifier = Modifier.safeDrawingPadding()) {
+                        ImagePreviewBottomSheet(
+                            modalSheetState = modalSheetState,
+                            imageNode = currentImageNode,
+                            isAvailableOffline = isCurrentImageNodeAvailableOffline,
+                            accountType = accountType,
+                            isBusinessAccountExpired = isBusinessAccountExpired,
+                            isHiddenNodesEnabled = isHiddenNodesEnabled,
+                            isHiddenNodesOnboarded = isHiddenNodesOnboarded,
+                            showInfoMenu = viewModel::isInfoMenuVisible,
+                            showFavouriteMenu = viewModel::isFavouriteMenuVisible,
+                            showLabelMenu = viewModel::isLabelMenuVisible,
+                            showDisputeMenu = viewModel::isDisputeMenuVisible,
+                            showOpenWithMenu = viewModel::isOpenWithMenuVisible,
+                            showForwardMenu = viewModel::isForwardMenuVisible,
+                            showSaveToDeviceMenu = viewModel::isSaveToDeviceMenuVisible,
+                            showImportMenu = viewModel::isImportMenuVisible,
+                            showGetLinkMenu = viewModel::isGetLinkMenuVisible,
+                            showSendToChatMenu = viewModel::isSendToChatMenuVisible,
+                            showShareMenu = viewModel::isShareMenuVisible,
+                            showRenameMenu = viewModel::isRenameMenuVisible,
+                            showHideMenu = viewModel::isHideMenuVisible,
+                            showUnhideMenu = viewModel::isUnhideMenuVisible,
+                            forceHideHiddenMenus = viewModel::forceHideHiddenMenus,
+                            showMoveMenu = viewModel::isMoveMenuVisible,
+                            showCopyMenu = viewModel::isCopyMenuVisible,
+                            showRestoreMenu = viewModel::isRestoreMenuVisible,
+                            showRemoveMenu = viewModel::isRemoveMenuVisible,
+                            showAvailableOfflineMenu = viewModel::isAvailableOfflineMenuVisible,
+                            showRemoveOfflineMenu = viewModel::isRemoveOfflineMenuVisible,
+                            showMoveToRubbishBin = viewModel::isMoveToRubbishBinMenuVisible,
+                            showAddToAlbum = viewModel::isAddToAlbumMenuVisible,
+                            downloadImage = viewModel::monitorImageResult,
+                            getImageThumbnailPath = viewModel::getLowestResolutionImagePath,
+                            onClickInfo = {
+                                onClickInfo(currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickFavourite = {
+                                onClickFavourite(currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickLabel = {
+                                onClickLabel(currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickDispute = {},
+                            onClickOpenWith = {
+                                onClickOpenWith(currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickForward = {
+                                onClickSendTo(currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickSaveToDevice = {
+                                onClickSaveToDevice()
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickImport = {
+                                onClickImport(currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onSwitchAvailableOffline = { checked ->
+                                onSwitchAvailableOffline?.invoke(checked, currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickGetLink = {
+                                onClickGetLink(currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickRemoveLink = {
+                                if (!currentImageNode.isTakenDown) {
+                                    showRemoveLinkDialog = true
+                                }
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickSendToChat = {
+                                onClickSendTo(currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickShare = {
+                                onClickShare(currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickRename = {
+                                onClickRename(currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickHide = {
+                                Analytics.tracker.trackEvent(ImagePreviewHideNodeMenuToolBarEvent)
+                                onClickHide(
+                                    currentImageNode,
+                                    accountType,
+                                    isBusinessAccountExpired,
+                                    isHiddenNodesOnboarded
+                                )
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickHideHelp = {
+                                onClickHideHelp()
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickUnhide = {
+                                onClickUnhide(currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickMove = {
+                                onClickMove(currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickCopy = {
+                                onClickCopy(currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickRestore = {
+                                onClickRestore(currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickRemove = {
+                                showRemoveDialog = true
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickMoveToRubbishBin = {
+                                showMoveToRubbishBinDialog = true
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                            onClickAddToAlbum = {
+                                onClickAddToAlbum(currentImageNode)
+                                hideBottomSheet(coroutineScope, modalSheetState)
+                            },
+                        )
+                    }
                 }
             },
         )
+
         StartTransferComponent(
             event = viewState.downloadEvent,
             onConsumeEvent = viewModel::consumeDownloadEvent,
@@ -625,7 +630,10 @@ private fun ImagePreviewContent(
                 enter = fadeIn() + expandVertically(),
                 exit = fadeOut() + shrinkVertically()
             ) {
-                Column(Modifier.padding(16.dp)) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
                     Box(
                         modifier = Modifier
                             .size(40.dp)
@@ -686,7 +694,10 @@ private fun ImagePreviewContent(
         )
         if (isVideo) {
             IconButton(
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .clip(RoundedCornerShape(40.dp))
+                    .background(Color.Black.copy(alpha = 0.5f)),
                 onClick = { onClickVideoPlay(imageNode) }
             ) {
                 Icon(
@@ -782,128 +793,132 @@ private fun ImagePreviewTopBar(
     onClickMore: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    TopAppBar(
-        title = {},
-        modifier = modifier,
-        backgroundColor = MaterialTheme.colors.white_alpha_070_grey_alpha_070,
-        navigationIcon = {
-            IconButton(onClick = onClickBack) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_arrow_back_white),
-                    contentDescription = "Image Preview Back",
-                    tint = MaterialTheme.colors.black_white,
-                    modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_BACK),
-                )
-            }
-        },
-        actions = {
-            val isSlideshowMenuVisible by produceState(false, imageNode) {
-                value = showSlideshowMenu(imageNode)
-            }
-
-            val isForwardMenuVisible by produceState(false, imageNode) {
-                value = showForwardMenu(imageNode)
-            }
-
-            val isSaveToDeviceMenuVisible by produceState(false, imageNode) {
-                value = showSaveToDeviceMenu(imageNode)
-            }
-
-            val isManageLinkMenuVisible by produceState(false, imageNode) {
-                value = showManageLinkMenu(imageNode)
-            }
-
-            val isMagnifierMenuVisible by produceState(false, imageNode) {
-                value = showMagnifierMenu(imageNode)
-            }
-
-            val isSendToMenuVisible by produceState(false, imageNode) {
-                value = showSendToMenu(imageNode)
-            }
-
-            val isMoreMenuVisible by produceState(false, imageNode) {
-                value = showMoreMenu(imageNode)
-            }
-
-            if (isSlideshowMenuVisible) {
-                IconButton(onClick = onClickSlideshow) {
+    Box(
+        modifier = Modifier.background(MaterialTheme.colors.white_alpha_070_grey_alpha_070),
+    ) {
+        TopAppBar(
+            title = {},
+            modifier = modifier,
+            backgroundColor = Color.Transparent,
+            navigationIcon = {
+                IconButton(onClick = onClickBack) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_slideshow),
-                        contentDescription = null,
+                        painter = painterResource(id = R.drawable.ic_arrow_back_white),
+                        contentDescription = "Image Preview Back",
                         tint = MaterialTheme.colors.black_white,
-                        modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SLIDESHOW),
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_BACK),
                     )
                 }
-            }
-
-            if (isForwardMenuVisible) {
-                IconButton(onClick = onClickForward) {
-                    Icon(
-                        painter = painterResource(id = iconPackR.drawable.ic_corner_up_right_medium_regular_outline),
-                        contentDescription = null,
-                        tint = MaterialTheme.colors.black_white,
-                        modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_FORWARD),
-                    )
+            },
+            actions = {
+                val isSlideshowMenuVisible by produceState(false, imageNode) {
+                    value = showSlideshowMenu(imageNode)
                 }
-            }
 
-            if (isSaveToDeviceMenuVisible) {
-                IconButton(onClick = onClickSaveToDevice) {
-                    Icon(
-                        painter = painterResource(id = iconPackR.drawable.ic_download_medium_regular_outline),
-                        contentDescription = null,
-                        tint = MaterialTheme.colors.black_white,
-                        modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SAVE_TO_DEVICE),
-                    )
+                val isForwardMenuVisible by produceState(false, imageNode) {
+                    value = showForwardMenu(imageNode)
                 }
-            }
 
-            if (isManageLinkMenuVisible) {
-                IconButton(onClick = onClickGetLink) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_link),
-                        contentDescription = null,
-                        tint = MaterialTheme.colors.black_white,
-                        modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MANAGE_LINK),
-                    )
+                val isSaveToDeviceMenuVisible by produceState(false, imageNode) {
+                    value = showSaveToDeviceMenu(imageNode)
                 }
-            }
 
-            if (isMagnifierMenuVisible) {
-                IconButton(onClick = onClickMagnifier) {
-                    Icon(
-                        painter = painterResource(id = iconPackR.drawable.ic_magnifier),
-                        contentDescription = null,
-                        tint = MaterialTheme.colors.black_white,
-                        modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MAGNIFIER),
-                    )
+                val isManageLinkMenuVisible by produceState(false, imageNode) {
+                    value = showManageLinkMenu(imageNode)
                 }
-            }
 
-            if (isSendToMenuVisible) {
-                IconButton(onClick = onClickSendTo) {
-                    Icon(
-                        painter = painterResource(id = iconPackR.drawable.ic_message_arrow_up_medium_regular_outline),
-                        contentDescription = null,
-                        tint = MaterialTheme.colors.black_white,
-                        modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SEND_TO),
-                    )
+                val isMagnifierMenuVisible by produceState(false, imageNode) {
+                    value = showMagnifierMenu(imageNode)
                 }
-            }
 
-            if (isMoreMenuVisible) {
-                IconButton(onClick = onClickMore) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_dots_vertical_white),
-                        contentDescription = null,
-                        tint = MaterialTheme.colors.black_white,
-                        modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MORE),
-                    )
+                val isSendToMenuVisible by produceState(false, imageNode) {
+                    value = showSendToMenu(imageNode)
                 }
-            }
-        },
-        elevation = 0.dp,
-    )
+
+                val isMoreMenuVisible by produceState(false, imageNode) {
+                    value = showMoreMenu(imageNode)
+                }
+
+                if (isSlideshowMenuVisible) {
+                    IconButton(onClick = onClickSlideshow) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_slideshow),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.black_white,
+                            modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SLIDESHOW),
+                        )
+                    }
+                }
+
+                if (isForwardMenuVisible) {
+                    IconButton(onClick = onClickForward) {
+                        Icon(
+                            painter = painterResource(id = iconPackR.drawable.ic_corner_up_right_medium_regular_outline),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.black_white,
+                            modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_FORWARD),
+                        )
+                    }
+                }
+
+                if (isSaveToDeviceMenuVisible) {
+                    IconButton(onClick = onClickSaveToDevice) {
+                        Icon(
+                            painter = painterResource(id = iconPackR.drawable.ic_download_medium_regular_outline),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.black_white,
+                            modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SAVE_TO_DEVICE),
+                        )
+                    }
+                }
+
+                if (isManageLinkMenuVisible) {
+                    IconButton(onClick = onClickGetLink) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_link),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.black_white,
+                            modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MANAGE_LINK),
+                        )
+                    }
+                }
+
+                if (isMagnifierMenuVisible) {
+                    IconButton(onClick = onClickMagnifier) {
+                        Icon(
+                            painter = painterResource(id = iconPackR.drawable.ic_magnifier),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.black_white,
+                            modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MAGNIFIER),
+                        )
+                    }
+                }
+
+                if (isSendToMenuVisible) {
+                    IconButton(onClick = onClickSendTo) {
+                        Icon(
+                            painter = painterResource(id = iconPackR.drawable.ic_message_arrow_up_medium_regular_outline),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.black_white,
+                            modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SEND_TO),
+                        )
+                    }
+                }
+
+                if (isMoreMenuVisible) {
+                    IconButton(onClick = onClickMore) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_dots_vertical_white),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.black_white,
+                            modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MORE),
+                        )
+                    }
+                }
+            },
+            elevation = 0.dp,
+        )
+    }
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
@@ -913,24 +928,29 @@ private fun ImagePreviewBottomBar(
     imageName: String = "",
     imageIndex: String = "",
 ) {
-    BottomAppBar(
-        backgroundColor = MaterialTheme.colors.white_alpha_070_grey_alpha_070,
-        elevation = 0.dp,
+    Box(
+        modifier = Modifier.background(MaterialTheme.colors.white_alpha_070_grey_alpha_070)
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+        BottomAppBar(
+            backgroundColor = Color.Transparent,
+            elevation = 0.dp,
+            modifier = modifier,
         ) {
-            MiddleEllipsisText(
-                text = imageName,
-                color = TextColor.Secondary,
-                modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_BAR_TEXT_IMAGE_NAME),
-            )
-            MiddleEllipsisText(
-                text = imageIndex,
-                color = TextColor.Secondary,
-                modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_BAR_TEXT_IMAGE_COUNT),
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                MiddleEllipsisText(
+                    text = imageName,
+                    color = TextColor.Secondary,
+                    modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_BAR_TEXT_IMAGE_NAME),
+                )
+                MiddleEllipsisText(
+                    text = imageIndex,
+                    color = TextColor.Secondary,
+                    modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_BAR_TEXT_IMAGE_COUNT),
+                )
+            }
         }
     }
 }

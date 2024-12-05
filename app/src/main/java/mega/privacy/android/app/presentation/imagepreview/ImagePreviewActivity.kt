@@ -3,7 +3,10 @@ package mega.privacy.android.app.presentation.imagepreview
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+import android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
@@ -11,14 +14,18 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.Color
 import androidx.core.os.bundleOf
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -127,15 +134,24 @@ class ImagePreviewActivity : BaseActivity() {
     private var tempNodeId: NodeId? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        setupImmersiveMode()
+        super.onCreate(savedInstanceState)
         Analytics.tracker.trackEvent(PhotoPreviewScreenEvent)
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val snackbarHostState: SnackbarHostState = remember {
                 SnackbarHostState()
             }
-            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+            val systemUiController = rememberSystemUiController()
+            val isDarkMode = themeMode.isDarkMode()
+            LaunchedEffect(systemUiController, isDarkMode) {
+                systemUiController.setSystemBarsColor(
+                    color = Color.Transparent,
+                    darkIcons = !isDarkMode
+                )
+            }
+            OriginalTempTheme(isDark = isDarkMode) {
                 PasscodeContainer(
                     passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                     content = {
@@ -172,11 +188,30 @@ class ImagePreviewActivity : BaseActivity() {
                             viewModel = nodeAttachmentViewModel,
                             snackbarHostState = snackbarHostState,
                         )
+
                     }
                 )
             }
         }
         setupFlow()
+    }
+
+    override fun shouldSetStatusBarTextColor() = false
+
+    private fun setupImmersiveMode() {
+        // Apply for Android version 10 or greater
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Draw behind display cutouts.
+            window.attributes.layoutInDisplayCutoutMode = LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+
+            // No scrim behind transparent navigation bar.
+            window.setFlags(FLAG_LAYOUT_NO_LIMITS, FLAG_LAYOUT_NO_LIMITS)
+
+            // System bars use fade by default to hide/show. Make them slide instead.
+            val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+            insetsController.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
     }
 
     private fun setupFlow() {
