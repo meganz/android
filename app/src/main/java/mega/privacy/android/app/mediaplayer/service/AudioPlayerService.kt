@@ -58,7 +58,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.monitoring.CrashReporter
-import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.mobile.analytics.event.AudioPlayerIsActivatedEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerLoopPlayingItemEnabledEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerLoopQueueEnabledEvent
@@ -88,7 +88,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
      * IsUserLoggedIn
      */
     @Inject
-    lateinit var isUserLoggedIn: IsUserLoggedIn
+    lateinit var isUserLoggedInUseCase: IsUserLoggedInUseCase
 
     /**
      * CrashReporter
@@ -557,7 +557,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
     override fun stopAudioServiceWhenAudioPlayerClosedWithUserNotLogin() {
         lifecycleScope.launch {
-            if (!isUserLoggedIn()) {
+            if (!isUserLoggedInUseCase()) {
                 stopPlayer()
             }
         }

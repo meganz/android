@@ -54,7 +54,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
@@ -76,7 +76,7 @@ import javax.inject.Provider
  * @property megaChatApi
  * @property _dbH
  * @property getMiscFlagsUseCase
- * @property isUserLoggedIn
+ * @property isUserLoggedInUseCase
  * @property myAccountInfo
  * @property passcodeManagement
  * @property crashReporter
@@ -126,7 +126,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     lateinit var getMiscFlagsUseCase: GetMiscFlagsUseCase
 
     @Inject
-    lateinit var isUserLoggedIn: IsUserLoggedIn
+    lateinit var isUserLoggedInUseCase: IsUserLoggedInUseCase
 
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
@@ -398,7 +398,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     private fun getMiscFlagsIfNeeded() {
         applicationScope.launch {
             runCatching {
-                val isUserLoggedOut = isUserLoggedIn().not()
+                val isUserLoggedOut = isUserLoggedInUseCase().not()
                 if (isUserLoggedOut) {
                     getMiscFlagsUseCase()
                 }
