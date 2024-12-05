@@ -27,7 +27,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Chronometer
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -39,6 +38,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ModalBottomSheetDefaults
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
@@ -81,9 +81,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.WorkManager
 import com.anggrayudi.storage.file.getAbsolutePath
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.admanager.AdManagerAdView
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -103,7 +100,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.BusinessExpiredAlertActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -129,6 +125,7 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
+import mega.privacy.android.app.main.ads.AdsContainer
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.ClearRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.Enable2FADialogFragment
@@ -347,7 +344,8 @@ import javax.inject.Inject
 @Suppress("KDocMissingDocumentation")
 @AndroidEntryPoint
 class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelectedListener,
-    BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, ActionNodeCallback, SnackbarShower,
+    BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
+    ActionNodeCallback, SnackbarShower,
     MeetingBottomSheetDialogActionListener, NotificationNavigationHandler,
     ParentNodeManager, CameraPermissionManager, NavigationDrawerManager, FileBrowserActionListener,
     SharesActionListener {
@@ -535,7 +533,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private lateinit var requestStatusProgressComposeView: ComposeView
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var navigationView: NavigationView
-    private lateinit var adsContainerView: FrameLayout
+    private lateinit var adsContainerView: ComposeView
 
     private var miniAudioPlayerController: MiniAudioPlayerController? = null
     private lateinit var cameraUploadViewTypes: LinearLayout
@@ -629,41 +627,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             runCatching {
                 getAccountCredentialsUseCase()
             }.getOrNull()
-        }
-    }
-
-    private val adView: AdManagerAdView by lazy {
-        AdManagerAdView(this).apply {
-            adUnitId = BuildConfig.AD_UNIT_ID
-            setAdSize(googleAdsManager.AD_SIZE)
-            adListener = object : AdListener() {
-                override fun onAdClicked() {
-                    Timber.d("Ad clicked")
-                }
-
-                override fun onAdClosed() {
-                    Timber.i("Ad closed")
-                }
-
-                override fun onAdFailedToLoad(adError: LoadAdError) {
-                    Timber.w("Ad failed to load: ${adError.message}")
-                    hideAdsView()
-                    fetchNewAd()
-                }
-
-                override fun onAdImpression() {
-                    Timber.i("Ad impression")
-                }
-
-                override fun onAdLoaded() {
-                    Timber.i("Ad loaded")
-                    handleShowingAds("")
-                }
-
-                override fun onAdOpened() {
-                    Timber.i("Ad opened")
-                }
-            }
         }
     }
 
@@ -2358,8 +2321,22 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     private fun setupAdsView() {
-        adsContainerView.removeAllViews()
-        adsContainerView.addView(adView)
+        adsContainerView.setContent {
+            val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val request by googleAdsManager.request.collectAsStateWithLifecycle()
+            AdsContainer(
+                modifier = Modifier.fillMaxSize(),
+                request = request,
+                isDark = themeMode.isDarkMode(),
+                onAdLoaded = {
+                    handleShowingAds("")
+                },
+                onAdFailedToLoad = {
+                    hideAdsView()
+                    fetchNewAd()
+                },
+            )
+        }
         fetchNewAd()
     }
 
@@ -2367,9 +2344,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * Fetch a new Ad by fetching a new AdRequest and loading it into the AdView
      */
     private fun fetchNewAd() {
-        googleAdsManager.fetchAdRequest()?.let {
-            adView.loadAd(it)
-        }
+        googleAdsManager.fetchAdRequest()
     }
 
     private fun showAdsView() {
@@ -2392,7 +2367,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         checkForInAppUpdateInstallStatus()
         cookieDialogHandler.onResume()
         updateTransfersWidgetVisibility()
-        adView.resume()
     }
 
     private fun checkForInAppUpdateInstallStatus() {
@@ -2804,7 +2778,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     override fun onPause() {
         Timber.d("onPause")
         transfersManagement.isOnTransfersSection = false
-        adView.pause()
         super.onPause()
     }
 
@@ -2814,7 +2787,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         reconnectDialog?.cancel()
         dismissAlertDialogIfExists(processFileDialog)
         cookieDialogHandler.onDestroy()
-        adView.destroy()
         super.onDestroy()
     }
 

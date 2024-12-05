@@ -140,7 +140,7 @@
                     app:menu="@menu/bottom_navigation_items"
                     app:layout_constraintBottom_toTopOf="@id/ads_web_compose_view"/>
 
-                <FrameLayout
+                <androidx.compose.ui.platform.ComposeView
                     android:id="@+id/ads_web_compose_view"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"

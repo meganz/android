@@ -1,12 +1,14 @@
 package mega.privacy.android.app.presentation.advertisements
 
 import android.app.Activity
-import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.FormError
 import com.google.android.ump.UserMessagingPlatform
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
@@ -32,11 +34,12 @@ class GoogleAdsManager @Inject constructor(
     private var isAdsFeatureEnabled: Boolean = false
     private var isAdRequestAvailable: Boolean = false
 
+    private val _request = MutableStateFlow<AdManagerAdRequest?>(null)
+
     /**
-     * Helper variable to get the AdSize for the ads.
+     * Flow to provide the AdRequest to be used in the AdManager.
      */
-    val AD_SIZE: AdSize
-        get() = AdSize(320, 50)
+    val request = _request.asStateFlow()
 
     /**
      *  Helper variable to determine if the privacy options form is required.
@@ -125,13 +128,12 @@ class GoogleAdsManager @Inject constructor(
     /**
      * Fetch an AdRequest to be used in the AdManager.
      */
-    fun fetchAdRequest(): AdManagerAdRequest? {
-        return if (isAdsEnabled() && consentInformation.canRequestAds()) {
+    fun fetchAdRequest() {
+        if (isAdsEnabled() && consentInformation.canRequestAds()) {
             isAdRequestAvailable = true
-            AdManagerAdRequest.Builder().build()
+            _request.update { AdManagerAdRequest.Builder().build() }
         } else {
-            isAdRequestAvailable = false
-            null
+            _request.update { null }
         }
     }
 
