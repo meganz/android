@@ -210,7 +210,7 @@ internal fun ChatRoomItemBottomSheetView(
                         ChatDivider()
                     }
 
-                    if (item.hasPermissions) {
+                    if (item.hasPermissions && item.schedId != null) {
                         MenuItem(
                             modifier = Modifier.testTag("edit"),
                             res = R.drawable.ic_scheduled_meeting_edit,
