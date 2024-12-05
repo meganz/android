@@ -130,7 +130,6 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.ClearRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.Enable2FADialogFragment
 import mega.privacy.android.app.main.dialog.businessgrace.BusinessGraceDialogFragment
-import mega.privacy.android.app.main.dialog.connect.ConfirmConnectDialogFragment
 import mega.privacy.android.app.main.dialog.contactlink.ContactLinkDialogFragment
 import mega.privacy.android.app.main.dialog.link.OpenLinkDialogFragment
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogFragment
@@ -3245,15 +3244,21 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             } else {
                 Timber.w("showOnlineMode - Root is NULL")
                 if (MegaApplication.openChatId == MEGACHAT_INVALID_HANDLE) {
-                    ConfirmConnectDialogFragment().show(
-                        supportFragmentManager,
-                        ConfirmConnectDialogFragment.TAG
-                    )
+                    navigateToLogin()
                 }
             }
         } catch (e: Exception) {
             Timber.w(e)
         }
+    }
+
+    private fun navigateToLogin() {
+        val intent = Intent(this, LoginActivity::class.java).apply {
+            putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
+        startActivity(intent)
+        finish()
     }
 
     private fun showOfflineMode() {
