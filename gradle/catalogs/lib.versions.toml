@@ -2,7 +2,7 @@
 anko = "0.10.8"
 bannerviewpager = "3.4.0"
 billing-client = "6.2.0"
-coil = "2.5.0"
+coil = "2.7.0"
 coroutines = "1.8.0"
 fresco = "3.4.0"
 javax = "1"
@@ -22,7 +22,7 @@ sqlcipher = "4.5.4"
 kotlin-serialisation = "1.6.3"
 eclipse-jgit = "6.6.0.202305301015-r"
 json = "20240303"
-zoomable-image-coil = "0.13.0"
+mega-telephoto = "1.0.0"
 mega-core-ui = "2.10.20240531102524"
 kotlinx-collections-immutable = "0.3.7"
 commonmark-java = "0.24.0"
@@ -75,7 +75,10 @@ kotlin-serialisation = { module = "org.jetbrains.kotlinx:kotlinx-serialization-j
 eclipse-jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "eclipse-jgit"}
 eclipse-jgit-ssh-jsch = { module = "org.eclipse.jgit:org.eclipse.jgit.ssh.jsch", version.ref = "eclipse-jgit"}
 json = { module = "org.json:json", version.ref = "json"}
-zoomable-image-coil = { module = "me.saket.telephoto:zoomable-image-coil", version.ref = "zoomable-image-coil" }
+zoomable-telephoto = { module = "me.saket.telephoto.mega:zoomable", version.ref = "mega-telephoto" }
+zoomable-image-coil = { module = "me.saket.telephoto.mega:zoomable-image-coil", version.ref = "mega-telephoto" }
+zoomable-image-core = { module = "me.saket.telephoto.mega:zoomable-image-core", version.ref = "mega-telephoto" }
+zoomable-image-subsampling-image = { module = "me.saket.telephoto.mega:zoomable-image-sub-sampling-image", version.ref = "mega-telephoto" }
 mega-core-ui = { group = "mega.android.core", name  = "ui", version.ref = "mega-core-ui" }
 mega-core-ui-tokens = { group = "mega.android.core", name  = "ui-tokens", version.ref = "mega-core-ui"}
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }

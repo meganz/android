@@ -65,6 +65,11 @@ allprojects {
             url =
                 uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/karma")
         }
+
+        maven {
+            url =
+                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/mega-telephoto")
+        }
     }
     configurations.all {
         resolutionStrategy.cacheDynamicVersionsFor(5, "minutes")

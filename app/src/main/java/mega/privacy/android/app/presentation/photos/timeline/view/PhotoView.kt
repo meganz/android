@@ -19,8 +19,11 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -156,6 +159,7 @@ private fun PhotoCoverView(
                     isPreview = isDownloadPreview,
                     downloadPhoto = downloadPhoto,
                     shouldApplySensitiveMode = shouldApplySensitiveMode,
+                    showOverlayOnSuccess = false
                 )
                 if (photo.isFavourite) {
                     Image(
@@ -173,14 +177,8 @@ private fun PhotoCoverView(
                     photo = photo,
                     shouldApplySensitiveMode = shouldApplySensitiveMode,
                     isPreview = isDownloadPreview,
-                    downloadPhoto = downloadPhoto
-                )
-                Spacer(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(
-                            color = colorResource(id = R.color.grey_alpha_032)
-                        )
+                    downloadPhoto = downloadPhoto,
+                    showOverlayOnSuccess = true
                 )
 
                 Text(
@@ -211,8 +209,12 @@ private fun PhotoImageView(
     photo: Photo,
     shouldApplySensitiveMode: Boolean,
     isPreview: Boolean,
+    showOverlayOnSuccess: Boolean = false,
     downloadPhoto: PhotoDownload,
 ) {
+
+    var showOverlayState by remember { mutableStateOf(false) }
+
     val imageState = produceState<String?>(initialValue = null) {
         downloadPhoto(isPreview, photo) { downloadSuccess ->
             if (downloadSuccess) {
@@ -225,23 +227,39 @@ private fun PhotoImageView(
         }
     }
 
-    AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(imageState.value)
-            .crossfade(true)
-            .build(),
-        contentDescription = null,
-        placeholder = ColorPainter(MaterialTheme.colors.grey_050_grey_700),
-        error = ColorPainter(MaterialTheme.colors.grey_050_grey_700),
-        contentScale = ContentScale.Crop,
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f)
-            .alpha(0.5f.takeIf {
-                shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
-            } ?: 1f)
-            .blur(16.dp.takeIf {
-                shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
-            } ?: 0.dp)
-    )
+    Box {
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageState.value)
+                .crossfade(true)
+                .build(),
+            contentDescription = null,
+            placeholder = ColorPainter(MaterialTheme.colors.grey_050_grey_700),
+            error = ColorPainter(MaterialTheme.colors.grey_050_grey_700),
+            contentScale = ContentScale.Crop,
+            onSuccess = {
+                if (showOverlayOnSuccess && imageState.value != null) {
+                    showOverlayState = true
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .alpha(0.5f.takeIf {
+                    shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
+                } ?: 1f)
+                .blur(16.dp.takeIf {
+                    shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
+                } ?: 0.dp)
+        )
+        if (showOverlayState)
+            Spacer(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        color = colorResource(id = R.color.grey_alpha_032)
+                    )
+            )
+    }
+
 }

@@ -310,7 +310,10 @@ dependencies {
     implementation(testlib.hamcrest)
     implementation(lib.mega.analytics)
     implementation(lib.kotlin.serialisation)
+    implementation(lib.zoomable.telephoto)
     implementation(lib.zoomable.image.coil)
+    implementation(lib.zoomable.image.core)
+    implementation(lib.zoomable.image.subsampling.image)
     implementation(lib.commonmark.java)
 
     // Debug

@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.wrapContentSize
@@ -93,6 +94,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
+import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
@@ -710,10 +712,14 @@ private fun ImagePreviewContent(
 
         if (progress in 1 until 100) {
             CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.BottomEnd),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .safeDrawingPadding()
+                    .padding(end = 16.dp)
+                    .width(25.dp),
                 progress = progress.toFloat() / 100,
                 color = MaterialTheme.colors.secondary,
-                strokeWidth = 2.dp,
+                strokeWidth = 3.dp,
             )
         }
     }
@@ -759,10 +765,12 @@ private fun ImageContent(
             .crossfade(true)
             .build()
 
+        val isThumbnailFile = imagePath?.contains(CacheFolderConstant.THUMBNAIL_FOLDER) == true
+
         ZoomableAsyncImage(
             model = request,
             state = imageState,
-            gesturesEnabled = enableZoom && !isMagnifierMode,
+            gesturesEnabled = enableZoom && !isMagnifierMode && !isThumbnailFile,
             contentDescription = "Image Preview",
             modifier = Modifier.fillMaxSize(),
             onClick = {
