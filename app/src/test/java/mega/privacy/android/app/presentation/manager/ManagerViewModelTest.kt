@@ -105,6 +105,7 @@ import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
+import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
@@ -354,6 +355,7 @@ class ManagerViewModelTest {
 
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase = mock()
     private val versionHistoryRemoveMessageMapper: VersionHistoryRemoveMessageMapper = mock()
+    private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
 
 
     private fun initViewModel() {
@@ -443,7 +445,8 @@ class ManagerViewModelTest {
             createFolderNodeUseCase = createFolderNodeUseCase,
             monitorChatListItemUpdates = { monitorChatListItemUpdates },
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
-            versionHistoryRemoveMessageMapper = versionHistoryRemoveMessageMapper
+            versionHistoryRemoveMessageMapper = versionHistoryRemoveMessageMapper,
+            backgroundFastLoginUseCase = backgroundFastLoginUseCase
         )
     }
 
@@ -1663,6 +1666,22 @@ class ManagerViewModelTest {
         runTest {
             underTest.initShareKeys(null)
             verifyNoInteractions(createShareKeyUseCase)
+        }
+
+    @Test
+    fun `test that background fast login is invoked when performFastLoginInBackground is called`() =
+        runTest {
+            underTest.performFastLoginInBackground()
+            verify(backgroundFastLoginUseCase).invoke()
+        }
+
+    @Test
+    fun `test that performFastLoginInBackground returns true when background fast login is successful`() =
+        runTest {
+            val sessionId = "session123"
+            whenever(backgroundFastLoginUseCase.invoke()).thenReturn(sessionId)
+            val result = underTest.performFastLoginInBackground()
+            assertThat(result).isEqualTo(true)
         }
 
     companion object {

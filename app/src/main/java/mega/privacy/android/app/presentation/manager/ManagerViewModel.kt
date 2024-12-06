@@ -93,6 +93,7 @@ import mega.privacy.android.domain.usecase.environment.MonitorDevicePowerConnect
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
+import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChatUseCase
 import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
@@ -275,6 +276,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase,
     private val versionHistoryRemoveMessageMapper: VersionHistoryRemoveMessageMapper,
+    private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
 ) : ViewModel() {
 
     /**
@@ -1466,6 +1468,13 @@ class ManagerViewModel @Inject constructor(
         }
         return versionHistoryRemoveMessageMapper(result.exceptionOrNull())
     }
+
+    /**
+     * Perform fast login in background
+     */
+    suspend fun performFastLoginInBackground() = runCatching {
+        backgroundFastLoginUseCase()
+    }.isSuccess
 
     internal companion object {
         internal const val IS_FIRST_LOGIN_KEY = "EXTRA_FIRST_LOGIN"

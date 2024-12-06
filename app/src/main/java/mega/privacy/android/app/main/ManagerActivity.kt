@@ -3244,7 +3244,26 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             } else {
                 Timber.w("showOnlineMode - Root is NULL")
                 if (MegaApplication.openChatId == MEGACHAT_INVALID_HANDLE) {
-                    navigateToLogin()
+                    lifecycleScope.launch {
+                        showSnackbar(
+                            SNACKBAR_TYPE,
+                            getString(R.string.login_connecting_to_server),
+                            -1
+                        )
+                        val loginSuccess = viewModel.performFastLoginInBackground()
+                        if (loginSuccess) {
+                            rootNode = megaApi.rootNode
+                            showSnackbar(
+                                SNACKBAR_TYPE,
+                                getString(mega.privacy.android.shared.resources.R.string.login_connected_to_server),
+                                -1
+                            )
+                            if (isInMainHomePage) moveFromOfflineToOnlineMode()
+                        } else {
+                            navigateToLogin()
+                        }
+                    }
+
                 }
             }
         } catch (e: Exception) {
@@ -3259,6 +3278,19 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
         startActivity(intent)
         finish()
+    }
+
+    private fun moveFromOfflineToOnlineMode() {
+        try {
+            if (drawerItem == null) {
+                selectDrawerItem(DrawerItem.HOMEPAGE)
+            }
+            resetNavigationViewMenu(bottomNavigationView.menu)
+            supportInvalidateOptionsMenu()
+            checkForInAppAdvertisement()
+        } catch (e: Exception) {
+            Timber.w(e)
+        }
     }
 
     private fun showOfflineMode() {

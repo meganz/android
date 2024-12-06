@@ -246,6 +246,10 @@ class HomepageFragment : Fragment() {
                 showOfflineMode()
             }
         }
+
+        viewLifecycleOwner.collectFlow(viewModel.monitorFetchNodesFinish) {
+            showOnlineMode()
+        }
     }
 
     override fun onResume() {

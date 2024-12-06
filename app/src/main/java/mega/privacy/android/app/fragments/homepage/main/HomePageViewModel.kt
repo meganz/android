@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.contact.MonitorMyChatOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.MonitorLogoutUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -29,6 +30,7 @@ class HomePageViewModel @Inject constructor(
     private val repository: HomepageRepository,
     isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val monitorLogoutUseCase: MonitorLogoutUseCase,
     private val monitorHomeBadgeCountUseCase: MonitorHomeBadgeCountUseCase,
     private val monitorMyChatOnlineStatusUseCase: MonitorMyChatOnlineStatusUseCase,
@@ -59,6 +61,11 @@ class HomePageViewModel @Inject constructor(
      */
     @OptIn(FlowPreview::class)
     val monitorConnectivity = monitorConnectivityUseCase().debounce(TimeUnit.SECONDS.toMillis(1))
+
+    /**
+     * Monitor Fetch Nodes finish
+     */
+    val monitorFetchNodesFinish = monitorFetchNodesFinishUseCase()
 
     init {
         viewModelScope.launch {

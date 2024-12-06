@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.EventType
@@ -14,16 +15,17 @@ import mega.privacy.android.domain.entity.contacts.OnlineStatus
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.HasBackupsChildren
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.GetCurrentUserStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorMyChatOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.notifications.GetEnabledNotificationsUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import org.junit.jupiter.api.BeforeEach
@@ -61,6 +63,7 @@ internal class ManagerDrawerViewModelTest {
     private val monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase = mock()
     private val monitorVerificationStatus: MonitorVerificationStatus = mock()
     private val getEnabledNotificationsUseCase: GetEnabledNotificationsUseCase = mock()
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase = mock()
 
     @BeforeEach
     fun resetMocks() {
@@ -114,6 +117,7 @@ internal class ManagerDrawerViewModelTest {
             rootNodeExistsUseCase,
             monitorConnectivityUseCase,
             getEnabledNotificationsUseCase,
+            monitorFetchNodesFinishUseCase,
             monitorMyAccountUpdateUseCase,
         )
     }
@@ -187,6 +191,22 @@ internal class ManagerDrawerViewModelTest {
 
             underTest.state.test {
                 assertThat(awaitItem().backupsNodeHandle).isEqualTo(expectedNodeId)
+            }
+        }
+
+    @ParameterizedTest(name = "with value {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that root node exists is updated correctly when fetch nodes finished is received`(
+        isRootNodeExist: Boolean,
+    ) =
+        runTest {
+            whenever(monitorFetchNodesFinishUseCase()).thenReturn(flowOf(true))
+            whenever(rootNodeExistsUseCase()).thenReturn(isRootNodeExist)
+
+            initTestClass()
+
+            underTest.state.test {
+                assertThat(awaitItem().isRootNodeExist).isEqualTo(isRootNodeExist)
             }
         }
 

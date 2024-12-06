@@ -856,4 +856,6 @@
     <string name="general_select_folder">Select folder</string>
     <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
     <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">Move to: [B]%1s[/B]</string>
+    <!-- Message shown to user when app is connected to the MEGA server -->
+    <string name="login_connected_to_server">Connected to the server</string>
 </resources>

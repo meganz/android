@@ -9,6 +9,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.usecase.contact.MonitorMyChatOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.MonitorLogoutUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -32,6 +33,7 @@ class HomePageViewModelTest {
     private val monitorLogoutUseCase: MonitorLogoutUseCase = mock()
     private val monitorHomeBadgeCountUseCase: MonitorHomeBadgeCountUseCase = mock()
     private val monitorMyChatOnlineStatusUseCase: MonitorMyChatOnlineStatusUseCase = mock()
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase = mock()
 
     private lateinit var underTest: HomePageViewModel
 
@@ -46,9 +48,10 @@ class HomePageViewModelTest {
             repository,
             isConnectedToInternetUseCase,
             monitorConnectivityUseCase,
+            monitorFetchNodesFinishUseCase,
             monitorLogoutUseCase,
             monitorHomeBadgeCountUseCase,
-            monitorMyChatOnlineStatusUseCase
+            monitorMyChatOnlineStatusUseCase,
         )
     }
 
@@ -58,6 +61,7 @@ class HomePageViewModelTest {
         whenever(monitorHomeBadgeCountUseCase()).thenReturn(emptyFlow())
         whenever(monitorLogoutUseCase()).thenReturn(emptyFlow())
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
+        whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
         reset(
             repository,
             isConnectedToInternetUseCase,

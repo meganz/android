@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
@@ -47,6 +48,8 @@ class RecentActionsComposeViewModelTest {
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
+    private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
+    private val monitorFetchNodesFinishFakeFlow = MutableSharedFlow<Boolean>()
     private val recentActionBucketUiEntityMapper = mock<RecentActionBucketUiEntityMapper>()
 
     private val megaRecentActionBucket = mock<RecentActionBucket>()
@@ -68,7 +71,8 @@ class RecentActionsComposeViewModelTest {
             monitorHideRecentActivityUseCase,
             monitorNodeUpdatesUseCase,
             recentActionBucketUiEntityMapper,
-            monitorConnectivityUseCase
+            monitorConnectivityUseCase,
+            monitorFetchNodesFinishUseCase
         )
         runBlocking {
             stubCommon()
@@ -84,6 +88,7 @@ class RecentActionsComposeViewModelTest {
             monitorAccountDetailUseCase = mock(),
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase
         )
     }
 
@@ -95,6 +100,7 @@ class RecentActionsComposeViewModelTest {
         })
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
+        whenever(monitorFetchNodesFinishUseCase()).thenReturn(monitorFetchNodesFinishFakeFlow)
 
         val recentActionBucketUiEntity1 = mock<RecentActionBucketUiEntity> {
             on { this.date }.thenReturn("Today")
@@ -145,6 +151,21 @@ class RecentActionsComposeViewModelTest {
                     assertThat(awaitItem().totalSize()).isEqualTo(1)
                     advanceUntilIdle()
                     monitorNodeUpdatesFakeFlow.emit(NodeUpdate(emptyMap()))
+                    whenever(getRecentActionsUseCase(any())).thenReturn(
+                        listOf(megaRecentActionBucket, megaRecentActionBucket3)
+                    )
+                    assertThat(awaitItem().totalSize()).isEqualTo(2)
+                }
+        }
+
+    @Test
+    fun `test that recent action items is updated when fetch nodes is finished`() =
+        runTest {
+            underTest.uiState.map { it.groupedRecentActionItems }.distinctUntilChanged()
+                .test {
+                    assertThat(awaitItem().totalSize()).isEqualTo(1)
+                    advanceUntilIdle()
+                    monitorFetchNodesFinishFakeFlow.emit(true)
                     whenever(getRecentActionsUseCase(any())).thenReturn(
                         listOf(megaRecentActionBucket, megaRecentActionBucket3)
                     )

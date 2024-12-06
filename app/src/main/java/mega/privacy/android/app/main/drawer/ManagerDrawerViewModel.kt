@@ -13,16 +13,17 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.verification.UnVerified
-import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.HasBackupsChildren
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.GetCurrentUserStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorMyChatOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.notifications.GetEnabledNotificationsUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import timber.log.Timber
@@ -41,6 +42,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getEnabledNotificationsUseCase: GetEnabledNotificationsUseCase,
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ManagerDrawerUiState())
@@ -72,6 +74,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
         observerVerificationStatus()
         observerConnectivityEvent()
         shouldShowPromoTag()
+        monitorFetchNodesFinish()
     }
 
     private fun observerConnectivityEvent() {
@@ -172,6 +175,14 @@ internal class ManagerDrawerViewModel @Inject constructor(
                 val promoNotificationCount = getEnabledNotificationsUseCase().size
                 _state.update { it.copy(showPromoTag = promoNotificationCount > 0) }
             }
+        }
+    }
+
+    private fun monitorFetchNodesFinish() {
+        viewModelScope.launch {
+            monitorFetchNodesFinishUseCase()
+                .catch { Timber.e(it) }
+                .collect { checkRootNode() }
         }
     }
 }
