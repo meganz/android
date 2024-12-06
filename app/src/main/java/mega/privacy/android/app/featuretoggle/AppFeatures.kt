@@ -16,6 +16,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enable the menu of Favourites playlist
+     */
+    FavouritesPlaylistMenuEnabled(
+        "Enable Favourites playlist menu",
+        false
+    ),
+
+    /**
      * Enable the video player zoom in feature
      */
     VideoPlayerZoomInEnable(

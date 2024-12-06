@@ -32,6 +32,7 @@ class VideoPlaylistDetailTopBarTest {
         selectedSize: Int = 0,
         onMenuActionClick: (VideoSectionMenuAction?) -> Unit = {},
         onBackPressed: () -> Unit = {},
+        enableFavouritesPlaylistMenu: Boolean = false,
     ) {
         composeTestRule.setContent {
             VideoPlaylistDetailTopBar(
@@ -42,7 +43,8 @@ class VideoPlaylistDetailTopBarTest {
                 isHideMenuActionVisible = false,
                 onMenuActionClick = onMenuActionClick,
                 onBackPressed = onBackPressed,
-                isSystemVideoPlaylist = isSystemVideoPlaylist
+                isSystemVideoPlaylist = isSystemVideoPlaylist,
+                enableFavouritesPlaylistMenu = enableFavouritesPlaylistMenu
             )
         }
     }
@@ -147,7 +149,19 @@ class VideoPlaylistDetailTopBarTest {
 
     @Test
     fun `test that more action is displayed when isSystemVideoPlaylist is false`() {
-        setComposeContent(isSystemVideoPlaylist = false)
+        setComposeContent(isSystemVideoPlaylist = false, enableFavouritesPlaylistMenu = true)
+        composeTestRule.onNodeWithTag(
+            testTag = TEST_TAG_VIDEO_SECTION_MORE_ACTION,
+            useUnmergedTree = true
+        )
+            .apply {
+                assertIsDisplayed()
+            }
+    }
+
+    @Test
+    fun `test that more action is displayed when isSystemVideoPlaylist is true and enableFavouritesPlaylistMenu is true`() {
+        setComposeContent(isSystemVideoPlaylist = true, enableFavouritesPlaylistMenu = true)
         composeTestRule.onNodeWithTag(
             testTag = TEST_TAG_VIDEO_SECTION_MORE_ACTION,
             useUnmergedTree = true

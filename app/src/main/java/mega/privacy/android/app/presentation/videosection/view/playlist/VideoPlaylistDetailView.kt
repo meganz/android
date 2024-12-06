@@ -98,11 +98,14 @@ fun VideoPlaylistDetailView(
     onLongClick: ((item: VideoUIEntity, index: Int) -> Unit),
     onBackPressed: () -> Unit,
     onMenuActionClick: (VideoSectionMenuAction?) -> Unit,
+    enableFavouritesPlaylistMenu: Boolean,
     modifier: Modifier = Modifier,
     errorMessage: Int? = null,
 ) {
     val items = playlist?.videos ?: emptyList()
     val lazyListState = rememberLazyListState()
+    val isSystemVideoPlaylist = playlist?.isSystemVideoPlayer == true
+
 
     val isNotInFirstItem by remember {
         derivedStateOf {
@@ -207,7 +210,8 @@ fun VideoPlaylistDetailView(
                     }
                 },
                 onBackPressed = onBackPressed,
-                isSystemVideoPlaylist = playlist?.isSystemVideoPlayer == true
+                isSystemVideoPlaylist = isSystemVideoPlaylist,
+                enableFavouritesPlaylistMenu = enableFavouritesPlaylistMenu
             )
         },
         floatingActionButton = {
@@ -281,7 +285,7 @@ fun VideoPlaylistDetailView(
                 title = playlist?.title,
                 totalDuration = playlist?.totalDuration,
                 numberOfVideos = playlist?.numberOfVideos,
-                isFavouritePlaylist = playlist?.isSystemVideoPlayer == true,
+                isFavouritePlaylist = isSystemVideoPlaylist,
                 onPlayAllClicked = {},
                 modifier = Modifier.testTag(
                     VIDEO_PLAYLIST_DETAIL_EMPTY_VIEW_TEST_TAG
@@ -330,7 +334,11 @@ fun VideoPlaylistDetailView(
                                     nodeAvailableOffline = videoItem.nodeAvailableOffline,
                                     onClick = { onClick(videoItem, it) },
                                     onMenuClick = { onMenuClick(videoItem) },
-                                    onLongClick = { onLongClick(videoItem, it) },
+                                    onLongClick = {
+                                        if (!isSystemVideoPlaylist || enableFavouritesPlaylistMenu) {
+                                            onLongClick(videoItem, it)
+                                        }
+                                    },
                                     modifier = Modifier
                                         .alpha(0.5f.takeIf {
                                             shouldApplySensitiveMode && (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited)
@@ -577,7 +585,8 @@ private fun VideoPlaylistDetailViewPreview() {
             onClick = { _, _ -> },
             onLongClick = { _, _ -> },
             onMenuClick = {},
-            onMenuActionClick = {}
+            onMenuActionClick = {},
+            enableFavouritesPlaylistMenu = false
         )
     }
 }
@@ -608,7 +617,8 @@ private fun VideoPlaylistDetailViewUnderActionModePreview() {
             onClick = { _, _ -> },
             onLongClick = { _, _ -> },
             onMenuClick = {},
-            onMenuActionClick = {}
+            onMenuActionClick = {},
+            enableFavouritesPlaylistMenu = false
         )
     }
 }

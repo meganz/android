@@ -28,6 +28,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
@@ -697,12 +698,12 @@ class VideoSectionViewModel @Inject constructor(
 
     private fun updateVideoItemOfPlaylistInSelectionState(item: VideoUIEntity, index: Int) =
         _state.value.currentVideoPlaylist?.let { playlist ->
-            if (playlist.videos == null || item.elementID == null) return@let
+            if (playlist.videos == null) return@let
             val isSelected = !item.isSelected
             val updatedVideos =
                 playlist.videos.updateItemSelectedState(index, isSelected)
             val selectedHandles = updateSelectedHandles(
-                videoID = item.elementID,
+                videoID = item.elementID ?: item.id.longValue,
                 isSelected = isSelected,
                 selectedHandles = _state.value.selectedVideoElementIDs
             )
@@ -1251,6 +1252,9 @@ class VideoSectionViewModel @Inject constructor(
     internal fun updateAddToPlaylistTitles(titles: List<String>?) = _state.update {
         it.copy(addToPlaylistTitles = titles)
     }
+
+    internal suspend fun enableFavouritesPlaylistMenu() =
+        getFeatureFlagValueUseCase(AppFeatures.FavouritesPlaylistMenuEnabled)
 
     companion object {
         private const val ERROR_MESSAGE_REPEATED_TITLE = 0
