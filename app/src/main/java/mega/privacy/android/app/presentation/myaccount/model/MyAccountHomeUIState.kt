@@ -4,7 +4,6 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import java.io.File
@@ -41,7 +40,6 @@ import java.io.File
  * @property navigateToAchievements
  * @property userMessage
  * @property accountTypeNameResource
- * @property storageState storage state of the account
  */
 data class MyAccountHomeUIState(
     val name: String? = null,
@@ -74,6 +72,5 @@ data class MyAccountHomeUIState(
     val navigateToAchievements: StateEvent = consumed,
     val userMessage: StateEventWithContent<Int> = consumed(),
     val accountTypeNameResource: Int,
-    val storageState: StorageState = StorageState.Unknown
 ) {
 }

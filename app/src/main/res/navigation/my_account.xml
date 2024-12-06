@@ -43,11 +43,7 @@
     <fragment
         android:id="@+id/my_account_usage"
         android:name="mega.privacy.android.app.myAccount.MyAccountUsageFragment"
-        tools:layout="@layout/fragment_my_account_usage">
-        <argument
-            android:name="storage_state"
-            app:argType="mega.privacy.android.domain.entity.StorageState" />
-    </fragment>
+        tools:layout="@layout/fragment_my_account_usage"/>
 
     <activity
         android:id="@+id/edit_profile"

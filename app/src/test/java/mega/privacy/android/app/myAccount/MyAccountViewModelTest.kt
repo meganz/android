@@ -9,6 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -21,6 +22,7 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.PaymentMethodType
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -56,6 +58,7 @@ import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCa
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
 import mega.privacy.android.domain.usecase.account.LegacyCancelSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.QueryCancelLinkUseCase
 import mega.privacy.android.domain.usecase.account.QueryChangeEmailLinkUseCase
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
@@ -77,6 +80,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.kotlin.any
@@ -141,6 +145,10 @@ internal class MyAccountViewModelTest {
     private val userUpdatesFlow = MutableSharedFlow<UserChanges>()
     private val verificationStatusFlow = MutableSharedFlow<VerificationStatus>()
     private val backupFolderFlow = MutableSharedFlow<Result<NodeId>>()
+    private val storageStateFlow = MutableStateFlow(StorageState.Unknown)
+    private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase> {
+        on { invoke() }.thenReturn(storageStateFlow)
+    }
 
     @BeforeEach
     fun setup() = runTest {
@@ -175,7 +183,7 @@ internal class MyAccountViewModelTest {
         whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
         whenever(myAccountInfo.usedFormatted).thenReturn("")
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
-
+        storageStateFlow.value = StorageState.Unknown
     }
 
     private fun initializeViewModel() {
@@ -219,6 +227,7 @@ internal class MyAccountViewModelTest {
             snackBarHandler = snackBarHandler,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            monitorStorageStateUseCase = monitorStorageStateUseCase,
         )
     }
 
@@ -739,6 +748,19 @@ internal class MyAccountViewModelTest {
             assertThat(awaitItem().accountType).isEqualTo(expected)
         }
     }
+
+    @ParameterizedTest(name = "{0}")
+    @EnumSource(StorageState::class)
+    fun `test that storage state should be updated when monitorStorageState emits`(state: StorageState) =
+        runTest {
+            storageStateFlow.emit(state)
+
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().storageState).isEqualTo(state)
+            }
+        }
 
     private val expectedSubscriptionRenewTime = 1873874783274L
     private val expectedProExpirationTime = 378672463728467L

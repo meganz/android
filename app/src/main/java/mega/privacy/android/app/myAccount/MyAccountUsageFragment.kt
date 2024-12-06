@@ -9,9 +9,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.navArgs
 import com.google.android.material.transition.MaterialContainerTransform
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentMyAccountUsageBinding
@@ -53,8 +54,6 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
     private lateinit var binding: FragmentMyAccountUsageBinding
     private lateinit var usageBinding: MyAccountUsageContainerBinding
     private lateinit var paymentAlertBinding: MyAccountPaymentInfoContainerBinding
-
-    private val args by navArgs<MyAccountUsageFragmentArgs>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,8 +100,6 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
 
         binding.rubbishSeparator.isVisible = false
         binding.previousVersionsStorageContainer.isVisible = false
-
-        setupAccountDetails()
     }
 
     override fun checkScroll() {
@@ -116,6 +113,10 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
     private fun setupObservers() {
         viewLifecycleOwner.collectFlow(viewModel.state) {
             refreshVersionsInfo(it.versionsInfo, it.isFileVersioningEnabled)
+        }
+        viewLifecycleOwner.collectFlow(viewModel.state.map { it.storageState }
+            .distinctUntilChanged()) {
+            setupAccountDetails()
         }
         viewModel.onUpdateAccountDetails().observe(viewLifecycleOwner) { setupAccountDetails() }
     }
@@ -178,7 +179,7 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
         } else {
             usageBinding.update(
                 requireContext(),
-                args.storageState,
+                viewModel.getStorageState(),
                 viewModel.isFreeAccount(),
                 viewModel.getTotalStorage(),
                 viewModel.getTotalTransfer(),

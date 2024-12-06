@@ -64,6 +64,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
@@ -93,6 +94,7 @@ import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCa
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
 import mega.privacy.android.domain.usecase.account.LegacyCancelSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.QueryCancelLinkUseCase
 import mega.privacy.android.domain.usecase.account.QueryChangeEmailLinkUseCase
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
@@ -193,6 +195,7 @@ class MyAccountViewModel @Inject constructor(
     private val snackBarHandler: SnackBarHandler,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -286,6 +289,15 @@ class MyAccountViewModel @Inject constructor(
                             accountType = accountDetail.levelDetail?.accountType
                                 ?: AccountType.FREE,
                         )
+                    }
+                }
+        }
+        viewModelScope.launch {
+            monitorStorageStateUseCase()
+                .catch { Timber.e(it) }
+                .collectLatest { storageState ->
+                    _state.update {
+                        it.copy(storageState = storageState)
                     }
                 }
         }
@@ -497,6 +509,11 @@ class MyAccountViewModel @Inject constructor(
      * @return
      */
     fun getAccountType(): AccountType = state.value.accountType
+
+    /**
+     * Get storage state
+     */
+    fun getStorageState(): StorageState = state.value.storageState
 
     /**
      * Is free account

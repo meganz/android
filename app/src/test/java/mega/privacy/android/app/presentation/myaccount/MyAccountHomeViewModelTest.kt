@@ -13,7 +13,6 @@ import mega.privacy.android.app.TEST_USER_ACCOUNT
 import mega.privacy.android.app.presentation.myaccount.mapper.AccountNameMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -30,7 +29,6 @@ import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -42,7 +40,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -69,7 +66,6 @@ class MyAccountHomeViewModelTest {
         )
     private val connectivityFlow = MutableStateFlow(false)
     private val userUpdatesFlow = MutableStateFlow<UserChanges>(UserChanges.Firstname)
-    private val storageStateFlow = MutableStateFlow(StorageState.Unknown)
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock {
         onBlocking { invoke() }.thenReturn(accountDetailFlow)
@@ -95,9 +91,6 @@ class MyAccountHomeViewModelTest {
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
     private val getUserFullNameUseCase: GetUserFullNameUseCase = mock()
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
-    private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase> {
-        on { invoke() }.thenReturn(storageStateFlow)
-    }
 
     @BeforeEach
     fun setup() {
@@ -108,7 +101,6 @@ class MyAccountHomeViewModelTest {
         getAccountDetailsUseCase.stub {
             onBlocking { invoke(any()) }.thenReturn(accountDetailsValue)
         }
-        storageStateFlow.value = StorageState.Unknown
 
         underTest = MyAccountHomeViewModel(
             getAccountDetailsUseCase,
@@ -125,7 +117,6 @@ class MyAccountHomeViewModelTest {
             getUserFullNameUseCase,
             getMyAvatarFileUseCase,
             accountNameMapper = AccountNameMapper(),
-            monitorStorageStateUseCase
         )
     }
 
@@ -303,19 +294,6 @@ class MyAccountHomeViewModelTest {
                 assertThat(state.accountType).isEqualTo(expected.accountTypeIdentifier)
                 assertThat(state.isProFlexiAccount).isEqualTo(expected.accountTypeIdentifier == AccountType.PRO_FLEXI)
                 assertThat(state.isBusinessProFlexiStatusActive).isTrue()
-            }
-        }
-
-    @ParameterizedTest(name = "{0}")
-    @EnumSource(StorageState::class)
-    fun `test that storage state should be updated when monitorStorageState emits`(state: StorageState) =
-        runTest {
-            storageStateFlow.emit(state)
-
-            advanceUntilIdle()
-
-            underTest.uiState.test {
-                assertThat(awaitItem().storageState).isEqualTo(state)
             }
         }
 

@@ -59,6 +59,7 @@ import mega.privacy.android.domain.entity.AccountType.PRO_II
 import mega.privacy.android.domain.entity.AccountType.PRO_III
 import mega.privacy.android.domain.entity.AccountType.PRO_LITE
 import mega.privacy.android.domain.entity.AccountType.STARTER
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import org.junit.Rule
 import org.junit.Test
@@ -96,6 +97,7 @@ class MyAccountHomeViewTest {
                     override val isPhoneNumberDialogShown: Boolean
                         get() = false
                 },
+                storageState = StorageState.Unknown,
                 navController = navController
             )
         }

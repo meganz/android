@@ -182,6 +182,7 @@ internal object Constants {
  */
 @Composable
 fun MyAccountHomeView(
+    storageState: StorageState,
     uiState: MyAccountHomeUIState,
     uiActions: MyAccountHomeViewActions,
     navController: NavController?,
@@ -256,6 +257,7 @@ fun MyAccountHomeView(
                 screenHeight.dp - headerHeight - accountTypeHeight - TOOLBAR_HEIGHT - HEADER_TOP_PADDING - ACCOUNT_TYPE_TOP_PADDING
 
             AccountInfoSection(
+                storageState = storageState,
                 uiState = uiState,
                 uiActions = uiActions,
                 modifier = Modifier
@@ -474,6 +476,7 @@ private fun PaymentAlertSection(
 
 @Composable
 private fun AccountInfoSection(
+    storageState: StorageState,
     uiState: MyAccountHomeUIState,
     uiActions: MyAccountHomeViewActions,
     modifier: Modifier = Modifier,
@@ -514,7 +517,7 @@ private fun AccountInfoSection(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(start = 14.dp, end = 14.dp, top = 12.dp, bottom = 8.dp),
-            storageState = uiState.storageState,
+            storageState = storageState,
             usedStorage = uiState.usedStorage,
             usedTransfer = uiState.usedTransfer,
             totalStorage = uiState.totalStorage,
@@ -971,6 +974,7 @@ private fun shouldShowPaymentInfo(uiState: MyAccountHomeUIState): Boolean {
 internal fun MyAccountHomePreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         MyAccountHomeView(
+            storageState = StorageState.Green,
             uiState = MyAccountHomeUIState(
                 name = "QWERTY UIOP",
                 email = "qwerty@uiop.com",

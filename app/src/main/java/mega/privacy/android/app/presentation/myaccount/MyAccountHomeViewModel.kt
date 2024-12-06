@@ -31,7 +31,6 @@ import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -60,7 +59,6 @@ class MyAccountHomeViewModel @Inject constructor(
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val accountNameMapper: AccountNameMapper,
-    private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
 ) : ViewModel() {
     private val _uiState =
         MutableStateFlow(MyAccountHomeUIState(accountTypeNameResource = accountNameMapper(null)))
@@ -146,15 +144,6 @@ class MyAccountHomeViewModel @Inject constructor(
                                 ?: 0,
                             proExpirationTime = accountDetail.levelDetail?.proExpirationTime ?: 0
                         )
-                    }
-                }
-        }
-        viewModelScope.launch {
-            monitorStorageStateUseCase()
-                .catch { Timber.e(it) }
-                .collectLatest { storageState ->
-                    _uiState.update {
-                        it.copy(storageState = storageState)
                     }
                 }
         }

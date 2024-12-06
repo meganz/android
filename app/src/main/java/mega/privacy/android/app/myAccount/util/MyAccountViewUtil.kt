@@ -50,7 +50,7 @@ object MyAccountViewUtil {
             storageProgressBar.progress = 0
             storageProgress.text = getGettingInfo(context)
         } else {
-            val isStorageOverQuota = usedStoragePercentage >= 100
+            val isStorageOverQuota = storageState == StorageState.Red
 
             storageProgressPercentage.apply {
                 isVisible = true
