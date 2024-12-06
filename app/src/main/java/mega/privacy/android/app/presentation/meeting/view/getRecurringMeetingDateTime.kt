@@ -19,6 +19,7 @@ import mega.privacy.android.app.presentation.extensions.isForever
 import mega.privacy.android.app.presentation.extensions.isToday
 import mega.privacy.android.app.presentation.extensions.isTomorrow
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.WeekOfMonth
@@ -185,7 +186,7 @@ fun getRecurringMeetingDateTime(
                 when (monthWeekDayItem.weekDaysList.first()) {
                     Weekday.Monday -> {
                         when (weekOfMonth) {
-                            WeekOfMonth.First ->
+                            WeekOfMonth.First -> {
                                 result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_first,
@@ -206,6 +207,8 @@ fun getRecurringMeetingDateTime(
                                         endTime
                                     )
                                 }
+
+                            }
 
                             WeekOfMonth.Second ->
                                 result = when {
@@ -991,6 +994,51 @@ fun getRecurringMeetingDateTime(
     }
 
     return formatAnnotatedString(result, highLightTime, highLightDate)
+}
+
+@Composable
+fun getAppropiateSubTextString(
+    scheduledMeeting: ChatScheduledMeeting?,
+    occurrence: ChatScheduledMeetingOccurr?,
+    is24HourFormat: Boolean,
+    highLightTime: Boolean = false,
+    highLightDate: Boolean = false,
+): AnnotatedString? {
+    occurrence?.let {
+        return getOccurrenceDateTime(occurrence, is24HourFormat)
+    }
+
+    scheduledMeeting?.let {
+        return getRecurringMeetingDateTime(
+            scheduledMeeting = scheduledMeeting,
+            is24HourFormat = is24HourFormat,
+            highLightTime = highLightTime,
+            highLightDate = highLightDate
+        )
+    }
+
+    return null
+}
+
+/**
+ * Get the appropriate day and time string for a occurrence.
+ *
+ * @param occurrence  [ChatScheduledMeetingOccurr]
+ */
+@Composable
+fun getOccurrenceDateTime(
+    occurrence: ChatScheduledMeetingOccurr, is24HourFormat: Boolean,
+): AnnotatedString {
+    val startTime = occurrence.getStartTime(is24HourFormat)
+    val endTime = occurrence.getEndTime(is24HourFormat)
+    val result = stringResource(
+        id = R.string.notification_subtitle_scheduled_meeting_one_off,
+        occurrence.getCompleteStartDate(),
+        startTime,
+        endTime
+    )
+
+    return formatAnnotatedString(result, highLightTime = false, highLightDate = false)
 }
 
 /**

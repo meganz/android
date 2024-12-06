@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.extensions
 
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import java.time.Instant
 import java.time.ZoneId
@@ -39,6 +40,54 @@ fun ChatScheduledMeetingOccurr.getEndZoneDateTime(): ZonedDateTime? {
         )
     }
 }
+
+/**
+ * Get start time formatted
+ *
+ * @param is24HourFormat True, if it's 24 hour format.
+ * @return Text of start time.
+ */
+fun ChatScheduledMeetingOccurr.getStartTime(is24HourFormat: Boolean): String =
+    this.startDateTime?.let { startDate ->
+        val hourFormatter = getHourFormatter(is24HourFormat)
+        return hourFormatter.format(startDate.parseUTCDate())
+    } ?: ""
+
+private fun getHourFormatter(is24HourFormat: Boolean): DateTimeFormatter =
+    DateTimeFormatter
+        .ofPattern(if (is24HourFormat) "HH:mm" else "hh:mma")
+        .withZone(ZoneId.systemDefault())
+
+/**
+ * Get end time formatted
+ *
+ * @param is24HourFormat True, if it's 24 hour format.
+ * @return Text of end time.
+ */
+fun ChatScheduledMeetingOccurr.getEndTime(is24HourFormat: Boolean): String =
+    this.endDateTime?.let { endDate ->
+        val hourFormatter = getHourFormatter(is24HourFormat)
+        return hourFormatter.format(endDate.parseUTCDate())
+    } ?: ""
+
+/**
+ * Get start date with weekday
+ *
+ * @return Text of start date
+ */
+fun ChatScheduledMeetingOccurr.getCompleteStartDate(): String =
+    this.startDateTime?.let { start ->
+        val dateFormatter = getCompleteDateFormatter()
+        return dateFormatter.format(start.parseUTCDate())
+    } ?: ""
+
+private fun Long.parseUTCDate(): ZonedDateTime =
+    ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneId.systemDefault())
+
+private fun getCompleteDateFormatter(): DateTimeFormatter =
+    DateTimeFormatter
+        .ofPattern("E',' d MMM',' yyyy")
+        .withZone(ZoneId.systemDefault())
 
 /**
  * Get day and month formatted

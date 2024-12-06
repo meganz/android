@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.UserAlert
  */
 internal fun UserAlert.schedMeetingNotification(): SchedMeetingNotification? =
     when {
-        this is ScheduledMeetingAlert && (this !is UpdatedScheduledMeetingCancelAlert || !this.isRecurring) ->
+        this is ScheduledMeetingAlert -> {
             SchedMeetingNotification(
                 scheduledMeeting = scheduledMeeting?.copy(
                     startDateTime = startDate ?: scheduledMeeting?.startDateTime,
@@ -21,9 +21,17 @@ internal fun UserAlert.schedMeetingNotification(): SchedMeetingNotification? =
                 ),
                 hasTimeChanged = hasTimeChanged(),
                 hasDateChanged = hasDateChanged(),
+                occurrenceChanged = if (this is UpdatedScheduledMeetingCancelAlert) {
+                    this.occurrenceChanged?.copy()
+                } else {
+                    null
+                }
             )
+        }
 
-        else -> null
+        else -> {
+            null
+        }
     }
 
 /**
@@ -41,3 +49,4 @@ internal fun UserAlert.hasTimeChanged(): Boolean =
  */
 internal fun UserAlert.hasDateChanged(): Boolean =
     this is UpdatedScheduledMeetingDateTimeAlert && hasDateChanged
+
