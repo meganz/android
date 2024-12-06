@@ -123,7 +123,7 @@ class VideoPlayerFragment : Fragment() {
     private lateinit var scaleGestureDetector: ScaleGestureDetector
     private lateinit var gestureDetector: GestureDetector
     private var zoomLevel = 1.0f
-    private val maxZoom = 10.0f
+    private val maxZoom = 5.0f
     private var translationX = 0f
     private var translationY = 0f
 
@@ -186,7 +186,7 @@ class VideoPlayerFragment : Fragment() {
             requireContext(),
             object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 override fun onScale(detector: ScaleGestureDetector): Boolean {
-                    if (!viewModel.screenLockState.value) {
+                    if (!viewModel.screenLockState.value && viewModel.isPlayerZoomInEnabled()) {
                         zoomLevel = (zoomLevel * detector.scaleFactor).coerceIn(1.0f, maxZoom)
                         updateTransformations()
                     }
@@ -465,10 +465,11 @@ class VideoPlayerFragment : Fragment() {
         }
     }
 
+    @OptIn(UnstableApi::class)
     private fun enforceBoundaries() {
-        videoPlayerView?.let { playerView ->
-            val maxTranslationX = (zoomLevel - 1) * playerView.width / 2
-            val maxTranslationY = (zoomLevel - 1) * playerView.height / 2
+        videoPlayerView?.videoSurfaceView?.let { textureView ->
+            val maxTranslationX = (zoomLevel - 1) * textureView.width / 2
+            val maxTranslationY = (zoomLevel - 1) * textureView.height / 2
 
             translationX = translationX.coerceIn(-maxTranslationX, maxTranslationX)
             translationY = translationY.coerceIn(-maxTranslationY, maxTranslationY)

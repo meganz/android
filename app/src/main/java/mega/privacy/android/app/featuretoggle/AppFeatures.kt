@@ -16,6 +16,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enable the video player zoom in feature
+     */
+    VideoPlayerZoomInEnable(
+        "Enable add video player zoom in",
+        true
+    ),
+
+    /**
      * Add video to playlist from video section
      */
     AddVideoToPlaylistFromVideoSection(

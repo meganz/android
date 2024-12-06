@@ -118,7 +118,6 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
@@ -156,6 +155,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoR
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SavePlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
+import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
@@ -323,6 +323,8 @@ class LegacyVideoPlayerViewModel @Inject constructor(
 
     private var currentPlayingVideoSize: Pair<Int, Int>? = null
 
+    private var isZoomInEnabled = false
+
     private val _isSubtitleDialogShown = savedStateHandle.getStateFlow(
         viewModelScope,
         subtitleDialogShowKey,
@@ -357,6 +359,9 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     }
 
     init {
+        viewModelScope.launch {
+            isZoomInEnabled = getFeatureFlagValueUseCase(AppFeatures.VideoPlayerZoomInEnable)
+        }
         viewModelScope.launch {
             combine(
                 _isSubtitleShown,
@@ -1954,6 +1959,8 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     internal suspend fun getCurrentPlayingNode() = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(playingHandle)
     }
+
+    internal fun isPlayerZoomInEnabled() = isZoomInEnabled
 
     companion object {
         private const val MEGA_SCREENSHOTS_FOLDER_NAME = "MEGA Screenshots/"

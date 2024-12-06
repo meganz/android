@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.TimberJUnit5Extension
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_MATCHED_ITEM
@@ -108,6 +109,9 @@ internal class LegacyVideoPlayerViewModelTest {
 
     private fun initViewModel() {
         wheneverBlocking { monitorVideoRepeatModeUseCase() }.thenReturn(emptyFlow())
+        wheneverBlocking {
+            getFeatureFlagValueUseCase(AppFeatures.VideoPlayerZoomInEnable)
+        }.thenReturn(true)
         underTest = LegacyVideoPlayerViewModel(
             context = mock(),
             mediaPlayerGateway = mediaPlayerGateway,
@@ -413,5 +417,11 @@ internal class LegacyVideoPlayerViewModelTest {
         whenever(getFileUriUseCase(anyOrNull(), anyOrNull())).thenReturn(expectedUri)
         initViewModel()
         assertThat(underTest.getContentUri(testFile)).isEqualTo(expectedUri)
+    }
+
+    @Test
+    fun `test that the isPlayerZoomInEnabled function return as expected`() = runTest {
+        initViewModel()
+        assertThat(underTest.isPlayerZoomInEnabled()).isTrue()
     }
 }
