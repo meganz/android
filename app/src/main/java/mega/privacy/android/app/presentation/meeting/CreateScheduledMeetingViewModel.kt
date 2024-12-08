@@ -224,7 +224,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 Timber.e("Scheduled meeting does not exist $exception")
             }.onSuccess { scheduledMeetingList ->
                 scheduledMeetingList
-                    ?.firstOrNull { !it.isCanceled && it.parentSchedId == -1L }
+                    ?.firstOrNull { it.parentSchedId == -1L }
                     ?.let { schedMeet ->
                         Timber.d("Scheduled meeting recovered")
                         val initialStartDate = schedMeet.getZoneStartTime()

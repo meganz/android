@@ -71,7 +71,7 @@ class GetScheduleMeetingDataUseCase @Inject constructor(
 
     private suspend fun getScheduledMeeting(chatId: Long): ChatScheduledMeeting =
         (getScheduledMeetingByChatUseCase(chatId) ?: error("Scheduled Meeting does not exist"))
-            .firstOrNull { !it.isCanceled && it.parentSchedId == -1L } ?: error("Invalid Meeting")
+            .firstOrNull { it.parentSchedId == -1L } ?: error("Invalid Meeting")
 
     private suspend fun getNextSchedMeetingOccurrence(chatId: Long): ChatScheduledMeetingOccurr? =
         runCatching { getNextSchedMeetingOccurrenceUseCase(chatId) }.getOrNull()

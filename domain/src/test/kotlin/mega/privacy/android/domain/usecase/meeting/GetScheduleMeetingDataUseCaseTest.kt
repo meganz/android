@@ -1,17 +1,12 @@
 package mega.privacy.android.domain.usecase.meeting
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.assertThrows
@@ -30,7 +25,6 @@ internal class GetScheduleMeetingDataUseCaseTest {
     private val fetchScheduledMeetingOccurrencesByChatUseCase =
         mock<FetchScheduledMeetingOccurrencesByChatUseCase>()
     private val getChatRoomUseCase = mock<GetChatRoomUseCase>()
-    private val testDispatcher = UnconfinedTestDispatcher()
 
     @Before
     fun setUp() {
