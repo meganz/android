@@ -24,6 +24,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
+     * Enable compose implementation of the main settings screen
+     */
+    SettingsComposeUI(
+        "Enable compose implementation of the main settings screen",
+        false,
+    ),
+
+    /**
      * Enable the video player zoom in feature
      */
     VideoPlayerZoomInEnable(
