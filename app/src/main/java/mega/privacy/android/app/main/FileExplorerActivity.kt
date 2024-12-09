@@ -30,7 +30,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -640,11 +640,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun setupObservers() {
         this.lifecycleScope.launch {
             val documents = viewModel.uiState
-                .mapNotNull { it.documents.takeIf { it.isNotEmpty() } }
+                .mapNotNull { filePreparedDocuments -> filePreparedDocuments.documents.takeIf { it.isNotEmpty() } }
                 .flowWithLifecycle(this@FileExplorerActivity.lifecycle, Lifecycle.State.STARTED)
                 .catch {
                     Timber.e(it)
-                }.first()
+                }.firstOrNull()
             onProcessAsyncInfo(documents)
         }
         viewModel.textInfo.observe(this) { dismissAlertDialogIfExists(statusDialog) }

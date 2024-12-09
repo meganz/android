@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.text.Spanned
@@ -56,7 +57,6 @@ import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.util.Stack
 import javax.inject.Inject
-import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * The fragment for cloud drive explorer
@@ -449,11 +449,21 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
     private fun initOriginalData() =
         lifecycleScope.launch {
             val chosenNode = withContext(ioDispatcher) {
-                megaApi.getNodeByHandle(parentHandle)
-                    .takeIf {
-                        (fileExplorerActivity.mode == FileExplorerActivity.COPY && fileExplorerViewModel.latestCopyTargetPathTab == FileExplorerActivity.CLOUD_TAB)
-                                || (fileExplorerActivity.mode == FileExplorerActivity.MOVE && fileExplorerViewModel.latestMoveTargetPathTab == FileExplorerActivity.CLOUD_TAB)
+                when (fileExplorerActivity.mode) {
+                    FileExplorerActivity.COPY -> {
+                        megaApi.getNodeByHandle(parentHandle)
+                            .takeIf { fileExplorerViewModel.latestCopyTargetPathTab == FileExplorerActivity.CLOUD_TAB }
                     }
+
+                    FileExplorerActivity.MOVE -> {
+                        megaApi.getNodeByHandle(parentHandle)
+                            .takeIf { fileExplorerViewModel.latestMoveTargetPathTab == FileExplorerActivity.CLOUD_TAB }
+                    }
+
+                    else -> {
+                        megaApi.getNodeByHandle(parentHandle)
+                    }
+                }
             }
             ensureActive()
             if (chosenNode != null && chosenNode.type != MegaNode.TYPE_ROOT) {
