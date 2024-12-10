@@ -14,6 +14,7 @@ import androidx.core.text.HtmlCompat;
 
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.R;
+import mega.privacy.android.domain.usecase.IsEmailValidUseCase;
 import timber.log.Timber;
 
 public class TextUtil {
@@ -113,7 +114,7 @@ public class TextUtil {
      *
      * @param str Email
      * @return Boolean
-     * @deprecated <p> Use {@link mega.privacy.android.domain.usecase.contact.IsEmailValidUseCase} instead.
+     * @deprecated <p> Use {@link IsEmailValidUseCase} instead.
      */
     @Deprecated
     public static boolean isEmail(String str) {

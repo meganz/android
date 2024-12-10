@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.contact
+package mega.privacy.android.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.TestInstance

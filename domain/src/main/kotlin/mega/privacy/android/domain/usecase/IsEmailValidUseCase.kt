@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.contact
+package mega.privacy.android.domain.usecase
 
 import java.util.regex.Pattern
 import javax.inject.Inject

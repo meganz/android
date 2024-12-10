@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.usecase.IsEmailValidUseCase
 import mega.privacy.android.domain.usecase.environment.IsConnectivityInRoamingStateUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
