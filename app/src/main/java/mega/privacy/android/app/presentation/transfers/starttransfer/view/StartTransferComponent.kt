@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.view.View
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.SnackbarHostState
@@ -132,11 +131,6 @@ internal fun StartTransferComponent(
                 }
             }
             when {
-                shouldAskForFilesPermission(uiState.requestFilesPermissionDenied, triggerEvent) -> {
-                    viewModel.transferEventWaitingForPermissionRequest(triggerEvent)
-                    showFilesPermissionRequest = true
-                }
-
                 triggerEvent !is TransferTriggerEvent.StartUpload.TextFile
                         && mediaReadPermission?.status?.isGranted == false -> {
                     viewModel.transferEventWaitingForPermissionRequest(triggerEvent)
@@ -518,14 +512,4 @@ private fun consumeMessageAction(
         )
     }
 }
-
-private fun shouldAskForFilesPermission(
-    requestFilesPermissionDenied: Boolean,
-    transferTriggerEvent: TransferTriggerEvent,
-) = (transferTriggerEvent is TransferTriggerEvent.StartChatUpload
-        || (transferTriggerEvent is TransferTriggerEvent.StartUpload
-        && transferTriggerEvent !is TransferTriggerEvent.StartUpload.TextFile))
-        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
-        && requestFilesPermissionDenied.not()
-        && !Environment.isExternalStorageManager()
 
