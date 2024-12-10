@@ -1656,14 +1656,13 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                 )
                             )
                         } else if (firstLogin && viewModel.getStorageState() !== StorageState.PayWall) {
-                            drawerItem = DrawerItem.PHOTOS
+                            drawerItem = DrawerItem.HOMEPAGE
                         } else {
                             showMyAccount()
                         }
                     } else {
                         if (firstLogin && viewModel.getStorageState() !== StorageState.PayWall) {
-                            Timber.d("First login. Go to Camera Uploads configuration.")
-                            drawerItem = DrawerItem.PHOTOS
+                            drawerItem = DrawerItem.HOMEPAGE
                             intent = null
                         }
                     }
@@ -1698,7 +1697,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                 )
                             )
                         } else if (firstLogin && viewModel.getStorageState() !== StorageState.PayWall) {
-                            drawerItem = DrawerItem.PHOTOS
+                            drawerItem = DrawerItem.HOMEPAGE
                         } else {
                             showMyAccount()
                         }
