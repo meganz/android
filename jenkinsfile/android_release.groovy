@@ -115,6 +115,7 @@ pipeline {
                         def appVersionInfo = common.readAppVersion()
                         def version = appVersionInfo[0]
                         def versionCode = appVersionInfo[2]
+                        def appGitHash = appVersionInfo[3]
                         def (slackChannelId, qaSlackChannelId) = common.fetchSlackChannelIdsByReleaseVersion(version)
 
                         if (slackChannelId == "") {
@@ -146,7 +147,7 @@ pipeline {
 
                         sh """
                             cd ${WORKSPACE}
-                            echo ${versionCode} > ${releaseInfo}
+                            echo ${versionCode},${appGitHash} > ${releaseInfo}
                         """
 
                         common.uploadToArtifactory(releaseInfo, releaseInfoPath)
@@ -540,8 +541,9 @@ pipeline {
                     def releaseInfoPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/v${releaseVersion}/${releaseInfo}"
 
                     common.downloadFromArtifactory(releaseInfoPath, releaseInfo)
-                    def content = readFile(WORKSPACE + "/" + releaseInfo)
-                    def versionCode = content.trim()
+                    def content = readFile(WORKSPACE + "/" + releaseInfo).trim().split(",")
+                    def versionCode = content[0]
+                    def appGitHash = content[1]
 
                     withCredentials([
                             string(credentialsId: 'ANDROID_TRANSIFIX_AUTHORIZATION_TOKEN', variable: 'TRANSIFEX_TOKEN'),
@@ -560,8 +562,8 @@ pipeline {
                         util.useGpg() {
                             sh("./gradlew postRelease --rv ${releaseVersion}")
                             sh("./gradlew setReleaseStatus --rv ${releaseVersion}")
-                            sh("./gradlew createGitlabRelease --rv ${releaseVersion} --vc ${versionCode}")
-                            sh("./gradlew createGithubRelease --rv ${releaseVersion} --vc ${versionCode}")
+                            sh("./gradlew createGitlabRelease --rv ${releaseVersion} --vc ${versionCode} --hash ${appGitHash}")
+                            sh("./gradlew createGithubRelease --rv ${releaseVersion} --vc ${versionCode} --hash ${appGitHash}")
                         }
                     }
                 }
