@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import mega.privacy.android.data.gateway.AssetsGateway
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import timber.log.Timber
 import javax.inject.Inject
@@ -31,4 +32,6 @@ class FileFeatureFlagValueProvider @Inject constructor(
 
     override suspend fun isEnabled(feature: Feature): Boolean? =
         featureFlagMaps[feature.name]
+
+    override val priority = FeatureFlagValuePriority.ConfigurationFile
 }

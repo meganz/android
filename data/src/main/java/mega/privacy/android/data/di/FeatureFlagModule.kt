@@ -6,13 +6,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
-import dagger.multibindings.IntoMap
+import dagger.multibindings.IntoSet
 import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.featuretoggle.remote.ABTestFeatureFlagValueProvider
 import mega.privacy.android.data.featuretoggle.remote.ApiFeatureFlagProvider
-import mega.privacy.android.data.qualifier.FeatureFlagPriorityKey
 import mega.privacy.android.domain.entity.Feature
-import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 
@@ -25,11 +23,7 @@ internal abstract class FeatureFlagModule {
      *
      */
     @Binds
-    @IntoMap
-    @FeatureFlagPriorityKey(
-        implementingClass = ApiFeatureFlagProvider::class,
-        priority = FeatureFlagValuePriority.RuntimeOverride
-    )
+    @IntoSet
     abstract fun provideApiFeatureFlagValueProvider(apiFeatureFlagProvider: ApiFeatureFlagProvider): @JvmSuppressWildcards FeatureFlagValueProvider
 
     /**
@@ -37,11 +31,7 @@ internal abstract class FeatureFlagModule {
      *
      */
     @Binds
-    @IntoMap
-    @FeatureFlagPriorityKey(
-        implementingClass = ABTestFeatureFlagValueProvider::class,
-        priority = FeatureFlagValuePriority.RemoteToggled
-    )
+    @IntoSet
     abstract fun provideRemoteFeatureFlagValueProvider(ABTestFeatureFlagValueProvider: ABTestFeatureFlagValueProvider): @JvmSuppressWildcards FeatureFlagValueProvider
 
     companion object {
@@ -59,11 +49,7 @@ internal abstract class FeatureFlagModule {
          * Provide data feature flag value provider
          */
         @Provides
-        @IntoMap
-        @FeatureFlagPriorityKey(
-            implementingClass = DataFeatures.Companion::class,
-            priority = FeatureFlagValuePriority.Default
-        )
+        @IntoSet
         fun provideDataFeatureFlagValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
             DataFeatures.Companion
 
@@ -81,11 +67,7 @@ internal abstract class FeatureFlagModule {
          * Provide sync feature flag value provider
          */
         @Provides
-        @IntoMap
-        @FeatureFlagPriorityKey(
-            implementingClass = SyncFeatures.Companion::class,
-            priority = FeatureFlagValuePriority.Default
-        )
+        @IntoSet
         fun provideSyncFeatureFlagValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
             SyncFeatures.Companion
     }

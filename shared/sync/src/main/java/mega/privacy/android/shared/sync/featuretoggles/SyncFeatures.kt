@@ -1,6 +1,7 @@
 package mega.privacy.android.shared.sync.featuretoggles
 
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 
 
@@ -40,5 +41,7 @@ enum class SyncFeatures(
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
             entries.firstOrNull { it == feature }?.defaultValue
+
+        override val priority = FeatureFlagValuePriority.Default
     }
 }

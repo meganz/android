@@ -2,7 +2,6 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.qualifier.FeatureFlagPriorityKey
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -14,19 +13,19 @@ import javax.inject.Inject
  * Default feature flag repository
  *
  * @property ioDispatcher
- * @property featureFlagValueProvider
+ * @property featureFlagValueProviderSet
  */
 internal class DefaultFeatureFlagRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val featureFlagValueProvider: Map<FeatureFlagPriorityKey, @JvmSuppressWildcards FeatureFlagValueProvider>,
+    private val featureFlagValueProviderSet: Set<@JvmSuppressWildcards FeatureFlagValueProvider>,
 ) : FeatureFlagRepository {
 
     override suspend fun getFeatureValue(feature: Feature) =
         withContext(ioDispatcher) {
-            val sortedMap = featureFlagValueProvider.toSortedMap(
-                compareByDescending<FeatureFlagPriorityKey> { it.priority }
-                    .thenBy { it.implementingClass.qualifiedName }
+            val sorted = featureFlagValueProviderSet.sortedWith(
+                compareByDescending<FeatureFlagValueProvider> { it.priority }
+                    .thenBy { it::class.qualifiedName }
             )
-            sortedMap.firstNotNullOfOrNull { it.value.isEnabled(feature) }
+            sorted.firstNotNullOfOrNull { it.isEnabled(feature) }
         }
 }

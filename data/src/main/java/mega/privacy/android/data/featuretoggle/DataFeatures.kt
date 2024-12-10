@@ -1,6 +1,7 @@
 package mega.privacy.android.data.featuretoggle
 
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 
 /**
@@ -27,5 +28,7 @@ enum class DataFeatures(
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
             entries.firstOrNull { it == feature }?.defaultValue
+
+        override val priority = FeatureFlagValuePriority.Default
     }
 }

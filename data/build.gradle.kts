@@ -1,5 +1,4 @@
 import mega.privacy.android.build.preBuiltSdkDependency
-import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     alias(convention.plugins.mega.android.library)
@@ -60,11 +59,6 @@ dependencies {
     implementation(androidx.concurrent.futures)
     implementation(androidx.paging)
     implementation(androidx.documentfile)
-
-    if (shouldApplyDefaultConfiguration(project)) {
-        kapt(google.autovalue)
-    }
-    implementation(google.autovalue.annotations)
 
     implementation(lib.billing.client.ktx)
 

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import java.io.IOException
 import javax.inject.Inject
@@ -74,5 +75,7 @@ class FeatureFlagPreferencesDataStore
         const val KEY_QUICK_SETTINGS = "featureFlagForQuickSettingsTile"
         val key = stringPreferencesKey(KEY_QUICK_SETTINGS)
     }
+
+    override val priority = FeatureFlagValuePriority.RuntimeOverride
 
 }

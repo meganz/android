@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.qualifier.FeatureFlagPriorityKey
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
@@ -20,57 +19,61 @@ class DefaultFeatureFlagRepositoryTest {
     private lateinit var underTest: FeatureFlagRepository
 
     private val defaultProviderMock =
-        mock<FeatureFlagValueProvider> { onBlocking { isEnabled(any()) }.thenReturn(null) }
+        mock<FeatureFlagValueProvider> {
+            onBlocking { isEnabled(any()) }.thenReturn(null)
+            on { priority }.thenReturn(FeatureFlagValuePriority.Default)
+        }
     private val secondaryDefaultProviderMock =
-        mock<FeatureFlagValueProvider> { onBlocking { isEnabled(any()) }.thenReturn(null) }
+        mock<FeatureFlagValueProvider> {
+            onBlocking { isEnabled(any()) }.thenReturn(null)
+            on { priority }.thenReturn(FeatureFlagValuePriority.Default)
+        }
     private val configurationFileProviderMock =
-        mock<FeatureFlagValueProvider> { onBlocking { isEnabled(any()) }.thenReturn(null) }
+        mock<FeatureFlagValueProvider> {
+            onBlocking { isEnabled(any()) }.thenReturn(null)
+            on { priority }.thenReturn(FeatureFlagValuePriority.ConfigurationFile)
+        }
     private val buildTimeOverrideProviderMock =
-        mock<FeatureFlagValueProvider> { onBlocking { isEnabled(any()) }.thenReturn(null) }
+        mock<FeatureFlagValueProvider> {
+            onBlocking { isEnabled(any()) }.thenReturn(null)
+            on { priority }.thenReturn(FeatureFlagValuePriority.BuildTimeOverride)
+        }
     private val remoteToggledProviderMock =
-        mock<FeatureFlagValueProvider> { onBlocking { isEnabled(any()) }.thenReturn(null) }
+        mock<FeatureFlagValueProvider> {
+            onBlocking { isEnabled(any()) }.thenReturn(null)
+            on { priority }.thenReturn(FeatureFlagValuePriority.RemoteToggled)
+        }
     private val runtimeOverrideProviderMock =
-        mock<FeatureFlagValueProvider> { onBlocking { isEnabled(any()) }.thenReturn(null) }
+        mock<FeatureFlagValueProvider> {
+            onBlocking { isEnabled(any()) }.thenReturn(null)
+            on { priority }.thenReturn(FeatureFlagValuePriority.RuntimeOverride)
+        }
 
-    private val providerMocks = mapOf(
-        FeatureFlagValuePriority.Default to defaultProviderMock,
-        FeatureFlagValuePriority.ConfigurationFile to configurationFileProviderMock,
-        FeatureFlagValuePriority.BuildTimeOverride to buildTimeOverrideProviderMock,
-        FeatureFlagValuePriority.RemoteToggled to remoteToggledProviderMock,
-        FeatureFlagValuePriority.RuntimeOverride to runtimeOverrideProviderMock,
+    private val providerMocks = setOf(
+        defaultProviderMock,
+        configurationFileProviderMock,
+        buildTimeOverrideProviderMock,
+        remoteToggledProviderMock,
+        runtimeOverrideProviderMock,
     )
 
     private val fake1 = mock<FeatureFlagValueProvider>()
     private val fake2 = mock<FeatureFlagValueProvider>()
 
 
-    private val featureFlagValueProviders = providerMocks.mapKeys {
-        FeatureFlagPriorityKey(
-            implementingClass = FeatureFlagValueProvider::class,
-            priority = it.key
-        )
-    }.plus(
-        FeatureFlagPriorityKey(
-            implementingClass = FakeFeatureFlagValueProvider::class,
-            priority = FeatureFlagValuePriority.Default
-        ) to secondaryDefaultProviderMock
+    private val featureFlagValueProviders = providerMocks.plus(
+        secondaryDefaultProviderMock
     ).plus(
-        FeatureFlagPriorityKey(
-            implementingClass = Fake1.FakeProvider::class,
-            priority = FeatureFlagValuePriority.RemoteToggled
-        ) to Fake1(fake1).fakeProvider
+        Fake1(fake1, FeatureFlagValuePriority.RemoteToggled).fakeProvider
     ).plus(
-        FeatureFlagPriorityKey(
-            implementingClass = Fake2.FakeProvider::class,
-            priority = FeatureFlagValuePriority.RemoteToggled
-        ) to Fake2(fake2).fakeProvider
+        Fake2(fake2, FeatureFlagValuePriority.RemoteToggled).fakeProvider
     )
 
     @BeforeEach
     fun setUp() {
         underTest = DefaultFeatureFlagRepository(
             ioDispatcher = UnconfinedTestDispatcher(),
-            featureFlagValueProvider = featureFlagValueProviders,
+            featureFlagValueProviderSet = featureFlagValueProviders,
         )
     }
 
@@ -124,20 +127,31 @@ class DefaultFeatureFlagRepositoryTest {
 
 private interface FakeFeatureFlagValueProvider : FeatureFlagValueProvider
 
-class Fake1(featureFlagValueProvider: FeatureFlagValueProvider) {
-    val fakeProvider = FakeProvider(featureFlagValueProvider)
+class Fake1(
+    featureFlagValueProvider: FeatureFlagValueProvider,
+    priority: FeatureFlagValuePriority,
+) {
+    val fakeProvider = FakeProvider(featureFlagValueProvider, priority)
 
-    class FakeProvider(private val featureFlagValueProvider: FeatureFlagValueProvider) :
-        FeatureFlagValueProvider {
+    class FakeProvider(
+        private val featureFlagValueProvider: FeatureFlagValueProvider,
+        override val priority: FeatureFlagValuePriority,
+    ) : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
             featureFlagValueProvider.isEnabled(feature)
     }
 }
 
-class Fake2(featureFlagValueProvider: FeatureFlagValueProvider) {
-    val fakeProvider = FakeProvider(featureFlagValueProvider)
+class Fake2(
+    featureFlagValueProvider: FeatureFlagValueProvider,
+    priority: FeatureFlagValuePriority,
+) {
+    val fakeProvider = FakeProvider(featureFlagValueProvider, priority)
 
-    class FakeProvider(private val featureFlagValueProvider: FeatureFlagValueProvider) :
+    class FakeProvider(
+        private val featureFlagValueProvider: FeatureFlagValueProvider,
+        override val priority: FeatureFlagValuePriority,
+    ) :
         FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
             featureFlagValueProvider.isEnabled(feature)

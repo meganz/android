@@ -6,6 +6,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.featureflag.FlagMapper
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.featureflag.ApiFeature
+import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import javax.inject.Inject
@@ -35,4 +36,6 @@ internal class ApiFeatureFlagProvider @Inject constructor(
                 null
             }
         }
+
+    override val priority = FeatureFlagValuePriority.RemoteToggled
 }

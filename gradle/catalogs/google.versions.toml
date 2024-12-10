@@ -2,7 +2,6 @@
 accompanist = "0.32.0"
 accompanist-pager = "0.30.1"
 accompanist-systemui = "0.23.1"
-autovalue = "1.10.4"
 firebase = "33.1.1"
 firebase-app-distribution = "16.0.0-beta13"
 flexbox = "3.0.0"
@@ -33,8 +32,6 @@ accompanist-permissions = { module = "com.google.accompanist:accompanist-permiss
 accompanist-navigationmaterial = { module = "com.google.accompanist:accompanist-navigation-material", version.ref = "accompanist" }
 accompanist-navigationanimation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanist" }
 accompanist-systemui = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist-systemui" }
-autovalue = { module = "com.google.auto.value:auto-value", version.ref = "autovalue" }
-autovalue-annotations = { module = "com.google.auto.value:auto-value-annotations", version.ref = "autovalue" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics"}
 firebase-app-distribution = { module = "com.google.firebase:firebase-appdistribution", version.ref = "firebase-app-distribution" }

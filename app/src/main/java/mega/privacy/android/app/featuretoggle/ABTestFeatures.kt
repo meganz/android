@@ -2,6 +2,7 @@ package mega.privacy.android.app.featuretoggle
 
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.featureflag.ABTestFeature
+import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 
 /**
@@ -88,6 +89,8 @@ enum class ABTestFeatures(
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
             entries.firstOrNull { it == feature }?.defaultValue
+
+        override val priority: FeatureFlagValuePriority = FeatureFlagValuePriority.RemoteToggled
     }
 }
 
