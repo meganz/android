@@ -882,4 +882,42 @@
     <string name="general_select_folder">Wybierz katalog</string>
     <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
     <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">Move to: [B]%1s[/B]</string>
+    <!-- Message shown to user when app is connected to the MEGA server -->
+    <string name="login_connected_to_server">Connected to the server</string>
+    <!-- User Alert notification for scheduled recurring meeting changes -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A] [B]updated the recurring meeting details to[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting hour change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A] [B]updated the recurring meeting time to[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting date of the week change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A] [B]updated the recurring meeting date to[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting multiple fields change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%s[/A] [B]updated the meeting to[/B]</string>
+    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A] [B]cancelled the occurrence scheduled for[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s[/A] [B]updated an occurrence to[/B]</string>
+    <!-- User Alert notification for scheduled meeting date change -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_date">[A]%s[/A] [B]updated the meeting date to[/B]</string>
+    <!-- User Alert notification for scheduled meeting time change -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]updated the meeting time to[/B]</string>
+    <!-- User Alert notification for canceled scheduled meeting -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]cancelled the meeting scheduled for[/B]</string>
+    <!-- Title of the ads free introduction screen -->
+    <string name="payment_ads_free_intro_title">Looking to enjoy an ad-free experience?</string>
+    <!-- Description of the ads free introduction screen -->
+    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan for lots of storage and more. Our Pro plans start at just %1$s a month.</string>
+    <!-- The Generous storage label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_generous_storage_label">Pojemna pamięć</string>
+    <!-- The Generous storage description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_generous_storage_description">Store unlimited data, starting from %1$s.</string>
+    <!-- The Transfer sharing label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_transfer_sharing_label">Współdzielenie transferu</string>
+    <!-- The Transfer sharing description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_transfer_sharing_description">The people you share data with can use your transfer quota to download the items you shared.</string>
+    <!-- The additional security label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_additional_security_label">Dodatkowe zabezpieczenia podczas udostępniania</string>
+    <!-- The additional security description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_additional_security_description">Ustawianie haseł i dat wygaśnięcia dla łączy do plików i katalogów.</string>
+    <!-- The button text view pro plan in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_button_view_pro_plan">Zobacz plany Pro</string>
 </resources>

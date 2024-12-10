@@ -842,4 +842,42 @@
     <string name="general_select_folder">フォルダを選択</string>
     <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
     <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">[B]%1s[/B]に移動</string>
+    <!-- Message shown to user when app is connected to the MEGA server -->
+    <string name="login_connected_to_server">サーバーに接続されています</string>
+    <!-- User Alert notification for scheduled recurring meeting changes -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A][B]さんが定期的なミーティングの詳細を以下のように更新しました：[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting hour change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A][B]さんが定期的なミーティングの時間を以下のように更新しました：[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting date of the week change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A][B]さんが定期的なミーティングの日付を以下のようにに更新しました：[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting multiple fields change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%1$s[/A][B]さんがミーティングを以下のように更新しました：[/B]</string>
+    <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A][B]さんが以下のように予定されていたイベントをキャンセルしました[/B]</string>
+    <!-- User Alert notification for scheduled recurring meeting occurrence change -->
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%1$s[/A][B]さんがミーティングの開催を以下のように更新しました：[/B]</string>
+    <!-- User Alert notification for scheduled meeting date change -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_date">[A]%1$s[/A][B]さんがミーティングの日付を以下のように更新しました：[/B]</string>
+    <!-- User Alert notification for scheduled meeting time change -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%1$s[/A][B]さんがミーティングの時間を以下のように更新しました：[/B]</string>
+    <!-- User Alert notification for canceled scheduled meeting -->
+    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A][B]さんが以下のように予定されていたミーティングをキャンセルしました：[/B]</string>
+    <!-- Title of the ads free introduction screen -->
+    <string name="payment_ads_free_intro_title">Looking to enjoy an ad-free experience?</string>
+    <!-- Description of the ads free introduction screen -->
+    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan for lots of storage and more. Our Pro plans start at just %1$s a month.</string>
+    <!-- The Generous storage label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_generous_storage_label">豊富なストレージ</string>
+    <!-- The Generous storage description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_generous_storage_description">Store unlimited data, starting from %1$s.</string>
+    <!-- The Transfer sharing label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_transfer_sharing_label">転送共有</string>
+    <!-- The Transfer sharing description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_transfer_sharing_description">データを共有する相手は、お客様の転送容量を使用して、お客様が共有した項目をダウンロードできます。</string>
+    <!-- The additional security label in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_additional_security_label">共有時のセキュリティの強化</string>
+    <!-- The additional security description in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_additional_security_description">ファイルとフォルダのリンクのパスワードと有効期限を設定できます。</string>
+    <!-- The button text view pro plan in the ads free introduction screen -->
+    <string name="payment_ads_free_intro_button_view_pro_plan">Proプランを見る</string>
 </resources>
