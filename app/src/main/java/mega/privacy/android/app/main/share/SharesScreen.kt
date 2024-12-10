@@ -80,6 +80,7 @@ internal fun SharesScreen(
     onSearchClick: () -> Unit = {},
     onMoreClick: () -> Unit = {},
     onPageSelected: (SharesTab) -> Unit = {},
+    onOpenDrawer: () -> Unit = {},
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val view = LocalView.current
@@ -146,11 +147,15 @@ internal fun SharesScreen(
                         navigationIcon = {
                             IconButton(
                                 onClick = {
-                                    onBackPressedDispatcher?.onBackPressed()
+                                    if (isTabShown) {
+                                        onOpenDrawer()
+                                    } else {
+                                        onBackPressedDispatcher?.onBackPressed()
+                                    }
                                 },
                             ) {
                                 Icon(
-                                    painter = painterResource(mega.privacy.android.core.R.drawable.ic_back),
+                                    painter = painterResource(if (isTabShown) mega.privacy.android.core.R.drawable.ic_menu else mega.privacy.android.core.R.drawable.ic_back),
                                     contentDescription = "Back button",
                                     tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
                                 )

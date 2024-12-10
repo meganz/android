@@ -6997,6 +6997,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
     }
 
+    fun openDrawer() {
+        drawerLayout.openDrawer(navigationView)
+    }
+
     private val isBusinessAccount: Boolean
         get() = megaApi.isBusinessAccount && myAccountInfo.accountType == Constants.BUSINESS
     private val isProFlexiAccount: Boolean

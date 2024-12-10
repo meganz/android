@@ -116,6 +116,9 @@ class SharesFragment : Fragment() {
                         else -> Unit
                     }
                 },
+                onOpenDrawer = {
+                    managerActivity.openDrawer()
+                }
             )
         }
     }.also {
