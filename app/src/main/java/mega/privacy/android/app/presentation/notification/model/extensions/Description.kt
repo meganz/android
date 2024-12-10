@@ -154,7 +154,7 @@ private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> String?
             is UpdatedScheduledMeetingRulesAlert -> {
                 val stringRes = when {
                     !hasDateChanged && !hasDayOfWeekChanged -> sharedR.string.meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed
-                    hasDateChanged && !hasDayOfWeekChanged -> if (isRecurring) {
+                    hasDateChanged && hasDayOfWeekChanged -> if (isRecurring) {
                         sharedR.string.meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes
                     } else {
                         sharedR.string.meetings_notification_subtitle_scheduled_meeting_updated_date
