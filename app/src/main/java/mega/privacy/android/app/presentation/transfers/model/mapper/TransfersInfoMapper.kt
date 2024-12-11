@@ -28,7 +28,7 @@ class TransfersInfoMapper @Inject constructor() {
         if (numPendingUploads + numPendingDownloadsNonBackground <= 0) {
             return TransfersInfo(
                 when {
-                    isTransferError || !isOnline -> TransfersStatus.TransferError
+                    isTransferError -> TransfersStatus.TransferError
                     lastTransfersCancelled -> TransfersStatus.Cancelled
                     else -> TransfersStatus.Completed
                 }
@@ -44,7 +44,7 @@ class TransfersInfoMapper @Inject constructor() {
             (isTransferOverQuota && (!pendingUploads || isStorageOverQuota))
                     || (isStorageOverQuota && !pendingDownloads) -> TransfersStatus.OverQuota
 
-            isTransferError -> TransfersStatus.TransferError
+            isTransferError || !isOnline -> TransfersStatus.TransferError
             else -> TransfersStatus.Transferring
         }
         return TransfersInfo(

@@ -70,14 +70,31 @@ class TransfersInfoMapperTest {
         }
 
         @Test
-        fun `test that Error status is set when there are no transfers and isOnline is false`() {
+        fun `test that Completed status is set when there are no transfers and isTransferError and isOnline is false`() {
             val result = underTest(
                 numPendingUploads = 0,
                 numPendingDownloadsNonBackground = 0,
                 totalSizeToTransfer = 10L,
                 totalSizeTransferred = 5L,
                 areTransfersPaused = false,
-                isTransferError = true,
+                isTransferError = false,
+                isOnline = false,
+                isTransferOverQuota = false,
+                isStorageOverQuota = false,
+                lastTransfersCancelled = false,
+            )
+            assertThat(result.status).isEqualTo(TransfersStatus.Completed)
+        }
+
+        @Test
+        fun `test that Error status is set when there are some transfers and isOnline is false`() {
+            val result = underTest(
+                numPendingUploads = 1,
+                numPendingDownloadsNonBackground = 0,
+                totalSizeToTransfer = 10L,
+                totalSizeTransferred = 5L,
+                areTransfersPaused = false,
+                isTransferError = false,
                 isOnline = false,
                 isTransferOverQuota = false,
                 isStorageOverQuota = false,
