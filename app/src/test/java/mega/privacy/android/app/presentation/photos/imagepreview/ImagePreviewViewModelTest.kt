@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -15,11 +16,15 @@ import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMap
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewVideoLauncher
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_NODE_FETCHER_SOURCE
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -40,6 +45,7 @@ import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUs
 import mega.privacy.android.domain.usecase.imagepreview.ClearImageResultUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
@@ -54,6 +60,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -67,10 +76,8 @@ class ImagePreviewViewModelTest {
     private lateinit var underTest: ImagePreviewViewModel
 
     private val savedStateHandle = mock<SavedStateHandle>()
-    private val imageNodeFetchers =
-        mapOf<@JvmSuppressWildcards ImagePreviewFetcherSource, @JvmSuppressWildcards ImageNodeFetcher>()
-    private val imagePreviewMenuMap =
-        mapOf<@JvmSuppressWildcards ImagePreviewMenuSource, @JvmSuppressWildcards ImagePreviewMenu>()
+    private val imageNodeFetchers = mutableMapOf<ImagePreviewFetcherSource, ImageNodeFetcher>()
+    private val imagePreviewMenuMap = mapOf<ImagePreviewMenuSource, ImagePreviewMenu>()
     private val addImageTypeUseCase: AddImageTypeUseCase = mock()
     private val getImageUseCase: GetImageUseCase = mock()
     private val getImageFromFileUseCase: GetImageFromFileUseCase = mock()
@@ -100,6 +107,7 @@ class ImagePreviewViewModelTest {
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
     private val clearImageResultUseCase: ClearImageResultUseCase = mock()
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
+    private val monitorConnectivityUseCase = Mockito.mock<MonitorConnectivityUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -135,7 +143,10 @@ class ImagePreviewViewModelTest {
         isHiddenNodesOnboardedUseCase,
         monitorShowHiddenItemsUseCase,
         getBusinessStatusUseCase,
-    )
+        monitorConnectivityUseCase,
+    ).also {
+        imageNodeFetchers.clear()
+    }
 
     private fun initViewModel() {
         underTest = ImagePreviewViewModel(
@@ -169,11 +180,24 @@ class ImagePreviewViewModelTest {
             clearImageResultUseCase = clearImageResultUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
         )
     }
 
     private fun commonStub() = runTest {
         whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that the online status is updated correctly`(isOnline: Boolean) = runTest {
+        whenever(monitorConnectivityUseCase()) doReturn flowOf(isOnline)
+
+        initViewModel()
+
+        underTest.state.test {
+            assertThat(expectMostRecentItem().isOnline).isEqualTo(isOnline)
+        }
     }
 
     @Test
@@ -567,6 +591,33 @@ class ImagePreviewViewModelTest {
             underTest.state.test {
                 val state = expectMostRecentItem()
                 assertThat(state.copyMoveException).isEqualTo(runtimeException)
+            }
+        }
+
+    @Test
+    internal fun `test that CopyOfflineNode transfer event is triggered when executeTransfer is invoked in offline mode`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { id } doReturn NodeId(123L)
+                on { isAvailableOffline } doReturn true
+            }
+            val offlineImageNodeFetcher = mock<OfflineImageNodeFetcher>()
+            whenever(monitorConnectivityUseCase()) doReturn flowOf(false)
+            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+                .thenReturn(ImagePreviewFetcherSource.OFFLINE)
+            whenever(savedStateHandle.get<Long>(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE))
+                .thenReturn(123L)
+            imageNodeFetchers[ImagePreviewFetcherSource.OFFLINE] = offlineImageNodeFetcher
+            whenever(offlineImageNodeFetcher.monitorImageNodes(any())) doReturn flowOf(
+                listOf(imageNode)
+            )
+            initViewModel()
+
+            underTest.executeTransfer(false)
+
+            underTest.state.test {
+                val state = expectMostRecentItem()
+                assertThat(state.downloadEvent.triggeredContent()).isInstanceOf(TransferTriggerEvent.CopyOfflineNode::class.java)
             }
         }
 

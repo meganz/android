@@ -19,6 +19,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.test.platform.app.InstrumentationRegistry
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.StateEventWithContentTriggered
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.DrawableResId
 
 internal fun SemanticsNodeInteractionsProvider.onNodeWithText(
@@ -87,3 +89,7 @@ internal fun ComposeContentTestRule.performClickOnAllNodes(testTag: String) {
             }
         }
 }
+
+
+fun <T> StateEventWithContent<T>.triggeredContent(): T? =
+    (this as? StateEventWithContentTriggered<T>)?.content

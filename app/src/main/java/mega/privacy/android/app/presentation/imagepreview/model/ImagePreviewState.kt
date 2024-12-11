@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NameCollision
 
-data class ImagePreviewState(
+internal data class ImagePreviewState(
     val isInitialized: Boolean = false,
     val imageNodes: List<ImageNode> = emptyList(),
     val currentImageNode: ImageNode? = null,
@@ -24,4 +24,5 @@ data class ImagePreviewState(
     val isHiddenNodesOnboarded: Boolean? = null,
     val isMagnifierMode: Boolean = false,
     val isBusinessAccountExpired: Boolean = false,
+    val isOnline: Boolean = false,
 )

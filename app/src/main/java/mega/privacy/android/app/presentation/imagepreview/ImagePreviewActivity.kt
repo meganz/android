@@ -17,6 +17,7 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
@@ -33,6 +34,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
@@ -52,6 +54,8 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
 import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowActivity
 import mega.privacy.android.app.presentation.imagepreview.view.ImagePreviewScreen
+import mega.privacy.android.app.presentation.offline.action.HandleOfflineNodeActions
+import mega.privacy.android.app.presentation.offline.action.OfflineNodeActionsViewModel
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
@@ -130,6 +134,7 @@ class ImagePreviewActivity : BaseActivity() {
 
     private val viewModel: ImagePreviewViewModel by viewModels()
     private val nodeAttachmentViewModel: NodeAttachmentViewModel by viewModels()
+    private val offlineNodeActionsViewModel: OfflineNodeActionsViewModel by viewModels()
 
     private var tempNodeId: NodeId? = null
 
@@ -188,7 +193,11 @@ class ImagePreviewActivity : BaseActivity() {
                             viewModel = nodeAttachmentViewModel,
                             snackbarHostState = snackbarHostState,
                         )
-
+                        HandleOfflineNodeActions(
+                            viewModel = offlineNodeActionsViewModel,
+                            snackBarHostState = snackbarHostState,
+                            coroutineScope = rememberCoroutineScope(),
+                        )
                     }
                 )
             }
@@ -275,11 +284,20 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun checkInfo(imageNode: ImageNode) {
-        val intent = Intent(this, FileInfoActivity::class.java).apply {
-            putExtra(Constants.HANDLE, imageNode.id.longValue)
-            putExtra(Constants.NAME, imageNode.name)
+        if (viewModel.isInOfflineMode()) {
+            Intent(this, OfflineFileInfoActivity::class.java).apply {
+                putExtra(Constants.HANDLE, imageNode.id.longValue.toString())
+            }.apply {
+                startActivity(this)
+            }
+        } else {
+            Intent(this, FileInfoActivity::class.java).apply {
+                putExtra(Constants.HANDLE, imageNode.id.longValue)
+                putExtra(Constants.NAME, imageNode.name)
+            }.apply {
+                startActivity(this)
+            }
         }
-        startActivity(intent)
     }
 
     private fun favouriteNode(imageNode: ImageNode) {
@@ -292,14 +310,18 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun handleOpenWith(imageNode: ImageNode) {
-        onNodeTapped(
-            this,
-            MegaNode.unserialize(imageNode.serializedData),
-            { this.saveNodeByOpenWith() },
-            this,
-            this,
-            true
-        )
+        if (viewModel.isInOfflineMode()) {
+            offlineNodeActionsViewModel.handleOpenWithIntentById(imageNode.id)
+        } else {
+            onNodeTapped(
+                this,
+                MegaNode.unserialize(imageNode.serializedData),
+                { this.saveNodeByOpenWith() },
+                this,
+                this,
+                true
+            )
+        }
     }
 
     private fun saveNodeToDevice() {
@@ -323,7 +345,14 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun shareNode(imageNode: ImageNode) {
-        MegaNodeUtil.shareNode(this, MegaNode.unserialize(imageNode.serializedData))
+        if (viewModel.isInOfflineMode()) {
+            offlineNodeActionsViewModel.handleShareOfflineNodeById(
+                nodeId = imageNode.id,
+                isOnline = false
+            )
+        } else {
+            MegaNodeUtil.shareNode(this, MegaNode.unserialize(imageNode.serializedData))
+        }
     }
 
     private fun renameNode(imageNode: ImageNode) {

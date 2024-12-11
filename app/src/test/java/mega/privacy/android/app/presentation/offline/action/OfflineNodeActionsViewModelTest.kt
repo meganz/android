@@ -80,6 +80,7 @@ class OfflineNodeActionsViewModelTest {
             getOfflineFilesUseCase = getOfflineFilesUseCase,
             exportNodesUseCase = exportNodesUseCase,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
+            getOfflineFileInformationByIdUseCase = mock(),
             snackBarHandler = snackBarHandler,
             nodeContentUriIntentMapper = nodeContentUriIntentMapper
         )
