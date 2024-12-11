@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.advertisements.AdDetails
 
 /**
@@ -13,4 +14,15 @@ interface AdsRepository {
         adSlots: List<String>,
         linkHandle: Long?,
     ): List<AdDetails>
+
+
+    /**
+     * Monitor ads closing timestamp
+     */
+    fun monitorAdsClosingTimestamp(): Flow<Long?>
+
+    /**
+     * Set ads closing timestamp
+     */
+    suspend fun setAdsClosingTimestamp(timestamp: Long)
 }

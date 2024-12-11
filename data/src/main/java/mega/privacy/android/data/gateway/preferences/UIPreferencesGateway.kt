@@ -116,4 +116,14 @@ interface UIPreferencesGateway {
      * Save recent queries
      */
     suspend fun setPhotosRecentQueries(queries: List<String>)
+
+    /**
+     * Monitor ads closing timestamp
+     */
+    fun monitorAdsClosingTimestamp(): Flow<Long?>
+
+    /**
+     * Set ads closing timestamp
+     */
+    suspend fun setAdsClosingTimestamp(timestamp: Long)
 }

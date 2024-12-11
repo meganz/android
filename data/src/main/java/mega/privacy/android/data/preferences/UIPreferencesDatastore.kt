@@ -27,6 +27,7 @@ private const val PHOTOS_RECENT_QUERIES = "PHOTOS_RECENT_QUERIES"
 private const val VIEW_TYPE = "VIEW_TYPE"
 private const val ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP =
     "ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP"
+private const val ADS_CLOSING_TIMESTAMP = "ADS_CLOSING_TIMESTAMP"
 private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
     name = USER_INTERFACE_PREFERENCES,
     produceMigrations = {
@@ -132,5 +133,15 @@ internal class UIPreferencesDatastore @Inject constructor(
                 if (text.isNullOrBlank()) listOf()
                 else text.split("[SEP]")
             }
+    }
+
+    override suspend fun setAdsClosingTimestamp(timestamp: Long) {
+        context.uiPreferenceDataStore.edit {
+            it[longPreferencesKey(ADS_CLOSING_TIMESTAMP)] = timestamp
+        }
+    }
+
+    override fun monitorAdsClosingTimestamp(): Flow<Long?> {
+        return context.uiPreferenceDataStore.monitor(longPreferencesKey(ADS_CLOSING_TIMESTAMP))
     }
 }
