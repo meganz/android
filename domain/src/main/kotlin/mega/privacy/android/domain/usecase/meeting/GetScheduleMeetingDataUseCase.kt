@@ -48,7 +48,10 @@ class GetScheduleMeetingDataUseCase @Inject constructor(
         val endTimestamp = occurrence?.endDateTime ?: schedMeeting.endDateTime
 
         val isChatRoomActive = isChatRoomActiveJob.await()
-        val isPending = isMeetingPending(startTimestamp, endTimestamp) && isChatRoomActive
+        val isPending = schedMeeting.isCanceled.not() && isMeetingPending(
+            startTimestamp,
+            endTimestamp
+        ) && isChatRoomActive
         val formattedTimestamp = if (startTimestamp != null && endTimestamp != null)
             meetingTimeMapper(startTimestamp, endTimestamp)
         else null
@@ -63,6 +66,7 @@ class GetScheduleMeetingDataUseCase @Inject constructor(
             isRecurringWeekly = isRecurringWeekly,
             isRecurringMonthly = isRecurringMonthly,
             isPending = isPending,
+            isCancelled = schedMeeting.isCanceled
         )
     }
 

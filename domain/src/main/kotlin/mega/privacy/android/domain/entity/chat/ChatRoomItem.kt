@@ -102,7 +102,8 @@ sealed class ChatRoomItem(
         override val lastTimestampFormatted: String? = null,
         override val highlight: Boolean = false,
         override val header: String? = null,
-    ) : ChatRoomItem(call, chatId, title, lastMessage, lastMessageType, currentCallStatus,
+    ) : ChatRoomItem(
+        call, chatId, title, lastMessage, lastMessageType, currentCallStatus,
         unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
         lastTimestampFormatted, highlight, header
     )
@@ -146,7 +147,8 @@ sealed class ChatRoomItem(
         override val lastTimestampFormatted: String? = null,
         override val highlight: Boolean = false,
         override val header: String? = null,
-    ) : ChatRoomItem(call, chatId, title, lastMessage, lastMessageType, currentCallStatus,
+    ) : ChatRoomItem(
+        call, chatId, title, lastMessage, lastMessageType, currentCallStatus,
         unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
         lastTimestampFormatted, highlight, header
     )
@@ -194,6 +196,7 @@ sealed class ChatRoomItem(
         val isWaitingRoom: Boolean = false,
         val isPublic: Boolean = false,
         val avatars: List<ChatAvatarItem>? = null,
+        val isCancelled: Boolean = false,
         override val call: ChatCall? = null,
         override val chatId: Long,
         override val title: String,
@@ -209,7 +212,8 @@ sealed class ChatRoomItem(
         override val lastTimestampFormatted: String? = null,
         override val highlight: Boolean = false,
         override val header: String? = null,
-    ) : ChatRoomItem(call, chatId, title, lastMessage, lastMessageType, currentCallStatus,
+    ) : ChatRoomItem(
+        call, chatId, title, lastMessage, lastMessageType, currentCallStatus,
         unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
         lastTimestampFormatted, highlight, header
     ) {
@@ -237,7 +241,7 @@ sealed class ChatRoomItem(
      * @return  True if is a pending meeting, false otherwise.
      */
     fun isPendingMeeting(): Boolean =
-        this is MeetingChatRoomItem && this.isPending
+        this is MeetingChatRoomItem && this.isCancelled.not() && this.isPending
 
     /**
      * Check if chat is a recurring meeting
@@ -318,6 +322,7 @@ sealed class ChatRoomItem(
         scheduledEndTimestamp: Long? = null,
         scheduledTimestampFormatted: String? = null,
         isWaitingRoom: Boolean? = null,
+        isCancelled: Boolean? = null,
     ): ChatRoomItem = when (this) {
         is IndividualChatRoomItem -> copy(
             call = call,
@@ -389,6 +394,7 @@ sealed class ChatRoomItem(
             scheduledEndTimestamp = scheduledEndTimestamp ?: this.scheduledEndTimestamp,
             scheduledTimestampFormatted = scheduledTimestampFormatted
                 ?: this.scheduledTimestampFormatted,
+            isCancelled = isCancelled ?: this.isCancelled
         )
     }
 }

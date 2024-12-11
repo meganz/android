@@ -76,7 +76,7 @@ internal fun ChatRoomItemView(
     val hapticFeedback = LocalHapticFeedback.current
     val hasOngoingCall = item.hasOngoingCall()
     val isLoading = item.lastTimestampFormatted.isNullOrBlank()
-    val isPending = item is MeetingChatRoomItem && item.isPending
+    val isPending = item is MeetingChatRoomItem && item.isPendingMeeting()
     val callDurationFromInitialTimestamp = item.getDurationFromInitialTimestamp()
     val shouldShownCallDuration =
         item.hasCallInProgress() && callDurationFromInitialTimestamp != null
@@ -298,21 +298,19 @@ internal fun ChatRoomItemView(
         )
 
         if (shouldShownCallDuration) {
-            callDurationFromInitialTimestamp?.let { duration ->
-                CallChronometer(
-                    modifier = Modifier
-                        .testTag(if (isPending) TEST_TAG_BOTTOM_TEXT_CALL_CHRONOMETER else TEST_TAG_MIDDLE_TEXT_CALL_CHRONOMETER)
-                        .constrainAs(durationChrono) {
-                            start.linkTo(if (isPending) bottomText.end else middleText.end)
-                            top.linkTo(if (isPending) bottomText.top else middleText.top)
-                            bottom.linkTo(if (isPending) bottomText.bottom else middleText.bottom)
-                            width = Dimension.preferredWrapContent
-                        }
-                        .shimmerEffect(isLoading, CircleShape),
-                    duration = duration,
-                    textStyle = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.secondary)
-                )
-            }
+            CallChronometer(
+                modifier = Modifier
+                    .testTag(if (isPending) TEST_TAG_BOTTOM_TEXT_CALL_CHRONOMETER else TEST_TAG_MIDDLE_TEXT_CALL_CHRONOMETER)
+                    .constrainAs(durationChrono) {
+                        start.linkTo(if (isPending) bottomText.end else middleText.end)
+                        top.linkTo(if (isPending) bottomText.top else middleText.top)
+                        bottom.linkTo(if (isPending) bottomText.bottom else middleText.bottom)
+                        width = Dimension.preferredWrapContent
+                    }
+                    .shimmerEffect(isLoading, CircleShape),
+                duration = callDurationFromInitialTimestamp,
+                textStyle = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.secondary)
+            )
         }
 
         BottomTextView(
@@ -656,6 +654,3 @@ const val TEST_TAG_MIDDLE_TEXT = "chat_room_item:middle_text"
  * Test tag for bottom text
  */
 const val TEST_TAG_BOTTOM_TEXT = "chat_room_item:bottom_text"
-
-
-

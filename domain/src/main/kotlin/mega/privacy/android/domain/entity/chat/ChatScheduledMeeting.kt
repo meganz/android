@@ -19,7 +19,7 @@ package mega.privacy.android.domain.entity.chat
  * @property changes            List of [ScheduledMeetingChanges].
  * @property isCanceled
  */
-data class ChatScheduledMeeting constructor(
+data class ChatScheduledMeeting(
     val chatId: Long = -1,
     val schedId: Long = -1,
     val parentSchedId: Long? = null,

@@ -19,8 +19,8 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.data.mapper.chat.ChatRoomItemMapper
-import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem
@@ -36,9 +36,9 @@ import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.usecase.ChatRoomItemStatusMapper
+import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
-import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduleMeetingDataUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdatesUseCase
@@ -111,7 +111,7 @@ class GetChatsUseCase @Inject constructor(
             val mutex = Mutex()
             val chats = mutableMapOf<Long, ChatRoomItem>()
 
-            emit(chats.addChatRooms(chatRoomType))
+            emit(chats.addChatRooms(mutex, chatRoomType))
 
             emitAll(
                 flowOf(
@@ -140,6 +140,7 @@ class GetChatsUseCase @Inject constructor(
         }
 
     private suspend fun MutableMap<Long, ChatRoomItem>.addChatRooms(
+        mutex: Mutex,
         chatRoomType: ChatRoomType,
     ): List<ChatRoomItem> =
         when (chatRoomType) {
@@ -150,7 +151,7 @@ class GetChatsUseCase @Inject constructor(
             .sortedByDescending(CombinedChatRoom::lastTimestamp)
             .forEach { chatRoom ->
                 if (!chatRoom.isPreview && (chatRoomType == ChatRoomType.ARCHIVED_CHATS || !chatRoom.isArchived)) {
-                    put(chatRoom.chatId, chatRoomItemMapper(chatRoom))
+                    mutex.withLock { put(chatRoom.chatId, chatRoomItemMapper(chatRoom)) }
                 }
             }.let { values.toList() }
 
@@ -160,8 +161,9 @@ class GetChatsUseCase @Inject constructor(
         getLastMessage: suspend (Long) -> String,
         lastTimeMapper: (Long) -> String,
         meetingTimeMapper: (Long, Long) -> String,
-    ): Flow<List<ChatRoomItem>> =
-        values.asFlow().flatMapMerge(MAX_CONCURRENT_JOBS) { currentItem ->
+    ): Flow<List<ChatRoomItem>> {
+        val copy = values.toMutableList()
+        return copy.asFlow().flatMapMerge(MAX_CONCURRENT_JOBS) { currentItem ->
             flow {
                 val newItem = currentItem.updateChatFields(getLastMessage, lastTimeMapper)
                 val updatedItem = if (currentItem is MeetingChatRoomItem) {
@@ -177,6 +179,7 @@ class GetChatsUseCase @Inject constructor(
                 emit(values.toList())
             }
         }
+    }
 
     private suspend fun ChatRoomItem.updateChatFields(
         getLastMessage: suspend (Long) -> String,
@@ -221,6 +224,7 @@ class GetChatsUseCase @Inject constructor(
                     scheduledStartTimestamp = schedMeetingData.scheduledStartTimestamp,
                     scheduledEndTimestamp = schedMeetingData.scheduledEndTimestamp,
                     scheduledTimestampFormatted = schedMeetingData.scheduledTimestampFormatted,
+                    isCancelled = schedMeetingData.isCancelled
                 )
             } ?: this
         } else this
@@ -232,11 +236,12 @@ class GetChatsUseCase @Inject constructor(
         if (chatRoomType != ChatRoomType.ARCHIVED_CHATS) {
             pushesRepository.monitorPushNotificationSettings().mapNotNull {
                 var listUpdated = false
-                values.toList().forEach { item ->
-                    val itemMuted = isChatMuted(item.chatId)
-                    if (item.isMuted != itemMuted) {
-                        listUpdated = true
-                        mutex.withLock {
+                mutex.withLock {
+                    values.toList().forEach { item ->
+                        val itemMuted = isChatMuted(item.chatId)
+                        if (item.isMuted != itemMuted) {
+                            listUpdated = true
+
                             get(item.chatId)?.let { currentItem ->
                                 val newItem = currentItem.copyChatRoomItem(
                                     isMuted = itemMuted,
@@ -306,6 +311,7 @@ class GetChatsUseCase @Inject constructor(
                                 isRecurringMonthly = schedData.isRecurringMonthly,
                                 scheduledStartTimestamp = schedData.scheduledStartTimestamp,
                                 scheduledEndTimestamp = schedData.scheduledEndTimestamp,
+                                isCancelled = schedData.isCancelled,
                             )
                             if (currentItem != newItem) {
                                 put(currentItem.chatId, newItem)
@@ -383,7 +389,7 @@ class GetChatsUseCase @Inject constructor(
         if (chatRoomType == ChatRoomType.MEETINGS) {
             sortedWith { firstItem, secondItem ->
                 when {
-                    firstItem.isPendingMeeting() && secondItem.isPendingMeeting() -> {
+                    (firstItem.isPendingMeeting() && secondItem.isPendingMeeting()) -> {
                         firstItem as MeetingChatRoomItem
                         secondItem as MeetingChatRoomItem
                         when {

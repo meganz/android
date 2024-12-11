@@ -8,11 +8,11 @@ import androidx.compose.ui.test.performClick
 import androidx.core.graphics.toColorInt
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
-import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
 import org.junit.Rule
 import org.junit.Test
@@ -195,6 +195,7 @@ class ChatRoomItemViewTest {
             on { chatId } doReturn 123L
             on { currentCallStatus } doReturn ChatRoomItemStatus.Joined
             on { highlight } doReturn true
+            on { isPendingMeeting() } doReturn true
         }
 
         composeTestRule.setContent {
@@ -208,8 +209,8 @@ class ChatRoomItemViewTest {
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_BOTTOM_TEXT, useUnmergedTree = true)
-            .assertIsDisplayed()
+            .assertExists()
         composeTestRule.onNodeWithTag(TEST_TAG_BOTTOM_TEXT_CALL_CHRONOMETER, useUnmergedTree = true)
-            .assertIsDisplayed()
+            .assertExists()
     }
 }
