@@ -208,7 +208,8 @@ import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
-import mega.privacy.android.app.presentation.settings.model.TargetPreference
+import mega.privacy.android.app.presentation.settings.model.StartScreenTargetPreference
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CHAT_BNV
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.CLOUD_DRIVE_BNV
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.HOME_BNV
@@ -312,6 +313,7 @@ import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionViewModel
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.settings.arguments.TargetPreference
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.widgets.setTransfersWidgetContent
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
@@ -4078,14 +4080,14 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * Opens the settings section and scrolls to storage category.
      */
     fun moveToSettingsSectionStorage() {
-        navigateToSettingsActivity(TargetPreference.Storage)
+        navigateToSettingsActivity(StorageTargetPreference)
     }
 
     /**
      * Opens the settings section and scrolls to start screen setting.
      */
     fun moveToSettingsSectionStartScreen() {
-        navigateToSettingsActivity(TargetPreference.StartScreen)
+        navigateToSettingsActivity(StartScreenTargetPreference)
     }
 
     override fun moveToChatSection(chatId: Long) {

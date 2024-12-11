@@ -23,10 +23,10 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.SettingsActivity
-import mega.privacy.android.app.presentation.settings.model.TargetPreference
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.app.presentation.settings.model.QRTargetPreference
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 
 /**
@@ -125,7 +125,7 @@ internal fun QRCodeTopBar(
 
 private fun onGotoSettings(context: Context) {
     val settingsIntent =
-        SettingsActivity.getIntent(context, TargetPreference.QR).apply {
+        SettingsActivity.getIntent(context, QRTargetPreference).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
     context.startActivity(settingsIntent)

@@ -48,7 +48,7 @@ import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogVie
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
 import mega.privacy.android.app.presentation.settings.SettingsActivity
-import mega.privacy.android.app.presentation.settings.model.TargetPreference
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
@@ -507,7 +507,7 @@ private fun consumeMessageAction(
     StartTransferEvent.Message.ActionEvent.GoToFileManagement -> {
         ContextCompat.startActivity(
             context,
-            SettingsActivity.getIntent(context, TargetPreference.Storage),
+            SettingsActivity.getIntent(context, StorageTargetPreference),
             null
         )
     }
