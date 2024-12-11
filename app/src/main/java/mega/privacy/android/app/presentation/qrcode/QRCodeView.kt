@@ -133,6 +133,7 @@ internal fun QRCodeView(
     onScanCancelConsumed: () -> Unit,
     onUploadEventConsumed: () -> Unit,
     qrCodeMapper: QRCodeMapper,
+    navigateToQrSettings: () -> Unit,
 ) {
     val view: View = LocalView.current
     val context = LocalContext.current
@@ -247,7 +248,8 @@ internal fun QRCodeView(
                             )
                         }
                     }
-                }
+                },
+                navigateToQrSettings = navigateToQrSettings
             )
         }
     ) {
@@ -684,8 +686,8 @@ private fun PreviewQRCodeView() {
         )
         QRCodeView(
             viewState = viewState,
-            onCreateQRCode = { },
             onBackPressed = { },
+            onCreateQRCode = { },
             onDeleteQRCode = { },
             onResetQRCode = { },
             onScanQrCodeClicked = { },
@@ -705,9 +707,11 @@ private fun PreviewQRCodeView() {
             onUploadFileConsumed = { },
             onScanCancelConsumed = { },
             onUploadEventConsumed = { },
-        ) { _, _, _, _, _ ->
-            Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
-        }
+            { _, _, _, _, _ ->
+                Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
+            },
+            navigateToQrSettings = {},
+        )
     }
 }
 

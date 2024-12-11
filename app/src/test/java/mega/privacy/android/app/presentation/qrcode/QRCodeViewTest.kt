@@ -15,12 +15,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
-import mega.privacy.android.app.presentation.qrcode.CREATE_TAG
-import mega.privacy.android.app.presentation.qrcode.LINK_TAG
-import mega.privacy.android.app.presentation.qrcode.QRCODE_TAG
-import mega.privacy.android.app.presentation.qrcode.QRCodeView
-import mega.privacy.android.app.presentation.qrcode.SCAN_TAG
-import mega.privacy.android.app.presentation.qrcode.SNACKBAR_TAG
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
@@ -58,8 +52,8 @@ class QRCodeViewTest {
             ) {
                 QRCodeView(
                     viewState = viewState,
-                    onCreateQRCode = { },
                     onBackPressed = { },
+                    onCreateQRCode = { },
                     onDeleteQRCode = { },
                     onResetQRCode = { },
                     onScanQrCodeClicked = { },
@@ -79,7 +73,8 @@ class QRCodeViewTest {
                     onUploadFileConsumed = { },
                     onScanCancelConsumed = { },
                     onUploadEventConsumed = {},
-                    qrCodeMapper = qrCodeMapper
+                    qrCodeMapper = qrCodeMapper,
+                    navigateToQrSettings = {}
                 )
             }
         }

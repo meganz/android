@@ -4,10 +4,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.presentation.qrcode.DROPDOWN_TAG
-import mega.privacy.android.app.presentation.qrcode.MORE_TAG
-import mega.privacy.android.app.presentation.qrcode.QRCodeTopBar
-import mega.privacy.android.app.presentation.qrcode.SHARE_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,7 +26,8 @@ class QRCodeTopBarTest {
                 onResetQRCode = { },
                 onDeleteQRCode = { },
                 onBackPressed = { },
-                onShare = { }
+                onShare = { },
+                navigateToQrSettings = {}
             )
         }
     }

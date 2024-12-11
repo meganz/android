@@ -18,12 +18,14 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
+import mega.privacy.android.app.presentation.settings.model.QRTargetPreference
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import javax.inject.Inject
@@ -49,6 +51,12 @@ class QRCodeComposeActivity : PasscodeActivity() {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val nameCollisionActivityLauncher = registerForActivityResult(
         NameCollisionActivityContract()
@@ -101,17 +109,18 @@ class QRCodeComposeActivity : PasscodeActivity() {
                     onCloudDriveClicked = viewModel::saveToCloudDrive,
                     onFileSystemClicked = ::saveToFileSystem,
                     onShowCollision = ::showCollision,
+                    onShowCollisionConsumed = viewModel::resetShowCollision,
                     onUploadFile = {
                         viewModel.uploadFile(
                             qrFile = it.first,
                             parentHandle = it.second
                         )
                     },
-                    onShowCollisionConsumed = viewModel::resetShowCollision,
                     onUploadFileConsumed = viewModel::resetUploadFile,
                     onScanCancelConsumed = viewModel::resetScanCancel,
                     onUploadEventConsumed = viewModel::onUploadEventConsumed,
                     qrCodeMapper = qrCodeMapper,
+                    navigateToQrSettings = { megaNavigator.openSettings(this, QRTargetPreference) },
                 )
             }
         }
