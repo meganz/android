@@ -26,12 +26,15 @@ class CheckEnableCameraUploadsStatusUseCase @Inject constructor(
     suspend operator fun invoke(): EnableCameraUploadsStatus {
         val userAccount = getAccountDetailsUseCase(forceRefresh = true)
 
-        return if (userAccount.isBusinessAccount && userAccount.accountTypeIdentifier == AccountType.BUSINESS) {
+        return if (userAccount.isBusinessAccount) {
             val isBusinessAccountActive = isBusinessAccountActiveUseCase()
             val isMasterBusinessAccount = userAccount.isMasterBusinessAccount
+            val isProFlexiAccount = userAccount.accountTypeIdentifier == AccountType.PRO_FLEXI
 
             if (isMasterBusinessAccount) {
                 getMasterBusinessAccountCameraUploadsStatus(isBusinessAccountActive)
+            } else if (isProFlexiAccount) {
+                getProFlexiAccountCameraUploadsStatus(isBusinessAccountActive)
             } else {
                 getBusinessAccountCameraUploadsStatus(isBusinessAccountActive)
             }
@@ -64,5 +67,18 @@ class CheckEnableCameraUploadsStatusUseCase @Inject constructor(
             EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
         } else {
             EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
+        }
+
+    /**
+     * Retrieves camera uploads status when the user is under a Pro Flexi account
+     *
+     * @param isBusinessAccountActive true if the Pro Flexi Account User is active
+     * @return The appropriate Camera Uploads Status
+     */
+    private fun getProFlexiAccountCameraUploadsStatus(isBusinessAccountActive: Boolean) =
+        if (isBusinessAccountActive) {
+            EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
+        } else {
+            EnableCameraUploadsStatus.SHOW_SUSPENDED_PRO_FLEXI_BUSINESS_ACCOUNT_PROMPT
         }
 }

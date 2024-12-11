@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.fileinfo.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.presentation.account.model.AccountDeactivatedStatus
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
@@ -55,6 +56,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
  * @param longitude the longitude of the node
  * @param latitude the latitude of the node
  * @param isPhoto true if the node is a photo (Image or Video)
+ * @param accountDeactivatedStatus the status of the account if it's deactivated
  */
 internal data class FileInfoViewState(
     val title: String = "",
@@ -98,8 +100,7 @@ internal data class FileInfoViewState(
     val longitude: Double = 0.0,
     val latitude: Double = 0.0,
     val isPhoto: Boolean = false,
-    val inactiveBusinessAccount: Boolean = false,
-    val isMasterBusinessAccount: Boolean = false,
+    val accountDeactivatedStatus: AccountDeactivatedStatus? = null,
 ) {
 
     /**

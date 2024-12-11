@@ -22,6 +22,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.account.model.AccountDeactivatedStatus
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
@@ -36,6 +37,7 @@ import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -195,20 +197,26 @@ class FileInfoViewModel @Inject constructor(
     private fun monitorBusinessAccountExpiry() {
         viewModelScope.launch {
             monitorAccountDetailUseCase().filter { it.levelDetail?.accountType?.isBusinessAccount == true }
-                .collect {
+                .collect { accountDetail ->
                     runCatching {
-                        isBusinessAccountActiveUseCase().let { active ->
-                            if (!active) {
-                                isMasterBusinessAccountUseCase().let { isMaster ->
-                                    _uiState.update {
-                                        it.copy(
-                                            isMasterBusinessAccount = isMaster,
-                                            inactiveBusinessAccount = true
-                                        )
-                                    }
-                                }
+                        val isBusinessAccountActive = isBusinessAccountActiveUseCase()
+                        if (!isBusinessAccountActive) {
+                            val isMasterBusinessAccount = isMasterBusinessAccountUseCase()
+                            val status = when {
+                                isMasterBusinessAccount -> AccountDeactivatedStatus.MASTER_BUSINESS_ACCOUNT_DEACTIVATED
+                                accountDetail.levelDetail?.accountType == AccountType.PRO_FLEXI -> AccountDeactivatedStatus.PRO_FLEXI_ACCOUNT_DEACTIVATED
+                                else -> AccountDeactivatedStatus.BUSINESS_ACCOUNT_DEACTIVATED
+                            }
+                            _uiState.update {
+                                it.copy(accountDeactivatedStatus = status)
+                            }
+
+                        } else {
+                            _uiState.update {
+                                it.copy(accountDeactivatedStatus = null)
                             }
                         }
+
                     }.onFailure {
                         Timber.e("Monitor business account expiry failed $it")
                     }

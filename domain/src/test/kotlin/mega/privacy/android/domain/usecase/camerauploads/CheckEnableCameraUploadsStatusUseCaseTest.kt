@@ -67,10 +67,11 @@ internal class CheckEnableCameraUploadsStatusUseCaseTest {
         accountType: AccountType,
     ) = runTest {
         val userAccount = mock<UserAccount> {
-            on { isBusinessAccount }.thenReturn(true)
+            on { isBusinessAccount }.thenReturn(accountType == AccountType.BUSINESS || accountType == AccountType.PRO_FLEXI)
             on { accountTypeIdentifier }.thenReturn(accountType)
         }
 
+        whenever(isBusinessAccountActiveUseCase()).thenReturn(true)
         whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(userAccount)
 
         assertThat(underTest()).isEqualTo(EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)

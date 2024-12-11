@@ -6,20 +6,19 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.account.business.BUSINESS_ACCOUNT_SUSPENDED_DIALOG
-import mega.privacy.android.app.presentation.account.business.BusinessAccountSuspendedDialog
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.app.presentation.account.model.AccountDeactivatedStatus
 
 /**
- * Test class for [BusinessAccountSuspendedDialog]
+ * Test class for [AccountSuspendedDialog]
  */
 @RunWith(AndroidJUnit4::class)
-internal class BusinessAccountSuspendedDialogTest {
+internal class AccountSuspendedDialogTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -27,8 +26,8 @@ internal class BusinessAccountSuspendedDialogTest {
     @Test
     fun `test that the dialog with correct content is shown for suspended business administrators`() {
         composeTestRule.setContent {
-            BusinessAccountSuspendedDialog(
-                isBusinessAdministratorAccount = true,
+            AccountSuspendedDialog(
+                accountDeactivatedStatus = AccountDeactivatedStatus.MASTER_BUSINESS_ACCOUNT_DEACTIVATED,
                 onAlertAcknowledged = {},
                 onAlertDismissed = {},
             )
@@ -45,8 +44,8 @@ internal class BusinessAccountSuspendedDialogTest {
     @Test
     fun `test that the dialog with correct content is shown for suspended business sub-users`() {
         composeTestRule.setContent {
-            BusinessAccountSuspendedDialog(
-                isBusinessAdministratorAccount = false,
+            AccountSuspendedDialog(
+                accountDeactivatedStatus = AccountDeactivatedStatus.BUSINESS_ACCOUNT_DEACTIVATED,
                 onAlertAcknowledged = {},
                 onAlertDismissed = {},
             )
@@ -64,8 +63,8 @@ internal class BusinessAccountSuspendedDialogTest {
     fun `test that clicking the positive button invokes the on alert acknowledged lambda`() {
         val onAlertAcknowledged = mock<() -> Unit>()
         composeTestRule.setContent {
-            BusinessAccountSuspendedDialog(
-                isBusinessAdministratorAccount = true,
+            AccountSuspendedDialog(
+                accountDeactivatedStatus = AccountDeactivatedStatus.MASTER_BUSINESS_ACCOUNT_DEACTIVATED,
                 onAlertAcknowledged = onAlertAcknowledged,
                 onAlertDismissed = {},
             )

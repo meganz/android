@@ -931,13 +931,24 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             return
         }
 
+        val isProFlexiAccount =
+            myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_PRO_FLEXI
+
         val builder =
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .apply {
-                    setTitle(R.string.account_business_account_deactivated_dialog_title)
+                    setTitle(
+                        if (isProFlexiAccount) {
+                            sharedR.string.account_pro_flexi_account_deactivated_dialog_title
+                        } else {
+                            R.string.account_business_account_deactivated_dialog_title
+                        }
+                    )
                     setMessage(
                         if (megaApi.isMasterBusinessAccount) {
                             R.string.account_business_account_deactivated_dialog_admin_body
+                        } else if (isProFlexiAccount) {
+                            sharedR.string.account_pro_flexi_account_deactivated_dialog_body
                         } else {
                             R.string.account_business_account_deactivated_dialog_sub_user_body
                         }

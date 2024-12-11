@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.account.business.BusinessAccountSuspendedDialog
+import mega.privacy.android.app.presentation.account.business.AccountSuspendedDialog
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.SharedInfoView
 import mega.privacy.android.app.utils.Util
@@ -79,11 +79,13 @@ internal fun FileInfoContent(
                 )
             }
             if (showExpiredBusinessDialog) {
-                BusinessAccountSuspendedDialog(
-                    isBusinessAdministratorAccount = isMasterBusinessAccount,
-                    onAlertAcknowledged = { showExpiredBusinessDialog = false },
-                    onAlertDismissed = { showExpiredBusinessDialog = false },
-                )
+                accountDeactivatedStatus?.let {
+                    AccountSuspendedDialog(
+                        accountDeactivatedStatus = it,
+                        onAlertAcknowledged = { showExpiredBusinessDialog = false },
+                        onAlertDismissed = { showExpiredBusinessDialog = false },
+                    )
+                }
             }
 
             //owner (incoming share)
@@ -226,7 +228,7 @@ internal fun FileInfoContent(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .clickable {
-                        if (viewState.inactiveBusinessAccount) {
+                        if (viewState.accountDeactivatedStatus != null) {
                             showExpiredBusinessDialog = true
                         } else {
                             onSetDescriptionClick(descriptionText)
@@ -237,7 +239,7 @@ internal fun FileInfoContent(
                 placeholder = if (isDescriptionEnabled()) stringResource(id = sharedR.string.file_info_information_description_placeholder) else stringResource(
                     id = sharedR.string.file_info_information_no_description_placeholder
                 ),
-                isEditable = isDescriptionEnabled() && viewState.inactiveBusinessAccount.not(),
+                isEditable = isDescriptionEnabled() && viewState.accountDeactivatedStatus != null,
                 onConfirmDescription = onSetDescriptionClick,
             )
 
@@ -249,7 +251,7 @@ internal fun FileInfoContent(
                         .padding(vertical = 8.dp),
                     tags = tags,
                     onAddTagClick = {
-                        if (viewState.inactiveBusinessAccount) {
+                        if (viewState.accountDeactivatedStatus != null) {
                             showExpiredBusinessDialog = true
                         } else {
                             onAddTagClick()

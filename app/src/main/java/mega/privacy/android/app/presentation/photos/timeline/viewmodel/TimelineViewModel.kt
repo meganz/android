@@ -41,6 +41,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.CAN_
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT
+import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_PRO_FLEXI_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
@@ -394,7 +395,8 @@ class TimelineViewModel @Inject constructor(
 
                 SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT,
                 SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT,
-                -> {
+                SHOW_SUSPENDED_PRO_FLEXI_BUSINESS_ACCOUNT_PROMPT,
+                    -> {
                     broadcastBusinessAccountExpiredUseCase()
                 }
             }
