@@ -864,9 +864,9 @@
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]cancelled the meeting scheduled for[/B]</string>
     <!-- Title of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_title">Looking to enjoy an ad-free experience?</string>
+    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
     <!-- Description of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan for lots of storage and more. Our Pro plans start at just %1$s a month.</string>
+    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">넉넉한 저장소</string>
     <!-- The Generous storage description in the ads free introduction screen -->
@@ -876,9 +876,15 @@
     <!-- The Transfer sharing description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_description">The people you share data with can use your transfer quota to download the items you shared.</string>
     <!-- The additional security label in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_label">공유할 때 추가 보안</string>
+    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass and MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_description">파일과 폴더 링크에 암호와 만료일을 설정</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
     <string name="payment_ads_free_intro_button_view_pro_plan">Pro 요금제 보기</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_title">통화</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_sound_notifications_title">소리 알림</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_sound_notifications_body">누군가 통화에 참여하거나 떠날 때 소리를 듣습니다.</string>
 </resources>

@@ -863,9 +863,9 @@
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]cancelled the meeting scheduled for[/B]</string>
     <!-- Title of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_title">Looking to enjoy an ad-free experience?</string>
+    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
     <!-- Description of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan for lots of storage and more. Our Pro plans start at just %1$s a month.</string>
+    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">大容量存储空间</string>
     <!-- The Generous storage description in the ads free introduction screen -->
@@ -875,9 +875,15 @@
     <!-- The Transfer sharing description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_description">与您共享数据的人可以使用您的传输流量来下载您共享的项目。</string>
     <!-- The additional security label in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_label">共享时的额外安全性</string>
+    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass and MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_description">为文件和文件夹链接设置密码和到期日期。</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
     <string name="payment_ads_free_intro_button_view_pro_plan">查看Pro方案</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_title">通话</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_sound_notifications_title">声音通知</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_sound_notifications_body">当有人加入或离开通话时播放提示音。</string>
 </resources>

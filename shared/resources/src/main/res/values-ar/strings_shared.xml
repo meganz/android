@@ -929,9 +929,9 @@
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]cancelled the meeting scheduled for[/B]</string>
     <!-- Title of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_title">Looking to enjoy an ad-free experience?</string>
+    <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
     <!-- Description of the ads free introduction screen -->
-    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan for lots of storage and more. Our Pro plans start at just %1$s a month.</string>
+    <string name="payment_ads_free_intro_description">Upgrade to a Pro plan with plenty of storage and more. Our Pro plans start at just %1$s a month.</string>
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">مساحة تخزين سخية</string>
     <!-- The Generous storage description in the ads free introduction screen -->
@@ -941,9 +941,15 @@
     <!-- The Transfer sharing description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_description">يمكن للأشخاص الذين تشارك البيانات معهم استخدام حجم تراسل المعطيات المتاح لك لتنزيل العناصر التي قمت بمشاركتها.</string>
     <!-- The additional security label in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_label">أمان إضافي عند المشاركة</string>
+    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass and MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_description">قم بتعيين كلمات المرور وتواريخ انتهاء الصلاحية لروابط الملفات والمجلدات.</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
     <string name="payment_ads_free_intro_button_view_pro_plan">عرض باقات برو Pro</string>
+    <!-- Label for call option on settings -->
+    <string name="settings_calls_title">اتصالات</string>
+    <!-- Label for the sound notifications option on calls settings -->
+    <string name="settings_calls_sound_notifications_title">إشعارات صوتية</string>
+    <!-- Text for the sound notifications option on calls settings -->
+    <string name="settings_calls_sound_notifications_body">تسمع صوتًا عندما ينضم شخص ما إلى مكالمة أو يغادرها.</string>
 </resources>
