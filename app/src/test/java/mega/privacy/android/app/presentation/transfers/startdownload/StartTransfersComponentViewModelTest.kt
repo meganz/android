@@ -53,7 +53,6 @@ import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorag
 import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWorkerAndWaitUntilIsStartedUseCase
 import mega.privacy.android.domain.usecase.transfers.filespermission.MonitorRequestFilesPermissionDeniedUseCase
 import mega.privacy.android.domain.usecase.transfers.filespermission.SetRequestFilesPermissionDeniedUseCase
@@ -77,7 +76,6 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -94,7 +92,6 @@ class StartTransfersComponentViewModelTest {
     private lateinit var underTest: StartTransfersComponentViewModel
 
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase = mock()
-    private val startDownloadsWithWorkerUseCase: StartDownloadsWithWorkerUseCase = mock()
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val clearActiveTransfersIfFinishedUseCase =
         mock<ClearActiveTransfersIfFinishedUseCase>()
@@ -171,7 +168,6 @@ class StartTransfersComponentViewModelTest {
             getOfflinePathForNodeUseCase = getOfflinePathForNodeUseCase,
             getOrCreateStorageDownloadLocationUseCase = getOrCreateStorageDownloadLocationUseCase,
             getFilePreviewDownloadPathUseCase = getFilePreviewDownloadPathUseCase,
-            startDownloadsWithWorkerUseCase = startDownloadsWithWorkerUseCase,
             clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             totalFileSizeOfNodesUseCase = totalFileSizeOfNodesUseCase,
@@ -212,7 +208,6 @@ class StartTransfersComponentViewModelTest {
             getOrCreateStorageDownloadLocationUseCase,
             getFilePreviewDownloadPathUseCase,
             clearActiveTransfersIfFinishedUseCase,
-            startDownloadsWithWorkerUseCase,
             isConnectedToInternetUseCase,
             totalFileSizeOfNodesUseCase,
             fileSizeStringMapper,
@@ -248,7 +243,6 @@ class StartTransfersComponentViewModelTest {
 
     private fun initialStub() = runTest {
         whenever(monitorOngoingActiveTransfersUseCase(any())).thenReturn(emptyFlow())
-        whenever(startDownloadsWithWorkerUseCase(any(), any(), any())).thenReturn(emptyFlow())
         whenever(
             startUploadWithWorkerUseCase(
                 eq(mapOf(uploadUri.toString() to null)),
@@ -257,7 +251,6 @@ class StartTransfersComponentViewModelTest {
             )
         ).thenReturn(emptyFlow())
         whenever(monitorRequestFilesPermissionDeniedUseCase()).thenReturn(emptyFlow())
-        whenever(getFeatureFlagValueUseCase(AppFeatures.StartDownloadsInWorker)).thenReturn(false)
         whenever(monitorStorageOverQuotaUseCase()).thenReturn(emptyFlow())
     }
 
@@ -273,7 +266,7 @@ class StartTransfersComponentViewModelTest {
 
     @ParameterizedTest
     @MethodSource("provideStartDownloadEvents")
-    fun `test that start download use case is invoked with correct parameters when download is started`(
+    fun `test that start download worker is started  when download is started`(
         startEvent: TransferTriggerEvent.DownloadTriggerEvent,
     ) = runTest {
         commonStub()
@@ -283,11 +276,7 @@ class StartTransfersComponentViewModelTest {
             whenever(getFilePreviewDownloadPathUseCase()).thenReturn(DESTINATION)
         }
         underTest.startTransfer(startEvent)
-        verify(startDownloadsWithWorkerUseCase).invoke(
-            nodes,
-            DESTINATION,
-            startEvent.isHighPriority
-        )
+        verify(startDownloadsWorkerAndWaitUntilIsStartedUseCase).invoke()
     }
 
     @ParameterizedTest
@@ -332,101 +321,6 @@ class StartTransfersComponentViewModelTest {
             )
             assertCurrentEventIsEqualTo(StartTransferEvent.Message.TransferCancelled)
         }
-
-    @Test
-    fun `test that job in progress is set to ScanningTransfersProgress when start download use case starts`() =
-        runTest {
-            commonStub()
-            stubStartDownload(flow {
-                awaitCancellation()
-            })
-            underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
-            assertThat(underTest.uiState.value.jobInProgressState)
-                .isInstanceOf(StartTransferJobInProgress.ScanningTransfers::class.java)
-        }
-
-    @Test
-    fun `test that ScanningTransfersProgress is updated when start download use case emits new folder update values`() =
-        runTest {
-            commonStub()
-            val expectedList = listOf(
-                TransferStage.STAGE_NONE,
-                TransferStage.STAGE_SCANNING,
-                TransferStage.STAGE_CREATING_TREE,
-            )
-            stubStartDownload(flow {
-                expectedList.map {
-                    MultiTransferEvent.SingleTransferEvent(
-                        transferEvent = TransferEvent.FolderTransferUpdateEvent(
-                            mock(),
-                            it,
-                            0, 0, 0, null, null,
-                        ), 0, 0
-                    )
-                }.forEach {
-                    emit(it)
-                    yield()
-                }
-                awaitCancellation()
-            })
-            underTest.uiState.test {
-                println(awaitItem())//ignore initial
-                underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
-                expectedList.forEach { expected ->
-                    val actual =
-                        (awaitItem().jobInProgressState as? StartTransferJobInProgress.ScanningTransfers)?.stage
-                    println(actual)
-                    assertThat(actual).isEqualTo(expected)
-                }
-            }
-
-            assertThat(underTest.uiState.value.jobInProgressState)
-                .isInstanceOf(StartTransferJobInProgress.ScanningTransfers::class.java)
-        }
-
-    @Test
-    fun `test that FinishDownloadProcessing event is emitted if start download use case emits an event with scanning finished true`() =
-        runTest {
-            commonStub()
-            val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
-            underTest.startTransfer(triggerEvent)
-            assertThat(underTest.uiState.value.jobInProgressState).isNull()
-            assertCurrentEventIsEqualTo(
-                StartTransferEvent.FinishDownloadProcessing(null, 1, 1, 0, triggerEvent)
-            )
-        }
-
-    @Test
-    fun `test that FinishDownloadProcessing event is emitted if start download use case finishes correctly`() =
-        runTest {
-            commonStub()
-            val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
-            underTest.startTransfer(triggerEvent)
-            assertCurrentEventIsEqualTo(
-                StartTransferEvent.FinishDownloadProcessing(null, 1, 1, 0, triggerEvent)
-            )
-        }
-
-    @Test
-    fun `test that NotSufficientSpace event is emitted if start download use case returns NotSufficientSpace`() =
-        runTest {
-            commonStub()
-            stubStartDownload(flowOf(MultiTransferEvent.InsufficientSpace))
-            underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
-            assertCurrentEventIsEqualTo(StartTransferEvent.Message.NotSufficientSpace)
-        }
-
-    @ParameterizedTest(name = "when StartDownloadUseCase finishes with {0}, then {1} is emitted")
-    @MethodSource("provideDownloadNodeParameters")
-    fun `test that a specific StartDownloadTransferEvent is emitted`(
-        multiTransferEvent: MultiTransferEvent,
-        startTransferEvent: StartTransferEvent,
-    ) = runTest {
-        commonStub()
-        stubStartDownload(flowOf(multiTransferEvent))
-        underTest.startTransfer(startDownloadEvent)
-        assertCurrentEventIsEqualTo(startTransferEvent)
-    }
 
     @ParameterizedTest
     @MethodSource("provideStartDownloadEvents")
@@ -689,7 +583,7 @@ class StartTransfersComponentViewModelTest {
                 uri
             )
             verify(saveOfflineNodesToDevice).invoke(listOf(nodeId), UriPath(DESTINATION))
-            verifyNoInteractions(startDownloadsWithWorkerUseCase)
+            verifyNoInteractions(startDownloadsWorkerAndWaitUntilIsStartedUseCase)
         }
 
     @Test
@@ -703,7 +597,7 @@ class StartTransfersComponentViewModelTest {
                 TransferTriggerEvent.CopyOfflineNode(listOf(nodeId)),
             )
             verify(saveOfflineNodesToDevice).invoke(listOf(nodeId), UriPath(DESTINATION))
-            verifyNoInteractions(startDownloadsWithWorkerUseCase)
+            verifyNoInteractions(startDownloadsWorkerAndWaitUntilIsStartedUseCase)
         }
 
     @Test
@@ -723,7 +617,7 @@ class StartTransfersComponentViewModelTest {
                 )
             )
             verify(saveUriToDeviceUseCase).invoke("name", UriPath(sourceUri), UriPath(DESTINATION))
-            verifyNoInteractions(startDownloadsWithWorkerUseCase)
+            verifyNoInteractions(startDownloadsWorkerAndWaitUntilIsStartedUseCase)
         }
 
     @Test
@@ -839,119 +733,111 @@ class StartTransfersComponentViewModelTest {
         }
     }
 
-    @Nested
-    inner class StartInWorkerTests {
-        @BeforeEach
-        fun initialSetup() = runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.StartDownloadsInWorker)).thenReturn(true)
+    @Test
+    fun `test that startDownloadsWorkerAndWaitUntilIsStartedUseCase is invoked when a download starts`() =
+        runTest {
+            commonStub()
+
+            underTest.startTransfer(startDownloadEvent)
+
+            verify(startDownloadsWorkerAndWaitUntilIsStartedUseCase)()
         }
 
-        @Test
-        fun `test that startDownloadsWorkerAndWaitUntilIsStartedUseCase is invoked when a download starts`() =
-            runTest {
-                commonStub()
+    @Test
+    fun `test that ui state is updated with pending transfers from monitorNotResolvedPendingTransfersUseCase when a download starts`() =
+        runTest {
+            commonStub()
+            val expectedList = listOf(
+                TransferStage.STAGE_NONE,
+                TransferStage.STAGE_SCANNING,
+                TransferStage.STAGE_CREATING_TREE,
+            )
 
-                underTest.startTransfer(startDownloadEvent)
-
-                verify(startDownloadsWorkerAndWaitUntilIsStartedUseCase)()
+            val pendingTransfers = expectedList.map { stage ->
+                listOf(mock<PendingTransfer> {
+                    on { this.scanningFoldersData } doReturn
+                            PendingTransfer.ScanningFoldersData(stage)
+                })
             }
 
-        @Test
-        fun `test that ui state is updated with pending transfers from monitorNotResolvedPendingTransfersUseCase when a download starts`() =
-            runTest {
-                commonStub()
-                val expectedList = listOf(
-                    TransferStage.STAGE_NONE,
-                    TransferStage.STAGE_SCANNING,
-                    TransferStage.STAGE_CREATING_TREE,
+            whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)) doReturn flow {
+                pendingTransfers.forEach {
+                    emit(it)
+                    yield()
+                }
+                awaitCancellation()
+            }
+
+            underTest.uiState.test {
+                println(awaitItem())//ignore initial
+                underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
+                expectedList.forEach { expected ->
+                    val actual =
+                        (awaitItem().jobInProgressState as? StartTransferJobInProgress.ScanningTransfers)?.stage
+                    println(actual)
+                    assertThat(actual).isEqualTo(expected)
+                }
+            }
+
+            assertThat(underTest.uiState.value.jobInProgressState)
+                .isInstanceOf(StartTransferJobInProgress.ScanningTransfers::class.java)
+        }
+
+    @Test
+    fun `test that FinishDownloadProcessing event is emitted when monitorNotResolvedPendingTransfersUseCase finishes`() =
+        runTest {
+            commonStub()
+            val pendingTransfer = mock<PendingTransfer> {
+                val scanningFoldersData = PendingTransfer.ScanningFoldersData(
+                    TransferStage.STAGE_TRANSFERRING_FILES,
                 )
-
-                val pendingTransfers = expectedList.map { stage ->
-                    listOf(mock<PendingTransfer> {
-                        on { this.scanningFoldersData } doReturn
-                                PendingTransfer.ScanningFoldersData(stage)
-                    })
-                }
-
-                whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)) doReturn flow {
-                    pendingTransfers.forEach {
-                        emit(it)
-                        yield()
-                    }
-                    awaitCancellation()
-                }
-
-                underTest.uiState.test {
-                    println(awaitItem())//ignore initial
-                    underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
-                    expectedList.forEach { expected ->
-                        val actual =
-                            (awaitItem().jobInProgressState as? StartTransferJobInProgress.ScanningTransfers)?.stage
-                        println(actual)
-                        assertThat(actual).isEqualTo(expected)
-                    }
-                }
-
-                assertThat(underTest.uiState.value.jobInProgressState)
-                    .isInstanceOf(StartTransferJobInProgress.ScanningTransfers::class.java)
+                on { this.scanningFoldersData } doReturn scanningFoldersData
+                on { this.startedFiles } doReturn 1
             }
+            val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
+            whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)) doReturn
+                    flowOf(listOf(pendingTransfer))
 
-        @Test
-        fun `test that FinishDownloadProcessing event is emitted when monitorNotResolvedPendingTransfersUseCase finishes`() =
-            runTest {
-                commonStub()
-                val pendingTransfer = mock<PendingTransfer> {
-                    val scanningFoldersData = PendingTransfer.ScanningFoldersData(
-                        TransferStage.STAGE_TRANSFERRING_FILES,
-                    )
-                    on { this.scanningFoldersData } doReturn scanningFoldersData
-                    on { this.startedFiles } doReturn 1
-                }
-                val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
-                whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)) doReturn
-                        flowOf(listOf(pendingTransfer))
+            underTest.startTransfer(triggerEvent)
 
-                underTest.startTransfer(triggerEvent)
+            assertThat(underTest.uiState.value.jobInProgressState).isNull()
+            assertCurrentEventIsEqualTo(
+                StartTransferEvent.FinishDownloadProcessing(null, 1, 1, 0, triggerEvent)
+            )
+        }
 
-                assertThat(underTest.uiState.value.jobInProgressState).isNull()
-                assertCurrentEventIsEqualTo(
-                    StartTransferEvent.FinishDownloadProcessing(null, 1, 1, 0, triggerEvent)
+    @Test
+    fun `test that deleteAllPendingTransfersUseCase is invoked when monitorNotResolvedPendingTransfersUseCase finishes`() =
+        runTest {
+            commonStub()
+            val pendingTransfer = mock<PendingTransfer> {
+                val scanningFoldersData = PendingTransfer.ScanningFoldersData(
+                    TransferStage.STAGE_TRANSFERRING_FILES,
                 )
+                on { this.scanningFoldersData } doReturn scanningFoldersData
             }
+            val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
+            whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)) doReturn
+                    flowOf(listOf(pendingTransfer))
 
-        @Test
-        fun `test that deleteAllPendingTransfersUseCase is invoked when monitorNotResolvedPendingTransfersUseCase finishes`() =
-            runTest {
-                commonStub()
-                val pendingTransfer = mock<PendingTransfer> {
-                    val scanningFoldersData = PendingTransfer.ScanningFoldersData(
-                        TransferStage.STAGE_TRANSFERRING_FILES,
-                    )
-                    on { this.scanningFoldersData } doReturn scanningFoldersData
-                }
-                val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
-                whenever(monitorPendingTransfersUntilResolvedUseCase(TransferType.DOWNLOAD)) doReturn
-                        flowOf(listOf(pendingTransfer))
+            underTest.startTransfer(triggerEvent)
 
-                underTest.startTransfer(triggerEvent)
+            verify(deleteAllPendingTransfersUseCase)()
+        }
 
-                verify(deleteAllPendingTransfersUseCase)()
-            }
+    @Test
+    fun `test that insertPendingDownloadsForNodesUseCase is invoked when a download starts`() =
+        runTest {
+            commonStub()
 
-        @Test
-        fun `test that insertPendingDownloadsForNodesUseCase is invoked when a download starts`() =
-            runTest {
-                commonStub()
+            underTest.startTransfer(startDownloadEvent)
 
-                underTest.startTransfer(startDownloadEvent)
-
-                verify(insertPendingDownloadsForNodesUseCase)(
-                    startDownloadEvent.nodes,
-                    UriPath(DESTINATION),
-                    false,
-                )
-            }
-    }
+            verify(insertPendingDownloadsForNodesUseCase)(
+                startDownloadEvent.nodes,
+                UriPath(DESTINATION),
+                false,
+            )
+        }
 
     @Nested
     inner class TriggerEventWithoutPermission {
@@ -1089,19 +975,9 @@ class StartTransfersComponentViewModelTest {
     }
 
     private fun stubStartTransfers(flow: Flow<MultiTransferEvent>) {
-        stubStartDownload(flow)
         stubStartUpload(flow)
     }
 
-    private fun stubStartDownload(flow: Flow<MultiTransferEvent>) {
-        whenever(
-            startDownloadsWithWorkerUseCase(
-                anyOrNull(),
-                anyOrNull(),
-                anyOrNull(),
-            )
-        ).thenReturn(flow)
-    }
 
     private fun stubStartUpload(flow: Flow<MultiTransferEvent>) {
         whenever(

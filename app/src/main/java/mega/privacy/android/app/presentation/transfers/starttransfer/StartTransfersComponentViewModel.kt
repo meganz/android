@@ -14,14 +14,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
@@ -59,7 +57,6 @@ import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorag
 import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWorkerAndWaitUntilIsStartedUseCase
 import mega.privacy.android.domain.usecase.transfers.filespermission.MonitorRequestFilesPermissionDeniedUseCase
 import mega.privacy.android.domain.usecase.transfers.filespermission.SetRequestFilesPermissionDeniedUseCase
@@ -85,7 +82,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase,
     private val getOrCreateStorageDownloadLocationUseCase: GetOrCreateStorageDownloadLocationUseCase,
     private val getFilePreviewDownloadPathUseCase: GetFilePreviewDownloadPathUseCase,
-    private val startDownloadsWithWorkerUseCase: StartDownloadsWithWorkerUseCase,
     private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val totalFileSizeOfNodesUseCase: TotalFileSizeOfNodesUseCase,
@@ -374,11 +370,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         runCatching { clearActiveTransfersIfFinishedUseCase() }
             .onFailure { Timber.e(it) }
         _uiState.updateJobInProgress(StartTransferJobInProgress.ScanningTransfers(TransferStage.STAGE_NONE))
-        if (getFeatureFlagValueUseCase(AppFeatures.StartDownloadsInWorker)) {
-            startDownloadNodesInWorker(nodes, isHighPriority, getUri, transferTriggerEvent)
-        } else {
-            startDownloadNodesInViewModel(nodes, isHighPriority, getUri, transferTriggerEvent)
-        }
+        startDownloadNodesInWorker(nodes, isHighPriority, getUri, transferTriggerEvent)
         checkDownloadRating()
     }
 
@@ -399,61 +391,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }.onFailure {
             Timber.e("Error on startDownloadNodes", it)
             _uiState.updateEventAndClearProgressWithException(it)
-        }
-    }
-
-    private suspend fun startDownloadNodesInViewModel(
-        nodes: List<TypedNode>,
-        isHighPriority: Boolean,
-        getUri: suspend () -> String?,
-        transferTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent,
-    ) {
-        var lastError: Throwable? = null
-        var startMessageShown = false
-        val terminalEvent = runCatching {
-            getUri().also {
-                if (it.isNullOrBlank()) {
-                    throw NullPointerException("path not found!")
-                }
-            }
-        }.onFailure { lastError = it }
-            .getOrNull()?.let { uri ->
-                startDownloadsWithWorkerUseCase(
-                    destinationPathOrUri = uri,
-                    nodes = nodes,
-                    isHighPriority = isHighPriority,
-                ).onEach { event ->
-                    val singleTransferEvent = (event as? MultiTransferEvent.SingleTransferEvent)
-                    // update scanning transfers state
-                    updateScanningFoldersProgress(singleTransferEvent)
-                    //show start message as soon as an event with all transfers updated is received
-                    if (!startMessageShown && singleTransferEvent?.allTransfersUpdated == true) {
-                        startMessageShown = true
-                        updateWithDownloadFinishProcessing(
-                            singleTransferEvent,
-                            transferTriggerEvent,
-                            nodes.size,
-                        )
-                    }
-                }.catch {
-                    lastError = it
-                    Timber.e(it)
-                }.onCompletion {
-                    if (it is CancellationException) {
-                        _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
-                    }
-                }.last()
-            }
-        when {
-            terminalEvent == MultiTransferEvent.InsufficientSpace ->
-                _uiState.updateEventAndClearProgress(StartTransferEvent.Message.NotSufficientSpace)
-
-            !startMessageShown -> updateWithDownloadFinishProcessing(
-                terminalEvent as? MultiTransferEvent.SingleTransferEvent,
-                transferTriggerEvent,
-                nodes.size,
-                lastError?.takeIf { terminalEvent == null },
-            )
         }
     }
 

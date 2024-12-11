@@ -232,14 +232,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Start downloads in the worker instead of in the view model
-     */
-    StartDownloadsInWorker(
-        "Start downloads in the worker instead of in the view model",
-        true,
-    ),
-
-    /**
      * Call settings implemented with the new components library
      */
     CallSettingsNewComponents(
