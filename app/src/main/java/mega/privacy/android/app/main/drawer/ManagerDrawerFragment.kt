@@ -37,7 +37,6 @@ import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel
 import mega.privacy.android.app.presentation.manager.model.UserInfoUiState
-import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -47,6 +46,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.mobile.analytics.event.DeviceCenterEntrypointButtonEvent
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
@@ -67,6 +67,9 @@ internal class ManagerDrawerFragment : Fragment() {
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val outMetrics: DisplayMetrics by lazy { resources.displayMetrics }
     private lateinit var drawerManager: NavigationDrawerManager
@@ -184,8 +187,7 @@ internal class ManagerDrawerFragment : Fragment() {
         }
         binding.settingsSection.setOnClickListener {
             drawerManager.closeDrawer()
-            val settingsIntent = SettingsActivity.getIntent(requireActivity())
-            startActivity(settingsIntent)
+            megaNavigator.openSettings(requireActivity())
         }
         binding.upgradeNavigationView.setOnClickListener {
             drawerManager.closeDrawer()
