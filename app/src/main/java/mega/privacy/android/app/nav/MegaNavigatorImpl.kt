@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
+import mega.privacy.android.app.presentation.settings.navigation.SettingsNavigatorImpl
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
@@ -61,6 +62,7 @@ import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.feature.sync.navigation.getSyncListRoute
 import mega.privacy.android.feature.sync.navigation.getSyncNewFolderRoute
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.settings.SettingsNavigator
 import java.io.File
 import javax.inject.Inject
 
@@ -75,8 +77,9 @@ internal class MegaNavigatorImpl @Inject constructor(
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
+    private val settingsNavigator: SettingsNavigatorImpl,
 ) : MegaNavigator,
-    AppNavigatorImpl {
+    AppNavigatorImpl, SettingsNavigator by settingsNavigator {
     override fun openSettingsCameraUploads(activity: Activity) {
         applicationScope.launch {
             activity.startActivity(

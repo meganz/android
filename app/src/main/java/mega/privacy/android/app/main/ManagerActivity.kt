@@ -206,7 +206,6 @@ import mega.privacy.android.app.presentation.requeststatus.RequestStatusProgress
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinComposeFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.SearchActivity
-import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.settings.model.StartScreenTargetPreference
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
@@ -378,7 +377,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * [MegaNavigator]
      */
     @Inject
-    lateinit var navigator: MegaNavigator
+    lateinit var megaNavigator: MegaNavigator
 
     private val searchResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -1197,7 +1196,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                             SyncPromotionBottomSheet(
                                 modifier = Modifier.semantics { testTagsAsResourceId = true },
                                 isFreeAccount = state.isFreeAccount,
-                                upgradeAccountClicked = { navigator.openUpgradeAccount(this@ManagerActivity) },
+                                upgradeAccountClicked = { megaNavigator.openUpgradeAccount(this@ManagerActivity) },
                                 hideSheet = { coroutineScope.launch { syncPromotionViewModel.onConsumeShouldShowSyncPromotion() } })
                         },
                         expandedRoundedCorners = true,
@@ -1255,7 +1254,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private fun onTransfersWidgetClick() {
         lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection)) {
-                navigator.openTransfers(this@ManagerActivity, IN_PROGRESS_TAB_INDEX)
+                megaNavigator.openTransfers(this@ManagerActivity, IN_PROGRESS_TAB_INDEX)
             } else {
                 drawerItem = DrawerItem.TRANSFERS
                 selectDrawerItem(drawerItem)
@@ -1741,7 +1740,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         IN_PROGRESS_TAB_INDEX
                     }
                 }
-                navigator.openTransfers(this@ManagerActivity, tab)
+                megaNavigator.openTransfers(this@ManagerActivity, tab)
             } else {
                 drawerItem = DrawerItem.TRANSFERS
                 transferPageViewModel.setTransfersTab(openTab)
@@ -2527,7 +2526,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 Constants.ACTION_EXPLORE_ZIP -> {
                     Timber.d("Open zip browser")
                     intent.extras?.getString(Constants.EXTRA_PATH_ZIP)?.let {
-                        navigator.openZipBrowserActivity(this, it) {
+                        megaNavigator.openZipBrowserActivity(this, it) {
                             showSnackbar(
                                 SNACKBAR_TYPE,
                                 getString(R.string.message_zip_format_error),
@@ -2754,7 +2753,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         if (chatId != -1L) {
             val chat = megaChatApi.getChatRoom(chatId)
             if (chat != null) {
-                navigator.openChat(
+                megaNavigator.openChat(
                     context = this,
                     chatId = chatId,
                     action = Constants.ACTION_CHAT_SHOW_MESSAGES,
@@ -3554,7 +3553,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     override fun drawerItemClicked(item: DrawerItem) {
         lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.TransfersSection) && item == DrawerItem.TRANSFERS) {
-                navigator.openTransfers(this@ManagerActivity, IN_PROGRESS_TAB_INDEX)
+                megaNavigator.openTransfers(this@ManagerActivity, IN_PROGRESS_TAB_INDEX)
             } else {
                 val oldDrawerItem = drawerItem
                 isFirstTimeCam
@@ -3884,8 +3883,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         if (drawerLayout.isDrawerOpen(navigationView)) {
             drawerLayout.closeDrawer(GravityCompat.START)
         }
-        val settingsIntent = SettingsActivity.getIntent(this, targetPreference)
-        startActivity(settingsIntent)
+        megaNavigator.openSettings(this, targetPreference)
     }
 
     private fun openFullscreenOfflineFragment(path: String?) {
@@ -4092,7 +4090,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     override fun moveToChatSection(chatId: Long) {
         if (chatId != -1L) {
-            navigator.openChat(
+            megaNavigator.openChat(
                 context = this,
                 chatId = chatId,
                 action = Constants.ACTION_CHAT_SHOW_MESSAGES
@@ -4735,7 +4733,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                             resetSyncFolderVisibility()
                             // Remove Cloud Drive and go back to Syncs
                             removeFragment(fileBrowserComposeFragment)
-                            navigator.openSyncs(this@ManagerActivity)
+                            megaNavigator.openSyncs(this@ManagerActivity)
                             goBackToRootLevel()
                         } else {
                             if (isMediaDiscoveryOpen()) {
@@ -5160,7 +5158,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         } else {
             Constants.ACTION_OPEN_CHAT_LINK
         }
-        navigator.openChat(
+        megaNavigator.openChat(
             context = this,
             action = action,
             link = link,
@@ -5619,7 +5617,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             selectDrawerItem(DrawerItem.DEVICE_CENTER)
         } else if (Constants.ACTION_OPEN_SYNC_MEGA_FOLDER == intent.action) {
             intent.dataString?.split("#")?.get(1)?.toLong()?.let { handle ->
-                navigator.openNodeInCloudDrive(
+                megaNavigator.openNodeInCloudDrive(
                     activity = this,
                     nodeHandle = handle,
                     errorMessage = null,

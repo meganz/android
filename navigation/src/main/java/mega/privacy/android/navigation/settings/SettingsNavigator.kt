@@ -1,5 +1,6 @@
 package mega.privacy.android.navigation.settings
 
+import android.content.Context
 import mega.privacy.android.navigation.settings.arguments.TargetPreference
 
 /**
@@ -12,5 +13,5 @@ interface SettingsNavigator {
      *
      * @param targetPreference
      */
-    fun openSettings(targetPreference: TargetPreference? = null)
+    fun openSettings(context: Context, targetPreference: TargetPreference? = null)
 }
