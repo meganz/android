@@ -56,7 +56,7 @@ internal fun CancelSubscriptionSurveyView(
     val context = LocalContext.current
     var showError by rememberSaveable { mutableStateOf(false) }
     var allowContact by rememberSaveable { mutableStateOf(false) }
-    var selectedOptionId by rememberSaveable { mutableIntStateOf(-1) }
+    var selectedOptionId by rememberSaveable { mutableIntStateOf(NONE) }
     var selectedOptionString by rememberSaveable { mutableStateOf("") }
     var othersDescriptionText by rememberSaveable { mutableStateOf("") }
     var othersErrorMessage: String? by rememberSaveable { mutableStateOf(null) }
@@ -189,28 +189,33 @@ internal fun CancelSubscriptionSurveyView(
                     id = SharedR.string.account_cancel_subscription_survey_cancel_button
                 ),
                 onClick = {
-                    if (selectedOptionId == -1) {
-                        showError = true
-                    } else {
-                        showError = false
-                        othersErrorMessage =
-                            if (othersDescriptionText.length < MIN_CHARACTER_LIMIT) {
-                                context.getString(getOtherErrorMessageResource(othersDescriptionText))
-                            } else {
-                                null
-                            }
-                        if (othersDescriptionText.length <= MAX_CHARACTER_LIMIT && othersErrorMessage == null) {
-                            if (selectedOptionId == UICancellationSurveyAnswer.Answer8.answerId) {
+                    when (selectedOptionId) {
+                        NONE -> showError = true
+                        UICancellationSurveyAnswer.Answer8.answerId -> {
+                            showError = false
+                            othersErrorMessage =
+                                if (othersDescriptionText.length < MIN_CHARACTER_LIMIT) {
+                                    context.getString(
+                                        getOtherErrorMessageResource(othersDescriptionText)
+                                    )
+                                } else {
+                                    null
+                                }
+
+                            if (othersDescriptionText.length <= MAX_CHARACTER_LIMIT && othersErrorMessage == null) {
                                 onCancelSubscriptionButtonClicked(
                                     othersDescriptionText,
                                     allowContact.toInt()
                                 )
-                            } else {
-                                onCancelSubscriptionButtonClicked(
-                                    "$selectedOptionId - $selectedOptionString",
-                                    allowContact.toInt()
-                                )
                             }
+                        }
+
+                        else -> {
+                            showError = false
+                            onCancelSubscriptionButtonClicked(
+                                "$selectedOptionId - $selectedOptionString",
+                                allowContact.toInt()
+                            )
                         }
                     }
                 },
@@ -310,6 +315,7 @@ private fun CancelSubscriptionSurveyViewPreview() {
     }
 }
 
+private const val NONE = -1
 internal const val MAX_CHARACTER_LIMIT = 120
 internal const val MIN_CHARACTER_LIMIT = 10
 

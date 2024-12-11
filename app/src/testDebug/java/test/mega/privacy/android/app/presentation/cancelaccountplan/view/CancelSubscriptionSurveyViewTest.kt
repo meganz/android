@@ -8,14 +8,20 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.fromId
+import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.cancelaccountplan.model.UICancellationSurveyAnswer
 import mega.privacy.android.shared.resources.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.robolectric.annotation.Config
 
 @HiltAndroidTest
@@ -91,8 +97,6 @@ class CancelSubscriptionSurveyViewTest {
                     )
                 )
             )
-
-
     }
 
     @Test
@@ -115,5 +119,56 @@ class CancelSubscriptionSurveyViewTest {
         )
             .assertCountEquals(possibleCancellationReasons.size)
 
+    }
+
+    @Test
+    fun `test that cancel button clicked is triggered correctly when an answer is selected`() {
+        val cancelButtonClicked: (String, Int) -> Unit = mock()
+        composeTestRule.setContent {
+            CancelSubscriptionSurveyView(
+                possibleCancellationReasons = possibleCancellationReasons,
+                onCancelSubscriptionButtonClicked = cancelButtonClicked,
+                onDoNotCancelButtonClicked = { }
+            )
+        }
+        val selectedAnswer = UICancellationSurveyAnswer.Answer5
+        composeTestRule.onNodeWithText(selectedAnswer.answerValue)
+            .performClick()
+        composeTestRule.onNodeWithTag(CANCEL_SUBSCRIPTION_BUTTON_TEST_TAG)
+            .performClick()
+        verify(cancelButtonClicked).invoke(any(), any())
+    }
+
+    @Test
+    fun `test that cancel button clicked is not triggered when no answer is selected`() {
+        val cancelButtonClicked: (String, Int) -> Unit = mock()
+        composeTestRule.setContent {
+            CancelSubscriptionSurveyView(
+                possibleCancellationReasons = possibleCancellationReasons,
+                onCancelSubscriptionButtonClicked = cancelButtonClicked,
+                onDoNotCancelButtonClicked = { }
+            )
+        }
+        composeTestRule.onNodeWithTag(CANCEL_SUBSCRIPTION_BUTTON_TEST_TAG)
+            .performClick()
+        verifyNoInteractions(cancelButtonClicked)
+    }
+
+    @Test
+    fun `test that cancel button clicked is not triggered when other reason is selected and empty`() {
+        val cancelButtonClicked: (String, Int) -> Unit = mock()
+        composeTestRule.setContent {
+            CancelSubscriptionSurveyView(
+                possibleCancellationReasons = possibleCancellationReasons,
+                onCancelSubscriptionButtonClicked = cancelButtonClicked,
+                onDoNotCancelButtonClicked = { }
+            )
+        }
+        val selectedAnswer = UICancellationSurveyAnswer.Answer8
+        composeTestRule.onNodeWithText(selectedAnswer.answerValue)
+            .performClick()
+        composeTestRule.onNodeWithTag(CANCEL_SUBSCRIPTION_BUTTON_TEST_TAG)
+            .performClick()
+        verifyNoInteractions(cancelButtonClicked)
     }
 }

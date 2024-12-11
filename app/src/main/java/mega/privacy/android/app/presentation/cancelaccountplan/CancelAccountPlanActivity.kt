@@ -10,12 +10,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.account.AccountStorageViewModel
 import mega.privacy.android.app.presentation.cancelaccountplan.model.CancellationInstructionsType
@@ -97,14 +95,10 @@ class CancelAccountPlanActivity : AppCompatActivity() {
                                     when (cancellationInstructionsType) {
                                         CancellationInstructionsType.AppStore,
                                         CancellationInstructionsType.WebClient,
-                                        -> navController.navigate(
-                                            cancellationInstructionsRoute
-                                        )
+                                            -> navController.navigate(cancellationInstructionsRoute)
 
                                         CancellationInstructionsType.PlayStore,
-                                        -> navController.navigate(
-                                            cancellationSurveyRoute
-                                        )
+                                            -> navController.navigate(cancellationSurveyRoute)
                                     }
                                 }
                             })
