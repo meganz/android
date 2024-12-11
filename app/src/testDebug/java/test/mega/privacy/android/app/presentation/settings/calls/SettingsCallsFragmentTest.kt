@@ -23,6 +23,7 @@ import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.whenever
+import mega.privacy.android.shared.resources.R as sharedR
 
 
 @HiltAndroidTest
@@ -52,7 +53,7 @@ class SettingsCallsFragmentTest {
         launchFragmentInHiltContainer<SettingsCallsFragment>()
 
         composeRule
-            .onNodeWithText(fromId(R.string.settings_calls_preferences_sound_notifications))
+            .onNodeWithText(fromId(sharedR.string.settings_calls_sound_notifications_title))
             .assertIsOn()
     }
 
@@ -68,11 +69,11 @@ class SettingsCallsFragmentTest {
         launchFragmentInHiltContainer<SettingsCallsFragment>()
 
         composeRule
-            .onNodeWithText(fromId(R.string.settings_calls_preferences_sound_notifications))
+            .onNodeWithText(fromId(sharedR.string.settings_calls_sound_notifications_title))
             .performClick()
 
         composeRule
-            .onNodeWithText(fromId(R.string.settings_calls_preferences_sound_notifications))
+            .onNodeWithText(fromId(sharedR.string.settings_calls_sound_notifications_title))
             .assertIsOn()
     }
 
@@ -88,11 +89,11 @@ class SettingsCallsFragmentTest {
         launchFragmentInHiltContainer<SettingsCallsFragment>()
 
         composeRule
-            .onNodeWithText(fromId(R.string.settings_calls_preferences_sound_notifications))
+            .onNodeWithText(fromId(sharedR.string.settings_calls_sound_notifications_title))
             .performClick()
 
         composeRule
-            .onNodeWithText(fromId(R.string.settings_calls_preferences_sound_notifications))
+            .onNodeWithText(fromId(sharedR.string.settings_calls_sound_notifications_title))
             .assertIsOff()
     }
 }

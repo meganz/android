@@ -23,6 +23,7 @@ import mega.privacy.android.shared.original.core.ui.controls.controlssliders.Meg
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.Typography
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 fun SettingsCallsView(
@@ -33,8 +34,8 @@ fun SettingsCallsView(
 ) {
     Column {
         CallSettingItem(
-            R.string.settings_calls_preferences_sound_notifications,
-            R.string.settings_calls_preferences_sound_notifications_text,
+            sharedR.string.settings_calls_sound_notifications_title,
+            sharedR.string.settings_calls_sound_notifications_body,
             settingsCallsState.soundNotifications == CallsSoundEnabledState.Enabled,
             onCheckedChange = onSoundNotificationsChanged
         )

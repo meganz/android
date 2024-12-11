@@ -454,7 +454,7 @@
             android:label="@string/settings_chat_image_quality" />
         <activity
             android:name=".presentation.settings.calls.SettingsCallsActivity"
-            android:label="@string/settings_calls_preferences"
+            android:label="@string/settings_calls_title"
             android:launchMode="singleTop" />
         <activity
             android:name=".activities.settingsActivities.DownloadPreferencesActivity"
