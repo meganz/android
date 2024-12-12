@@ -56,7 +56,7 @@ include(":legacy-core-ui")
 include(":icon-pack")
 include(":shared:resources")
 include(":shared:sync")
-include(":feature:settings")
+include(":feature:chat")
 
 println("isServerBuild = ${isServerBuild()}")
 buildCache {
