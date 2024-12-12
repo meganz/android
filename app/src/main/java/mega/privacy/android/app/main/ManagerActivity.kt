@@ -1727,7 +1727,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
             checkCurrentStorageStatus()
 
-            //INITIAL FRAGMENT
+            // Load the initial Fragment after logging in for the first time
             if (selectDrawerItemPending) {
                 selectDrawerItem(drawerItem)
             }
@@ -2135,6 +2135,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
 
             firstTimeAfterInstallation || askPermissions || newCreationAccount -> {
+                // Set this value to false after successfully logging in for the first time
+                if (firstTimeAfterInstallation) {
+                    firstTimeAfterInstallation = false
+                    dbH.setFirstTime(false)
+                }
                 if (!initialPermissionsAlreadyAsked && !onAskingPermissionsFragment) {
                     drawerItem = DrawerItem.ASK_PERMISSIONS
                     askForAccess()
@@ -2303,7 +2308,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             DrawerItem.CLOUD_DRIVE
         } else {
             viewModel.setIsFirstLogin(true)
-            DrawerItem.PHOTOS
+            DrawerItem.HOMEPAGE
         }
         selectDrawerItem(drawerItem)
     }
@@ -2959,15 +2964,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 if (storageStateFromBroadcast !== StorageState.Unknown) storageStateFromBroadcast else viewModel.getStorageState()
             )
         }
-        if (!firstTimeAfterInstallation) {
-            Timber.d("Its NOT first time")
-            userInfoViewModel.refreshContactDatabase(false)
-        } else {
-            Timber.d("Its first time")
-            userInfoViewModel.refreshContactDatabase(true)
-            firstTimeAfterInstallation = false
-            dbH.setFirstTime(false)
-        }
+        Timber.d("Should force refresh contact database after logging in for the first time - $firstTimeAfterInstallation")
+        userInfoViewModel.refreshContactDatabase(firstTimeAfterInstallation)
         cookieDialogHandler.showDialogIfNeeded(this)
     }
 
