@@ -52,6 +52,6 @@ enum class ApiFeatures(
         override suspend fun isEnabled(feature: Feature) =
             entries.firstOrNull { it == feature }?.defaultValue
 
-        override val priority: FeatureFlagValuePriority = FeatureFlagValuePriority.RemoteToggled
+        override val priority: FeatureFlagValuePriority = FeatureFlagValuePriority.Default
     }
 }
