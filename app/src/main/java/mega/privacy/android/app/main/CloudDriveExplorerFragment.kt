@@ -691,7 +691,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
 
                 if (modeCloud == FileExplorerActivity.MOVE || modeCloud == FileExplorerActivity.COPY) {
                     activity.parentMoveCopy()?.let {
-                        activateButton(it.handle != parentNode.handle)
+                        activateButton(modeCloud == FileExplorerActivity.COPY || it.handle != parentNode.handle)
                     } ?: activateButton(true)
                 }
 
