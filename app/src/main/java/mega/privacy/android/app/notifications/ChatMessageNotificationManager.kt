@@ -13,6 +13,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes
@@ -23,7 +24,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.chat.ChatMessage
-import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
@@ -62,7 +62,7 @@ class ChatMessageNotificationManager @Inject constructor(
     ) = with(chatMessageNotificationData) {
         val notificationId = MegaApiJava.userHandleToBase64(msg.messageId).hashCode()
 
-        if (msg.isDeleted || msg.status == ChatMessageStatus.SEEN) {
+        if (msg.isDeleted || chat?.chatId == MegaApplication.openChatId) {
             notificationManagerCompat.cancel(notificationId)
             return@with
         }

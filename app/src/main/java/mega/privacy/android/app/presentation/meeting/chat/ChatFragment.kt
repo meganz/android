@@ -21,6 +21,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -67,6 +68,8 @@ internal class ChatFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View = ComposeView(requireContext()).apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        MegaApplication.openChatId = requireActivity().intent.getLongExtra(Constants.CHAT_ID, -1L)
+
         setContent {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             SessionContainer(shouldCheckChatSession = true) {
@@ -164,6 +167,17 @@ internal class ChatFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        MegaApplication.openChatId = requireActivity().intent.getLongExtra(Constants.CHAT_ID, -1L)
         Analytics.tracker.trackEvent(ChatConversationScreenEvent)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        MegaApplication.openChatId = -1L
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        MegaApplication.openChatId = -1L
     }
 }
