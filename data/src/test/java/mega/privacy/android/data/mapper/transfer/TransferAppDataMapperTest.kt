@@ -1,7 +1,13 @@
 package mega.privacy.android.data.mapper.transfer
 
 import com.google.common.truth.Truth
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.*
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.BackgroundTransfer
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.CameraUpload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatDownload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatUpload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OriginalContentUri
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SDCardDownload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_INDICATOR
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_REPEATED_TRANSFER_SEPARATOR
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_SEPARATOR
@@ -148,8 +154,8 @@ class TransferAppDataMapperTest {
                     to listOf(TransferAppData.VoiceClip),
             generateAppDataString(CameraUpload)
                     to listOf(TransferAppData.CameraUpload),
-            generateAppDataString(SDCardDownload, TARGET_PATH)
-                    to listOf(TransferAppData.SdCardDownload(TARGET_PATH, null)),
+            generateAppDataString(SDCardDownload, TARGET_PATH, TARGET_URI)
+                    to listOf(TransferAppData.SdCardDownload(TARGET_PATH, TARGET_URI)),
             generateAppDataString(BackgroundTransfer)
                     to listOf(TransferAppData.BackgroundTransfer),
             generateAppDataString(SDCardDownload, TARGET_PATH, TARGET_URI)

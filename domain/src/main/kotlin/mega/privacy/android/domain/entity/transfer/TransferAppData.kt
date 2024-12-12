@@ -36,7 +36,7 @@ sealed interface TransferAppData {
      * @param targetPathForSDK the path where the transfers will be stored by the SDK
      * @param finalTargetUri the target uri in the sd card where the file will be moved once downloaded
      */
-    data class SdCardDownload(val targetPathForSDK: String, val finalTargetUri: String?) :
+    data class SdCardDownload(val targetPathForSDK: String, val finalTargetUri: String) :
         TransferAppData
 
     /**

@@ -39,7 +39,7 @@ class TransferAppDataMapper @Inject constructor() {
 
                     SDCardDownload -> {
                         values.firstIfNotBlank()?.let {
-                            TransferAppData.SdCardDownload(it, values.getOrNull(1))
+                            TransferAppData.SdCardDownload(it, values.getOrElse(1) { "" })
                         }
                     }
 

@@ -21,7 +21,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
-import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -43,11 +42,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.internal.verification.Times
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.anyVararg
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -55,8 +56,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.mockito.kotlin.doReturn
-import org.junit.jupiter.params.provider.NullSource
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -190,7 +189,7 @@ class DownloadNodesUseCaseTest {
 
     private fun provideAppData() = listOf(
         listOf(TransferAppData.BackgroundTransfer),
-        listOf(TransferAppData.SdCardDownload("target", null)),
+        listOf(TransferAppData.SdCardDownload("targetPathForSDK", "finalTargetUri")),
         listOf(TransferAppData.CameraUpload),
         listOf(TransferAppData.VoiceClip),
         listOf(TransferAppData.ChatUpload(12345L)),
