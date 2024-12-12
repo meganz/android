@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +19,7 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import com.google.android.gms.ads.admanager.AdManagerAdView
 import mega.privacy.android.app.BuildConfig
+import mega.privacy.android.shared.original.core.ui.controls.ads.AdsCloseIcon
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import timber.log.Timber
 
@@ -34,6 +36,7 @@ fun AdsContainer(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentLifecycleState by lifecycleOwner.lifecycle.currentStateAsState()
+    var showFreeAdsDialog by rememberSaveable { mutableStateOf(false) }
     var handledState by remember { mutableStateOf(Lifecycle.State.INITIALIZED) }
     var handledRequest by remember { mutableStateOf(request) }
     OriginalTempTheme(isDark = isDark) {
@@ -104,6 +107,21 @@ fun AdsContainer(
                     }
                 }
             )
+
+            AdsCloseIcon(
+                modifier = Modifier.align(Alignment.TopEnd),
+                onClick = {
+                    showFreeAdsDialog = true
+                }
+            )
+
+            if (showFreeAdsDialog) {
+                AdsFreeIntroView(
+                    onDismiss = {
+                        showFreeAdsDialog = false
+                    }
+                )
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.main.ads
 
 import mega.privacy.android.shared.resources.R as sharedR
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -16,14 +17,20 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.shared.original.core.ui.controls.ads.AdsFreeItem
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -32,16 +39,47 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
+import mega.privacy.mobile.analytics.event.AdsBannerCloseAdsButtonPressedEvent
+import java.util.Locale
 
+/**
+ * Ads Free Intro View with view model.
+ */
+@Composable
+internal fun AdsFreeIntroView(
+    modifier: Modifier = Modifier,
+    viewModel: AdsFreeIntroViewModel = hiltViewModel(),
+    onDismiss: () -> Unit,
+) {
+    val state = viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        Analytics.tracker.trackEvent(AdsBannerCloseAdsButtonPressedEvent)
+    }
+
+    AdsFreeIntroContent(
+        modifier = modifier,
+        onDismiss = onDismiss,
+        uiState = state.value,
+    )
+}
 
 /**
  * Add free intro view.
  */
 @Composable
-fun AdsFreeIntroView(
+internal fun AdsFreeIntroContent(
     modifier: Modifier = Modifier,
+    uiState: AdsFreeIntroUiState = AdsFreeIntroUiState(),
     onDismiss: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val formattedPrice =
+        uiState.cheapestSubscriptionAvailable?.localisePriceCurrencyCode(Locale.getDefault(), true)
+    val formattedStorage =
+        uiState.cheapestSubscriptionAvailable?.formatStorageSize(usePlaceholder = false)
+    val minimalStorageValueAndUnit =
+        formattedStorage?.let { "${it.size} ${stringResource(it.unit)}" }.orEmpty()
     FullScreenDialog(
         onDismissRequest = onDismiss,
     ) {
@@ -71,17 +109,24 @@ fun AdsFreeIntroView(
             )
 
             MegaText(
-                text = stringResource(sharedR.string.payment_ads_free_intro_description),
+                text = stringResource(
+                    sharedR.string.payment_ads_free_intro_description,
+                    formattedPrice?.price.orEmpty()
+                ),
                 textColor = TextColor.Secondary,
                 style = MaterialTheme.typography.subtitle2,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
                     .testTag(ADS_FREE_DESCRIPTION_TEST_TAG),
             )
 
             AdsFreeItem(
                 title = stringResource(sharedR.string.payment_ads_free_intro_generous_storage_label),
-                desc = stringResource(sharedR.string.payment_ads_free_intro_generous_storage_description),
+                desc = stringResource(
+                    sharedR.string.payment_ads_free_intro_generous_storage_description,
+                    minimalStorageValueAndUnit
+                ),
                 icon = R.drawable.ic_cloud_outline,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -117,7 +162,9 @@ fun AdsFreeIntroView(
             ) {
                 OutlinedMegaButton(
                     text = stringResource(R.string.general_skip),
-                    onClick = { },
+                    onClick = {
+                        onDismiss()
+                    },
                     rounded = false,
                     modifier = Modifier
                         .padding(end = 8.dp)
@@ -125,7 +172,10 @@ fun AdsFreeIntroView(
                 )
                 RaisedDefaultMegaButton(
                     text = stringResource(sharedR.string.payment_ads_free_intro_button_view_pro_plan),
-                    onClick = { },
+                    onClick = {
+                        context.startActivity(Intent(context, UpgradeAccountActivity::class.java))
+                        onDismiss()
+                    },
                     modifier = Modifier
                         .testTag(VIEW_PRO_PLAN_BUTTON_TEST_TAG),
                 )
@@ -138,7 +188,7 @@ fun AdsFreeIntroView(
 @Composable
 private fun AddFreeIntroViewPreview() {
     OriginalTempTheme(isSystemInDarkTheme()) {
-        AdsFreeIntroView {}
+        AdsFreeIntroContent(uiState = AdsFreeIntroUiState()) {}
     }
 }
 
