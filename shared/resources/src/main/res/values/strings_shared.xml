@@ -894,6 +894,10 @@
     <string name="payment_ads_free_intro_additional_security_description">Make your online life safer, faster, and easier with our password manager and high speed VPN</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
     <string name="payment_ads_free_intro_button_view_pro_plan">View Pro plans</string>
+    <!-- Text of the remove favourite option of the Favourites playlist bottom sheet  -->
+    <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Remove favourite</string>
+    <!-- The empty hint of the Favourites playlist -->
+    <string name="favourites_playlist_empty_hint">No favourites</string>
     <!-- Label for call option on settings -->
     <string name="settings_calls_title">Calls</string>
     <!-- Label for the sound notifications option on calls settings -->
