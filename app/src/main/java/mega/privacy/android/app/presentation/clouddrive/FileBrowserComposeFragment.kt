@@ -66,6 +66,7 @@ import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -264,6 +265,12 @@ class FileBrowserComposeFragment : Fragment() {
                                 disableSelectMode()
                             },
                             snackBarHostState = snackbarHostState,
+                            navigateToStorageSettings = {
+                                megaNavigator.openSettings(
+                                    requireActivity(),
+                                    StorageTargetPreference
+                                )
+                            },
                         )
                         EventEffect(
                             event = nodeActionState.downloadEvent,

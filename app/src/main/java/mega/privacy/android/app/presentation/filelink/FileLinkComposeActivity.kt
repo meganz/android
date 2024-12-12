@@ -44,6 +44,7 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
@@ -179,7 +180,13 @@ class FileLinkComposeActivity : PasscodeActivity(),
                 StartTransferComponent(
                     event = uiState.downloadEvent,
                     onConsumeEvent = viewModel::resetDownloadFile,
-                    snackBarHostState = snackBarHostState
+                    snackBarHostState = snackBarHostState,
+                    navigateToStorageSettings = {
+                        megaNavigator.openSettings(
+                            this,
+                            StorageTargetPreference
+                        )
+                    }
                 )
             }
         }

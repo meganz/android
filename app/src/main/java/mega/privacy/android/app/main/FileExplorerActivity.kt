@@ -49,6 +49,15 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.listeners.CreateFolderListener
 import mega.privacy.android.app.listeners.GetAttrUserListener
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.CAMERA
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.COPY
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.IMPORT
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.MOVE
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.SAVE
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.SELECT
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.SELECT_CAMERA_FOLDER
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.SHARE_LINK
+import mega.privacy.android.app.main.FileExplorerActivity.Companion.UPLOAD
 import mega.privacy.android.app.main.adapters.FileExplorerPagerAdapter
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.ALLOW_ADD_PARTICIPANTS
@@ -65,6 +74,7 @@ import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSh
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
@@ -99,6 +109,7 @@ import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToCloudDriveEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
@@ -163,6 +174,12 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     @Inject
     @LoginMutex
     lateinit var loginMutex: Mutex
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel by viewModels<FileExplorerViewModel>()
 
@@ -2608,9 +2625,15 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun addStartUploadTransferView() {
         binding.root.addView(
             createStartTransferView(
-                this,
-                viewModel.uiState.map { it.uploadEvent },
-                viewModel::consumeUploadEvent
+                activity = this,
+                transferEventState = viewModel.uiState.map { it.uploadEvent },
+                onConsumeEvent = viewModel::consumeUploadEvent,
+                navigateToStorageSettings = {
+                    megaNavigator.openSettings(
+                        this,
+                        StorageTargetPreference
+                    )
+                }
             ) { startTransferEvent ->
                 ((startTransferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.Files).let {
                     backToCloud(

@@ -55,6 +55,7 @@ import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
@@ -285,7 +286,13 @@ class FolderLinkComposeActivity : PasscodeActivity(),
             StartTransferComponent(
                 event = uiState.downloadEvent,
                 onConsumeEvent = viewModel::resetDownloadNode,
-                snackBarHostState = scaffoldState.snackbarHostState
+                snackBarHostState = scaffoldState.snackbarHostState,
+                navigateToStorageSettings = {
+                    megaNavigator.openSettings(
+                        this,
+                        StorageTargetPreference
+                    )
+                }
             )
         }
     }

@@ -53,6 +53,7 @@ import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -100,6 +101,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificati
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.mobile.analytics.event.TextEditorCloseMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.TextEditorCopyMenuItemEvent
 import mega.privacy.mobile.analytics.event.TextEditorDownloadMenuToolbarEvent
@@ -158,6 +160,13 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      */
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
+
     private val viewModel by viewModels<TextEditorViewModel>()
     private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>()
     private lateinit var binding: ActivityTextFileEditorBinding
@@ -765,6 +774,12 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     if (isTextFileUpload) {
                         finish()
                     }
+                },
+                navigateToStorageSettings = {
+                    megaNavigator.openSettings(
+                        this,
+                        StorageTargetPreference
+                    )
                 }
             )
         )

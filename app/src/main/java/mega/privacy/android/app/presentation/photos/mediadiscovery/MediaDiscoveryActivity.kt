@@ -31,6 +31,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkMedi
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDiscoveryScreen
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
@@ -96,6 +97,12 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
                     onPhotoClicked = this::onClick,
                     onPhotoLongPressed = this::onLongPress,
                     onImportClicked = this::importNode,
+                    navigateToStorageSettings = {
+                        megaNavigator.openSettings(
+                            this,
+                            StorageTargetPreference
+                        )
+                    }
                 )
             }
         }

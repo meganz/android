@@ -1,7 +1,7 @@
 package mega.privacy.android.app.main
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -45,6 +45,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsIma
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
@@ -58,7 +59,6 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -67,7 +67,6 @@ import timber.log.Timber
 import java.io.File
 import java.util.Stack
 import javax.inject.Inject
-import mega.privacy.android.icon.pack.R as iconPackR
 
 @AndroidEntryPoint
 class ContactFileListFragment : ContactFileBaseFragment() {
@@ -436,16 +435,22 @@ class ContactFileListFragment : ContactFileBaseFragment() {
             )
             root.addView(
                 createStartTransferView(
-                    requireActivity(),
-                    startDownloadViewModel!!.state,
-                    {
+                    activity = requireActivity(),
+                    transferEventState = startDownloadViewModel!!.state,
+                    onConsumeEvent = {
                         if ((startDownloadViewModel!!.state.value as StateEventWithContentTriggered<TransferTriggerEvent?>).content is StartUpload) {
                             viewModel!!.consumeUploadEvent()
                         }
                         startDownloadViewModel!!.consumeDownloadEvent()
                         Unit
                     },
-                    { StartTransferEvent: StartTransferEvent? -> Unit }
+                    onScanningFinished = { StartTransferEvent: StartTransferEvent? -> Unit },
+                    navigateToStorageSettings = {
+                        megaNavigator.openSettings(
+                            requireActivity(),
+                            StorageTargetPreference
+                        )
+                    }
                 )
             )
         }

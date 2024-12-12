@@ -31,12 +31,14 @@ import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
 import mega.privacy.android.app.main.managerSections.LegacyTransfersFragment
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -55,6 +57,12 @@ internal class TransferPageFragment : Fragment() {
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private var _binding: FragmentTransferPageBinding? = null
     val binding: FragmentTransferPageBinding
@@ -99,9 +107,15 @@ internal class TransferPageFragment : Fragment() {
     private fun addStartDownloadTransferView(root: ViewGroup) {
         root.addView(
             createStartTransferView(
-                requireActivity(),
-                transfersViewModel.uiState.map { it.startEvent },
-                transfersViewModel::consumeRetry
+                activity = requireActivity(),
+                transferEventState = transfersViewModel.uiState.map { it.startEvent },
+                onConsumeEvent = transfersViewModel::consumeRetry,
+                navigateToStorageSettings = {
+                    megaNavigator.openSettings(
+                        requireActivity(),
+                        StorageTargetPreference
+                    )
+                }
             )
         )
     }

@@ -19,6 +19,7 @@ import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -34,6 +35,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.namecollision.data.toDomainEntity
 import mega.privacy.android.app.namecollision.data.toUiEntity
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
@@ -49,18 +51,27 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
+import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
 
 /**
  * Activity for showing name collisions and resolving them as per user's choices.
  */
+@AndroidEntryPoint
 class NameCollisionActivity : PasscodeActivity() {
     private val viewModel: NameCollisionViewModel by viewModels()
 
     private lateinit var binding: ActivityNameCollisionBinding
 
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -161,9 +172,15 @@ class NameCollisionActivity : PasscodeActivity() {
     private fun addStartUploadTransferView() {
         binding.root.addView(
             createStartTransferView(
-                this,
-                viewModel.uiState.map { it.uploadEvent },
-                { },
+                activity = this,
+                transferEventState = viewModel.uiState.map { it.uploadEvent },
+                onConsumeEvent = { },
+                navigateToStorageSettings = {
+                    megaNavigator.openSettings(
+                        this,
+                        StorageTargetPreference
+                    )
+                }
             ) { transferEvent ->
                 ((transferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.CollidedFiles).let {
                     setResult(

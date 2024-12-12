@@ -73,8 +73,9 @@ class QRCodeViewTest {
                     onUploadFileConsumed = { },
                     onScanCancelConsumed = { },
                     onUploadEventConsumed = {},
+                    navigateToQrSettings = {},
+                    navigateToStorageSettings = {},
                     qrCodeMapper = qrCodeMapper,
-                    navigateToQrSettings = {}
                 )
             }
         }

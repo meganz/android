@@ -59,6 +59,7 @@ import mega.privacy.android.app.presentation.offline.action.OfflineNodeActionsVi
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.utils.Constants
@@ -74,6 +75,7 @@ import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.PhotoPreviewSaveToDeviceMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.PhotoPreviewScreenEvent
@@ -93,6 +95,12 @@ class ImagePreviewActivity : BaseActivity() {
 
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val selectMoveFolderLauncher: ActivityResultLauncher<LongArray> =
         registerForActivityResult(
@@ -187,6 +195,12 @@ class ImagePreviewActivity : BaseActivity() {
                             onClickRemove = ::removeNode,
                             onClickMoveToRubbishBin = ::moveNodeToRubbishBin,
                             onClickAddToAlbum = ::addToAlbum,
+                            navigateToStorageSettings = {
+                                megaNavigator.openSettings(
+                                    this,
+                                    StorageTargetPreference
+                                )
+                            }
                         )
 
                         NodeAttachmentView(

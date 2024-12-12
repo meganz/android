@@ -36,6 +36,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startW
 import mega.privacy.android.app.presentation.meeting.chat.view.showPermissionNotAllowedSnackbar
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -57,7 +58,7 @@ internal class ChatFragment : Fragment() {
      * The centralized navigator in the :app module
      */
     @Inject
-    lateinit var navigator: MegaNavigator
+    lateinit var megaNavigator: MegaNavigator
 
     @OptIn(ExperimentalMaterialNavigationApi::class)
     override fun onCreateView(
@@ -110,7 +111,7 @@ internal class ChatFragment : Fragment() {
                                     scaffoldState = scaffoldState,
                                     startMeeting = { startMeetingActivity(requireContext(), it) },
                                     navigateToInviteContact = {
-                                        navigator.openInviteContactActivity(
+                                        megaNavigator.openInviteContactActivity(
                                             requireContext(),
                                             false
                                         )
@@ -144,6 +145,12 @@ internal class ChatFragment : Fragment() {
                                             coroutineScope,
                                             scaffoldState.snackbarHostState,
                                             R.string.chat_attach_pick_from_camera_deny_permission
+                                        )
+                                    },
+                                    navigateToStorageSettings = {
+                                        megaNavigator.openSettings(
+                                            requireActivity(),
+                                            StorageTargetPreference
                                         )
                                     }
                                 )

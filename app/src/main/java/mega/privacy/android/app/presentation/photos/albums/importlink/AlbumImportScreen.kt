@@ -68,8 +68,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.app.utils.StringUtils.formatColorTag
-import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
@@ -113,6 +111,7 @@ internal fun AlbumImportScreen(
     onNavigateFileExplorer: () -> Unit,
     onUpgradeAccount: () -> Unit,
     onBack: (isBackToHome: Boolean) -> Unit,
+    navigateToStorageSettings: () -> Unit,
 ) {
     val isLight = MaterialTheme.colors.isLight
     val state by albumImportViewModel.stateFlow.collectAsStateWithLifecycle()
@@ -315,7 +314,8 @@ internal fun AlbumImportScreen(
             StartTransferComponent(
                 event = state.downloadEvent,
                 onConsumeEvent = albumImportViewModel::consumeDownloadEvent,
-                snackBarHostState = scaffoldState.snackbarHostState
+                snackBarHostState = scaffoldState.snackbarHostState,
+                navigateToStorageSettings = navigateToStorageSettings,
             )
         },
     )

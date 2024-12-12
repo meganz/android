@@ -132,8 +132,9 @@ internal fun QRCodeView(
     onUploadFileConsumed: () -> Unit,
     onScanCancelConsumed: () -> Unit,
     onUploadEventConsumed: () -> Unit,
-    qrCodeMapper: QRCodeMapper,
+    navigateToStorageSettings: () -> Unit,
     navigateToQrSettings: () -> Unit,
+    qrCodeMapper: QRCodeMapper,
 ) {
     val view: View = LocalView.current
     val context = LocalContext.current
@@ -199,6 +200,7 @@ internal fun QRCodeView(
         event = viewState.uploadEvent,
         onConsumeEvent = onUploadEventConsumed,
         snackBarHostState = snackBarHostState,
+        navigateToStorageSettings = navigateToStorageSettings,
     )
 
     Scaffold(
@@ -707,11 +709,11 @@ private fun PreviewQRCodeView() {
             onUploadFileConsumed = { },
             onScanCancelConsumed = { },
             onUploadEventConsumed = { },
-            { _, _, _, _, _ ->
-                Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
-            },
+            navigateToStorageSettings = {},
             navigateToQrSettings = {},
-        )
+        ) { _, _, _, _, _ ->
+            Bitmap.createBitmap(500, 500, Bitmap.Config.ARGB_8888)
+        }
     }
 }
 

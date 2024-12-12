@@ -98,6 +98,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.ChatImageNodeF
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource;
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference;
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -105,6 +106,7 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.node.NameCollision;
+import mega.privacy.android.navigation.MegaNavigator;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiJava;
@@ -127,6 +129,9 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
     @Inject
     CopyRequestMessageMapper copyRequestMessageMapper;
+
+    @Inject
+    MegaNavigator megaNavigator;
 
     private NodeAttachmentHistoryViewModel viewModel;
     private StartDownloadViewModel startDownloadViewModel;
@@ -411,6 +416,10 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                         startDownloadViewModel.getState(),
                         () -> {
                             startDownloadViewModel.consumeDownloadEvent();
+                            return Unit.INSTANCE;
+                        },
+                        () -> {
+                            megaNavigator.openSettings(this, StorageTargetPreference.INSTANCE);
                             return Unit.INSTANCE;
                         },
                         (StartTransferEvent) -> Unit.INSTANCE

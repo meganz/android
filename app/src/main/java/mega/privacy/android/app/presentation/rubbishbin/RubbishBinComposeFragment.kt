@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.rubbishbin
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -44,6 +44,7 @@ import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.view.RubbishBinComposeView
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
@@ -52,13 +53,13 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * Fragment is for Rubbish Bin
@@ -84,6 +85,12 @@ class RubbishBinComposeFragment : Fragment() {
      */
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel: RubbishBinViewModel by activityViewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
@@ -166,6 +173,12 @@ class RubbishBinComposeFragment : Fragment() {
                         event = nodeActionState.downloadEvent,
                         onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
                         snackBarHostState = snackbarHostState,
+                        navigateToStorageSettings = {
+                            megaNavigator.openSettings(
+                                requireActivity(),
+                                StorageTargetPreference
+                            )
+                        },
                     )
                 }
                 updateActionModeTitle(

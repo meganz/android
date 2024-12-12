@@ -36,9 +36,10 @@ import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
+import mega.privacy.android.core.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.shared.original.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import org.junit.Rule
 import org.junit.Test
@@ -49,7 +50,6 @@ import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import mega.privacy.android.core.test.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 class ChatViewTest {
@@ -234,11 +234,11 @@ class ChatViewTest {
                 LocalViewModelStoreOwner provides viewModelStoreOwner
             ) {
                 ChatView(
-                    uiState = state,
+                    bottomSheetNavigator = rememberBottomSheetNavigator(),
                     onBackPressed = {},
                     onMenuActionPressed = actionPressed,
                     navHostController = rememberNavController(),
-                    bottomSheetNavigator = rememberBottomSheetNavigator(),
+                    uiState = state,
                     scaffoldState = rememberScaffoldState(),
                     setSelectedMessages = {},
                     setSelectMode = {},
@@ -267,6 +267,7 @@ class ChatViewTest {
                     navigateToReactionInfo = {},
                     navigateToNotSentModal = {},
                     navigateToConversation = {},
+                    navigateToStorageSettings = {},
                 )
             }
         }

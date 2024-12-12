@@ -70,6 +70,7 @@ fun MediaDiscoveryScreen(
     onPhotoClicked: (Photo) -> Unit = {},
     onPhotoLongPressed: (Photo) -> Unit = {},
     onImportClicked: () -> Unit = {},
+    navigateToStorageSettings: () -> Unit,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val lazyGridState = rememberLazyGridState()
@@ -194,7 +195,8 @@ fun MediaDiscoveryScreen(
             StartTransferComponent(
                 event = uiState.downloadEvent,
                 onConsumeEvent = viewModel::consumeDownloadEvent,
-                snackBarHostState = scaffoldState.snackbarHostState
+                snackBarHostState = scaffoldState.snackbarHostState,
+                navigateToStorageSettings = navigateToStorageSettings,
             )
         },
     )

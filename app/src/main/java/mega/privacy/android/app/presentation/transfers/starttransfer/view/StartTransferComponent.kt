@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -47,8 +46,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
-import mega.privacy.android.app.presentation.settings.SettingsActivity
-import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
@@ -82,6 +79,7 @@ internal fun StartTransferComponent(
     snackBarHostState: SnackbarHostState,
     onScanningFinished: (StartTransferEvent) -> Unit = {},
     viewModel: StartTransfersComponentViewModel = hiltViewModel(),
+    navigateToStorageSettings: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -170,6 +168,7 @@ internal fun StartTransferComponent(
         onAskedResumeTransfers = viewModel::setAskedResumeTransfers,
         snackBarHostState = snackBarHostState,
         onScanningFinished = onScanningFinished,
+        navigateToStorageSettings = navigateToStorageSettings,
     )
 }
 
@@ -184,6 +183,7 @@ fun createStartTransferView(
     activity: Activity,
     transferEventState: Flow<StateEventWithContent<TransferTriggerEvent>>,
     onConsumeEvent: () -> Unit,
+    navigateToStorageSettings: () -> Unit,
     onScanningFinished: (StartTransferEvent) -> Unit = {},
 ): View = ComposeView(activity).apply {
     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -196,10 +196,11 @@ fun createStartTransferView(
             //if we need this view is because we are not using compose views, so we don't have a scaffold to show snack bars and need to launch a View snackbar
             LegacySnackBarWrapper(snackbarHostState = snackbarHostState, activity)
             StartTransferComponent(
-                downloadEvent,
-                onConsumeEvent,
+                event = downloadEvent,
+                onConsumeEvent = onConsumeEvent,
                 snackBarHostState = snackbarHostState,
-                onScanningFinished,
+                onScanningFinished = onScanningFinished,
+                navigateToStorageSettings = navigateToStorageSettings,
             )
         }
     }
@@ -220,6 +221,7 @@ private fun StartTransferComponent(
     onAskedResumeTransfers: () -> Unit,
     snackBarHostState: SnackbarHostState,
     onScanningFinished: (StartTransferEvent) -> Unit = {},
+    navigateToStorageSettings: () -> Unit,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -268,7 +270,7 @@ private fun StartTransferComponent(
                 }
 
                 is StartTransferEvent.Message ->
-                    consumeMessage(it, snackBarHostState, context)
+                    consumeMessage(it, snackBarHostState, context, navigateToStorageSettings)
 
                 StartTransferEvent.NotConnected -> {
                     showOfflineAlertDialog = true
@@ -486,6 +488,7 @@ private suspend fun consumeMessage(
     event: StartTransferEvent.Message,
     snackBarHostState: SnackbarHostState,
     context: Context,
+    navigateToStorageSettings: () -> Unit,
 ) {
     //show snack bar with an optional action
     val result = snackBarHostState.showAutoDurationSnackbar(
@@ -495,21 +498,17 @@ private suspend fun consumeMessage(
     if (result == SnackbarResult.ActionPerformed && event.actionEvent != null) {
         consumeMessageAction(
             event.actionEvent,
-            context
+            navigateToStorageSettings
         )
     }
 }
 
 private fun consumeMessageAction(
     actionEvent: StartTransferEvent.Message.ActionEvent,
-    context: Context,
+    navigateToStorageSettings: () -> Unit,
 ) = when (actionEvent) {
     StartTransferEvent.Message.ActionEvent.GoToFileManagement -> {
-        ContextCompat.startActivity(
-            context,
-            SettingsActivity.getIntent(context, StorageTargetPreference),
-            null
-        )
+        navigateToStorageSettings()
     }
 }
 

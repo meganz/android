@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -38,6 +39,7 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.namecollision.NameCollisionActivity
 import mega.privacy.android.app.namecollision.data.NameCollisionResultUiEntity
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
+import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
@@ -50,19 +52,28 @@ import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Activity which shows the content of a local folder picked via system picker to upload all its content
  * or part of it.
  */
+@AndroidEntryPoint
 class UploadFolderActivity : PasscodeActivity(), Scrollable {
 
     companion object {
         private const val WAIT_TIME_TO_UPDATE = 150L
         private const val SHADOW = 0.5f
     }
+
+    /**
+     * Mega navigator
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel: UploadFolderViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
@@ -253,7 +264,13 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
             createStartTransferView(
                 this,
                 viewModel.uiState.map { it.transferTriggerEvent },
-                viewModel::consumeTransferTriggerEvent
+                viewModel::consumeTransferTriggerEvent,
+                navigateToStorageSettings = {
+                    megaNavigator.openSettings(
+                        this,
+                        StorageTargetPreference
+                    )
+                }
             ) { event ->
                 if (event is StartTransferEvent.FinishUploadProcessing) {
                     val total = ((event.triggerEvent as? TransferTriggerEvent.StartUpload.Files)

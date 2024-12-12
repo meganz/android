@@ -40,6 +40,7 @@ internal fun NavGraphBuilder.chatScreen(
     navigateToNotSentModal: () -> Unit,
     navigateToConversation: (Long) -> Unit,
     onBackPress: () -> Unit,
+    navigateToStorageSettings: () -> Unit,
 ) {
     composable(
         route = ConversationRoute
@@ -103,6 +104,7 @@ internal fun NavGraphBuilder.chatScreen(
             navigateToNotSentModal = navigateToNotSentModal,
             navigateToConversation = navigateToConversation,
             navHostController = navController,
+            navigateToStorageSettings = navigateToStorageSettings,
         )
     }
 }
