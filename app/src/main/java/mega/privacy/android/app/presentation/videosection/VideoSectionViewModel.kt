@@ -435,6 +435,9 @@ class VideoSectionViewModel @Inject constructor(
             }
             setPendingRefreshNodes()
             loadVideoPlaylists()
+            if (_state.value.currentVideoPlaylist?.isSystemVideoPlayer == true) {
+                refreshVideoPlaylistsWithUpdateCurrentVideoPlaylist()
+            }
         }
 
     internal fun searchQuery(queryString: String) {

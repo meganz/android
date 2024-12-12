@@ -55,10 +55,11 @@ internal fun VideoPlaylistDetailTopBar(
             appBarType = AppBarType.BACK_NAVIGATION,
             title = title,
             onNavigationPressed = onBackPressed,
-            actions = if (isSystemVideoPlaylist && !enableFavouritesPlaylistMenu)
-                emptyList()
-            else
-                listOf(VideoSectionMenuAction.VideoSectionMoreAction),
+            actions = when {
+                isSystemVideoPlaylist && !enableFavouritesPlaylistMenu -> emptyList()
+                isSystemVideoPlaylist -> listOf(VideoSectionMenuAction.VideoSectionSortByAction)
+                else -> listOf(VideoSectionMenuAction.VideoSectionMoreAction)
+            },
             onActionPressed = { onMenuActionClick(it as? VideoSectionMenuAction) },
             windowInsets = WindowInsets(0.dp)
         )

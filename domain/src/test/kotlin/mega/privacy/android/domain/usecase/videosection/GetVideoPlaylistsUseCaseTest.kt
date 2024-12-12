@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration
@@ -42,7 +43,7 @@ class GetVideoPlaylistsUseCaseTest {
     fun `test that videoPlaylists is not empty`() = runTest {
         initOrder(SortOrder.ORDER_DEFAULT_ASC)
         val list = listOf(mock<UserVideoPlaylist>())
-        whenever(videoSectionRepository.getVideoPlaylists()).thenReturn(list)
+        whenever(videoSectionRepository.getVideoPlaylists(any())).thenReturn(list)
         assertThat(underTest()).isNotEmpty()
     }
 
@@ -60,7 +61,7 @@ class GetVideoPlaylistsUseCaseTest {
                 playlist2,
                 playlist3
             )
-            whenever(videoSectionRepository.getVideoPlaylists()).thenReturn(list)
+            whenever(videoSectionRepository.getVideoPlaylists(any())).thenReturn(list)
             val actual = underTest()
             assertThat(actual).isNotEmpty()
             assertThat((actual[0] is FavouritesVideoPlaylist)).isTrue()
@@ -83,7 +84,7 @@ class GetVideoPlaylistsUseCaseTest {
                 playlist2,
                 playlist3
             )
-            whenever(videoSectionRepository.getVideoPlaylists()).thenReturn(list)
+            whenever(videoSectionRepository.getVideoPlaylists(any())).thenReturn(list)
             val actual = underTest()
             assertThat(actual).isNotEmpty()
             assertThat((actual[0] is FavouritesVideoPlaylist)).isTrue()
@@ -106,7 +107,7 @@ class GetVideoPlaylistsUseCaseTest {
                 playlist2,
                 playlist3
             )
-            whenever(videoSectionRepository.getVideoPlaylists()).thenReturn(list)
+            whenever(videoSectionRepository.getVideoPlaylists(any())).thenReturn(list)
             val actual = underTest()
             assertThat(actual).isNotEmpty()
             assertThat((actual[0] is FavouritesVideoPlaylist)).isTrue()
@@ -129,7 +130,7 @@ class GetVideoPlaylistsUseCaseTest {
                 playlist2,
                 playlist3
             )
-            whenever(videoSectionRepository.getVideoPlaylists()).thenReturn(list)
+            whenever(videoSectionRepository.getVideoPlaylists(any())).thenReturn(list)
             val actual = underTest()
             assertThat(actual).isNotEmpty()
             assertThat((actual[0] is FavouritesVideoPlaylist)).isTrue()
@@ -142,7 +143,7 @@ class GetVideoPlaylistsUseCaseTest {
     fun `test that videoPlaylists is empty`() =
         runTest {
             initOrder(SortOrder.ORDER_DEFAULT_ASC)
-            whenever(videoSectionRepository.getVideoPlaylists()).thenReturn(emptyList())
+            whenever(videoSectionRepository.getVideoPlaylists(any())).thenReturn(emptyList())
             assertThat(underTest()).isEmpty()
         }
 

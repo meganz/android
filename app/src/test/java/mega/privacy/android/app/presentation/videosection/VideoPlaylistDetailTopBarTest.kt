@@ -11,6 +11,7 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenu
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_MORE_ACTION
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_REMOVE_ACTION
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_SELECT_ALL_ACTION
+import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_SORT_BY_ACTION
 import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_DETAIL_SELECTED_MODE_TOP_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_DETAIL_TOP_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistDetailTopBar
@@ -160,14 +161,19 @@ class VideoPlaylistDetailTopBarTest {
     }
 
     @Test
-    fun `test that more action is displayed when isSystemVideoPlaylist is true and enableFavouritesPlaylistMenu is true`() {
-        setComposeContent(isSystemVideoPlaylist = true, enableFavouritesPlaylistMenu = true)
-        composeTestRule.onNodeWithTag(
-            testTag = TEST_TAG_VIDEO_SECTION_MORE_ACTION,
-            useUnmergedTree = true
+    fun `test that sort by action is displayed and VideoSectionSortByAction is invoked after is pressed`() {
+        setComposeContent(
+            onMenuActionClick = onMenuActionClick,
+            isSystemVideoPlaylist = true,
+            enableFavouritesPlaylistMenu = true
         )
-            .apply {
-                assertIsDisplayed()
-            }
+        composeTestRule.onNodeWithTag(
+            testTag = TEST_TAG_VIDEO_SECTION_SORT_BY_ACTION,
+            useUnmergedTree = true
+        ).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+        onMenuActionClick.invoke(VideoSectionMenuAction.VideoSectionSortByAction)
     }
 }

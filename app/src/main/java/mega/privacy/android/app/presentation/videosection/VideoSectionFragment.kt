@@ -47,6 +47,7 @@ import mega.privacy.android.app.presentation.videosection.view.VideoSectionFeatu
 import mega.privacy.android.app.presentation.videosection.view.videoSectionRoute
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
+import mega.privacy.android.app.utils.Constants.ORDER_FAVOURITES
 import mega.privacy.android.app.utils.Constants.ORDER_VIDEO_PLAYLIST
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
@@ -183,7 +184,14 @@ class VideoSectionFragment : Fragment() {
     private fun showSortByPanel() {
         val currentSelectTab = videoSectionViewModel.tabState.value.selectedTab
         (requireActivity() as ManagerActivity).showNewSortByPanel(
-            if (currentSelectTab == VideoSectionTab.All) ORDER_CLOUD else ORDER_VIDEO_PLAYLIST
+            when {
+                currentSelectTab == VideoSectionTab.All -> ORDER_CLOUD
+
+                videoSectionViewModel.state.value.currentVideoPlaylist?.isSystemVideoPlayer == true ->
+                    ORDER_FAVOURITES
+
+                else -> ORDER_VIDEO_PLAYLIST
+            }
         )
     }
 
@@ -241,6 +249,9 @@ class VideoSectionFragment : Fragment() {
 
                     is VideoSectionMenuAction.VideoSectionMoveAction ->
                         NodeController(managerActivity).chooseLocationToMoveNodes(selectedVideos)
+
+                    is VideoSectionMenuAction.VideoSectionSortByAction ->
+                        showSortByPanel()
 
                     else -> {}
                 }

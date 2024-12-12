@@ -22,7 +22,7 @@ class GetVideoPlaylistsUseCase @Inject constructor(
     suspend operator fun invoke(): List<VideoPlaylist> = getVideoPlaylistsByOrder()
 
     private suspend fun getVideoPlaylistsByOrder() =
-        videoSectionRepository.getVideoPlaylists().let { list ->
+        videoSectionRepository.getVideoPlaylists(getCloudSortOrder()).let { list ->
             if (list.isNotEmpty()) {
                 orderVideoPlaylists(list)
             } else {

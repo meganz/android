@@ -22,9 +22,10 @@ interface VideoSectionRepository {
     /**
      * Get video playlists
      *
+     * @param sortOrder the list order, this is for getting favourites playlist items by sort order
      * @return video playlist lists
      */
-    suspend fun getVideoPlaylists(): List<VideoPlaylist>
+    suspend fun getVideoPlaylists(sortOrder: SortOrder = SortOrder.ORDER_NONE): List<VideoPlaylist>
 
     /**
      * Create a video playlist

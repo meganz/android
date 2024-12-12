@@ -105,19 +105,22 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
         megaNode = this, requireSerializedData = false, offline = offline
     )
 
-    override suspend fun getVideoPlaylists(): List<VideoPlaylist> =
+    override suspend fun getVideoPlaylists(sortOrder: SortOrder): List<VideoPlaylist> =
         withContext(ioDispatcher) {
             val offlineItems = getAllOfflineNodeHandle()
-            val systemVideoPlaylist = listOf(getFavouritesVideoPlaylist(offlineItems))
+            val systemVideoPlaylist = listOf(getFavouritesVideoPlaylist(sortOrder, offlineItems))
             val userVideoPlaylists = getAllUserSets().map { userSet ->
                 userSet.toVideoPlaylist(offlineItems)
             }
             systemVideoPlaylist + userVideoPlaylists
         }
 
-    private suspend fun getFavouritesVideoPlaylist(offlineItems: Map<String, Offline>): FavouritesVideoPlaylist {
+    private suspend fun getFavouritesVideoPlaylist(
+        sortOrder: SortOrder,
+        offlineItems: Map<String, Offline>,
+    ): FavouritesVideoPlaylist {
         val favouriteVideos =
-            getAllVideoMegaNodes(SortOrder.ORDER_NONE).filter { it.isFavourite }.map { megaNode ->
+            getAllVideoMegaNodes(sortOrder).filter { it.isFavourite }.map { megaNode ->
                 val isOutShared =
                     megaApiGateway.getMegaNodeByHandle(megaNode.parentHandle)?.isOutShare == true
                 typedVideoNodeMapper(
