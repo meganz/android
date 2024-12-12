@@ -239,7 +239,7 @@ internal fun FileInfoContent(
                 placeholder = if (isDescriptionEnabled()) stringResource(id = sharedR.string.file_info_information_description_placeholder) else stringResource(
                     id = sharedR.string.file_info_information_no_description_placeholder
                 ),
-                isEditable = isDescriptionEnabled() && viewState.accountDeactivatedStatus != null,
+                isEditable = isDescriptionEnabled() && viewState.accountDeactivatedStatus == null,
                 onConfirmDescription = onSetDescriptionClick,
             )
 
