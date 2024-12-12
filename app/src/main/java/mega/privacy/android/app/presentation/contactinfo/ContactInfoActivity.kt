@@ -1270,7 +1270,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
         val builder = MaterialAlertDialogBuilder(this)
             .setTitle(getString(viewModel.nickName
-                ?.let { R.string.add_nickname } ?: run { R.string.edit_nickname })
+                ?.let { R.string.edit_nickname } ?: run { R.string.add_nickname })
             )
             .setPositiveButton(getString(R.string.button_set)) { _, _ ->
                 val name = emojiEditText.text.toString()
