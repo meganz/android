@@ -135,7 +135,8 @@ private fun SearchToolbarBody(
                 hintId = R.string.hint_action_search,
                 onSearchTextChange = { updateSearchQuery(it) },
                 onCloseClicked = { onBackPressed() },
-                elevation = false
+                elevation = false,
+                isHideAfterSearch = true,
             )
         }
     }

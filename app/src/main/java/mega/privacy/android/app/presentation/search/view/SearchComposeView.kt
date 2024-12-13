@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -86,7 +85,6 @@ fun SearchComposeView(
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
     val scaffoldState = rememberScaffoldState()
-    val snackBarHostState = remember { SnackbarHostState() }
     var topBarPadding by remember { mutableStateOf(0.dp) }
 
     LaunchedEffect(key1 = state.resetScroll) {

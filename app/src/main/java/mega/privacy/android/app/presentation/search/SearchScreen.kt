@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.search
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -32,7 +31,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 /**
  * Search activity to search Nodes and display
  */
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchScreen(
     showSortOrderBottomSheet: () -> Unit,
