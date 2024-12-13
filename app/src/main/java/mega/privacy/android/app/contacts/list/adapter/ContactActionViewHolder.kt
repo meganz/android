@@ -18,5 +18,6 @@ class ContactActionViewHolder(
         binding.txtTitle.text = item.title
         binding.chipCounter.text = item.counter.toString()
         binding.chipCounter.isVisible = item.counter > 0
+        binding.imgLeadingIcon.setImageResource(item.leadingIcon)
     }
 }

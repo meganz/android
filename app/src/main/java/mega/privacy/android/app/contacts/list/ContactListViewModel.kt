@@ -44,6 +44,7 @@ import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
+import mega.privacy.android.icon.pack.R as IconPackR
 
 /**
  * ViewModel that handles all related logic to Contact List for the current user.
@@ -132,11 +133,13 @@ internal class ContactListViewModel @Inject constructor(
                                     ContactActionItem(
                                         Type.REQUESTS,
                                         context.getString(R.string.section_requests),
-                                        it
+                                        R.drawable.ic_users,
+                                        it,
                                     ),
                                     ContactActionItem(
                                         Type.GROUPS,
-                                        context.getString(R.string.section_groups)
+                                        context.getString(R.string.section_groups),
+                                        IconPackR.drawable.ic_message_chat_circle_medium_regular_outline,
                                     )
                                 )
                             )
