@@ -188,7 +188,11 @@ internal fun VideoSectionNavHost(
                         }
                     }
                 },
-                enableFavouritesPlaylistMenu = enableFavouritesPlaylistMenu
+                enableFavouritesPlaylistMenu = enableFavouritesPlaylistMenu,
+                onRemoveFavouriteOptionClicked = {
+                    // Will implement in the ticket - CC-8498
+                    viewModel.clearAllSelectedVideosOfPlaylist()
+                }
             )
         }
 

@@ -124,7 +124,7 @@ internal fun VideoItemView(
             Image(
                 painter = painterResource(
                     id = if (isSelected)
-                        R.drawable.ic_select_thumbnail
+                        R.drawable.ic_video_section_select_thumbnail
                     else
                         coreR.drawable.ic_dots_vertical_grey
                 ),

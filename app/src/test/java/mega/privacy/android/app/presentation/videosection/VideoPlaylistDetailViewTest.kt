@@ -83,7 +83,8 @@ class VideoPlaylistDetailViewTest {
         onPlayAllClicked: () -> Unit = {},
         onBackPressed: () -> Unit = {},
         onMenuActionClick: (VideoSectionMenuAction?) -> Unit = {},
-        enableFavouritesPlaylistMenu: Boolean = false
+        enableFavouritesPlaylistMenu: Boolean = false,
+        onRemoveFavouriteOptionClicked: () -> Unit = {},
     ) {
         composeTestRule.setContent {
             VideoPlaylistDetailView(
@@ -111,7 +112,8 @@ class VideoPlaylistDetailViewTest {
                 onPlayAllClicked = onPlayAllClicked,
                 onBackPressed = onBackPressed,
                 onMenuActionClick = onMenuActionClick,
-                enableFavouritesPlaylistMenu = enableFavouritesPlaylistMenu
+                enableFavouritesPlaylistMenu = enableFavouritesPlaylistMenu,
+                onRemoveFavouriteOptionClicked = onRemoveFavouriteOptionClicked
             )
         }
     }

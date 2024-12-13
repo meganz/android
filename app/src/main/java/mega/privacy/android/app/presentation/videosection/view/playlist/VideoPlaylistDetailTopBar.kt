@@ -26,20 +26,27 @@ internal fun VideoPlaylistDetailTopBar(
     if (isActionMode) {
         SelectModeAppBar(
             title = selectedSize.toString(),
-            actions = if (selectedSize == 0) {
-                emptyList()
-            } else {
-                mutableListOf<VideoSectionMenuAction>().apply {
-                    add(VideoSectionMenuAction.VideoSectionRemoveAction)
-                    add(VideoSectionMenuAction.VideoSectionSelectAllAction)
-                    add(VideoSectionMenuAction.VideoSectionClearSelectionAction)
-                    if (isHideMenuActionVisible) {
-                        add(VideoSectionMenuAction.VideoSectionHideAction)
+            actions = when {
+                selectedSize == 0 -> emptyList()
+                isSystemVideoPlaylist -> listOf(
+                    VideoSectionMenuAction.VideoSectionDownloadAction,
+                    VideoSectionMenuAction.VideoSectionSendToChatAction,
+                    VideoSectionMenuAction.VideoSectionShareAction,
+                    VideoSectionMenuAction.VideoSectionMoreAction
+                )
+
+                else ->
+                    mutableListOf<VideoSectionMenuAction>().apply {
+                        add(VideoSectionMenuAction.VideoSectionRemoveAction)
+                        add(VideoSectionMenuAction.VideoSectionSelectAllAction)
+                        add(VideoSectionMenuAction.VideoSectionClearSelectionAction)
+                        if (isHideMenuActionVisible) {
+                            add(VideoSectionMenuAction.VideoSectionHideAction)
+                        }
+                        if (isUnhideMenuActionVisible) {
+                            add(VideoSectionMenuAction.VideoSectionUnhideAction)
+                        }
                     }
-                    if (isUnhideMenuActionVisible) {
-                        add(VideoSectionMenuAction.VideoSectionUnhideAction)
-                    }
-                }
             },
             onActionPressed = {
                 onMenuActionClick(it as? VideoSectionMenuAction)

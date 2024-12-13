@@ -89,7 +89,7 @@ internal fun VideoPlaylistItemView(
             Image(
                 painter = painterResource(
                     id = if (isSelected)
-                        R.drawable.ic_select_thumbnail
+                        R.drawable.ic_video_section_select_thumbnail
                     else
                         mega.privacy.android.core.R.drawable.ic_dots_vertical_grey
                 ),

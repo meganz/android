@@ -752,7 +752,11 @@ class VideoSectionViewModel @Inject constructor(
     }
 
     internal suspend fun getSelectedMegaNode(): List<MegaNode> =
-        _state.value.selectedVideoHandles.mapNotNull {
+        if (_state.value.currentVideoPlaylist?.isSystemVideoPlayer == true) {
+            _state.value.selectedVideoElementIDs
+        } else {
+            _state.value.selectedVideoHandles
+        }.mapNotNull {
             runCatching {
                 getNodeByHandle(it)
             }.getOrNull()

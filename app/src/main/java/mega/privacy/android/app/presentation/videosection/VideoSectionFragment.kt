@@ -198,7 +198,12 @@ class VideoSectionFragment : Fragment() {
     private fun handleVideoSectionMenuAction(action: VideoSectionMenuAction?) =
         (activity as? ManagerActivity)?.let { managerActivity ->
             viewLifecycleOwner.lifecycleScope.launch {
-                val selectedVideos = videoSectionViewModel.state.value.selectedVideoHandles
+                val selectedVideos =
+                    if (videoSectionViewModel.state.value.currentVideoPlaylist?.isSystemVideoPlayer == true) {
+                        videoSectionViewModel.state.value.selectedVideoElementIDs
+                    } else {
+                        videoSectionViewModel.state.value.selectedVideoHandles
+                    }
                 when (action) {
                     is VideoSectionMenuAction.VideoSectionDownloadAction ->
                         managerActivity.saveNodesToDevice(
