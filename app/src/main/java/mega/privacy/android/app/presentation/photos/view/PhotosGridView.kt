@@ -3,12 +3,10 @@
 package mega.privacy.android.app.presentation.photos.view
 
 import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.icon.pack.R as IconPackR
 import android.content.res.Configuration
 import android.text.format.DateFormat.getBestDateTimePattern
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -17,7 +15,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,14 +28,10 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -51,21 +44,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.timeline.view.PhotoImageView
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_DAY
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_MONTH_WITH_DAY
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_YEAR_WITH_MONTH
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
-import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_032
 import mega.privacy.android.shared.original.core.ui.theme.white
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -155,12 +145,13 @@ internal fun PhotosGridView(
                                 onLongClick = { onLongPress(item.photo) }
                             ),
                         photoView = {
-                            PhotoView(
+                            PhotoImageView(
                                 photo = item.photo,
                                 isPreview = isDownloadPreview(configuration, currentZoomLevel),
                                 downloadPhoto = photoDownland,
                                 alpha = if (isBlurUnselectItem && !isSelected) 0.4f else 1.0f,
                                 shouldApplySensitiveMode = shouldApplySensitiveMode,
+                                showOverlayOnSuccess = item.photo is Photo.Video
                             )
                         }
                     )
@@ -222,12 +213,6 @@ internal fun PhotoViewContainer(
             )
         }
         if (photo is Photo.Video) {
-            Spacer(
-                modifier = Modifier
-                    .matchParentSize()
-                    .background(color = grey_alpha_032)
-            )
-
             Text(
                 text = TimeUtils.getVideoDuration(photo.fileTypeInfo.duration.inWholeSeconds.toInt()),
                 color = white,
@@ -251,49 +236,6 @@ internal fun PhotoViewContainer(
         }
     }
 }
-
-@Composable
-internal fun PhotoView(
-    photo: Photo,
-    isPreview: Boolean,
-    shouldApplySensitiveMode: Boolean,
-    downloadPhoto: PhotoDownload,
-    alpha: Float = DefaultAlpha,
-) {
-    val imageState = produceState<String?>(initialValue = null) {
-        downloadPhoto(isPreview, photo) { downloadSuccess ->
-            if (downloadSuccess) {
-                value = if (isPreview) {
-                    photo.previewFilePath
-                } else {
-                    photo.thumbnailFilePath
-                }
-            }
-        }
-    }
-
-    AsyncImage(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(imageState.value)
-            .crossfade(true)
-            .build(),
-        alpha = alpha,
-        contentDescription = null,
-        placeholder = painterResource(id = IconPackR.drawable.ic_image_medium_solid),
-        error = painterResource(id = IconPackR.drawable.ic_image_medium_solid),
-        contentScale = ContentScale.Crop,
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f)
-            .alpha(0.5f.takeIf {
-                shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
-            } ?: 1f)
-            .blur(16.dp.takeIf {
-                shouldApplySensitiveMode && (photo.isSensitive || photo.isSensitiveInherited)
-            } ?: 0.dp)
-    )
-}
-
 
 @Composable
 internal fun Separator(

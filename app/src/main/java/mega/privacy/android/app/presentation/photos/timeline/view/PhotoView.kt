@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -204,13 +205,17 @@ private fun PhotoCoverView(
 }
 
 
+/**
+ * Photo image view for grid layout
+ */
 @Composable
-private fun PhotoImageView(
+fun PhotoImageView(
     photo: Photo,
     shouldApplySensitiveMode: Boolean,
     isPreview: Boolean,
     showOverlayOnSuccess: Boolean = false,
     downloadPhoto: PhotoDownload,
+    alpha: Float = DefaultAlpha,
 ) {
 
     var showOverlayState by remember { mutableStateOf(false) }
@@ -242,6 +247,7 @@ private fun PhotoImageView(
                     showOverlayState = true
                 }
             },
+            alpha = alpha,
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(1f)
