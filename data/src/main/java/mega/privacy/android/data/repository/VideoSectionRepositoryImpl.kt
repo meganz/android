@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -313,7 +314,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
             }
         }
 
-    override fun monitorSetsUpdates(): Flow<List<Long>> = megaApiGateway.globalUpdates
+    override fun monitorSetsUpdates(): Flow<List<Long>> = merge(megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnSetsUpdate>()
         .mapNotNull { it.sets }
         .map { sets ->
@@ -322,7 +323,19 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
             }.map {
                 it.id()
             }
-        }
+        },
+        megaApiGateway.globalUpdates
+            .filterIsInstance<GlobalUpdate.OnSetElementsUpdate>()
+            .mapNotNull { it.elements }
+            .map { elements ->
+                val updatedIds = elements.map { it.setId() }
+                if (updatedIds.any { it in videoPlaylistsMap.keys }) {
+                    updatedIds
+                } else {
+                    emptyList()
+                }
+            }
+    )
 
     override fun getVideoSetsMap() = videoSetsMap
 
