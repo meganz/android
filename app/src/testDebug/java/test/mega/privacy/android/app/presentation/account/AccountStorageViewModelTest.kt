@@ -9,11 +9,9 @@ import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountStorageDetail
-import mega.privacy.android.domain.entity.achievement.AchievementType
-import mega.privacy.android.domain.entity.achievement.AchievementsOverview
-import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.advertisements.MonitorAdsClosingTimestampUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -41,7 +39,9 @@ class AccountStorageViewModelTest {
     }
     private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
     private val getAccountAchievements: GetAccountAchievements = mock()
-
+    private val monitorAdsClosingTimestampUseCase: MonitorAdsClosingTimestampUseCase = mock {
+        on { invoke() }.thenReturn(flowOf(0L))
+    }
 
     @BeforeAll
     internal fun setUp() {
@@ -52,7 +52,8 @@ class AccountStorageViewModelTest {
         underTest = AccountStorageViewModel(
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getStringFromStringResMapper = getStringFromStringResMapper,
-            getAccountAchievements = getAccountAchievements
+            getAccountAchievements = getAccountAchievements,
+            monitorAdsClosingTimestampUseCase = monitorAdsClosingTimestampUseCase
         )
     }
 
@@ -79,6 +80,19 @@ class AccountStorageViewModelTest {
             underTest.monitorAccountDetail()
             underTest.state.test {
                 assertThat(awaitItem().totalStorage).isEqualTo(totalStorage)
+            }
+        }
+
+    @Test
+    fun `test that last ads closing timestamp is updated correctly`() =
+        runTest {
+            val timestamp = 123456789L
+            whenever(monitorAdsClosingTimestampUseCase()).thenReturn(
+                flowOf(timestamp)
+            )
+            init()
+            underTest.state.test {
+                assertThat(awaitItem().lastAdsClosingTimestamp).isEqualTo(timestamp)
             }
         }
 }

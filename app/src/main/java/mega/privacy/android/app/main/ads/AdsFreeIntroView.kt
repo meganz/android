@@ -1,7 +1,6 @@
 package mega.privacy.android.app.main.ads
 
 import mega.privacy.android.shared.resources.R as sharedR
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountSource
 import mega.privacy.android.shared.original.core.ui.controls.ads.AdsFreeItem
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -39,7 +39,9 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
-import mega.privacy.mobile.analytics.event.AdsBannerCloseAdsButtonPressedEvent
+import mega.privacy.mobile.analytics.event.AdFreeDialogScreenEvent
+import mega.privacy.mobile.analytics.event.AdFreeDialogScreenSkipButtonPressedEvent
+import mega.privacy.mobile.analytics.event.AdFreeDialogScreenViewProPlansButtonPressedEvent
 import java.util.Locale
 
 /**
@@ -54,7 +56,7 @@ internal fun AdsFreeIntroView(
     val state = viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
-        Analytics.tracker.trackEvent(AdsBannerCloseAdsButtonPressedEvent)
+        Analytics.tracker.trackEvent(AdFreeDialogScreenEvent)
     }
 
     AdsFreeIntroContent(
@@ -163,6 +165,7 @@ internal fun AdsFreeIntroContent(
                 OutlinedMegaButton(
                     text = stringResource(R.string.general_skip),
                     onClick = {
+                        Analytics.tracker.trackEvent(AdFreeDialogScreenSkipButtonPressedEvent)
                         onDismiss()
                     },
                     rounded = false,
@@ -173,7 +176,13 @@ internal fun AdsFreeIntroContent(
                 RaisedDefaultMegaButton(
                     text = stringResource(sharedR.string.payment_ads_free_intro_button_view_pro_plan),
                     onClick = {
-                        context.startActivity(Intent(context, UpgradeAccountActivity::class.java))
+                        Analytics.tracker.trackEvent(
+                            AdFreeDialogScreenViewProPlansButtonPressedEvent
+                        )
+                        UpgradeAccountActivity.navigate(
+                            context = context,
+                            source = UpgradeAccountSource.ADS_FREE_SCREEN
+                        )
                         onDismiss()
                     },
                     modifier = Modifier

@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.account.model
 
-import mega.privacy.android.domain.entity.account.AccountDetail
-
 /**
  * UI state for account storage
  *
@@ -9,10 +7,16 @@ import mega.privacy.android.domain.entity.account.AccountDetail
  * @property totalStorageFormatted  Total storage formatted
  * @property baseStorage        Base storage
  * @property baseStorageFormatted Base storage formatted
+ * @property lastAdsClosingTimestamp Last ads closing timestamp
+ * @property storageUsedPercentage Storage used percentage
+ * @property transferUsedPercentage Transfer used percentage
  */
 data class AccountStorageUIState(
     val totalStorage: Long? = null,
     val totalStorageFormatted: String? = null,
     val baseStorage: Long? = null,
     val baseStorageFormatted: String = "",
+    val lastAdsClosingTimestamp: Long = 0L,
+    val storageUsedPercentage: Int = 0,
+    val transferUsedPercentage: Int = 0,
 )

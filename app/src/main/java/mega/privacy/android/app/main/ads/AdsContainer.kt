@@ -18,9 +18,11 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import com.google.android.gms.ads.admanager.AdManagerAdView
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.shared.original.core.ui.controls.ads.AdsCloseIcon
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.mobile.analytics.event.AdsBannerCloseAdsButtonPressedEvent
 import timber.log.Timber
 
 /**
@@ -32,6 +34,7 @@ fun AdsContainer(
     isDark: Boolean,
     onAdLoaded: () -> Unit,
     onAdFailedToLoad: () -> Unit,
+    onAdsClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -112,6 +115,8 @@ fun AdsContainer(
                 modifier = Modifier.align(Alignment.TopEnd),
                 onClick = {
                     showFreeAdsDialog = true
+                    onAdsClose()
+                    Analytics.tracker.trackEvent(AdsBannerCloseAdsButtonPressedEvent)
                 }
             )
 

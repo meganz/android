@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.advertisements.SetAdsClosingTimestampUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.ShouldShowGenericCookieDialogUseCase
@@ -29,6 +30,7 @@ class GoogleAdsManager @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val shouldShowGenericCookieDialogUseCase: ShouldShowGenericCookieDialogUseCase,
+    private val setAdsClosingTimestampUseCase: SetAdsClosingTimestampUseCase,
 ) {
 
     private var isAdsFeatureEnabled: Boolean = false
@@ -61,6 +63,7 @@ class GoogleAdsManager @Inject constructor(
         runCatching {
             isAdsFeatureEnabled =
                 getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
+            Timber.d("Ads feature enabled: $isAdsFeatureEnabled")
         }.onFailure {
             isAdsFeatureEnabled = false
             Timber.e(it, "Error getting feature flag value")
@@ -137,4 +140,10 @@ class GoogleAdsManager @Inject constructor(
         }
     }
 
+    /**
+     * Callback to be called when the ads are closed.
+     */
+    suspend fun onAdsClosed() {
+        setAdsClosingTimestampUseCase(System.currentTimeMillis())
+    }
 }

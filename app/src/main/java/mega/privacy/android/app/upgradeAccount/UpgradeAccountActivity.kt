@@ -1,10 +1,12 @@
 package mega.privacy.android.app.upgradeAccount
 
-import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.commit
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 
@@ -19,7 +21,6 @@ class UpgradeAccountActivity : AppCompatActivity() {
      *
      * @param savedInstanceState Bundle containing the activity's previously saved state.
      */
-    @SuppressLint("CommitTransaction")
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -27,10 +28,11 @@ class UpgradeAccountActivity : AppCompatActivity() {
         setContentView(R.layout.activity_upgrade_account)
 
         if (savedInstanceState == null) {
-            val fragment = UpgradeAccountFragment()
-            supportFragmentManager.beginTransaction()
-                .add(R.id.upgrade_account_container, fragment)
-                .commit()
+            supportFragmentManager.commit {
+                add(R.id.upgrade_account_container, UpgradeAccountFragment().apply {
+                    arguments = intent.extras
+                })
+            }
         }
     }
 
@@ -46,5 +48,21 @@ class UpgradeAccountActivity : AppCompatActivity() {
             finish()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    companion object {
+        const val EXTRA_SOURCE = "EXTRA_SOURCE"
+
+        /**
+         * Navigates to the Upgrade Account Activity.
+         */
+        fun navigate(
+            context: Context,
+            source: UpgradeAccountSource = UpgradeAccountSource.UNKNOWN,
+        ) {
+            context.startActivity(Intent(context, UpgradeAccountActivity::class.java).apply {
+                putExtra(EXTRA_SOURCE, source)
+            })
+        }
     }
 }

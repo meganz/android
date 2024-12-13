@@ -2345,6 +2345,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     hideAdsView()
                     fetchNewAd()
                 },
+                onAdsClose = {
+                    lifecycleScope.launch { googleAdsManager.onAdsClosed() }
+                }
             )
         }
         fetchNewAd()
