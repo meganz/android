@@ -1,5 +1,5 @@
 MEGA Android Client
-================
+================n
 
 A fully-featured client to access your Cloud Storage provided by MEGA.
 
