@@ -21,7 +21,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     FavouritesPlaylistMenuEnabled(
         "Enable Favourites playlist menu",
-        false
+        true
     ),
 
     /**
