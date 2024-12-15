@@ -36,6 +36,7 @@ import mega.privacy.android.app.presentation.featureflag.ShakeDetectorViewModel
 import mega.privacy.android.app.presentation.featureflag.model.FeatureFlagMapper
 import mega.privacy.android.app.presentation.featureflag.model.toFeatureFlag
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
+import mega.privacy.android.app.presentation.settings.model.SetFeatureFlagPlaceHolder
 import mega.privacy.android.data.preferences.FeatureFlagPreferencesDataStore
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
@@ -216,5 +217,9 @@ class QAModule {
 
     @Provides
     fun provideFeatureFlagMapper(): FeatureFlagMapper = ::toFeatureFlag
+
+    @Provides
+    fun provideSetFeatureFlagPlaceHolder(setFeatureFlag: SetFeatureFlag): SetFeatureFlagPlaceHolder =
+        SetFeatureFlagPlaceHolder { name, enabled -> setFeatureFlag(name, enabled) }
 
 }
