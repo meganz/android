@@ -127,8 +127,8 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
                         }
                     )
                     LaunchedEffect(uiState.title, uiState.offlineNodes) {
+                        viewModel.updateTitle(uiState.title.ifEmpty { defaultTitle })
                         (requireActivity() as? ManagerActivity)?.setToolbarTitleFromFullscreenOfflineFragment(
-                            title = uiState.title.ifEmpty { defaultTitle },
                             firstNavigationLevel = false,
                             showSearch = true
                         )
@@ -175,6 +175,11 @@ class OfflineComposeFragment : Fragment(), ActionMode.Callback {
             }
         }
     }
+
+    /**
+     * Get current page title
+     */
+    fun getCurrentPageTitle(): String = viewModel.uiState.value.title
 
     /**
      * Checks if the fragment is in search mode

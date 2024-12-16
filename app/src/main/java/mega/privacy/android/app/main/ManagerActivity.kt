@@ -3115,6 +3115,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                             )?.setupToolbar()
                         }
 
+                        HomepageScreen.FULLSCREEN_OFFLINE -> setToolbarTitleFromFullscreenOfflineFragment(
+                            firstNavigationLevel = false,
+                            showSearch = true
+                        )
+
                         HomepageScreen.VIDEO_SECTION -> supportActionBar?.hide()
                         else -> {}
                     }
@@ -3133,14 +3138,16 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     fun setToolbarTitleFromFullscreenOfflineFragment(
-        title: String?,
         firstNavigationLevel: Boolean, showSearch: Boolean,
     ) {
-        supportActionBar?.subtitle = null
-        supportActionBar?.title = title
-        viewModel.setIsFirstNavigationLevel(firstNavigationLevel)
-        viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON)
-        searchMenuItem?.isVisible = showSearch
+        if (drawerItem == DrawerItem.HOMEPAGE && homepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
+            supportActionBar?.subtitle = null
+            supportActionBar?.title = fullscreenOfflineComposeFragment?.getCurrentPageTitle()
+                ?: getString(R.string.section_saved_for_offline_new)
+            viewModel.setIsFirstNavigationLevel(firstNavigationLevel)
+            viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON)
+            searchMenuItem?.isVisible = showSearch
+        }
     }
 
     private fun updateNavigationToolbarIcon(numUnreadUserAlerts: Int) {

@@ -305,4 +305,13 @@ class OfflineComposeViewModel @Inject constructor(
             it.copy(openFolderInPageEvent = consumed())
         }
     }
+
+    /**
+     * Update title
+     */
+    fun updateTitle(title: String) {
+        _uiState.update {
+            it.copy(title = title)
+        }
+    }
 }
