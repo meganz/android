@@ -2,11 +2,9 @@ package mega.privacy.android.data.repository
 
 import android.content.Context
 import android.net.Uri
-import android.provider.DocumentsContract
 import android.webkit.MimeTypeMap
 import androidx.core.net.toFile
 import androidx.core.net.toUri
-import androidx.documentfile.provider.DocumentFile
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -46,6 +44,7 @@ import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.qualifier.FileVersionsOption
+import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
@@ -117,6 +116,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val sdCardGateway: SDCardGateway,
     private val fileAttributeGateway: FileAttributeGateway,
     @ApplicationScope private val sharingScope: CoroutineScope,
+    private val documentFileWrapper: DocumentFileWrapper,
 ) : FileSystemRepository {
 
     init {
@@ -461,12 +461,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         destinationUri: UriPath,
     ) = withContext(ioDispatcher) {
         val uri = destinationUri.value.toUri()
-        val isTreeUri = DocumentsContract.isTreeUri(uri)
-        val destination = if (isTreeUri) {
-            DocumentFile.fromTreeUri(context, uri)
-        } else {
-            DocumentFile.fromSingleUri(context, uri)
-        } ?: throw FileNotFoundException("Content uri doesn't exist: $destinationUri")
+        val destination = documentFileWrapper.fromUri(uri)
+            ?: throw FileNotFoundException("Content uri doesn't exist: $destinationUri")
+
         fileGateway.copyFilesToDocumentFolder(source, destination)
     }
 
@@ -483,10 +480,10 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         subFolders: List<String>,
     ) =
         withContext(ioDispatcher) {
-            val sourceDocument = DocumentFile.fromFile(file)
+            val sourceDocument = documentFileWrapper.fromFile(file)
             val sdCardUri = Uri.parse(destinationUri)
 
-            val destDocument = getSdDocumentFile(
+            val destDocument = documentFileWrapper.getSdDocumentFile(
                 sdCardUri,
                 subFolders,
                 file.name,
@@ -514,22 +511,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             }
             return@withContext false
         }
-
-    private fun getSdDocumentFile(
-        folderUri: Uri,
-        subFolders: List<String>,
-        fileName: String,
-        mimeType: String,
-    ): DocumentFile? {
-        var folderDocument = DocumentFile.fromTreeUri(context, folderUri)
-
-        subFolders.forEach { folder ->
-            folderDocument =
-                folderDocument?.findFile(folder) ?: folderDocument?.createDirectory(folder)
-        }
-        folderDocument?.findFile(fileName)?.delete()
-        return folderDocument?.createFile(mimeType, fileName)
-    }
 
     override suspend fun createNewImageUri(fileName: String): String? = withContext(ioDispatcher) {
         fileGateway.createNewImageUri(fileName)?.toString()
@@ -623,19 +604,16 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileGateway.copyUriToDocumentFolder(
                 name = name,
                 source = source.value.toUri(),
-                destination = DocumentFile.fromFile(destination)
+                destination = documentFileWrapper.fromFile(destination)
             )
         }
 
     override suspend fun copyUri(name: String, source: UriPath, destination: UriPath) =
         withContext(ioDispatcher) {
             val uri = destination.value.toUri()
-            val isTreeUri = DocumentsContract.isTreeUri(uri)
-            val destinationUri = if (isTreeUri) {
-                DocumentFile.fromTreeUri(context, uri)
-            } else {
-                DocumentFile.fromSingleUri(context, uri)
-            } ?: throw FileNotFoundException("Content uri doesn't exist: $destination")
+            val destinationUri = documentFileWrapper.fromUri(uri)
+                ?: throw FileNotFoundException("Content uri doesn't exist: $destination")
+
             fileGateway.copyUriToDocumentFolder(
                 name = name,
                 source = source.value.toUri(),
@@ -651,12 +629,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun getDocumentFileName(uri: UriPath): String = withContext(ioDispatcher) {
         val rawUri = uri.value.toUri()
-        val isTreeUri = DocumentsContract.isTreeUri(rawUri)
-        val document = if (isTreeUri) {
-            DocumentFile.fromTreeUri(context, rawUri)
-        } else {
-            DocumentFile.fromSingleUri(context, rawUri)
-        } ?: throw FileNotFoundException("Content uri doesn't exist: $rawUri")
+        val document = documentFileWrapper.fromUri(rawUri)
+            ?: throw FileNotFoundException("Content uri doesn't exist: $rawUri")
+
         document.name.orEmpty()
     }
 
@@ -684,4 +659,15 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
         newFile
     }
+
+    override suspend fun getFileLengthFromSdCardContentUri(
+        fileContentUri: String,
+    ) = Uri.parse(fileContentUri)?.let { uri ->
+        documentFileWrapper.fromSingleUri(uri)?.length() ?: 0L
+    } ?: 0L
+
+    override suspend fun deleteFileFromSdCardContentUri(fileContentUri: String) =
+        Uri.parse(fileContentUri)?.let { uri ->
+            documentFileWrapper.fromSingleUri(uri)?.delete() ?: false
+        } ?: false
 }

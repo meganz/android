@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import android.content.Context
 import android.net.Uri
+import androidx.documentfile.provider.DocumentFile
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +35,7 @@ import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
@@ -59,6 +61,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
+import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.clearInvocations
@@ -68,6 +71,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 import kotlin.test.assertFailsWith
@@ -101,6 +105,7 @@ internal class FileSystemRepositoryImplTest {
     private val sdCardGateway = mock<SDCardGateway>()
     private val fileAttributeGateway = mock<FileAttributeGateway>()
     private val mimeTypeMapper = mock<MimeTypeMapper>()
+    private val documentFileWrapper = mock<DocumentFileWrapper>()
 
     @BeforeAll
     fun setUp() {
@@ -135,7 +140,8 @@ internal class FileSystemRepositoryImplTest {
             deviceGateway = deviceGateway,
             sdCardGateway = sdCardGateway,
             fileAttributeGateway = fileAttributeGateway,
-            sharingScope = TestScope()
+            sharingScope = TestScope(),
+            documentFileWrapper = documentFileWrapper,
         )
     }
 
@@ -161,6 +167,7 @@ internal class FileSystemRepositoryImplTest {
             sdCardGateway,
             fileAttributeGateway,
             mimeTypeMapper,
+            documentFileWrapper,
         )
     }
 
@@ -461,6 +468,67 @@ internal class FileSystemRepositoryImplTest {
         fun `test that isSDCardCachePath returns gateway value`(expected: Boolean) = runTest {
             whenever(sdCardGateway.isSDCardCachePath(any())).thenReturn(expected)
             assertThat(underTest.isSDCardCachePath("something")).isEqualTo(expected)
+        }
+
+        @ParameterizedTest(name = "when file exists is: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that getFileLengthFromSdCardContentUri returns correctly`(fileExists: Boolean) =
+            runTest {
+                mockStatic(Uri::class.java).use { mockedUri ->
+                    val fileContentUri = "test/path"
+                    val uri = mock<Uri>()
+                    val length = if (fileExists) 123L else 0L
+                    val documentFile = if (fileExists) mock<DocumentFile> {
+                        on { length() } doReturn 123L
+                    } else null
+
+
+                    mockedUri.`when`<Uri> { Uri.parse(fileContentUri) }.thenReturn(uri)
+                    whenever(documentFileWrapper.fromSingleUri(uri)).thenReturn(documentFile)
+                    assertThat(underTest.getFileLengthFromSdCardContentUri(fileContentUri))
+                        .isEqualTo(length)
+                }
+            }
+
+        @Test
+        fun `test that getFileLengthFromSdCardContentUri returns 0L if uri is null`() = runTest {
+            mockStatic(Uri::class.java).use { mockedUri ->
+                val fileContentUri = "test/path"
+
+                mockedUri.`when`<Uri> { Uri.parse(fileContentUri) }.thenReturn(null)
+                verifyNoInteractions(documentFileWrapper)
+                assertThat(underTest.getFileLengthFromSdCardContentUri(fileContentUri))
+                    .isEqualTo(0L)
+            }
+        }
+
+        @ParameterizedTest(name = "when file exists is: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that deleteFileFromSdCardContentUri returns correctly`(fileExists: Boolean) =
+            runTest {
+                mockStatic(Uri::class.java).use { mockedUri ->
+                    val fileContentUri = "test/path"
+                    val uri = mock<Uri>()
+                    val documentFile = if (fileExists) mock<DocumentFile> {
+                        on { delete() } doReturn true
+                    } else null
+
+                    mockedUri.`when`<Uri> { Uri.parse(fileContentUri) }.thenReturn(uri)
+                    whenever(documentFileWrapper.fromSingleUri(uri)).thenReturn(documentFile)
+                    assertThat(underTest.deleteFileFromSdCardContentUri(fileContentUri))
+                        .isEqualTo(fileExists)
+                }
+            }
+
+        @Test
+        fun `test that deleteFileFromSdCardContentUri returns false if uri is null`() = runTest {
+            mockStatic(Uri::class.java).use { mockedUri ->
+                val fileContentUri = "test/path"
+
+                mockedUri.`when`<Uri> { Uri.parse(fileContentUri) }.thenReturn(null)
+                verifyNoInteractions(documentFileWrapper)
+                assertThat(underTest.deleteFileFromSdCardContentUri(fileContentUri)).isFalse()
+            }
         }
     }
 

@@ -524,4 +524,14 @@ interface FileSystemRepository {
         originalUriPath: UriPath,
         newFilename: String,
     ): File
+
+    /**
+     * Gets the length of the file given the content URI.
+     */
+    suspend fun getFileLengthFromSdCardContentUri(fileContentUri: String): Long
+
+    /**
+     * Deletes the file given the content URI.
+     */
+    suspend fun deleteFileFromSdCardContentUri(fileContentUri: String): Boolean
 }
