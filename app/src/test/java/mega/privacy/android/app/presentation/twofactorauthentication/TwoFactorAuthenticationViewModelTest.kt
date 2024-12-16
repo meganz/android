@@ -16,7 +16,7 @@ import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.EnableMultiFactorAuth
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
-import mega.privacy.android.domain.usecase.GetMultiFactorAuthCode
+import mega.privacy.android.domain.usecase.auth.GetMultiFactorAuthCodeUseCase
 import mega.privacy.android.domain.usecase.auth.IsMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
@@ -38,7 +38,7 @@ internal class TwoFactorAuthenticationViewModelTest {
     private lateinit var underTest: TwoFactorAuthenticationViewModel
     private val enableMultiFactorAuth = mock<EnableMultiFactorAuth>()
     private val isMasterKeyExportedUseCase = mock<IsMasterKeyExportedUseCase>()
-    private val getMultiFactorAuthCode = mock<GetMultiFactorAuthCode>()
+    private val getMultiFactorAuthCodeUseCase = mock<GetMultiFactorAuthCodeUseCase>()
     private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
     private val qrCodeMapper = mock<QRCodeMapper>()
     private val getExportMasterKeyUseCase = mock<GetExportMasterKeyUseCase>()
@@ -51,7 +51,7 @@ internal class TwoFactorAuthenticationViewModelTest {
         underTest = TwoFactorAuthenticationViewModel(
             enableMultiFactorAuth,
             isMasterKeyExportedUseCase,
-            getMultiFactorAuthCode,
+            getMultiFactorAuthCodeUseCase,
             getCurrentUserEmail,
             qrCodeMapper,
             getExportMasterKeyUseCase,
@@ -163,7 +163,7 @@ internal class TwoFactorAuthenticationViewModelTest {
     fun `test that authentication code should not be null when getting multi factor authentication is successful`() =
         runTest {
             val expectedAuthCode = "123456789"
-            whenever(getMultiFactorAuthCode()).thenReturn(expectedAuthCode)
+            whenever(getMultiFactorAuthCodeUseCase()).thenReturn(expectedAuthCode)
             underTest.getAuthenticationCode()
             underTest.uiState.test {
                 val state = awaitItem()
@@ -175,7 +175,7 @@ internal class TwoFactorAuthenticationViewModelTest {
     fun `test that authentication code should be null when getting multi factor authentication is not successful`() =
         runTest {
             val fakeErrorCode = Random.nextInt()
-            whenever(getMultiFactorAuthCode()).thenAnswer {
+            whenever(getMultiFactorAuthCodeUseCase()).thenAnswer {
                 throw MegaException(
                     errorCode = fakeErrorCode,
                     errorString = ""

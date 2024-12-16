@@ -18,7 +18,7 @@ import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFa
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.usecase.EnableMultiFactorAuth
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
-import mega.privacy.android.domain.usecase.GetMultiFactorAuthCode
+import mega.privacy.android.domain.usecase.auth.GetMultiFactorAuthCodeUseCase
 import mega.privacy.android.domain.usecase.auth.IsMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
@@ -31,7 +31,7 @@ import javax.inject.Inject
 class TwoFactorAuthenticationViewModel @Inject constructor(
     private val enableMultiFactorAuth: EnableMultiFactorAuth,
     private val isMasterKeyExportedUseCase: IsMasterKeyExportedUseCase,
-    private val getMultiFactorAuthCode: GetMultiFactorAuthCode,
+    private val getMultiFactorAuthCodeUseCase: GetMultiFactorAuthCodeUseCase,
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val qrCodeMapper: QRCodeMapper,
     private val getExportMasterKeyUseCase: GetExportMasterKeyUseCase,
@@ -194,7 +194,7 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
      */
     fun getAuthenticationCode() {
         viewModelScope.launch {
-            runCatching { getMultiFactorAuthCode() }.let { result ->
+            runCatching { getMultiFactorAuthCodeUseCase() }.let { result ->
                 _uiState.update {
                     it.copy(
                         seed = result.getOrNull(),
