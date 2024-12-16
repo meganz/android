@@ -14,7 +14,7 @@ import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.usecase.EnableMultiFactorAuth
+import mega.privacy.android.domain.usecase.auth.EnableMultiFactorAuthUseCase
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
 import mega.privacy.android.domain.usecase.auth.GetMultiFactorAuthCodeUseCase
 import mega.privacy.android.domain.usecase.auth.IsMasterKeyExportedUseCase
@@ -36,7 +36,7 @@ import kotlin.random.Random
 @RunWith(RobolectricTestRunner::class)
 internal class TwoFactorAuthenticationViewModelTest {
     private lateinit var underTest: TwoFactorAuthenticationViewModel
-    private val enableMultiFactorAuth = mock<EnableMultiFactorAuth>()
+    private val enableMultiFactorAuthUseCase = mock<EnableMultiFactorAuthUseCase>()
     private val isMasterKeyExportedUseCase = mock<IsMasterKeyExportedUseCase>()
     private val getMultiFactorAuthCodeUseCase = mock<GetMultiFactorAuthCodeUseCase>()
     private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
@@ -49,7 +49,7 @@ internal class TwoFactorAuthenticationViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
 
         underTest = TwoFactorAuthenticationViewModel(
-            enableMultiFactorAuth,
+            enableMultiFactorAuthUseCase,
             isMasterKeyExportedUseCase,
             getMultiFactorAuthCodeUseCase,
             getCurrentUserEmail,
@@ -87,7 +87,7 @@ internal class TwoFactorAuthenticationViewModelTest {
     @Test
     fun `test that authenticationState should be Passed when submitting multi factor authentication code is successful`() =
         runTest {
-            whenever(enableMultiFactorAuth(any())).thenReturn(true)
+            whenever(enableMultiFactorAuthUseCase(any())).thenReturn(true)
             underTest.submitMultiFactorAuthPin("")
             underTest.uiState.test {
                 val state = awaitItem()
@@ -99,7 +99,7 @@ internal class TwoFactorAuthenticationViewModelTest {
     fun `test that authenticationState should be Failed when wrong multi factor authentication pin get submitted`() =
         runTest {
             val fakeErrorCode = Random.nextInt()
-            whenever(enableMultiFactorAuth(any()))
+            whenever(enableMultiFactorAuthUseCase(any()))
                 .thenAnswer {
                     throw EnableMultiFactorAuthException(
                         errorCode = fakeErrorCode,
@@ -117,7 +117,7 @@ internal class TwoFactorAuthenticationViewModelTest {
     fun `test that when multi factor authentication returns error should return Error state`() =
         runTest {
             val fakeErrorCode = Random.nextInt()
-            whenever(enableMultiFactorAuth(any()))
+            whenever(enableMultiFactorAuthUseCase(any()))
                 .thenAnswer {
                     throw MegaException(
                         errorCode = fakeErrorCode,

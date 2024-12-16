@@ -16,7 +16,7 @@ import mega.privacy.android.app.presentation.twofactorauthentication.extensions.
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
-import mega.privacy.android.domain.usecase.EnableMultiFactorAuth
+import mega.privacy.android.domain.usecase.auth.EnableMultiFactorAuthUseCase
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
 import mega.privacy.android.domain.usecase.auth.GetMultiFactorAuthCodeUseCase
 import mega.privacy.android.domain.usecase.auth.IsMasterKeyExportedUseCase
@@ -29,7 +29,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class TwoFactorAuthenticationViewModel @Inject constructor(
-    private val enableMultiFactorAuth: EnableMultiFactorAuth,
+    private val enableMultiFactorAuthUseCase: EnableMultiFactorAuthUseCase,
     private val isMasterKeyExportedUseCase: IsMasterKeyExportedUseCase,
     private val getMultiFactorAuthCodeUseCase: GetMultiFactorAuthCodeUseCase,
     private val getCurrentUserEmail: GetCurrentUserEmail,
@@ -243,7 +243,7 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
                 )
             }
             runCatching {
-                enableMultiFactorAuth(pin)
+                enableMultiFactorAuthUseCase(pin)
             }.onSuccess {
                 _uiState.update {
                     it.copy(
