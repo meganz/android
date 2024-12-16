@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.chat.RemoveChatOpeningWithLinkUseCase
 import mega.privacy.android.domain.usecase.chat.SetChatOpeningWithLinkUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastLocalVideoChangedDueToProximitySensorUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastWaitingForOtherParticipantsHasEndedUseCase
+import mega.privacy.android.domain.usecase.meeting.EnableOrDisableVideoUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -51,6 +52,7 @@ class ChatManagement @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val megaChatApi: MegaChatApiAndroid,
     private val broadcastJoinedSuccessfullyUseCase: BroadcastJoinedSuccessfullyUseCase,
+    private val enableOrDisableVideoUseCase: EnableOrDisableVideoUseCase,
     private val broadcastWaitingForOtherParticipantsHasEndedUseCase: BroadcastWaitingForOtherParticipantsHasEndedUseCase,
     private val broadcastLocalVideoChangedDueToProximitySensorUseCase: BroadcastLocalVideoChangedDueToProximitySensorUseCase,
     private val setChatOpeningWithLinkUseCase: SetChatOpeningWithLinkUseCase,
@@ -364,6 +366,22 @@ class ChatManagement @Inject constructor(
     }
 
     /**
+     * Enable or disable local video
+     *
+     * @param chatId
+     * @param enable
+     */
+    private fun enableDisableVideo(chatId: Long, enable: Boolean) {
+        applicationScope.launch {
+            runCatching {
+                enableOrDisableVideoUseCase(chatId, enable)
+            }.onFailure { exception ->
+                Timber.e(exception.message)
+            }
+        }
+    }
+
+    /**
      * Check if a call request has been sent
      *
      * @param callId ID of the call to check
@@ -617,11 +635,7 @@ class ChatManagement @Inject constructor(
                     if (callInProgress.hasLocalVideo() && !isDisablingLocalVideo) {
                         Timber.d("Screen locked, local video is going to be disabled")
                         isScreenOn = false
-                        CallUtil.enableOrDisableLocalVideo(
-                            false, callInProgress.chatid, DisableAudioVideoCallListener(
-                                getInstance()
-                            )
-                        )
+                        enableDisableVideo(callInProgress.chatid, enable = false)
                     }
                 }
 
@@ -631,11 +645,7 @@ class ChatManagement @Inject constructor(
                     if (!callInProgress.hasLocalVideo() && !isDisablingLocalVideo) {
                         Timber.d("Screen unlocked, local video is going to be enabled")
                         isScreenOn = true
-                        CallUtil.enableOrDisableLocalVideo(
-                            true, callInProgress.chatid, DisableAudioVideoCallListener(
-                                getInstance()
-                            )
-                        )
+                        enableDisableVideo(callInProgress.chatid, enable = true)
                     }
                 }
             }
@@ -673,11 +683,7 @@ class ChatManagement @Inject constructor(
                 isInTemporaryState = true
                 broadcastChangesInLocalVideoDueToProximitySensor(false)
                 if (call.hasLocalVideo() && !isDisablingLocalVideo) {
-                    CallUtil.enableOrDisableLocalVideo(
-                        false, call.chatid, DisableAudioVideoCallListener(
-                            getInstance()
-                        )
-                    )
+                    enableDisableVideo(chatId = call.chatid, enable = false)
                 }
             }
 
@@ -687,11 +693,7 @@ class ChatManagement @Inject constructor(
                 isInTemporaryState = false
                 broadcastChangesInLocalVideoDueToProximitySensor(true)
                 if (!call.hasLocalVideo() && !isDisablingLocalVideo) {
-                    CallUtil.enableOrDisableLocalVideo(
-                        true, call.chatid, DisableAudioVideoCallListener(
-                            getInstance()
-                        )
-                    )
+                    enableDisableVideo(chatId = call.chatid, enable = true)
                 }
             }
         }

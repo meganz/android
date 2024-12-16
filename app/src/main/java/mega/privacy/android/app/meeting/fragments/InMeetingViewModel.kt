@@ -770,10 +770,6 @@ class InMeetingViewModel @Inject constructor(
                                 updateParticipantsWithRaisedHand(call)
                             }
 
-                            contains(ChatCallChanges.LocalAVFlags) -> checkUpdatesInLocalAVFlags(
-                                update = true
-                            )
-
                             contains(ChatCallChanges.CallComposition) -> {
                                 if (call.callCompositionChange == CallCompositionChanges.Added || call.callCompositionChange == CallCompositionChanges.Removed) {
                                     val numParticipants = call.numParticipants ?: 0
@@ -807,17 +803,6 @@ class InMeetingViewModel @Inject constructor(
                     }
                 }
         }
-    }
-
-    /**
-     * Check update Local AVFlags
-     *
-     * @param update    True, is updated. False, if not.
-     */
-    fun checkUpdatesInLocalAVFlags(update: Boolean) = _state.update { state ->
-        state.copy(
-            shouldUpdateLocalAVFlags = update,
-        )
     }
 
     /**

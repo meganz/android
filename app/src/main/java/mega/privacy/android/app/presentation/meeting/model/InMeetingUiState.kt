@@ -216,6 +216,14 @@ data class InMeetingUiState(
     }
 
     /**
+     * Check if it's me as participant
+     *
+     * @param peerId User handle of a participant
+     * @return True, if it's me. False, otherwise
+     */
+    fun isMeAsParticipant(peerId: Long): Boolean = peerId == myUserHandle
+
+    /**
      * Get the button to be displayed depending on the type of call on hold you have
      */
     val getButtonTypeToShow

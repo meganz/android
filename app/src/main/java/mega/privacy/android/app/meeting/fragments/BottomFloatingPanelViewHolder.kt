@@ -240,7 +240,7 @@ class BottomFloatingPanelViewHolder(
         meetingActionButtons.apply {
             isMicOn = savedMicState
             Timber.d("Mic Enabled $isMicOn")
-            isCameraOn = true
+            isCameraOn = savedCamState
             Timber.d("Camera Enabled $isCameraOn")
         }
         updateSpeakerIcon(savedSpeakerState)
