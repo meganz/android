@@ -4224,7 +4224,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 if (drawerItem === DrawerItem.CHAT) {
                     Util.hideKeyboard(this@ManagerActivity, 0)
                 } else if (drawerItem == DrawerItem.HOMEPAGE) {
-                    if (homepageScreen != HomepageScreen.FULLSCREEN_OFFLINE) {
+                    if (homepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
                         Util.hideKeyboard(this@ManagerActivity)
                     }
                 } else {
@@ -6589,9 +6589,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             searchView?.setQuery(viewModel.state.value.searchQuery, true)
         }
     }
-
-    val isSearchOpen: Boolean
-        get() = searchExpand
 
     fun homepageToSearch() {
         hideItemsWhenSearchSelected()

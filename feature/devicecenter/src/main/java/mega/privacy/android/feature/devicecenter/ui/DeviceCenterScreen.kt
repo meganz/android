@@ -100,7 +100,6 @@ internal const val TEST_TAG_DEVICE_CENTER_SCREEN_UPGRADE_DIALOG =
  * @param onFeatureExited Lambda that performs a specific action when the Device Center is exited
  * @param onActionPressed Action for each available option of the app bar menu
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun DeviceCenterScreen(
     uiState: DeviceCenterUiState,
@@ -363,6 +362,7 @@ private fun DeviceCenterAppBar(
 
                 return@let list
             },
+            isHideAfterSearch = true,
             modifier = Modifier.testTag(DEVICE_CENTER_TOOLBAR),
         )
     }
