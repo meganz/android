@@ -59,6 +59,7 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -117,6 +118,7 @@ class VideoSectionViewModel @Inject constructor(
     private val clearRecentlyWatchedVideosUseCase: ClearRecentlyWatchedVideosUseCase,
     private val removeRecentlyWatchedItemUseCase: RemoveRecentlyWatchedItemUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val removeFavouritesUseCase: RemoveFavouritesUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -1262,6 +1264,18 @@ class VideoSectionViewModel @Inject constructor(
 
     internal suspend fun enableFavouritesPlaylistMenu() =
         getFeatureFlagValueUseCase(AppFeatures.FavouritesPlaylistMenuEnabled)
+
+    internal fun removeFavourites() = viewModelScope.launch {
+        runCatching {
+            _state.value.selectedVideoElementIDs.let { handles ->
+                if (handles.isNotEmpty()) {
+                    removeFavouritesUseCase(handles.map { NodeId(it) })
+                }
+            }
+        }.onFailure {
+            Timber.e(it)
+        }
+    }
 
     companion object {
         private const val ERROR_MESSAGE_REPEATED_TITLE = 0

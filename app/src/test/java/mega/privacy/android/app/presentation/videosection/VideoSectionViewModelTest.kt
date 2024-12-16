@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.AnalyticsTestExtension
 import mega.privacy.android.app.TimberJUnit5Extension
@@ -46,6 +47,7 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -76,6 +78,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import java.util.concurrent.TimeUnit
@@ -129,6 +132,7 @@ class VideoSectionViewModelTest {
         }.thenReturn(flowOf(false))
     }
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val removeFavouritesUseCase = mock<RemoveFavouritesUseCase>()
 
     private val expectedId = NodeId(1)
     private val expectedVideo = mock<VideoUIEntity> {
@@ -206,6 +210,7 @@ class VideoSectionViewModelTest {
             clearRecentlyWatchedVideosUseCase = clearRecentlyWatchedVideosUseCase,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            removeFavouritesUseCase = removeFavouritesUseCase,
         )
     }
 
@@ -229,7 +234,8 @@ class VideoSectionViewModelTest {
             getNodeContentUriUseCase,
             monitorVideoRecentlyWatchedUseCase,
             clearRecentlyWatchedVideosUseCase,
-            removeRecentlyWatchedItemUseCase
+            removeRecentlyWatchedItemUseCase,
+            removeFavouritesUseCase
         )
     }
 
@@ -1842,6 +1848,27 @@ class VideoSectionViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that the RemoveFavouritesUseCase is invoked as expected`() = runTest {
+        val testSelectedHandle = 1L
+        val testVideos = listOf(
+            mock<VideoUIEntity> {
+                on { elementID }.thenReturn(testSelectedHandle)
+            }
+        )
+
+        val testFavouritesPlaylist = mock<VideoPlaylistUIEntity> {
+            on { isSystemVideoPlayer }.thenReturn(true)
+            on { videos }.thenReturn(testVideos)
+        }
+        initUnderTest()
+        underTest.updateCurrentVideoPlaylist(testFavouritesPlaylist)
+        underTest.onVideoItemOfPlaylistLongClicked(testVideos[0], 0)
+        underTest.removeFavourites()
+        advanceUntilIdle()
+        verify(removeFavouritesUseCase).invoke(testVideos.map { NodeId(it.elementID ?: 0) })
+    }
 
     companion object {
         @JvmField

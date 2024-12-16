@@ -190,7 +190,7 @@ internal fun VideoSectionNavHost(
                 },
                 enableFavouritesPlaylistMenu = enableFavouritesPlaylistMenu,
                 onRemoveFavouriteOptionClicked = {
-                    // Will implement in the ticket - CC-8498
+                    viewModel.removeFavourites()
                     viewModel.clearAllSelectedVideosOfPlaylist()
                 }
             )
