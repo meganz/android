@@ -7,7 +7,6 @@ import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.settings.twofactorauthentication.TwoFactorAuthenticationUseCases
 import mega.privacy.android.domain.usecase.EnableMultiFactorAuth
 import mega.privacy.android.domain.usecase.GetMultiFactorAuthCode
-import mega.privacy.android.domain.usecase.IsMasterKeyExported
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -16,16 +15,8 @@ import org.mockito.kotlin.mock
 )
 @Module
 object TestTwoFactorAuthenticationUseCases {
-
-    val isMasterKeyExported = mock<IsMasterKeyExported>()
     val enableMultiFactorAuth = mock<EnableMultiFactorAuth>()
     val getMultiFactorAuthCode = mock<GetMultiFactorAuthCode>()
-
-    /**
-     * Provides IsMasterKeyExported Use Case
-     */
-    @Provides
-    fun providesIsMasterKeyExported(): IsMasterKeyExported = isMasterKeyExported
 
     /**
      * Provides EnableMultiFactorAuth Use Case
@@ -40,6 +31,4 @@ object TestTwoFactorAuthenticationUseCases {
     @Provides
     fun providesGetMultiFactorAuthCode(): GetMultiFactorAuthCode =
         getMultiFactorAuthCode
-
-
 }

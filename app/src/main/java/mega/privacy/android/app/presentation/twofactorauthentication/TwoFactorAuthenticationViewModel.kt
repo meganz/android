@@ -19,7 +19,7 @@ import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.usecase.EnableMultiFactorAuth
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
 import mega.privacy.android.domain.usecase.GetMultiFactorAuthCode
-import mega.privacy.android.domain.usecase.IsMasterKeyExported
+import mega.privacy.android.domain.usecase.auth.IsMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import javax.inject.Inject
@@ -30,7 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TwoFactorAuthenticationViewModel @Inject constructor(
     private val enableMultiFactorAuth: EnableMultiFactorAuth,
-    private val isMasterKeyExported: IsMasterKeyExported,
+    private val isMasterKeyExportedUseCase: IsMasterKeyExportedUseCase,
     private val getMultiFactorAuthCode: GetMultiFactorAuthCode,
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val qrCodeMapper: QRCodeMapper,
@@ -211,7 +211,7 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
      */
     fun getMasterKeyStatus() {
         viewModelScope.launch {
-            runCatching { isMasterKeyExported() }.let { result ->
+            runCatching { isMasterKeyExportedUseCase() }.let { result ->
                 _uiState.update {
                     it.copy(isMasterKeyExported = result.getOrElse { false })
                 }
