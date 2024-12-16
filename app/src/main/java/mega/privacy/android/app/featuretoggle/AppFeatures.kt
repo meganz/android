@@ -85,7 +85,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     DocumentScanner(
         "Enable new document scanner implementation",
-        false
+        true,
     ),
 
     /**
