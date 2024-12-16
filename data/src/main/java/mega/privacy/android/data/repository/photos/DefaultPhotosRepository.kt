@@ -213,13 +213,14 @@ internal class DefaultPhotosRepository @Inject constructor(
         node: MegaNode,
         filterSvg: Boolean = true,
         includeRubbishBin: Boolean = false,
+        includeThumbnail: Boolean = true,
     ): Boolean {
         val fileType = fileTypeInfoMapper(node.name, node.duration)
         return node.isFile
                 && fileType is ImageFileTypeInfo
                 && (fileType !is SvgFileTypeInfo || !filterSvg)
                 && (!nodeRepository.isNodeInRubbishBin(NodeId(node.handle)) || includeRubbishBin)
-                && node.hasThumbnail()
+                && (node.hasThumbnail() || !includeThumbnail)
     }
 
     private suspend fun isVideoNodeValid(
@@ -779,9 +780,10 @@ internal class DefaultPhotosRepository @Inject constructor(
         nodeId: NodeId,
         filterSvg: Boolean,
         includeRubbishBin: Boolean,
+        includeThumbnail: Boolean,
     ): ImageNode? = withContext(ioDispatcher) {
         getMegaNode(nodeId)?.let { megaNode ->
-            if (isImageNodeValid(megaNode, filterSvg, includeRubbishBin) ||
+            if (isImageNodeValid(megaNode, filterSvg, includeRubbishBin, includeThumbnail) ||
                 isVideoNodeValid(megaNode, includeRubbishBin)
             ) {
                 imageNodeMapper(
@@ -893,6 +895,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                 node = it,
                 filterSvg = false,
                 includeRubbishBin = includeRubbishBin,
+                includeThumbnail = false,
             ) || isVideoNodeValid(
                 node = it,
                 includeRubbishBin = includeRubbishBin,
@@ -919,7 +922,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     override suspend fun getImageNodeFromChatMessage(chatId: Long, messageId: Long): ImageNode? =
         withContext(ioDispatcher) {
             getChatNode(chatId, messageId)?.let { megaNode ->
-                if (isImageNodeValid(megaNode) ||
+                if (isImageNodeValid(megaNode, includeThumbnail = false) ||
                     isVideoNodeValid(megaNode)
                 ) {
                     imageNodeMapper(

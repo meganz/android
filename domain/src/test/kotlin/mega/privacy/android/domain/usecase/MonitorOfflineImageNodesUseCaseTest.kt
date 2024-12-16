@@ -64,7 +64,7 @@ class MonitorOfflineImageNodesUseCaseTest {
         )
         val imageNode = mock<ImageNode>()
         whenever(nodeRepository.monitorOfflineNodeUpdates()).thenReturn(flowOf(listOf(offlineNode)))
-        whenever(photosRepository.fetchImageNode(NodeId(123L), false)).thenReturn(imageNode)
+        whenever(photosRepository.fetchImageNode(NodeId(123L), false, includeThumbnail = false)).thenReturn(imageNode)
 
         val result = underTest("testPath").first()
         assertThat(result).containsExactly(imageNode)

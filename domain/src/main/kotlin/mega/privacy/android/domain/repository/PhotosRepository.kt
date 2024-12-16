@@ -124,6 +124,7 @@ interface PhotosRepository {
         nodeId: NodeId,
         filterSvg: Boolean = true,
         includeRubbishBin: Boolean = false,
+        includeThumbnail: Boolean = true,
     ): ImageNode?
 
     /**

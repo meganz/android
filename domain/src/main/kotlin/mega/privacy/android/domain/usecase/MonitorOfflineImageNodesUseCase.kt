@@ -43,6 +43,7 @@ class MonitorOfflineImageNodesUseCase @Inject constructor(
             photosRepository.fetchImageNode(
                 nodeId = NodeId(handle),
                 filterSvg = filterSvg,
+                includeThumbnail = false,
             ) ?: getOfflineFileInformationByIdUseCase(
                 nodeId = NodeId(handle),
                 useOriginalImageAsThumbnail = true

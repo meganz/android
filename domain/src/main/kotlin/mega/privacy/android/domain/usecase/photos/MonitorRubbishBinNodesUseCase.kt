@@ -72,6 +72,7 @@ class MonitorRubbishBinNodesUseCase @Inject constructor(
                 nodeId = node.id,
                 filterSvg = false,
                 includeRubbishBin = true,
+                includeThumbnail = false,
             )
             if (newNode == null) {
                 nodesCache.remove(node.id)

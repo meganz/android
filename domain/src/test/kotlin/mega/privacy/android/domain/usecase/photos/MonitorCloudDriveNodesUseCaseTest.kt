@@ -104,13 +104,15 @@ class MonitorCloudDriveNodesUseCaseTest {
         whenever(
             photosRepository.fetchImageNode(
                 nodeId = NodeId(2L),
-                filterSvg = false
+                filterSvg = false,
+                includeThumbnail = false,
             )
         ).thenReturn(imageNode1)
         whenever(
             photosRepository.fetchImageNode(
                 nodeId = NodeId(3L),
-                filterSvg = false
+                filterSvg = false,
+                includeThumbnail = false
             )
         ).thenReturn(imageNode2)
         val nodeUpdate = NodeUpdate(update)
