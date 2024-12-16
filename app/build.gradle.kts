@@ -33,6 +33,7 @@ plugins {
     alias(convention.plugins.mega.lint)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.de.mannodermaus.android.junit5)
+    alias(plugin.plugins.kotlin.serialisation)
     id("kotlin-parcelize")
     id("kotlin-kapt")
     id("androidx.navigation.safeargs.kotlin")
@@ -242,6 +243,8 @@ dependencies {
     implementation(lib.coil.compose)
     implementation(androidx.paging.compose)
     implementation(lib.kotlinx.collections.immutable)
+    implementation(lib.mega.core.ui)
+    implementation(androidx.material3)
 
     // Google
     implementation(google.gson)
