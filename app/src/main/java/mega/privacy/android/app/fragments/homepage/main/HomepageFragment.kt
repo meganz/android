@@ -715,7 +715,7 @@ class HomepageFragment : Fragment() {
      * @param operation the operation to be executed if online
      */
     private fun doIfOnline(showSnackBar: Boolean, operation: () -> Unit) {
-        if (viewModel.isConnected && !viewModel.isRootNodeNull()) {
+        if (viewModel.isConnected.value && !viewModel.isRootNodeNull()) {
             operation()
         } else if (showSnackBar) {
             (activity as ManagerActivity).showSnackbar(

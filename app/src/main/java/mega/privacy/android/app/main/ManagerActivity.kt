@@ -3293,6 +3293,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             resetNavigationViewMenu(bottomNavigationView.menu)
             supportInvalidateOptionsMenu()
             checkForInAppAdvertisement()
+            userInfoViewModel.getUserInfo()
         } catch (e: Exception) {
             Timber.w(e)
         }
