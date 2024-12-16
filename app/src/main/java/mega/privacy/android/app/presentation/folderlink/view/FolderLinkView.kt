@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.folderlink.view
 import mega.privacy.android.icon.pack.R as iconPackR
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -49,12 +48,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.main.ads.AdsContainer
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
-import mega.privacy.android.app.presentation.advertisements.model.AdsUIState
-import mega.privacy.android.app.presentation.advertisements.view.AdsBannerView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
@@ -139,11 +138,9 @@ internal fun FolderLinkView(
     onLinkClicked: (String) -> Unit,
     onDisputeTakeDownClicked: (String) -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
-    adsUiState: AdsUIState,
-    onAdClicked: (uri: Uri?) -> Unit,
-    onAdDismissed: () -> Unit,
     onTransferWidgetClick: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
+    request: AdManagerAdRequest?,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -243,12 +240,11 @@ internal fun FolderLinkView(
                         onImportClicked = onImportClicked,
                         onSaveToDeviceClicked = { onSaveToDeviceClicked(null) }
                     )
-                    if (adsUiState.showAdsView) {
-                        AdsBannerView(
-                            uiState = adsUiState,
-                            onAdClicked = onAdClicked,
-                            onAdsWebpageLoaded = {},
-                            onAdDismissed = onAdDismissed
+                    request?.let {
+                        AdsContainer(
+                            request = request,
+                            modifier = Modifier.fillMaxWidth(),
+                            isLoggedInUser = state.hasDbCredentials,
                         )
                     }
                 }

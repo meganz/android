@@ -199,7 +199,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     lateinit var pauseTransfersQueueUseCase: PauseTransfersQueueUseCase
 
     protected val billingViewModel by viewModels<BillingViewModel>()
-    protected val adsViewModel: AdsViewModel by viewModels()
     private val viewModel by viewModels<BaseViewModel>()
 
     @JvmField
@@ -338,7 +337,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             if (it is BillingEvent.OnPurchaseUpdate) {
                 onPurchasesUpdated(it.purchases, it.activeSubscription)
                 billingViewModel.markHandleBillingEvent()
-                adsViewModel.disableAdsFeature()
             }
         }
 

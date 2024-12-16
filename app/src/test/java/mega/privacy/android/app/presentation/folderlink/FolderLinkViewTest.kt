@@ -12,8 +12,8 @@ import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.palm.composestateevents.triggered
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.advertisements.model.AdsUIState
-import mega.privacy.android.app.presentation.advertisements.view.WEB_VIEW_TEST_TAG
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
@@ -31,8 +31,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class FolderLinkViewTest {
@@ -40,7 +38,6 @@ class FolderLinkViewTest {
     val composeTestRule = createComposeRule()
 
     private fun setComposeContent(
-        adsUiState: AdsUIState = AdsUIState(),
         uiState: FolderLinkState = FolderLinkState(),
     ) {
         composeTestRule.setContent {
@@ -72,12 +69,10 @@ class FolderLinkViewTest {
                 onLinkClicked = { },
                 onDisputeTakeDownClicked = { },
                 onEnterMediaDiscoveryClick = { },
-                adsUiState = adsUiState,
-                onAdClicked = { },
-                onAdDismissed = { },
                 fileTypeIconMapper = FileTypeIconMapper(),
                 onTransferWidgetClick = { },
                 transferState = TransferManagementUiState(),
+                request = null
             )
         }
     }
@@ -152,50 +147,6 @@ class FolderLinkViewTest {
             )
         )
         composeTestRule.onNodeWithText(nodeName).assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that AdsBannerView does not exist when showAdsView is false`() {
-        val nodeName = "Folder1"
-        val node = mock<TypedFolderNode>()
-        whenever(node.name).thenReturn(nodeName)
-        setComposeContent(
-            uiState = FolderLinkState(
-                isNodesFetched = true,
-                nodesList = listOf(
-                    NodeUIItem(
-                        node,
-                        isSelected = false,
-                        isInvisible = false
-                    )
-                ),
-                hasDbCredentials = true
-            ),
-            adsUiState = AdsUIState(showAdsView = false)
-        )
-        composeTestRule.onNodeWithTag(WEB_VIEW_TEST_TAG).assertDoesNotExist()
-    }
-
-    @Test
-    fun `test that AdsBannerView is shown when showAdsView is true`() {
-        val nodeName = "Folder1"
-        val node = mock<TypedFolderNode>()
-        whenever(node.name).thenReturn(nodeName)
-        setComposeContent(
-            uiState = FolderLinkState(
-                isNodesFetched = true,
-                nodesList = listOf(
-                    NodeUIItem(
-                        node,
-                        isSelected = false,
-                        isInvisible = false
-                    )
-                ),
-                hasDbCredentials = true
-            ),
-            adsUiState = AdsUIState(showAdsView = true)
-        )
-        composeTestRule.onNodeWithTag(WEB_VIEW_TEST_TAG).assertIsDisplayed()
     }
 
     @Test

@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.folderlink
 import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
@@ -34,8 +33,6 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityFolderLinkComposeBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
-import mega.privacy.android.app.extensions.isPortrait
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -43,7 +40,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
+import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
@@ -114,6 +111,12 @@ class FolderLinkComposeActivity : PasscodeActivity(),
      */
     @Inject
     lateinit var megaNavigator: MegaNavigator
+
+    /**
+     * [GoogleAdsManager]
+     */
+    @Inject
+    lateinit var googleAdsManager: GoogleAdsManager
 
     private lateinit var binding: ActivityFolderLinkComposeBinding
 
@@ -207,31 +210,24 @@ class FolderLinkComposeActivity : PasscodeActivity(),
     private fun checkForInAppAdvertisement() {
         lifecycleScope.launch {
             runCatching {
-                val isInAppAdvertisementEnabled = true
-                val isAdsEnabled = getFeatureFlagValueUseCase(ABTestFeatures.ads)
-
-                if (isInAppAdvertisementEnabled && isAdsEnabled) {
-                    if (this@FolderLinkComposeActivity.isPortrait()) {
-                        adsViewModel.enableAdsFeature()
-                        adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
-                    }
+                googleAdsManager.checkForAdsAvailability()
+                if (googleAdsManager.isAdsEnabled()) {
+                    googleAdsManager.checkLatestConsentInformation(
+                        activity = this@FolderLinkComposeActivity,
+                        onConsentInformationUpdated = { googleAdsManager.fetchAdRequest() }
+                    )
                 }
             }.onFailure {
-                Timber.e("Failed to fetch feature flags or ab_ads test flag with error: ${it.message}")
+                Timber.e("Failed to fetch latest consent information : ${it.message}")
             }
         }
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        adsViewModel.onScreenOrientationChanged(isPortrait())
     }
 
     @Composable
     private fun StartFolderLinkView() {
         val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.state.collectAsStateWithLifecycle()
-        val adsUiState by adsViewModel.uiState.collectAsStateWithLifecycle()
+        val request by googleAdsManager.request.collectAsStateWithLifecycle()
         val transferState by transfersManagementViewModel.state.collectAsStateWithLifecycle()
 
         val scaffoldState = rememberScaffoldState()
@@ -265,23 +261,9 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                 onDisputeTakeDownClicked = ::navigateToLink,
                 onLinkClicked = ::navigateToLink,
                 onEnterMediaDiscoveryClick = ::onEnterMediaDiscoveryClick,
-                adsUiState = adsUiState,
-                onAdClicked = { uri ->
-                    uri?.let {
-                        val intent = Intent(Intent.ACTION_VIEW, it)
-                        if (intent.resolveActivity(packageManager) != null) {
-                            startActivity(intent)
-                            adsViewModel.onAdConsumed()
-                        } else {
-                            Timber.d("No Application found to can handle Ads intent")
-                            adsViewModel.fetchNewAd()
-                        }
-                    }
-                    adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
-                },
-                onAdDismissed = adsViewModel::onAdConsumed,
                 onTransferWidgetClick = ::onTransfersWidgetClick,
-                fileTypeIconMapper = fileTypeIconMapper
+                fileTypeIconMapper = fileTypeIconMapper,
+                request = request
             )
             StartTransferComponent(
                 event = uiState.downloadEvent,
@@ -511,7 +493,8 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         val builder = DecryptAlertDialog.Builder()
         val decryptAlertDialog = builder
             .setTitle(getString(R.string.alert_decryption_key))
-            .setPosText(R.string.general_decryp).setNegText(sharedR.string.general_dialog_cancel_button)
+            .setPosText(R.string.general_decryp)
+            .setNegText(sharedR.string.general_dialog_cancel_button)
             .setMessage(getString(R.string.message_decryption_key))
             .setErrorMessage(R.string.invalid_decryption_key)
             .setKey(mKey)

@@ -5,12 +5,10 @@ import com.google.android.ump.ConsentInformation
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.domain.usecase.advertisements.SetAdsClosingTimestampUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.ShouldShowGenericCookieDialogUseCase
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -29,7 +27,6 @@ class GoogleAdsManagerTest {
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
     private val shouldShowGenericCookieDialogUseCase = mock<ShouldShowGenericCookieDialogUseCase>()
-    private val setAdsClosingTimestampUseCase = mock<SetAdsClosingTimestampUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -38,7 +35,6 @@ class GoogleAdsManagerTest {
             consentInformation,
             getCookieSettingsUseCase,
             shouldShowGenericCookieDialogUseCase,
-            setAdsClosingTimestampUseCase
         )
     }
 
@@ -48,7 +44,6 @@ class GoogleAdsManagerTest {
             getFeatureFlagValueUseCase,
             getCookieSettingsUseCase,
             shouldShowGenericCookieDialogUseCase,
-            setAdsClosingTimestampUseCase
         )
     }
 
@@ -75,12 +70,5 @@ class GoogleAdsManagerTest {
         underTest.request.test {
             assertThat(awaitItem() != null).isEqualTo(expectedResult)
         }
-    }
-
-    @Test
-    fun `test that on ads closed invoke correct use case`() = runTest {
-        init()
-        underTest.onAdsClosed()
-        assertThat(underTest.isAdRequestAvailable()).isFalse()
     }
 }

@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.filelink
 
 import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
@@ -26,14 +25,12 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.extensions.isPortrait
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
-import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
+import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.filelink.view.FileLinkView
@@ -95,6 +92,12 @@ class FileLinkComposeActivity : PasscodeActivity(),
     @Inject
     lateinit var navigator: MegaNavigator
 
+    /**
+     * [GoogleAdsManager]
+     */
+    @Inject
+    lateinit var googleAdsManager: GoogleAdsManager
+
     private val viewModel: FileLinkViewModel by viewModels()
     private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
 
@@ -131,7 +134,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.state.collectAsStateWithLifecycle()
             val transferState by transfersManagementViewModel.state.collectAsStateWithLifecycle()
-            val adsUiState by adsViewModel.uiState.collectAsStateWithLifecycle()
+            val request by googleAdsManager.request.collectAsStateWithLifecycle()
 
             EventEffect(
                 event = uiState.openFile,
@@ -161,21 +164,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
                     onErrorMessageConsumed = viewModel::resetErrorMessage,
                     onOverQuotaErrorConsumed = viewModel::resetOverQuotaError,
                     onForeignNodeErrorConsumed = viewModel::resetForeignNodeError,
-                    adsUiState = adsUiState,
-                    onAdClicked = { uri ->
-                        uri?.let {
-                            val intent = Intent(Intent.ACTION_VIEW, it)
-                            if (intent.resolveActivity(packageManager) != null) {
-                                startActivity(intent)
-                                adsViewModel.onAdConsumed()
-                            } else {
-                                Timber.d("No Application found to can handle Ads intent")
-                                adsViewModel.fetchNewAd()
-                            }
-                        }
-                        adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
-                    },
-                    onAdDismissed = adsViewModel::onAdConsumed
+                    request = request,
                 )
                 StartTransferComponent(
                     event = uiState.downloadEvent,
@@ -197,24 +186,17 @@ class FileLinkComposeActivity : PasscodeActivity(),
     private fun checkForInAppAdvertisement() {
         lifecycleScope.launch {
             runCatching {
-                val isInAppAdvertisementEnabled = true
-                val isAdsEnabled = getFeatureFlagValueUseCase(ABTestFeatures.ads)
-
-                if (isInAppAdvertisementEnabled && isAdsEnabled) {
-                    if (this@FileLinkComposeActivity.isPortrait()) {
-                        adsViewModel.enableAdsFeature()
-                        adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
-                    }
+                googleAdsManager.checkForAdsAvailability()
+                if (googleAdsManager.isAdsEnabled()) {
+                    googleAdsManager.checkLatestConsentInformation(
+                        activity = this@FileLinkComposeActivity,
+                        onConsentInformationUpdated = { googleAdsManager.fetchAdRequest() }
+                    )
                 }
             }.onFailure {
-                Timber.e("Failed to fetch feature flags or ab_ads test flag with error: ${it.message}")
+                Timber.e("Failed to fetch latest consent information : ${it.message}")
             }
         }
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        adsViewModel.onScreenOrientationChanged(isPortrait())
     }
 
     private fun setupObserver() {

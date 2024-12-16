@@ -2334,21 +2334,19 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         adsContainerView.setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val request by googleAdsManager.request.collectAsStateWithLifecycle()
-            AdsContainer(
-                modifier = Modifier.fillMaxSize(),
-                request = request,
-                isDark = themeMode.isDarkMode(),
-                onAdLoaded = {
-                    handleShowingAds("")
-                },
-                onAdFailedToLoad = {
-                    hideAdsView()
-                    fetchNewAd()
-                },
-                onAdsClose = {
-                    lifecycleScope.launch { googleAdsManager.onAdsClosed() }
-                }
-            )
+            OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                AdsContainer(
+                    modifier = Modifier.fillMaxSize(),
+                    request = request,
+                    onAdLoaded = {
+                        handleShowingAds("")
+                    },
+                    onAdFailedToLoad = {
+                        hideAdsView()
+                        fetchNewAd()
+                    },
+                )
+            }
         }
         fetchNewAd()
     }
