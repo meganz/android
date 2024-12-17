@@ -17,7 +17,6 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
-import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
@@ -43,7 +42,6 @@ import java.util.stream.Stream
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class SyncNewFolderViewModelTest {
 
-    private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase = mock()
     private val monitorSelectedMegaFolderUseCase: MonitorSelectedMegaFolderUseCase = mock()
     private val syncFolderPairUseCase: SyncFolderPairUseCase = mock()
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase = mock()
@@ -56,7 +54,6 @@ internal class SyncNewFolderViewModelTest {
     @AfterEach
     fun resetAndTearDown() {
         reset(
-            getExternalPathByContentUriUseCase,
             monitorSelectedMegaFolderUseCase,
             syncFolderPairUseCase,
             isStorageOverQuotaUseCase,
@@ -73,8 +70,6 @@ internal class SyncNewFolderViewModelTest {
         runTest {
             whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
             initViewModel(syncType = syncType)
-            val localFolderContentUri =
-                "content://com.android.externalstorage.documents/tree/primary%3ASync%2FsomeFolder"
             val localFolderUri: Uri = mock()
             val localFolderFolderStoragePath = "/storage/emulated/0/Sync/someFolder"
             val localDCIMFolderPath = "/storage/emulated/0/DCIM"
@@ -83,13 +78,11 @@ internal class SyncNewFolderViewModelTest {
                 deviceName = "Device Name",
                 selectedLocalFolder = localFolderFolderStoragePath
             )
-            whenever(getExternalPathByContentUriUseCase.invoke(localFolderContentUri)).thenReturn(
-                localFolderFolderStoragePath
-            )
-            whenever(localFolderUri.toString()).thenReturn(localFolderContentUri)
             whenever(getLocalDCIMFolderPathUseCase.invoke()).thenReturn(
                 localDCIMFolderPath
             )
+            whenever(localFolderUri.path).thenReturn(localFolderFolderStoragePath)
+            whenever(localFolderUri.scheme).thenReturn("file")
 
             underTest.handleAction(SyncNewFolderAction.LocalFolderSelected(localFolderUri))
 
@@ -103,18 +96,14 @@ internal class SyncNewFolderViewModelTest {
     ) = runTest {
         whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
         initViewModel(syncType = syncType)
-        val localFolderContentUri =
-            "content://com.android.externalstorage.documents/tree/primary%3ADCIM"
+        val localFolderContentUri = "file:///storage/emulated/0/DCIM"
         val localFolderUri: Uri = mock()
-        val localFolderFolderStoragePath = "/storage/emulated/0/DCIM"
         val localDCIMFolderPath = "/storage/emulated/0/DCIM"
-        whenever(getExternalPathByContentUriUseCase.invoke(localFolderContentUri)).thenReturn(
-            localFolderFolderStoragePath
-        )
-        whenever(localFolderUri.toString()).thenReturn(localFolderContentUri)
         whenever(getLocalDCIMFolderPathUseCase.invoke()).thenReturn(
             localDCIMFolderPath
         )
+        whenever(localFolderUri.path).thenReturn(localDCIMFolderPath)
+        whenever(localFolderUri.scheme).thenReturn("file")
 
         underTest.handleAction(SyncNewFolderAction.LocalFolderSelected(localFolderUri))
 
@@ -246,7 +235,6 @@ internal class SyncNewFolderViewModelTest {
     private fun initViewModel(syncType: SyncType) {
         underTest = SyncNewFolderViewModel(
             syncType = syncType,
-            getExternalPathByContentUriUseCase = getExternalPathByContentUriUseCase,
             monitorSelectedMegaFolderUseCase = monitorSelectedMegaFolderUseCase,
             syncFolderPairUseCase = syncFolderPairUseCase,
             isStorageOverQuotaUseCase = isStorageOverQuotaUseCase,

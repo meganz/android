@@ -5,7 +5,7 @@ import android.net.Uri
 internal sealed interface SyncNewFolderAction {
 
     /**
-     * @param path - selected local folder path
+     * @param path - file uri of the selected folder
      */
     data class LocalFolderSelected(val path: Uri) : SyncNewFolderAction
 

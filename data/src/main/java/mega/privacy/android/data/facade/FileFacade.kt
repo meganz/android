@@ -557,7 +557,11 @@ internal class FileFacade @Inject constructor(
     override suspend fun getFilesInDocumentFolder(folder: UriPath): DocumentFolder {
         val uri = Uri.parse(folder.value)
         val semaphore = Semaphore(10)
-        val document = DocumentFile.fromTreeUri(context, uri) ?: throw FileNotFoundException()
+        val document = if (isFileUri(folder.value)) {
+            DocumentFile.fromFile(Uri.parse(folder.value).toFile())
+        } else {
+            DocumentFile.fromTreeUri(context, uri)
+        } ?: throw FileNotFoundException()
         val files = document.listFiles()
         val folders = files.filter { it.isDirectory }
         val countMap = coroutineScope {
@@ -602,8 +606,12 @@ internal class FileFacade @Inject constructor(
         // using stack to avoid recursive call and optimize memory usage
         val stack = Stack<DocumentFile>()
         val uri = Uri.parse(folder.value)
-        val document = DocumentFile.fromTreeUri(context, uri) ?: throw FileNotFoundException()
-        stack.addAll(document.listFiles().toList())
+        val document = if (isFileUri(folder.value)) {
+            DocumentFile.fromFile(Uri.parse(folder.value).toFile())
+        } else {
+            DocumentFile.fromTreeUri(context, uri)
+        } ?: throw FileNotFoundException()
+        stack.addAll(document.listFiles())
         val result = mutableListOf<DocumentEntity>()
         while (stack.isNotEmpty() && coroutineContext.isActive) {
             val file = stack.pop()

@@ -2,7 +2,6 @@ package mega.privacy.android.feature.sync.ui.newfolderpair
 
 import mega.privacy.android.shared.resources.R as sharedResR
 import android.Manifest
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -57,7 +56,6 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
-import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
@@ -69,7 +67,7 @@ import mega.privacy.mobile.analytics.event.AndroidSyncSelectDeviceFolderButtonPr
 internal fun SyncNewFolderScreen(
     selectedLocalFolder: String,
     selectedMegaFolder: RemoteFolder?,
-    localFolderSelected: (Uri) -> Unit,
+    onSelectFolder: () -> Unit,
     selectMegaFolderClicked: () -> Unit,
     syncClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
@@ -85,7 +83,7 @@ internal fun SyncNewFolderScreen(
         state = state,
         selectedLocalFolder = selectedLocalFolder,
         selectedMegaFolder = selectedMegaFolder,
-        localFolderSelected = localFolderSelected,
+        onSelectFolder = onSelectFolder,
         selectMegaFolderClicked = selectMegaFolderClicked,
         syncClicked = syncClicked,
         syncPermissionsManager = syncPermissionsManager,
@@ -102,7 +100,7 @@ private fun SyncNewFolderScreenScaffold(
     state: SyncNewFolderState,
     selectedLocalFolder: String,
     selectedMegaFolder: RemoteFolder?,
-    localFolderSelected: (Uri) -> Unit,
+    onSelectFolder: () -> Unit,
     selectMegaFolderClicked: () -> Unit,
     syncClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
@@ -138,7 +136,7 @@ private fun SyncNewFolderScreenScaffold(
                 SyncNewFolderScreenContent(
                     syncType = syncType,
                     deviceName = state.deviceName,
-                    localFolderSelected = localFolderSelected,
+                    onSelectFolder = onSelectFolder,
                     selectMegaFolderClicked = selectMegaFolderClicked,
                     selectedLocalFolder = selectedLocalFolder,
                     selectedMegaFolder = selectedMegaFolder,
@@ -170,7 +168,7 @@ private fun SyncNewFolderScreenScaffold(
 private fun SyncNewFolderScreenContent(
     syncType: SyncType,
     deviceName: String,
-    localFolderSelected: (Uri) -> Unit,
+    onSelectFolder: () -> Unit,
     selectMegaFolderClicked: () -> Unit,
     selectedLocalFolder: String,
     selectedMegaFolder: RemoteFolder?,
@@ -194,17 +192,12 @@ private fun SyncNewFolderScreenContent(
     Column(
         modifier.verticalScroll(scrollState)
     ) {
-        val folderPicker = launchFolderPicker(
-            Uri.parse(ROOT_FOLDER_URI_STRING)
-        ) {
-            localFolderSelected(it)
-        }
         val launcher = rememberLauncherForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
             if (isGranted) {
                 runCatching {
-                    folderPicker.launch(null)
+                    onSelectFolder()
                 }.onFailure {
                     coroutineScope.launch {
                         snackBarHostState.showAutoDurationSnackbar(context.getString(sharedResR.string.general_no_picker_warning))
@@ -299,7 +292,7 @@ private fun SyncNewFolderScreenContent(
                 Analytics.tracker.trackEvent(AndroidSyncSelectDeviceFolderButtonPressedEvent)
                 if (syncPermissionsManager.isManageExternalStoragePermissionGranted()) {
                     runCatching {
-                        folderPicker.launch(null)
+                        onSelectFolder()
                     }.onFailure {
                         coroutineScope.launch {
                             snackBarHostState.showAutoDurationSnackbar(context.getString(sharedResR.string.general_no_picker_warning))
@@ -358,8 +351,6 @@ private fun SyncNewFolderScreenContent(
     }
 }
 
-private const val ROOT_FOLDER_URI_STRING =
-    "content://com.android.externalstorage.documents/root/primary"
 internal const val TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR = "sync_new_folder_screen_toolbar_test_tag"
 internal const val TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON =
     "sync_new_folder_screen_sync_button_test_tag"
@@ -377,7 +368,7 @@ private fun SyncNewFolderScreenPreview(
             ),
             selectedLocalFolder = "",
             selectedMegaFolder = null,
-            localFolderSelected = {},
+            onSelectFolder = {},
             selectMegaFolderClicked = {},
             syncClicked = {},
             syncPermissionsManager = SyncPermissionsManager(LocalContext.current),
@@ -401,7 +392,7 @@ private fun SyncNewFolderScreenContentPreview(
             deviceName = "Device Name",
             selectedLocalFolder = "",
             selectedMegaFolder = null,
-            localFolderSelected = {},
+            onSelectFolder = {},
             selectMegaFolderClicked = {},
             syncClicked = {},
             syncPermissionsManager = SyncPermissionsManager(LocalContext.current),

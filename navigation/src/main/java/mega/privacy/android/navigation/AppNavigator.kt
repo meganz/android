@@ -2,6 +2,9 @@ package mega.privacy.android.navigation
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.StringRes
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
@@ -258,5 +261,14 @@ interface AppNavigator {
         searchedItems: List<Long>? = null,
         mediaQueueTitle: String? = null,
         nodeHandles: List<Long>? = null,
+    )
+
+    /**
+     * Open internal folder picker
+     */
+    fun openInternalFolderPicker(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        initialUri: Uri? = null,
     )
 }

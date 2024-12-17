@@ -1,6 +1,11 @@
 package mega.privacy.android.feature.sync.navigation
 
+import android.app.Activity
 import android.content.Intent
+import android.net.Uri
+import android.os.Environment
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
@@ -16,11 +21,13 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.ui.SyncEmptyScreen
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerRoute
+import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.mobile.analytics.event.AddSyncScreenEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
@@ -87,6 +94,7 @@ private const val stopBackupMegaPicker = "$syncRoute/stop-backup-mega-picker"
 
 internal fun NavGraphBuilder.syncNavGraph(
     navController: NavController,
+    megaNavigator: MegaNavigator,
     fileTypeIconMapper: FileTypeIconMapper,
     syncPermissionsManager: SyncPermissionsManager,
     openUpgradeAccountPage: () -> Unit,
@@ -133,16 +141,30 @@ internal fun NavGraphBuilder.syncNavGraph(
                 }
             )
         ) { navBackStackEntry ->
+            val context = LocalContext.current
             val syncType = GsonBuilder().create()
                 .fromJson(navBackStackEntry.arguments?.getString("syncType"), SyncType::class.java)
                 ?: SyncType.TYPE_TWOWAY
             Timber.d("Sync Type = $syncType")
 
-            SyncNewFolderScreenRoute(
+            val viewModel =
                 hiltViewModel<SyncNewFolderViewModel, SyncNewFolderViewModel.SyncNewFolderViewModelFactory> { factory ->
                     factory.create(syncType = syncType)
-                },
-                syncPermissionsManager,
+                }
+
+            val launcher =
+                rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                    if (it.resultCode == Activity.RESULT_OK) {
+                        val uri = it.data?.data
+                        if (uri != null) {
+                            viewModel.handleAction(SyncNewFolderAction.LocalFolderSelected(uri))
+                        }
+                    }
+                }
+
+            SyncNewFolderScreenRoute(
+                viewModel = viewModel,
+                syncPermissionsManager = syncPermissionsManager,
                 openSelectMegaFolderScreen = {
                     navController.navigate(syncMegaPicker)
                 },
@@ -154,6 +176,13 @@ internal fun NavGraphBuilder.syncNavGraph(
                 },
                 onBackClicked = {
                     navFromNewFolderRouteToListRoute()
+                },
+                onSelectFolder = {
+                    megaNavigator.openInternalFolderPicker(
+                        context = context,
+                        launcher,
+                        Uri.fromFile(Environment.getExternalStorageDirectory())
+                    )
                 },
             )
         }

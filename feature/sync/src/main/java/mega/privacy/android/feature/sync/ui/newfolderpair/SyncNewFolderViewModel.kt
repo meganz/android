@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.ui.newfolderpair
 
 import mega.privacy.android.shared.resources.R as sharedR
+import androidx.core.net.toFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
@@ -19,7 +20,6 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
-import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
@@ -30,7 +30,6 @@ import timber.log.Timber
 @HiltViewModel(assistedFactory = SyncNewFolderViewModel.SyncNewFolderViewModelFactory::class)
 internal class SyncNewFolderViewModel @AssistedInject constructor(
     @Assisted val syncType: SyncType,
-    private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase,
     private val monitorSelectedMegaFolderUseCase: MonitorSelectedMegaFolderUseCase,
     private val syncFolderPairUseCase: SyncFolderPairUseCase,
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase,
@@ -78,7 +77,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
         when (action) {
             is SyncNewFolderAction.LocalFolderSelected -> {
                 viewModelScope.launch {
-                    getExternalPathByContentUriUseCase(action.path.toString())?.let { path ->
+                    action.path.toFile().absolutePath.let { path ->
                         val localDCIMFolderPath = getLocalDCIMFolderPathUseCase()
                         if (localDCIMFolderPath.isNotEmpty() && path.contains(localDCIMFolderPath)) {
                             _state.update { state ->

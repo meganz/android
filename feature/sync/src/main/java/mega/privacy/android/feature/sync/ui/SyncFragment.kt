@@ -109,6 +109,7 @@ class SyncFragment : Fragment() {
         ) {
             syncNavGraph(
                 navController = animatedNavController,
+                megaNavigator = megaNavigator,
                 fileTypeIconMapper = fileTypeIconMapper,
                 syncPermissionsManager = syncPermissionsManager,
                 openUpgradeAccountPage = {

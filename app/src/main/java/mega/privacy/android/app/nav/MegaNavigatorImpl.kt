@@ -3,6 +3,8 @@ package mega.privacy.android.app.nav
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.net.toUri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -23,6 +25,8 @@ import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
+import mega.privacy.android.app.uploadFolder.UploadFolderActivity
+import mega.privacy.android.app.uploadFolder.UploadFolderType
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
@@ -435,5 +439,18 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(Intent(Intent.ACTION_VIEW).apply {
             data = "https://mega.nz/${getSyncNewFolderRoute(syncType = syncType)}".toUri()
         })
+    }
+
+    override fun openInternalFolderPicker(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        initialUri: Uri?,
+    ) {
+        launcher.launch(
+            Intent(context, UploadFolderActivity::class.java).apply {
+                data = initialUri
+                putExtra(UploadFolderActivity.UPLOAD_FOLDER_TYPE, UploadFolderType.SINGLE_SELECT)
+            }
+        )
     }
 }
