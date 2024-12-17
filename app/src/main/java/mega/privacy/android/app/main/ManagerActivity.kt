@@ -4232,7 +4232,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 if (drawerItem === DrawerItem.CHAT) {
                     Util.hideKeyboard(this@ManagerActivity, 0)
                 } else if (drawerItem == DrawerItem.HOMEPAGE) {
-                    if (homepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
+                    if (homepageScreen == HomepageScreen.FULLSCREEN_OFFLINE || homepageScreen == HomepageScreen.DOCUMENTS || homepageScreen == HomepageScreen.AUDIO) {
                         Util.hideKeyboard(this@ManagerActivity)
                     }
                 } else {
