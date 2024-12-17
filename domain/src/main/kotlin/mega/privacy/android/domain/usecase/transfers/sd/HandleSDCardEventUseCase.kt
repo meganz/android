@@ -4,12 +4,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.transfer.DestinationUriAndSubFolders
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.transfer.getSDCardDownloadAppData
 import mega.privacy.android.domain.entity.transfer.getSDCardFinalTransferUri
 import mega.privacy.android.domain.entity.transfer.isSDCardDownload
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.TransferRepository
 import java.io.File
 import javax.inject.Inject
 
@@ -24,6 +28,7 @@ class HandleSDCardEventUseCase @Inject constructor(
     private val deleteSdTransferByTagUseCase: DeleteSdTransferByTagUseCase,
     private val moveFileToSdCardUseCase: MoveFileToSdCardUseCase,
     private val fileSystemRepository: FileSystemRepository,
+    private val transferRepository: TransferRepository,
     @ApplicationScope private val scope: CoroutineScope,
 ) {
     /**
@@ -51,6 +56,7 @@ class HandleSDCardEventUseCase @Inject constructor(
                         transfer.appData
                     )
                 )
+                updateActiveTransfer(transfer)
             }
 
             is TransferEvent.TransferFinishEvent -> {
@@ -72,7 +78,23 @@ class HandleSDCardEventUseCase @Inject constructor(
                 }
             }
 
-            else -> {} //nothing here
+            else -> {
+                updateActiveTransfer(transfer)
+            }
+        }
+    }
+
+    private suspend fun updateActiveTransfer(transfer: Transfer) {
+        if (transfer.getSDCardDownloadAppData()?.parentPath.isNullOrEmpty()) {
+            transfer.appData.map { data ->
+                if (data is TransferAppData.SdCardDownload && data.parentPath.isNullOrEmpty()) {
+                    data.copy(parentPath = transfer.parentPath)
+                } else {
+                    data
+                }
+            }.let { updatedAppData ->
+                transferRepository.insertOrUpdateActiveTransfer(transfer.copy(appData = updatedAppData))
+            }
         }
     }
 }

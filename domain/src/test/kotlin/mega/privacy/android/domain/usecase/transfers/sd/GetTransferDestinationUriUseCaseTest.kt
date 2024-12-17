@@ -61,7 +61,12 @@ class GetTransferDestinationUriUseCaseTest {
         val transfer = mock<Transfer> {
             on { it.transferType } doReturn TransferType.DOWNLOAD
             on { it.isRootTransfer } doReturn true
-            on { it.appData } doReturn listOf(TransferAppData.SdCardDownload("path", expected))
+            on { it.appData } doReturn listOf(
+                TransferAppData.SdCardDownload(
+                    targetPathForSDK = "path",
+                    finalTargetUri = expected
+                )
+            )
         }
 
         val actual = underTest(transfer)
@@ -86,8 +91,8 @@ class GetTransferDestinationUriUseCaseTest {
             val parentTransfer = mock<SdTransfer> {
                 on { it.appData } doReturn listOf(
                     TransferAppData.SdCardDownload(
-                        cachePath,
-                        expected
+                        targetPathForSDK = cachePath,
+                        finalTargetUri = expected
                     )
                 )
             }

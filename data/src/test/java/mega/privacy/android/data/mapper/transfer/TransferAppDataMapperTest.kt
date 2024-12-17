@@ -78,8 +78,8 @@ class TransferAppDataMapperTest {
             val raw =
                 "SD_CARD_DOWNLOAD>/storage/48F8-4FB7/Download mega>content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega"
             val expected = TransferAppData.SdCardDownload(
-                "/storage/48F8-4FB7/Download mega",
-                "content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega"
+                targetPathForSDK = "/storage/48F8-4FB7/Download mega",
+                finalTargetUri = "content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega"
             )
             Truth.assertThat(underTest(raw)).containsExactly(expected)
         }
@@ -138,6 +138,7 @@ class TransferAppDataMapperTest {
         private const val FAKE_ID = 12345L
         private const val FAKE_ID_2 = 23456L
         private const val FAKE_INDEX = 1
+        private const val PARENT_PATH = "parentPath"
         private const val TARGET_PATH = "target"
         private const val TARGET_URI = "targetUri"
         private val wrongParameters = listOf(
@@ -155,11 +156,22 @@ class TransferAppDataMapperTest {
             generateAppDataString(CameraUpload)
                     to listOf(TransferAppData.CameraUpload),
             generateAppDataString(SDCardDownload, TARGET_PATH, TARGET_URI)
-                    to listOf(TransferAppData.SdCardDownload(TARGET_PATH, TARGET_URI)),
+                    to listOf(
+                TransferAppData.SdCardDownload(
+                    targetPathForSDK = TARGET_PATH,
+                    finalTargetUri = TARGET_URI
+                )
+            ),
             generateAppDataString(BackgroundTransfer)
                     to listOf(TransferAppData.BackgroundTransfer),
-            generateAppDataString(SDCardDownload, TARGET_PATH, TARGET_URI)
-                    to listOf(TransferAppData.SdCardDownload(TARGET_PATH, TARGET_URI)),
+            generateAppDataString(SDCardDownload, TARGET_PATH, TARGET_URI, PARENT_PATH)
+                    to listOf(
+                TransferAppData.SdCardDownload(
+                    targetPathForSDK = TARGET_PATH,
+                    finalTargetUri = TARGET_URI,
+                    parentPath = PARENT_PATH
+                )
+            ),
             generateAppDataString(OriginalContentUri, TARGET_URI)
                     to listOf(TransferAppData.OriginalContentUri(TARGET_URI)),
             generateAppDataString(

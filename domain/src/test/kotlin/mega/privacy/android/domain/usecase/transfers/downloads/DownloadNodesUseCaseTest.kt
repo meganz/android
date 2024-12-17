@@ -189,7 +189,12 @@ class DownloadNodesUseCaseTest {
 
     private fun provideAppData() = listOf(
         listOf(TransferAppData.BackgroundTransfer),
-        listOf(TransferAppData.SdCardDownload("targetPathForSDK", "finalTargetUri")),
+        listOf(
+            TransferAppData.SdCardDownload(
+                targetPathForSDK = "targetPathForSDK",
+                finalTargetUri = "finalTargetUri"
+            )
+        ),
         listOf(TransferAppData.CameraUpload),
         listOf(TransferAppData.VoiceClip),
         listOf(TransferAppData.ChatUpload(12345L)),

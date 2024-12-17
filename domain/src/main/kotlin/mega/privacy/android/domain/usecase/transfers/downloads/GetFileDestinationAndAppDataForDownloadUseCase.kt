@@ -37,8 +37,8 @@ class GetFileDestinationAndAppDataForDownloadUseCase @Inject constructor(
                 folderDestination = downloadDestination?.let { UriPath(it) }
                 appData =
                     TransferAppData.SdCardDownload(
-                        downloadDestination ?: "",
-                        uriPathFolderDestination.value
+                        targetPathForSDK = downloadDestination ?: "",
+                        finalTargetUri = uriPathFolderDestination.value
                     )
             }
 
@@ -57,8 +57,8 @@ class GetFileDestinationAndAppDataForDownloadUseCase @Inject constructor(
                 folderDestination = downloadDestination?.let { UriPath(it) }
                 appData =
                     TransferAppData.SdCardDownload(
-                        downloadDestination ?: "",
-                        uriPathFolderDestination.value
+                        targetPathForSDK = downloadDestination ?: "",
+                        finalTargetUri = uriPathFolderDestination.value
                     )
             }
 

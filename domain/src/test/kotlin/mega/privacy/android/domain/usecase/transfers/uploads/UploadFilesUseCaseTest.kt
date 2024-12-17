@@ -227,9 +227,20 @@ class UploadFilesUseCaseTest {
 
     private fun provideAppDataExceptChat() = listOf(
         listOf(TransferAppData.BackgroundTransfer),
-        listOf(TransferAppData.SdCardDownload("targetPathForSDK", "finalTargetUri")),
+        listOf(
+            TransferAppData.SdCardDownload(
+                targetPathForSDK = "targetPathForSDK",
+                finalTargetUri = "finalTargetUri"
+            )
+        ),
         listOf(TransferAppData.CameraUpload),
-        listOf(TransferAppData.CameraUpload, TransferAppData.SdCardDownload("targetPathForSDK", "finalTargetUri")),
+        listOf(
+            TransferAppData.CameraUpload,
+            TransferAppData.SdCardDownload(
+                targetPathForSDK = "targetPathForSDK",
+                finalTargetUri = "finalTargetUri"
+            )
+        ),
         listOf(null),
     )
 
