@@ -425,19 +425,15 @@ internal class MegaNavigatorImpl @Inject constructor(
         )
     }
 
-    override fun openSyncs(context: Context, deviceName: String?) {
+    override fun openSyncs(context: Context) {
         context.startActivity(Intent(Intent.ACTION_VIEW).apply {
-            data = "https://mega.nz/${getSyncListRoute(deviceName = deviceName)}".toUri()
+            data = "https://mega.nz/${getSyncListRoute()}".toUri()
         })
     }
 
-    override fun openNewSync(context: Context, syncType: SyncType, deviceName: String?) {
+    override fun openNewSync(context: Context, syncType: SyncType) {
         context.startActivity(Intent(Intent.ACTION_VIEW).apply {
-            data = "https://mega.nz/${
-                getSyncNewFolderRoute(
-                    syncType = syncType, deviceName = deviceName
-                )
-            }".toUri()
+            data = "https://mega.nz/${getSyncNewFolderRoute(syncType = syncType)}".toUri()
         })
     }
 }

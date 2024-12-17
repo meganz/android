@@ -17,41 +17,59 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
+import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
+import timber.log.Timber
 
 @HiltViewModel(assistedFactory = SyncNewFolderViewModel.SyncNewFolderViewModelFactory::class)
 internal class SyncNewFolderViewModel @AssistedInject constructor(
     @Assisted val syncType: SyncType,
-    @Assisted val deviceName: String,
     private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase,
     private val monitorSelectedMegaFolderUseCase: MonitorSelectedMegaFolderUseCase,
     private val syncFolderPairUseCase: SyncFolderPairUseCase,
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase,
     private val getLocalDCIMFolderPathUseCase: GetLocalDCIMFolderPathUseCase,
     private val clearSelectedMegaFolderUseCase: ClearSelectedMegaFolderUseCase,
+    private val getDeviceIdUseCase: GetDeviceIdUseCase,
+    private val getDeviceNameUseCase: GetDeviceNameUseCase,
 ) : ViewModel() {
 
     @AssistedFactory
     interface SyncNewFolderViewModelFactory {
-        fun create(syncType: SyncType, deviceName: String): SyncNewFolderViewModel
+        fun create(syncType: SyncType): SyncNewFolderViewModel
     }
 
     private val _state =
-        MutableStateFlow(SyncNewFolderState(syncType = syncType, deviceName = deviceName))
+        MutableStateFlow(SyncNewFolderState(syncType = syncType))
     val state: StateFlow<SyncNewFolderState> = _state.asStateFlow()
 
     init {
+        getDeviceName()
         viewModelScope.launch {
             clearSelectedMegaFolderUseCase()
             monitorSelectedMegaFolderUseCase().collectLatest { folder ->
                 _state.update { state ->
                     state.copy(selectedMegaFolder = folder)
                 }
+            }
+        }
+    }
+
+    private fun getDeviceName() {
+        viewModelScope.launch {
+            runCatching {
+                getDeviceIdUseCase()?.let { deviceId ->
+                    val deviceName = getDeviceNameUseCase(deviceId).orEmpty()
+                    _state.update { it.copy(deviceName = deviceName) }
+                }
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }

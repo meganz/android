@@ -90,7 +90,7 @@ internal fun SyncListScreen(
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
-    title: String? = null,
+    title: String,
     selectedChip: SyncChip = SYNC_FOLDERS,
 ) {
     val onBackPressedDispatcher =
@@ -148,7 +148,7 @@ internal fun SyncListScreen(
             scaffoldState = scaffoldState,
             topBar = {
                 MegaAppBar(
-                    title = title ?: stringResource(R.string.sync_toolbar_title),
+                    title = title.ifEmpty { stringResource(R.string.sync_toolbar_title) },
                     appBarType = AppBarType.BACK_NAVIGATION,
                     elevation = 0.dp,
                     onNavigationPressed = {
@@ -248,7 +248,7 @@ internal fun SyncListScreen(
                     syncFoldersViewModel = syncFoldersViewModel,
                     syncStalledIssuesViewModel = syncStalledIssuesViewModel,
                     syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
-                    deviceName = title ?: "",
+                    deviceName = title,
                     selectedChip = selectedChip,
                     snackBarHostState = scaffoldState.snackbarHostState,
                 )

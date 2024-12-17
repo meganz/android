@@ -10,5 +10,6 @@ internal data class SyncListState(
     val shouldShowCleanSolvedIssueMenuItem: Boolean = false,
     val selectedSyncOption: SyncOption = SyncOption.WI_FI_OR_MOBILE_DATA,
     val isFreeAccount: Boolean = true,
+    val deviceName: String = "",
     val enabledFlags: Set<Feature> = emptySet(),
 )

@@ -46,7 +46,6 @@ internal fun SyncListRoute(
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
-    title: String? = null,
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -139,7 +138,7 @@ internal fun SyncListRoute(
         },
         onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
         onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
-        title = title,
+        title = state.deviceName,
         syncFoldersViewModel = syncFoldersViewModel,
         syncStalledIssuesViewModel = syncStalledIssuesViewModel,
         syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,

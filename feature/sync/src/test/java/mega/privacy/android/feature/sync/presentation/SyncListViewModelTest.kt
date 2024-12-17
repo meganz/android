@@ -16,6 +16,8 @@ import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
+import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
@@ -60,6 +62,8 @@ class SyncListViewModelTest {
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
     private val getAccountTypeUseCase: GetAccountTypeUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
+    private val getDeviceIdUseCase: GetDeviceIdUseCase = mock()
+    private val getDeviceNameUseCase: GetDeviceNameUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     private val stalledIssues = listOf(
@@ -101,7 +105,9 @@ class SyncListViewModelTest {
             stalledIssueItemMapper,
             monitorSyncSolvedIssuesUseCase,
             getAccountTypeUseCase,
-            monitorAccountDetailUseCase
+            monitorAccountDetailUseCase,
+            getDeviceIdUseCase,
+            getDeviceNameUseCase,
         )
     }
 
@@ -198,6 +204,8 @@ class SyncListViewModelTest {
             monitorSyncByWiFiUseCase = monitorSyncByWiFiUseCase,
             getAccountTypeUseCase = getAccountTypeUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            getDeviceIdUseCase = getDeviceIdUseCase,
+            getDeviceNameUseCase = getDeviceNameUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }

@@ -109,8 +109,8 @@ internal fun DeviceCenterScreen(
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit,
     onNonBackupFolderClicked: (NonBackupDeviceFolderUINode) -> Unit,
     onInfoOptionClicked: (DeviceCenterUINode) -> Unit,
-    onAddNewSyncOptionClicked: (DeviceUINode) -> Unit,
-    onAddBackupOptionClicked: (DeviceUINode) -> Unit,
+    onAddNewSyncOptionClicked: () -> Unit,
+    onAddBackupOptionClicked: () -> Unit,
     onRenameDeviceOptionClicked: (DeviceUINode) -> Unit,
     onRenameDeviceCancelled: () -> Unit,
     onRenameDeviceSuccessful: () -> Unit,
@@ -177,14 +177,14 @@ internal fun DeviceCenterScreen(
                     if (uiState.isFreeAccount) {
                         showUpgradeDialog = true
                     } else {
-                        onAddNewSyncOptionClicked(uiState.menuClickedDevice)
+                        onAddNewSyncOptionClicked()
                     }
                 },
                 onAddBackupClicked = {
                     if (uiState.isFreeAccount) {
                         showUpgradeDialog = true
                     } else {
-                        onAddBackupOptionClicked(uiState.menuClickedDevice)
+                        onAddBackupOptionClicked()
                     }
                 },
                 onBottomSheetDismissed = {

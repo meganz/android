@@ -13,6 +13,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
+import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
@@ -38,6 +40,8 @@ internal class SyncListViewModel @Inject constructor(
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
     private val getAccountTypeUseCase: GetAccountTypeUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getDeviceIdUseCase: GetDeviceIdUseCase,
+    private val getDeviceNameUseCase: GetDeviceNameUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
@@ -51,6 +55,7 @@ internal class SyncListViewModel @Inject constructor(
         monitorSolvedIssue()
         monitorSyncByWifiSetting()
         getAndMonitorAccountType()
+        getDeviceName()
     }
 
     private fun checkFeatureFlags() {
@@ -129,6 +134,19 @@ internal class SyncListViewModel @Inject constructor(
                 _state.update {
                     it.copy(isFreeAccount = accountDetail.levelDetail?.accountType == AccountType.FREE)
                 }
+            }
+        }
+    }
+
+    private fun getDeviceName() {
+        viewModelScope.launch {
+            runCatching {
+                getDeviceIdUseCase()?.let { deviceId ->
+                    val deviceName = getDeviceNameUseCase(deviceId).orEmpty()
+                    _state.update { it.copy(deviceName = deviceName) }
+                }
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }

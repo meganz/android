@@ -94,18 +94,16 @@ interface AppNavigator {
      * Navigates to the Syncs page
      *
      * @param context       Context
-     * @param deviceName    The device name
      */
-    fun openSyncs(context: Context, deviceName: String? = null)
+    fun openSyncs(context: Context)
 
     /**
      * Navigates to the Add New Sync page
      *
      * @param context       Context
      * @param syncType      The sync type from [SyncType]
-     * @param deviceName    The device name
      */
-    fun openNewSync(context: Context, syncType: SyncType, deviceName: String? = null)
+    fun openNewSync(context: Context, syncType: SyncType)
 
     /**
      * Open zip browser

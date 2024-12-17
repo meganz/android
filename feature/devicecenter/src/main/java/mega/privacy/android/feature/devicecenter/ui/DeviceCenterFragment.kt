@@ -116,7 +116,6 @@ class DeviceCenterFragment : Fragment() {
                                 megaNavigator.openSyncs(
                                     context = this@DeviceCenterFragment.activity
                                         ?: return@DeviceCenterScreen,
-                                    deviceName = device.name,
                                 )
                             } else {
                                 viewModel.showDeviceFolders(device)
@@ -157,19 +156,17 @@ class DeviceCenterFragment : Fragment() {
                             )
                         },
                         onInfoOptionClicked = viewModel::onInfoClicked,
-                        onAddNewSyncOptionClicked = { device ->
+                        onAddNewSyncOptionClicked = {
                             megaNavigator.openNewSync(
                                 context = this@DeviceCenterFragment.activity
                                     ?: return@DeviceCenterScreen,
-                                deviceName = device.name,
                                 syncType = SyncType.TYPE_TWOWAY,
                             )
                         },
-                        onAddBackupOptionClicked = { device ->
+                        onAddBackupOptionClicked = {
                             megaNavigator.openNewSync(
                                 context = this@DeviceCenterFragment.activity
                                     ?: return@DeviceCenterScreen,
-                                deviceName = device.name,
                                 syncType = SyncType.TYPE_BACKUP,
                             )
                         },

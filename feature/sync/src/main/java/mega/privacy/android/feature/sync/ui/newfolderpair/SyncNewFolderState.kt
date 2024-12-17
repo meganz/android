@@ -21,7 +21,7 @@ import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
  */
 internal data class SyncNewFolderState(
     val syncType: SyncType,
-    val deviceName: String,
+    val deviceName: String = "",
     val folderPairName: String = "",
     val selectedLocalFolder: String = "",
     val selectedMegaFolder: RemoteFolder? = null,

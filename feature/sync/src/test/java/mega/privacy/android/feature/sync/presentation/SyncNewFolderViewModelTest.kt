@@ -15,6 +15,8 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
+import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
@@ -47,6 +49,8 @@ internal class SyncNewFolderViewModelTest {
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase = mock()
     private val getLocalDCIMFolderPathUseCase: GetLocalDCIMFolderPathUseCase = mock()
     private val clearSelectedMegaFolderUseCase: ClearSelectedMegaFolderUseCase = mock()
+    private val getDeviceIdUseCase: GetDeviceIdUseCase = mock()
+    private val getDeviceNameUseCase: GetDeviceNameUseCase = mock()
     private lateinit var underTest: SyncNewFolderViewModel
 
     @AfterEach
@@ -57,7 +61,9 @@ internal class SyncNewFolderViewModelTest {
             syncFolderPairUseCase,
             isStorageOverQuotaUseCase,
             getLocalDCIMFolderPathUseCase,
-            clearSelectedMegaFolderUseCase
+            clearSelectedMegaFolderUseCase,
+            getDeviceIdUseCase,
+            getDeviceNameUseCase,
         )
     }
 
@@ -136,7 +142,6 @@ internal class SyncNewFolderViewModelTest {
             initViewModel(syncType = syncType)
             val expectedState = SyncNewFolderState(
                 syncType = syncType,
-                deviceName = "Device Name",
                 selectedMegaFolder = remoteFolder,
             )
 
@@ -241,13 +246,14 @@ internal class SyncNewFolderViewModelTest {
     private fun initViewModel(syncType: SyncType) {
         underTest = SyncNewFolderViewModel(
             syncType = syncType,
-            deviceName = "Device Name",
             getExternalPathByContentUriUseCase = getExternalPathByContentUriUseCase,
             monitorSelectedMegaFolderUseCase = monitorSelectedMegaFolderUseCase,
             syncFolderPairUseCase = syncFolderPairUseCase,
             isStorageOverQuotaUseCase = isStorageOverQuotaUseCase,
             getLocalDCIMFolderPathUseCase = getLocalDCIMFolderPathUseCase,
             clearSelectedMegaFolderUseCase = clearSelectedMegaFolderUseCase,
+            getDeviceIdUseCase = getDeviceIdUseCase,
+            getDeviceNameUseCase = getDeviceNameUseCase,
         )
     }
 
