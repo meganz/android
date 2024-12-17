@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -64,7 +65,9 @@ internal fun VideoToPlaylistView(
     val lazyListState = rememberLazyListState()
 
     MegaScaffold(
-        modifier = modifier.semantics { testTagsAsResourceId = true },
+        modifier = modifier
+            .systemBarsPadding()
+            .semantics { testTagsAsResourceId = true },
         topBar = {
             LegacySearchAppBar(
                 modifier = Modifier.testTag(VIDEO_TO_PLAYLIST_SEARCH_BAR_TEST_TAG),

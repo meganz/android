@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.videosection.view.playlist
 
 import mega.privacy.android.shared.resources.R as sharedR
+import android.content.res.Configuration
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -29,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -116,9 +119,21 @@ internal fun CreateVideoPlaylistDialog(
         )
     )
 
+    val isLandScape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     MegaDialog(
-        properties = DialogProperties(usePlatformDefaultWidth = false),
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        ),
         modifier = modifier
+            .fillMaxWidth(
+                if (isLandScape && Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                    0.7f
+                } else {
+                    1f
+                }
+            )
             .padding(horizontal = 40.dp),
         onDismissRequest = onDismissRequest,
         titleString = title,
