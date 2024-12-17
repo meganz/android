@@ -19,7 +19,6 @@ import mega.privacy.android.app.AnalyticsTestExtension
 import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetails
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.login.model.LoginError
@@ -118,7 +117,6 @@ internal class LoginViewModelTest {
     private val saveLastRegisteredEmailUseCase = mock<SaveLastRegisteredEmailUseCase>()
     private val clearLastRegisteredEmailUseCase = mock<ClearLastRegisteredEmailUseCase>()
     private val installReferrerHandler = mock<InstallReferrerHandler>()
-    private val transfersManagement = mock<TransfersManagement>()
     private val clearUserCredentialsUseCase = mock<ClearUserCredentialsUseCase>()
     private val startUploadsWorkerUseCase = mock<StartUploadsWorkerUseCase>()
     private val getHistoricalProcessExitReasonsUseCase =
@@ -169,7 +167,6 @@ internal class LoginViewModelTest {
             saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase,
             clearLastRegisteredEmailUseCase = clearLastRegisteredEmailUseCase,
             installReferrerHandler = installReferrerHandler,
-            transfersManagement = transfersManagement,
             clearUserCredentialsUseCase = clearUserCredentialsUseCase,
             startUploadsWorkerUseCase = startUploadsWorkerUseCase,
             getHistoricalProcessExitReasonsUseCase = getHistoricalProcessExitReasonsUseCase,

@@ -468,17 +468,30 @@ internal class DefaultTransfersRepository @Inject constructor(
         appEventGateway.broadcastCompletedTransfer(CompletedTransferState.Error)
     }
 
-    override suspend fun addCompletedTransfersIfNotExist(transfers: List<CompletedTransfer>) =
+    override suspend fun addCompletedTransfersIfNotExist(transfers: List<Transfer>) {
         withContext(ioDispatcher) {
-            // remove id field before comparison
-            val existingTransfers =
-                megaLocalRoomGateway.getCompletedTransfers().firstOrNull()
-                    .orEmpty().map { it.copy(id = null) }
-            transfers
-                .map { it.copy(id = null) }
-                .filter { !existingTransfers.any { existingTransfer -> existingTransfer == it } }
-                .let { megaLocalRoomGateway.addCompletedTransfers(it) }
+            megaLocalRoomGateway.getCompletedTransfers().firstOrNull().orEmpty()
+                .let { completedDBTransfers ->
+                    if (completedDBTransfers.isEmpty()) {
+                        transfers.map { completedTransferMapper(it, null) }
+                    } else {
+                        //remove id before comparison
+                        val updatedCompletedDBTransfers =
+                            completedDBTransfers.map { it.copy(id = null) }
+
+                        transfers.mapNotNull { transfer ->
+                            completedTransferMapper(transfer, null).takeIf {
+                                it !in updatedCompletedDBTransfers
+                            }
+                        }
+                    }
+                }.also {
+                    if (it.isNotEmpty()) {
+                        megaLocalRoomGateway.addCompletedTransfers(it)
+                    }
+                }
         }
+    }
 
     override suspend fun deleteOldestCompletedTransfers() = withContext(ioDispatcher) {
         workerManagerGateway.enqueueDeleteOldestCompletedTransfersWorkRequest()
