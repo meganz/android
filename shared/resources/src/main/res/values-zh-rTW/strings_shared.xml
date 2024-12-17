@@ -869,13 +869,13 @@
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">大容量儲存空間</string>
     <!-- The Generous storage description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_generous_storage_description">Store unlimited data, starting from %1$s.</string>
+    <string name="payment_ads_free_intro_generous_storage_description">儲存無限資料，從%1$s起。</string>
     <!-- The Transfer sharing label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_label">傳輸流量共享</string>
     <!-- The Transfer sharing description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_description">與您共享資料的人可以使用您的傳輸配額來下載您共享的項目。</string>
     <!-- The additional security label in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass and MEGA&#160;VPN</string>
+    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass和MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_description">為檔案和資料夾連結設定密碼和到期日期。</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
@@ -886,4 +886,8 @@
     <string name="settings_calls_sound_notifications_title">提示音通知</string>
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_sound_notifications_body">當有人加入或離開通話時播放提示音。</string>
+    <!-- Text of the remove favourite option of the Favourites playlist bottom sheet  -->
+    <string name="favourites_playlist_bottom_sheet_option_remove_favourite">移除收藏</string>
+    <!-- The empty hint of the Favourites playlist -->
+    <string name="favourites_playlist_empty_hint">沒有收藏</string>
 </resources>

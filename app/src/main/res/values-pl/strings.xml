@@ -3998,7 +3998,7 @@
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
     <string name="settings_camera_uploads_grant_media_permissions_body">Aby włączyć przesyłanie z kamery, zezwól firmie MEGA na dostęp do zdjęć i innych nośników na urządzeniu.</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
-    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Udostępnik</string>
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Udostępnij</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">Nie przyznawaj</string>
     <!--  -->
@@ -5584,7 +5584,7 @@
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Zezwalaj na dostęp do swojej galerii</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
-    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Udostępnik</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Udostępnij</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Wymagana aktualizacja</string>
     <!-- The Body of the Dialog shown to Update the application from playstore -->

@@ -883,13 +883,13 @@
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">Großzügiger Speicherplatz</string>
     <!-- The Generous storage description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_generous_storage_description">Store unlimited data, starting from %1$s.</string>
+    <string name="payment_ads_free_intro_generous_storage_description">Speichern Sie beliebig viele Daten, beginnend mit %1$s.</string>
     <!-- The Transfer sharing label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_label">Transfervolumen teilen</string>
     <!-- The Transfer sharing description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_description">Die Personen, für die Sie Daten freigeben, können Ihr Transfervolumen nutzen, um Ihre freigegebenen Inhalte herunterzuladen.</string>
     <!-- The additional security label in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass and MEGA&#160;VPN</string>
+    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass und MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_description">Schützen Sie Datei- und Ordnerlinks mit Passwort und Ablaufdatum.</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
@@ -900,4 +900,8 @@
     <string name="settings_calls_sound_notifications_title">Benachrichtigungstöne</string>
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_sound_notifications_body">Lassen Sie sich durch einen Ton benachrichtigen, wenn jemand einer Konferenz beitritt oder sie verlässt.</string>
+    <!-- Text of the remove favourite option of the Favourites playlist bottom sheet  -->
+    <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Lesezeichen entfernen</string>
+    <!-- The empty hint of the Favourites playlist -->
+    <string name="favourites_playlist_empty_hint">Keine Favoriten</string>
 </resources>

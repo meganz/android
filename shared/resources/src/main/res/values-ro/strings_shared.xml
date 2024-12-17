@@ -871,25 +871,25 @@
     <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
     <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">Mutați la: [B]%1s[/B]</string>
     <!-- Message shown to user when app is connected to the MEGA server -->
-    <string name="login_connected_to_server">Connected to the server</string>
+    <string name="login_connected_to_server">Conectat la server</string>
     <!-- User Alert notification for scheduled recurring meeting changes -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A] [B]updated the recurring meeting details to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A] [B]a actualizat detaliile întâlnirii recurente la[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting hour change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A] [B]updated the recurring meeting time to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A] [B]a actualizat ora întâlnirii recurente la[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting date of the week change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A] [B]updated the recurring meeting date to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A] [B]a actualizat data întâlnirii recurente la[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting multiple fields change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%s[/A] [B]updated the meeting to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%s[/A] [B]a actualizat întâlnirea la[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A] [B]cancelled the occurrence scheduled for[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A] [B]a anulat evenimentul programat pentru[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s[/A] [B]updated an occurrence to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s[/A] [B]a actualizat o apariție la[/B]</string>
     <!-- User Alert notification for scheduled meeting date change -->
-    <string name="meetings_notification_subtitle_scheduled_meeting_updated_date">[A]%s[/A] [B]updated the meeting date to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_date">[A]%s[/A] [B]a actualizat data întâlnirii la[/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
-    <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]updated the meeting time to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]a actualizat ora întâlnirii la[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]cancelled the meeting scheduled for[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]a anulat întâlnirea programată pentru[/B]</string>
     <!-- Title of the ads free introduction screen -->
     <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
     <!-- Description of the ads free introduction screen -->
@@ -897,13 +897,13 @@
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">Spațiu de stocare generos</string>
     <!-- The Generous storage description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_generous_storage_description">Store unlimited data, starting from %1$s.</string>
+    <string name="payment_ads_free_intro_generous_storage_description">Stocați date nelimitate, începând de la %1$s.</string>
     <!-- The Transfer sharing label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_label">Partajarea transferurilor</string>
     <!-- The Transfer sharing description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_description">Persoanele cu care partajați date pot folosi cota de transfer pentru a descărca elementele pe care le-ați partajat.</string>
     <!-- The additional security label in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass and MEGA&#160;VPN</string>
+    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass și MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_description">Setați parolele și datele de expirare pentru linkurile de fișiere și folder.</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
@@ -914,4 +914,8 @@
     <string name="settings_calls_sound_notifications_title">Notificări sonore</string>
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_sound_notifications_body">Auzi un sunet când cineva se alătură sau părăsește un apel.</string>
+    <!-- Text of the remove favourite option of the Favourites playlist bottom sheet  -->
+    <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Elimină de la favorite</string>
+    <!-- The empty hint of the Favourites playlist -->
+    <string name="favourites_playlist_empty_hint">Niciun favorit</string>
 </resources>

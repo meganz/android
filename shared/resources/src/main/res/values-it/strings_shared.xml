@@ -911,4 +911,8 @@
     <string name="settings_calls_sound_notifications_title">Sono delle notifiche</string>
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_sound_notifications_body">Senti un suono quando un utente entra o esce da una chiamata.</string>
+    <!-- Text of the remove favourite option of the Favourites playlist bottom sheet  -->
+    <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Rimuovi preferito</string>
+    <!-- The empty hint of the Favourites playlist -->
+    <string name="favourites_playlist_empty_hint">Nessun preferito</string>
 </resources>

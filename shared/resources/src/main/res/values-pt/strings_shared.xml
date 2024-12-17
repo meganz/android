@@ -903,7 +903,7 @@
     <!-- The Transfer sharing description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_description">As pessoas com as quais você compartilhar dados podem usar a sua cota de transferência para fazer download dos itens que você compartilhou.</string>
     <!-- The additional security label in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass and MEGA&#160;VPN</string>
+    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass e MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_description">Adicione senhas e datas de validade para links de arquivos e de pastas.</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
@@ -914,4 +914,8 @@
     <string name="settings_calls_sound_notifications_title">Notificações sonoras</string>
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_sound_notifications_body">Ouvir um som quando alguém entra ou sai de uma chamada.</string>
+    <!-- Text of the remove favourite option of the Favourites playlist bottom sheet  -->
+    <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Remover favorito</string>
+    <!-- The empty hint of the Favourites playlist -->
+    <string name="favourites_playlist_empty_hint">Não há itens marcados como favoritos</string>
 </resources>

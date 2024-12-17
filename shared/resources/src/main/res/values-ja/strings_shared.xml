@@ -875,7 +875,7 @@
     <!-- The Transfer sharing description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_description">データを共有する相手は、お客様の転送容量を使用して、お客様が共有した項目をダウンロードできます。</string>
     <!-- The additional security label in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass and MEGA&#160;VPN</string>
+    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;PassとMEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_description">ファイルとフォルダのリンクのパスワードと有効期限を設定できます。</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
@@ -886,4 +886,8 @@
     <string name="settings_calls_sound_notifications_title">サウンド通知</string>
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_sound_notifications_body">誰かが通話に参加または退出したときに音を聞きます。</string>
+    <!-- Text of the remove favourite option of the Favourites playlist bottom sheet  -->
+    <string name="favourites_playlist_bottom_sheet_option_remove_favourite">お気に入りを削除</string>
+    <!-- The empty hint of the Favourites playlist -->
+    <string name="favourites_playlist_empty_hint">お気に入りがありません</string>
 </resources>
