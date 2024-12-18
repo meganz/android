@@ -85,6 +85,20 @@ class TransferAppDataMapperTest {
         }
 
         @Test
+        fun `test that the sd card paths are mapped correctly when parentPath is received as param`() {
+            val raw =
+                "SD_CARD_DOWNLOAD>/storage/48F8-4FB7/Download mega>content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega"
+            val parentPath = "path/parentPath"
+            val expected = TransferAppData.SdCardDownload(
+                targetPathForSDK = "/storage/48F8-4FB7/Download mega",
+                finalTargetUri = "content://com.android.externalstorage.documents/tree/48F8-4FB7%3ADownload%20mega",
+                parentPath = parentPath
+            )
+            Truth.assertThat(underTest(appDataRaw = raw, parentPath = parentPath))
+                .containsExactly(expected)
+        }
+
+        @Test
         fun `test that a chat upload is mapped correctly if the message id is a number`() {
             val chatId = 1265L
             val raw = "CHAT_UPLOAD>$chatId"

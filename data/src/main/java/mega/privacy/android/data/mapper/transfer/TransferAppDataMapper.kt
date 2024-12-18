@@ -16,11 +16,16 @@ import javax.inject.Inject
 class TransferAppDataMapper @Inject constructor() {
     /**
      * Get a list of [TransferAppData] corresponding to raw appData [String]
+     *
      * @param appDataRaw the app data [String] as it is in MegaTransfer
+     * @param parentPath the parent path of the transfer as it is in MegaTransfer.
+     *                   It is only required for SDCardDownload.
+     *
      * @return a [List] of [TransferAppData]
      */
     operator fun invoke(
         appDataRaw: String,
+        parentPath: String? = null,
     ): List<TransferAppData> = if (appDataRaw.isEmpty()) emptyList() else {
         appDataRaw
             .split(APP_DATA_REPEATED_TRANSFER_SEPARATOR)
@@ -42,7 +47,7 @@ class TransferAppDataMapper @Inject constructor() {
                             TransferAppData.SdCardDownload(
                                 targetPathForSDK = it,
                                 finalTargetUri = values.getOrElse(1) { "" },
-                                parentPath = values.getOrNull(2),
+                                parentPath = parentPath ?: values.getOrNull(2),
                             )
                         }
                     }
