@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import android.content.Context
 import android.net.Uri
+import android.os.ParcelFileDescriptor
 import androidx.documentfile.provider.DocumentFile
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
@@ -766,5 +767,23 @@ internal class FileSystemRepositoryImplTest {
         )
 
         assertThat(result).isEqualTo(newFile)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that file descriptor from gateway is returned with correct parameters when getFileDescriptor is invoked`(
+        writePermission: Boolean,
+    ) = runTest {
+        val expected = 354
+        val parcelFileDescriptor = mock<ParcelFileDescriptor> {
+            on { detachFd() } doReturn expected
+        }
+        val uriPath = mock<UriPath>()
+        whenever(fileGateway.getFileDescriptor(uriPath, writePermission)) doReturn
+                parcelFileDescriptor
+
+        val actual = underTest.getDetachedFileDescriptor(uriPath, writePermission)
+
+        assertThat(actual).isEqualTo(expected)
     }
 }

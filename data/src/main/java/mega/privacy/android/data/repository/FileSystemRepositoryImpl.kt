@@ -670,4 +670,11 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         Uri.parse(fileContentUri)?.let { uri ->
             documentFileWrapper.fromSingleUri(uri)?.delete() ?: false
         } ?: false
+
+    override suspend fun getDetachedFileDescriptor(
+        uriPath: UriPath,
+        writePermission: Boolean,
+    ) = withContext(ioDispatcher) {
+        fileGateway.getFileDescriptor(uriPath, writePermission)?.detachFd()
+    }
 }

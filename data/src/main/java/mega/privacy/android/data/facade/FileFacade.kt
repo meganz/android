@@ -43,6 +43,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.mapper.file.DocumentFileMapper
 import mega.privacy.android.domain.entity.document.DocumentEntity
@@ -754,6 +755,16 @@ internal class FileFacade @Inject constructor(
             }
         return null
     }
+
+    override suspend fun getFileDescriptor(uriPath: UriPath, writePermission: Boolean) =
+        runCatching {
+            context.contentResolver.openFileDescriptor(
+                uriPath.toUri(),
+                if (writePermission) "rw" else "r"
+            )
+        }.onFailure {
+            Timber.e(it, "Error getting file descriptor for $uriPath")
+        }.getOrNull()
 
     private fun getRealPathFromUri(context: Context, uri: Uri): String? {
         when {

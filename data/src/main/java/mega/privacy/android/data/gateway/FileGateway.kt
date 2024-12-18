@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway
 
 import android.net.Uri
+import android.os.ParcelFileDescriptor
 import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.document.DocumentEntity
@@ -413,4 +414,10 @@ interface FileGateway {
      * or selected a file inside downloads folder sometimes it returns null
      */
     suspend fun getFileFromUri(uri: Uri): File?
+
+    /**
+     * Get [ParcelFileDescriptor] from uriPath
+     * @param writePermission true if write permission is needed, false if only read permission is needed
+     */
+    suspend fun getFileDescriptor(uriPath: UriPath, writePermission: Boolean): ParcelFileDescriptor?
 }

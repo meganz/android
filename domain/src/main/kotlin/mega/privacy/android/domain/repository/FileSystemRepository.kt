@@ -534,4 +534,11 @@ interface FileSystemRepository {
      * Deletes the file given the content URI.
      */
     suspend fun deleteFileFromSdCardContentUri(fileContentUri: String): Boolean
+
+    /**
+     * Get the detached native fd from the given uriPath. You are now responsible for closing the fd in native
+     * code.
+     * @param writePermission true if write permission is needed, false if only read permission is needed
+     */
+    suspend fun getDetachedFileDescriptor(uriPath: UriPath, writePermission: Boolean): Int?
 }

@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.os.Environment
+import android.os.ParcelFileDescriptor
 import android.provider.OpenableColumns
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +13,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.data.mapper.file.DocumentFileMapper
+import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -256,4 +259,31 @@ internal class FileFacadeTest {
 
             assertThat(result).isFalse()
         }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that getFileDescriptor returns correct result from content resolver with correct permissions`(
+        writePermission: Boolean,
+    ) = runTest {
+        mockStatic(Uri::class.java).use { _ ->
+            val expected = mock<ParcelFileDescriptor>()
+            val testUri = UriPath("uri://example")
+            val uri = mock<Uri> {
+                on { scheme } doReturn "file"
+            }
+            val contentResolver = mock<ContentResolver>()
+            whenever(Uri.parse(testUri.value)).thenReturn(uri)
+            whenever(context.contentResolver) doReturn contentResolver
+            whenever(
+                contentResolver.openFileDescriptor(
+                    testUri.toUri(),
+                    if (writePermission) "rw" else "r"
+                )
+            ) doReturn expected
+
+            val actual = underTest.getFileDescriptor(testUri, writePermission)
+
+            assertThat(actual).isEqualTo(expected)
+        }
+    }
 }
