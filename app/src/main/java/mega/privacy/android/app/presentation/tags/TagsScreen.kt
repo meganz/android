@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.rememberScaffoldState
@@ -166,9 +165,6 @@ private fun TagsContent(
             value = tag,
             imeAction = ImeAction.Done,
             supportingText = uiState.message,
-            keyboardActions = KeyboardActions(
-                onDone = { addTag(tag, newTag = true) }
-            ),
             showError = uiState.isError,
             onValueChange = {
                 tag = it.removePrefix("#").lowercase()
