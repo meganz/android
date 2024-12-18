@@ -6,7 +6,9 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Environment
 import android.os.ParcelFileDescriptor
+import android.provider.DocumentsContract
 import android.provider.OpenableColumns
+import androidx.documentfile.provider.DocumentFile
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,6 +17,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.data.mapper.file.DocumentFileMapper
+import mega.privacy.android.domain.entity.document.DocumentEntity
+import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
@@ -286,4 +290,122 @@ internal class FileFacadeTest {
             assertThat(actual).isEqualTo(expected)
         }
     }
+
+    @Test
+    fun `test that getDocumentEntities returns the mapped entities from a list of content uris`() =
+        runTest {
+            mockStatic(DocumentFile::class.java).use {
+                mockStatic(DocumentsContract::class.java).use {
+                    val uri = mock<Uri> {
+                        on { this.scheme } doReturn "content"
+                    }
+                    val doc = mock<DocumentFile>()
+                    val expected = mock<DocumentEntity>()
+                    whenever(DocumentsContract.isTreeUri(uri)) doReturn false
+                    whenever(DocumentFile.fromSingleUri(context, uri)) doReturn doc
+                    whenever(documentFileMapper(doc, 0, 0)) doReturn expected
+
+                    val actual = underTest.getDocumentEntities(listOf(uri))
+
+                    assertThat(actual).containsExactly(expected)
+                }
+            }
+        }
+
+    @Test
+    fun `test that getDocumentMetadata returns the mapped entity from a content uri file`() =
+        runTest {
+            mockStatic(DocumentFile::class.java).use {
+                mockStatic(DocumentsContract::class.java).use {
+                    val uri = mock<Uri> {
+                        on { this.scheme } doReturn "content"
+                    }
+                    val doc = mock<DocumentFile> {
+                        on { name } doReturn "file.txt"
+                        on { this.isDirectory } doReturn false
+                    }
+                    val expected = DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
+                    whenever(DocumentsContract.isTreeUri(uri)) doReturn false
+                    whenever(DocumentFile.fromSingleUri(context, uri)) doReturn doc
+
+                    val actual = underTest.getDocumentMetadata(uri)
+
+                    assertThat(actual).isEqualTo(expected)
+                }
+            }
+        }
+
+    @Test
+    fun `test that getDocumentMetadata returns the correct values from a content uri folder`() =
+        runTest {
+            mockStatic(DocumentFile::class.java).use {
+                mockStatic(DocumentsContract::class.java).use {
+                    val uri = mock<Uri> {
+                        on { this.scheme } doReturn "content"
+                    }
+                    val doc = mock<DocumentFile> {
+                        on { name } doReturn "folder"
+                        on { this.isDirectory } doReturn true
+                    }
+                    val expected = DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
+                    whenever(DocumentsContract.isTreeUri(uri)) doReturn true
+                    whenever(DocumentFile.fromTreeUri(context, uri)) doReturn doc
+
+                    val actual = underTest.getDocumentMetadata(uri)
+
+                    assertThat(actual).isEqualTo(expected)
+                }
+            }
+        }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that getDocumentMetadata returns the correct values from a file uri`(
+        isDirectory: Boolean,
+    ) = runTest {
+        mockStatic(DocumentFile::class.java).use {
+            val file = File(temporaryFolder, "file.txt")
+            file.createNewFile()
+            val uri = mock<Uri> {
+                on { this.scheme } doReturn "file"
+                on { this.path } doReturn file.path
+            }
+            val doc = mock<DocumentFile> {
+                on { name } doReturn "name"
+                on { this.isDirectory } doReturn isDirectory
+            }
+            val expected = DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
+            whenever(DocumentFile.fromFile(file)) doReturn doc
+
+            val actual = underTest.getDocumentMetadata(uri)
+
+            assertThat(actual).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test that getFolderChildUris returns the correct child uris`() =
+        runTest {
+            mockStatic(DocumentFile::class.java).use {
+                mockStatic(DocumentsContract::class.java).use {
+                    val uri = mock<Uri> {
+                        on { this.scheme } doReturn "content"
+                    }
+                    val expected = mock<Uri>()
+                    val child = mock<DocumentFile> {
+                        on { this.uri } doReturn expected
+                    }
+                    val doc = mock<DocumentFile> {
+                        on { this.isDirectory } doReturn true
+                        on { this.listFiles() } doReturn arrayOf(child)
+                    }
+                    whenever(DocumentsContract.isTreeUri(uri)) doReturn true
+                    whenever(DocumentFile.fromTreeUri(context, uri)) doReturn doc
+
+                    val actual = underTest.getFolderChildUris(uri)
+
+                    assertThat(actual).containsExactly(expected)
+                }
+            }
+        }
 }

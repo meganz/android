@@ -40,6 +40,7 @@ import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
+import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -785,5 +786,42 @@ internal class FileSystemRepositoryImplTest {
         val actual = underTest.getDetachedFileDescriptor(uriPath, writePermission)
 
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that getDocumentMetadata returns correct value from gateway`() = runTest {
+        mockStatic(Uri::class.java).use {
+            val uriPath = UriPath("file://test/file/path.txt")
+            val expected = mock<DocumentMetadata>()
+            val uri = mock<Uri> {
+                on { scheme } doReturn "file"
+            }
+            whenever(Uri.parse(uriPath.value)) doReturn uri
+            whenever(fileGateway.getDocumentMetadata(uri)) doReturn expected
+
+            val actual = underTest.getDocumentMetadata(uriPath)
+
+            assertThat(actual).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test that getFolderChildUriPaths returns correct value from gateway`() = runTest {
+        mockStatic(Uri::class.java).use {
+            val uriPath = UriPath("file://test/file/path")
+            val expected = UriPath("file://child.txt")
+            val result = mock<Uri> {
+                on { toString() } doReturn expected.value
+            }
+            val uri = mock<Uri> {
+                on { scheme } doReturn "file"
+            }
+            whenever(Uri.parse(uriPath.value)) doReturn uri
+            whenever(fileGateway.getFolderChildUris(uri)) doReturn listOf(result)
+
+            val actual = underTest.getFolderChildUriPaths(uriPath)
+
+            assertThat(actual).containsExactly(expected)
+        }
     }
 }

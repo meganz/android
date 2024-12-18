@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
+import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -499,9 +500,21 @@ interface FileSystemRepository {
     suspend fun getDocumentFileName(uri: UriPath): String
 
     /**
-     * Get document entities
+     * Get a list of [DocumentEntity]s from a list of [UriPath]s, non-existing documents are filtered out
      */
     suspend fun getDocumentEntities(uris: List<UriPath>): List<DocumentEntity>
+
+    /**
+     * Get a [DocumentMetadata] from an [UriPath] or null if the document doesn't exist
+     */
+    suspend fun getDocumentMetadata(uriPath: UriPath): DocumentMetadata?
+
+    /**
+     * Get the list of [UriPath]s that are direct children of the given [UriPath]
+     *
+     * @return the list of [UriPath]s that are direct children of the [uriPath] or empty list if [uriPath] doesn't represent a folder or it's empty
+     */
+    suspend fun getFolderChildUriPaths(uriPath: UriPath): List<UriPath>
 
     /**
      * Get file from uri

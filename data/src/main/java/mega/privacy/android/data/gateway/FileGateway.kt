@@ -6,6 +6,7 @@ import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
+import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
 import java.io.IOException
@@ -401,9 +402,21 @@ interface FileGateway {
     fun isPathInsecure(path: String): Boolean
 
     /**
-     * Get document entities
+     * Get a list of [DocumentEntity]s from a list of [Uri]s, non-existing documents are filtered out
      */
     suspend fun getDocumentEntities(uris: List<Uri>): List<DocumentEntity>
+
+    /**
+     * Get a [DocumentEntity] from an [Uri] or null if the document doesn't exist
+     */
+    suspend fun getDocumentMetadata(uri: Uri): DocumentMetadata?
+
+    /**
+     * Get the list of [Uri]s that are direct children of the given [Uri]
+     *
+     * @return the list of [Uri]s that are direct children of the [uri] or an empty list if [uri] doesn't represent a folder or it's empty
+     */
+    suspend fun getFolderChildUris(uri: Uri): List<Uri>
 
     /**
      * Get file from uri

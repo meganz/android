@@ -23,6 +23,7 @@ import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.extensions.getRequestListener
+import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
@@ -48,6 +49,7 @@ import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
+import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -638,6 +640,17 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun getDocumentEntities(uris: List<UriPath>): List<DocumentEntity> =
         withContext(ioDispatcher) {
             fileGateway.getDocumentEntities(uris.map { Uri.parse(it.value) })
+        }
+
+    override suspend fun getDocumentMetadata(uriPath: UriPath): DocumentMetadata? =
+        withContext(ioDispatcher) {
+            fileGateway.getDocumentMetadata(uriPath.toUri())
+        }
+
+    override suspend fun getFolderChildUriPaths(uriPath: UriPath): List<UriPath> =
+        withContext(ioDispatcher) {
+            fileGateway.getFolderChildUris(uriPath.toUri())
+                .map { UriPath(it.toString()) }
         }
 
     override suspend fun getFileFromUri(uri: UriPath): File? = withContext(ioDispatcher) {

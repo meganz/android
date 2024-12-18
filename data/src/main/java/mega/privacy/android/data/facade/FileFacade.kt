@@ -48,6 +48,7 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.mapper.file.DocumentFileMapper
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
+import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.FileNotCreatedException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
@@ -729,12 +730,7 @@ internal class FileFacade @Inject constructor(
 
     override suspend fun getDocumentEntities(uris: List<Uri>): List<DocumentEntity> {
         return uris.mapNotNull { uri ->
-            val file = uri.takeIf { (uri.scheme == "file") }?.path?.let { File(it) }
-            when {
-                file?.exists() == true -> DocumentFile.fromFile(file)
-                DocumentsContract.isTreeUri(uri) -> DocumentFile.fromTreeUri(context, uri)
-                else -> DocumentFile.fromSingleUri(context, uri)
-            }?.let { doc ->
+            getDocumentFileFromUri(uri)?.let { doc ->
                 val childFiles = if (doc.isDirectory) doc.listFiles() else emptyArray()
                 documentFileMapper(
                     file = doc,
@@ -742,6 +738,27 @@ internal class FileFacade @Inject constructor(
                     numFolders = childFiles.count { it.isDirectory },
                 )
             }
+        }
+    }
+
+    override suspend fun getDocumentMetadata(uri: Uri): DocumentMetadata? =
+        getDocumentFileFromUri(uri)?.let { doc ->
+            DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
+        }
+
+    override suspend fun getFolderChildUris(uri: Uri): List<Uri> =
+        (getDocumentFileFromUri(uri)
+            ?.takeIf { it.isDirectory }
+            ?.listFiles()
+            ?.map { it.uri })
+            .orEmpty()
+
+    private fun getDocumentFileFromUri(uri: Uri): DocumentFile? {
+        val file = uri.takeIf { (uri.scheme == "file") }?.path?.let { File(it) }
+        return when {
+            file?.exists() == true -> DocumentFile.fromFile(file)
+            DocumentsContract.isTreeUri(uri) -> DocumentFile.fromTreeUri(context, uri)
+            else -> DocumentFile.fromSingleUri(context, uri)
         }
     }
 
