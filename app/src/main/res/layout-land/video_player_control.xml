@@ -76,7 +76,7 @@
             android:enabled="false"
             android:src="@drawable/ic_lock"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/controls_view"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/white" />
 
@@ -122,7 +122,8 @@
             android:background="@color/grey_alpha_070"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginEnd="30dp">
 
             <ImageButton
                 android:id="@+id/speed_playback"

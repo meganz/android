@@ -32,7 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
+import androidx.core.view.updateMargins
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -836,12 +836,14 @@ class VideoPlayerFragment : Fragment() {
      * @param bottom padding bottom
      */
     private fun updatePlayerControllerPadding(left: Int, right: Int, bottom: Int) {
-        binding.playerControlsLayout.updatePadding(
-            left = left,
-            top = 0,
-            right = right,
-            bottom = bottom
-        )
+        if (left == 0 && right == 0 && bottom == 0) {
+            return
+        }
+        binding.playerView.findViewById<View>(R.id.controls_view).let {
+            val layoutParams = it.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.updateMargins(left, 0, right, bottom)
+            it.layoutParams = layoutParams
+        }
     }
 
     companion object {
