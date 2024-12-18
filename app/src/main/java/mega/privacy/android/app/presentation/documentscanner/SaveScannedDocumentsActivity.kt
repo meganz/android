@@ -5,10 +5,13 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.components.session.SessionContainer
@@ -50,11 +53,17 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
      * onCreate
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdgeAndConsumeInsets()
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val systemUiController = rememberSystemUiController()
+            val useDarkIcons = themeMode.isDarkMode().not()
+            systemUiController.setSystemBarsColor(
+                color = Color.Transparent,
+                darkIcons = useDarkIcons
+            )
 
             SessionContainer {
                 OriginalTempTheme(isDark = themeMode.isDarkMode()) {
