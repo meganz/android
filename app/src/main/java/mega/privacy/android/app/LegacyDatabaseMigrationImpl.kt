@@ -221,8 +221,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                     "${SqliteDatabaseHandler.KEY_PENDING_MSG_TRANSFER_TAG} INTEGER, " +
                     "${SqliteDatabaseHandler.KEY_PENDING_MSG_STATE} INTEGER)"
         db.execSQL(CREATE_NEW_PENDING_MSG_TABLE)
-
-        db.execSQL(SqliteDatabaseHandler.CREATE_SD_TRANSFERS_TABLE)
     }
 
     override fun onUpgrade(db: SupportSQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -821,7 +819,6 @@ class LegacyDatabaseMigrationImpl @Inject constructor(
                     )
                 }';"
             )
-            db.execSQL(SqliteDatabaseHandler.CREATE_SD_TRANSFERS_TABLE)
         }
         if (oldVersion <= 60) {
             db.execSQL("ALTER TABLE ${SqliteDatabaseHandler.TABLE_PREFERENCES} ADD COLUMN ${SqliteDatabaseHandler.KEY_PASSCODE_LOCK_REQUIRE_TIME} TEXT;")

@@ -51,7 +51,6 @@ import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
 import mega.privacy.android.data.model.GlobalTransfer
-import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
@@ -673,21 +672,6 @@ internal class DefaultTransfersRepository @Inject constructor(
                 megaApiGateway.pauseTransferByTag(transferTag, isPause, listener)
             }
         }
-
-    override suspend fun getAllSdTransfers(): List<SdTransfer> =
-        megaLocalRoomGateway.getAllSdTransfers()
-
-    override suspend fun getSdTransferByTag(tag: Int): SdTransfer? = withContext(ioDispatcher) {
-        megaLocalRoomGateway.getSdTransferByTag(tag)
-    }
-
-    override suspend fun deleteSdTransferByTag(tag: Int) {
-        megaLocalRoomGateway.deleteSdTransferByTag(tag)
-    }
-
-    override suspend fun insertSdTransfer(transfer: SdTransfer) {
-        megaLocalRoomGateway.insertSdTransfer(transfer)
-    }
 
     override suspend fun getCompletedTransferById(id: Int) = withContext(ioDispatcher) {
         megaLocalRoomGateway.getCompletedTransferById(id)

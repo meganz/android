@@ -5,7 +5,6 @@ import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Offline
-import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
@@ -226,32 +225,6 @@ interface MegaLocalRoomGateway {
      * Set an active transfer as finished cancelled by its tag
      */
     suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>)
-
-    /**
-     * Get all sd transfers
-     *
-     * @return the list of sd transfers
-     */
-    suspend fun getAllSdTransfers(): List<SdTransfer>
-
-    /**
-     * Get sd transfers by tag
-     *
-     * @return the sd transfer with this tag or null if not found
-     */
-    suspend fun getSdTransferByTag(tag: Int): SdTransfer?
-
-    /**
-     * Insert sd transfer
-     *
-     */
-    suspend fun insertSdTransfer(transfer: SdTransfer)
-
-    /**
-     * Delete sd transfer by tag
-     *
-     */
-    suspend fun deleteSdTransferByTag(tag: Int)
 
     /**
      * Get completed transfer by id

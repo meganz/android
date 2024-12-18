@@ -17,7 +17,6 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_OFFLINE
-import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_SD_TRANSFERS
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
@@ -1835,21 +1834,6 @@ class SqliteDatabaseHandler @Inject constructor(
         const val KEY_PENDING_MSG_TRANSFER_TAG = "transfertag"
         const val KEY_PENDING_MSG_STATE = "state"
 
-        const val KEY_SD_TRANSFERS_TAG = "sdtransfertag"
-        const val KEY_SD_TRANSFERS_NAME = "sdtransfername"
-        const val KEY_SD_TRANSFERS_SIZE = "sdtransfersize"
-        const val KEY_SD_TRANSFERS_HANDLE = "sdtransferhandle"
-        const val KEY_SD_TRANSFERS_APP_DATA = "sdtransferappdata"
-        const val KEY_SD_TRANSFERS_PATH = "sdtransferpath"
-        const val CREATE_SD_TRANSFERS_TABLE =
-            "CREATE TABLE IF NOT EXISTS $TABLE_SD_TRANSFERS(" +
-                    "$KEY_ID INTEGER PRIMARY KEY, " +                     // 0
-                    "$KEY_SD_TRANSFERS_TAG INTEGER, " +                   // 1
-                    "$KEY_SD_TRANSFERS_NAME TEXT, " +                     // 2
-                    "$KEY_SD_TRANSFERS_SIZE TEXT, " +                     // 3
-                    "$KEY_SD_TRANSFERS_HANDLE TEXT, " +                   // 4
-                    "$KEY_SD_TRANSFERS_PATH TEXT, " +                     // 5
-                    "$KEY_SD_TRANSFERS_APP_DATA TEXT)"                    // 6
         const val OLD_VIDEO_QUALITY_ORIGINAL = 0
 
         fun encrypt(original: String?): String? =

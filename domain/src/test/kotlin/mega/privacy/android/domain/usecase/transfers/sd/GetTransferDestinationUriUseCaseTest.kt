@@ -2,37 +2,25 @@ package mega.privacy.android.domain.usecase.transfers.sd
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.repository.TransferRepository
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.reset
-import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetTransferDestinationUriUseCaseTest {
 
     private lateinit var underTest: GetTransferDestinationUriUseCase
 
-    private val transferRepository = mock<TransferRepository>()
-
     @BeforeAll
     fun setUp() {
-        underTest = GetTransferDestinationUriUseCase(transferRepository)
-    }
-
-    @BeforeEach
-    fun resetMocks() {
-        reset(transferRepository)
+        underTest = GetTransferDestinationUriUseCase()
     }
 
     @ParameterizedTest
@@ -76,7 +64,7 @@ class GetTransferDestinationUriUseCaseTest {
     }
 
     @Test
-    fun `test that database sd transfer's targetUri  and sub folders are returned when it's not a root transfer`() =
+    fun `test that sd transfer's targetUri and sub folders are returned when it's not a root transfer`() =
         runTest {
             val expected = "destinationUri"
             val expectedSubFolder = "subFolder"
@@ -87,16 +75,13 @@ class GetTransferDestinationUriUseCaseTest {
                 on { it.isRootTransfer } doReturn false
                 on { it.folderTransferTag } doReturn folderTag
                 on { it.parentPath } doReturn "$cachePath/$expectedSubFolder"
-            }
-            val parentTransfer = mock<SdTransfer> {
                 on { it.appData } doReturn listOf(
                     TransferAppData.SdCardDownload(
                         targetPathForSDK = cachePath,
-                        finalTargetUri = expected
+                        finalTargetUri = expected,
                     )
                 )
             }
-            whenever(transferRepository.getSdTransferByTag(folderTag)) doReturn parentTransfer
             val actual = underTest(transfer)
 
             assertThat(actual?.destinationUri).isEqualTo(expected)

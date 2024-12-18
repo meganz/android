@@ -27,7 +27,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
@@ -36,8 +35,6 @@ import java.util.stream.Stream
 class HandleSDCardEventUseCaseTest {
     private lateinit var underTest: HandleSDCardEventUseCase
 
-    private val insertSdTransferUseCase = mock<InsertSdTransferUseCase>()
-    private val deleteSdTransferByTagUseCase = mock<DeleteSdTransferByTagUseCase>()
     private val moveFileToSdCardUseCase = mock<MoveFileToSdCardUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val transferRepository = mock<TransferRepository>()
@@ -48,8 +45,6 @@ class HandleSDCardEventUseCaseTest {
     fun setUp() {
 
         underTest = HandleSDCardEventUseCase(
-            insertSdTransferUseCase = insertSdTransferUseCase,
-            deleteSdTransferByTagUseCase = deleteSdTransferByTagUseCase,
             moveFileToSdCardUseCase = moveFileToSdCardUseCase,
             fileSystemRepository = fileSystemRepository,
             transferRepository = transferRepository,
@@ -60,21 +55,10 @@ class HandleSDCardEventUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            insertSdTransferUseCase,
-            deleteSdTransferByTagUseCase,
             moveFileToSdCardUseCase,
             fileSystemRepository,
             transferRepository
         )
-    }
-
-    @Test
-    fun `test that insertSdTransferUseCase is invoked for sd transfers start event`() = runTest {
-        val transfer = mockTransfer()
-        val transferEvent = TransferEvent.TransferStartEvent(transfer)
-        whenever(fileSystemRepository.isSDCardCachePath(any())).thenReturn(false)
-        underTest(transferEvent, null)
-        verify(insertSdTransferUseCase)(any())
     }
 
     @ParameterizedTest(name = "if event is {0}")
@@ -104,30 +88,6 @@ class HandleSDCardEventUseCaseTest {
             val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
             underTest(transferEvent, DestinationUriAndSubFolders(TARGET_PATH, subFolders))
             verify(moveFileToSdCardUseCase).invoke(any(), eq(TARGET_PATH), eq(subFolders))
-        }
-
-    @Test
-    fun `test that deleteSdTransferByTagUseCase is invoked when root sd transfers finish event is received`() =
-        runTest {
-            val transfer = mockTransfer()
-            whenever(transfer.isRootTransfer).thenReturn(true)
-            whenever(transfer.isFolderTransfer).thenReturn(true)
-            val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
-            underTest(transferEvent, null)
-            verify(deleteSdTransferByTagUseCase)(any())
-        }
-
-    @Test
-    fun `test that deleteSdTransferByTagUseCase is not invoked when the received finish event is not a sd transfer`() =
-        runTest {
-            val transfer = mockTransfer()
-            whenever(transfer.isRootTransfer).thenReturn(true)
-            whenever(transfer.isFolderTransfer).thenReturn(true)
-            whenever(transfer.appData).thenReturn(emptyList())
-            whenever(fileSystemRepository.isSDCardCachePath(any())).thenReturn(false)
-            val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
-            underTest(transferEvent, null)
-            verifyNoInteractions(deleteSdTransferByTagUseCase)
         }
 
     private fun mockTransfer() =

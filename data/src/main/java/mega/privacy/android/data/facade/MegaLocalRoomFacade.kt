@@ -14,7 +14,6 @@ import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
-import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
@@ -35,15 +34,12 @@ import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferMode
 import mega.privacy.android.data.mapper.transfer.pending.InsertPendingTransferRequestMapper
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMapper
-import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
-import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Offline
-import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -72,9 +68,6 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val completedTransferEntityMapper: CompletedTransferEntityMapper,
     private val completedTransferLegacyModelMapper: CompletedTransferLegacyModelMapper,
     private val activeTransferEntityMapper: ActiveTransferEntityMapper,
-    private val sdTransferDao: Lazy<SdTransferDao>,
-    private val sdTransferModelMapper: SdTransferModelMapper,
-    private val sdTransferEntityMapper: SdTransferEntityMapper,
     private val backupDao: Lazy<BackupDao>,
     private val backupEntityMapper: BackupEntityMapper,
     private val backupModelMapper: BackupModelMapper,
@@ -263,23 +256,6 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun setActiveTransferAsCancelledByTag(tags: List<Int>) =
         activeTransferDao.get().setActiveTransferAsCancelledByTag(tags)
-
-    override suspend fun getAllSdTransfers(): List<SdTransfer> {
-        val entities = sdTransferDao.get().getAllSdTransfers().first()
-        return entities.map { sdTransferModelMapper(it) }
-    }
-
-    override suspend fun getSdTransferByTag(tag: Int): SdTransfer? =
-        sdTransferDao.get().getSdTransferByTag(tag)?.let {
-            sdTransferModelMapper(it)
-        }
-
-    override suspend fun insertSdTransfer(transfer: SdTransfer) =
-        sdTransferDao.get().insertSdTransfer(sdTransferEntityMapper(transfer))
-
-    override suspend fun deleteSdTransferByTag(tag: Int) {
-        sdTransferDao.get().deleteSdTransferByTag(tag)
-    }
 
     override suspend fun getCompletedTransferById(id: Int) = completedTransferDao.get()
         .getCompletedTransferById(id)?.let { completedTransferModelMapper(it) }

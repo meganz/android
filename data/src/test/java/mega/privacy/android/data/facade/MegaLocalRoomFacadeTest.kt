@@ -15,7 +15,6 @@ import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
-import mega.privacy.android.data.database.dao.SdTransferDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.BackupEntity
@@ -24,7 +23,6 @@ import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
 import mega.privacy.android.data.database.entity.PendingTransferEntity
-import mega.privacy.android.data.database.entity.SdTransferEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
 import mega.privacy.android.data.facade.MegaLocalRoomFacade.Companion.MAX_INSERT_LIST_SIZE
 import mega.privacy.android.data.mapper.backup.BackupEntityMapper
@@ -45,13 +43,10 @@ import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferMode
 import mega.privacy.android.data.mapper.transfer.pending.InsertPendingTransferRequestMapper
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.pending.PendingTransferModelMapper
-import mega.privacy.android.data.mapper.transfer.sd.SdTransferEntityMapper
-import mega.privacy.android.data.mapper.transfer.sd.SdTransferModelMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedEntityMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
-import mega.privacy.android.domain.entity.SdTransfer
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -95,9 +90,6 @@ internal class MegaLocalRoomFacadeTest {
     private val activeTransferDao = mock<ActiveTransferDao>()
     private val activeTransferEntityMapper = mock<ActiveTransferEntityMapper>()
     private val completedTransferEntityMapper: CompletedTransferEntityMapper = mock()
-    private val sdTransferDao: SdTransferDao = mock()
-    private val sdTransferEntityMapper = mock<SdTransferEntityMapper>()
-    private val sdTransferModelMapper = mock<SdTransferModelMapper>()
     private val backupDao = mock<BackupDao>()
     private val backupEntityMapper = mock<BackupEntityMapper>()
     private val backupModelMapper = mock<BackupModelMapper>()
@@ -135,9 +127,6 @@ internal class MegaLocalRoomFacadeTest {
             decryptData = decryptData,
             completedTransferEntityMapper = completedTransferEntityMapper,
             completedTransferLegacyModelMapper = completedTransferLegacyModelMapper,
-            sdTransferDao = { sdTransferDao },
-            sdTransferEntityMapper = sdTransferEntityMapper,
-            sdTransferModelMapper = sdTransferModelMapper,
             backupDao = { backupDao },
             backupEntityMapper = backupEntityMapper,
             backupModelMapper = backupModelMapper,
@@ -261,23 +250,6 @@ internal class MegaLocalRoomFacadeTest {
 
             assertThat(underTest.getCompletedTransfers().single().size)
                 .isEqualTo(completedTransferEntities.size)
-        }
-
-    @Test
-    fun `test that insertSdTransfer invokes correctly when call insertSdTransfer`() = runTest {
-        val sdTransferEntity = mock<SdTransferEntity>()
-        val sdTransferModel = mock<SdTransfer>()
-        whenever(sdTransferEntityMapper(sdTransferModel)).thenReturn(sdTransferEntity)
-        underTest.insertSdTransfer(sdTransferModel)
-        verify(sdTransferDao).insertSdTransfer(sdTransferEntity)
-    }
-
-    @Test
-    fun `test that deleteSdTransferByTag invokes correctly when call deleteSdTransferByTag`() =
-        runTest {
-            val tag = 1
-            underTest.deleteSdTransferByTag(tag)
-            verify(sdTransferDao).deleteSdTransferByTag(tag)
         }
 
     @Test
@@ -622,19 +594,6 @@ internal class MegaLocalRoomFacadeTest {
                 awaitComplete()
             }
         }
-
-    @Test
-    fun `test that getSdTransferByTag returns mapped transfer from dao`() = runTest {
-        val tag = 1
-        val sdTransferEntity = mock<SdTransferEntity>()
-        whenever(sdTransferDao.getSdTransferByTag(tag)) doReturn sdTransferEntity
-        val expected = mock<SdTransfer>()
-        whenever(sdTransferModelMapper(sdTransferEntity)) doReturn expected
-
-        val actual = underTest.getSdTransferByTag(tag)
-
-        assertThat(actual).isEqualTo(expected)
-    }
 
     @Test
     fun `test that addCompletedTransfers insert the mapped entities`() = runTest {
