@@ -103,7 +103,7 @@ internal fun SaveScannedDocumentsView(
             MegaAppBar(
                 modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_TOOLBAR),
                 title = stringResource(R.string.scan_title_save_scan),
-                appBarType = AppBarType.BACK_NAVIGATION,
+                appBarType = AppBarType.CLOSE,
                 onNavigationPressed = { onBackPressedDispatcher?.onBackPressed() },
             )
         }
