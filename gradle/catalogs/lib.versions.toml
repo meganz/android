@@ -23,6 +23,7 @@ kotlin-serialisation = "1.7.3"
 eclipse-jgit = "6.6.0.202305301015-r"
 json = "20240303"
 mega-telephoto = "1.0.0"
+telephoto = "0.14.0"
 mega-core-ui = "2.71.20241211171938-SNAPSHOT"
 kotlinx-collections-immutable = "0.3.7"
 commonmark-java = "0.24.0"
@@ -79,6 +80,7 @@ zoomable-telephoto = { module = "me.saket.telephoto.mega:zoomable", version.ref 
 zoomable-image-coil = { module = "me.saket.telephoto.mega:zoomable-image-coil", version.ref = "mega-telephoto" }
 zoomable-image-core = { module = "me.saket.telephoto.mega:zoomable-image-core", version.ref = "mega-telephoto" }
 zoomable-image-subsampling-image = { module = "me.saket.telephoto.mega:zoomable-image-sub-sampling-image", version.ref = "mega-telephoto" }
+telephoto-flick = { module = "me.saket.telephoto:flick", version.ref = "telephoto" }
 mega-core-ui = { group = "mega.android.core", name  = "ui", version.ref = "mega-core-ui" }
 mega-core-ui-tokens = { group = "mega.android.core", name  = "ui-tokens", version.ref = "mega-core-ui"}
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }

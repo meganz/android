@@ -8,11 +8,14 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -51,6 +54,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -79,10 +83,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.request.ImageRequest
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import me.saket.telephoto.flick.FlickToDismiss
+import me.saket.telephoto.flick.FlickToDismissState
+import me.saket.telephoto.flick.rememberFlickToDismissState
 import me.saket.telephoto.zoomable.DoubleClickToZoomListener
 import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.ZoomableImageState
@@ -105,6 +113,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_alpha_070_grey_alpha_070
+import mega.privacy.android.shared.original.core.ui.theme.extensions.white_black
 import mega.privacy.android.shared.original.core.ui.theme.grey_100
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -180,6 +189,7 @@ internal fun ImagePreviewScreen(
         )
 
         val zoomableStateMap = remember { mutableMapOf<NodeId, ZoomableState?>() }
+        var flickOffsetFraction by remember { mutableFloatStateOf(0f) }
 
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect { page ->
@@ -284,12 +294,13 @@ internal fun ImagePreviewScreen(
                 .semantics { testTagsAsResourceId = true },
             scaffoldState = scaffoldState,
             contentWindowInsets = WindowInsets.ime,
+            backgroundAlpha = 0f,
             content = { innerPadding ->
                 ImagePreviewContent(
                     modifier = Modifier
                         .background(
-                            color = Color.Black.takeIf { inFullScreenMode || isMagnifierMode }
-                                ?: MaterialTheme.colors.surface,
+                            color = (Color.Black.takeIf { flickOffsetFraction == 0f && (inFullScreenMode || isMagnifierMode) }
+                                ?: MaterialTheme.colors.white_black).copy(alpha = 1f - flickOffsetFraction),
                         )
                         .padding(innerPadding),
                     pagerState = pagerState,
@@ -301,13 +312,17 @@ internal fun ImagePreviewScreen(
                     getImagePath = viewModel::getHighestResolutionImagePath,
                     getErrorImagePath = viewModel::getFallbackImagePath,
                     onImageTap = { viewModel.switchFullScreenMode() },
+                    onFlick = {
+                        flickOffsetFraction = it
+                    },
+                    onSwitchFullScreenMode = viewModel::setFullScreenMode,
                     onClickVideoPlay = onClickVideoPlay,
                     onCloseMagnifier = viewModel::switchMagnifierMode,
                     topAppBar = { imageNode ->
                         AnimatedVisibility(
                             visible = !inFullScreenMode && !isMagnifierMode,
-                            enter = fadeIn() + expandVertically(),
-                            exit = fadeOut() + shrinkVertically()
+                            enter = slideInVertically(initialOffsetY = { -it }),
+                            exit = slideOutVertically(targetOffsetY = { -it })
                         ) {
                             ImagePreviewTopBar(
                                 imageNode = imageNode,
@@ -342,8 +357,8 @@ internal fun ImagePreviewScreen(
                     bottomAppBar = { currentImageNode, index ->
                         AnimatedVisibility(
                             visible = !inFullScreenMode && !isMagnifierMode,
-                            enter = fadeIn() + expandVertically(),
-                            exit = fadeOut() + shrinkVertically()
+                            enter = slideInVertically(initialOffsetY = { it }),
+                            exit = slideOutVertically(targetOffsetY = { it })
                         ) {
                             val photoIndexText = stringResource(
                                 R.string.wizard_steps_indicator,
@@ -528,6 +543,8 @@ private fun ImagePreviewContent(
     currentImageNode: ImageNode,
     isMagnifierMode: Boolean,
     onImageTap: () -> Unit,
+    onSwitchFullScreenMode: (Boolean) -> Unit,
+    onFlick: (Float) -> Unit,
     topAppBar: @Composable (ImageNode) -> Unit,
     bottomAppBar: @Composable (ImageNode, Int) -> Unit,
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
@@ -579,6 +596,8 @@ private fun ImagePreviewContent(
                         isMagnifierMode = isMagnifierMode,
                         imageState = imageState,
                         onImageTap = onImageTap,
+                        onSwitchFullScreenMode = onSwitchFullScreenMode,
+                        onFlick = onFlick,
                         onClickVideoPlay = onClickVideoPlay,
                         onDragMagnifier = {}
                     )
@@ -608,6 +627,8 @@ private fun ImagePreviewContent(
                 isMagnifierMode = isMagnifierMode,
                 onImageTap = onImageTap,
                 onClickVideoPlay = onClickVideoPlay,
+                onSwitchFullScreenMode = onSwitchFullScreenMode,
+                onFlick = onFlick,
                 onDragMagnifier = { isDraggingMagnifier = it },
             )
         }
@@ -661,6 +682,34 @@ private fun ImagePreviewContent(
 }
 
 @Composable
+private fun HandleFlickStateEffect(
+    flickState: FlickToDismissState,
+    onSwitchFullScreenMode: (Boolean) -> Unit,
+    onFlick: (Float) -> Unit = {},
+) {
+    val gestureState = flickState.gestureState
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    LaunchedEffect(gestureState) {
+        when (gestureState) {
+            is FlickToDismissState.GestureState.Idle -> return@LaunchedEffect
+            is FlickToDismissState.GestureState.Resetting -> onSwitchFullScreenMode(false)
+            is FlickToDismissState.GestureState.Dismissing -> {
+                onSwitchFullScreenMode(true)
+                delay(gestureState.animationDuration / 2)
+                backDispatcher?.onBackPressed()
+            }
+
+            else -> onSwitchFullScreenMode(true)
+        }
+    }
+
+    LaunchedEffect(flickState.offsetFraction) {
+        onFlick(flickState.offsetFraction)
+    }
+}
+
+@Composable
 private fun ImagePreviewContent(
     imageNode: ImageNode,
     progress: Int,
@@ -670,10 +719,22 @@ private fun ImagePreviewContent(
     onImageTap: () -> Unit,
     onClickVideoPlay: (ImageNode) -> Unit,
     onDragMagnifier: (Boolean) -> Unit,
+    onSwitchFullScreenMode: (Boolean) -> Unit,
+    onFlick: (Float) -> Unit = {},
     modifier: Modifier = Modifier,
     imageState: ZoomableImageState? = null,
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
+    val flickState = rememberFlickToDismissState(dismissThresholdRatio = 0.25f)
+    HandleFlickStateEffect(
+        flickState = flickState,
+        onSwitchFullScreenMode = onSwitchFullScreenMode,
+        onFlick = onFlick
+    )
+    FlickToDismiss(
+        state = flickState,
+        modifier = modifier
+            .fillMaxSize(),
+    ) {
         val isVideo = imageNode.type is VideoFileTypeInfo
         ImageContent(
             fullSizePath = imageNode.run {

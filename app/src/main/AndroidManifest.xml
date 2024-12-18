@@ -710,6 +710,7 @@
             android:launchMode="singleTop" />
         <activity
             android:name=".presentation.imagepreview.ImagePreviewActivity"
+            android:theme="@style/Theme.Mega.ImagePreview"
             android:label=""
             android:launchMode="singleTop"
             android:windowSoftInputMode="stateHidden|adjustResize" />

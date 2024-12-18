@@ -46,6 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.map
@@ -85,6 +86,7 @@ fun MegaScaffold(
     modifier: Modifier = Modifier,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
+    backgroundAlpha: Float = DefaultAlpha,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
@@ -130,6 +132,7 @@ fun MegaScaffold(
                 modifier = modifier,
                 scaffoldState = scaffoldState,
                 contentWindowInsets = contentWindowInsets,
+                backgroundAlpha = backgroundAlpha,
                 topBar = topBar,
                 bottomBar = bottomBar,
                 floatingActionButton = {
@@ -153,6 +156,7 @@ fun MegaScaffold(
                 modifier = modifier,
                 scaffoldState = scaffoldState,
                 contentWindowInsets = contentWindowInsets,
+                backgroundAlpha = backgroundAlpha,
                 topBar = topBar,
                 bottomBar = bottomBar,
                 floatingActionButton = floatingActionButton,
@@ -169,6 +173,7 @@ private fun MegaScaffold(
     modifier: Modifier = Modifier,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
+    backgroundAlpha: Float,
     topBar: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
@@ -200,7 +205,9 @@ private fun MegaScaffold(
                 }
             },
             floatingActionButton = floatingActionButton,
-            backgroundColor = MegaOriginalTheme.colors.background.pageBackground,
+            backgroundColor = MegaOriginalTheme.colors.background.pageBackground.copy(
+                alpha = backgroundAlpha
+            ),
             contentWindowInsets = contentWindowInsets,
             content = { paddingValues ->
                 content.invoke(paddingValues)

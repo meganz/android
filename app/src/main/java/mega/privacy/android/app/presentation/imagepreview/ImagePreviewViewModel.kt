@@ -434,6 +434,16 @@ class ImagePreviewViewModel @Inject constructor(
         }
     }
 
+    fun setFullScreenMode(
+        isFullScreenMode: Boolean
+    ) {
+        _state.update {
+            it.copy(
+                inFullScreenMode = isFullScreenMode,
+            )
+        }
+    }
+
     fun setCurrentImageNodeIndex(currentImageNodeIndex: Int) {
         _state.update {
             it.copy(

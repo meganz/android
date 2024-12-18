@@ -317,6 +317,7 @@ dependencies {
     implementation(lib.zoomable.image.coil)
     implementation(lib.zoomable.image.core)
     implementation(lib.zoomable.image.subsampling.image)
+    implementation(lib.telephoto.flick)
     implementation(lib.commonmark.java)
 
     // Debug
