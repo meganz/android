@@ -744,22 +744,21 @@ class HomepageFragment : Fragment() {
     /**
      * Update FAB position, considering the visibility of PSA layout and mini audio player.
      *
-     * @param psaLayoutHeight height of PSA layout
-     * @param miniAudioPlayerHeight height of mini audio player
+     * @param extendsHeight the height of the PSA layout or mini audio player
      */
-    fun updateFabPosition(psaLayoutHeight: Int, miniAudioPlayerHeight: Int) {
+    fun updateFabPosition(extendsHeight: Int) {
         if (!this::fabMain.isInitialized) {
             return
         }
 
         val fabMainParams = fabMain.layoutParams as ConstraintLayout.LayoutParams
         fabMainParams.bottomMargin =
-            resources.getDimensionPixelSize(R.dimen.fab_margin_span) + psaLayoutHeight + miniAudioPlayerHeight
+            resources.getDimensionPixelSize(R.dimen.fab_margin_span) + extendsHeight
         fabMain.layoutParams = fabMainParams
 
         val fabMaskMainParams = fabMaskMain.layoutParams as ConstraintLayout.LayoutParams
         fabMaskMainParams.bottomMargin =
-            resources.getDimensionPixelSize(R.dimen.fab_margin_span) + psaLayoutHeight + miniAudioPlayerHeight
+            resources.getDimensionPixelSize(R.dimen.fab_margin_span) + extendsHeight
         fabMaskMain.layoutParams = fabMaskMainParams
     }
 

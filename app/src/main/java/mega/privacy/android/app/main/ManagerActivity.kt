@@ -2335,6 +2335,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         } else {
             hideAdsView()
         }
+        updateHomepageFabPosition()
     }
 
     private fun setupAdsView() {
@@ -3967,12 +3968,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         val params = CoordinatorLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
         )
-        val padding =
-            if (adsContainerView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
-            else resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
         params.setMargins(
             0, 0, 0,
-            padding
+            resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
         )
         fragmentLayout.layoutParams = params
     }
@@ -4000,11 +3998,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         val fragment =
             getFragmentByType(HomepageFragment::class.java)
         if (isInMainHomePage && fragment != null) {
-            fragment.updateFabPosition(
-                psaViewHolder?.psaLayoutHeight().takeIf { psaViewHolder?.visible() == true } ?: 0,
-                miniAudioPlayerController?.playerHeight()
-                    .takeIf { miniAudioPlayerController?.visible() == true } ?: 0
-            )
+            val extendsHeight =
+                (psaViewHolder?.psaLayoutHeight().takeIf { psaViewHolder?.visible() == true }
+                    ?: 0) + (miniAudioPlayerController?.playerHeight()
+                    .takeIf { miniAudioPlayerController?.visible() == true }
+                    ?: 0) + if (adsContainerView.isVisible) adsContainerView.height else 0
+            fragment.updateFabPosition(extendsHeight)
         }
     }
 
@@ -6489,9 +6488,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
-            val height: Int =
-                if (adsContainerView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
-                else resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
+            val height: Int = resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
 
             if (hide && visibility == View.VISIBLE) {
                 updateMiniAudioPlayerVisibility(false)
