@@ -150,6 +150,7 @@ class SyncPromotionBottomSheetTest {
                 sheetBody = {
                     SyncPromotionBottomSheet(
                         upgradeAccountClicked = onUpgrade,
+                        onSyncNewFolderClicked = {},
                         isFreeAccount = isFreeAccount,
                     )
                 },

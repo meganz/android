@@ -65,6 +65,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.feature.sync.navigation.getSyncListRoute
 import mega.privacy.android.feature.sync.navigation.getSyncNewFolderRoute
+import mega.privacy.android.feature.sync.ui.SyncHostActivity
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.settings.SettingsNavigator
 import java.io.File
@@ -430,13 +431,13 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openSyncs(context: Context) {
-        context.startActivity(Intent(Intent.ACTION_VIEW).apply {
+        context.startActivity(Intent(context, SyncHostActivity::class.java).apply {
             data = "https://mega.nz/${getSyncListRoute()}".toUri()
         })
     }
 
     override fun openNewSync(context: Context, syncType: SyncType) {
-        context.startActivity(Intent(Intent.ACTION_VIEW).apply {
+        context.startActivity(Intent(context, SyncHostActivity::class.java).apply {
             data = "https://mega.nz/${getSyncNewFolderRoute(syncType = syncType)}".toUri()
         })
     }

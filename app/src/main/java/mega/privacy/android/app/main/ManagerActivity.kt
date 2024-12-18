@@ -289,6 +289,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
 import mega.privacy.android.domain.entity.psa.Psa
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
@@ -1203,6 +1204,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                 modifier = Modifier.semantics { testTagsAsResourceId = true },
                                 isFreeAccount = state.isFreeAccount,
                                 upgradeAccountClicked = { megaNavigator.openUpgradeAccount(this@ManagerActivity) },
+                                onSyncNewFolderClicked = {
+                                    megaNavigator.openNewSync(
+                                        context = this@ManagerActivity,
+                                        syncType = SyncType.TYPE_TWOWAY
+                                    )
+                                },
                                 hideSheet = { coroutineScope.launch { syncPromotionViewModel.onConsumeShouldShowSyncPromotion() } })
                         },
                         expandedRoundedCorners = true,
