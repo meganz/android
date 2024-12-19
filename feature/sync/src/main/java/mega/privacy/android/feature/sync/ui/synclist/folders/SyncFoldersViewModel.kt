@@ -154,11 +154,8 @@ internal class SyncFoldersViewModel @Inject constructor(
                         it.localPaths.firstOrNull()?.contains(sync.deviceStoragePath)
                             ?: (it.nodeNames.first().contains(sync.megaStoragePath))
                     },
-                    expanded = if (_uiState.value.syncUiItems.isNotEmpty()) {
-                        _uiState.value.syncUiItems.first { it.id == sync.id }.expanded
-                    } else {
-                        false
-                    },
+                    expanded = _uiState.value.syncUiItems.firstOrNull { it.id == sync.id }?.expanded
+                        ?: false,
                     numberOfFiles = numOfFiles,
                     numberOfFolders = numOfFolders,
                     totalSizeInBytes = totalSizeInBytes,
