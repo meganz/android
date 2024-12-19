@@ -183,7 +183,8 @@ class CallChangesObserver @Inject constructor(
                     chatId = chatId,
                     callId = callId,
                     endCallReason = call.endCallReason,
-                    isIgnored = call.isIgnored
+                    isIgnored = call.isIgnored,
+                    isOutgoing = isOutgoing
                 )
             }
 
@@ -420,6 +421,7 @@ class CallChangesObserver @Inject constructor(
         callId: Long,
         endCallReason: EndCallReason?,
         isIgnored: Boolean,
+        isOutgoing: Boolean,
     ) {
         chatManagement.setOpeningMeetingLink(chatId, false)
         wakeLock?.takeIf { it.isHeld }?.release()
@@ -429,7 +431,7 @@ class CallChangesObserver @Inject constructor(
         chatManagement.setRequestSentCall(callId, false)
 
         try {
-            if (endCallReason == EndCallReason.NoAnswer && !isIgnored && !isRequestSent) {
+            if (endCallReason == EndCallReason.NoAnswer && !isIgnored && !isRequestSent && !isOutgoing) {
                 val chatRoom = megaChatApi.getChatRoom(chatId)
                 if (chatRoom != null
                     && !chatRoom.isGroup
