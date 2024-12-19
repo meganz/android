@@ -2811,9 +2811,11 @@ interface MegaApiGateway {
     fun getABTestValue(flag: String): Long
 
     /**
-     * Get banner quota time
+     * Get the time (in seconds) during which transfers will be stopped due to a bandwidth over quota
+     *
+     * @return Time (in seconds) during which transfers will be stopped, otherwise 0
      */
-    suspend fun getBannerQuotaTime(): Long
+    suspend fun getBandwidthOverQuotaDelay(): Long
 
     /**
      * Launches a request to stop sharing a file/folder

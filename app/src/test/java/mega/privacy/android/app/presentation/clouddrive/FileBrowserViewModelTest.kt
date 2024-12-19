@@ -62,8 +62,8 @@ import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.ShouldEnterMediaDiscoveryModeUseCase
-import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -582,7 +582,7 @@ class FileBrowserViewModelTest {
     fun `test that the transfer overquota banner is hidden when transfers management detects a non overquota state`() =
         runTest {
             whenever(transfersManagement.isTransferOverQuotaBannerShown).thenReturn(false)
-            whenever(getBandwidthOverQuotaDelayUseCase()).thenReturn(10000)
+            whenever(getBandwidthOverQuotaDelayUseCase()).thenReturn(10000.seconds)
             underTest.changeTransferOverQuotaBannerVisibility()
             underTest.state.test {
                 assertThat(awaitItem().shouldShowBannerVisibility).isFalse()
@@ -718,7 +718,7 @@ class FileBrowserViewModelTest {
         whenever(getParentNodeUseCase(NodeId(any()))).thenReturn(null)
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
-        whenever(getBandwidthOverQuotaDelayUseCase()).thenReturn(1L)
+        whenever(getBandwidthOverQuotaDelayUseCase()).thenReturn(1.seconds)
         whenever(fileDurationMapper(any())).thenReturn(1.seconds)
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())

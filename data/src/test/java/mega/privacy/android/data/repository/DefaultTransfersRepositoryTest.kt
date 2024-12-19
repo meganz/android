@@ -79,6 +79,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Test class for [DefaultTransfersRepository]
@@ -1672,6 +1673,15 @@ class DefaultTransfersRepositoryTest {
             underTest.clearPreferences()
             verify(transfersPreferencesGateway).clearPreferences()
         }
+
+    @Test
+    fun `test that getBandwidthOverQuotaDelay invokes and returns correctly`() = runTest {
+        val expected = 123L
+
+        whenever(megaApiGateway.getBandwidthOverQuotaDelay()).thenReturn(expected)
+
+        assertThat(underTest.getBandwidthOverQuotaDelay()).isEqualTo(expected.seconds)
+    }
 
     private fun getCompletedTransfer(fileName: String) = CompletedTransfer(
         fileName = fileName,

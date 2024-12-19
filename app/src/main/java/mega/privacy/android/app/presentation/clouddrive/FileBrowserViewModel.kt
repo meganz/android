@@ -66,8 +66,8 @@ import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.ShouldEnterMediaDiscoveryModeUseCase
-import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -671,7 +671,7 @@ class FileBrowserViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     shouldShowBannerVisibility = transfersManagement.isTransferOverQuotaBannerShown,
-                    bannerTime = overQuotaBannerTimeDelay
+                    bannerTime = overQuotaBannerTimeDelay.inWholeSeconds
                 )
             }
         }

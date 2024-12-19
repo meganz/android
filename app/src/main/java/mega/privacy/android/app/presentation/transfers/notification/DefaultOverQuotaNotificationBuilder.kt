@@ -26,10 +26,10 @@ import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
-import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
-import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
 import nz.mega.sdk.MegaAccountDetails
 import javax.inject.Inject
 
@@ -108,7 +108,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             R.id.content_text,
             context.getString(
                 R.string.current_text_depleted_transfer_overquota,
-                TimeUtils.getHumanizedTime(getBandwidthOverQuotaDelayUseCase())
+                TimeUtils.getHumanizedTime(getBandwidthOverQuotaDelayUseCase().inWholeSeconds)
             )
         )
         val dismissButtonText =

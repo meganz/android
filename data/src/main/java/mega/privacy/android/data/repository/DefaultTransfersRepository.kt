@@ -80,6 +80,7 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Default [TransferRepository] implementation.
@@ -815,6 +816,10 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun clearPreferences() = withContext(ioDispatcher) {
         transfersPreferencesGateway.get().clearPreferences()
+    }
+
+    override suspend fun getBandwidthOverQuotaDelay() = withContext(ioDispatcher) {
+        megaApiGateway.getBandwidthOverQuotaDelay().seconds
     }
 }
 

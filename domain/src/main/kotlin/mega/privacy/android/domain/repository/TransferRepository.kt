@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferRequest
 import java.io.File
+import kotlin.time.Duration
 
 /**
  * Transfer repository of Domain Module
@@ -580,4 +581,11 @@ interface TransferRepository {
      * Clear all preferences
      */
     suspend fun clearPreferences()
+
+    /**
+     * Get the time during which transfers will be stopped due to a bandwidth over quota
+     *
+     * @return Time during which transfers will be stopped, otherwise 0
+     */
+    suspend fun getBandwidthOverQuotaDelay(): Duration
 }

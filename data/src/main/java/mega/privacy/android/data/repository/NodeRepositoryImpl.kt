@@ -855,11 +855,6 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getBannerQuotaTime() =
-        withContext(ioDispatcher) {
-            megaApiGateway.getBannerQuotaTime()
-        }
-
     override suspend fun disableExport(nodeToDisable: NodeId) = withContext(ioDispatcher) {
         val node = getMegaNodeByHandle(nodeToDisable, true)
         requireNotNull(node) { "Node to disable export with handle ${nodeToDisable.longValue} not found" }
