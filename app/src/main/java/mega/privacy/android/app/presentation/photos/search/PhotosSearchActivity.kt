@@ -295,7 +295,7 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
                 )
             }
         }
-        if (transfersManagement.isOnTransferOverQuota()) {
+        if (transfersManagementViewModel.isTransferOverQuota()) {
             transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
         }
     }

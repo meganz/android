@@ -68,17 +68,6 @@ class TransfersManagement @Inject constructor(
                 || transferOverQuotaTimestamp - System.currentTimeMillis() > WAIT_TIME_TO_SHOW_WARNING
 
     /**
-     * Checks if it is on transfer over quota.
-     *
-     * @return True if it is on transfer over quota, false otherwise.
-     */
-    @Deprecated(
-        message = "There's a use case to get the transfer over quota that: MonitorTransferOverQuotaUseCase",
-        replaceWith = ReplaceWith("MonitorTransferOverQuotaUseCase().first()")
-    )
-    fun isOnTransferOverQuota(): Boolean = megaApi.bandwidthOverquotaDelay > 0
-
-    /**
      * Sets if the widget has to be shown depending on if it is on transfer over quota
      * and the Transfers section has been opened from the transfers widget.
      * Also sets if the "transfer over quota" banner has to be shown due to the same reason.

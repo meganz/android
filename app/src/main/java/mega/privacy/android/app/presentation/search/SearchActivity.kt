@@ -715,7 +715,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             }
             finish()
         }
-        if (transfersManagement.isOnTransferOverQuota()) {
+        if (transfersManagementViewModel.isTransferOverQuota()) {
             transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
         }
     }

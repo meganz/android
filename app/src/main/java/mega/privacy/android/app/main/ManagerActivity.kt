@@ -1271,7 +1271,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
         }
 
-        if (transfersManagement.isOnTransferOverQuota()) {
+        if (transfersManagementViewModel.isTransferOverQuota()) {
             transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
         }
     }

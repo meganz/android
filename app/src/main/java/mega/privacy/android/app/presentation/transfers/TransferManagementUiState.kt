@@ -12,6 +12,8 @@ import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
  * @property lastTransfersCancelled flag to indicate that last finished transfers has been cancelled,
  * so transfer status should be [TransfersStatus.Cancelled] until new transfer events are received
  * @property isTransferError true if there is a transfer error and transfers section has not been visited.
+ * @property isOnline true if the device is online
+ * @property isTransferOverQuota true if the account is in transfer over quota
  */
 data class TransferManagementUiState(
     val transfersInfo: TransfersInfo = TransfersInfo(),
@@ -19,4 +21,5 @@ data class TransferManagementUiState(
     val lastTransfersCancelled: Boolean = false,
     val isTransferError: Boolean = false,
     val isOnline: Boolean = false,
+    val isTransferOverQuota: Boolean = false,
 )

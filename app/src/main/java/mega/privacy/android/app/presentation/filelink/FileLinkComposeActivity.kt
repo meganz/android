@@ -250,7 +250,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
      * Handle widget click
      */
     private fun onTransfersWidgetClick() {
-        if (transfersManagement.isOnTransferOverQuota()) {
+        if (transfersManagementViewModel.isTransferOverQuota()) {
             transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
         }
         lifecycleScope.launch {

@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel.Companion.waitTimeToShowOffline
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -25,6 +24,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorLastTransfersHaveBeenCancelledUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.shared.original.core.ui.model.TransfersInfo
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import org.junit.jupiter.api.AfterAll
@@ -51,7 +51,6 @@ class TransfersManagementViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val transfersInfoMapper = mock<TransfersInfoMapper>()
-    private val transfersManagement = mock<TransfersManagement>()
     private val monitorLastTransfersHaveBeenCancelledUseCase =
         mock<MonitorLastTransfersHaveBeenCancelledUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
@@ -60,6 +59,7 @@ class TransfersManagementViewModelTest {
     private var monitorConnectivityUseCaseFlow = MutableStateFlow(false)
     private val monitorLastTransfersHaveBeenCancelledUseCaseFlow = MutableSharedFlow<Unit>()
     private val monitorCompletedTransferEventUseCase = mock<MonitorCompletedTransferEventUseCase>()
+    private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase>()
 
     @BeforeAll
     fun setup() = runTest {
@@ -76,13 +76,13 @@ class TransfersManagementViewModelTest {
             getNumPendingTransfersUseCase = mock(),
             isCompletedTransfersEmptyUseCase = mock(),
             transfersInfoMapper = transfersInfoMapper,
-            transfersManagement = transfersManagement,
             ioDispatcher = ioDispatcher,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             monitorTransfersStatusUseCase = monitorTransfersStatusUseCase,
             monitorLastTransfersHaveBeenCancelledUseCase = monitorLastTransfersHaveBeenCancelledUseCase,
             monitorCompletedTransfersEventUseCase = monitorCompletedTransferEventUseCase,
             samplePeriod = 0L,
+            monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
         )
     }
 
@@ -90,7 +90,6 @@ class TransfersManagementViewModelTest {
     fun resetMocks() {
         reset(
             transfersInfoMapper,
-            transfersManagement,
             monitorConnectivityUseCase,
             monitorLastTransfersHaveBeenCancelledUseCase,
         )
@@ -363,6 +362,21 @@ class TransfersManagementViewModelTest {
             }
         }
 
+    @Test
+    fun `test that monitorTransferOverQuotaUseCase updates state`() = runTest {
+        val flow = MutableStateFlow(false)
+
+        whenever(monitorTransferOverQuotaUseCase()) doReturn flow
+
+        initTest()
+
+        underTest.state.map { it.isTransferOverQuota }.test {
+            assertThat(awaitItem()).isFalse()
+            flow.emit(true)
+            assertThat(awaitItem()).isTrue()
+        }
+    }
+
     private fun commonStub() {
         monitorConnectivityUseCaseFlow = MutableStateFlow(true)
         whenever(monitorConnectivityUseCase()) doReturn monitorConnectivityUseCaseFlow
@@ -382,5 +396,6 @@ class TransfersManagementViewModelTest {
             )
         ) doReturn TransfersInfo()
         whenever(monitorCompletedTransferEventUseCase()) doReturn emptyFlow()
+        whenever(monitorTransferOverQuotaUseCase()) doReturn emptyFlow()
     }
 }

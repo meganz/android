@@ -9,10 +9,10 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.extensions.skipUnstable
@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.transfers.MonitorLastTransfersHaveBee
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersStatusUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.IsCompletedTransfersEmptyUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
 import timber.log.Timber
 import javax.inject.Inject
@@ -36,7 +37,6 @@ import kotlin.time.Duration.Companion.milliseconds
  * @property getNumPendingTransfersUseCase      [GetNumPendingTransfersUseCase]
  * @property isCompletedTransfersEmptyUseCase   [IsCompletedTransfersEmptyUseCase]
  * @property transfersInfoMapper                [TransfersInfoMapper]
- * @property transfersManagement                [TransfersManagement]
  */
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -44,13 +44,13 @@ class TransfersManagementViewModel @Inject constructor(
     private val getNumPendingTransfersUseCase: GetNumPendingTransfersUseCase,
     private val isCompletedTransfersEmptyUseCase: IsCompletedTransfersEmptyUseCase,
     private val transfersInfoMapper: TransfersInfoMapper,
-    private val transfersManagement: TransfersManagement,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     monitorTransfersStatusUseCase: MonitorTransfersStatusUseCase,
     monitorLastTransfersHaveBeenCancelledUseCase: MonitorLastTransfersHaveBeenCancelledUseCase,
     private val monitorCompletedTransfersEventUseCase: MonitorCompletedTransferEventUseCase,
     private val samplePeriod: Long?,
+    private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransferManagementUiState())
     private val shouldShowCompletedTab = SingleLiveEvent<Boolean>()
@@ -93,6 +93,7 @@ class TransfersManagementViewModel @Inject constructor(
                 }
         }
         monitorFailedTransfers()
+        monitorTransferOverQuota()
     }
 
     private fun monitorFailedTransfers() {
@@ -104,6 +105,19 @@ class TransfersManagementViewModel @Inject constructor(
             }
         }
     }
+
+    private fun monitorTransferOverQuota() {
+        viewModelScope.launch {
+            monitorTransferOverQuotaUseCase().collectLatest { isTransferOverQuota ->
+                _state.update { state -> state.copy(isTransferOverQuota = isTransferOverQuota) }
+            }
+        }
+    }
+
+    /**
+     * Checks if the transfer is over quota.
+     */
+    fun isTransferOverQuota() = state.value.isTransferOverQuota
 
     /**
      * Checks if should show transfer errors. If so, updates state as the error is immediately consumed.
