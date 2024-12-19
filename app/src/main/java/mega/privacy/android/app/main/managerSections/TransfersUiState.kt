@@ -11,9 +11,11 @@ import mega.privacy.android.domain.entity.transfer.Transfer
  * @property pauseOrResumeTransferResult
  * @property cancelTransfersResult
  * @property startEvent event to start a new transfer
+ * @property isInTransferOverQuota
  */
 data class TransfersUiState(
     val pauseOrResumeTransferResult: Result<Transfer>? = null,
     val cancelTransfersResult: Result<Unit>? = null,
     val startEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
+    val isInTransferOverQuota: Boolean = false,
 )

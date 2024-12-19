@@ -6,13 +6,14 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper
@@ -36,6 +37,7 @@ import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseC
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import nz.mega.sdk.MegaTransfer
@@ -54,7 +56,6 @@ import java.math.BigInteger
 @ExperimentalCoroutinesApi
 internal class TransfersViewModelTest {
     private lateinit var underTest: TransfersViewModel
-    private val transfersManagement: TransfersManagement = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase = mock()
     private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase = mock()
@@ -72,6 +73,9 @@ internal class TransfersViewModelTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val transferAppDataMapper = mock<TransferAppDataMapper>()
     private val retryChatUploadUseCase = mock<RetryChatUploadUseCase>()
+    private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase> {
+        onBlocking { invoke() } doReturn emptyFlow()
+    }
 
     @BeforeEach
     fun setUp() {
@@ -80,7 +84,6 @@ internal class TransfersViewModelTest {
 
     private fun initViewModel() {
         underTest = TransfersViewModel(
-            transfersManagement = transfersManagement,
             ioDispatcher = ioDispatcher,
             moveTransferBeforeByTagUseCase = moveTransferBeforeByTagUseCase,
             moveTransferToFirstByTagUseCase = moveTransferToFirstByTagUseCase,
@@ -98,6 +101,7 @@ internal class TransfersViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             transferAppDataMapper = transferAppDataMapper,
             retryChatUploadUseCase = retryChatUploadUseCase,
+            monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
         )
     }
 
@@ -471,6 +475,22 @@ internal class TransfersViewModelTest {
                 assertThat(awaitItem()).isEqualTo(expected)
             }
         }
+
+    @Test
+    fun `test that MonitorTransferOverQuotaUseCase updates state`() = runTest {
+        val flow = MutableStateFlow(false)
+
+        whenever(monitorTransferOverQuotaUseCase()).thenReturn(flow)
+
+        initViewModel()
+
+        assertThat(underTest.isOnTransferOverQuota()).isFalse()
+
+        flow.emit(true)
+        advanceUntilIdle()
+
+        assertThat(underTest.isOnTransferOverQuota()).isTrue()
+    }
 
 
     companion object {

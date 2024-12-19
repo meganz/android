@@ -13,11 +13,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -43,6 +43,7 @@ import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseC
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import nz.mega.sdk.MegaTransfer
@@ -56,7 +57,6 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class TransfersViewModel @Inject constructor(
-    private val transfersManagement: TransfersManagement,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase,
     private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase,
@@ -74,6 +74,7 @@ class TransfersViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val transferAppDataMapper: TransferAppDataMapper,
     private val retryChatUploadUseCase: RetryChatUploadUseCase,
+    private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TransfersUiState())
 
@@ -151,6 +152,16 @@ class TransfersViewModel @Inject constructor(
                     _completedTransfers.update { completedTransfers }
                 }
         }
+
+        monitorTransferOverQuota()
+    }
+
+    private fun monitorTransferOverQuota() {
+        viewModelScope.launch {
+            monitorTransferOverQuotaUseCase().collectLatest { isInTransferOverQuota ->
+                _uiState.update { state -> state.copy(isInTransferOverQuota = isInTransferOverQuota) }
+            }
+        }
     }
 
     /**
@@ -160,7 +171,7 @@ class TransfersViewModel @Inject constructor(
         viewModelScope.launch {
             _activeState.update {
                 ActiveTransfersState.GetMoreQuotaViewVisibility(
-                    transfersManagement.isOnTransferOverQuota()
+                    uiState.value.isInTransferOverQuota
                 )
             }
         }
@@ -171,7 +182,7 @@ class TransfersViewModel @Inject constructor(
      *
      * @return True if it is on transfer over quota, false otherwise.
      */
-    fun isOnTransferOverQuota() = transfersManagement.isOnTransferOverQuota()
+    fun isOnTransferOverQuota() = uiState.value.isInTransferOverQuota
 
     /**
      * Set active transfers
