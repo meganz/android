@@ -154,9 +154,6 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
-import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_CLOUD_SLOT_ID
-import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_HOME_SLOT_ID
-import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
 import mega.privacy.android.app.presentation.backups.BackupsFragment
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
@@ -2322,13 +2319,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     /**
      * Checks for the screen orientation and handle showing the Ads view
-     * @param slotId assigned Ad slot id to be used to fetch new ad
      */
-    fun handleShowingAds(slotId: String) {
+    fun handleShowingAds() {
         //slotId is not used for now during the implementation of the new Ads SDK
-        if (this.isPortrait() && googleAdsManager.isAdRequestAvailable() &&
-            (drawerItem == DrawerItem.CLOUD_DRIVE || isInMainHomePage || isInPhotosPage)
-        ) {
+        if (isShowingAds()) {
             showAdsView()
             showBNVImmediate()
             showHideBottomNavigationView(hide = false)
@@ -2336,6 +2330,19 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             hideAdsView()
         }
         updateHomepageFabPosition()
+    }
+
+    private fun isShowingAds(): Boolean {
+        return isPortrait() && googleAdsManager.isAdRequestAvailable() &&
+                (drawerItem == DrawerItem.CLOUD_DRIVE
+                        || drawerItem == DrawerItem.CHAT
+                        || drawerItem == DrawerItem.SHARED_ITEMS
+                        || drawerItem == DrawerItem.HOMEPAGE && homepageScreen == HomepageScreen.HOMEPAGE
+                        || drawerItem == DrawerItem.HOMEPAGE && homepageScreen == HomepageScreen.FAVOURITES
+                        || drawerItem == DrawerItem.HOMEPAGE && homepageScreen == HomepageScreen.DOCUMENTS
+                        || drawerItem == DrawerItem.HOMEPAGE && homepageScreen == HomepageScreen.AUDIO
+                        || drawerItem == DrawerItem.HOMEPAGE && homepageScreen == HomepageScreen.VIDEO_SECTION
+                        || isInPhotosPage)
     }
 
     private fun setupAdsView() {
@@ -2347,7 +2354,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     modifier = Modifier.fillMaxSize(),
                     request = request,
                     onAdLoaded = {
-                        handleShowingAds("")
+                        handleShowingAds()
                     },
                     onAdFailedToLoad = {
                         hideAdsView()
@@ -2742,12 +2749,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     Timber.e(e, "Exception NotificationManager - remove contact notification")
                 }
                 setToolbarTitle()
-                hideAdsView()
             }
 
             DrawerItem.CHAT -> {
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
-                hideAdsView()
             }
 
             DrawerItem.PHOTOS -> {
@@ -3329,7 +3334,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 clickDrawerItem(drawerItem)
             }
             supportInvalidateOptionsMenu()
-            hideAdsView()
         } catch (e: Exception) {
             Timber.w(e)
         }
@@ -3352,7 +3356,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             DrawerItem.HOMEPAGE -> {
                 setBottomNavigationMenuItemChecked(HOME_BNV)
                 if (isInMainHomePage) {
-                    handleShowingAds(TAB_HOME_SLOT_ID)
+                    handleShowingAds()
                 }
             }
 
@@ -3505,7 +3509,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     if (bottomNavigationCurrentItem == HOME_BNV) {
                         setAppBarVisibility(false)
                     }
-                    handleShowingAds(TAB_HOME_SLOT_ID)
+                    handleShowingAds()
                     updateTransfersWidgetVisibility()
                     setDrawerLockMode(false)
                     return@addOnDestinationChangedListener
@@ -3513,22 +3517,18 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
                 R.id.favouritesFragment -> {
                     homepageScreen = HomepageScreen.FAVOURITES
-                    hideAdsView()
                 }
 
                 R.id.documentSectionFragment -> {
                     homepageScreen = HomepageScreen.DOCUMENTS
-                    hideAdsView()
                 }
 
                 R.id.audioSectionFragment -> {
                     homepageScreen = HomepageScreen.AUDIO
-                    hideAdsView()
                 }
 
                 R.id.videoSectionFragment -> {
                     homepageScreen = HomepageScreen.VIDEO_SECTION
-                    hideAdsView()
                 }
 
                 R.id.offlineFragmentCompose,
@@ -3554,7 +3554,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             if (destinationId != R.id.offlineFragmentCompose)
                 setAppBarVisibility(true)
             showHideBottomNavigationView(true)
-            hideAdsView()
             supportInvalidateOptionsMenu()
             setToolbarTitle()
             setDrawerLockMode(true)
@@ -3742,7 +3741,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     showBNVImmediate()
                     setAppBarVisibility(false)
                     showHideBottomNavigationView(false)
-                    handleShowingAds(TAB_HOME_SLOT_ID)
+                    handleShowingAds()
                 } else {
                     // For example, back from Rubbish Bin to Photos
                     setToolbarTitle()
@@ -3807,7 +3806,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV)
                 supportInvalidateOptionsMenu()
                 showFabButton()
-                hideAdsView()
                 updateSharesTab()
                 val fragment = supportFragmentManager.findFragmentByTag(SharesFragment.TAG)
                     ?: SharesFragment.newInstance()
@@ -3846,7 +3844,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 }
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
                 hideFabButton()
-                hideAdsView()
                 changeAppBarElevation(false)
                 Analytics.tracker.trackEvent(ChatRoomsBottomNavigationItemEvent)
             }
@@ -3968,10 +3965,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         val params = CoordinatorLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
         )
-        params.setMargins(
-            0, 0, 0,
-            resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
-        )
+        val height =
+            if (adsContainerView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
+            else resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
+        params.setMargins(0, 0, 0, height)
         fragmentLayout.layoutParams = params
     }
 
@@ -4002,7 +3999,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 (psaViewHolder?.psaLayoutHeight().takeIf { psaViewHolder?.visible() == true }
                     ?: 0) + (miniAudioPlayerController?.playerHeight()
                     .takeIf { miniAudioPlayerController?.visible() == true }
-                    ?: 0) + if (adsContainerView.isVisible) adsContainerView.height else 0
+                    ?: 0)
             fragment.updateFabPosition(extendsHeight)
         }
     }
@@ -4961,7 +4958,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     drawerItem = DrawerItem.CLOUD_DRIVE
                     setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV)
                 }
-                handleShowingAds(TAB_CLOUD_SLOT_ID)
+                handleShowingAds()
             }
 
             R.id.bottom_navigation_item_homepage -> {
@@ -4972,7 +4969,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 } else {
                     setBottomNavigationMenuItemChecked(HOME_BNV)
                 }
-                handleShowingAds(TAB_HOME_SLOT_ID)
+                handleShowingAds()
             }
 
             R.id.bottom_navigation_item_camera_uploads -> {
@@ -4982,7 +4979,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     drawerItem = DrawerItem.PHOTOS
                     setBottomNavigationMenuItemChecked(PHOTOS_BNV)
                 }
-                handleShowingAds(TAB_PHOTOS_SLOT_ID)
+                handleShowingAds()
             }
 
             R.id.bottom_navigation_item_shared_items -> {
@@ -4999,13 +4996,13 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     drawerItem = DrawerItem.SHARED_ITEMS
                     setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV)
                 }
-                hideAdsView()
+                handleShowingAds()
             }
 
             R.id.bottom_navigation_item_chat -> {
                 drawerItem = DrawerItem.CHAT
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
-                hideAdsView()
+                handleShowingAds()
             }
         }
         checkIfShouldCloseSearchView(oldDrawerItem)
@@ -6488,11 +6485,14 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
-            val height: Int = resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
+            val height =
+                if (adsContainerView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
+                else resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
 
             if (hide && visibility == View.VISIBLE) {
                 updateMiniAudioPlayerVisibility(false)
-                params.setMargins(0, 0, 0, 0)
+                val bottom = if (adsContainerView.isVisible) adsContainerView.height else 0
+                params.setMargins(0, 0, 0, bottom)
                 fragmentLayout.layoutParams = params
                 animate().translationY(height.toFloat())
                     .setDuration(Constants.ANIMATION_DURATION)

@@ -45,8 +45,8 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
@@ -390,7 +390,7 @@ class PhotosFragment : Fragment() {
             timelineActionMode?.finish()
             timelineActionMode = null
             managerActivity.showHideBottomNavigationView(false)
-            managerActivity.handleShowingAds(TAB_PHOTOS_SLOT_ID)
+            managerActivity.handleShowingAds()
         }
     }
 
@@ -418,13 +418,17 @@ class PhotosFragment : Fragment() {
                 enterAlbumsActionMode()
             }
             albumsActionMode?.title = state.selectedAlbumIds.size.toString()
-            managerActivity.hideAdsView()
-            managerActivity.showHideBottomNavigationView(true)
+            if (managerActivity.drawerItem == DrawerItem.PHOTOS) {
+                managerActivity.hideAdsView()
+                managerActivity.showHideBottomNavigationView(true)
+            }
         } else {
             albumsActionMode?.finish()
             albumsActionMode = null
-            managerActivity.showHideBottomNavigationView(false)
-            managerActivity.handleShowingAds(TAB_PHOTOS_SLOT_ID)
+            if (managerActivity.drawerItem == DrawerItem.PHOTOS) {
+                managerActivity.showHideBottomNavigationView(false)
+                managerActivity.handleShowingAds()
+            }
         }
     }
 

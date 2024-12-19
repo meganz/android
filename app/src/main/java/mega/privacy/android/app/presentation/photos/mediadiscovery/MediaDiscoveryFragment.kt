@@ -35,7 +35,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_CLOUD_SLOT_ID
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.photos.albums.importlink.ImagePreviewProvider
@@ -154,7 +153,7 @@ class MediaDiscoveryFragment : Fragment() {
         if (isVisible) {
             managerActivity?.hideAdsView()
         } else {
-            managerActivity?.handleShowingAds(TAB_CLOUD_SLOT_ID)
+            managerActivity?.handleShowingAds()
         }
     }
 
@@ -286,7 +285,7 @@ class MediaDiscoveryFragment : Fragment() {
         actionMode?.finish()
         actionMode = null
         managerActivity?.showHideBottomNavigationView(false)
-        managerActivity?.handleShowingAds(TAB_CLOUD_SLOT_ID)
+        managerActivity?.handleShowingAds()
     }
 
     private fun handleActionMode(photo: Photo) {
