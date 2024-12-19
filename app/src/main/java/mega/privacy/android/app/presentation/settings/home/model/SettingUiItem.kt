@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.settings.model
+package mega.privacy.android.app.presentation.settings.home.model
 
 import androidx.compose.runtime.Composable
 

@@ -6,8 +6,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.presentation.settings.SettingContainerViewModel
-import mega.privacy.android.app.presentation.settings.view.SettingsHomeView
+import mega.privacy.android.app.presentation.settings.home.SettingContainerViewModel
+import mega.privacy.android.app.presentation.settings.home.view.SettingsHomeView
 
 /**
  * Settings home
@@ -27,6 +27,6 @@ fun NavGraphBuilder.settingsHome(
     composable<SettingsHome> { backStackEntry ->
         val viewModel = hiltViewModel<SettingContainerViewModel>()
         val state by viewModel.state.collectAsStateWithLifecycle()
-        SettingsHomeView(onBackPressed)
+        SettingsHomeView(onBackPressed = onBackPressed)
     }
 }

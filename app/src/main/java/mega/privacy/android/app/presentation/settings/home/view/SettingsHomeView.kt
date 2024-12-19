@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.settings.view
+package mega.privacy.android.app.presentation.settings.home.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

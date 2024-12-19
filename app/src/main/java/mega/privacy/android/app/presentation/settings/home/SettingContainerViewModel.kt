@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.settings
+package mega.privacy.android.app.presentation.settings.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,13 +9,15 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.settings.model.SettingUiItem
+import mega.privacy.android.app.presentation.settings.home.model.SettingUiItem
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Setting container view model
  */
-class SettingContainerViewModel : ViewModel() {
+class SettingContainerViewModel @Inject constructor(
+) : ViewModel() {
     private val _state = MutableStateFlow(emptyList<SettingUiItem>())
     val state = _state.asStateFlow()
 

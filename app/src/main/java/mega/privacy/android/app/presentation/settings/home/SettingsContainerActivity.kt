@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.settings
+package mega.privacy.android.app.presentation.settings.home
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
