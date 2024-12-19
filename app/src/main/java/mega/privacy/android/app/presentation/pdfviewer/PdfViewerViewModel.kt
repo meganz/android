@@ -8,6 +8,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -26,6 +27,7 @@ import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCo
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import java.net.URL
@@ -47,6 +49,7 @@ class PdfViewerViewModel @Inject constructor(
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
 ) : ViewModel() {
 
     private val handle: Long
@@ -64,6 +67,7 @@ class PdfViewerViewModel @Inject constructor(
         monitorAccountDetail()
         monitorIsHiddenNodesOnboarded()
         checkIsNodeInBackups()
+        monitorTransferOverQuota()
     }
 
     private fun checkIsNodeInBackups() {
@@ -72,6 +76,19 @@ class PdfViewerViewModel @Inject constructor(
             _state.update { it.copy(isNodeInBackups = isNodeInBackups) }
         }
     }
+
+    private fun monitorTransferOverQuota() {
+        viewModelScope.launch {
+            monitorTransferOverQuotaUseCase().collectLatest { isInTransferOverQuota ->
+                _state.update { state -> state.copy(isInTransferOverQuota = isInTransferOverQuota) }
+            }
+        }
+    }
+
+    /**
+     * Checks if the account is overquota
+     */
+    fun isInTransferOverQuota() = uiState.value.isInTransferOverQuota
 
     /**
      * Imports a chat node if there is no name collision.

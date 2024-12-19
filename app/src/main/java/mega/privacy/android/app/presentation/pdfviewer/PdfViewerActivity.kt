@@ -369,7 +369,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     }
                 }
             }
-            if (transfersManagement.isOnTransferOverQuota()) {
+            if (viewModel.isInTransferOverQuota()) {
                 showGeneralTransferOverQuotaWarning()
             }
         }
@@ -441,7 +441,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                         Timber.w("Exception loading PDF as stream", e)
                     }
                     viewModel.resetPdfStreamData()
-                    if (loading && !transfersManagement.isOnTransferOverQuota()) {
+                    if (loading && viewModel.isInTransferOverQuota().not()) {
                         binding.pdfViewerProgressBar.isVisible = true
                     }
                 }
@@ -616,7 +616,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 Timber.d("Add transfer listener")
                 megaApi.addTransferListener(this)
                 megaApi.addGlobalListener(this)
-                if (transfersManagement.isOnTransferOverQuota()) {
+                if (viewModel.isInTransferOverQuota()) {
                     showGeneralTransferOverQuotaWarning()
                 }
             }

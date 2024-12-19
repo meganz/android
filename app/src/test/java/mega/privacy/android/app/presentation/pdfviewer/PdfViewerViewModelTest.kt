@@ -5,6 +5,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -28,6 +30,7 @@ import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCo
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -38,6 +41,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
@@ -70,9 +74,14 @@ internal class PdfViewerViewModelTest {
     }
     private val savedStateHandle = mock<SavedStateHandle>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+    private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase>()
 
     @BeforeEach
     fun setUp() {
+        initTest()
+    }
+
+    private fun initTest() {
         underTest = PdfViewerViewModel(
             getDataBytesFromUrlUseCase = getDataBytesFromUrlUseCase,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
@@ -85,6 +94,7 @@ internal class PdfViewerViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             savedStateHandle = savedStateHandle,
+            monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
         )
     }
 
@@ -96,6 +106,8 @@ internal class PdfViewerViewModelTest {
             getChatFileUseCase,
             isAvailableOfflineUseCase,
         )
+
+        wheneverBlocking { monitorTransferOverQuotaUseCase() } doReturn emptyFlow()
     }
 
     @Test
@@ -390,6 +402,23 @@ internal class PdfViewerViewModelTest {
                 val content = (event as StateEventWithContentTriggered).content
                 assertThat(content).isEqualTo(chatFile)
             }
+        }
+
+    @Test
+    internal fun `test that monitorTransferOverQuotaUseCase updates state correctly`() =
+        runTest {
+            val flow = MutableStateFlow(false)
+
+            whenever(monitorTransferOverQuotaUseCase()).thenReturn(flow)
+
+            initTest()
+
+            assertThat(underTest.isInTransferOverQuota()).isFalse()
+
+            flow.emit(true)
+            advanceUntilIdle()
+
+            assertThat(underTest.isInTransferOverQuota()).isTrue()
         }
 
     companion object {
