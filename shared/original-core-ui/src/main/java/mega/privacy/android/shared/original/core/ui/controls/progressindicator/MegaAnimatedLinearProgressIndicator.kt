@@ -34,33 +34,48 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 @Composable
 fun MegaAnimatedLinearProgressIndicator(
     modifier: Modifier = Modifier,
-    indicatorProgress: Float = 0f,
+    indicatorProgress: Float? = null,
     progressAnimDuration: Int = 500,
     height: Dp = 8.dp,
     clip: RoundedCornerShape = RoundedCornerShape(20.dp),
     strokeCap: StrokeCap = StrokeCap.Round,
 ) {
-    val isInPreview = LocalInspectionMode.current
-    var progress by remember { mutableFloatStateOf(if (isInPreview) indicatorProgress else 0f) }
-    val progressAnimation by animateFloatAsState(
-        targetValue = progress,
-        animationSpec = tween(durationMillis = progressAnimDuration, easing = FastOutSlowInEasing),
-        label = "Progress Animation"
-    )
+    if (indicatorProgress != null) {// If progress is not null, it will be a determinate progress indicator
+        val isInPreview = LocalInspectionMode.current
+        var progress by remember { mutableFloatStateOf(if (isInPreview) indicatorProgress else 0f) }
+        val progressAnimation by animateFloatAsState(
+            targetValue = progress,
+            animationSpec = tween(
+                durationMillis = progressAnimDuration,
+                easing = FastOutSlowInEasing
+            ),
+            label = "Progress Animation"
+        )
 
-    LinearProgressIndicator(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(height)
-            .clip(clip),
-        progress = progressAnimation,
-        color = MegaOriginalTheme.colors.button.brand,
-        strokeCap = strokeCap,
-        backgroundColor = MegaOriginalTheme.colors.background.surface2
-    )
+        LinearProgressIndicator(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(height)
+                .clip(clip),
+            progress = progressAnimation,
+            color = MegaOriginalTheme.colors.button.brand,
+            strokeCap = strokeCap,
+            backgroundColor = MegaOriginalTheme.colors.background.surface2
+        )
 
-    LaunchedEffect(indicatorProgress) {
-        progress = indicatorProgress
+        LaunchedEffect(indicatorProgress) {
+            progress = indicatorProgress
+        }
+    } else {
+        LinearProgressIndicator(//If progress is null, it will be an indeterminate progress indicator
+            modifier = modifier
+                .fillMaxWidth()
+                .height(height)
+                .clip(clip),
+            color = MegaOriginalTheme.colors.button.brand,
+            strokeCap = strokeCap,
+            backgroundColor = MegaOriginalTheme.colors.background.surface2
+        )
     }
 }
 

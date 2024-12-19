@@ -31,6 +31,11 @@ data class CreateAccountUIState(
     val isEmailValid: Boolean? = null,
 
     /**
+     * Input state of password
+     */
+    val isPasswordValid: Boolean? = null,
+
+    /**
      * Check if password matches confirm password
      */
     val isConfirmPasswordMatched: Boolean? = null,
