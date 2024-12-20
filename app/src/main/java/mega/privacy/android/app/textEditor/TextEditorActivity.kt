@@ -18,6 +18,7 @@ import android.util.TypedValue.COMPLEX_UNIT_PX
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
+import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -27,7 +28,11 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
@@ -43,7 +48,6 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
-import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.Scrollable
@@ -182,6 +186,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     private var originalContentTextSize: Float = 0f
     private var originalNameTextSize: Float = 0f
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
+    private var statusBarHeight = 0
+    private var appBarHeight = 0
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             if (!viewModel.isViewMode() && viewModel.isFileEdited()) {
@@ -219,7 +225,6 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         enableEdgeToEdge()
         binding = ActivityTextFileEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        consumeInsetsWithToolbar(customToolbar = binding.fileEditorToolbar)
         Analytics.tracker.trackEvent(TextEditorScreenEvent)
 
         lifecycleScope.launch {
@@ -229,11 +234,17 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             }.onFailure { Timber.e(it) }
         }
 
+        binding.fileEditorToolbar.post {
+            appBarHeight = binding.fileEditorToolbar.height
+            updateScrollerViewTopPadding(appBarHeight)
+        }
+
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         getOriginalTextSize()
 
         setSupportActionBar(binding.fileEditorToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        updateContentPadding()
 
         if (savedInstanceState == null) {
             viewModel.setInitialValues(
@@ -259,6 +270,21 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             if (savedInstanceState.getBoolean(RENAME_SHOWN, false)) {
                 renameNode()
             }
+        }
+    }
+
+    private fun updateContentPadding() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                leftMargin = insets.left
+                bottomMargin = insets.bottom
+                rightMargin = insets.right
+            }
+
+            binding.fileEditorToolbar.updatePadding(top = insets.top)
+            statusBarHeight = insets.top
+            WindowInsetsCompat.CONSUMED
         }
     }
 
@@ -745,19 +771,31 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             setOnClickListener { viewModel.nextClicked() }
         }
 
-        binding.fileEditorScrollView.setOnScrollChangeListener { _, _, _, _, _ ->
+        binding.fileEditorScrollView.setOnScrollChangeListener { _, _, scrollY, _, _ ->
             checkScroll()
-            hideUI()
             animatePaginationUI()
-        }
-
-        binding.fileEditorScrollView.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_UP) {
-                animateUI()
+            val topPadding = if (scrollY == 0) {
+                appBarHeight
+            } else {
+                statusBarHeight
             }
-            false
+            updateScrollerViewTopPadding(topPadding)
+            binding.fileEditorScrollView.let {
+                if ((it.getChildAt(0).bottom <= it.height + scrollY) || scrollY == 0) {
+                    showUI()
+                } else {
+                    hideUI()
+                }
+            }
         }
     }
+
+    private fun updateScrollerViewTopPadding(padding: Int) =
+        with(binding.fileEditorScrollView) {
+            if (paddingTop != padding) {
+                updatePadding(top = padding)
+            }
+        }
 
     private fun addStartTransferView() {
         binding.root.addView(
@@ -1063,6 +1101,14 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         animateUI()
     }
 
+    private fun showUI() {
+        if (currentUIState == STATE_SHOWN || !viewModel.isViewMode()) {
+            return
+        }
+
+        animateUI()
+    }
+
     /**
      * Shows or hides some UI elements: Toolbar, bottom view and edit button.
      * The action depends on the current UI state:
@@ -1079,6 +1125,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             binding.editFab.hide()
             animateToolbar(false, ANIMATION_DURATION)
             animateBottom(false, ANIMATION_DURATION)
+            updateScrollerViewTopPadding(statusBarHeight)
         } else {
             currentUIState = STATE_SHOWN
 
