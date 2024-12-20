@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.documentscanner
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -23,6 +28,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.documentscanner.dialogs.ExitSaveScannedDocumentsScreenWarningDialog
 import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedDocumentsDestinationGroup
 import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedDocumentsFileTypeGroup
 import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedDocumentsFilenameGroup
@@ -72,6 +78,8 @@ internal fun SaveScannedDocumentsView(
     val scaffoldState = rememberScaffoldState()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
+    var showWarningDialog by rememberSaveable { mutableStateOf(false) }
+
     EventEffect(
         event = uiState.snackbarMessage,
         onConsumed = { onSnackbarMessageConsumed() },
@@ -95,6 +103,21 @@ internal fun SaveScannedDocumentsView(
             onUploadScansStarted(uriToUpload)
         },
     )
+
+    BackHandler(enabled = !showWarningDialog) {
+        showWarningDialog = true
+    }
+
+    if (showWarningDialog) {
+        ExitSaveScannedDocumentsScreenWarningDialog(
+            canSelectScanFileType = uiState.canSelectScanFileType,
+            onWarningAcknowledged = {
+                showWarningDialog = false
+                onBackPressedDispatcher?.onBackPressed()
+            },
+            onWarningDismissed = { showWarningDialog = false },
+        )
+    }
 
     MegaScaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
