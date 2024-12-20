@@ -8,15 +8,11 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.coroutines.yield
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
@@ -28,14 +24,12 @@ import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.api.StreamingGateway
-import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
-import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
@@ -51,7 +45,6 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
-import nz.mega.sdk.MegaUser
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -60,16 +53,13 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -341,17 +331,6 @@ internal class FileSystemRepositoryImplTest {
             verify(megaApiGateway, times(1)).getFileVersionsOption(any())
             assertThat(expectedFileVersionsOption).isEqualTo(actual)
         }
-
-    @ParameterizedTest(name = " megaApi call returns {0}")
-    @NullAndEmptySource
-    @ValueSource(strings = ["testName"])
-    fun `test that escapeFsIncompatible returns correctly if`(
-        fileName: String?,
-    ) = runTest {
-        whenever(megaApiGateway.escapeFsIncompatible(any(), any())).thenReturn(fileName)
-        assertThat(underTest.escapeFsIncompatible("file name", "dest/path")).isEqualTo(fileName)
-    }
-
 
     @Nested
     @DisplayName("GPS Coordinates")

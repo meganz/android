@@ -7,22 +7,15 @@ import androidx.core.net.toFile
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getFileName
-import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
@@ -36,14 +29,12 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
-import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
-import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -52,12 +43,9 @@ import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NullFileException
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileSystemRepository
 import nz.mega.sdk.MegaError
@@ -67,7 +55,6 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
 import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
-import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -247,9 +234,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             fileAttributeGateway.getPhotoGPSCoordinates(filePath)
         }
-
-    override suspend fun escapeFsIncompatible(fileName: String, dstPath: String): String? =
-        withContext(ioDispatcher) { megaApiGateway.escapeFsIncompatible(fileName, dstPath) }
 
     override suspend fun setLastModified(path: String, timestamp: Long) =
         withContext(ioDispatcher) {

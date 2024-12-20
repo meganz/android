@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
@@ -203,26 +202,6 @@ interface FileSystemRepository {
      * @return a pair with latitude and longitude coordinates
      */
     suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Double, Double>?
-
-    /**
-     * Make a name suitable for a file name in the local filesystem
-     *
-     * This function escapes (%xx) forbidden characters in the local filesystem if needed.
-     * You can revert this operation using MegaApi::unescapeFsIncompatible
-     *
-     * If no dstPath is provided or filesystem type it's not supported this method will
-     * escape characters contained in the following list: \/:?\"<>|*
-     * Otherwise it will check forbidden characters for local filesystem type
-     *
-     * The input string must be UTF8 encoded. The returned value will be UTF8 too.
-     *
-     * You take the ownership of the returned value
-     *
-     * @param fileName Name to convert (UTF8)
-     * @param dstPath  Destination path
-     * @return Converted name (UTF8)
-     */
-    suspend fun escapeFsIncompatible(fileName: String, dstPath: String): String?
 
     /**
      * Sets the last-modified time of the file or directory named by this abstract pathname
