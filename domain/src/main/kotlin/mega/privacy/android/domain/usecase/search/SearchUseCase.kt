@@ -60,7 +60,7 @@ class SearchUseCase @Inject constructor(
                 )
 
             // General Children (Non Query Search applied)
-            query.isEmpty() && searchCategory == SearchCategory.ALL && modificationDate == null && creationDate == null -> searchRepository.getChildren(
+            query.isEmpty() && searchCategory == SearchCategory.ALL && modificationDate == null && creationDate == null && description == null && tag == null -> searchRepository.getChildren(
                 nodeId = getSearchParentNode(nodeSourceType, parentHandle, invalidNodeHandle),
                 order = getCloudSortOrder(),
                 parameters = searchParameters,

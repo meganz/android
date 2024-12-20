@@ -312,4 +312,32 @@ class SearchUseCaseTest {
             )
         }
     }
+
+    @Test
+    fun `test that search is called when tag search is triggered`() {
+        runTest {
+            whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            whenever(searchRepository.getRubbishNodeId()).thenReturn(NodeId(-1))
+            underTest(
+                parentHandle = NodeId(123456),
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                searchParameters = SearchParameters(
+                    query = "",
+                    searchCategory = SearchCategory.ALL,
+                    tag = "tag"
+                )
+            )
+            verify(searchRepository).search(
+                nodeId = NodeId(123456),
+                order = getCloudSortOrder(),
+                parameters = SearchParameters(
+                    query = "",
+                    searchTarget = SearchTarget.ROOT_NODES,
+                    searchCategory = SearchCategory.ALL,
+                    tag = "tag",
+                ),
+            )
+        }
+    }
 }
