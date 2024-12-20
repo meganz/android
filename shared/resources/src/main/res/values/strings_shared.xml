@@ -904,4 +904,6 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Remove favourite</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">No favourites</string>
+    <!-- Message to enter confirm password -->
+    <string name="general_confirm_your_password">Confirm your password</string>
 </resources>
