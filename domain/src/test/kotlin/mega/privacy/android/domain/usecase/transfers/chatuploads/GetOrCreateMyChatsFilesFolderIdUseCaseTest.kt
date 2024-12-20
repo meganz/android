@@ -31,7 +31,6 @@ import org.mockito.kotlin.whenever
 class GetOrCreateMyChatsFilesFolderIdUseCaseTest {
     private lateinit var underTest: GetOrCreateMyChatsFilesFolderIdUseCase
 
-    private val fileSystemRepository = mock<FileSystemRepository>()
     private val chatRepository = mock<ChatRepository>()
     private val createFolderNodeUseCase = mock<CreateFolderNodeUseCase>()
     private val isNodeInRubbishOrDeletedUseCase = mock<IsNodeInRubbishOrDeletedUseCase>()
@@ -42,7 +41,6 @@ class GetOrCreateMyChatsFilesFolderIdUseCaseTest {
     fun setup() {
         underTest = GetOrCreateMyChatsFilesFolderIdUseCase(
             createFolderNodeUseCase = createFolderNodeUseCase,
-            fileSystemRepository = fileSystemRepository,
             chatRepository = chatRepository,
             isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
             getChildNodeUseCase = getChildNodeUseCase,
@@ -53,7 +51,6 @@ class GetOrCreateMyChatsFilesFolderIdUseCaseTest {
     @BeforeEach
     fun resetMocks() =
         reset(
-            fileSystemRepository,
             chatRepository,
             createFolderNodeUseCase,
             isNodeInRubbishOrDeletedUseCase,
@@ -65,7 +62,7 @@ class GetOrCreateMyChatsFilesFolderIdUseCaseTest {
     fun `test that repository folder id is returned when the folder exists and is not in the rubbish bin`() =
         runTest {
             val folderId = NodeId(11L)
-            whenever(fileSystemRepository.getMyChatsFilesFolderId()).thenReturn(folderId)
+            whenever(chatRepository.getMyChatsFilesFolderId()).thenReturn(folderId)
             whenever(isNodeInRubbishOrDeletedUseCase(folderId.longValue)).thenReturn(false)
             val actual = underTest()
             assertThat(actual).isEqualTo(folderId)
@@ -85,7 +82,7 @@ class GetOrCreateMyChatsFilesFolderIdUseCaseTest {
         runTest {
             val handle = 11L
             val folderId = NodeId(handle)
-            whenever(fileSystemRepository.getMyChatsFilesFolderId()).thenReturn(folderId)
+            whenever(chatRepository.getMyChatsFilesFolderId()).thenReturn(folderId)
             whenever(isNodeInRubbishOrDeletedUseCase(folderId.longValue)).thenReturn(true)
             stubFolderCreation()
             val actual = underTest()
@@ -113,7 +110,7 @@ class GetOrCreateMyChatsFilesFolderIdUseCaseTest {
     @Test
     fun `test that exception is thrown when set folder fails`() = runTest {
         stubFolderCreation()
-        whenever(fileSystemRepository.setMyChatFilesFolder(any())).thenReturn(null)
+        whenever(chatRepository.setMyChatFilesFolder(any())).thenReturn(null)
         assertThrows<Exception> {
             underTest()
         }
@@ -129,9 +126,9 @@ class GetOrCreateMyChatsFilesFolderIdUseCaseTest {
                 on { id } doReturn NodeId(rootNodeHandle)
             }
 
-            whenever(fileSystemRepository.getMyChatsFilesFolderId()).thenReturn(null)
+            whenever(chatRepository.getMyChatsFilesFolderId()).thenReturn(null)
             whenever(chatRepository.getDefaultChatFolderName()).thenReturn(folderName)
-            whenever(fileSystemRepository.setMyChatFilesFolder(any())).thenReturn(folderHandle)
+            whenever(chatRepository.setMyChatFilesFolder(any())).thenReturn(folderHandle)
             whenever(createFolderNodeUseCase(folderName)).thenAnswer {
                 throw ResourceAlreadyExistsMegaException(
                     errorCode = 0,
@@ -157,9 +154,9 @@ class GetOrCreateMyChatsFilesFolderIdUseCaseTest {
             val folderName = "My chat files"
             val folderHandle = 11L
 
-            whenever(fileSystemRepository.getMyChatsFilesFolderId()).thenReturn(null)
+            whenever(chatRepository.getMyChatsFilesFolderId()).thenReturn(null)
             whenever(chatRepository.getDefaultChatFolderName()).thenReturn(folderName)
-            whenever(fileSystemRepository.setMyChatFilesFolder(any())).thenReturn(folderHandle)
+            whenever(chatRepository.setMyChatFilesFolder(any())).thenReturn(folderHandle)
             whenever(createFolderNodeUseCase(folderName)).thenAnswer {
                 throw NotEnoughQuotaMegaException(
                     errorCode = 0,
@@ -171,9 +168,9 @@ class GetOrCreateMyChatsFilesFolderIdUseCaseTest {
         }
 
     private suspend fun stubFolderCreation(handle: Long = 11L, folderName: String = "Folder name") {
-        whenever(fileSystemRepository.getMyChatsFilesFolderId()).thenReturn(null)
+        whenever(chatRepository.getMyChatsFilesFolderId()).thenReturn(null)
         whenever(chatRepository.getDefaultChatFolderName()).thenReturn(folderName)
-        whenever(fileSystemRepository.setMyChatFilesFolder(any())).thenReturn(handle)
+        whenever(chatRepository.setMyChatFilesFolder(any())).thenReturn(handle)
         whenever(createFolderNodeUseCase(any(), anyOrNull())).thenReturn(NodeId(handle))
     }
 }

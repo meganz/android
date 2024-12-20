@@ -100,7 +100,6 @@ internal class FileSystemRepositoryImplTest {
     private val nodeMapper: NodeMapper = mock()
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val fileGateway: FileGateway = mock()
-    private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper = mock()
     private val fileVersionsOptionCache: Cache<Boolean> = mock()
     private val streamingGateway = mock<StreamingGateway>()
     private val deviceGateway = mock<DeviceGateway>()
@@ -112,7 +111,6 @@ internal class FileSystemRepositoryImplTest {
     @BeforeAll
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
-        whenever(megaApiGateway.globalUpdates).thenReturn(emptyFlow())
         initUnderTest()
     }
 
@@ -136,13 +134,11 @@ internal class FileSystemRepositoryImplTest {
             nodeMapper = nodeMapper,
             fileTypeInfoMapper = fileTypeInfoMapper,
             fileGateway = fileGateway,
-            chatFilesFolderUserAttributeMapper = chatFilesFolderUserAttributeMapper,
             fileVersionsOptionCache = fileVersionsOptionCache,
             streamingGateway = streamingGateway,
             deviceGateway = deviceGateway,
             sdCardGateway = sdCardGateway,
             fileAttributeGateway = fileAttributeGateway,
-            sharingScope = TestScope(),
             documentFileWrapper = documentFileWrapper,
         )
     }
@@ -162,7 +158,6 @@ internal class FileSystemRepositoryImplTest {
             nodeMapper,
             fileTypeInfoMapper,
             fileGateway,
-            chatFilesFolderUserAttributeMapper,
             fileVersionsOptionCache,
             streamingGateway,
             deviceGateway,
@@ -530,83 +525,6 @@ internal class FileSystemRepositoryImplTest {
                 mockedUri.`when`<Uri> { Uri.parse(fileContentUri) }.thenReturn(null)
                 verifyNoInteractions(documentFileWrapper)
                 assertThat(underTest.deleteFileFromSdCardContentUri(fileContentUri)).isFalse()
-            }
-        }
-    }
-
-    @Nested
-    @DisplayName("My chats files folder")
-    inner class MyChatsFilesFolder {
-
-        private val globalUpdatesFlow = MutableSharedFlow<GlobalUpdate>()
-
-        @BeforeEach
-        fun resetCache() {
-            whenever(megaApiGateway.globalUpdates).thenReturn(globalUpdatesFlow)
-            initUnderTest()
-        }
-
-        @Test
-        fun `test that my chats files folder id is retrieved from the gateway if not set`() =
-            runTest {
-                val handle = 11L
-                stubGetMyChatFilesFolder(handle)
-                val actual = underTest.getMyChatsFilesFolderId()
-                assertThat(actual?.longValue).isEqualTo(handle)
-            }
-
-        @Test
-        fun `test that my chats files folder id is cached`() = runTest {
-            stubGetMyChatFilesFolder()
-            underTest.getMyChatsFilesFolderId()
-            verify(megaApiGateway).getMyChatFilesFolder(any())
-            clearInvocations(megaApiGateway)
-            underTest.getMyChatsFilesFolderId()
-            verify(megaApiGateway, never()).getMyChatFilesFolder(any())
-        }
-
-        @Test
-        fun `test that updates are monitored after my chats files folder id is set`() = runTest {
-            val handle = 11L
-            stubGetMyChatFilesFolder(handle + 1)
-            val initial = underTest.getMyChatsFilesFolderId()
-            assertThat(initial?.longValue).isNotEqualTo(handle)
-
-            stubGetMyChatFilesFolder(handle)
-            globalUpdatesFlow.emit(stubGlobalMyChatsFilesFolderUpdate())
-
-            yield() // listening to global updates is in another scope, we need to yield to get the update
-            val expected = underTest.getMyChatsFilesFolderId()
-            assertThat(expected?.longValue).isEqualTo(handle)
-        }
-
-        private fun stubGetMyChatFilesFolder(folderHandle: Long = 1L) {
-            val megaError = mock<MegaError> {
-                on { errorCode } doReturn MegaError.API_OK
-                on { errorString } doReturn ""
-            }
-            val megaRequest = mock<MegaRequest> {
-                on { nodeHandle } doReturn folderHandle
-            }
-            whenever(megaApiGateway.getMyChatFilesFolder(any())).thenAnswer {
-                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    megaRequest,
-                    megaError,
-                )
-            }
-        }
-
-        private fun stubGlobalMyChatsFilesFolderUpdate(): GlobalUpdate.OnUsersUpdate {
-            val userHandle = 77L
-            val megaUser = mock<MegaUser> {
-                on { this.handle } doReturn userHandle
-                on { isOwnChange } doReturn 0
-                on { this.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER.toLong()) } doReturn true
-            }
-            whenever(megaApiGateway.myUser).thenReturn(megaUser)
-            return mock<GlobalUpdate.OnUsersUpdate> {
-                on { users } doReturn arrayListOf(megaUser)
             }
         }
     }

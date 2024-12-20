@@ -7,12 +7,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.yield
 import mega.privacy.android.data.R
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.AppEventGateway
@@ -23,6 +27,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.chat.ChatStorageGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatHistoryLoadStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatInitStateMapper
@@ -43,6 +48,7 @@ import mega.privacy.android.data.mapper.chat.update.ChatRoomMessageUpdateMapper
 import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
 import mega.privacy.android.data.mapper.notification.ChatMessageNotificationBehaviourMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.Contact
@@ -69,20 +75,26 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaUser
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.mockito.Mockito
 import org.mockito.kotlin.any
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
@@ -105,7 +117,7 @@ class ChatRepositoryImplTest {
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val chatRoomMapper = mock<ChatRoomMapper>()
     private val combinedChatRoomMapper = mock<CombinedChatRoomMapper>()
-    private val sharingScope = mock<CoroutineScope>()
+    private val sharingScope = TestScope()
     private val megaChatPeerListMapper = mock<MegaChatPeerListMapper>()
     private val testDispatcher = UnconfinedTestDispatcher()
     private val chatConnectionStatusMapper = ChatConnectionStatusMapper()
@@ -136,6 +148,7 @@ class ChatRepositoryImplTest {
     private val chatRoomMessageUpdateMapper = ChatRoomMessageUpdateMapper(chatMessageMapper)
     private val userChatStatusMapper = UserChatStatusMapper()
     private val chatPresenceConfigMapper = ChatPresenceConfigMapper(userChatStatusMapper)
+    private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper = mock()
 
     private val chatPermissionsMapper = ChatPermissionsMapper()
     private val lastMessageTypeMapper = LastMessageTypeMapper()
@@ -146,9 +159,18 @@ class ChatRepositoryImplTest {
         chatListItemChangesMapper = chatListItemChangesMapper
     )
 
+    @BeforeAll
+    fun init() {
+        Dispatchers.setMain(testDispatcher)
+    }
+
     @BeforeEach
     fun setUp() {
-        Dispatchers.setMain(testDispatcher)
+        whenever(megaApiGateway.globalUpdates).thenReturn(emptyFlow())
+        initUnderTest()
+    }
+
+    private fun initUnderTest(sharingScope: CoroutineScope = this.sharingScope) {
 
         underTest = ChatRepositoryImpl(
             megaChatApiGateway = megaChatApiGateway,
@@ -182,6 +204,7 @@ class ChatRepositoryImplTest {
             chatRoomMessageUpdateMapper = chatRoomMessageUpdateMapper,
             chatPresenceConfigMapper = chatPresenceConfigMapper,
             context = context,
+            chatFilesFolderUserAttributeMapper = chatFilesFolderUserAttributeMapper,
         )
 
         whenever(chatRoom.chatId).thenReturn(chatId)
@@ -189,22 +212,23 @@ class ChatRepositoryImplTest {
     }
 
     @AfterEach
-    fun tearDown() {
-        Dispatchers.resetMain()
-        Mockito.clearInvocations(
-            megaChatApiGateway,
-            megaApiGateway,
-            chatRequestMapper,
-            localStorageGateway,
-        )
-
+    fun cleanUp() {
         reset(
             databaseHandler,
             megaChatApiGateway,
             megaLocalRoomGateway,
             chatMessageMapper,
-            reactionUpdateMapper
+            reactionUpdateMapper,
+            chatFilesFolderUserAttributeMapper,
+            megaApiGateway,
+            chatRequestMapper,
+            localStorageGateway,
         )
+    }
+
+    @AfterAll
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -1262,4 +1286,75 @@ class ChatRepositoryImplTest {
 
             assertThat(actual).isEqualTo(emptyList<ChatListItem>())
         }
+
+    @Nested
+    @DisplayName("My chats files folder")
+    inner class MyChatsFilesFolder {
+
+        @Test
+        fun `test that my chats files folder id is retrieved from the gateway if not set`() =
+            runTest {
+                val handle = 11L
+                stubGetMyChatFilesFolder(handle)
+                val actual = underTest.getMyChatsFilesFolderId()
+                assertThat(actual?.longValue).isEqualTo(handle)
+            }
+
+        @Test
+        fun `test that my chats files folder id is cached`() = runTest {
+            stubGetMyChatFilesFolder()
+            underTest.getMyChatsFilesFolderId()
+            verify(megaApiGateway).getMyChatFilesFolder(any())
+            clearInvocations(megaApiGateway)
+            underTest.getMyChatsFilesFolderId()
+            verify(megaApiGateway, never()).getMyChatFilesFolder(any())
+        }
+
+        @Test
+        fun `test that updates are monitored after my chats files folder id is set`() = runTest {
+            val globalUpdatesFlow = MutableSharedFlow<GlobalUpdate>()
+            whenever(megaApiGateway.globalUpdates).thenReturn(globalUpdatesFlow)
+            initUnderTest(TestScope(testDispatcher))
+            val handle = 11L
+            stubGetMyChatFilesFolder(handle + 1)
+            val initial = underTest.getMyChatsFilesFolderId()
+            assertThat(initial?.longValue).isNotEqualTo(handle)
+
+            stubGetMyChatFilesFolder(handle)
+            globalUpdatesFlow.emit(stubGlobalMyChatsFilesFolderUpdate())
+            yield() // listening to global updates is in another scope, we need to yield to get the update
+            val expected = underTest.getMyChatsFilesFolderId()
+            assertThat(expected?.longValue).isEqualTo(handle)
+        }
+
+        private fun stubGetMyChatFilesFolder(folderHandle: Long = 1L) {
+            val megaError = mock<MegaError> {
+                on { errorCode } doReturn MegaError.API_OK
+                on { errorString } doReturn ""
+            }
+            val megaRequest = mock<MegaRequest> {
+                on { nodeHandle } doReturn folderHandle
+            }
+            whenever(megaApiGateway.getMyChatFilesFolder(any())).thenAnswer {
+                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+        }
+
+        private fun stubGlobalMyChatsFilesFolderUpdate(): GlobalUpdate.OnUsersUpdate {
+            val userHandle = 77L
+            val megaUser = mock<MegaUser> {
+                on { this.handle } doReturn userHandle
+                on { isOwnChange } doReturn 0
+                on { this.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER.toLong()) } doReturn true
+            }
+            whenever(megaApiGateway.myUser).thenReturn(megaUser)
+            return mock<GlobalUpdate.OnUsersUpdate> {
+                on { users } doReturn arrayListOf(megaUser)
+            }
+        }
+    }
 }

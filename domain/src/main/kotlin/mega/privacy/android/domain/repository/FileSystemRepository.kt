@@ -51,18 +51,6 @@ interface FileSystemRepository {
     suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String
 
     /**
-     * setMyChatFilesFolder
-     * @param nodeHandle
-     * @return node handle [Long]
-     */
-    suspend fun setMyChatFilesFolder(nodeHandle: Long): Long?
-
-    /**
-     * @return the [NodeId] of the folder for saving chat files in user attributes, null if it's not configured yet
-     */
-    suspend fun getMyChatsFilesFolderId(): NodeId?
-
-    /**
      * Get file versions option
      *
      * @param forceRefresh

@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.chat
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -18,7 +19,7 @@ import org.mockito.kotlin.whenever
 class GetMyChatsFilesFolderIdUseCaseTest {
     private lateinit var underTest: GetMyChatsFilesFolderIdUseCase
 
-    val fileSystemRepository = mock<FileSystemRepository>()
+    val fileSystemRepository = mock<ChatRepository>()
     val isNodeInRubbishOrDeletedUseCase = mock<IsNodeInRubbishOrDeletedUseCase>()
 
     @BeforeAll

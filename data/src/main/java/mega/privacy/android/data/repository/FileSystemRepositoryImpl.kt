@@ -92,7 +92,6 @@ import javax.inject.Inject
  * @property nodeMapper
  * @property fileTypeInfoMapper
  * @property fileGateway
- * @property chatFilesFolderUserAttributeMapper
  * @property streamingGateway
  * @property sdCardGateway
  * @property fileAttributeGateway
@@ -111,22 +110,13 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val nodeMapper: NodeMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val fileGateway: FileGateway,
-    private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
     private val streamingGateway: StreamingGateway,
     private val deviceGateway: DeviceGateway,
     private val sdCardGateway: SDCardGateway,
     private val fileAttributeGateway: FileAttributeGateway,
-    @ApplicationScope private val sharingScope: CoroutineScope,
     private val documentFileWrapper: DocumentFileWrapper,
 ) : FileSystemRepository {
-
-    init {
-        monitorChatsFilesFolderIdChanges()
-    }
-
-    private var myChatsFilesFolderIdFlow: MutableStateFlow<NodeId?> = MutableStateFlow(null)
-
 
     override val localDCIMFolderPath: String
         get() = fileGateway.localDCIMFolderPath
@@ -212,70 +202,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun getOfflineBackupsPath() =
         withContext(ioDispatcher) { fileGateway.getOfflineFilesBackupsRootPath() }
-
-    override suspend fun setMyChatFilesFolder(nodeHandle: Long) = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("setMyChatFilesFolder") {
-                myChatsFilesFolderIdFlow.value = NodeId(nodeHandle)
-                chatFilesFolderUserAttributeMapper(it.megaStringMap)?.let { value ->
-                    megaApiGateway.base64ToHandle(value)
-                        .takeIf { handle -> handle != megaApiGateway.getInvalidHandle() }
-                }
-            }
-            megaApiGateway.setMyChatFilesFolder(nodeHandle, listener)
-        }
-    }
-
-    override suspend fun getMyChatsFilesFolderId(): NodeId? =
-        myChatsFilesFolderIdFlow.value ?: run {
-            getMyChatsFilesFolderIdFromGateway()
-        }
-
-    private suspend fun getMyChatsFilesFolderIdFromGateway(): NodeId? = withContext(ioDispatcher) {
-        runCatching {
-            suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener("getMyChatFilesFolder") {
-                    NodeId(it.nodeHandle)
-                }
-                megaApiGateway.getMyChatFilesFolder(listener)
-
-            }
-        }.getOrElse {
-            //if error is API_ENOENT it means folder is not set, not an actual error. Otherwise re-throw the error
-            if ((it as? MegaException)?.errorCode != API_ENOENT) {
-                throw (it)
-            } else {
-                null
-            }
-        }?.also {
-            myChatsFilesFolderIdFlow.value = it
-        }
-    }
-
-    private fun monitorChatsFilesFolderIdChanges() {
-        sharingScope.launch {
-            megaApiGateway.globalUpdates
-                .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
-                .filter {
-                    val currentUserHandle = megaApiGateway.myUser?.handle
-                    it.users?.any { user ->
-                        user.isOwnChange == 0
-                                && user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER.toLong())
-                                && user.handle == currentUserHandle
-                    } == true
-                }
-                .catch { Timber.e(it) }
-                .flowOn(ioDispatcher)
-                .collect {
-                    runCatching {
-                        getMyChatsFilesFolderIdFromGateway()
-                    }.onFailure {
-                        Timber.e(it)
-                    }
-                }
-        }
-    }
-
 
     override suspend fun getFileVersionsOption(forceRefresh: Boolean): Boolean =
         fileVersionsOptionCache.get()?.takeUnless { forceRefresh }
