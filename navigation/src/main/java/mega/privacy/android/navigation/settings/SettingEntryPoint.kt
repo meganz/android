@@ -7,6 +7,6 @@ package mega.privacy.android.navigation.settings
  * @property items
  */
 data class SettingEntryPoint(
-    val section: String,
+    val section: SettingSectionHeader,
     val items: List<SettingItem>
 )
