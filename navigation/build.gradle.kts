@@ -10,6 +10,7 @@ android {
 dependencies {
     implementation(project(":domain"))
     implementation(androidx.appcompat)
+    implementation(androidx.navigation.compose)
 
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)

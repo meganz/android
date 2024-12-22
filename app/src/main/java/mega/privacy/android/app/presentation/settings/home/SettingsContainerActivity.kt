@@ -29,6 +29,7 @@ import mega.privacy.android.app.presentation.settings.navigation.SettingsGraph
 import mega.privacy.android.app.presentation.settings.navigation.settingsGraph
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.settings.FeatureSettings
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -42,6 +43,9 @@ class SettingsContainerActivity : ComponentActivity() {
 
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+
+    @Inject
+    lateinit var featureSettings: Set<FeatureSettings>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -77,6 +81,14 @@ class SettingsContainerActivity : ComponentActivity() {
                     onBackPressed = { finishAfterTransition() },
                     navController = navHostController,
                 )
+
+                featureSettings.forEach {
+                    it.settingsNavGraph(
+                        this,
+                        { finishAfterTransition() },
+                        navHostController,
+                    )
+                }
             }
             PrimaryFilledButton(
                 modifier = Modifier,

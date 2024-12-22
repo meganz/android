@@ -30,6 +30,7 @@ import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.call.MonitorCallSoundEnabledUseCase
 import mega.privacy.android.domain.usecase.call.SetCallsSoundEnabledStateUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
+import mega.privacy.android.navigation.settings.FeatureSettings
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
@@ -173,4 +174,8 @@ object TestSettingsModule {
 
     @Provides
     fun provideEnableFileVersionsOption(): EnableFileVersionsOption = mock()
+
+    @Provides
+    @ElementsIntoSet
+    fun provideFeatureSettingsSet(): Set<@JvmSuppressWildcards FeatureSettings> = setOf()
 }

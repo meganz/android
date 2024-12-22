@@ -9,6 +9,7 @@ import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.PutPreference
+import mega.privacy.android.navigation.settings.FeatureSettings
 
 /**
  * Settings module
@@ -72,6 +73,10 @@ abstract class SettingsModule {
         @Provides
         fun provideGetBooleanPreference(settingsRepository: SettingsRepository): GetPreference<Boolean> =
             GetPreference(settingsRepository::monitorBooleanPreference)
+
+        @Provides
+        @ElementsIntoSet
+        fun provideFeatureSettingsSet(): Set<@JvmSuppressWildcards FeatureSettings> = setOf()
     }
 
 }
