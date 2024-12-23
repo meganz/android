@@ -59,8 +59,15 @@ class SearchUseCase @Inject constructor(
                     parameters = searchParameters,
                 )
 
+            // Tag search recursively
+            query.isEmpty() && tag.isNullOrEmpty().not() -> searchRepository.search(
+                nodeId = getSearchParentNode(nodeSourceType, parentHandle, invalidNodeHandle),
+                order = getCloudSortOrder(),
+                parameters = searchParameters,
+            )
+
             // General Children (Non Query Search applied)
-            query.isEmpty() && searchCategory == SearchCategory.ALL && modificationDate == null && creationDate == null && description == null && tag == null -> searchRepository.getChildren(
+            query.isEmpty() && searchCategory == SearchCategory.ALL && modificationDate == null && creationDate == null -> searchRepository.getChildren(
                 nodeId = getSearchParentNode(nodeSourceType, parentHandle, invalidNodeHandle),
                 order = getCloudSortOrder(),
                 parameters = searchParameters,
