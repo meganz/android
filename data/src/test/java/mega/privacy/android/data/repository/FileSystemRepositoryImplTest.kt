@@ -222,17 +222,6 @@ internal class FileSystemRepositoryImplTest {
         }
 
     @Test
-    fun `test that local file url string is returned if node exists`() = runTest {
-        whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
-        val expected = "expectedUrl"
-        whenever(streamingGateway.getLocalLink(any())).thenReturn(expected)
-
-        val actual = underTest.getFileStreamingUri(mock { on { id }.thenReturn(NodeId(1L)) })
-
-        assertThat(actual).isEqualTo(expected)
-    }
-
-    @Test
     fun `test that temporary file is created successfully`() = runTest {
         val localPath = "/path/to/local"
         val newPath = "/path/to/new"

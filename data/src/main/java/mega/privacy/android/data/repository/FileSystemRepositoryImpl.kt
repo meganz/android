@@ -143,12 +143,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         fileGateway.getFileByPath(path)
     }
 
-    override suspend fun getFileStreamingUri(node: Node) = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(node.id.longValue)?.let {
-            streamingGateway.getLocalLink(it)
-        }
-    }
-
     override suspend fun createTempFile(
         rootPath: String,
         localPath: String,

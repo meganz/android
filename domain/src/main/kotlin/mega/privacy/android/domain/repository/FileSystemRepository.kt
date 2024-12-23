@@ -59,14 +59,6 @@ interface FileSystemRepository {
     suspend fun getFileByPath(path: String): File?
 
     /**
-     * Get file streaming uri for a node
-     *
-     * @param node
-     * @return local url string if found
-     */
-    suspend fun getFileStreamingUri(node: Node): String?
-
-    /**
      * create temp file in file system
      * @param rootPath root path
      * @param localPath
