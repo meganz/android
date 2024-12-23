@@ -88,7 +88,6 @@ internal class FileSystemRepositoryImplTest {
     private val nodeMapper: NodeMapper = mock()
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val fileGateway: FileGateway = mock()
-    private val fileVersionsOptionCache: Cache<Boolean> = mock()
     private val streamingGateway = mock<StreamingGateway>()
     private val deviceGateway = mock<DeviceGateway>()
     private val sdCardGateway = mock<SDCardGateway>()
@@ -120,7 +119,6 @@ internal class FileSystemRepositoryImplTest {
             nodeMapper = nodeMapper,
             fileTypeInfoMapper = fileTypeInfoMapper,
             fileGateway = fileGateway,
-            fileVersionsOptionCache = fileVersionsOptionCache,
             streamingGateway = streamingGateway,
             deviceGateway = deviceGateway,
             sdCardGateway = sdCardGateway,
@@ -142,7 +140,6 @@ internal class FileSystemRepositoryImplTest {
             nodeMapper,
             fileTypeInfoMapper,
             fileGateway,
-            fileVersionsOptionCache,
             streamingGateway,
             deviceGateway,
             sdCardGateway,
@@ -159,67 +156,6 @@ internal class FileSystemRepositoryImplTest {
         whenever(fileGateway.localDCIMFolderPath).thenReturn(testPath)
         assertThat(underTest.localDCIMFolderPath).isEqualTo(testPath)
     }
-
-    @Test
-    fun `test that data return from cache when fileVersionsOptionCache is not null and call getFileVersionsOption with forceRefresh false`() =
-        runTest {
-            val expectedFileVersionsOption = true
-            whenever(fileVersionsOptionCache.get()).thenReturn(expectedFileVersionsOption)
-            val actual = underTest.getFileVersionsOption(false)
-            verify(fileVersionsOptionCache, times(0)).set(any())
-            verify(megaApiGateway, times(0)).getFileVersionsOption(any())
-            assertThat(expectedFileVersionsOption).isEqualTo(actual)
-        }
-
-    @Test
-    fun `test that data return from sdk when fileVersionsOptionCache is not null and call getFileVersionsOption with forceRefresh true`() =
-        runTest {
-            val expectedFileVersionsOption = true
-            val api = mock<MegaApiJava>()
-            val request = mock<MegaRequest> {
-                on { flag }.thenReturn(expectedFileVersionsOption)
-            }
-            val error = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_OK)
-            }
-            whenever(fileVersionsOptionCache.get()).thenReturn(expectedFileVersionsOption.not())
-            whenever(megaApiGateway.getFileVersionsOption(any())).thenAnswer {
-                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
-                    api,
-                    request,
-                    error
-                )
-            }
-            val actual = underTest.getFileVersionsOption(true)
-            verify(fileVersionsOptionCache, times(1)).set(expectedFileVersionsOption)
-            verify(megaApiGateway, times(1)).getFileVersionsOption(any())
-            assertThat(expectedFileVersionsOption).isEqualTo(actual)
-        }
-
-    @Test
-    fun `test that data return from sdk when fileVersionsOptionCache is null and call getFileVersionsOption with forceRefresh false`() =
-        runTest {
-            val expectedFileVersionsOption = true
-            val api = mock<MegaApiJava>()
-            val request = mock<MegaRequest> {
-                on { flag }.thenReturn(expectedFileVersionsOption)
-            }
-            val error = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_OK)
-            }
-            whenever(fileVersionsOptionCache.get()).thenReturn(null)
-            whenever(megaApiGateway.getFileVersionsOption(any())).thenAnswer {
-                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
-                    api,
-                    request,
-                    error
-                )
-            }
-            val actual = underTest.getFileVersionsOption(false)
-            verify(fileVersionsOptionCache, times(1)).set(expectedFileVersionsOption)
-            verify(megaApiGateway, times(1)).getFileVersionsOption(any())
-            assertThat(expectedFileVersionsOption).isEqualTo(actual)
-        }
 
     @Test
     fun `test that temporary file is created successfully`() = runTest {
@@ -294,31 +230,6 @@ internal class FileSystemRepositoryImplTest {
             assertThat(underTest.deleteCameraUploadsTemporaryRootDirectory()).isEqualTo(
                 deleteRootDirectory
             )
-        }
-
-    @Test
-    fun `test that data return from sdk when fileVersionsOptionCache is API_ENOENT and call getFileVersionsOption with forceRefresh true`() =
-        runTest {
-            val expectedFileVersionsOption = false
-            val api = mock<MegaApiJava>()
-            val request = mock<MegaRequest> {
-                on { flag }.thenReturn(expectedFileVersionsOption)
-            }
-            val error = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_ENOENT)
-            }
-            whenever(fileVersionsOptionCache.get()).thenReturn(null)
-            whenever(megaApiGateway.getFileVersionsOption(any())).thenAnswer {
-                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
-                    api,
-                    request,
-                    error
-                )
-            }
-            val actual = underTest.getFileVersionsOption(true)
-            verify(fileVersionsOptionCache, times(1)).set(expectedFileVersionsOption)
-            verify(megaApiGateway, times(1)).getFileVersionsOption(any())
-            assertThat(expectedFileVersionsOption).isEqualTo(actual)
         }
 
     @Nested

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.decodeBase64
 import mega.privacy.android.data.extensions.encodeBase64
@@ -31,6 +32,7 @@ import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGa
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.StartScreenMapper
+import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundEnabledState
@@ -49,6 +51,8 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SettingsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaError.API_ENOENT
+import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequest.TYPE_GET_ATTR_USER
 import nz.mega.sdk.MegaStringMap
@@ -90,6 +94,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val uiPreferencesGateway: UIPreferencesGateway,
     private val startScreenMapper: StartScreenMapper,
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
+    @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
 ) : SettingsRepository {
     private val showHiddenNodesFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
@@ -582,5 +587,27 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun setRaiseToHandSuggestionShown() = withContext(ioDispatcher) {
         callsPreferencesGateway.setRaiseToHandSuggestionPreference()
+    }
+
+    override suspend fun getFileVersionsOption(forceRefresh: Boolean) = withContext(ioDispatcher) {
+        fileVersionsOptionCache.get()?.takeUnless { forceRefresh }
+            ?: fetchFileVersionsOption().also {
+                fileVersionsOptionCache.set(it)
+            }
+    }
+
+    private suspend fun fetchFileVersionsOption(): Boolean = withContext(ioDispatcher) {
+        return@withContext suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request: MegaRequest, error: MegaError ->
+                    when (error.errorCode) {
+                        API_OK -> continuation.resumeWith(Result.success(request.flag))
+                        API_ENOENT -> continuation.resumeWith(Result.success(false))
+                        else -> continuation.failWithError(error, "fetchFileVersionsOption")
+                    }
+                }
+            )
+            megaApiGateway.getFileVersionsOption(listener)
+        }
     }
 }

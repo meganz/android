@@ -67,7 +67,6 @@ import javax.inject.Inject
  * Default implementation of [FileSystemRepository]
  *
  * @property context
- * @property megaApiGateway
  * @property ioDispatcher
  * @property megaLocalStorageGateway
  * @property shareDataMapper
@@ -93,7 +92,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val nodeMapper: NodeMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val fileGateway: FileGateway,
-    @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
     private val streamingGateway: StreamingGateway,
     private val deviceGateway: DeviceGateway,
     private val sdCardGateway: SDCardGateway,
@@ -109,27 +107,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun getOfflineBackupsPath() =
         withContext(ioDispatcher) { fileGateway.getOfflineFilesBackupsRootPath() }
-
-    override suspend fun getFileVersionsOption(forceRefresh: Boolean): Boolean =
-        fileVersionsOptionCache.get()?.takeUnless { forceRefresh }
-            ?: fetchFileVersionsOption().also {
-                fileVersionsOptionCache.set(it)
-            }
-
-    private suspend fun fetchFileVersionsOption(): Boolean = withContext(ioDispatcher) {
-        return@withContext suspendCancellableCoroutine { continuation ->
-            val listener = OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request: MegaRequest, error: MegaError ->
-                    when (error.errorCode) {
-                        API_OK -> continuation.resumeWith(Result.success(request.flag))
-                        API_ENOENT -> continuation.resumeWith(Result.success(false))
-                        else -> continuation.failWithError(error, "fetchFileVersionsOption")
-                    }
-                }
-            )
-            megaApiGateway.getFileVersionsOption(listener)
-        }
-    }
 
     override suspend fun getLocalFile(fileNode: FileNode) = withContext(ioDispatcher) {
         fileGateway.getLocalFile(

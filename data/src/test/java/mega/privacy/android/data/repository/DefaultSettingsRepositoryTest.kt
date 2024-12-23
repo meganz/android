@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -32,6 +33,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
@@ -49,7 +51,7 @@ internal class DefaultSettingsRepositoryTest {
         on { preferences }.thenReturn(mock())
     }
     private val context: Context = mock()
-    private val apiFacade: MegaApiGateway = mock()
+    private val megaApiGateway: MegaApiGateway = mock()
     private val megaLocalStorageGateway: MegaLocalStorageGateway = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val chatPreferencesGateway: ChatPreferencesGateway = mock()
@@ -59,13 +61,14 @@ internal class DefaultSettingsRepositoryTest {
     private val uiPreferencesGateway: UIPreferencesGateway = mock()
     private val startScreenMapper: StartScreenMapper = mock()
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway = mock()
+    private val fileVersionsOptionCache: Cache<Boolean> = mock()
 
     @BeforeAll
     fun setUp() {
         underTest = DefaultSettingsRepository(
             databaseHandler = { databaseHandler },
             context = context,
-            megaApiGateway = apiFacade,
+            megaApiGateway = megaApiGateway,
             megaLocalStorageGateway = megaLocalStorageGateway,
             ioDispatcher = ioDispatcher,
             chatPreferencesGateway = chatPreferencesGateway,
@@ -75,6 +78,7 @@ internal class DefaultSettingsRepositoryTest {
             uiPreferencesGateway = uiPreferencesGateway,
             startScreenMapper = startScreenMapper,
             fileManagementPreferencesGateway = fileManagementPreferencesGateway,
+            fileVersionsOptionCache = fileVersionsOptionCache,
         )
     }
 
@@ -83,7 +87,7 @@ internal class DefaultSettingsRepositoryTest {
         reset(
             databaseHandler,
             context,
-            apiFacade,
+            megaApiGateway,
             megaLocalStorageGateway,
             chatPreferencesGateway,
             callsPreferencesGateway,
@@ -91,7 +95,8 @@ internal class DefaultSettingsRepositoryTest {
             fileGateway,
             uiPreferencesGateway,
             startScreenMapper,
-            fileManagementPreferencesGateway
+            fileManagementPreferencesGateway,
+            fileVersionsOptionCache,
         )
     }
 
@@ -103,7 +108,7 @@ internal class DefaultSettingsRepositoryTest {
             on { errorCode }.thenReturn(MegaError.API_OK)
         }
 
-        whenever(apiFacade.setFileVersionsOption(any(), any())).thenAnswer {
+        whenever(megaApiGateway.setFileVersionsOption(any(), any())).thenAnswer {
             (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
                 api,
                 request,
@@ -123,7 +128,7 @@ internal class DefaultSettingsRepositoryTest {
                 on { errorCode }.thenReturn(MegaError.API_OK + 1)
             }
 
-            whenever(apiFacade.setFileVersionsOption(any(), any())).thenAnswer {
+            whenever(megaApiGateway.setFileVersionsOption(any(), any())).thenAnswer {
                 (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
                     api,
                     request,
@@ -219,5 +224,91 @@ internal class DefaultSettingsRepositoryTest {
         runTest {
             underTest.setRaiseToHandSuggestionShown()
             verify(callsPreferencesGateway).setRaiseToHandSuggestionPreference()
+        }
+
+    @Test
+    fun `test that data return from cache when fileVersionsOptionCache is not null and call getFileVersionsOption with forceRefresh false`() =
+        runTest {
+            val expectedFileVersionsOption = true
+            whenever(fileVersionsOptionCache.get()).thenReturn(expectedFileVersionsOption)
+            val actual = underTest.getFileVersionsOption(false)
+            verify(fileVersionsOptionCache, times(0)).set(any())
+            verify(megaApiGateway, times(0)).getFileVersionsOption(any())
+            assertThat(expectedFileVersionsOption).isEqualTo(actual)
+        }
+
+    @Test
+    fun `test that data return from sdk when fileVersionsOptionCache is not null and call getFileVersionsOption with forceRefresh true`() =
+        runTest {
+            val expectedFileVersionsOption = true
+            val api = mock<MegaApiJava>()
+            val request = mock<MegaRequest> {
+                on { flag }.thenReturn(expectedFileVersionsOption)
+            }
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+            whenever(fileVersionsOptionCache.get()).thenReturn(expectedFileVersionsOption.not())
+            whenever(megaApiGateway.getFileVersionsOption(any())).thenAnswer {
+                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    api,
+                    request,
+                    error
+                )
+            }
+            val actual = underTest.getFileVersionsOption(true)
+            verify(fileVersionsOptionCache, times(1)).set(expectedFileVersionsOption)
+            verify(megaApiGateway, times(1)).getFileVersionsOption(any())
+            assertThat(expectedFileVersionsOption).isEqualTo(actual)
+        }
+
+    @Test
+    fun `test that data return from sdk when fileVersionsOptionCache is null and call getFileVersionsOption with forceRefresh false`() =
+        runTest {
+            val expectedFileVersionsOption = true
+            val api = mock<MegaApiJava>()
+            val request = mock<MegaRequest> {
+                on { flag }.thenReturn(expectedFileVersionsOption)
+            }
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+            whenever(fileVersionsOptionCache.get()).thenReturn(null)
+            whenever(megaApiGateway.getFileVersionsOption(any())).thenAnswer {
+                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    api,
+                    request,
+                    error
+                )
+            }
+            val actual = underTest.getFileVersionsOption(false)
+            verify(fileVersionsOptionCache, times(1)).set(expectedFileVersionsOption)
+            verify(megaApiGateway, times(1)).getFileVersionsOption(any())
+            assertThat(expectedFileVersionsOption).isEqualTo(actual)
+        }
+
+    @Test
+    fun `test that data return from sdk when fileVersionsOptionCache is API_ENOENT and call getFileVersionsOption with forceRefresh true`() =
+        runTest {
+            val expectedFileVersionsOption = false
+            val api = mock<MegaApiJava>()
+            val request = mock<MegaRequest> {
+                on { flag }.thenReturn(expectedFileVersionsOption)
+            }
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_ENOENT)
+            }
+            whenever(fileVersionsOptionCache.get()).thenReturn(null)
+            whenever(megaApiGateway.getFileVersionsOption(any())).thenAnswer {
+                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    api,
+                    request,
+                    error
+                )
+            }
+            val actual = underTest.getFileVersionsOption(true)
+            verify(fileVersionsOptionCache, times(1)).set(expectedFileVersionsOption)
+            verify(megaApiGateway, times(1)).getFileVersionsOption(any())
+            assertThat(expectedFileVersionsOption).isEqualTo(actual)
         }
 }

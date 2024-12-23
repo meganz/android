@@ -38,14 +38,6 @@ interface FileSystemRepository {
     suspend fun getOfflineBackupsPath(): String
 
     /**
-     * Get file versions option
-     *
-     * @param forceRefresh
-     * @return
-     */
-    suspend fun getFileVersionsOption(forceRefresh: Boolean): Boolean
-
-    /**
      * Get local file
      *
      * @param fileNode

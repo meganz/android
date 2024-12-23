@@ -486,4 +486,12 @@ interface SettingsRepository {
      * set raise to hand feature tooltip shown
      */
     suspend fun setRaiseToHandSuggestionShown()
+
+    /**
+     * Get file versions option
+     *
+     * @param forceRefresh
+     * @return
+     */
+    suspend fun getFileVersionsOption(forceRefresh: Boolean): Boolean
 }
