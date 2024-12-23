@@ -82,7 +82,6 @@ import javax.inject.Inject
  */
 internal class FileSystemRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val shareDataMapper: ShareDataMapper,
@@ -156,10 +155,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             cacheGateway.getCameraUploadsCacheFolder()
         }
-
-    override suspend fun getFingerprint(filePath: String) = withContext(ioDispatcher) {
-        megaApiGateway.getFingerprint(filePath)
-    }
 
     override suspend fun doesFolderExists(folderPath: String) = withContext(ioDispatcher) {
         fileGateway.isFileAvailable(folderPath)

@@ -6,8 +6,6 @@ import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
 import java.io.IOException
@@ -103,14 +101,6 @@ interface FileSystemRepository {
      * @return true if the delete operation is successful, and false if otherwise
      */
     suspend fun deleteCameraUploadsTemporaryRootDirectory(): Boolean
-
-    /**
-     * Get the fingerprint of a file by path
-     *
-     * @param filePath file path
-     * @return fingerprint
-     */
-    suspend fun getFingerprint(filePath: String): String?
 
     /**
      * Checks whether the Folder exists

@@ -13,16 +13,12 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
-import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
-import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
@@ -41,10 +37,6 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.FileNotCreatedException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -76,9 +68,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class FileSystemRepositoryImplTest {
     private lateinit var underTest: FileSystemRepository
-
     private val context: Context = mock()
-    private val megaApiGateway: MegaApiGateway = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val megaLocalStorageGateway: MegaLocalStorageGateway = mock()
     private val shareDataMapper: ShareDataMapper = mock()
@@ -109,7 +99,6 @@ internal class FileSystemRepositoryImplTest {
     private fun initUnderTest() {
         underTest = FileSystemRepositoryImpl(
             context = context,
-            megaApiGateway = megaApiGateway,
             ioDispatcher = ioDispatcher,
             megaLocalStorageGateway = megaLocalStorageGateway,
             shareDataMapper = shareDataMapper,
@@ -131,7 +120,6 @@ internal class FileSystemRepositoryImplTest {
     fun resetMocks() {
         reset(
             context,
-            megaApiGateway,
             megaLocalStorageGateway,
             shareDataMapper,
             megaExceptionMapper,
