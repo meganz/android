@@ -89,8 +89,6 @@ internal class FileSystemRepositoryImplTest {
 
     private val context: Context = mock()
     private val megaApiGateway: MegaApiGateway = mock()
-    private val megaApiFolderGateway: MegaApiFolderGateway = mock()
-    private val megaChatApiGateway: MegaChatApiGateway = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val megaLocalStorageGateway: MegaLocalStorageGateway = mock()
     private val shareDataMapper: ShareDataMapper = mock()
@@ -123,8 +121,6 @@ internal class FileSystemRepositoryImplTest {
         underTest = FileSystemRepositoryImpl(
             context = context,
             megaApiGateway = megaApiGateway,
-            megaApiFolderGateway = megaApiFolderGateway,
-            megaChatApiGateway = megaChatApiGateway,
             ioDispatcher = ioDispatcher,
             megaLocalStorageGateway = megaLocalStorageGateway,
             shareDataMapper = shareDataMapper,
@@ -148,8 +144,6 @@ internal class FileSystemRepositoryImplTest {
         reset(
             context,
             megaApiGateway,
-            megaApiFolderGateway,
-            megaChatApiGateway,
             megaLocalStorageGateway,
             shareDataMapper,
             megaExceptionMapper,

@@ -28,16 +28,21 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.TransfersPreferencesGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
@@ -53,6 +58,7 @@ import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapp
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -67,12 +73,15 @@ import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransferRequest
+import mega.privacy.android.domain.exception.NullFileException
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaError.API_OK
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
 import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
@@ -95,6 +104,8 @@ import kotlin.time.Duration.Companion.seconds
 @Singleton
 internal class DefaultTransfersRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
+    private val megaApiFolderGateway: MegaApiFolderGateway,
+    private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val scope: CoroutineScope,
     private val transferEventMapper: TransferEventMapper,
@@ -115,6 +126,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val inProgressTransferMapper: InProgressTransferMapper,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val transfersPreferencesGateway: Lazy<TransfersPreferencesGateway>,
+    private val cacheGateway: CacheGateway,
 ) : TransferRepository {
 
     private val monitorPausedTransfers = MutableStateFlow(false)
@@ -821,6 +833,77 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun getBandwidthOverQuotaDelay() = withContext(ioDispatcher) {
         megaApiGateway.getBandwidthOverQuotaDelay().seconds
     }
+
+    @Deprecated(
+        "ViewerNode should be replaced by [TypedNode], there's a similar use-case to download any type of [TypedNode] and receive a flow of the progress: StartDownloadUseCase. Please add [TransferAppData.BackgroundTransfer] to avoid this transfers to be added in the counters of the DownloadService notification",
+        replaceWith = ReplaceWith("StartDownloadUseCase")
+    )
+    override suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String =
+        withContext(ioDispatcher) {
+            getMegaNode(viewerNode)?.let { node ->
+                val file = cacheGateway.getCacheFile(
+                    CacheFolderConstant.TEMPORARY_FOLDER,
+                    node.getFileName()
+                ) ?: throw NullFileException()
+                suspendCancellableCoroutine { continuation ->
+                    val listener = OptionalMegaTransferListenerInterface(
+                        onTransferFinish = { _, error ->
+                            if (error.errorCode == API_OK) {
+                                continuation.resumeWith(Result.success(file.absolutePath))
+                            } else {
+                                continuation.failWithError(error, "downloadBackgroundFile")
+                            }
+                        }
+                    )
+                    megaApiGateway.startDownload(
+                        node = node,
+                        localPath = file.absolutePath,
+                        fileName = file.name,
+                        appData = AppDataTypeConstants.BackgroundTransfer.sdkTypeValue,
+                        startFirst = true,
+                        cancelToken = null,
+                        collisionCheck = COLLISION_CHECK_FINGERPRINT,
+                        collisionResolution = COLLISION_RESOLUTION_NEW_WITH_N,
+                        listener = listener
+                    )
+                }
+            } ?: throw NullPointerException()
+        }
+
+    private suspend fun getMegaNode(viewerNode: ViewerNode): MegaNode? = withContext(ioDispatcher) {
+        when (viewerNode) {
+            is ViewerNode.ChatNode -> getMegaNodeFromChat(viewerNode)
+            is ViewerNode.FileLinkNode -> MegaNode.unserialize(viewerNode.serializedNode)
+            is ViewerNode.FolderLinkNode -> getMegaNodeFromFolderLink(viewerNode)
+            is ViewerNode.GeneralNode -> megaApiGateway.getMegaNodeByHandle(viewerNode.id)
+        }
+    }
+
+    private suspend fun getMegaNodeFromChat(chatNode: ViewerNode.ChatNode) =
+        withContext(ioDispatcher) {
+            with(chatNode) {
+                val messageChat = megaChatApiGateway.getMessage(chatId, messageId)
+                    ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId)
+
+                if (messageChat != null) {
+                    val node = messageChat.megaNodeList.get(0)
+                    val chat = megaChatApiGateway.getChatRoom(chatId)
+
+                    if (chat?.isPreview == true) {
+                        megaApiGateway.authorizeChatNode(node, chat.authorizationToken)
+                    } else {
+                        node
+                    }
+                } else null
+            }
+        }
+
+    private suspend fun getMegaNodeFromFolderLink(folderLinkNode: ViewerNode.FolderLinkNode) =
+        withContext(ioDispatcher) {
+            megaApiFolderGateway.getMegaNodeByHandle(folderLinkNode.id)?.let {
+                megaApiFolderGateway.authorizeNode(it)
+            }
+        }
 }
 
 private fun MegaTransfer.isBackgroundTransfer() =

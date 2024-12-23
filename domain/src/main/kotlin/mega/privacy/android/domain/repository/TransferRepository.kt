@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -588,4 +589,16 @@ interface TransferRepository {
      * @return Time during which transfers will be stopped, otherwise 0
      */
     suspend fun getBandwidthOverQuotaDelay(): Duration
+
+    /**
+     * Downloads a file node in background.
+     *
+     * @param viewerNode File node to download.
+     * @return The local path of the downloaded file.
+     */
+    @Deprecated(
+        message = "ViewerNode should be replaced by [TypedNode], there's a similar use-case to download any type of [TypedNode] and receive a flow of the progress: StartDownloadUseCase. Please add [TransferAppData.BackgroundTransfer] to avoid this transfers to be added in the counters of the DownloadService notification",
+        replaceWith = ReplaceWith("StartDownloadUseCase"),
+    )
+    suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String
 }

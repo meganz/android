@@ -12,13 +12,16 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.TransfersPreferencesGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
@@ -109,6 +112,9 @@ class DefaultTransfersRepositoryTest {
     private val inProgressTransferMapper = mock<InProgressTransferMapper>()
     private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
     private val transfersPreferencesGateway = mock<TransfersPreferencesGateway>()
+    private val cacheGateway = mock<CacheGateway>()
+    private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
+    private val megaChatApiGateway = mock<MegaChatApiGateway>()
 
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -124,6 +130,8 @@ class DefaultTransfersRepositoryTest {
         stubPauseTransfers(paused)
         return DefaultTransfersRepository(
             megaApiGateway = megaApiGateway,
+            megaChatApiGateway = megaChatApiGateway,
+            megaApiFolderGateway = megaApiFolderGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             transferEventMapper = transferEventMapper,
             appEventGateway = appEventGateway,
@@ -144,6 +152,7 @@ class DefaultTransfersRepositoryTest {
             inProgressTransferMapper = inProgressTransferMapper,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             transfersPreferencesGateway = { transfersPreferencesGateway },
+            cacheGateway = cacheGateway
         )
     }
 
@@ -151,6 +160,8 @@ class DefaultTransfersRepositoryTest {
     fun resetMocks() {
         reset(
             megaApiGateway,
+            megaChatApiGateway,
+            megaApiFolderGateway,
             transferEventMapper,
             appEventGateway,
             transferMapper,
@@ -165,6 +176,7 @@ class DefaultTransfersRepositoryTest {
             sdCardGateway,
             deviceGateway,
             inProgressTransferMapper,
+            cacheGateway,
         )
     }
 

@@ -81,8 +81,6 @@ import javax.inject.Inject
  *
  * @property context
  * @property megaApiGateway
- * @property megaApiFolderGateway
- * @property megaChatApiGateway
  * @property ioDispatcher
  * @property megaLocalStorageGateway
  * @property shareDataMapper
@@ -99,8 +97,6 @@ import javax.inject.Inject
 internal class FileSystemRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
-    private val megaApiFolderGateway: MegaApiFolderGateway,
-    private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val shareDataMapper: ShareDataMapper,
@@ -120,82 +116,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override val localDCIMFolderPath: String
         get() = fileGateway.localDCIMFolderPath
-
-
-    @Deprecated(
-        "ViewerNode should be replaced by [TypedNode], there's a similar use-case to download any type of [TypedNode] and receive a flow of the progress: StartDownloadUseCase. Please add [TransferAppData.BackgroundTransfer] to avoid this transfers to be added in the counters of the DownloadService notification",
-        replaceWith = ReplaceWith("StartDownloadUseCase")
-    )
-    override suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String =
-        withContext(ioDispatcher) {
-            getMegaNode(viewerNode)?.let { node ->
-                val file = cacheGateway.getCacheFile(
-                    CacheFolderConstant.TEMPORARY_FOLDER,
-                    node.getFileName()
-                ) ?: throw NullFileException()
-                suspendCancellableCoroutine { continuation ->
-                    val listener = OptionalMegaTransferListenerInterface(
-                        onTransferFinish = { _, error ->
-                            if (error.errorCode == API_OK) {
-                                continuation.resumeWith(Result.success(file.absolutePath))
-                            } else {
-                                continuation.failWithError(error, "downloadBackgroundFile")
-                            }
-                        }
-                    )
-                    megaApiGateway.startDownload(
-                        node = node,
-                        localPath = file.absolutePath,
-                        fileName = file.name,
-                        appData = AppDataTypeConstants.BackgroundTransfer.sdkTypeValue,
-                        startFirst = true,
-                        cancelToken = null,
-                        collisionCheck = COLLISION_CHECK_FINGERPRINT,
-                        collisionResolution = COLLISION_RESOLUTION_NEW_WITH_N,
-                        listener = listener
-                    )
-                }
-            } ?: throw NullPointerException()
-        }
-
-    @Deprecated(
-        message = "ViewerNode should be replaced by [TypedNode], there's a mapper to get the corresponding [MegaNode] from any [TypedNode]: MegaNodeMapper",
-        replaceWith = ReplaceWith("MegaNodeMapper"),
-    )
-    private suspend fun getMegaNode(viewerNode: ViewerNode): MegaNode? = withContext(ioDispatcher) {
-        when (viewerNode) {
-            is ViewerNode.ChatNode -> getMegaNodeFromChat(viewerNode)
-            is ViewerNode.FileLinkNode -> MegaNode.unserialize(viewerNode.serializedNode)
-            is ViewerNode.FolderLinkNode -> getMegaNodeFromFolderLink(viewerNode)
-            is ViewerNode.GeneralNode -> megaApiGateway.getMegaNodeByHandle(viewerNode.id)
-        }
-    }
-
-    private suspend fun getMegaNodeFromChat(chatNode: ViewerNode.ChatNode) =
-        withContext(ioDispatcher) {
-            with(chatNode) {
-                val messageChat = megaChatApiGateway.getMessage(chatId, messageId)
-                    ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId)
-
-                if (messageChat != null) {
-                    val node = messageChat.megaNodeList.get(0)
-                    val chat = megaChatApiGateway.getChatRoom(chatId)
-
-                    if (chat?.isPreview == true) {
-                        megaApiGateway.authorizeChatNode(node, chat.authorizationToken)
-                    } else {
-                        node
-                    }
-                } else null
-            }
-        }
-
-    private suspend fun getMegaNodeFromFolderLink(folderLinkNode: ViewerNode.FolderLinkNode) =
-        withContext(ioDispatcher) {
-            megaApiFolderGateway.getMegaNodeByHandle(folderLinkNode.id)?.let {
-                megaApiFolderGateway.authorizeNode(it)
-            }
-        }
 
     override suspend fun getOfflinePath() =
         withContext(ioDispatcher) { fileGateway.getOfflineFilesRootPath() }
