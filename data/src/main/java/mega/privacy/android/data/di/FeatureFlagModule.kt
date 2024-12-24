@@ -11,6 +11,7 @@ import mega.privacy.android.data.featuretoggle.DataFeatures
 import mega.privacy.android.data.featuretoggle.remote.ABTestFeatureFlagValueProvider
 import mega.privacy.android.data.featuretoggle.remote.ApiFeatureFlagProvider
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.featuretoggle.DomainFeatures
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 
@@ -70,5 +71,23 @@ internal abstract class FeatureFlagModule {
         @IntoSet
         fun provideSyncFeatureFlagValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
             SyncFeatures.Companion
+
+        /**
+         * Provide domain features
+         *
+         * @return Domain features
+         */
+        @Provides
+        @ElementsIntoSet
+        fun provideDomainFeatures(): Set<@JvmSuppressWildcards Feature> =
+            DomainFeatures.entries.toSet()
+
+        /**
+         * Provide domain feature flag value provider
+         */
+        @Provides
+        @IntoSet
+        fun provideDomainFeatureFlagValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
+            DomainFeatures.Companion
     }
 }

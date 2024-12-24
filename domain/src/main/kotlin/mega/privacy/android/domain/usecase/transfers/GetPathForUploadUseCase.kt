@@ -5,6 +5,7 @@ import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.PermissionRepository
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.UseContentUrisForUploadsUseCase
 import java.io.File
 import javax.inject.Inject
 
@@ -19,6 +20,7 @@ class GetPathForUploadUseCase @Inject constructor(
     private val doesPathHaveSufficientSpaceUseCase: DoesPathHaveSufficientSpaceUseCase,
     private val fileSystemRepository: FileSystemRepository,
     private val permissionRepository: PermissionRepository,
+    private val useContentUrisForUploadsUseCase: UseContentUrisForUploadsUseCase,
 ) {
     /**
      * Invoke
@@ -28,6 +30,11 @@ class GetPathForUploadUseCase @Inject constructor(
      */
     suspend operator fun invoke(originalUriPath: UriPath, isChatUpload: Boolean): String? {
         return when {
+            fileSystemRepository.isContentUri(originalUriPath.value)
+                    && useContentUrisForUploadsUseCase(isChatUpload) -> {
+                originalUriPath.value
+            }
+
             fileSystemRepository.isFilePath(originalUriPath.value) -> {
                 originalUriPath.value
             }

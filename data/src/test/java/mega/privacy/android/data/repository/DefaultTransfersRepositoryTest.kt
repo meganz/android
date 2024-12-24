@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import android.os.Build
 import androidx.work.WorkInfo
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -1694,6 +1695,20 @@ class DefaultTransfersRepositoryTest {
 
         assertThat(underTest.getBandwidthOverQuotaDelay()).isEqualTo(expected.seconds)
     }
+
+    @ParameterizedTest
+    @ValueSource(ints = [-55, 10, 28, 29, 30, 31, 32, 33, 34, 35])
+    fun `test that transfers with content uris are only allowed for Android R or above`(
+        sdkVersionInt: Int,
+    ) = runTest {
+        val expected = sdkVersionInt >= Build.VERSION_CODES.R
+        whenever(deviceGateway.getSdkVersionInt()) doReturn sdkVersionInt
+
+        val actual = underTest.allowTransfersWithContentUris()
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
 
     private fun getCompletedTransfer(fileName: String) = CompletedTransfer(
         fileName = fileName,
