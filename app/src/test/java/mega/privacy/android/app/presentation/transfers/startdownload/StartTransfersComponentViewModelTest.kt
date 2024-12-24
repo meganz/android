@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
@@ -576,13 +575,16 @@ class StartTransfersComponentViewModelTest {
             }
             val nodeId = NodeId(1)
             whenever(shouldAskDownloadDestinationUseCase()).thenReturn(true)
+            whenever(saveOfflineNodesToDevice(listOf(nodeId), UriPath(DESTINATION))).thenReturn(1)
             underTest.startDownloadWithoutConfirmation(
                 TransferTriggerEvent.CopyOfflineNode(listOf(nodeId))
             )
             underTest.startDownloadWithDestination(
                 uri
             )
-            verify(saveOfflineNodesToDevice).invoke(listOf(nodeId), UriPath(DESTINATION))
+            assertCurrentEventIsEqualTo(
+                StartTransferEvent.FinishCopyOffline(1)
+            )
             verifyNoInteractions(startDownloadsWorkerAndWaitUntilIsStartedUseCase)
         }
 

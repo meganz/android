@@ -279,6 +279,16 @@ private fun StartTransferComponent(
                 StartTransferEvent.PausedTransfers -> {
                     showResumeTransfersAlertDialog = true
                 }
+
+                is StartTransferEvent.FinishCopyOffline -> {
+                    snackBarHostState.showAutoDurationSnackbar(
+                        context.resources.getQuantityString(
+                            R.plurals.download_complete,
+                            it.totalFiles,
+                            it.totalFiles,
+                        )
+                    )
+                }
             }
         })
 

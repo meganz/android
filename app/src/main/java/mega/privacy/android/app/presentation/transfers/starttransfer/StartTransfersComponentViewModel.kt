@@ -309,6 +309,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     ) {
         runCatching {
             saveOfflineNodesToDevice(startDownloadNode.nodeIds, UriPath(destination))
+        }.onSuccess {
+            _uiState.updateEventAndClearProgress(StartTransferEvent.FinishCopyOffline(it))
         }.onFailure {
             Timber.e(it)
         }

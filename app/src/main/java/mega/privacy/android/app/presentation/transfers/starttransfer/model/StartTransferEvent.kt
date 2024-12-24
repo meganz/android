@@ -49,6 +49,14 @@ sealed interface StartTransferEvent {
     data object PausedTransfers : StartTransferEvent
 
     /**
+     * Copy offline has finished
+     * @property totalFiles total files copied
+     */
+    data class FinishCopyOffline(
+        val totalFiles: Int,
+    ) : StartTransferEvent
+
+    /**
      * A message should be shown
      * @param message the [StringRes] of the message to be shown
      * @param action the [StringRes] of the action, if any
