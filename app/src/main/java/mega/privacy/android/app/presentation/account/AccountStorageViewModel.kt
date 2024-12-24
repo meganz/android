@@ -20,7 +20,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.advertisements.MonitorAdsClosingTimestampUseCase
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.days
 
 /**
  * ViewModel for account storage
@@ -111,8 +111,6 @@ class AccountStorageViewModel @Inject constructor(
                             ),
                             storageUsedPercentage = accountDetail.storageDetail?.usedPercentage
                                 ?: 0,
-                            transferUsedPercentage = accountDetail.transferDetail?.usedTransferPercentage
-                                ?: 0
                         )
                     }
                 }
@@ -177,10 +175,10 @@ class AccountStorageViewModel @Inject constructor(
      */
     fun isUpgradeAccountDueToAds(): Boolean {
         val state = _state.value
-        Timber.d("Storage: ${state.storageUsedPercentage}, Transfer: ${state.transferUsedPercentage}")
+        Timber.d("Storage: ${state.storageUsedPercentage}")
         val within2Days =
-            System.currentTimeMillis() - state.lastAdsClosingTimestamp <= 2.hours.inWholeMicroseconds
-        return state.storageUsedPercentage < 50 && state.transferUsedPercentage < 50 && within2Days
+            System.currentTimeMillis() - state.lastAdsClosingTimestamp <= 2.days.inWholeMicroseconds
+        return state.storageUsedPercentage < 50 && within2Days
     }
 
     private companion object {

@@ -9,7 +9,6 @@ package mega.privacy.android.app.presentation.account.model
  * @property baseStorageFormatted Base storage formatted
  * @property lastAdsClosingTimestamp Last ads closing timestamp
  * @property storageUsedPercentage Storage used percentage
- * @property transferUsedPercentage Transfer used percentage
  */
 data class AccountStorageUIState(
     val totalStorage: Long? = null,
@@ -18,5 +17,4 @@ data class AccountStorageUIState(
     val baseStorageFormatted: String = "",
     val lastAdsClosingTimestamp: Long = 0L,
     val storageUsedPercentage: Int = 0,
-    val transferUsedPercentage: Int = 0,
 )

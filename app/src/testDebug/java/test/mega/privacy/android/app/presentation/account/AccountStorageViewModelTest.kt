@@ -70,6 +70,7 @@ class AccountStorageViewModelTest {
         runTest {
             val accountStorageDetail = mock<AccountStorageDetail> {
                 on { totalStorage } doReturn totalStorage
+                on { usedPercentage } doReturn 50
             }
             val accountDetail = mock<AccountDetail> {
                 on { storageDetail } doReturn accountStorageDetail
@@ -79,7 +80,9 @@ class AccountStorageViewModelTest {
             )
             underTest.monitorAccountDetail()
             underTest.state.test {
-                assertThat(awaitItem().totalStorage).isEqualTo(totalStorage)
+                val item = awaitItem()
+                assertThat(item.totalStorage).isEqualTo(totalStorage)
+                assertThat(item.storageUsedPercentage).isEqualTo(50)
             }
         }
 
