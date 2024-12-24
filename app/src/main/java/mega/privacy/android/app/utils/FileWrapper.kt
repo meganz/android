@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
+import mega.privacy.android.data.extensions.isFile
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.transfers.GetFileDescriptorWrapperFromUriPathUseCase
 
@@ -70,5 +71,14 @@ class FileWrapper(
                         )
                     }
             }
+
+        /**
+         * Static method to check if a string represents a file as opposed to an Uri.
+         * This method doesn't check if the path is valid or points to an existing File or not.
+         * @return true if this string represents a file path, false otherwise
+         */
+        @Keep
+        @JvmStatic
+        fun isPath(path: String) = path.startsWith("file").not() && UriPath(path).isFile()
     }
 }

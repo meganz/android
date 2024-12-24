@@ -12,3 +12,10 @@ fun UriPath.toUri(): Uri {
         .getOrNull()?.takeUnless { it.scheme.isNullOrEmpty() }
         ?: Uri.fromFile(File(this.value))
 }
+
+/**
+ * @return true if this UriPath represents a file, false otherwise
+ */
+fun UriPath.isFile(): Boolean {
+    return toUri().scheme == "file"
+}
