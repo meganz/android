@@ -200,22 +200,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables full storage over quota banner
-     */
-    FullStorageOverQuotaBanner(
-        "Enable full storage over quota banner",
-        true
-    ),
-
-    /**
-     * Enables almost full storage quota banner
-     */
-    AlmostFullStorageOverQuotaBanner(
-        "Enable almost full storage quota banner",
-        true
-    ),
-
-    /**
      * New import section
      */
     NewUploadDestinationActivity(

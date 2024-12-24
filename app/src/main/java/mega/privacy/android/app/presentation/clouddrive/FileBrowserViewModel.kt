@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -25,7 +24,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
@@ -173,17 +171,13 @@ class FileBrowserViewModel @Inject constructor(
     private fun monitorStorageOverQuotaCapacity() {
         viewModelScope.launch {
             combine(
-                flow { emit(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)) },
-                flow { emit(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)) },
                 monitorStorageStateUseCase(),
                 monitorAlmostFullStorageBannerClosingTimestampUseCase()
             )
-            { isFullStorageOverQuotaBannerEnabled: Boolean, isAlmostFullStorageQuotaBannerEnabled: Boolean, storageState: StorageState, shouldShow: Boolean ->
+            { storageState: StorageState, shouldShow: Boolean ->
                 cachedStorageState = storageState
                 storageCapacityMapper(
                     storageState = storageState,
-                    isFullStorageOverQuotaBannerEnabled = isFullStorageOverQuotaBannerEnabled,
-                    isAlmostFullStorageQuotaBannerEnabled = isAlmostFullStorageQuotaBannerEnabled,
                     shouldShow = shouldShow
                 )
             }.catch { Timber.e(it) }

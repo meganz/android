@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -27,7 +26,6 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
@@ -158,16 +156,12 @@ class MediaDiscoveryViewModel @Inject constructor(
     private fun monitorStorageOverQuotaCapacity() {
         viewModelScope.launch {
             combine(
-                flow { emit(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)) },
-                flow { emit(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)) },
                 monitorStorageStateUseCase(),
                 monitorAlmostFullStorageBannerClosingTimestampUseCase()
             )
-            { isFullStorageOverQuotaBannerEnabled, isAlmostFullStorageQuotaBannerEnabled, storageState, shouldShow  ->
+            { storageState, shouldShow ->
                 storageCapacityMapper(
                     storageState = storageState,
-                    isFullStorageOverQuotaBannerEnabled = isFullStorageOverQuotaBannerEnabled,
-                    isAlmostFullStorageQuotaBannerEnabled = isAlmostFullStorageQuotaBannerEnabled,
                     shouldShow = shouldShow
                 )
             }.catch { Timber.e(it) }

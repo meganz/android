@@ -16,7 +16,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
@@ -79,7 +78,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -224,10 +222,6 @@ class FileBrowserViewModelTest {
     ) = runTest {
         runBlocking {
             stubCommon()
-            getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(AppFeatures.FullStorageOverQuotaBanner) }.thenReturn(true)
-                onBlocking { invoke(AppFeatures.AlmostFullStorageOverQuotaBanner) }.thenReturn(true)
-            }
             whenever(monitorStorageStateUseCase()).thenReturn(
                 storageState.asHotFlow()
             )
@@ -239,8 +233,6 @@ class FileBrowserViewModelTest {
             whenever(
                 storageCapacityMapper(
                     storageState = storageState,
-                    isFullStorageOverQuotaBannerEnabled = true,
-                    isAlmostFullStorageQuotaBannerEnabled = true,
                     shouldShow = isDismissiblePeriodOver
                 )
             ).thenReturn(
@@ -725,11 +717,7 @@ class FileBrowserViewModelTest {
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
         whenever(shouldEnterMediaDiscoveryModeUseCase(any())).thenReturn(false)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.FullStorageOverQuotaBanner)).thenReturn(true)
         whenever(getFeatureFlagValueUseCase(ApiFeatures.HiddenNodesInternalRelease)).thenReturn(true)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.AlmostFullStorageOverQuotaBanner)).thenReturn(
-            true
-        )
         whenever(monitorStorageStateUseCase()).thenReturn(
             StorageState.Green.asHotFlow()
         )
@@ -738,8 +726,6 @@ class FileBrowserViewModelTest {
         whenever(
             storageCapacityMapper(
                 storageState = any(),
-                isFullStorageOverQuotaBannerEnabled = any(),
-                isAlmostFullStorageQuotaBannerEnabled = any(),
                 shouldShow = any()
             )
         ).thenReturn(

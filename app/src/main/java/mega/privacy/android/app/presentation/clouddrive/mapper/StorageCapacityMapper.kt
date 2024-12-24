@@ -16,19 +16,15 @@ class StorageCapacityMapper @Inject constructor() {
      * Invocation method
      * Map the [StorageState] to [StorageOverQuotaCapacity]
      * @param storageState The [StorageState] object
-     * @param isFullStorageOverQuotaBannerEnabled true if the feature flag FullStorageOverQuotaBanner is enabled
-     * @param isAlmostFullStorageQuotaBannerEnabled true if the feature flag AlmostFullStorageOverQuotaBanner is enabled
      * @param shouldShow true if the banner should be shown
      * @return The mapped [StorageOverQuotaCapacity]
      */
     operator fun invoke(
         storageState: StorageState,
-        isFullStorageOverQuotaBannerEnabled: Boolean,
-        isAlmostFullStorageQuotaBannerEnabled: Boolean,
         shouldShow: Boolean,
     ): StorageOverQuotaCapacity = when (storageState) {
-        StorageState.Red -> if (isFullStorageOverQuotaBannerEnabled) FULL else DEFAULT
-        StorageState.Orange -> if (isAlmostFullStorageQuotaBannerEnabled && shouldShow) ALMOST_FULL else DEFAULT
+        StorageState.Red -> FULL
+        StorageState.Orange -> if (shouldShow) ALMOST_FULL else DEFAULT
         else -> DEFAULT
     }
 }
