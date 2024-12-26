@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import android.util.Base64
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -42,8 +43,18 @@ internal class RemotePreferencesRepositoryImplTest {
 
         whenever(megaStringMapMapper.invoke(any<MegaStringMap>())).thenReturn(emptyMap())
         whenever(megaStringMapMapper.invoke(any<Map<String, String>>())).thenReturn(mock())
-        whenever(stringWrapper.encodeBase64(any())).thenAnswer { ((it.arguments[0]) as String) }
-        whenever(stringWrapper.decodeBase64(any())).thenAnswer { ((it.arguments[0]) as String) }
+        whenever(
+            stringWrapper.encodeBase64(
+                any(),
+                eq(Base64.NO_WRAP)
+            )
+        ).thenAnswer { ((it.arguments[0]) as String) }
+        whenever(
+            stringWrapper.decodeBase64(
+                any(),
+                eq(Base64.NO_WRAP)
+            )
+        ).thenAnswer { ((it.arguments[0]) as String) }
 
         whenever(megaApiGateway.getUserAttribute(eq(MegaApiJava.USER_ATTR_APPS_PREFS), any()))
             .thenAnswer {

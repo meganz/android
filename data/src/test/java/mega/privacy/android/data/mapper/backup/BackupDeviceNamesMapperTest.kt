@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper.backup
 
+import android.util.Base64
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.data.wrapper.StringWrapper
 import nz.mega.sdk.MegaStringList
@@ -47,8 +48,12 @@ internal class BackupDeviceNamesMapperTest {
         val secondPair = Pair("67890", deviceTwoBase64Name)
 
         stringWrapper.stub {
-            on { decodeBase64(deviceOneBase64Name) }.thenReturn(expectedDeviceOneName)
-            on { decodeBase64(deviceTwoBase64Name) }.thenReturn(expectedDeviceTwoName)
+            on { decodeBase64(deviceOneBase64Name, Base64.URL_SAFE) }.thenReturn(
+                expectedDeviceOneName
+            )
+            on { decodeBase64(deviceTwoBase64Name, Base64.URL_SAFE) }.thenReturn(
+                expectedDeviceTwoName
+            )
         }
 
         val megaStringKeyList = mock<MegaStringList> {

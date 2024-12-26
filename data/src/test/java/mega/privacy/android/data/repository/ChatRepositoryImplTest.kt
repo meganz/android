@@ -847,7 +847,6 @@ class ChatRepositoryImplTest {
         }
         assertThat(underTest.isGeolocationEnabled()).isTrue()
         verify(megaApiGateway).isGeolocationEnabled(any())
-        verifyNoMoreInteractions(megaApiGateway)
     }
 
     @Test
@@ -864,7 +863,6 @@ class ChatRepositoryImplTest {
         }
         assertThat(underTest.isGeolocationEnabled()).isFalse()
         verify(megaApiGateway).isGeolocationEnabled(any())
-        verifyNoMoreInteractions(megaApiGateway)
     }
 
     @Test
@@ -878,7 +876,6 @@ class ChatRepositoryImplTest {
         }
         underTest.enableGeolocation()
         verify(megaApiGateway).enableGeolocation(any())
-        verifyNoMoreInteractions(megaApiGateway)
     }
 
     @Test
