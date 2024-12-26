@@ -260,7 +260,7 @@ class LoginFragment : Fragment() {
                                 Constants.ACTION_OPEN_HANDLE_NODE,
                                 Constants.ACTION_OPEN_CHAT_LINK,
                                 Constants.ACTION_JOIN_OPEN_CHAT_LINK,
-                                -> {
+                                    -> {
                                     intentDataString = dataString
                                 }
 
@@ -272,7 +272,7 @@ class LoginFragment : Fragment() {
 
                                 Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL,
                                 Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL,
-                                -> {
+                                    -> {
                                     intentData = data
                                 }
                             }
@@ -611,7 +611,14 @@ class LoginFragment : Fragment() {
                     if (viewModel.getStorageState() === StorageState.PayWall) {
                         showOverDiskQuotaPaywallWarning(activity, true)
                     } else {
-                        loginActivity.startActivity(intent)
+                        loginActivity.startActivity(
+                            intent.apply {
+                                putExtra(
+                                    IntentConstants.EXTRA_FIRST_LAUNCH,
+                                    uiState.isFirstTimeLaunch
+                                )
+                            },
+                        )
                     }
                     loginActivity.finish()
                 }

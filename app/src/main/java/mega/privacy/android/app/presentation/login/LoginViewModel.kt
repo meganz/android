@@ -59,6 +59,7 @@ import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUse
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
+import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.ClearLastRegisteredEmailUseCase
@@ -138,6 +139,7 @@ class LoginViewModel @Inject constructor(
     private val enableRequestStatusMonitorUseCase: EnableRequestStatusMonitorUseCase,
     private val monitorRequestStatusProgressEventUseCase: MonitorRequestStatusProgressEventUseCase,
     private val checkIfTransfersShouldBePausedUseCase: CheckIfTransfersShouldBePausedUseCase,
+    private val isFirstLaunchUseCase: IsFirstLaunchUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -246,6 +248,11 @@ class LoginViewModel @Inject constructor(
                 flowOf(getFeatureFlagValueUseCase(AppFeatures.LoginReportIssueButton)).map { enabled ->
                     { state: LoginState ->
                         state.copy(enabledFlags = if (enabled) state.enabledFlags + AppFeatures.LoginReportIssueButton else state.enabledFlags - AppFeatures.LoginReportIssueButton)
+                    }
+                },
+                flowOf(isFirstLaunchUseCase()).map { isFirstLaunch ->
+                    { state: LoginState ->
+                        state.copy(isFirstTimeLaunch = isFirstLaunch)
                     }
                 },
             ).collect {

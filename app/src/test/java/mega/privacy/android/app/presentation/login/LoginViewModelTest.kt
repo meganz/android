@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUse
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
+import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.ClearLastRegisteredEmailUseCase
@@ -127,6 +128,7 @@ internal class LoginViewModelTest {
         mock<MonitorRequestStatusProgressEventUseCase>()
     private val checkIfTransfersShouldBePausedUseCase =
         mock<CheckIfTransfersShouldBePausedUseCase>()
+    private val isFirstLaunchUseCase = mock<IsFirstLaunchUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -173,6 +175,7 @@ internal class LoginViewModelTest {
             enableRequestStatusMonitorUseCase = enableRequestStatusMonitorUseCase,
             monitorRequestStatusProgressEventUseCase = monitorRequestStatusProgressEventUseCase,
             checkIfTransfersShouldBePausedUseCase = checkIfTransfersShouldBePausedUseCase,
+            isFirstLaunchUseCase = isFirstLaunchUseCase
         )
     }
 
@@ -190,6 +193,7 @@ internal class LoginViewModelTest {
         reset(
             monitorRequestStatusProgressEventUseCase,
             checkIfTransfersShouldBePausedUseCase,
+            isFirstLaunchUseCase
         )
     }
 
@@ -227,6 +231,7 @@ internal class LoginViewModelTest {
                 assertThat(enabledFlags).isEmpty()
                 assertThat(isCheckingSignupLink).isFalse()
                 assertThat(snackbarMessage).isInstanceOf(consumed().javaClass)
+                assertThat(isFirstTimeLaunch).isFalse()
             }
         }
     }

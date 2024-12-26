@@ -52,6 +52,7 @@ import mega.privacy.android.domain.exception.LoginException
  * @property isFastLoginInProgress      True if a fast login is in progress, false otherwise.
  * @property loginTemporaryError        [TemporaryWaitingError] during login
  * @property requestStatusProgress      Progress of the request status, 0 to 1000, hide progress bar if -1
+ * @property isFirstTimeLaunch          True if it is the first time the app is launched.
  */
 data class LoginState(
     val intentState: LoginIntentState? = null,
@@ -89,6 +90,7 @@ data class LoginState(
     val snackbarMessage: StateEventWithContent<Int> = consumed(),
     val loginTemporaryError: TemporaryWaitingError? = null,
     val requestStatusProgress: Progress? = null,
+    val isFirstTimeLaunch: Boolean = false,
 ) {
 
     /**

@@ -299,7 +299,6 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
@@ -456,9 +455,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     @Inject
     lateinit var nodeSourceTypeMapper: NodeSourceTypeMapper
-
-    @Inject
-    lateinit var isFirstLaunchUseCase: IsFirstLaunchUseCase
 
     @Inject
     lateinit var workManager: WorkManager
@@ -1332,11 +1328,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     private fun setIsFirstLaunch() {
-        runBlocking {
-            runCatching {
-                firstTimeAfterInstallation = isFirstLaunchUseCase()
-            }
-        }
+        firstTimeAfterInstallation =
+            intent.getBooleanExtra(IntentConstants.EXTRA_FIRST_LAUNCH, false)
     }
 
     private fun handleDuplicateLaunches(): Boolean {
