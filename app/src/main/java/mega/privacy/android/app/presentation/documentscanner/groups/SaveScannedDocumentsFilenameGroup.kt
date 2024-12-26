@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,7 +32,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -65,8 +69,17 @@ internal fun SaveScannedDocumentsFilenameGroup(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
-    var input by remember(filename) { mutableStateOf(filename) }
     var isFocused by remember { mutableStateOf(false) }
+
+    // Used to de-select the text when the TextField is focused and the User selects the Text again
+    var keepWholeSelection by rememberSaveable { mutableStateOf(false) }
+    if (keepWholeSelection) {
+        SideEffect { keepWholeSelection = false }
+    }
+
+    var filenameValueState by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(filename))
+    }
 
     Column(modifier = modifier) {
         MegaText(
@@ -102,17 +115,36 @@ internal fun SaveScannedDocumentsFilenameGroup(
                     .weight(1f)
                     .padding(horizontal = 16.dp)
                     .focusRequester(focusRequester)
-                    .onFocusChanged {
-                        if (isFocused != it.isFocused) {
-                            isFocused = it.isFocused
+                    .onFocusChanged { focusState ->
+                        isFocused = focusState.isFocused
+                        if (focusState.isFocused) {
+                            // When the Text Field gains focus, select the entire filename
+                            filenameValueState = filenameValueState.copy(
+                                selection = TextRange(0, filenameValueState.text.length)
+                            )
+                            keepWholeSelection = true
+                        } else {
+                            // When the Text Field loses focus, de-select the entire filename
+                            filenameValueState = filenameValueState.copy(
+                                selection = TextRange(0, 0)
+                            )
                         }
                     }
                     .testTag(SAVE_SCANNED_DOCUMENTS_FILENAME_GROUP_FILENAME_TEXT_FIELD),
-                text = input,
+                textFieldValue = if (isFocused) {
+                    filenameValueState
+                } else {
+                    TextFieldValue("${filenameValueState.text}${scanFileType.fileSuffix}")
+                },
                 placeholder = "",
-                onTextChange = { newText ->
-                    input = newText
-                    onFilenameChanged(input)
+                onTextChange = { newTextFieldValue ->
+                    onFilenameChanged(newTextFieldValue.text)
+
+                    if (keepWholeSelection) {
+                        keepWholeSelection = false
+                    } else {
+                        filenameValueState = newTextFieldValue
+                    }
                 },
                 errorText = filenameErrorMessage?.let { stringResource(it) },
                 imeAction = ImeAction.Done,
@@ -120,7 +152,7 @@ internal fun SaveScannedDocumentsFilenameGroup(
                     onDone = {
                         keyboardController?.hide()
                         focusManager.clearFocus(true)
-                        onFilenameConfirmed(input)
+                        onFilenameConfirmed(filenameValueState.text)
                     }
                 ),
             )
