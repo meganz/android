@@ -338,8 +338,21 @@ private fun SyncNewFolderScreenContent(
                     .fillMaxWidth()
                     .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
                 textId = when (syncType) {
-                    SyncType.TYPE_BACKUP -> sharedResR.string.sync_add_new_backup_proceed_button_label
-                    else -> R.string.sync_button_label
+                    SyncType.TYPE_BACKUP -> {
+                        if (buttonClicked) {
+                            sharedResR.string.sync_list_sync_state_updating
+                        } else {
+                            sharedResR.string.sync_add_new_backup_proceed_button_label
+                        }
+                    }
+
+                    else -> {
+                        if (buttonClicked) {
+                            R.string.sync_list_sync_state_syncing
+                        } else {
+                            R.string.sync_button_label
+                        }
+                    }
                 },
                 onClick = {
                     buttonClicked = true
