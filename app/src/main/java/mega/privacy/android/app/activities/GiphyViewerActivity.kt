@@ -6,13 +6,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate
+import coil.load
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
 import mega.privacy.android.app.databinding.ActivityGiphyViewerBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.toGiphyUri
 import mega.privacy.android.app.utils.Constants.ACTION_PREVIEW_GIPHY
-import mega.privacy.android.app.utils.FrescoUtils.loadGif
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
 
 class GiphyViewerActivity : PasscodeActivity() {
@@ -57,23 +57,25 @@ class GiphyViewerActivity : PasscodeActivity() {
             }
         }
 
-        updateGifDimensionsView()
-
-        loadGif(
-            binding.gifImage,
-            binding.gifProgressBar,
-            false,
-            null,
-            gifData?.webpUrl?.toGiphyUri()
-        )
+        val (width, height) = updateGifDimensionsView()
+        gifData?.webpUrl?.toGiphyUri()?.let {
+            binding.gifImage.load(it) {
+                size(width, height)
+                listener(
+                    onStart = { binding.gifProgressBar.visibility = View.VISIBLE },
+                    onSuccess = { _, _ -> binding.gifProgressBar.visibility = View.GONE },
+                    onError = { _, _ -> binding.gifProgressBar.visibility = View.GONE }
+                )
+            }
+        }
     }
 
     /**
      * Updates the dimensions of the view where the GIF will be shown to show the right ones
      * depending on the available space on screen and orientation.
      */
-    private fun updateGifDimensionsView() {
-        val params = binding.gifImage.layoutParams ?: return
+    private fun updateGifDimensionsView(): Pair<Int, Int> {
+        val params = binding.gifImage.layoutParams ?: return 0 to 0
         val gifWidth = gifData?.width
         val gifHeight = gifData?.height
         val gifScreenWidth: Int
@@ -108,6 +110,7 @@ class GiphyViewerActivity : PasscodeActivity() {
         }
 
         binding.gifImage.layoutParams = params
+        return gifScreenWidth to gifScreenHeight
     }
 
     /**

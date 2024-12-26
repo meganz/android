@@ -400,10 +400,12 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
                 binding.giphyList.adapter = giphyAdapter
                 binding.giphyListView.visibility = VISIBLE
             }
+
             isChangeOfType || (gifsData?.size ?: return) <= DEFAULT_LIMIT -> {
                 giphyAdapter?.setGifs(gifsData)
                 binding.giphyList.scrollToPosition(0)
             }
+
             else -> {
                 giphyAdapter?.addGifs(gifsData)
             }
@@ -470,6 +472,7 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
                 binding.emptyGiphyView.visibility = GONE
                 binding.giphyListView.visibility = VISIBLE
             }
+
             else -> {
                 binding.emptyGiphyView.visibility = VISIBLE
                 binding.giphyListView.visibility = GONE
@@ -488,5 +491,9 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         val factor = screenGifWidth.toFloat() / gifWidth.toFloat()
 
         return (gifHeight * factor).toInt()
+    }
+
+    override fun getScreenGifWidth(): Int {
+        return screenGifWidth
     }
 }
