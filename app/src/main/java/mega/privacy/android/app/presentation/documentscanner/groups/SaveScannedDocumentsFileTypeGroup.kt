@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.documentscanner.groups
 
+import mega.privacy.android.core.R as CoreR
 import mega.privacy.android.shared.resources.R as SharedR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -7,8 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -17,8 +18,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.shared.original.core.ui.controls.chip.DefaultChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
-import mega.privacy.android.shared.original.core.ui.controls.chip.RoundedChipStyle
+import mega.privacy.android.shared.original.core.ui.controls.chip.TransparentChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
@@ -41,37 +43,32 @@ internal fun SaveScannedDocumentsFileTypeGroup(
     Column(modifier = modifier) {
         MegaText(
             modifier = Modifier
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 8.dp,
-                )
+                .padding(top = 16.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
                 .testTag(SAVE_SCANNED_DOCUMENTS_FILE_TYPE_GROUP_HEADER),
             text = stringResource(R.string.scan_file_type),
-            textColor = TextColor.Primary,
-            style = MaterialTheme.typography.body2,
+            textColor = TextColor.Secondary,
         )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    top = 16.dp,
-                    bottom = 16.dp,
-                    start = 72.dp,
-                    end = 16.dp,
-                ),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                .padding(top = 8.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
         ) {
+            val isPdfSelected = selectedScanFileType == ScanFileType.Pdf
+            val isJpgSelected = selectedScanFileType == ScanFileType.Jpg
             MegaChip(
-                selected = selectedScanFileType == ScanFileType.Pdf,
+                selected = isPdfSelected,
                 text = stringResource(SharedR.string.document_scanning_confirmation_file_type_pdf),
                 modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_FILE_TYPE_GROUP_CHIP_PDF),
-                style = RoundedChipStyle,
+                style = if (isPdfSelected) DefaultChipStyle else TransparentChipStyle,
+                leadingIcon = if (isPdfSelected) CoreR.drawable.ic_filter_selected else null
             ) { onScanFileTypeSelected(ScanFileType.Pdf) }
             MegaChip(
-                selected = selectedScanFileType == ScanFileType.Jpg,
+                selected = isJpgSelected,
                 text = stringResource(SharedR.string.document_scanning_confirmation_file_type_jpg),
                 modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_FILE_TYPE_GROUP_CHIP_JPG),
-                style = RoundedChipStyle,
+                style = if (isJpgSelected) DefaultChipStyle else TransparentChipStyle,
+                leadingIcon = if (isJpgSelected) CoreR.drawable.ic_filter_selected else null
             ) { onScanFileTypeSelected(ScanFileType.Jpg) }
         }
     }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.MaterialTheme
@@ -25,6 +26,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -44,6 +46,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
@@ -84,27 +87,20 @@ internal fun SaveScannedDocumentsFilenameGroup(
     Column(modifier = modifier) {
         MegaText(
             modifier = Modifier
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 8.dp,
-                )
+                .padding(top = 8.dp, start = 16.dp, end = 16.dp)
                 .testTag(SAVE_SCANNED_DOCUMENTS_FILENAME_GROUP_HEADER),
             text = stringResource(R.string.scan_file_name),
-            textColor = TextColor.Primary,
-            style = MaterialTheme.typography.body2,
+            textColor = TextColor.Secondary,
         )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    horizontal = 8.dp,
-                    vertical = 36.dp,
-                ),
+                .padding(top = 8.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Image(
                 modifier = Modifier
-                    .wrapContentWidth()
+                    .size(48.dp)
                     .testTag(SAVE_SCANNED_DOCUMENTS_FILENAME_GROUP_FILE_TYPE_IMAGE),
                 imageVector = ImageVector.vectorResource(scanFileType.iconRes),
                 contentDescription = "Image File Type"
@@ -113,7 +109,7 @@ internal fun SaveScannedDocumentsFilenameGroup(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(horizontal = 16.dp)
+                    .padding(start = 12.dp, end = 8.dp)
                     .focusRequester(focusRequester)
                     .onFocusChanged { focusState ->
                         isFocused = focusState.isFocused
@@ -137,6 +133,7 @@ internal fun SaveScannedDocumentsFilenameGroup(
                     TextFieldValue("${filenameValueState.text}${scanFileType.fileSuffix}")
                 },
                 placeholder = "",
+                showIndicatorLine = false,
                 onTextChange = { newTextFieldValue ->
                     onFilenameChanged(newTextFieldValue.text)
 
@@ -163,7 +160,8 @@ internal fun SaveScannedDocumentsFilenameGroup(
                     .clickable(enabled = !isFocused) { focusRequester.requestFocus() }
                     .testTag(SAVE_SCANNED_DOCUMENTS_FILENAME_GROUP_EDIT_FILENAME_IMAGE)
                     .alpha(if (isFocused) 0f else 1f),
-                painter = painterResource(IconPackR.drawable.ic_edit_medium_regular_outline),
+                painter = painterResource(IconPackR.drawable.ic_pen_02_medium_regular_outline),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.teal_300_teal_200),
                 contentDescription = "Edit Filename Image"
             )
         }

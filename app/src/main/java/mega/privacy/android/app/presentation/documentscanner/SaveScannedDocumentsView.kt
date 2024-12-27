@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.documentscanner
 
+import mega.privacy.android.shared.resources.R as SharedR
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -125,7 +126,7 @@ internal fun SaveScannedDocumentsView(
         topBar = {
             MegaAppBar(
                 modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_TOOLBAR),
-                title = stringResource(R.string.scan_title_save_scan),
+                title = stringResource(SharedR.string.document_scanning_settings_toolbar_title),
                 appBarType = AppBarType.CLOSE,
                 onNavigationPressed = { onBackPressedDispatcher?.onBackPressed() },
             )
@@ -149,9 +150,7 @@ internal fun SaveScannedDocumentsView(
                     onFilenameConfirmed = onFilenameConfirmed,
                 )
                 MegaDivider(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .testTag(SAVE_SCANNED_DOCUMENTS_FILE_NAME_DIVIDER),
+                    modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_FILE_NAME_DIVIDER),
                     dividerType = DividerType.FullSize,
                 )
                 if (uiState.canSelectScanFileType) {
@@ -160,9 +159,7 @@ internal fun SaveScannedDocumentsView(
                         onScanFileTypeSelected = onScanFileTypeSelected,
                     )
                     MegaDivider(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .testTag(SAVE_SCANNED_DOCUMENTS_FILE_TYPE_DIVIDER),
+                        modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_FILE_TYPE_DIVIDER),
                         dividerType = DividerType.FullSize,
                     )
                 }
@@ -172,18 +169,16 @@ internal fun SaveScannedDocumentsView(
                     onScanDestinationSelected = onScanDestinationSelected,
                 )
                 MegaDivider(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .testTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_DIVIDER),
+                    modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_DIVIDER),
                     dividerType = DividerType.FullSize,
                 )
             }
             RaisedDefaultMegaButton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(bottom = 80.dp, start = 16.dp, end = 16.dp)
                     .testTag(SAVE_SCANNED_DOCUMENTS_SAVE_BUTTON),
-                textId = R.string.scan_action_save,
+                textId = R.string.general_next,
                 onClick = onSaveButtonClicked,
             )
         }
