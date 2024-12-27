@@ -328,6 +328,7 @@ internal class ManagerDrawerFragment : Fragment() {
         binding.upgradeNavigationView.isEnabled = isEnable
         binding.notificationsSection.isEnabled = isEnable
         binding.settingsSection.isEnabled = isEnable
+        binding.deviceCenterSection.isEnabled = isEnable
         val alpha = if (isEnable) 1f else 0.38f
         with(alpha) {
             binding.myAccountSectionText.alpha = this
@@ -335,6 +336,7 @@ internal class ManagerDrawerFragment : Fragment() {
             binding.notificationSectionText.alpha = this
             binding.rubbishBinSectionText.alpha = this
             binding.settingsSectionText.alpha = this
+            binding.deviceCenterSection.alpha = this
         }
     }
 
