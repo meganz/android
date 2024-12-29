@@ -119,5 +119,6 @@ class SettingItemFlowMapperTest {
         description = null,
         isEnabled = null,
         isDestructive = false,
+        onClick = {},
     )
 }

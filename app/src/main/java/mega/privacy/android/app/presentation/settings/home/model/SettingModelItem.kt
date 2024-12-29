@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.settings.home.model
 
+import androidx.navigation.NavHostController
 import mega.privacy.android.navigation.settings.SettingSectionHeader
 
 /**
@@ -11,6 +12,7 @@ import mega.privacy.android.navigation.settings.SettingSectionHeader
  * @property description
  * @property isEnabled
  * @property isDestructive
+ * @property onClick
  */
 data class SettingModelItem(
     val section: SettingSectionHeader,
@@ -19,4 +21,5 @@ data class SettingModelItem(
     val description: String?,
     val isEnabled: (() -> Boolean?)?,
     val isDestructive: Boolean,
+    val onClick: (NavHostController) -> Unit,
 )

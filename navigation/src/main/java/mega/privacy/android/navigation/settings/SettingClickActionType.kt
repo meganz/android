@@ -16,5 +16,5 @@ sealed interface SettingClickActionType {
      *
      * @property function
      */
-    data class FunctionAction(val function: suspend () -> Unit)
+    data class FunctionAction(val function: suspend () -> Unit) : SettingClickActionType
 }
