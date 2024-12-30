@@ -6,11 +6,12 @@ import mega.privacy.android.navigation.settings.SettingClickActionType
 import mega.privacy.android.navigation.settings.SettingDescriptionValue
 import mega.privacy.android.navigation.settings.SettingItem
 import mega.privacy.android.navigation.settings.SettingSectionHeader
+import javax.inject.Inject
 
 /**
  * Setting item mapper
  */
-class SettingItemMapper {
+class SettingItemMapper @Inject constructor() {
 
     /**
      * Invoke

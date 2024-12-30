@@ -4,8 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.navigation.settings.SettingSectionHeader
+import javax.inject.Inject
 
-internal class SectionHeaderMapper {
+internal class SectionHeaderMapper @Inject constructor() {
     operator fun invoke(section: SettingSectionHeader): @Composable () -> String {
         return when (section) {
             SettingSectionHeader.Appearance -> getComposableResource(R.string.settings_appearance)

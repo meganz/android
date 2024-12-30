@@ -5,8 +5,9 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.presentation.settings.home.model.SettingModelItem
 import mega.privacy.android.navigation.settings.SettingDescriptionValue
 import mega.privacy.android.navigation.settings.SettingItem
+import javax.inject.Inject
 
-internal class SettingItemFlowMapper {
+internal class SettingItemFlowMapper @Inject constructor() {
     operator fun invoke(item: SettingItem): Flow<(List<SettingModelItem>) -> List<SettingModelItem>>? =
         item.isEnabled?.map { newValue ->
             { itemList: List<SettingModelItem> ->
