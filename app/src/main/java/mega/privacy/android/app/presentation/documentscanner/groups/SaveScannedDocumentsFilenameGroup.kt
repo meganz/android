@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -20,7 +18,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
@@ -96,11 +93,9 @@ internal fun SaveScannedDocumentsFilenameGroup(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
         ) {
             Image(
                 modifier = Modifier
-                    .size(48.dp)
                     .testTag(SAVE_SCANNED_DOCUMENTS_FILENAME_GROUP_FILE_TYPE_IMAGE),
                 imageVector = ImageVector.vectorResource(scanFileType.iconRes),
                 contentDescription = "Image File Type"
@@ -109,7 +104,7 @@ internal fun SaveScannedDocumentsFilenameGroup(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(start = 12.dp, end = 8.dp)
+                    .padding(top = 4.dp, start = 12.dp, end = 8.dp)
                     .focusRequester(focusRequester)
                     .onFocusChanged { focusState ->
                         isFocused = focusState.isFocused
@@ -133,7 +128,7 @@ internal fun SaveScannedDocumentsFilenameGroup(
                     TextFieldValue("${filenameValueState.text}${scanFileType.fileSuffix}")
                 },
                 placeholder = "",
-                showIndicatorLine = false,
+                showIndicatorLine = isFocused || filenameErrorMessage != null,
                 onTextChange = { newTextFieldValue ->
                     onFilenameChanged(newTextFieldValue.text)
 
@@ -156,7 +151,7 @@ internal fun SaveScannedDocumentsFilenameGroup(
 
             Image(
                 modifier = Modifier
-                    .wrapContentWidth()
+                    .padding(top = 12.dp)
                     .clickable(enabled = !isFocused) { focusRequester.requestFocus() }
                     .testTag(SAVE_SCANNED_DOCUMENTS_FILENAME_GROUP_EDIT_FILENAME_IMAGE)
                     .alpha(if (isFocused) 0f else 1f),
