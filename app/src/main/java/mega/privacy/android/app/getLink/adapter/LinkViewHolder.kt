@@ -2,9 +2,11 @@ package mega.privacy.android.app.getLink.adapter
 
 import mega.privacy.android.icon.pack.R as IconPackR
 import android.content.Context
-import android.net.Uri
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import com.zhpan.bannerview.utils.BannerUtils.dp2px
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -16,6 +18,8 @@ import mega.privacy.android.app.utils.Constants.ICON_MARGIN_DP
 import mega.privacy.android.app.utils.Constants.ICON_SIZE_DP
 import mega.privacy.android.app.utils.Constants.THUMB_MARGIN_DP
 import mega.privacy.android.app.utils.Constants.THUMB_SIZE_DP
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 
 /**
  * RecyclerView.ViewHolder to draw data items in [LinksAdapter].
@@ -38,7 +42,7 @@ class LinkViewHolder(
         val margin: Int
         val node = item.node
 
-        if (node.isFolder || item.thumbnail == null) {
+        if (node.isFolder || item.node.hasThumbnail()) {
             thumbSize = dp2px(ICON_SIZE_DP.toFloat())
             margin = dp2px(ICON_MARGIN_DP.toFloat())
         } else {
@@ -46,7 +50,7 @@ class LinkViewHolder(
             margin = dp2px(THUMB_MARGIN_DP.toFloat())
         }
 
-        (binding.thumbnailImage.layoutParams as ConstraintLayout.LayoutParams).apply {
+        binding.thumbnailImage.updateLayoutParams<ConstraintLayout.LayoutParams> {
             height = thumbSize
             width = thumbSize
             setMargins(margin, margin, margin, margin)
@@ -54,13 +58,25 @@ class LinkViewHolder(
 
         when {
             node.isFolder -> {
-                binding.thumbnailImage.hierarchy.setPlaceholderImage(IconPackR.drawable.ic_folder_medium_solid)
+                binding.thumbnailImage.setImageResource(IconPackR.drawable.ic_folder_medium_solid)
             }
-            item.thumbnail != null -> {
-                binding.thumbnailImage.setImageURI(Uri.fromFile(item.thumbnail))
+
+            item.node.hasThumbnail() -> {
+                binding.thumbnailImage.load(ThumbnailRequest(NodeId(item.node.handle))) {
+                    placeholder(MimeTypeList.typeForName(node.name).iconResourceId)
+                    crossfade(true)
+                    transformations(
+                        RoundedCornersTransformation(
+                            binding.root.context.resources.getDimension(
+                                R.dimen.thumbnail_corner_radius
+                            )
+                        )
+                    )
+                }
             }
+
             else -> {
-                binding.thumbnailImage.hierarchy.setPlaceholderImage(MimeTypeList.typeForName(node.name).iconResourceId)
+                binding.thumbnailImage.setImageResource(MimeTypeList.typeForName(node.name).iconResourceId)
             }
         }
 
