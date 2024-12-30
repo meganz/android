@@ -1,0 +1,26 @@
+cmake_minimum_required(VERSION 3.18)
+project(BuildAndroidSdk)
+
+message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+message(STATUS "ANDROID_NDK: ${NDK_ROOT}")
+message(STATUS "CMAKE_ANDROID_NDK: ${NDK_ROOT}")
+message(STATUS "CMAKE_SYSTEM_NAME: Android")
+message(STATUS "CMAKE_ANDROID_ARCH_ABI: ${ABI}")
+message(STATUS "ANDROID_ABI: ${ABI}")
+message(STATUS "ANDROID_PLATFORM: android-${ANDROID_API_LEVEL}")
+message(STATUS "VCPKG_ROOT: ${VCPKD_ROOT}")
+message(STATUS "VCPKG_TARGET_TRIPLET: arm64-android-mega")
+message(STATUS "ENABLE_CHAT: ${ENABLE_CHAT}")
+message(STATUS "ENABLE_JAVA_BINDINGS: ${ENABLE_JAVA_BINDINGS}")
+message(STATUS "ENABLE_SDKLIB_EXAMPLES: ${ENABLE_SDKLIB_EXAMPLES}")
+message(STATUS "ENABLE_SDKLIB_TESTS: ${ENABLE_SDKLIB_TESTS}")
+message(STATUS "CMAKE_ANDROID_API: ${ANDROID_API_LEVEL}")
+message(STATUS "ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES: ${ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES}")
+message(STATUS "USE_PDFIUM: ${USE_PDFIUM}")
+
+
+# Include PdfiumAndroid.cmake
+include(${CMAKE_SOURCE_DIR}/pdfviewer/PdfiumAndroid.cmake)
+
+# Add the mega/sdk project
+#add_subdirectory(${CMAKE_SOURCE_DIR}/mega/sdk)
