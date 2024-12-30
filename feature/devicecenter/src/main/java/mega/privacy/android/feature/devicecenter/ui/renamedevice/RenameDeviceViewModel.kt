@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.exception.ResourceAlreadyExistsMegaException
 import mega.privacy.android.domain.usecase.backup.RenameDeviceUseCase
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.renamedevice.model.RenameDeviceState
@@ -67,7 +68,12 @@ class RenameDeviceViewModel @Inject constructor(
                         renameSuccessfulEvent = triggered,
                     )
                 }
-            }.onFailure { Timber.e(it) }
+            }.onFailure { exception ->
+                when (exception) {
+                    is ResourceAlreadyExistsMegaException -> _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_name_already_exists) }
+                    else -> Timber.e(exception)
+                }
+            }
         }
     }
 
