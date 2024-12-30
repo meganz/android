@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
@@ -99,10 +98,18 @@ class FavouriteFolderViewModel @Inject constructor(
 
     private var currentNodeJob: Job? = null
 
-    init {
-        currentRootHandle = savedStateHandle[KEY_ARGUMENT_PARENT_HANDLE] ?: -1
-        getChildrenNodes(currentRootHandle)
+    /**
+     * Initialize data
+     */
+    fun init(parentHandle: Long) {
+        currentRootHandle = parentHandle
+        getChildrenNodes(parentHandle)
     }
+
+    /**
+     * Returns the parent node handle
+     */
+    fun getParentNodeHandle() = currentFavouriteFolderInfo?.currentHandle
 
     private suspend fun handleHiddenNodes(parentHandle: Long) {
         combine(

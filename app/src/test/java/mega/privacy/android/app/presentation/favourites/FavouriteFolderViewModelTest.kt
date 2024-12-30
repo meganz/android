@@ -144,6 +144,7 @@ class FavouriteFolderViewModelTest {
             )
         )
         initViewModel()
+        underTest.init(-1)
         underTest.childrenNodesState.test {
             assertThat(awaitItem()).isInstanceOf(ChildrenNodesLoadState.Empty::class.java)
         }
@@ -175,6 +176,7 @@ class FavouriteFolderViewModelTest {
             ).thenReturn(mock<FavouriteFolder>())
             whenever(fetchNodeWrapper(anyOrNull())).thenReturn(megaNode)
             initViewModel()
+            underTest.init(-1)
             underTest.childrenNodesState.test {
                 val actual = awaitItem()
                 assertTrue(actual is ChildrenNodesLoadState.Success)
@@ -208,6 +210,7 @@ class FavouriteFolderViewModelTest {
             ).thenReturn(mock<FavouriteFolder>())
             whenever(fetchNodeWrapper(anyOrNull())).thenReturn(megaNode)
             initViewModel()
+            underTest.init(-1)
             underTest.childrenNodesState.test {
                 val actual = awaitItem()
                 assertTrue(actual is ChildrenNodesLoadState.Success)

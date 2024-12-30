@@ -9,7 +9,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -21,6 +21,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentFavouriteFolderBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.favourites.FavouriteFolderViewModel.Companion.KEY_ARGUMENT_PARENT_HANDLE
 import mega.privacy.android.app.presentation.favourites.adapter.FavouritesAdapter
 import mega.privacy.android.app.presentation.favourites.adapter.SelectAnimator
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
@@ -51,7 +52,7 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class FavouriteFolderFragment : Fragment() {
-    private val viewModel by viewModels<FavouriteFolderViewModel>()
+    private val viewModel by activityViewModels<FavouriteFolderViewModel>()
     private lateinit var binding: FragmentFavouriteFolderBinding
     private lateinit var adapter: FavouritesAdapter
 
@@ -95,10 +96,15 @@ class FavouriteFolderFragment : Fragment() {
             context,
             getString(R.string.file_browser_empty_folder_new)
         )
+        initData()
         setupAdapter()
+        setupAddFabButton()
         return binding.root
     }
 
+    /**
+     * onViewCreated
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupFlow()
@@ -106,6 +112,10 @@ class FavouriteFolderFragment : Fragment() {
             viewLifecycleOwner,
             onBackPressedCallback
         )
+    }
+
+    private fun initData() {
+        viewModel.init(arguments?.getLong(KEY_ARGUMENT_PARENT_HANDLE) ?: -1)
     }
 
     /**
@@ -127,6 +137,15 @@ class FavouriteFolderFragment : Fragment() {
         )
         binding.fileListViewBrowser.adapter = adapter
         binding.fileListViewBrowser.itemAnimator = SelectAnimator()
+    }
+
+    /**
+     * Setup add fab button
+     */
+    private fun setupAddFabButton() {
+        binding.addFabButton.setOnClickListener {
+            (requireActivity() as? ManagerActivity)?.showUploadPanel()
+        }
     }
 
     /**

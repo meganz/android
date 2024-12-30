@@ -168,6 +168,7 @@ import mega.privacy.android.app.presentation.documentscanner.dialogs.DocumentSca
 import mega.privacy.android.app.presentation.documentscanner.model.HandleScanDocumentResult
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.serializable
+import mega.privacy.android.app.presentation.favourites.FavouriteFolderViewModel
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment
@@ -356,6 +357,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     internal val incomingSharesViewModel: IncomingSharesComposeViewModel by viewModels()
     private val outgoingSharesViewModel: OutgoingSharesComposeViewModel by viewModels()
     private val linksViewModel: LinksViewModel by viewModels()
+    private val favouriteFolderViewModel: FavouriteFolderViewModel by viewModels()
     internal val rubbishBinViewModel: RubbishBinViewModel by viewModels()
     private val callInProgressViewModel: OngoingCallViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by viewModels()
@@ -5223,8 +5225,13 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         get() {
             var parentHandle: Long = -1
             when (drawerItem) {
-                DrawerItem.HOMEPAGE ->                 // For home page, its parent is always the root of cloud drive.
-                    parentHandle = megaApi.rootNode?.handle ?: INVALID_HANDLE
+                DrawerItem.HOMEPAGE ->
+                    parentHandle = if (homepageScreen == HomepageScreen.FAVOURITES) {
+                        getParentHandleForFavourites() ?: megaApi.rootNode?.handle ?: INVALID_HANDLE
+                    } else {
+                        // For home page, its parent is always the root of cloud drive.
+                        megaApi.rootNode?.handle ?: INVALID_HANDLE
+                    }
 
                 DrawerItem.CLOUD_DRIVE -> parentHandle =
                     fileBrowserViewModel.getSafeBrowserParentHandle()
@@ -6299,6 +6306,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * Returns the current node handle from links viewmodel
      */
     fun getHandleFromLinksViewModel() = linksViewModel.getCurrentNodeHandle()
+
+    private fun getParentHandleForFavourites() = favouriteFolderViewModel.getParentNodeHandle()
 
     fun hideFabButton() {
         initFabButtonShow = false
