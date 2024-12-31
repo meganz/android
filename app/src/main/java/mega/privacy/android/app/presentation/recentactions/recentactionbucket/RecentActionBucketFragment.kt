@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
@@ -369,6 +370,7 @@ class RecentActionBucketFragment : Fragment() {
                     nodeHandles = getNodesHandles(false)
                 )
             }.onFailure {
+                ensureActive() // make sure view is still active
                 (activity as ManagerActivity).showSnackbar(
                     SNACKBAR_TYPE,
                     getString(R.string.intent_not_available),
