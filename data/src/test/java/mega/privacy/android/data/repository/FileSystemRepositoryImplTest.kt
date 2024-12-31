@@ -70,15 +70,9 @@ internal class FileSystemRepositoryImplTest {
     private lateinit var underTest: FileSystemRepository
     private val context: Context = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
-    private val megaLocalStorageGateway: MegaLocalStorageGateway = mock()
-    private val shareDataMapper: ShareDataMapper = mock()
-    private val megaExceptionMapper: MegaExceptionMapper = mock()
-    private val sortOrderIntMapper: SortOrderIntMapper = mock()
     private val cacheGateway: CacheGateway = mock()
-    private val nodeMapper: NodeMapper = mock()
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val fileGateway: FileGateway = mock()
-    private val streamingGateway = mock<StreamingGateway>()
     private val deviceGateway = mock<DeviceGateway>()
     private val sdCardGateway = mock<SDCardGateway>()
     private val fileAttributeGateway = mock<FileAttributeGateway>()
@@ -100,15 +94,9 @@ internal class FileSystemRepositoryImplTest {
         underTest = FileSystemRepositoryImpl(
             context = context,
             ioDispatcher = ioDispatcher,
-            megaLocalStorageGateway = megaLocalStorageGateway,
-            shareDataMapper = shareDataMapper,
-            megaExceptionMapper = megaExceptionMapper,
-            sortOrderIntMapper = sortOrderIntMapper,
             cacheGateway = cacheGateway,
-            nodeMapper = nodeMapper,
             fileTypeInfoMapper = fileTypeInfoMapper,
             fileGateway = fileGateway,
-            streamingGateway = streamingGateway,
             deviceGateway = deviceGateway,
             sdCardGateway = sdCardGateway,
             fileAttributeGateway = fileAttributeGateway,
@@ -120,15 +108,9 @@ internal class FileSystemRepositoryImplTest {
     fun resetMocks() {
         reset(
             context,
-            megaLocalStorageGateway,
-            shareDataMapper,
-            megaExceptionMapper,
-            sortOrderIntMapper,
             cacheGateway,
-            nodeMapper,
             fileTypeInfoMapper,
             fileGateway,
-            streamingGateway,
             deviceGateway,
             sdCardGateway,
             fileAttributeGateway,

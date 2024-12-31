@@ -40,7 +40,7 @@ class AppModule {
     fun provideMegaApi(
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
-        getFileDescriptorWrapperFromUriPathUseCase: Lazy<GetFileDescriptorWrapperFromUriPathUseCase>,
+        getFileDescriptorWrapperFromUriPathUseCase: GetFileDescriptorWrapperFromUriPathUseCase,
     ): MegaApiAndroid {
         FileWrapper.initializeFactory(getFileDescriptorWrapperFromUriPathUseCase, ioDispatcher)
         val packageInfo: PackageInfo

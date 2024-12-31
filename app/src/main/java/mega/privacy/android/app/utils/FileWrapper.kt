@@ -1,8 +1,9 @@
 package mega.privacy.android.app.utils
 
 import androidx.annotation.Keep
-import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.data.extensions.isFile
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -33,14 +34,14 @@ class FileWrapper(
          * As this is used by native code, we can't use dependency injection directly, we need static methods
          */
         fun initializeFactory(
-            getFileWrapperFromUriPathUseCase: Lazy<GetFileDescriptorWrapperFromUriPathUseCase>,
+            getFileWrapperFromUriPathUseCase: GetFileDescriptorWrapperFromUriPathUseCase,
             ioDispatcher: CoroutineDispatcher,
         ) {
             FileWrapper.getFileWrapperFromUriPathUseCase = getFileWrapperFromUriPathUseCase
             FileWrapper.ioDispatcher = ioDispatcher
         }
 
-        private lateinit var getFileWrapperFromUriPathUseCase: Lazy<GetFileDescriptorWrapperFromUriPathUseCase>
+        private lateinit var getFileWrapperFromUriPathUseCase: GetFileDescriptorWrapperFromUriPathUseCase
 
         private lateinit var ioDispatcher: CoroutineDispatcher
 
@@ -51,26 +52,28 @@ class FileWrapper(
         @JvmStatic
         @Keep
         fun getFromUri(uriPath: String) =
-            runBlocking(ioDispatcher) {
-                getFileWrapperFromUriPathUseCase.get().invoke(UriPath(uriPath))
+            runBlocking(jniContext()) {
+                getFileWrapperFromUriPathUseCase(UriPath(uriPath))
                     ?.let { asyncWrapper ->
                         FileWrapper(
                             uri = asyncWrapper.uriPath.value,
                             name = asyncWrapper.name,
                             isFolder = asyncWrapper.isFolder,
                             getDetachedFileDescriptorFunction = {
-                                runBlocking(ioDispatcher) {
+                                runBlocking(jniContext()) {
                                     asyncWrapper.getDetachedFileDescriptor(it)
                                 }
                             },
                             getChildrenUrisFunction = {
-                                runBlocking(ioDispatcher) {
+                                runBlocking(jniContext()) {
                                     asyncWrapper.getChildrenUris()
                                 }
                             }
                         )
                     }
             }
+
+        private fun jniContext() = (SupervisorJob() + ioDispatcher)
 
         /**
          * Static method to check if a string represents a file as opposed to an Uri.

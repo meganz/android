@@ -68,30 +68,18 @@ import javax.inject.Inject
  *
  * @property context
  * @property ioDispatcher
- * @property megaLocalStorageGateway
- * @property shareDataMapper
- * @property megaExceptionMapper
- * @property sortOrderIntMapper
  * @property cacheGateway
- * @property nodeMapper
  * @property fileTypeInfoMapper
  * @property fileGateway
- * @property streamingGateway
  * @property sdCardGateway
  * @property fileAttributeGateway
  */
 internal class FileSystemRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val megaLocalStorageGateway: MegaLocalStorageGateway,
-    private val shareDataMapper: ShareDataMapper,
-    private val megaExceptionMapper: MegaExceptionMapper,
-    private val sortOrderIntMapper: SortOrderIntMapper,
     private val cacheGateway: CacheGateway,
-    private val nodeMapper: NodeMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val fileGateway: FileGateway,
-    private val streamingGateway: StreamingGateway,
     private val deviceGateway: DeviceGateway,
     private val sdCardGateway: SDCardGateway,
     private val fileAttributeGateway: FileAttributeGateway,
