@@ -61,7 +61,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     NewCreateAccountFragment(
         "Enable new create account fragment",
-        false
+        true
     ),
 
     /**
