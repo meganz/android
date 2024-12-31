@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -19,10 +18,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.legacy.core.ui.customTextSelectionColors
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldProvider
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldState
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 
 /**
@@ -41,10 +41,7 @@ fun TextButtonChip(
     isChecked: Boolean = true,
 ) = Box {
 
-    val customTextSelectionColors = TextSelectionColors(
-        handleColor = MaterialTheme.colors.secondary,
-        backgroundColor = MaterialTheme.colors.secondary
-    )
+    val customTextSelectionColors = customTextSelectionColors()
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
         TextButton(
             modifier = modifier

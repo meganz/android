@@ -14,7 +14,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -35,14 +34,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.legacy.core.ui.controls.keyboard.keyboardAsState
+import mega.privacy.android.legacy.core.ui.customTextSelectionColors
 import mega.privacy.android.shared.original.core.ui.model.KeyboardState
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldProvider
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldState
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.legacy.core.ui.controls.keyboard.keyboardAsState
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 
 /**
  * Text field Chip
@@ -76,10 +76,7 @@ fun TextFieldChip(
         focusManager.clearFocus()
     }
 
-    val customTextSelectionColors = TextSelectionColors(
-        handleColor = MaterialTheme.colors.secondary,
-        backgroundColor = MaterialTheme.colors.secondary
-    )
+    val customTextSelectionColors = customTextSelectionColors()
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
         BasicTextField(

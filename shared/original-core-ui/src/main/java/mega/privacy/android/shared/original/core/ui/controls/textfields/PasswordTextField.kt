@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -42,8 +41,8 @@ import mega.privacy.android.core.R
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldProvider
 import mega.privacy.android.shared.original.core.ui.preview.TextFieldState
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.autofill
 
 /**
@@ -84,10 +83,7 @@ fun PasswordTextField(
     )
     var isFocused by remember { mutableStateOf(false) }
     var showPassword by remember { mutableStateOf(false) }
-    val customTextSelectionColors = TextSelectionColors(
-        handleColor = MegaOriginalTheme.colors.border.strongSelected,
-        backgroundColor = MegaOriginalTheme.colors.border.strongSelected
-    )
+    val customTextSelectionColors = customTextSelectionColors()
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
         BasicTextField(

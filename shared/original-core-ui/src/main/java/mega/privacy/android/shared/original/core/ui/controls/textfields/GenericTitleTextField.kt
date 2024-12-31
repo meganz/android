@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
-import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -96,10 +95,7 @@ fun GenericTitleTextField(
             errorLabelColor = MegaOriginalTheme.colors.text.error,
         )
 
-        val customTextSelectionColors = TextSelectionColors(
-            handleColor = MegaOriginalTheme.colors.border.strongSelected,
-            backgroundColor = MegaOriginalTheme.colors.border.strongSelected
-        )
+        val customTextSelectionColors = customTextSelectionColors()
 
         val keyboardOption = KeyboardOptions(
             keyboardType = KeyboardType.Text,
