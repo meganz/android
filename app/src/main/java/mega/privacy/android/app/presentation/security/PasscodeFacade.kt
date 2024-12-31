@@ -120,9 +120,9 @@ class PasscodeFacade @Inject constructor(
 
         if (isScreenRotation && !passcodeManagement.needsOpenAgain) {
             isScreenRotation = false
-            passcodeUtil.resume(true)
+            passcodeUtil.resume()
         } else if (passcodeManagement.showPasscodeScreen) {
-            passcodeUtil.resume(false)
+            passcodeUtil.resume()
         }
     }
 

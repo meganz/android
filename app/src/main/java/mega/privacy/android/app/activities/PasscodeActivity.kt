@@ -85,9 +85,9 @@ open class PasscodeActivity : BaseActivity() {
 
         if (isScreenRotation && !passcodeManagement.needsOpenAgain) {
             isScreenRotation = false
-            passcodeUtil.resume(true)
+            passcodeUtil.resume()
         } else if (passcodeManagement.showPasscodeScreen) {
-            passcodeUtil.resume(false)
+            passcodeUtil.resume()
         }
     }
 

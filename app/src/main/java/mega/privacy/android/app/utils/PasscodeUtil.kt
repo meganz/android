@@ -17,7 +17,6 @@ import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -28,6 +27,7 @@ import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder
 import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeLockStateUseCase
@@ -175,7 +175,10 @@ class PasscodeUtil @Inject constructor(
             }
         }
 
-        dialogBuilder.setNegativeButton(context.getString(sharedR.string.general_dialog_cancel_button), null)
+        dialogBuilder.setNegativeButton(
+            context.getString(sharedR.string.general_dialog_cancel_button),
+            null
+        )
 
         val requirePasscodeDialog = dialogBuilder.create()
         requirePasscodeDialog.show()
@@ -321,11 +324,9 @@ class PasscodeUtil @Inject constructor(
     /**
      * Called after resume some activity to check if should lock or not the app.
      */
-    fun resume(isRotating: Boolean) {
-        runBlocking {
-            if (shouldLock(isRotating)) {
-                showLockScreen()
-            }
+    fun resume() {
+        if (passcodeManagement.shouldLock.value) {
+            showLockScreen()
         }
     }
 
@@ -346,14 +347,14 @@ class PasscodeUtil @Inject constructor(
     /**
      * Launches an intent to show passcode screen when the app is locked
      */
-    private suspend fun showLockScreen() {
+    private fun showLockScreen() {
         val activity = context as Activity
         if (activity.findViewById<ComposeView>(R.id.pass_code) == null) {
-            val themeMode = getThemeMode().first()
             val view = ComposeView(activity)
                 .apply {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
                     setContent {
+                        val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                         val locked: Boolean by monitorPasscodeLockStateUseCase().collectAsStateWithLifecycle(
                             initialValue = true
                         )
