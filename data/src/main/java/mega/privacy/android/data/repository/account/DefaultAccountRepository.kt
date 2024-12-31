@@ -670,12 +670,6 @@ internal class DefaultAccountRepository @Inject constructor(
             //Remove UI preferences
             getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE).edit { clear() }
 
-            //Remove emoji preferences
-            getSharedPreferences(PREFERENCE_EMOJI, Context.MODE_PRIVATE).edit { clear() }
-            getSharedPreferences(PREFERENCE_REACTION, Context.MODE_PRIVATE).edit { clear() }
-            getSharedPreferences(PREFERENCE_VARIANT_EMOJI, Context.MODE_PRIVATE).edit { clear() }
-            getSharedPreferences(PREFERENCE_VARIANT_REACTION, Context.MODE_PRIVATE).edit { clear() }
-
             //Remove sms dialog time checker preference
             getSharedPreferences(LAST_SHOW_SMS_FILE, Context.MODE_PRIVATE).edit { clear() }
 
@@ -1491,10 +1485,6 @@ internal class DefaultAccountRepository @Inject constructor(
         private const val SHOW_LINE_NUMBERS = "SHOW_LINE_NUMBERS"
         private const val SHOW_OFFLINE_WARNING = "SHOW_OFFLINE_WARNING"
         private const val KEY_MOBILE_DATA_HIGH_RESOLUTION = "setting_mobile_data_high_resolution"
-        private const val PREFERENCE_EMOJI = "emoji-recent-manager"
-        private const val PREFERENCE_REACTION = "reaction-recent-manager"
-        private const val PREFERENCE_VARIANT_EMOJI = "variant-emoji-manager"
-        private const val PREFERENCE_VARIANT_REACTION = "variant-reaction-manager"
         private const val LAST_SHOW_SMS_FILE = "last_show_sms_timestamp_sp"
         private const val KEY_AUDIO_BACKGROUND_PLAY_ENABLED =
             "settings_audio_background_play_enabled"
