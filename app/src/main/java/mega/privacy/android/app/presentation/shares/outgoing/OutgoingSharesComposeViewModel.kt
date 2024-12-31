@@ -202,11 +202,6 @@ class OutgoingSharesComposeViewModel @Inject constructor(
         setPendingRefreshNodes()
     }
 
-    /**
-     * Returns the count of nodes in the current folder
-     */
-    fun getNodeCount() = _state.value.nodesList.size
-
     private fun setPendingRefreshNodes() {
         _state.update { it.copy(isPendingRefresh = true) }
     }
@@ -345,24 +340,29 @@ class OutgoingSharesComposeViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 handleAccessedFolderOnBackPress()
-                getParentNodeUseCase(NodeId(_state.value.currentHandle))?.id?.longValue?.let { parentHandle ->
-                    removeCurrentNodeFromUiStateSet()
-                    val rootNode = getRootNodeUseCase()?.id?.longValue
-                    if (rootNode == parentHandle) {
-                        goBackToRootLevel()
-                    } else {
-                        setCurrentHandle(parentHandle)
-                        handleStack.takeIf { stack -> stack.isNotEmpty() }?.pop()
-                        // Update the Toolbar Title
-                        _state.update { it.copy(updateToolbarTitleEvent = triggered) }
-                    }
-                } ?: run {
-                    // Exit OutgoingShares if there is nothing left in the Back Stack
-                    _state.update {
-                        it.copy(
-                            openedFolderNodeHandles = emptySet(),
-                            exitOutgoingSharesEvent = triggered
-                        )
+                if (handleStack.firstOrNull() == state.value.currentHandle) {
+                    handleStack.pop()
+                    goBackToRootLevel()
+                } else {
+                    getParentNodeUseCase(NodeId(_state.value.currentHandle))?.id?.longValue?.let { parentHandle ->
+                        removeCurrentNodeFromUiStateSet()
+                        val rootNode = getRootNodeUseCase()?.id?.longValue
+                        if (rootNode == parentHandle) {
+                            goBackToRootLevel()
+                        } else {
+                            setCurrentHandle(parentHandle)
+                            handleStack.takeIf { stack -> stack.isNotEmpty() }?.pop()
+                            // Update the Toolbar Title
+                            _state.update { it.copy(updateToolbarTitleEvent = triggered) }
+                        }
+                    } ?: run {
+                        // Exit OutgoingShares if there is nothing left in the Back Stack
+                        _state.update {
+                            it.copy(
+                                openedFolderNodeHandles = emptySet(),
+                                exitOutgoingSharesEvent = triggered
+                            )
+                        }
                     }
                 }
             }.onFailure {
@@ -628,19 +628,6 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     fun consumeUpdateToolbarTitleEvent() {
         _state.update { it.copy(updateToolbarTitleEvent = consumed) }
     }
-
-    /**
-     * Checks if the User has left the Folder that was immediately accessed
-     *
-     * @return true if the User left the accessed Folder
-     */
-    fun isAccessedFolderExited() = _state.value.isAccessedFolderExited
-
-    /**
-     * Resets the value of [OutgoingSharesState.isAccessedFolderExited]
-     */
-    fun resetIsAccessedFolderExited() =
-        _state.update { it.copy(isAccessedFolderExited = false) }
 
     /**
      *  Download file triggered

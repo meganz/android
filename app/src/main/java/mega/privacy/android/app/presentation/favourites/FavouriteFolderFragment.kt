@@ -34,7 +34,6 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
@@ -276,7 +275,7 @@ class FavouriteFolderFragment : Fragment() {
                         MegaNodeUtil.manageTextFileIntent(
                             requireContext(),
                             favourite.node,
-                            Constants.FAVOURITES_ADAPTER
+                            FAVOURITES_ADAPTER
                         )
                     }
 
