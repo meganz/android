@@ -18,10 +18,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import androidx.appcompat.widget.SearchView
+import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
@@ -72,7 +74,9 @@ import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
+import mega.privacy.android.app.presentation.documentscanner.dialogs.DiscardScanUploadingWarningDialog
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
@@ -100,16 +104,19 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.LoginMutex
+import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToCloudDriveEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
@@ -161,6 +168,12 @@ import javax.inject.Inject
 class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener,
     ActionNodeCallback, SnackbarShower {
+
+    /**
+     * The Application Theme Mode
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
 
     @Inject
     lateinit var monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase
@@ -268,7 +281,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 when (importFragmentSelected) {
                     CHAT_FRAGMENT -> {
                         if (ACTION_UPLOAD_TO_CHAT == action) {
-                            finishAndRemoveTask()
+                            viewModel.handleBackNavigation()
                         } else {
                             chatExplorer = chatExplorerFragment
 
@@ -285,7 +298,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     }
 
                     IMPORT_FRAGMENT -> {
-                        finishAndRemoveTask()
+                        viewModel.handleBackNavigation()
                     }
                 }
             } else if (isCloudVisible) {
@@ -352,9 +365,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     private fun onProcessAsyncInfo(documents: List<DocumentEntity>?) {
-        if (documents == null || documents.isEmpty()) {
+        if (documents.isNullOrEmpty()) {
             Timber.w("Selected items list is null or empty.")
-            finishFileExplorer()
             return
         }
 
@@ -634,6 +646,27 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
         )
+
+        binding.discardScanUploadingWarningDialogComposeView.setContent {
+            val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val isDark = themeMode.isDarkMode()
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+            OriginalTheme(isDark = isDark) {
+                if (state.isUploadingScans && state.isScanUploadingAborted) {
+                    DiscardScanUploadingWarningDialog(
+                        hasMultipleScans = state.hasMultipleScans,
+                        onWarningAcknowledged = {
+                            viewModel.setIsScanUploadingAborted(false)
+                            viewModel.setShouldFinishScreen(true)
+                        },
+                        onWarningDismissed = {
+                            viewModel.setIsScanUploadingAborted(false)
+                        },
+                    )
+                }
+            }
+        }
     }
 
     private fun handleImportFromUploadDestination() {
@@ -661,7 +694,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }.firstOrNull()
             onProcessAsyncInfo(documents)
         }
-        viewModel.textInfo.observe(this) { dismissAlertDialogIfExists(statusDialog) }
+
+        collectFlow(viewModel.uiState) { fileExplorerState ->
+            if (fileExplorerState.shouldFinishScreen) {
+                finishAndRemoveTask()
+                viewModel.setShouldFinishScreen(false)
+            }
+        }
 
         collectFlow(viewModel.copyTargetPathFlow) {
             if (it != null) {
@@ -682,15 +721,18 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         handler = Handler(Looper.getMainLooper())
         Timber.d("SHOW action bar")
 
+        val upButtonRes =
+            if (intent.action == ACTION_SAVE_TO_CLOUD || intent.action == ACTION_UPLOAD_TO_CHAT) {
+                // Use the "X" Button when accessing this Activity from Document Scanner
+                R.drawable.ic_close_white
+            } else {
+                R.drawable.ic_arrow_back_white
+            }
+
         supportActionBar?.apply {
             show()
             Timber.d("supportActionBar.setHomeAsUpIndicator")
-            setHomeAsUpIndicator(
-                tintIcon(
-                    this@FileExplorerActivity,
-                    R.drawable.ic_arrow_back_white
-                )
-            )
+            setHomeAsUpIndicator(tintIcon(this@FileExplorerActivity, upButtonRes))
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
         }
@@ -868,6 +910,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
         }
     }
+
+    /**
+     * Calls the respective ViewModel function to handle the Back Navigation logic
+     */
+    fun handleBackNavigation() = viewModel.handleBackNavigation()
 
     /**
      * Updates the UI for showing tabs or only a fragment.
@@ -1438,7 +1485,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 chooseFragment(IMPORT_FRAGMENT)
             }
         } else {
-            finishAndRemoveTask()
+            viewModel.handleBackNavigation()
         }
     }
 
@@ -2697,6 +2744,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
          * Intent extra for the scan file type
          */
         const val EXTRA_SCAN_FILE_TYPE = "scan_file_type"
+
+        /**
+         * Intent extra to check whether or not there are multiple scans to be uploaded
+         */
+        const val EXTRA_HAS_MULTIPLE_SCANS = "EXTRA_HAS_MULTIPLE_SCANS"
 
         /**
          * Intent action for processed info.

@@ -117,6 +117,7 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
         val intent = Intent(this, FileExplorerActivity::class.java).apply {
             putExtra(Intent.EXTRA_STREAM, uriToUpload)
             putExtra(FileExplorerActivity.EXTRA_SCAN_FILE_TYPE, uiState.scanFileType.ordinal)
+            putExtra(FileExplorerActivity.EXTRA_HAS_MULTIPLE_SCANS, !uiState.canSelectScanFileType)
             when (scanDestination) {
                 ScanDestination.CloudDrive -> {
                     action = FileExplorerActivity.ACTION_SAVE_TO_CLOUD

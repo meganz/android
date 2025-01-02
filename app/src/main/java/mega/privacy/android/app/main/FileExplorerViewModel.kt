@@ -7,6 +7,7 @@ import android.os.Parcelable
 import android.webkit.URLUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +17,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -56,10 +58,6 @@ import javax.inject.Inject
 
 /**
  * ViewModel class responsible for preparing and managing the data for FileExplorerActivity.
- *
- * @property storageState    [StorageState]
- * @property isImportingText True if it is importing text, false if it is importing files.
- * @property uiState     [FileExplorerUiState]
  */
 @HiltViewModel
 class FileExplorerViewModel @Inject constructor(
@@ -75,6 +73,7 @@ class FileExplorerViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val getDocumentsFromSharedUrisUseCase: GetDocumentsFromSharedUrisUseCase,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileExplorerUiState())
@@ -126,7 +125,33 @@ class FileExplorerViewModel @Inject constructor(
 
     val showHiddenItems: Boolean get() = _showHiddenItems
 
-    fun init() = viewModelScope.launch {
+
+    init {
+        viewModelScope.launch {
+            combine(
+                savedStateHandle.getStateFlow(
+                    key = FileExplorerActivity.EXTRA_HAS_MULTIPLE_SCANS,
+                    initialValue = false,
+                ),
+                savedStateHandle.getStateFlow(
+                    key = FileExplorerActivity.EXTRA_SCAN_FILE_TYPE,
+                    initialValue = -1,
+                ),
+            ) { hasMultipleScans: Boolean, scanFileTypeInt: Int ->
+                { state: FileExplorerUiState ->
+                    state.copy(
+                        hasMultipleScans = hasMultipleScans,
+                        isUploadingScans = scanFileTypeInt != -1,
+                    )
+                }
+            }.collect { _uiState.update(it) }
+        }
+    }
+
+    /**
+     * Sets up the Cloud Drive Explorer content
+     */
+    fun initCloudDriveExplorerContent() = viewModelScope.launch {
         if (isHiddenNodesActive()) {
             _accountDetail = monitorAccountDetailUseCase().firstOrNull()
             _showHiddenItems = monitorShowHiddenItemsUseCase().firstOrNull() ?: true
@@ -526,4 +551,35 @@ class FileExplorerViewModel @Inject constructor(
      * Get the documents
      */
     fun getDocuments() = uiState.value.documents
+
+    /**
+     * Handles Back Navigation logic by checking if the there are scans to be uploaded or not
+     */
+    fun handleBackNavigation() {
+        if (_uiState.value.isUploadingScans) {
+            setIsScanUploadingAborted(true)
+        } else {
+            setShouldFinishScreen(true)
+        }
+    }
+
+
+    /**
+     * Sets the value of [FileExplorerUiState.isScanUploadingAborted]
+     *
+     * @param isAborting true if the User is in the process of uploading the scans, but decides to
+     * back out of the process
+     */
+    fun setIsScanUploadingAborted(isAborting: Boolean) {
+        _uiState.update { it.copy(isScanUploadingAborted = isAborting) }
+    }
+
+    /**
+     * Sets the value of [FileExplorerUiState.shouldFinishScreen]
+     *
+     * @param shouldFinishScreen true if the File Explorer should be finished
+     */
+    fun setShouldFinishScreen(shouldFinishScreen: Boolean) {
+        _uiState.update { it.copy(shouldFinishScreen = shouldFinishScreen) }
+    }
 }

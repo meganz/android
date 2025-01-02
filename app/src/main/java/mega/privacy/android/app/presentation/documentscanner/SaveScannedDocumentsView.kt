@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.documentscanner.dialogs.ExitSaveScannedDocumentsScreenWarningDialog
+import mega.privacy.android.app.presentation.documentscanner.dialogs.DiscardScanUploadingWarningDialog
 import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedDocumentsDestinationGroup
 import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedDocumentsFileTypeGroup
 import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedDocumentsFilenameGroup
@@ -120,8 +120,8 @@ internal fun SaveScannedDocumentsView(
     }
 
     if (showWarningDialog) {
-        ExitSaveScannedDocumentsScreenWarningDialog(
-            canSelectScanFileType = uiState.canSelectScanFileType,
+        DiscardScanUploadingWarningDialog(
+            hasMultipleScans = !uiState.canSelectScanFileType,
             onWarningAcknowledged = {
                 showWarningDialog = false
                 onBackPressedDispatcher?.onBackPressed()

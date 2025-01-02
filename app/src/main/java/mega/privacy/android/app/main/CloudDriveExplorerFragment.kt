@@ -255,7 +255,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
 
         binding.actionText.setOnClickListener { buttonClicked() }
         binding.cancelText.setOnClickListener {
-            (requireActivity() as FileExplorerActivity).finishAndRemoveTask()
+            (requireActivity() as? FileExplorerActivity)?.handleBackNavigation()
         }
         binding.cancelText.text = getString(sharedR.string.general_dialog_cancel_button)
         binding.fabSelect.setOnClickListener { buttonClicked() }
@@ -345,7 +345,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         }
 
         initOriginalData()
-        fileExplorerViewModel.init()
+        fileExplorerViewModel.initCloudDriveExplorerContent()
 
         when (modeCloud) {
             FileExplorerActivity.MOVE,

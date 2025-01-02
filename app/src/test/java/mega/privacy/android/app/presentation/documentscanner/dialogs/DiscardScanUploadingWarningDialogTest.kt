@@ -15,10 +15,10 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
 
 /**
- * Test class for [ExitSaveScannedDocumentsScreenWarningDialog]
+ * Test class for [DiscardScanUploadingWarningDialog]
  */
 @RunWith(AndroidJUnit4::class)
-internal class ExitSaveScannedDocumentsScreenWarningDialogTest {
+internal class DiscardScanUploadingWarningDialogTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -26,8 +26,8 @@ internal class ExitSaveScannedDocumentsScreenWarningDialogTest {
     @Test
     fun `test that the dialog and its static elements are shown`() {
         composeTestRule.setContent {
-            ExitSaveScannedDocumentsScreenWarningDialog(
-                canSelectScanFileType = true,
+            DiscardScanUploadingWarningDialog(
+                hasMultipleScans = true,
                 onWarningAcknowledged = {},
                 onWarningDismissed = {}
             )
@@ -42,10 +42,10 @@ internal class ExitSaveScannedDocumentsScreenWarningDialogTest {
     }
 
     @Test
-    fun `test that the correct title and body are shown when selecting a scan file type is allowed`() {
+    fun `test that the correct title and body are shown when only one scan will be discarded`() {
         composeTestRule.setContent {
-            ExitSaveScannedDocumentsScreenWarningDialog(
-                canSelectScanFileType = true,
+            DiscardScanUploadingWarningDialog(
+                hasMultipleScans = false,
                 onWarningAcknowledged = {},
                 onWarningDismissed = {}
             )
@@ -58,10 +58,10 @@ internal class ExitSaveScannedDocumentsScreenWarningDialogTest {
     }
 
     @Test
-    fun `test that the correct title and body are shown when selecting a scan file type is not allowed`() {
+    fun `test that the correct title and body are shown when more than one scan will be discarded`() {
         composeTestRule.setContent {
-            ExitSaveScannedDocumentsScreenWarningDialog(
-                canSelectScanFileType = false,
+            DiscardScanUploadingWarningDialog(
+                hasMultipleScans = true,
                 onWarningAcknowledged = {},
                 onWarningDismissed = {}
             )
@@ -77,8 +77,8 @@ internal class ExitSaveScannedDocumentsScreenWarningDialogTest {
     fun `test that clicking the confirmation button invokes the correct lambda`() {
         val onWarningAcknowledged = mock<() -> Unit>()
         composeTestRule.setContent {
-            ExitSaveScannedDocumentsScreenWarningDialog(
-                canSelectScanFileType = true,
+            DiscardScanUploadingWarningDialog(
+                hasMultipleScans = true,
                 onWarningAcknowledged = onWarningAcknowledged,
                 onWarningDismissed = {}
             )
@@ -94,8 +94,8 @@ internal class ExitSaveScannedDocumentsScreenWarningDialogTest {
     fun `test that clicking the cancel button invokes the correct lambda`() {
         val onWarningDismissed = mock<() -> Unit>()
         composeTestRule.setContent {
-            ExitSaveScannedDocumentsScreenWarningDialog(
-                canSelectScanFileType = true,
+            DiscardScanUploadingWarningDialog(
+                hasMultipleScans = true,
                 onWarningAcknowledged = {},
                 onWarningDismissed = onWarningDismissed,
             )

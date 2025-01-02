@@ -223,7 +223,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             buttonClicked()
         }
         binding.cancelText.setOnClickListener {
-            fileExplorerActivity.finishAndRemoveTask()
+            fileExplorerActivity.handleBackNavigation()
         }
         binding.cancelText.text = getString(sharedR.string.general_dialog_cancel_button)
         binding.fabSelect.setOnClickListener {

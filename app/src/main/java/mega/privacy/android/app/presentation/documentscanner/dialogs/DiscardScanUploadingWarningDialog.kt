@@ -14,33 +14,33 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
- * A Composable Dialog shown when the User attempts to back away from the Save Scanned Document Screen
+ * A Composable Dialog shown when the User no longer wants to proceed with uploading the scanned
+ * document/s
  *
- * @param canSelectScanFileType true if the User can select either scan type due to having only
- * one scan
+ * @param hasMultipleScans true if the User has more than one scan that will be discarded
  * @param onWarningAcknowledged Lambda when the User wants to leave the screen
  * @param onWarningDismissed Lambda when the User does not want to leave the screen
  */
 @Composable
-internal fun ExitSaveScannedDocumentsScreenWarningDialog(
-    canSelectScanFileType: Boolean,
+internal fun DiscardScanUploadingWarningDialog(
+    hasMultipleScans: Boolean,
     onWarningAcknowledged: () -> Unit,
     onWarningDismissed: () -> Unit,
 ) {
     MegaAlertDialog(
         modifier = Modifier.testTag(EXIT_SAVE_SCANNED_DOCUMENTS_SCREEN_WARNING_DIALOG),
         title = stringResource(
-            if (canSelectScanFileType) {
-                R.string.scan_dialog_discard_title
-            } else {
+            if (hasMultipleScans) {
                 R.string.scan_dialog_discard_all_title
+            } else {
+                R.string.scan_dialog_discard_title
             }
         ),
         text = stringResource(
-            if (canSelectScanFileType) {
-                R.string.scan_dialog_discard_body
-            } else {
+            if (hasMultipleScans) {
                 R.string.scan_dialog_discard_all_body
+            } else {
+                R.string.scan_dialog_discard_body
             }
         ),
         confirmButtonText = stringResource(R.string.scan_dialog_discard_action),
@@ -51,19 +51,19 @@ internal fun ExitSaveScannedDocumentsScreenWarningDialog(
 }
 
 /**
- * A Preview Composable for [ExitSaveScannedDocumentsScreenWarningDialog]
+ * A Preview Composable for [DiscardScanUploadingWarningDialog]
  *
- * @param canSelectScanFileType true if the User can select either scan type due to having only
+ * @param hasMultipleScans true if the User has more than one scan that will be discarded
  * one scan
  */
 @CombinedThemePreviews
 @Composable
-private fun ExitSaveScannedDocumentsScreenWarningDialogPreview(
-    @PreviewParameter(BooleanProvider::class) canSelectScanFileType: Boolean,
+private fun DiscardScanUploadingWarningDialogPreview(
+    @PreviewParameter(BooleanProvider::class) hasMultipleScans: Boolean,
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
-        ExitSaveScannedDocumentsScreenWarningDialog(
-            canSelectScanFileType = canSelectScanFileType,
+        DiscardScanUploadingWarningDialog(
+            hasMultipleScans = hasMultipleScans,
             onWarningAcknowledged = {},
             onWarningDismissed = {},
         )
