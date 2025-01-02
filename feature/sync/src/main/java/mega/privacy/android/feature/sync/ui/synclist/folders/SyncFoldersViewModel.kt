@@ -316,12 +316,16 @@ internal class SyncFoldersViewModel @Inject constructor(
 
             is SyncFoldersAction.PauseRunClicked -> {
                 viewModelScope.launch {
-                    if (action.syncUiItem.status != SyncStatus.PAUSED) {
-                        pauseSyncUseCase(action.syncUiItem.id)
-                        setUserPausedSyncsUseCase(action.syncUiItem.id, true)
-                    } else {
-                        resumeSyncUseCase(action.syncUiItem.id)
-                        setUserPausedSyncsUseCase(action.syncUiItem.id, false)
+                    runCatching {
+                        if (action.syncUiItem.status != SyncStatus.PAUSED) {
+                            pauseSyncUseCase(action.syncUiItem.id)
+                            setUserPausedSyncsUseCase(action.syncUiItem.id, true)
+                        } else {
+                            resumeSyncUseCase(action.syncUiItem.id)
+                            setUserPausedSyncsUseCase(action.syncUiItem.id, false)
+                        }
+                    }.onFailure {
+                        Timber.e(it)
                     }
                 }
             }

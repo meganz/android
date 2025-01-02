@@ -2,6 +2,7 @@ package mega.privacy.android.data.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.entity.UserPausedSyncEntity
@@ -17,7 +18,7 @@ interface UserPausedSyncsDao {
     /**
      * Insert paused sync
      */
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertPausedSync(pausedSync: UserPausedSyncEntity)
 
     /**
