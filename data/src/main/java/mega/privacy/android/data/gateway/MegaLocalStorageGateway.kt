@@ -281,13 +281,6 @@ interface MegaLocalStorageGateway {
     suspend fun getTransferQueueStatus(): Boolean
 
     /**
-     * Remove pending message by chat id
-     *
-     * @param chatId Chat id.
-     */
-    fun removePendingMessageByChatId(chatId: Long)
-
-    /**
      * Should show copyright
      */
     fun shouldShowCopyright(): Boolean

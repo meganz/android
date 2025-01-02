@@ -178,8 +178,5 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getTransferQueueStatus() = dbHandler.get().transferQueueStatus
 
-    override fun removePendingMessageByChatId(chatId: Long) =
-        dbHandler.get().removePendingMessageByChatId(chatId)
-
     override fun shouldShowCopyright(): Boolean = dbHandler.get().shouldShowCopyright
 }

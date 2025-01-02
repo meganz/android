@@ -2803,7 +2803,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     override fun onDestroy() {
         Timber.d("onDestroy()")
-        dbH.removeSentPendingMessages()
         reconnectDialog?.cancel()
         dismissAlertDialogIfExists(processFileDialog)
         cookieDialogHandler.onDestroy()

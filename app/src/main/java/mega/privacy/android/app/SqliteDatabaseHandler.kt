@@ -26,7 +26,6 @@ import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.VideoQuality
-import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.settings.ChatSettings.Companion.VIBRATION_ON
@@ -1569,84 +1568,6 @@ class SqliteDatabaseHandler @Inject constructor(
         legacyDatabaseMigration.onCreate(writableDatabase)
     }
 
-    /**
-     * Updates a pending message.
-     *
-     * @param idMessage   Identifier of the pending message.
-     * @param transferTag Identifier of the transfer.
-     */
-    override fun updatePendingMessageOnTransferStart(idMessage: Long, transferTag: Int) {
-        updatePendingMessage(
-            idMessage,
-            transferTag,
-            Constants.INVALID_OPTION,
-            PendingMessageState.UPLOADING.value
-        )
-    }
-
-    /**
-     * Updates a pending message.
-     *
-     * @param idMessage  Identifier of the pending message.
-     * @param nodeHandle Handle of the node already uploaded.
-     * @param state      State of the pending message.
-     */
-    override fun updatePendingMessageOnTransferFinish(
-        idMessage: Long,
-        nodeHandle: String?,
-        state: Int,
-    ) {
-        updatePendingMessage(idMessage, Constants.INVALID_ID, nodeHandle, state)
-    }
-
-    /**
-     * Updates a pending message.
-     *
-     * @param idMessage   Identifier of the pending message.
-     * @param transferTag Identifier of the transfer.
-     * @param nodeHandle  Handle of the node already uploaded.
-     * @param state       State of the pending message.
-     */
-    override fun updatePendingMessage(
-        idMessage: Long,
-        transferTag: Int,
-        nodeHandle: String?,
-        state: Int,
-    ) {
-        val values = ContentValues()
-        if (transferTag != Constants.INVALID_ID) {
-            values.put(KEY_PENDING_MSG_TRANSFER_TAG, transferTag)
-        }
-        values.put(KEY_PENDING_MSG_NODE_HANDLE, encrypt(nodeHandle))
-        values.put(KEY_PENDING_MSG_STATE, state)
-        val where = "$KEY_ID=$idMessage"
-        writableDatabase.update(
-            TABLE_PENDING_MSG_SINGLE,
-            SQLiteDatabase.CONFLICT_REPLACE,
-            values,
-            where,
-            emptyArray()
-        )
-    }
-
-    override fun removeSentPendingMessages() {
-        Timber.d("removeSentPendingMessages")
-        writableDatabase.delete(
-            TABLE_PENDING_MSG_SINGLE,
-            KEY_PENDING_MSG_STATE + "=" + PendingMessageState.SENT.value,
-            emptyArray()
-        )
-    }
-
-    override fun removePendingMessageByChatId(idChat: Long) {
-        Timber.d("removePendingMessageByChatId")
-        writableDatabase.delete(
-            TABLE_PENDING_MSG_SINGLE,
-            "$KEY_PENDING_MSG_ID_CHAT = '${encrypt(idChat.toString())}'",
-            emptyArray()
-        )
-    }
-
     override val autoPlayEnabled: String?
         get() {
             val selectQuery =
@@ -1709,7 +1630,6 @@ class SqliteDatabaseHandler @Inject constructor(
         const val TABLE_CHAT_SETTINGS = "chatsettings"
         const val TABLE_COMPLETED_TRANSFERS = "completedtransfers"
         const val TABLE_EPHEMERAL = "ephemeral"
-        const val TABLE_PENDING_MSG_SINGLE = "pendingmsgsingle"
         const val KEY_ID = "id"
         const val KEY_EMAIL = "email"
         const val KEY_PASSWORD = "password"
@@ -1816,7 +1736,6 @@ class SqliteDatabaseHandler @Inject constructor(
         const val KEY_TRANSFER_PARENT_HANDLE = "transferparenthandle"
         const val KEY_FIRST_LOGIN_CHAT = "firstloginchat"
         const val KEY_AUTO_PLAY = "autoplay"
-        const val KEY_ID_CHAT = "idchat"
 
         const val KEY_LAST_PUBLIC_HANDLE = "lastpublichandle"
         const val KEY_LAST_PUBLIC_HANDLE_TIMESTAMP = "lastpublichandletimestamp"
@@ -1824,15 +1743,6 @@ class SqliteDatabaseHandler @Inject constructor(
         const val KEY_STORAGE_STATE = "storagestate"
         const val KEY_MY_CHAT_FILES_FOLDER_HANDLE = "mychatfilesfolderhandle"
         const val KEY_TRANSFER_QUEUE_STATUS = "transferqueuestatus"
-        const val KEY_PENDING_MSG_ID_CHAT = "idchat"
-        const val KEY_PENDING_MSG_TIMESTAMP = "timestamp"
-        const val KEY_PENDING_MSG_TEMP_KARERE = "idtempkarere"
-        const val KEY_PENDING_MSG_FILE_PATH = "filePath"
-        const val KEY_PENDING_MSG_NAME = "filename"
-        const val KEY_PENDING_MSG_NODE_HANDLE = "nodehandle"
-        const val KEY_PENDING_MSG_FINGERPRINT = "filefingerprint"
-        const val KEY_PENDING_MSG_TRANSFER_TAG = "transfertag"
-        const val KEY_PENDING_MSG_STATE = "state"
 
         const val OLD_VIDEO_QUALITY_ORIGINAL = 0
 

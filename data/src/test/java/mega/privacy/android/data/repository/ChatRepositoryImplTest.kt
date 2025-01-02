@@ -792,7 +792,7 @@ class ChatRepositoryImplTest {
 
             underTest.clearChatHistory(chatId)
             verify(megaChatApiGateway).clearChatHistory(eq(chatId), any())
-            verify(localStorageGateway).removePendingMessageByChatId(chatId)
+            verify(chatStorageGateway).clearChatPendingMessages(chatId)
             verifyNoMoreInteractions(megaChatApiGateway)
             verifyNoMoreInteractions(localStorageGateway)
         }

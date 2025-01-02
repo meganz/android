@@ -750,7 +750,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                 val listener = OptionalMegaChatRequestListenerInterface(
                     onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
                         if (error.errorCode == MegaChatError.ERROR_OK) {
-                            localStorageGateway.removePendingMessageByChatId(chatId)
                             continuation.resume(Unit)
                         } else {
                             continuation.failWithError(error, "clearChatHistory")
@@ -759,6 +758,7 @@ internal class ChatRepositoryImpl @Inject constructor(
                 )
                 megaChatApiGateway.clearChatHistory(chatId = chatId, listener = listener)
             }
+            chatStorageGateway.clearChatPendingMessages(chatId)
         }
 
     override suspend fun archiveChat(chatId: Long, archive: Boolean) =
