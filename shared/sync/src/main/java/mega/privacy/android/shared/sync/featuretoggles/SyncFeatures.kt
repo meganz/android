@@ -25,7 +25,7 @@ enum class SyncFeatures(
      */
     BackupForAndroid(
         "Enable the Backup for Android feature",
-        false
+        true
     ),
 
     /**
