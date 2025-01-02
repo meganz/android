@@ -309,12 +309,8 @@ class MyAccountActivity : PasscodeActivity(),
      * Handles the show cancel subscription action depending on the feature flag.
      */
     private fun handleShowCancelSubscription() {
-        if (viewModel.isNewCancelSubscriptionFeatureEnabled()) {
-            Analytics.tracker.trackEvent(CancelSubscriptionMenuToolbarEvent)
-            navigateToCancelAccountPlan()
-        } else {
-            showCancelSubscriptions()
-        }
+        Analytics.tracker.trackEvent(CancelSubscriptionMenuToolbarEvent)
+        navigateToCancelAccountPlan()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -342,14 +338,8 @@ class MyAccountActivity : PasscodeActivity(),
             R.id.my_account -> {
                 menu.toggleAllMenuItemsVisibility(true)
 
-                if (viewModel.isNewCancelSubscriptionFeatureEnabled()) {
-                    if (!viewModel.isProSubscription()) {
-                        menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
-                    }
-                } else {
-                    if (viewModel.thereIsNoSubscription() || isProFlexiAccount) {
-                        menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
-                    }
+                if (!viewModel.isProSubscription()) {
+                    menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
                 }
 
                 if (isBusinessAccount || isProFlexiAccount) {

@@ -54,7 +54,6 @@ data class MyAccountUiState(
     val shouldNavigateToSmsVerification: Boolean = false,
     val showInvalidChangeEmailLinkPrompt: Boolean = false,
     val showChangeEmailConfirmation: Boolean = false,
-    val showNewCancelSubscriptionFeature: Boolean = false,
     val isProSubscription: Boolean = false,
     val subscriptionDetails: AccountLevelDetail? = null,
     val accountType: AccountType = AccountType.FREE,

@@ -163,14 +163,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * To enable the new cancel subscription feature
-     */
-    CancelSubscription(
-        "Enable cancel subscription feature",
-        true
-    ),
-
-    /**
      * Raise to speak in a call
      */
     RaiseToSpeak("Raise to speak in a call or a meeting", true),

@@ -66,7 +66,6 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
@@ -135,7 +134,6 @@ internal class MyAccountViewModelTest {
     private val monitorBackupFolder: MonitorBackupFolder = mock()
     private val getFolderTreeInfo: GetFolderTreeInfo = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val testDispatcher = UnconfinedTestDispatcher()
     private val snackBarHandler: SnackBarHandler = mock()
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
@@ -222,7 +220,6 @@ internal class MyAccountViewModelTest {
             monitorBackupFolder = monitorBackupFolder,
             getFolderTreeInfo = getFolderTreeInfo,
             getNodeByIdUseCase = getNodeByIdUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             ioDispatcher = testDispatcher,
             snackBarHandler = snackBarHandler,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
@@ -544,19 +541,6 @@ internal class MyAccountViewModelTest {
 
         underTest.state.test {
             assertThat(awaitItem().showChangeEmailConfirmation).isFalse()
-        }
-    }
-
-    @ParameterizedTest(name = "when CancelSubscription flag is {0}, showNewCancelSubscriptionFeature is {1}")
-    @MethodSource("provideShowNewCancelSubscriptionFeatureParameters")
-    fun `test that showNewCancelSubscriptionFeature is correct when CancelSubscription flag is provided`(
-        flag: Boolean,
-        expected: Boolean,
-    ) = runTest {
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(flag)
-        initializeViewModel()
-        underTest.state.test {
-            assertThat(awaitItem().showNewCancelSubscriptionFeature).isEqualTo(expected)
         }
     }
 
@@ -894,7 +878,6 @@ internal class MyAccountViewModelTest {
             monitorBackupFolder,
             getFolderTreeInfo,
             getNodeByIdUseCase,
-            getFeatureFlagValueUseCase,
             snackBarHandler,
             getBusinessStatusUseCase,
             monitorAccountDetailUseCase,
