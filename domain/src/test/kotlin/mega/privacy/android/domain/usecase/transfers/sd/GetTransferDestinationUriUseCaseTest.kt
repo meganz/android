@@ -5,22 +5,35 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.repository.TransferRepository
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetTransferDestinationUriUseCaseTest {
 
     private lateinit var underTest: GetTransferDestinationUriUseCase
 
+    private val transferRepository = mock<TransferRepository>()
+
     @BeforeAll
     fun setUp() {
-        underTest = GetTransferDestinationUriUseCase()
+        underTest = GetTransferDestinationUriUseCase(
+            transferRepository = transferRepository
+        )
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(transferRepository)
     }
 
     @ParameterizedTest
@@ -75,6 +88,9 @@ class GetTransferDestinationUriUseCaseTest {
                 on { it.isRootTransfer } doReturn false
                 on { it.folderTransferTag } doReturn folderTag
                 on { it.parentPath } doReturn "$cachePath/$expectedSubFolder"
+            }
+            val rootSdTransfer = mock<Transfer> {
+                on { it.transferType } doReturn TransferType.DOWNLOAD
                 on { it.appData } doReturn listOf(
                     TransferAppData.SdCardDownload(
                         targetPathForSDK = cachePath,
@@ -82,6 +98,9 @@ class GetTransferDestinationUriUseCaseTest {
                     )
                 )
             }
+
+            whenever(transferRepository.getTransferByTag(folderTag)).thenReturn(rootSdTransfer)
+
             val actual = underTest(transfer)
 
             assertThat(actual?.destinationUri).isEqualTo(expected)
