@@ -10,7 +10,7 @@ fun main(args: Array<String>) {
         moduleName = "shared/original-core-ui",
         packageName = "mega.privacy.android.shared.original.core.ui.theme.values",
         themePrefix = "Temp",
-        groupsToExpose = listOf("Text", "Background"),
+        groupsToExpose = listOf("Text", "Background", "Icon"),
         jsonGroupNameForCoreColorTokens = "Core/Android-temp",
     )
 }

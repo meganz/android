@@ -45,7 +45,7 @@ private annotation class ArabicLocale
 
 
 /**
- * Annotation to generate previews with night and day themes
+ * Annotation to generate previews with night and day themes with full screen device UI
  */
 @Preview(
     showBackground = true,
@@ -67,6 +67,26 @@ private annotation class ArabicLocale
     device = "spec:width=1080px,height=2340px,dpi=440,navigation=buttons",
 )
 annotation class CombinedThemePreviews
+
+/**
+ * Annotation to generate previews with night and day themes without device UI
+ */
+@Preview(
+    showBackground = true,
+    locale = "en",
+    backgroundColor = 0xFF18191A,
+    name = "1-Dark theme",
+    group = "themes",
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Preview(
+    showBackground = true,
+    locale = "en",
+    name = "2-Light theme",
+    group = "themes",
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+)
+annotation class CombinedThemeComponentPreviews
 
 /**
  * Annotation to generate previews with night and day themes for tablet landscape
@@ -130,5 +150,5 @@ annotation class CombinedThemeRtlPreviews
  */
 @FrenchLocale
 @FontScalePreviews
-@CombinedThemePreviews
+@CombinedThemeComponentPreviews
 annotation class CombinedTextAndThemePreviews
