@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.ModalBottomSheetValue
@@ -31,6 +32,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
@@ -69,6 +71,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivide
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.mobile.analytics.event.AndroidBackupFABButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncMultiFABButtonPressedEvent
@@ -143,6 +146,15 @@ internal fun SyncListScreen(
             }
         }
     ) {
+        var isWarningBannerDisplayed by rememberSaveable { mutableStateOf(false) }
+        ComposableLifecycle { event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                isWarningBannerDisplayed =
+                    syncPermissionsManager.isManageExternalStoragePermissionGranted().not()
+                            || syncPermissionsManager.isDisableBatteryOptimizationGranted().not()
+            }
+        }
+
         val multiFabState = rememberMultiFloatingActionButtonState()
         MegaScaffold(
             scaffoldState = scaffoldState,
@@ -150,12 +162,12 @@ internal fun SyncListScreen(
                 MegaAppBar(
                     title = title.ifEmpty { stringResource(R.string.sync_toolbar_title) },
                     appBarType = AppBarType.BACK_NAVIGATION,
-                    elevation = 0.dp,
                     onNavigationPressed = {
                         onBackPressedDispatcher?.onBackPressed()
                     },
                     actions = actions,
-                    onActionPressed = onActionPressed
+                    onActionPressed = onActionPressed,
+                    elevation = if (isWarningBannerDisplayed) AppBarDefaults.TopAppBarElevation else 0.dp,
                 )
             },
             floatingActionButton = {

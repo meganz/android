@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
@@ -112,6 +113,7 @@ private fun SyncNewFolderScreenScaffold(
 ) {
     val scaffoldState = rememberScaffoldState()
     val syncType = state.syncType
+    var isWarningBannerDisplayed by rememberSaveable { mutableStateOf(false) }
 
     MegaScaffold(
         scaffoldState = scaffoldState,
@@ -124,7 +126,7 @@ private fun SyncNewFolderScreenScaffold(
                     else -> stringResource(R.string.sync_toolbar_title)
                 },
                 onNavigationPressed = { onBackClicked() },
-                elevation = 0.dp
+                elevation = if (isWarningBannerDisplayed) AppBarDefaults.TopAppBarElevation else 0.dp,
             )
         },
         content = { paddingValues ->
@@ -145,6 +147,9 @@ private fun SyncNewFolderScreenScaffold(
                     showStorageOverQuota = showStorageOverQuota,
                     onDismissStorageOverQuota = onDismissStorageOverQuota,
                     onOpenUpgradeAccount = onOpenUpgradeAccount,
+                    onShowSyncPermissionBannerValueChanged = { value ->
+                        isWarningBannerDisplayed = value
+                    },
                     snackBarHostState = scaffoldState.snackbarHostState,
                 )
 
@@ -177,6 +182,7 @@ private fun SyncNewFolderScreenContent(
     showStorageOverQuota: Boolean,
     onDismissStorageOverQuota: () -> Unit,
     onOpenUpgradeAccount: () -> Unit,
+    onShowSyncPermissionBannerValueChanged: (Boolean) -> Unit,
     snackBarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
@@ -189,6 +195,7 @@ private fun SyncNewFolderScreenContent(
     }
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+
     Column(
         modifier.verticalScroll(scrollState)
     ) {
@@ -205,6 +212,7 @@ private fun SyncNewFolderScreenContent(
                 }
             } else {
                 showSyncPermissionBanner = true
+                onShowSyncPermissionBannerValueChanged(true)
             }
         }
 
@@ -229,6 +237,7 @@ private fun SyncNewFolderScreenContent(
                                 onAnnotationClick = {
                                     syncPermissionsManager.launchAppSettingFileStorageAccess()
                                     showSyncPermissionBanner = false
+                                    onShowSyncPermissionBannerValueChanged(false)
                                 },
                             )
                         }
@@ -246,6 +255,7 @@ private fun SyncNewFolderScreenContent(
                 modifier = Modifier.clickable {
                     syncPermissionsManager.launchAppSettingFileStorageAccess()
                     showSyncPermissionBanner = false
+                    onShowSyncPermissionBannerValueChanged(false)
                 })
         }
 
@@ -255,6 +265,7 @@ private fun SyncNewFolderScreenContent(
                 showAllowAppAccessDialog = false
             }, onDismiss = {
                 showSyncPermissionBanner = true
+                onShowSyncPermissionBannerValueChanged(true)
                 showAllowAppAccessDialog = false
             })
         }
@@ -302,6 +313,7 @@ private fun SyncNewFolderScreenContent(
                     if (showSyncPermissionBanner) {
                         syncPermissionsManager.launchAppSettingFileStorageAccess()
                         showSyncPermissionBanner = false
+                        onShowSyncPermissionBannerValueChanged(false)
                     } else {
                         if (syncPermissionsManager.isSDKAboveOrEqualToR()) {
                             showAllowAppAccessDialog = true
@@ -412,6 +424,7 @@ private fun SyncNewFolderScreenContentPreview(
             showStorageOverQuota = false,
             onDismissStorageOverQuota = {},
             onOpenUpgradeAccount = {},
+            onShowSyncPermissionBannerValueChanged = {},
             snackBarHostState = rememberScaffoldState().snackbarHostState,
         )
     }
