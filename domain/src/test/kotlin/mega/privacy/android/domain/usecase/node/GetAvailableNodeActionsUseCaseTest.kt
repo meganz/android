@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.node
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeAction
 import mega.privacy.android.domain.entity.node.NodeId
@@ -15,6 +14,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -239,6 +240,7 @@ internal class GetAvailableNodeActionsUseCaseTest {
                 dynamicTest("node: $name, takenDown: $takenDown, inShared: $inShared, folder: $folder") {
                     runTest {
                         val node = mockNode()
+                        whenever(getNodeAccessPermission(node.id)).thenReturn(AccessPermission.OWNER)
                         whenever(node.isTakenDown).thenReturn(takenDown)
                         val result = underTest(node)
 
@@ -344,6 +346,27 @@ internal class GetAvailableNodeActionsUseCaseTest {
                 }
             }
         }
+
+    @ParameterizedTest(name = "folder with access permission : {0}")
+    @EnumSource(AccessPermission::class)
+    fun `test that share folder action is not returned when node is an incoming share`(permission: AccessPermission) {
+        mockedNodes.map { (name, mockNode) ->
+            dynamicTest("node: $name, permission: $permission") {
+                runTest {
+                    val node = mockNode()
+                    whenever(getNodeAccessPermission(node.id)).thenReturn(permission)
+                    whenever(node.isTakenDown).thenReturn(false)
+                    whenever(node.isIncomingShare).thenReturn(false)
+                    val result = underTest(node)
+                    if (permission == AccessPermission.OWNER && mockNode.isFolder()) {
+                        Truth.assertThat(result).contains(NodeAction.ShareFolder)
+                    } else {
+                        Truth.assertThat(result).doesNotContain(NodeAction.ShareFolder)
+                    }
+                }
+            }
+        }
+    }
 
     private val mockedNodes = mapOf(
         "File" to this::mockFile,
