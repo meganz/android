@@ -1332,6 +1332,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private fun setIsFirstLaunch() {
         firstTimeAfterInstallation =
             intent.getBooleanExtra(IntentConstants.EXTRA_FIRST_LAUNCH, false)
+        intent.removeExtra(IntentConstants.EXTRA_FIRST_LAUNCH)
     }
 
     private fun handleDuplicateLaunches(): Boolean {
