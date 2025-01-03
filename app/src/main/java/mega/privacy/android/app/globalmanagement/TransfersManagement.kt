@@ -1,6 +1,5 @@
 package mega.privacy.android.app.globalmanagement
 
-import android.os.CountDownTimer
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
@@ -21,11 +20,8 @@ class TransfersManagement @Inject constructor(
         private const val WAIT_TIME_TO_SHOW_WARNING = 60000L
     }
 
-    private var networkTimer: CountDownTimer? = null
-
     private var transferOverQuotaTimestamp: Long = 0
     var isCurrentTransferOverQuota = false
-    var isOnTransfersSection = false
     var isTransferOverQuotaNotificationShown = false
     var isTransferOverQuotaBannerShown = false
 
@@ -34,10 +30,8 @@ class TransfersManagement @Inject constructor(
     }
 
     fun resetDefaults() {
-        networkTimer = null
         transferOverQuotaTimestamp = 0
         isCurrentTransferOverQuota = false
-        isOnTransfersSection = false
         isTransferOverQuotaNotificationShown = false
         isTransferOverQuotaBannerShown = false
     }

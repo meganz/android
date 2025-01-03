@@ -52,11 +52,11 @@ import mega.privacy.android.app.listeners.ChatLogoutListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.presentation.advertisements.AdsViewModel
 import mega.privacy.android.app.presentation.base.BaseViewModel
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.presentation.weakaccountprotection.WeakAccountProtectionAlertActivity
 import mega.privacy.android.app.psa.PsaWebBrowser
@@ -198,8 +198,9 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     @Inject
     lateinit var pauseTransfersQueueUseCase: PauseTransfersQueueUseCase
 
-    protected val billingViewModel by viewModels<BillingViewModel>()
+    private val billingViewModel by viewModels<BillingViewModel>()
     private val viewModel by viewModels<BaseViewModel>()
+    protected val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
 
     @JvmField
     protected var app: MegaApplication = MegaApplication.getInstance()
@@ -1049,7 +1050,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * Shows a warning indicating transfer over quota occurred.
      */
     fun showGeneralTransferOverQuotaWarning() = lifecycleScope.launch {
-        if (isActivityInBackground || transfersManagement.isOnTransfersSection || transferGeneralOverQuotaWarning != null) return@launch
+        if (isActivityInBackground || transfersManagementViewModel.isInTransfersSection() || transferGeneralOverQuotaWarning != null) return@launch
         val builder =
             MaterialAlertDialogBuilder(
                 this@BaseActivity,

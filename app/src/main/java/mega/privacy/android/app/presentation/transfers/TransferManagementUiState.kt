@@ -14,6 +14,7 @@ import mega.privacy.android.shared.original.core.ui.model.TransfersStatus
  * @property isTransferError true if there is a transfer error and transfers section has not been visited.
  * @property isOnline true if the device is online
  * @property isTransferOverQuota true if the account is in transfer over quota
+ * @property isInTransfersSection true if the app is in the transfers section
  */
 data class TransferManagementUiState(
     val transfersInfo: TransfersInfo = TransfersInfo(),
@@ -22,4 +23,5 @@ data class TransferManagementUiState(
     val isTransferError: Boolean = false,
     val isOnline: Boolean = false,
     val isTransferOverQuota: Boolean = false,
+    val isInTransfersSection: Boolean = false,
 )

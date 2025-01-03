@@ -207,6 +207,20 @@ class TransfersManagementViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Gets from the UI state if the app is in the transfers section.
+     */
+    fun isInTransfersSection() = state.value.isInTransfersSection
+
+    /**
+     * Updates UI state to indicate that the app is in the transfers section.
+     */
+    fun setInTransfersSection(isInTransfersSection: Boolean) {
+        _state.update {
+            it.copy(isInTransfersSection = isInTransfersSection)
+        }
+    }
+
     companion object {
         private const val DEFAULT_SAMPLE_PERIOD = 500L
         internal val waitTimeToShowOffline = 30_000L.milliseconds

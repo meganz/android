@@ -221,7 +221,6 @@ import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesComposeViewModel
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeViewModel
-import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
@@ -367,7 +366,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
     private val syncMonitorViewModel: SyncMonitorViewModel by viewModels()
-    private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
     private val transfersViewModel: TransfersViewModel by viewModels()
     private val syncPromotionViewModel: SyncPromotionViewModel by viewModels()
     val sharesViewModel: SharesViewModel by viewModels()
@@ -2797,7 +2795,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     override fun onPause() {
         Timber.d("onPause")
-        transfersManagement.isOnTransfersSection = false
+        transfersManagementViewModel.setInTransfersSection(false)
         super.onPause()
     }
 
@@ -3643,7 +3641,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         if (item !== DrawerItem.TRANSFERS) {
             transferPageFragment?.destroyActionModeIfNeeded()
         }
-        transfersManagement.isOnTransfersSection = item === DrawerItem.TRANSFERS
+        transfersManagementViewModel.setInTransfersSection(drawerItem == DrawerItem.TRANSFERS)
         when (item) {
             DrawerItem.CLOUD_DRIVE -> {
                 // Synchronize the setting of different operations
@@ -6741,7 +6739,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * Updates values of TransfersManagement object after the activity comes from background.
      */
     private fun checkTransferOverQuotaOnResume() {
-        transfersManagement.isOnTransfersSection = drawerItem === DrawerItem.TRANSFERS
+        transfersManagementViewModel.setInTransfersSection(drawerItem == DrawerItem.TRANSFERS)
         if (transfersManagement.isTransferOverQuotaNotificationShown) {
             transfersManagement.isTransferOverQuotaBannerShown = true
             transfersManagement.isTransferOverQuotaNotificationShown = false

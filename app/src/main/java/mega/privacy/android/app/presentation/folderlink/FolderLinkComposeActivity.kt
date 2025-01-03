@@ -52,7 +52,6 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
-import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.transfers.view.IN_PROGRESS_TAB_INDEX
 import mega.privacy.android.app.textEditor.TextEditorActivity
@@ -120,7 +119,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
     private lateinit var binding: ActivityFolderLinkComposeBinding
 
     private val viewModel: FolderLinkViewModel by viewModels()
-    private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
 
     private var mKey: String? = null
     private var statusDialog: AlertDialog? = null
