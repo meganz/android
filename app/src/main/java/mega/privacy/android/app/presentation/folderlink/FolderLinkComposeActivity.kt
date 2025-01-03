@@ -17,12 +17,11 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.core.text.HtmlCompat
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
@@ -194,7 +193,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         }
 
         intent?.let { viewModel.handleIntent(it) }
-        setupObservers()
         viewModel.checkLoginRequired()
         checkForInAppAdvertisement()
         setupMiniAudioPlayer()
@@ -276,6 +274,52 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                     )
                 }
             )
+
+            EventEffect(
+                event = uiState.showLoginEvent,
+                onConsumed = viewModel::onShowLoginEventConsumed
+            ) {
+                showLoginScreen()
+            }
+
+            EventEffect(
+                event = uiState.finishActivityEvent,
+                onConsumed = viewModel::onFinishActivityEventConsumed
+            ) {
+                finish()
+            }
+
+            EventEffect(
+                event = uiState.askForDecryptionKeyDialogEvent,
+                onConsumed = viewModel::resetAskForDecryptionKeyDialog
+            ) {
+                showAskForDecryptionKeyDialog()
+            }
+
+            EventEffect(
+                event = uiState.collisionsEvent,
+                onConsumed = {
+                    viewModel.resetLaunchCollisionActivity()
+                    viewModel.clearAllSelection()
+                }
+            ) {
+                AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
+                nameCollisionActivityLauncher.launch(ArrayList(it))
+            }
+
+            EventEffect(
+                event = uiState.copyResultEvent,
+                onConsumed = viewModel::resetShowCopyResult
+            ) { (resultText, throwable) ->
+                showCopyResult(copyResultText = resultText, throwable = throwable)
+            }
+
+            EventEffect(
+                event = uiState.showErrorDialogEvent,
+                onConsumed = viewModel::onShowErrorDialogEventConsumed
+            ) { (errorDialogTitle, errorDialogContent) ->
+                showErrorDialog(title = errorDialogTitle, message = errorDialogContent)
+            }
         }
     }
 
@@ -423,60 +467,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         MegaNodeUtil.shareLink(this, viewModel.state.value.url, viewModel.state.value.title)
     }
 
-    private fun setupObservers() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect {
-                    when {
-                        it.finishActivity -> {
-                            finish()
-                        }
-
-                        it.isInitialState -> {
-                            it.shouldLogin?.let { showLogin ->
-                                if (showLogin) {
-                                    showLoginScreen()
-                                } else {
-                                    it.url?.let { url -> viewModel.folderLogin(url) }
-                                }
-                            }
-                            return@collect
-                        }
-
-                        it.isLoginComplete && !it.isNodesFetched -> {
-                            viewModel.fetchNodes(it.folderSubHandle)
-                            // Get cookies settings after login.
-                            MegaApplication.getInstance().checkEnabledCookies()
-                        }
-
-                        it.collisions != null -> {
-                            AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
-                            nameCollisionActivityLauncher.launch(ArrayList(it.collisions))
-                            viewModel.resetLaunchCollisionActivity()
-                            viewModel.clearAllSelection()
-                        }
-
-                        it.copyResultText != null || it.copyThrowable != null -> {
-                            showCopyResult(it.copyResultText, it.copyThrowable)
-                            viewModel.resetShowCopyResult()
-                        }
-
-                        it.askForDecryptionKeyDialog -> {
-                            askForDecryptionKeyDialog()
-                        }
-
-                        it.errorDialogTitle != -1 && it.errorDialogContent != -1 -> {
-                            Timber.w("Show error dialog")
-                            showErrorDialog(it.errorDialogTitle, it.errorDialogContent)
-                        }
-
-                        else -> {}
-                    }
-                }
-            }
-        }
-    }
-
     private fun showLoginScreen() {
         Timber.d("Refresh session - sdk or karere")
         val intent = Intent(this, LoginActivity::class.java)
@@ -488,7 +478,7 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         finish()
     }
 
-    private fun askForDecryptionKeyDialog() {
+    private fun showAskForDecryptionKeyDialog() {
         Timber.d("askForDecryptionKeyDialog")
         val builder = DecryptAlertDialog.Builder()
         val decryptAlertDialog = builder
@@ -501,7 +491,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
             .build()
 
         decryptAlertDialog.show(supportFragmentManager, TAG_DECRYPT)
-        viewModel.resetAskForDecryptionKeyDialog()
     }
 
     /**

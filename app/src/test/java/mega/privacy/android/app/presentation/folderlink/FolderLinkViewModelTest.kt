@@ -55,6 +55,7 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
+import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.navigation.MegaNavigator
@@ -110,6 +111,8 @@ class FolderLinkViewModelTest {
     private val megaNavigator: MegaNavigator = mock()
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper = mock()
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase = mock()
+    private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase =
+        mock()
 
 
     @BeforeEach
@@ -152,7 +155,8 @@ class FolderLinkViewModelTest {
             getFolderLinkNodeContentUriUseCase,
             megaNavigator,
             nodeContentUriIntentMapper,
-            getNodePreviewFileUseCase
+            getNodePreviewFileUseCase,
+            updateCrashAndPerformanceReportersUseCase
         )
     }
 
@@ -189,7 +193,8 @@ class FolderLinkViewModelTest {
             getFolderLinkNodeContentUriUseCase,
             megaNavigator,
             nodeContentUriIntentMapper,
-            getNodePreviewFileUseCase
+            getNodePreviewFileUseCase,
+            updateCrashAndPerformanceReportersUseCase
         )
     }
 
@@ -200,11 +205,9 @@ class FolderLinkViewModelTest {
             assertThat(initial.isInitialState).isEqualTo(true)
             assertThat(initial.isLoginComplete).isEqualTo(false)
             assertThat(initial.isNodesFetched).isEqualTo(false)
-            assertThat(initial.askForDecryptionKeyDialog).isEqualTo(false)
-            assertThat(initial.collisions).isNull()
-            assertThat(initial.copyResultText).isNull()
-            assertThat(initial.copyThrowable).isNull()
-            assertThat(initial.shouldLogin).isNull()
+            assertThat(initial.askForDecryptionKeyDialogEvent).isEqualTo(consumed)
+            assertThat(initial.collisionsEvent).isEqualTo(consumed())
+            assertThat(initial.copyResultEvent).isEqualTo(consumed())
             assertThat(initial.hasDbCredentials).isFalse()
             assertThat(initial.nodesList).isEmpty()
             assertThat(initial.rootNode).isNull()
@@ -212,12 +215,11 @@ class FolderLinkViewModelTest {
             assertThat(initial.currentViewType).isEqualTo(ViewType.LIST)
             assertThat(initial.title).isEqualTo("")
             assertThat(initial.selectedNodeCount).isEqualTo(0)
-            assertThat(initial.finishActivity).isFalse()
+            assertThat(initial.finishActivityEvent).isEqualTo(consumed)
             assertThat(initial.importNode).isNull()
             assertThat(initial.openFile).isInstanceOf(consumed().javaClass)
             assertThat(initial.selectImportLocation).isEqualTo(consumed)
-            assertThat(initial.errorDialogTitle).isEqualTo(-1)
-            assertThat(initial.errorDialogContent).isEqualTo(-1)
+            assertThat(initial.showErrorDialogEvent).isEqualTo(consumed())
             assertThat(initial.snackBarMessage).isEqualTo(-1)
         }
     }
@@ -225,14 +227,17 @@ class FolderLinkViewModelTest {
     @Test
     fun `test that on login into folder and on result OK values are updated correctly`() = runTest {
         val folderLink = "abcd"
+        val childNode = mock<TypedFolderNode>()
+        val childrenNodes = listOf(childNode)
+        val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
         whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+        whenever(fetchFolderNodesUseCase(anyOrNull())).thenReturn(fetchFolderNodeResult)
         underTest.state.test {
             underTest.folderLogin(folderLink)
             val newValue = expectMostRecentItem()
             assertThat(newValue.isLoginComplete).isTrue()
             assertThat(newValue.isInitialState).isFalse()
-            assertThat(newValue.errorDialogTitle).isEqualTo(-1)
-            assertThat(newValue.errorDialogContent).isEqualTo(-1)
+            assertThat(newValue.showErrorDialogEvent).isEqualTo(consumed())
         }
     }
 
@@ -246,9 +251,8 @@ class FolderLinkViewModelTest {
                 val newValue = expectMostRecentItem()
                 assertThat(newValue.isLoginComplete).isFalse()
                 assertThat(newValue.isInitialState).isFalse()
-                assertThat(newValue.askForDecryptionKeyDialog).isTrue()
-                assertThat(newValue.errorDialogTitle).isEqualTo(-1)
-                assertThat(newValue.errorDialogContent).isEqualTo(-1)
+                assertThat(newValue.askForDecryptionKeyDialogEvent).isEqualTo(triggered)
+                assertThat(newValue.showErrorDialogEvent).isEqualTo(consumed())
             }
         }
 
@@ -263,9 +267,8 @@ class FolderLinkViewModelTest {
                 val newValue = expectMostRecentItem()
                 assertThat(newValue.isLoginComplete).isFalse()
                 assertThat(newValue.isInitialState).isFalse()
-                assertThat(newValue.askForDecryptionKeyDialog).isEqualTo(decryptionIntroduced)
-                assertThat(newValue.errorDialogTitle).isEqualTo(-1)
-                assertThat(newValue.errorDialogContent).isEqualTo(-1)
+                assertThat(newValue.askForDecryptionKeyDialogEvent).isEqualTo(triggered)
+                assertThat(newValue.showErrorDialogEvent).isEqualTo(consumed())
                 assertThat(newValue.snackBarMessage).isEqualTo(-1)
             }
         }
@@ -280,7 +283,7 @@ class FolderLinkViewModelTest {
                 val newValue = expectMostRecentItem()
                 assertThat(newValue.isLoginComplete).isFalse()
                 assertThat(newValue.isInitialState).isFalse()
-                assertThat(newValue.askForDecryptionKeyDialog).isFalse()
+                assertThat(newValue.askForDecryptionKeyDialogEvent).isEqualTo(consumed)
             }
         }
 
@@ -292,7 +295,7 @@ class FolderLinkViewModelTest {
             underTest.state.test {
                 underTest.checkLoginRequired()
                 val value = expectMostRecentItem()
-                assertThat(value.shouldLogin).isTrue()
+                assertThat(value.showLoginEvent).isEqualTo(triggered)
                 assertThat(value.hasDbCredentials).isTrue()
             }
         }
@@ -305,7 +308,7 @@ class FolderLinkViewModelTest {
             underTest.state.test {
                 underTest.checkLoginRequired()
                 val value = expectMostRecentItem()
-                assertThat(value.shouldLogin).isFalse()
+                assertThat(value.showLoginEvent).isEqualTo(consumed)
                 assertThat(value.hasDbCredentials).isTrue()
             }
         }
@@ -315,7 +318,7 @@ class FolderLinkViewModelTest {
         underTest.state.test {
             underTest.resetLaunchCollisionActivity()
             val newValue = expectMostRecentItem()
-            assertThat(newValue.collisions).isNull()
+            assertThat(newValue.collisionsEvent).isEqualTo(consumed())
         }
     }
 
@@ -324,8 +327,7 @@ class FolderLinkViewModelTest {
         underTest.state.test {
             underTest.resetShowCopyResult()
             val newValue = expectMostRecentItem()
-            assertThat(newValue.copyResultText).isNull()
-            assertThat(newValue.copyThrowable).isNull()
+            assertThat(newValue.copyResultEvent).isEqualTo(consumed())
         }
     }
 
@@ -334,7 +336,7 @@ class FolderLinkViewModelTest {
         underTest.state.test {
             underTest.resetAskForDecryptionKeyDialog()
             val newValue = expectMostRecentItem()
-            assertThat(newValue.askForDecryptionKeyDialog).isFalse()
+            assertThat(newValue.askForDecryptionKeyDialogEvent).isEqualTo(consumed)
         }
     }
 
