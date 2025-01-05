@@ -176,7 +176,7 @@ internal fun SaveScannedDocumentsView(
             RaisedDefaultMegaButton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 80.dp, start = 16.dp, end = 16.dp)
+                    .padding(bottom = 16.dp, start = 16.dp, end = 16.dp)
                     .testTag(SAVE_SCANNED_DOCUMENTS_SAVE_BUTTON),
                 textId = R.string.general_next,
                 onClick = onSaveButtonClicked,
