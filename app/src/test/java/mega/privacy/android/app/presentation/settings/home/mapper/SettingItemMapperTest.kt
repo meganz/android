@@ -8,7 +8,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.navigation.settings.SettingClickActionType
 import mega.privacy.android.navigation.settings.SettingDescriptionValue
 import mega.privacy.android.navigation.settings.SettingItem
-import mega.privacy.android.navigation.settings.SettingSectionHeader
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
@@ -20,14 +19,12 @@ class SettingItemMapperTest {
 
     @Test
     fun `test that static values are set`() {
-        val expectedSection = SettingSectionHeader.About
         val expectedKey = "Key"
         val expectedName = "name"
         val expectedIsDestructive = true
         val expectedDescription = "description"
 
         val actual = underTest(
-            section = expectedSection,
             item = SettingItem(
                 key = expectedKey,
                 name = expectedName,
@@ -39,7 +36,6 @@ class SettingItemMapperTest {
             suspendHandler = {}
         )
 
-        assertThat(actual.section).isEqualTo(expectedSection)
         assertThat(actual.key).isEqualTo(expectedKey)
         assertThat(actual.name).isEqualTo(expectedName)
         assertThat(actual.isDestructive).isEqualTo(expectedIsDestructive)
@@ -48,7 +44,6 @@ class SettingItemMapperTest {
     @Test
     fun `test that dynamic description is set to empty string`() {
         val actual = underTest(
-            section = SettingSectionHeader.Media,
             item = SettingItem(
                 key = "expectedKey",
                 name = "expectedName",
@@ -66,7 +61,6 @@ class SettingItemMapperTest {
     @Test
     fun `test that dynamic enabled state returns a non null function that returns null`() {
         val actual = underTest(
-            section = SettingSectionHeader.Media,
             item = SettingItem(
                 key = "expectedKey",
                 name = "expectedName",
@@ -84,7 +78,6 @@ class SettingItemMapperTest {
     @Test
     fun `test that navigation actions are mapped to calls on the navigation host`() {
         val actual = underTest(
-            section = SettingSectionHeader.Security,
             item = SettingItem(
                 key = "expectedKey",
                 name = "expectedName",
@@ -111,7 +104,6 @@ class SettingItemMapperTest {
             { func: suspend () -> Unit -> this.launch { func() } }
 
         val actual = underTest(
-            section = SettingSectionHeader.Security,
             item = SettingItem(
                 key = "expectedKey",
                 name = "expectedName",

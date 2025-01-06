@@ -19,7 +19,7 @@ class SectionHeaderMapperTest {
     @Test
     fun `test that SettingSectionHeader Appearance is mapped correctly`() {
         composeTestRule.setContent {
-            Text(underTest(SettingSectionHeader.Appearance)())
+            Text(underTest(SettingSectionHeader.Appearance).headerText())
         }
         composeTestRule.onNodeWithText("Appearance").assertExists()
     }
@@ -27,7 +27,7 @@ class SectionHeaderMapperTest {
     @Test
     fun `test that SettingSectionHeader About is mapped correctly`() {
         composeTestRule.setContent {
-            Text(underTest(SettingSectionHeader.About)())
+            Text(underTest(SettingSectionHeader.About).headerText())
         }
         composeTestRule.onNodeWithText("About").assertExists()
     }
@@ -35,7 +35,7 @@ class SectionHeaderMapperTest {
     @Test
     fun `test that SettingSectionHeader Features is mapped correctly`() {
         composeTestRule.setContent {
-            Text(underTest(SettingSectionHeader.Features)())
+            Text(underTest(SettingSectionHeader.Features).headerText())
         }
         composeTestRule.onNodeWithText("Features").assertExists()
     }
@@ -43,7 +43,7 @@ class SectionHeaderMapperTest {
     @Test
     fun `test that SettingSectionHeader Help is mapped correctly`() {
         composeTestRule.setContent {
-            Text(underTest(SettingSectionHeader.Help)())
+            Text(underTest(SettingSectionHeader.Help).headerText())
         }
         composeTestRule.onNodeWithText("Help").assertExists()
     }
@@ -51,7 +51,7 @@ class SectionHeaderMapperTest {
     @Test
     fun `test that SettingSectionHeader Media is mapped correctly`() {
         composeTestRule.setContent {
-            Text(underTest(SettingSectionHeader.Media)())
+            Text(underTest(SettingSectionHeader.Media).headerText())
         }
         composeTestRule.onNodeWithText("Media").assertExists()
     }
@@ -59,7 +59,7 @@ class SectionHeaderMapperTest {
     @Test
     fun `test that SettingSectionHeader Security is mapped correctly`() {
         composeTestRule.setContent {
-            Text(underTest(SettingSectionHeader.Security)())
+            Text(underTest(SettingSectionHeader.Security).headerText())
         }
         composeTestRule.onNodeWithText("Security").assertExists()
     }
@@ -67,7 +67,7 @@ class SectionHeaderMapperTest {
     @Test
     fun `test that SettingSectionHeader Storage is mapped correctly`() {
         composeTestRule.setContent {
-            Text(underTest(SettingSectionHeader.Storage)())
+            Text(underTest(SettingSectionHeader.Storage).headerText())
         }
         composeTestRule.onNodeWithText("Storage").assertExists()
     }
@@ -75,7 +75,7 @@ class SectionHeaderMapperTest {
     @Test
     fun `test that SettingSectionHeader UserInterface is mapped correctly`() {
         composeTestRule.setContent {
-            Text(underTest(SettingSectionHeader.UserInterface)())
+            Text(underTest(SettingSectionHeader.UserInterface).headerText())
         }
         composeTestRule.onNodeWithText("User interface").assertExists()
     }
@@ -84,7 +84,7 @@ class SectionHeaderMapperTest {
     fun `test that SettingSectionHeader Custom is mapped correctly`() {
         val customTitle = "ExpectedCustom"
         composeTestRule.setContent {
-            Text(underTest(SettingSectionHeader.Custom(customTitle))())
+            Text(underTest(SettingSectionHeader.Custom(customTitle)).headerText())
         }
         composeTestRule.onNodeWithText(customTitle).assertExists()
     }

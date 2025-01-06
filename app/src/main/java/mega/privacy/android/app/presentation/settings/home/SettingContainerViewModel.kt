@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.settings.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,14 +17,18 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.settings.home.mapper.SectionHeaderMapper
+import mega.privacy.android.app.presentation.settings.home.mapper.SettingHeaderComparator
 import mega.privacy.android.app.presentation.settings.home.mapper.SettingItemFlowMapper
 import mega.privacy.android.app.presentation.settings.home.mapper.SettingItemMapper
+import mega.privacy.android.app.presentation.settings.home.model.SettingHeaderItem
 import mega.privacy.android.app.presentation.settings.home.model.SettingModelItem
-import mega.privacy.android.app.presentation.settings.home.model.SettingSection
 import mega.privacy.android.app.presentation.settings.home.model.SettingsUiState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.navigation.settings.FeatureSettings
+import mega.privacy.android.navigation.settings.SettingEntryPoint
+import mega.privacy.android.navigation.settings.SettingSectionHeader
 import timber.log.Timber
+import java.util.SortedMap
 import javax.inject.Inject
 
 /**
@@ -36,6 +41,7 @@ internal class SettingContainerViewModel @Inject constructor(
     private val settingItemMapper: SettingItemMapper,
     private val settingItemFlowMapper: SettingItemFlowMapper,
     private val sectionHeaderMapper: SectionHeaderMapper,
+    private val settingHeaderComparator: SettingHeaderComparator,
     @ApplicationScope private val functionScope: CoroutineScope,
 ) : ViewModel() {
     private val _state: MutableStateFlow<SettingsUiState> =
@@ -45,25 +51,25 @@ internal class SettingContainerViewModel @Inject constructor(
     init {
 
         viewModelScope.launch {
-            val settingList: List<SettingModelItem> = featureSettings.toSettingList()
+            val settingMap: SortedMap<SettingHeaderItem, List<SettingModelItem>> =
+                featureSettings.toSettingSectionMap()
 
             val updateFlows =
                 featureSettings.toUpdateFlowArray() + flowOf({ it })
 
             runCatching {
                 combine(
-                    flowOf(settingList).filterNot { it.isEmpty() },
+                    flowOf(settingMap).filterNot { it.isEmpty() },
                     merge(*updateFlows)
-                ) { list, updateFunction ->
-                    updateFunction(list)
-                }.mapLatest { list ->
-                    list.groupBy { it.section }
-                        .map { (section, items) ->
-                            SettingSection(
-                                sectionHeader = sectionHeaderMapper(section),
-                                sectionItems = items
-                            )
-                        }
+                ) { map, updateFunction ->
+                    map.mapValues { (_, list) ->
+                        updateFunction(list)
+                    }
+                }.mapLatest { sectionMap ->
+                    sectionMap
+                        .flatMap { (section, items) ->
+                            listOf(section) + items
+                        }.toPersistentList()
                 }.catch {
                     Timber.e(it)
                 }.collectLatest {
@@ -76,11 +82,23 @@ internal class SettingContainerViewModel @Inject constructor(
 
     }
 
-    private fun Set<FeatureSettings>.toSettingList() = map { it.entryPoints }.flatten()
-        .map { entry ->
+    private fun Set<FeatureSettings>.toSettingSectionMap(): SortedMap<SettingHeaderItem, List<SettingModelItem>> =
+        getEntriesAsSequence()
+            .mapEntryPointsToSectionItemPairs()
+            .groupBy(
+                keySelector = { sectionHeaderMapper(it.first) },
+                valueTransform = { it.second }
+            ).toSortedMap(settingHeaderComparator)
+
+    private fun Set<FeatureSettings>.getEntriesAsSequence(): Sequence<SettingEntryPoint> =
+        asSequence()
+            .map { it.entryPoints }
+            .flatten()
+
+    private fun Sequence<SettingEntryPoint>.mapEntryPointsToSectionItemPairs(): Sequence<Pair<SettingSectionHeader, SettingModelItem>> =
+        map { entry ->
             entry.items.map {
-                settingItemMapper(
-                    section = entry.section,
+                entry.section to settingItemMapper(
                     item = it,
                     suspendHandler = getSuspendHandler()
                 )

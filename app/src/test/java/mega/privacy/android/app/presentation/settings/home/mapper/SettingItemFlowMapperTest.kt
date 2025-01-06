@@ -7,7 +7,6 @@ import mega.privacy.android.app.presentation.settings.home.model.SettingModelIte
 import mega.privacy.android.navigation.settings.SettingClickActionType
 import mega.privacy.android.navigation.settings.SettingDescriptionValue
 import mega.privacy.android.navigation.settings.SettingItem
-import mega.privacy.android.navigation.settings.SettingSectionHeader
 import org.junit.jupiter.api.Test
 
 class SettingItemFlowMapperTest {
@@ -113,7 +112,6 @@ class SettingItemFlowMapperTest {
     }
 
     private fun getModel(key: String) = SettingModelItem(
-        section = SettingSectionHeader.Help,
         key = key,
         name = "",
         description = null,

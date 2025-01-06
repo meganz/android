@@ -5,7 +5,6 @@ import mega.privacy.android.app.presentation.settings.home.model.SettingModelIte
 import mega.privacy.android.navigation.settings.SettingClickActionType
 import mega.privacy.android.navigation.settings.SettingDescriptionValue
 import mega.privacy.android.navigation.settings.SettingItem
-import mega.privacy.android.navigation.settings.SettingSectionHeader
 import javax.inject.Inject
 
 /**
@@ -20,12 +19,10 @@ class SettingItemMapper @Inject constructor() {
      * @return [SettingModelItem]
      */
     operator fun invoke(
-        section: SettingSectionHeader,
         item: SettingItem,
         suspendHandler: (suspend () -> Unit) -> Unit,
     ): SettingModelItem {
         return SettingModelItem(
-            section = section,
             key = item.key,
             name = item.name,
             description = getDescription(item),

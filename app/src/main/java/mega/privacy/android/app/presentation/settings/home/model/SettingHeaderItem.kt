@@ -8,7 +8,10 @@ import androidx.compose.runtime.Composable
  * @property headerText
  * @property key
  */
-data class SettingHeaderItem(
+internal class SettingHeaderItem(
     val headerText: @Composable () -> String,
     override val key: String,
-) : SettingListItem
+) : SettingListItem{
+    override fun equals(other: Any?) = key == (other as? SettingHeaderItem)?.key
+    override fun hashCode() = key.hashCode()
+}

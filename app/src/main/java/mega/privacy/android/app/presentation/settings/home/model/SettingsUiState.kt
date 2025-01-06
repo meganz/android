@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.settings.home.model
 
+import kotlinx.collections.immutable.ImmutableList
+
 /**
  * Settings ui state
  */
@@ -14,5 +16,5 @@ sealed interface SettingsUiState {
      *
      * @property settings
      */
-    data class Data(val settings: List<SettingSection>) : SettingsUiState
+    data class Data(val settings: ImmutableList<SettingListItem>) : SettingsUiState
 }
