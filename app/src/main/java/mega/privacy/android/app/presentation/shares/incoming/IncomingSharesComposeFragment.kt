@@ -491,6 +491,8 @@ class IncomingSharesComposeFragment : Fragment() {
                     control.saveToDevice().isVisible = false
                 }
                 control.trash().isVisible = nonRootNodesPermission
+                control.addToAlbum().isVisible = false
+                control.addTo().isVisible = false
                 CloudStorageOptionControlUtil.applyControl(menu, control)
             }
             return true

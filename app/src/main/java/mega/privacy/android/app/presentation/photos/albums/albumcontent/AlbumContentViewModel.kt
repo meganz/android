@@ -324,6 +324,7 @@ internal class AlbumContentViewModel @Inject constructor(
             it.copy(
                 isAddingPhotos = progress?.isProgressing ?: false,
                 totalAddedPhotos = progress?.totalAddedPhotos ?: 0,
+                showProgressMessage = progress?.isAsync == false,
             )
         }
     }

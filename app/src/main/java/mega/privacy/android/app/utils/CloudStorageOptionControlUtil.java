@@ -173,6 +173,14 @@ public class CloudStorageOptionControlUtil {
       return disputeTakedown;
     }
 
+    public Option addToAlbum() {
+      return addToAlbum;
+    }
+
+    public Option addTo() {
+      return addTo;
+    }
+
     public int alwaysActionCount() {
       int count = 0;
       for (Option option : options) {
@@ -242,5 +250,8 @@ public class CloudStorageOptionControlUtil {
 
     menu.findItem(R.id.cab_menu_dispute).setVisible(control.disputeTakedown.visible);
     menu.findItem(R.id.cab_menu_dispute).setShowAsAction(control.disputeTakedown.showAsAction);
+
+    menu.findItem(R.id.cab_menu_add_to_album).setVisible(control.addToAlbum.visible);
+    menu.findItem(R.id.cab_menu_add_to).setVisible(control.addTo.visible);
   }
 }

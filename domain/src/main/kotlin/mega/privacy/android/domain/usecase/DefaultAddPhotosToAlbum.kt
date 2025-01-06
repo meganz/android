@@ -11,7 +11,7 @@ import javax.inject.Inject
 class DefaultAddPhotosToAlbum @Inject constructor(
     private val albumRepository: AlbumRepository,
 ) : AddPhotosToAlbum {
-    override suspend fun invoke(albumId: AlbumId, photoIds: List<NodeId>) {
-        albumRepository.addPhotosToAlbum(albumId, photoIds)
+    override suspend fun invoke(albumId: AlbumId, photoIds: List<NodeId>, isAsync: Boolean) {
+        albumRepository.addPhotosToAlbum(albumId, photoIds, isAsync)
     }
 }

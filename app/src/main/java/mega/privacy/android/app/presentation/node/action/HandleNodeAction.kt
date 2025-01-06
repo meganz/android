@@ -91,7 +91,10 @@ fun HandleNodeAction(
                         sortOrder = sortOrder,
                         viewType = nodeSourceType ?: Constants.FILE_BROWSER_ADAPTER,
                         coroutineScope = coroutineScope,
-                        enableAddToAlbum = nodeSourceType == Constants.FILE_BROWSER_ADAPTER,
+                        enableAddToAlbum = nodeSourceType in listOf(
+                            Constants.FILE_BROWSER_ADAPTER,
+                            Constants.OUTGOING_SHARES_ADAPTER,
+                        )
                     )
                 }
 
@@ -225,7 +228,10 @@ private fun openImageViewerActivity(
         menuOptionsSource = menuOptionsSource,
         anchorImageNodeId = currentFileNode.id,
         params = mapOf(paramKey to currentFileNodeParentId),
-        enableAddToAlbum = nodeSourceType == Constants.FILE_BROWSER_ADAPTER,
+        enableAddToAlbum = nodeSourceType in listOf(
+            Constants.FILE_BROWSER_ADAPTER,
+            Constants.OUTGOING_SHARES_ADAPTER,
+        )
     )
 
     context.startActivity(intent)

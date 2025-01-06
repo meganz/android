@@ -61,6 +61,7 @@ import mega.privacy.android.app.presentation.contact.authenticitycredendials.Aut
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesComposeViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
@@ -85,7 +86,9 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
@@ -485,6 +488,26 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     if (accountType?.isPaid != true || isBusinessAccountExpired) View.VISIBLE else View.GONE
                 optionHideHelp.visibility =
                     if (accountType?.isPaid == true && !isBusinessAccountExpired && !node.isMarkedSensitive) View.VISIBLE else View.GONE
+                optionAddToAlbum.let { option ->
+                    val fileType = getFileTypeInfoByNameUseCase(node.name)
+                    if (fileType is ImageFileTypeInfo || fileType is VideoFileTypeInfo) {
+                        option.visibility = View.VISIBLE
+                        option.setText(if (fileType is ImageFileTypeInfo) sharedR.string.album_add_to_image else sharedR.string.album_add_to_media)
+                    } else {
+                        option.visibility = View.GONE
+                    }
+
+                    option.setOnClickListener {
+                        val intent =
+                            Intent(requireContext(), AddToAlbumActivity::class.java).apply {
+                                val ids = listOf(node.handle).toTypedArray()
+                                val type = if (fileType is ImageFileTypeInfo) 0 else 1
+                                putExtra("ids", ids)
+                                putExtra("type", type)
+                            }
+                        addToAlbumLauncher.launch(intent)
+                    }
+                }
                 if (accessLevel != MegaShare.ACCESS_OWNER || isTakenDown) {
                     counterShares--
                     optionShare.visibility = View.GONE
@@ -552,6 +575,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     SEARCH_MODE,
                     VIDEO_RECENTLY_WATCHED_MODE,
                     VIDEO_SECTION_MODE,
+                    VIDEO_PLAYLIST_DETAIL,
                         -> {
                         Timber.d("show Cloud bottom sheet")
                         optionRemove.visibility = View.GONE
@@ -578,6 +602,15 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                                 } else {
                                     View.GONE
                                 }
+                        }
+
+                        if (mode in listOf(
+                                VIDEO_SECTION_MODE,
+                                VIDEO_RECENTLY_WATCHED_MODE,
+                                VIDEO_PLAYLIST_DETAIL
+                            )
+                        ) {
+                            optionAddToAlbum.visibility = View.GONE
                         }
                     }
 
@@ -641,6 +674,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                             counterShares--
                             optionSendChat.visibility = View.GONE
                         }
+                        optionAddToAlbum.visibility = View.GONE
                     }
 
                     SHARED_ITEMS_MODE -> {
@@ -694,6 +728,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                                 counterShares--
                                 optionRemoveLink.visibility = View.GONE
                             }
+                            optionAddToAlbum.visibility = View.GONE
                             when (accessLevel) {
                                 MegaShare.ACCESS_FULL -> {
                                     Timber.d("access FULL")
@@ -831,10 +866,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     optionLabelCurrent.visibility = View.GONE
                 }
                 state.shareData?.let { data -> hideNodeActions(data, node) }
-
-                optionAddToAlbum.let { option ->
-                    option.visibility = View.GONE
-                }
 
                 if (savedInstanceState?.getBoolean(
                         Constants.CANNOT_OPEN_FILE_SHOWN,
@@ -1679,7 +1710,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             args.putLong(NODE_ID_KEY, nodeId.longValue)
             args.putInt(
                 MODE_KEY,
-                mode?.takeIf { it in DEFAULT_MODE..VIDEO_SECTION_MODE } ?: DEFAULT_MODE)
+                mode?.takeIf { it in DEFAULT_MODE..VIDEO_PLAYLIST_DETAIL } ?: DEFAULT_MODE)
             shareData?.let {
                 val shareInfo = NodeShareInformation(
                     user = it.user,
@@ -1755,5 +1786,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
          * For Video Section
          */
         const val VIDEO_SECTION_MODE = 10
+
+        /**
+         * For Video playlist detail
+         */
+        const val VIDEO_PLAYLIST_DETAIL = 11
     }
 }

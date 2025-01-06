@@ -55,7 +55,7 @@ interface AlbumRepository {
      * @param albumID the id of the album which we want to put the photos in
      * @param photoIDs the photos' node handles
      */
-    suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>)
+    suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>, isAsync: Boolean)
 
     /**
      * Add bulk photos to an album

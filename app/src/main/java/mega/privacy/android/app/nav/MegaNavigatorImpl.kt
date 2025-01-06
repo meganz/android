@@ -290,7 +290,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                 putExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID, it)
             }
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            putExtra(INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM, false)
+            putExtra(INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM, enableAddToAlbum)
         }
         val mimeType =
             if (fileTypeInfo.extension == "opus") "audio/*" else fileTypeInfo.mimeType
@@ -411,6 +411,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         searchedItems: List<Long>?,
         mediaQueueTitle: String?,
         nodeHandles: List<Long>?,
+        enableAddToAlbum: Boolean,
     ) {
         val info = fileTypeInfo ?: getFileTypeInfoByNameUseCase(name)
         manageMediaIntent(
@@ -426,7 +427,8 @@ internal class MegaNavigatorImpl @Inject constructor(
             isMediaQueueAvailable = isMediaQueueAvailable,
             searchedItems = searchedItems,
             mediaQueueTitle = mediaQueueTitle,
-            nodeHandles = nodeHandles
+            nodeHandles = nodeHandles,
+            enableAddToAlbum = enableAddToAlbum,
         )
     }
 

@@ -109,6 +109,7 @@ class ImagePreviewProvider @Inject constructor(
                     menuOptionsSource = ImagePreviewMenuSource.MEDIA_DISCOVERY,
                     anchorImageNodeId = NodeId(photo.id),
                     params = mapOf(PARENT_ID to parentID, IS_RECURSIVE to recursive),
+                    enableAddToAlbum = true,
                 ).run {
                     activity.startActivity(this)
                 }
@@ -202,7 +203,8 @@ class ImagePreviewProvider @Inject constructor(
                     parentId = parentId ?: -1,
                     viewType = viewType,
                     sortOrder = sortOrder ?: SortOrder.ORDER_NONE,
-                    isFolderLink = isFolderLink
+                    isFolderLink = isFolderLink,
+                    enableAddToAlbum = true,
                 )
             }
         }.onFailure {

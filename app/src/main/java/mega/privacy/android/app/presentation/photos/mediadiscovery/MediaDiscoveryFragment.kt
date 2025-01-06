@@ -83,6 +83,12 @@ class MediaDiscoveryFragment : Fragment() {
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
+    internal val addToAlbumLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAddToAlbumResult,
+        )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         managerActivity = activity as? ManagerActivity
@@ -405,6 +411,13 @@ class MediaDiscoveryFragment : Fragment() {
                 selectedSize,
                 selectedSize,
             )
+        Util.showSnackbar(requireActivity(), message)
+    }
+
+    private fun handleAddToAlbumResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+        val message = result.data?.getStringExtra("message") ?: return
+
         Util.showSnackbar(requireActivity(), message)
     }
 

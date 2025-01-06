@@ -148,7 +148,7 @@ private fun EmptyState(
         horizontalAlignment = Alignment.CenterHorizontally,
         content = {
             Image(
-                painter = painterResource(id = iconPackR.drawable.ic_playlist_glass),
+                painter = painterResource(id = iconPackR.drawable.ic_playlist_glass_red),
                 contentDescription = null,
             )
 

@@ -13,5 +13,5 @@ fun interface AddPhotosToAlbum {
      * @param albumId is the destination album
      * @param photoIds is the list of photo ids to be added in album
      */
-    suspend operator fun invoke(albumId: AlbumId, photoIds: List<NodeId>)
+    suspend operator fun invoke(albumId: AlbumId, photoIds: List<NodeId>, isAsync: Boolean)
 }

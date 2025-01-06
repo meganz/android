@@ -170,7 +170,7 @@ class AlbumPhotosSelectionViewModelTest {
             NodeId(2L),
             NodeId(3L),
         )
-        whenever(addPhotosToAlbum(album.id, photoIds)).thenReturn(Unit)
+        whenever(addPhotosToAlbum(album.id, photoIds, false)).thenReturn(Unit)
 
         underTest?.addPhotos(album, photoIds.map { it.longValue }.toSet())
 

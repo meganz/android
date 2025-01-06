@@ -29,7 +29,7 @@ class DefaultObserveAlbumPhotosAddingProgressTest {
     @Test
     fun `test that use case returns correct result`() = runTest {
         val albumId = AlbumId(1L)
-        val expectedProgress = AlbumPhotosAddingProgress(true, 0)
+        val expectedProgress = AlbumPhotosAddingProgress(true, 0, false)
 
         whenever(albumRepository.observeAlbumPhotosAddingProgress(albumId))
             .thenReturn(flowOf(expectedProgress))

@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.shares.outgoing
 
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -11,6 +12,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.material.SnackbarHostState
@@ -54,6 +58,7 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
+import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.outgoing.ui.OutgoingSharesView
@@ -63,8 +68,12 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -132,6 +141,12 @@ class OutgoingSharesComposeFragment : Fragment() {
      * Toggle the elevation of the app bar
      */
     var toggleAppBarElevation: (Boolean) -> Unit = {}
+
+    private val addToAlbumLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAddToAlbumResult,
+        )
 
     /**
      * onAttach
@@ -467,6 +482,24 @@ class OutgoingSharesComposeFragment : Fragment() {
                     }
                 }
 
+                val mediaNodes = selected
+                    .filter {
+                        val type = (it as? FileNode)?.type
+                        type is ImageFileTypeInfo || type is VideoFileTypeInfo
+                    }
+                if (mediaNodes.size == selected.size) {
+                    if (mediaNodes.all { (it as? FileNode)?.type is VideoFileTypeInfo }) {
+                        control.addToAlbum().isVisible = false
+                        control.addTo().isVisible = true
+                    } else {
+                        control.addToAlbum().isVisible = true
+                        control.addTo().isVisible = false
+                    }
+                } else {
+                    control.addToAlbum().isVisible = false
+                    control.addTo().isVisible = false
+                }
+
                 CloudStorageOptionControlUtil.applyControl(menu, control)
             }
             return true
@@ -599,9 +632,25 @@ class OutgoingSharesComposeFragment : Fragment() {
                 // This option is only available in the Incoming Shares page
                 OptionItems.LEAVE_SHARE_CLICKED -> Unit
 
-                OptionItems.ADD_TO_ALBUM -> {}
+                OptionItems.ADD_TO_ALBUM -> {
+                    val intent = Intent(requireContext(), AddToAlbumActivity::class.java).apply {
+                        val ids = viewModel.state.value.selectedNodeHandles.toTypedArray()
+                        putExtra("ids", ids)
+                        putExtra("type", 0)
+                    }
+                    addToAlbumLauncher.launch(intent)
+                    disableSelectMode()
+                }
 
-                OptionItems.ADD_TO -> {}
+                OptionItems.ADD_TO -> {
+                    val intent = Intent(requireContext(), AddToAlbumActivity::class.java).apply {
+                        val ids = viewModel.state.value.selectedNodeHandles.toTypedArray()
+                        putExtra("ids", ids)
+                        putExtra("type", 1)
+                    }
+                    addToAlbumLauncher.launch(intent)
+                    disableSelectMode()
+                }
             }
         }
     }
@@ -638,5 +687,12 @@ class OutgoingSharesComposeFragment : Fragment() {
             putExtra(Constants.EMAIL, email)
             requireActivity().startActivity(this)
         }
+    }
+
+    private fun handleAddToAlbumResult(result: ActivityResult) {
+        if (result.resultCode != RESULT_OK) return
+        val message = result.data?.getStringExtra("message") ?: return
+
+        Util.showSnackbar(requireActivity(), message)
     }
 }

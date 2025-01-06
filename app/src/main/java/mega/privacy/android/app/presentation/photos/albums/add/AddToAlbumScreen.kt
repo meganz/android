@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.add
 
 import mega.privacy.android.shared.resources.R as sharedR
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -45,7 +44,6 @@ import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefau
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun AddToAlbumScreen(
     addToAlbumViewModel: AddToAlbumViewModel,
@@ -189,7 +187,6 @@ private fun AddToAlbumBottomBar(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AddToAlbumContent(
     modifier: Modifier = Modifier,

@@ -261,6 +261,7 @@ interface AppNavigator {
         searchedItems: List<Long>? = null,
         mediaQueueTitle: String? = null,
         nodeHandles: List<Long>? = null,
+        enableAddToAlbum: Boolean = false,
     )
 
     /**

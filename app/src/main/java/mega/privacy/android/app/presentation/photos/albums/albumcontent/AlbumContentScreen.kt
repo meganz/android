@@ -198,24 +198,30 @@ internal fun AlbumContentScreen(
         ) {
             val userAlbum = albumContentState.uiAlbum?.id as? UserAlbum
             if (userAlbum != null && albumContentState.isAddingPhotosProgressCompleted) {
-                val message = pluralStringResource(
-                    id = R.plurals.photos_album_selection_added,
-                    count = albumContentState.totalAddedPhotos,
-                    albumContentState.totalAddedPhotos,
-                    userAlbum.title,
-                )
-                Snackbar(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(8.dp),
-                    backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white,
-                ) {
-                    Text(text = message)
-                }
+                if (albumContentState.showProgressMessage) {
+                    val message = pluralStringResource(
+                        id = R.plurals.photos_album_selection_added,
+                        count = albumContentState.totalAddedPhotos,
+                        albumContentState.totalAddedPhotos,
+                        userAlbum.title,
+                    )
+                    Snackbar(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(8.dp),
+                        backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white,
+                    ) {
+                        Text(text = message)
+                    }
 
-                LaunchedEffect(message) {
-                    delay(3000L)
-                    albumContentViewModel.updatePhotosAddingProgressCompleted(albumId = userAlbum.id)
+                    LaunchedEffect(message) {
+                        delay(3000L)
+                        albumContentViewModel.updatePhotosAddingProgressCompleted(albumId = userAlbum.id)
+                    }
+                } else {
+                    LaunchedEffect("${albumContentState.totalAddedPhotos}${userAlbum.title}") {
+                        albumContentViewModel.updatePhotosAddingProgressCompleted(albumId = userAlbum.id)
+                    }
                 }
             }
 

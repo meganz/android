@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.photos.mediadiscovery.actionMode
 
 import mega.privacy.android.shared.resources.R as sharedR
+import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
@@ -9,7 +10,11 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
 
 class MediaDiscoveryActionModeCallback(
     val fragment: MediaDiscoveryFragment,
@@ -50,6 +55,24 @@ class MediaDiscoveryActionModeCallback(
             } else {
                 menu?.findItem(R.id.cab_menu_hide)?.isVisible = false
                 menu?.findItem(R.id.cab_menu_unhide)?.isVisible = false
+            }
+
+            val mediaNodes = selectedNodes
+                .filter {
+                    val type = (it as? FileNode)?.type
+                    type is ImageFileTypeInfo || type is VideoFileTypeInfo
+                }
+            if (mediaNodes.size == selectedNodes.size) {
+                if (mediaNodes.all { (it as? FileNode)?.type is VideoFileTypeInfo }) {
+                    menu?.findItem(R.id.cab_menu_add_to_album)?.isVisible = false
+                    menu?.findItem(R.id.cab_menu_add_to)?.isVisible = true
+                } else {
+                    menu?.findItem(R.id.cab_menu_add_to_album)?.isVisible = true
+                    menu?.findItem(R.id.cab_menu_add_to)?.isVisible = false
+                }
+            } else {
+                menu?.findItem(R.id.cab_menu_add_to_album)?.isVisible = false
+                menu?.findItem(R.id.cab_menu_add_to)?.isVisible = false
             }
         }
         return true
@@ -109,6 +132,26 @@ class MediaDiscoveryActionModeCallback(
             R.id.cab_menu_trash -> {
                 fragment.actionMoveToTrash()
                 fragment.destroyActionMode()
+            }
+
+            R.id.cab_menu_add_to_album -> with(fragment) {
+                val intent = Intent(requireContext(), AddToAlbumActivity::class.java).apply {
+                    val ids = mediaDiscoveryViewModel.state.value.selectedPhotoIds.toTypedArray()
+                    putExtra("ids", ids)
+                    putExtra("type", 0)
+                }
+                addToAlbumLauncher.launch(intent)
+                destroyActionMode()
+            }
+
+            R.id.cab_menu_add_to -> with(fragment) {
+                val intent = Intent(requireContext(), AddToAlbumActivity::class.java).apply {
+                    val ids = mediaDiscoveryViewModel.state.value.selectedPhotoIds.toTypedArray()
+                    putExtra("ids", ids)
+                    putExtra("type", 1)
+                }
+                addToAlbumLauncher.launch(intent)
+                destroyActionMode()
             }
         }
         return true

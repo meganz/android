@@ -278,6 +278,7 @@ internal class AddToAlbumViewModel @Inject constructor(
             addPhotosToAlbum(
                 albumId = album.id,
                 photoIds = nodeIds,
+                isAsync = true,
             )
         }.onSuccess {
             state.update {

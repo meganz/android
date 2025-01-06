@@ -519,7 +519,7 @@ class ImagePreviewActivity : BaseActivity() {
                 putExtra(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE, anchorImageNodeId?.longValue)
                 putExtra(FETCHER_PARAMS, bundleOf(*params.toList().toTypedArray()))
                 putExtra(IMAGE_PREVIEW_IS_FOREIGN, isForeign)
-                putExtra(IMAGE_PREVIEW_ADD_TO_ALBUM, false)
+                putExtra(IMAGE_PREVIEW_ADD_TO_ALBUM, enableAddToAlbum)
             }
         }
 

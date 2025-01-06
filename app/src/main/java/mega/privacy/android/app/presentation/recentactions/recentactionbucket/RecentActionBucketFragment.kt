@@ -115,6 +115,12 @@ class RecentActionBucketFragment : Fragment() {
             ::handleHiddenNodesOnboardingResult,
         )
 
+    internal val addToAlbumLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAddToAlbumResult,
+        )
+
     private var tempNodeIds: List<NodeId> = listOf()
 
     override fun onCreateView(
@@ -367,7 +373,8 @@ class RecentActionBucketFragment : Fragment() {
                     handle = node.handle,
                     viewType = RECENTS_BUCKET_ADAPTER,
                     parentId = node.parentHandle,
-                    nodeHandles = getNodesHandles(false)
+                    nodeHandles = getNodesHandles(false),
+                    enableAddToAlbum = true,
                 )
             }.onFailure {
                 ensureActive() // make sure view is still active
@@ -416,6 +423,7 @@ class RecentActionBucketFragment : Fragment() {
             menuOptionsSource = menuOptionSource,
             anchorImageNodeId = NodeId(node.handle),
             params = mapOf(DefaultImageNodeFetcher.NODE_IDS to nodeIds),
+            enableAddToAlbum = true,
         )
         putThumbnailLocation(
             intent,
@@ -571,6 +579,13 @@ class RecentActionBucketFragment : Fragment() {
             tempNodeIds.size,
             tempNodeIds.size
         )
+        Util.showSnackbar(requireActivity(), message)
+    }
+
+    private fun handleAddToAlbumResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+        val message = result.data?.getStringExtra("message") ?: return
+
         Util.showSnackbar(requireActivity(), message)
     }
 }

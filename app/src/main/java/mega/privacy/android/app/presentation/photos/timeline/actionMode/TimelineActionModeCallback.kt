@@ -11,6 +11,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.ApiFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.PhotosFragment
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.mobile.analytics.event.TimelineHideNodeMenuItemEvent
 
@@ -65,7 +68,11 @@ class TimelineActionModeCallback(
             }
 
             menu?.findItem(R.id.cab_menu_add_to_album)?.let {
-                it.isVisible = false
+                it.isVisible = selectedNodes
+                    .filter { node ->
+                        val type = (node as? FileNode)?.type
+                        type is ImageFileTypeInfo || type is VideoFileTypeInfo
+                    }.size == selectedNodes.size
             }
         }
         return true

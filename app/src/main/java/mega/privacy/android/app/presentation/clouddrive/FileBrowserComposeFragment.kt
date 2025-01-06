@@ -73,7 +73,10 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
@@ -559,8 +562,25 @@ class FileBrowserComposeFragment : Fragment() {
             nodeList: List<NodeUIItem<TypedNode>>,
             menu: Menu,
         ) {
-            menu.findItem(R.id.cab_menu_add_to_album)?.isVisible = false
-            menu.findItem(R.id.cab_menu_add_to)?.isVisible = false
+            val mediaNodes = nodeList
+                .filter { it.id.longValue in selected }
+                .filter {
+                    val type = (it.node as? FileNode)?.type
+                    type is ImageFileTypeInfo || type is VideoFileTypeInfo
+                }
+
+            if (mediaNodes.size == selected.size) {
+                if (mediaNodes.all { (it.node as? FileNode)?.type is VideoFileTypeInfo }) {
+                    menu.findItem(R.id.cab_menu_add_to_album)?.isVisible = false
+                    menu.findItem(R.id.cab_menu_add_to)?.isVisible = true
+                } else {
+                    menu.findItem(R.id.cab_menu_add_to_album)?.isVisible = true
+                    menu.findItem(R.id.cab_menu_add_to)?.isVisible = false
+                }
+            } else {
+                menu.findItem(R.id.cab_menu_add_to_album)?.isVisible = false
+                menu.findItem(R.id.cab_menu_add_to)?.isVisible = false
+            }
         }
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
