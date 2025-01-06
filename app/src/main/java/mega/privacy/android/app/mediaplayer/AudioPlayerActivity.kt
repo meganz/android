@@ -581,7 +581,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         if (isFinishing) {
             dragToExit.showPreviousHiddenThumbnail()
         }
-        serviceGateway?.stopAudioServiceWhenAudioPlayerClosedWithUserNotLogin()
+        if (serviceGateway?.getCurrentAdapterType() != FOLDER_LINK_ADAPTER)
+            serviceGateway?.stopAudioServiceWhenAudioPlayerClosedWithUserNotLogin()
 
         serviceGateway = null
         playerServiceGateway = null

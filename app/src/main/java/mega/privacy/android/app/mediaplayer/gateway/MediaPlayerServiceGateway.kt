@@ -108,4 +108,11 @@ interface MediaPlayerServiceGateway {
      * Check the user if logged in when the audio player is closed, if not, stop the audio service
      */
     fun stopAudioServiceWhenAudioPlayerClosedWithUserNotLogin()
+
+    /**
+     * Get the current adapter type
+     *
+     * @return the current adapter type
+     */
+    fun getCurrentAdapterType(): Int
 }

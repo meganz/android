@@ -7,8 +7,10 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -36,6 +38,7 @@ import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
@@ -45,6 +48,7 @@ import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -68,6 +72,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -113,6 +118,8 @@ class FolderLinkViewModelTest {
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase = mock()
     private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase =
         mock()
+    private val isUserLoggedInUseCase: IsUserLoggedInUseCase = mock()
+    private val stopAudioService: StopAudioService = mock()
 
 
     @BeforeEach
@@ -156,45 +163,50 @@ class FolderLinkViewModelTest {
             megaNavigator,
             nodeContentUriIntentMapper,
             getNodePreviewFileUseCase,
-            updateCrashAndPerformanceReportersUseCase
+            updateCrashAndPerformanceReportersUseCase,
+            isUserLoggedInUseCase,
+            stopAudioService
         )
     }
 
     private fun initViewModel() {
         underTest = FolderLinkViewModel(
-            isConnectedToInternetUseCase,
-            monitorViewType,
-            loginToFolderUseCase,
-            copyNodesUseCase,
-            copyRequestMessageMapper,
-            hasCredentialsUseCase,
-            rootNodeExistsUseCase,
-            setViewType,
-            fetchFolderNodesUseCase,
-            getFolderParentNodeUseCase,
-            getFolderLinkChildrenNodesUseCase,
-            addNodeType,
-            getStringFromStringResMapper,
-            areAchievementsEnabledUseCase,
-            getAccountTypeUseCase,
-            getCurrentUserEmail,
-            getPricing,
-            containsMediaItemUseCase,
-            getLocalFileForNodeUseCase,
-            getLocalFolderLinkFromMegaApiFolderUseCase,
-            megaApiFolderHttpServerStartUseCase,
-            megaApiFolderHttpServerIsRunningUseCase,
-            httpServerStart,
-            httpServerIsRunning,
-            getLocalFolderLinkFromMegaApiUseCase,
-            getFileUriUseCase,
-            mapNodeToPublicLinkUseCase,
-            checkNodesNameCollisionUseCase,
-            getFolderLinkNodeContentUriUseCase,
-            megaNavigator,
-            nodeContentUriIntentMapper,
-            getNodePreviewFileUseCase,
-            updateCrashAndPerformanceReportersUseCase
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
+            monitorViewType = monitorViewType,
+            loginToFolderUseCase = loginToFolderUseCase,
+            copyNodesUseCase = copyNodesUseCase,
+            copyRequestMessageMapper = copyRequestMessageMapper,
+            hasCredentialsUseCase = hasCredentialsUseCase,
+            rootNodeExistsUseCase = rootNodeExistsUseCase,
+            setViewType = setViewType,
+            fetchFolderNodesUseCase = fetchFolderNodesUseCase,
+            getFolderParentNodeUseCase = getFolderParentNodeUseCase,
+            getFolderLinkChildrenNodesUseCase = getFolderLinkChildrenNodesUseCase,
+            addNodeType = addNodeType,
+            getStringFromStringResMapper = getStringFromStringResMapper,
+            areAchievementsEnabledUseCase = areAchievementsEnabledUseCase,
+            getAccountTypeUseCase = getAccountTypeUseCase,
+            getCurrentUserEmail = getCurrentUserEmail,
+            getPricing = getPricing,
+            containsMediaItemUseCase = containsMediaItemUseCase,
+            getLocalFileForNodeUseCase = getLocalFileForNodeUseCase,
+            getLocalFolderLinkFromMegaApiFolderUseCase = getLocalFolderLinkFromMegaApiFolderUseCase,
+            megaApiFolderHttpServerStartUseCase = megaApiFolderHttpServerStartUseCase,
+            megaApiFolderHttpServerIsRunningUseCase = megaApiFolderHttpServerIsRunningUseCase,
+            httpServerStart = httpServerStart,
+            httpServerIsRunning = httpServerIsRunning,
+            getLocalFolderLinkFromMegaApiUseCase = getLocalFolderLinkFromMegaApiUseCase,
+            getFileUriUseCase = getFileUriUseCase,
+            mapNodeToPublicLinkUseCase = mapNodeToPublicLinkUseCase,
+            checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            getFolderLinkNodeContentUriUseCase = getFolderLinkNodeContentUriUseCase,
+            megaNavigator = megaNavigator,
+            nodeContentUriIntentMapper = nodeContentUriIntentMapper,
+            getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            updateCrashAndPerformanceReportersUseCase = updateCrashAndPerformanceReportersUseCase,
+            isUserLoggedInUseCase = isUserLoggedInUseCase,
+            stopAudioService = stopAudioService,
+            applicationScope = CoroutineScope(UnconfinedTestDispatcher())
         )
     }
 
@@ -723,5 +735,19 @@ class FolderLinkViewModelTest {
 
         whenever(getFolderLinkNodeContentUriUseCase(anyOrNull())).thenReturn(expectedNodeContentUri)
         assertThat(underTest.getNodeContentUri(mock())).isEqualTo(expectedNodeContentUri)
+    }
+
+    @Test
+    fun `test that stopAudioService is invoked when the user is not logged in`() = runTest {
+        whenever(isUserLoggedInUseCase()).thenReturn(false)
+        underTest.stopAudioPlayerServiceWithoutLogin()
+        verify(stopAudioService).invoke()
+    }
+
+    @Test
+    fun `test that stopAudioService is not invoked when the user is logged in`() = runTest {
+        whenever(isUserLoggedInUseCase()).thenReturn(true)
+        underTest.stopAudioPlayerServiceWithoutLogin()
+        verify(stopAudioService, times(0)).invoke()
     }
 }

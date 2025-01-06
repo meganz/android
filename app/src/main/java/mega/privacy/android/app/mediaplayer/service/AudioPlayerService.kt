@@ -55,6 +55,8 @@ import mega.privacy.android.app.utils.ChatUtil.STREAM_MUSIC_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.getAudioFocus
 import mega.privacy.android.app.utils.ChatUtil.getRequest
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.monitoring.CrashReporter
@@ -116,6 +118,8 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
     private var audioClosable = true
 
     private var currentNotification: Notification? = null
+
+    private var adapterType = INVALID_VALUE
 
     // We need keep it as Runnable here, because we need remove it from handler later,
     // using lambda doesn't work when remove it from handler.
@@ -364,6 +368,9 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                 lifecycleScope.launch {
                     if (viewModelGateway.buildPlayerSource(intent)) {
                         MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
+                        intent?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)?.let {
+                            adapterType = it
+                        }
                     }
                 }
             }
@@ -562,6 +569,8 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
             }
         }
     }
+
+    override fun getCurrentAdapterType(): Int = adapterType
 
     override fun playing() = mediaPlayerGateway.mediaPlayerIsPlaying()
 
