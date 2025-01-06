@@ -24,7 +24,6 @@ import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
-import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -175,9 +174,28 @@ class FileLinkComposeActivity : PasscodeActivity(),
                         )
                     }
                 )
+                EventEffect(
+                    event = uiState.askForDecryptionKeyDialogEvent,
+                    onConsumed = viewModel::resetAskForDecryptionKeyDialog
+                ) {
+                    showAskForDecryptionKeyDialog()
+                }
+
+                EventEffect(
+                    event = uiState.collisionsEvent,
+                    onConsumed = viewModel::resetCollision,
+                ) {
+                    nameCollisionActivityLauncher.launch(arrayListOf(it))
+                }
+
+                EventEffect(
+                    event = uiState.copySuccessEvent,
+                    onConsumed = viewModel::resetCopySuccessEvent,
+                ) {
+                    launchManagerActivity()
+                }
             }
         }
-        setupObserver()
         checkForInAppAdvertisement()
     }
 
@@ -193,25 +211,6 @@ class FileLinkComposeActivity : PasscodeActivity(),
                 }
             }.onFailure {
                 Timber.e("Failed to fetch latest consent information : ${it.message}")
-            }
-        }
-    }
-
-    private fun setupObserver() {
-        this.collectFlow(viewModel.state) {
-            when {
-                it.askForDecryptionDialog -> {
-                    askForDecryptionKeyDialog()
-                }
-
-                it.collision != null -> {
-                    nameCollisionActivityLauncher.launch(arrayListOf(it.collision))
-                    viewModel.resetCollision()
-                }
-
-                it.copySuccess -> {
-                    launchManagerActivity()
-                }
             }
         }
     }
@@ -303,16 +302,16 @@ class FileLinkComposeActivity : PasscodeActivity(),
     /**
      * Show dialog for getting decryption key
      */
-    private fun askForDecryptionKeyDialog() {
+    private fun showAskForDecryptionKeyDialog() {
         Timber.d("askForDecryptionKeyDialog")
         val decryptAlertDialog = DecryptAlertDialog.Builder()
             .setTitle(getString(R.string.alert_decryption_key))
-            .setPosText(R.string.general_decryp).setNegText(sharedR.string.general_dialog_cancel_button)
+            .setPosText(R.string.general_decryp)
+            .setNegText(sharedR.string.general_dialog_cancel_button)
             .setMessage(getString(R.string.message_decryption_key))
             .setErrorMessage(R.string.invalid_decryption_key).setKey(mKey)
             .build()
         decryptAlertDialog.show(supportFragmentManager, TAG_DECRYPT)
-        viewModel.resetAskForDecryptionKeyDialog()
     }
 
     private fun onPreviewClick() {

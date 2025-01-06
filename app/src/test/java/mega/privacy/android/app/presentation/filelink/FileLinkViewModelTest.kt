@@ -128,9 +128,9 @@ class FileLinkViewModelTest {
             assertThat(initial.handle).isEqualTo(-1)
             assertThat(initial.previewPath).isNull()
             assertThat(initial.iconResource).isNull()
-            assertThat(initial.askForDecryptionDialog).isFalse()
-            assertThat(initial.collision).isNull()
-            assertThat(initial.copySuccess).isFalse()
+            assertThat(initial.askForDecryptionKeyDialogEvent).isEqualTo(consumed)
+            assertThat(initial.collisionsEvent).isEqualTo(consumed())
+            assertThat(initial.copySuccessEvent).isEqualTo(consumed)
             assertThat(initial.openFile).isInstanceOf(consumed().javaClass)
         }
     }
@@ -196,7 +196,7 @@ class FileLinkViewModelTest {
             underTest.state.test {
                 underTest.getPublicNode(url)
                 val result = expectMostRecentItem()
-                assertThat(result.askForDecryptionDialog).isEqualTo(true)
+                assertThat(result.askForDecryptionKeyDialogEvent).isEqualTo(triggered)
             }
         }
 
@@ -209,7 +209,7 @@ class FileLinkViewModelTest {
             underTest.state.test {
                 underTest.getPublicNode(url, true)
                 val result = expectMostRecentItem()
-                assertThat(result.askForDecryptionDialog).isEqualTo(true)
+                assertThat(result.askForDecryptionKeyDialogEvent).isEqualTo(triggered)
             }
         }
 
@@ -222,7 +222,7 @@ class FileLinkViewModelTest {
             underTest.state.test {
                 underTest.getPublicNode(url, false)
                 val result = expectMostRecentItem()
-                assertThat(result.askForDecryptionDialog).isEqualTo(false)
+                assertThat(result.askForDecryptionKeyDialogEvent).isEqualTo(consumed)
                 assertThat(result.fetchPublicNodeError).isNotNull()
             }
         }
@@ -245,7 +245,7 @@ class FileLinkViewModelTest {
             underTest.state.test {
                 underTest.resetAskForDecryptionKeyDialog()
                 val newValue = expectMostRecentItem()
-                assertThat(newValue.askForDecryptionDialog).isEqualTo(false)
+                assertThat(newValue.askForDecryptionKeyDialogEvent).isEqualTo(consumed)
             }
         }
 
@@ -301,7 +301,7 @@ class FileLinkViewModelTest {
             underTest.getPublicNode(url)
             underTest.handleImportNode(parentNodeHandle)
             val newValue = expectMostRecentItem()
-            assertThat(newValue.collision).isNotNull()
+            assertThat(newValue.collisionsEvent).isNotEqualTo(consumed())
         }
     }
 
@@ -336,7 +336,7 @@ class FileLinkViewModelTest {
             underTest.getPublicNode(url)
             underTest.handleImportNode(parentNodeHandle)
             val newValue = expectMostRecentItem()
-            assertThat(newValue.collision).isNull()
+            assertThat(newValue.collisionsEvent).isEqualTo(consumed())
         }
     }
 

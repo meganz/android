@@ -145,7 +145,7 @@ class FileLinkViewModel @Inject constructor(
                     is PublicNodeException.InvalidDecryptionKey -> {
                         if (decryptionIntroduced) {
                             Timber.w("Incorrect key, ask again!")
-                            _state.update { it.copy(askForDecryptionDialog = true) }
+                            _state.update { it.copy(askForDecryptionKeyDialogEvent = triggered) }
                         } else {
                             _state.update {
                                 it.copy(fetchPublicNodeError = exception)
@@ -154,7 +154,7 @@ class FileLinkViewModel @Inject constructor(
                     }
 
                     is PublicNodeException.DecryptionKeyRequired -> {
-                        _state.update { it.copy(askForDecryptionDialog = true) }
+                        _state.update { it.copy(askForDecryptionKeyDialogEvent = triggered) }
                     }
 
                     else -> {
@@ -243,7 +243,10 @@ class FileLinkViewModel @Inject constructor(
                 copy(targetHandle)
             } else if (result.conflictNodes.isNotEmpty()) {
                 _state.update {
-                    it.copy(collision = result.conflictNodes.first(), jobInProgressState = null)
+                    it.copy(
+                        collisionsEvent = triggered(result.conflictNodes.first()),
+                        jobInProgressState = null
+                    )
                 }
             }
         }.onFailure { throwable ->
@@ -260,7 +263,14 @@ class FileLinkViewModel @Inject constructor(
             return@launch
         }
         runCatching { copyPublicNodeUseCase(fileNode, NodeId(targetHandle), null) }
-            .onSuccess { _state.update { it.copy(copySuccess = true, jobInProgressState = null) } }
+            .onSuccess {
+                _state.update {
+                    it.copy(
+                        copySuccessEvent = triggered,
+                        jobInProgressState = null
+                    )
+                }
+            }
             .onFailure { copyThrowable ->
                 resetJobInProgressState()
                 handleCopyError(copyThrowable)
@@ -313,14 +323,21 @@ class FileLinkViewModel @Inject constructor(
      * Reset collision
      */
     fun resetCollision() {
-        _state.update { it.copy(collision = null) }
+        _state.update { it.copy(collisionsEvent = consumed()) }
     }
 
     /**
      * Reset the askForDecryptionKeyDialog boolean
      */
     fun resetAskForDecryptionKeyDialog() {
-        _state.update { it.copy(askForDecryptionDialog = false) }
+        _state.update { it.copy(askForDecryptionKeyDialogEvent = consumed) }
+    }
+
+    /**
+     * Reset the copySuccessEvent when consumed
+     */
+    fun resetCopySuccessEvent() {
+        _state.update { it.copy(copySuccessEvent = consumed) }
     }
 
     /**
