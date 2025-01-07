@@ -90,8 +90,8 @@ internal fun SortByDialog(
                 Text(
                     text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     style = MaterialTheme.typography.button,
-                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
-                        id = R.color.teal_300
+                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.accent_050) else colorResource(
+                        id = R.color.accent_900
                     )
                 )
             }
@@ -161,8 +161,8 @@ internal fun FilterDialog(
                 Text(
                     text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     style = MaterialTheme.typography.button,
-                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
-                        id = R.color.teal_300
+                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.accent_050) else colorResource(
+                        id = R.color.accent_900
                     )
                 )
             }
@@ -197,8 +197,8 @@ internal fun RemovePhotosFromAlbumDialog(
                 Text(
                     text = stringResource(id = R.string.general_remove),
                     style = MaterialTheme.typography.button,
-                    color = if (!isLight) colorResource(id = R.color.teal_200) else colorResource(
-                        id = R.color.teal_300
+                    color = if (!isLight) colorResource(id = R.color.accent_050) else colorResource(
+                        id = R.color.accent_900
                     )
                 )
             }
@@ -210,8 +210,8 @@ internal fun RemovePhotosFromAlbumDialog(
                 Text(
                     text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     style = MaterialTheme.typography.button,
-                    color = if (!isLight) colorResource(id = R.color.teal_200) else colorResource(
-                        id = R.color.teal_300
+                    color = if (!isLight) colorResource(id = R.color.accent_050) else colorResource(
+                        id = R.color.accent_900
                     )
                 )
             }

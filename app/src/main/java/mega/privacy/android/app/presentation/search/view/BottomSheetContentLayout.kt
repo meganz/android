@@ -64,7 +64,7 @@ internal fun BottomSheetContentLayout(
                     if (option.isSelected) {
                         Icon(
                             painter = painterResource(id = iconPackR.drawable.ic_check_medium_regular_outline),
-                            tint = colorResource(id = R.color.teal_300),
+                            tint = colorResource(id = R.color.accent_900),
                             contentDescription = null,
                             modifier = Modifier.size(24.dp)
                         )

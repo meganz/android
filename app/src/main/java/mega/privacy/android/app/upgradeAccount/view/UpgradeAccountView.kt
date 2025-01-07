@@ -92,7 +92,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_gr
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_100_alpha_060_dark_grey
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.yellow_100_yellow_700_alpha_015
 import mega.privacy.android.shared.original.core.ui.theme.subtitle1
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
@@ -154,7 +154,7 @@ fun UpgradeAccountView(
                             fontWeight = FontWeight.Medium,
                         )
                     },
-                    backgroundColor = MaterialTheme.colors.teal_300_teal_200,
+                    backgroundColor = MaterialTheme.colors.accent_900_accent_050,
                     modifier = modifier
                         .padding(
                             start = 16.dp,

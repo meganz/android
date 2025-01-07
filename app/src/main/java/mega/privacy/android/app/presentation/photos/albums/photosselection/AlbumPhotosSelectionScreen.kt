@@ -72,7 +72,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_087
@@ -197,7 +197,7 @@ fun AlbumPhotosSelectionScreen(
                             selectedPhotoIds = state.selectedPhotoIds,
                         )
                     },
-                    backgroundColor = teal_300,
+                    backgroundColor = accent_900,
                 ) {
                     Icon(
                         painter = painterResource(id = iconPackR.drawable.ic_check_medium_regular_outline),
@@ -260,7 +260,7 @@ private fun AlbumPhotosSelectionHeader(
                 if (numSelectedPhotos > 0) {
                     Text(
                         text = "$numSelectedPhotos",
-                        color = teal_300,
+                        color = accent_900,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.subtitle1,
                     )
@@ -291,7 +291,7 @@ private fun AlbumPhotosSelectionHeader(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_arrow_back_white),
                     contentDescription = null,
-                    tint = teal_300.takeIf {
+                    tint = accent_900.takeIf {
                         numSelectedPhotos > 0
                     } ?: (black.takeIf { isLight } ?: white),
                 )
@@ -303,7 +303,7 @@ private fun AlbumPhotosSelectionHeader(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_filter_light),
                         contentDescription = null,
-                        tint = teal_300.takeIf {
+                        tint = accent_900.takeIf {
                             numSelectedPhotos > 0
                         } ?: (black.takeIf { isLight } ?: white),
                     )
@@ -315,7 +315,7 @@ private fun AlbumPhotosSelectionHeader(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_dots_vertical_white),
                         contentDescription = null,
-                        tint = teal_300,
+                        tint = accent_900,
                     )
                 }
 
@@ -430,7 +430,7 @@ private fun SelectLocationDialog(
                         .align(Alignment.End)
                         .padding(top = 8.dp, end = 16.dp, bottom = 16.dp)
                         .clickable { onDialogDismissed() },
-                    color = teal_300,
+                    color = accent_900,
                     fontWeight = FontWeight.W500,
                     style = MaterialTheme.typography.button,
                 )
@@ -473,8 +473,8 @@ private fun MaxSelectionDialog(
                 Text(
                     text = stringResource(id = R.string.general_ok),
                     style = MaterialTheme.typography.button,
-                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
-                        id = R.color.teal_300
+                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.accent_050) else colorResource(
+                        id = R.color.accent_900
                     )
                 )
             }

@@ -100,7 +100,7 @@ class VideoPlayerViewHolder(val container: ViewGroup) {
             if (repeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
                 context.getColor(R.color.white)
             } else {
-                context.getColor(R.color.teal_300)
+                context.getColor(R.color.accent_900)
             }
         )
     }

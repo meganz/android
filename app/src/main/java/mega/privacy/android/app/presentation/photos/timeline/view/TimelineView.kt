@@ -55,13 +55,12 @@ import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.isScrolledToEnd
 import mega.privacy.android.app.presentation.photos.view.isScrollingDown
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.teal_100
-import mega.privacy.android.shared.original.core.ui.theme.teal_200
-import mega.privacy.android.shared.original.core.ui.theme.teal_300
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_038
@@ -162,7 +161,7 @@ fun TimelineView(
                         snackbarData = snackBarData,
                         actionOnNewLine = true,
                         backgroundColor = black.takeIf { isLight } ?: white,
-                        actionColor = teal_200.takeIf { isLight } ?: teal_300,
+                        actionColor = accent_050.takeIf { isLight } ?: accent_900,
                     )
                 }
             )
@@ -389,7 +388,7 @@ fun NewEnableCameraUploadsButton(onClick: () -> Unit) {
                     Text(
                         text = stringResource(id = R.string.settings_camera_upload_on),
                         modifier = Modifier.clickable { onClick() },
-                        color = teal_300.takeIf { isLight } ?: teal_100,
+                        color = accent_900.takeIf { isLight } ?: accent_050,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         textAlign = TextAlign.End,

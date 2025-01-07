@@ -77,7 +77,7 @@ import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWi
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 internal object Constants {
@@ -400,7 +400,7 @@ internal fun FolderLinkSelectedTopAppBar(
                 text = title,
                 style = MaterialTheme.typography.subtitle1,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colors.teal_300_teal_200
+                color = MaterialTheme.colors.accent_900_accent_050
             )
         },
         navigationIcon = {
@@ -408,7 +408,7 @@ internal fun FolderLinkSelectedTopAppBar(
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = stringResource(id = R.string.general_back_button),
-                    tint = MaterialTheme.colors.teal_300_teal_200
+                    tint = MaterialTheme.colors.accent_900_accent_050
                 )
             }
         },
@@ -417,7 +417,7 @@ internal fun FolderLinkSelectedTopAppBar(
                 Icon(
                     Icons.Default.MoreVert,
                     contentDescription = stringResource(id = R.string.label_more),
-                    tint = MaterialTheme.colors.teal_300_teal_200
+                    tint = MaterialTheme.colors.accent_900_accent_050
                 )
             }
 

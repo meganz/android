@@ -51,8 +51,8 @@ import mega.privacy.android.shared.original.core.ui.theme.caption
 import mega.privacy.android.shared.original.core.ui.theme.grey_300
 import mega.privacy.android.shared.original.core.ui.theme.red_400
 import mega.privacy.android.shared.original.core.ui.theme.red_900
-import mega.privacy.android.shared.original.core.ui.theme.teal_200
-import mega.privacy.android.shared.original.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white
 
@@ -78,9 +78,9 @@ internal fun CreateVideoPlaylistDialog(
 
     val inputColor = if (isInputValid()) {
         if (MaterialTheme.colors.isLight) {
-            teal_300
+            accent_900
         } else {
-            teal_200
+            accent_050
         }
     } else {
         if (MaterialTheme.colors.isLight) {
@@ -232,7 +232,7 @@ internal fun CreateVideoPlaylistDialog(
             ) {
                 Text(
                     text = positiveButtonText,
-                    color = teal_300
+                    color = accent_900
                 )
             }
         },
@@ -253,7 +253,7 @@ internal fun CreateVideoPlaylistDialog(
             ) {
                 Text(
                     stringResource(id = sharedR.string.general_dialog_cancel_button),
-                    color = teal_300
+                    color = accent_900
                 )
             }
         }

@@ -56,7 +56,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_050_white_alpha_050
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -370,7 +370,7 @@ private fun MDHeader(
 }
 
 @Composable
-private fun tealIconTint() = MaterialTheme.colors.teal_300_teal_200
+private fun tealIconTint() = MaterialTheme.colors.accent_900_accent_050
 
 @Composable
 private fun greyColor() = MaterialTheme.colors.grey_alpha_050_white_alpha_050

@@ -261,7 +261,7 @@ internal fun SelectSubtitleView(
                 ) {
                     Text(
                         text = stringResource(id = sharedR.string.general_dialog_cancel_button),
-                        color = colorResource(id = R.color.teal_300)
+                        color = colorResource(id = R.color.accent_900)
                     )
                 }
 
@@ -269,7 +269,7 @@ internal fun SelectSubtitleView(
                     modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 24.dp),
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = colorResource(id = R.color.teal_300_teal_200),
-                        disabledBackgroundColor = colorResource(id = R.color.teal_200_alpha_038)
+                        disabledBackgroundColor = colorResource(id = R.color.accent_050_alpha_038)
                     ),
                     onClick = {
                         onAddSubtitle(selectedSubtitleFileInfo)
@@ -459,7 +459,7 @@ internal fun SelectedTopBar(
                 text = "1",
                 style = MaterialTheme.typography.subtitle1,
                 fontWeight = FontWeight.Medium,
-                color = colorResource(id = R.color.teal_300)
+                color = colorResource(id = R.color.accent_900)
             )
         },
         navigationIcon = {
@@ -467,7 +467,7 @@ internal fun SelectedTopBar(
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Back button",
-                    tint = colorResource(id = R.color.teal_300)
+                    tint = colorResource(id = R.color.accent_900)
                 )
             }
         },

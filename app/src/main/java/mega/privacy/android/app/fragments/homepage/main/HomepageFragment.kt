@@ -863,15 +863,20 @@ class HomepageFragment : Fragment() {
         // The tint of the icon in the middle of the FAB
         val tintAnim = ObjectAnimator.ofArgb(
             fabMaskMain.drawable.mutate(), "tint",
-            if (isExpand) Color.BLACK else Color.WHITE
+            ContextCompat.getColor(
+                requireContext(),
+                if (isExpand) R.color.color_icon_primary
+                else R.color.color_icon_inverse
+            )
         )
 
         // The background tint of the FAB
         val backgroundTintAnim = ObjectAnimator.ofArgb(
             fabMaskMain.background.mutate(), "tint",
-            if (isExpand) Color.WHITE else getThemeColor(
+            ContextCompat.getColor(
                 requireContext(),
-                com.google.android.material.R.attr.colorSecondary
+                if (isExpand) R.color.color_background_surface_2
+                else R.color.color_button_primary
             )
         )
 

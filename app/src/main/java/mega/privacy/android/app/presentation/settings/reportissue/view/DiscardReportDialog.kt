@@ -32,8 +32,8 @@ fun DiscardReportDialog(
                 Text(
                     text = stringResource(id = R.string.settings_help_report_issue_discard_button),
                     style = MaterialTheme.typography.button,
-                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
-                        id = R.color.teal_300
+                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.accent_050) else colorResource(
+                        id = R.color.accent_900
                     )
                 )
             }
@@ -46,8 +46,8 @@ fun DiscardReportDialog(
                 Text(
                     text = stringResource(id = sharedR.string.general_dialog_cancel_button),
                     style = MaterialTheme.typography.button,
-                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
-                        id = R.color.teal_300
+                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.accent_050) else colorResource(
+                        id = R.color.accent_900
                     )
                 )
             }

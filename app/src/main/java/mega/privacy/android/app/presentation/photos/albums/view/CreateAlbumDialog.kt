@@ -50,8 +50,8 @@ import mega.privacy.android.shared.original.core.ui.theme.caption
 import mega.privacy.android.shared.original.core.ui.theme.grey_300
 import mega.privacy.android.shared.original.core.ui.theme.red_400
 import mega.privacy.android.shared.original.core.ui.theme.red_900
-import mega.privacy.android.shared.original.core.ui.theme.teal_200
-import mega.privacy.android.shared.original.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.mobile.analytics.event.CreateNewAlbumDialogEvent
 
@@ -80,9 +80,9 @@ fun CreateNewAlbumDialog(
 
     val inputColor = if (isInputValid()) {
         if (MaterialTheme.colors.isLight) {
-            teal_300
+            accent_900
         } else {
-            teal_200
+            accent_050
         }
     } else {
         if (MaterialTheme.colors.isLight) {
@@ -241,7 +241,7 @@ fun CreateNewAlbumDialog(
             ) {
                 Text(
                     text = stringResource(id = positiveButtonTextResID),
-                    color = teal_300
+                    color = accent_900
                 )
             }
         },
@@ -262,7 +262,7 @@ fun CreateNewAlbumDialog(
             ) {
                 Text(
                     stringResource(id = sharedR.string.general_dialog_cancel_button),
-                    color = teal_300
+                    color = accent_900
                 )
             }
         }

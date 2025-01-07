@@ -65,7 +65,7 @@ import mega.privacy.android.shared.original.core.ui.controls.snackbars.MegaSnack
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_200_grey_700
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.utils.isScreenOrientationLandscape
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -375,7 +375,7 @@ fun BottomPanelView(
                                                 else
                                                     stringResource(id = R.string.meetings_bottom_panel_in_call_participants_mute_all_participants_button),
                                                 style = MaterialTheme.typography.subtitle2.copy(
-                                                    color = if (areAllParticipantsMuted()) MaterialTheme.colors.grey_200_grey_700 else MaterialTheme.colors.teal_300_teal_200
+                                                    color = if (areAllParticipantsMuted()) MaterialTheme.colors.grey_200_grey_700 else MaterialTheme.colors.accent_900_accent_050
                                                 ),
                                                 maxLines = 1,
                                                 overflow = TextOverflow.Ellipsis

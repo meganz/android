@@ -94,7 +94,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import java.io.File
@@ -325,7 +325,7 @@ internal fun QRCodeView(
                         Icon(
                             painter = painterResource(id = R.drawable.copy),
                             contentDescription = stringResource(id = R.string.context_copy),
-                            tint = MaterialTheme.colors.teal_300_teal_200
+                            tint = MaterialTheme.colors.accent_900_accent_050
                         )
                     }
                 }

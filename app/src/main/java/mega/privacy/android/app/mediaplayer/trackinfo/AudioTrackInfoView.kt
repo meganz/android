@@ -169,7 +169,7 @@ fun AudioInfoView(
             text = duration ?: "00:00",
             textAlign = TextAlign.Center,
             fontSize = 14.sp,
-            color = colorResource(id = R.color.teal_300),
+            color = colorResource(id = R.color.accent_900),
             modifier = Modifier
                 .padding(top = 8.dp, bottom = 24.dp)
                 .testTag(AUDIO_DURATION_TEST_TAG)
@@ -261,7 +261,7 @@ fun AudioNodeInfoView(
         Text(
             text = (locationValue?.location ?: ""),
             fontSize = 14.sp,
-            color = colorResource(R.color.teal_300),
+            color = colorResource(R.color.accent_900),
             modifier = Modifier
                 .padding(top = 4.dp, start = 72.dp)
                 .clickable {

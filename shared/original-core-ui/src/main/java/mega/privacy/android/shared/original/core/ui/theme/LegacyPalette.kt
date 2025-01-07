@@ -19,7 +19,7 @@ val primary_variant_light = white
 /**
  * Secondary light.
  */
-val secondary_light = teal_300
+val secondary_light = accent_900
 
 /**
  * Surface light.
@@ -56,7 +56,7 @@ val primary_variant_dark = dark_grey
 /**
  * Secondary dark.
  */
-val secondary_dark = teal_200
+val secondary_dark = accent_050
 
 /**
  * Surface dark.
@@ -102,7 +102,7 @@ val LegacyLightColorPalette = lightColors(
 val LegacyDarkColorPalette = darkColors(
     primary = primary_dark,
     primaryVariant = primary_variant_dark,
-    secondary = teal_200,
+    secondary = accent_050,
     surface = surface_dark,
     error = error_dark,
     onPrimary = on_primary_dark,

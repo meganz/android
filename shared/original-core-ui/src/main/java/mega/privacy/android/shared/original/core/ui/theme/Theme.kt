@@ -47,8 +47,8 @@ fun OriginalTempTheme(
     content: @Composable () -> Unit,
 ) = OriginalTheme(
     isDark = isDark,
-    darkColorTokens = TempSemanticTokensDark,
-    lightColorTokens = TempSemanticTokensLight,
+    darkColorTokens = AndroidNewSemanticTokensDark,
+    lightColorTokens = AndroidNewSemanticTokensLight,
     content = content,
 )
 

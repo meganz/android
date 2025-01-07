@@ -167,7 +167,6 @@ internal class ContactListViewModel @Inject constructor(
                 mutableListOf<ContactItem>().apply {
                     if (newContacts.isNotEmpty()) add(ContactItem.Header(context.getString(R.string.section_recently_added)))
                     addAll(newContacts)
-                    add(ContactItem.Header(context.getString(R.string.section_contacts)))
                 }
             } else {
                 emptyList()

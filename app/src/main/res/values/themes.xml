@@ -26,7 +26,7 @@
         <!-- e.g. the color of the action bar -->
         <item name="colorPrimary">@color/white</item>
         <!-- e.g. the background color of the FAB -->
-        <item name="colorSecondary">@color/teal_300</item>
+        <item name="colorSecondary">@color/accent_900</item>
         <!-- e.g. The action bar color of the "select folder" screen -->
         <item name="colorPrimaryVariant">@color/white</item>
         <!-- e.g. A variant color of the FAB -->

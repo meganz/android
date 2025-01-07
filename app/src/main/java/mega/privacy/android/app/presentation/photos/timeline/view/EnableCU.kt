@@ -45,8 +45,8 @@ import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
 import mega.privacy.android.shared.original.core.ui.theme.grey_200
 import mega.privacy.android.shared.original.core.ui.theme.grey_500
-import mega.privacy.android.shared.original.core.ui.theme.teal_200
-import mega.privacy.android.shared.original.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.white
 
 /**
@@ -161,7 +161,7 @@ fun EnableCU(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = colorResource(id = R.color.teal_300)
+                backgroundColor = colorResource(id = R.color.accent_900)
             )
         ) {
             Text(
@@ -255,7 +255,7 @@ fun EnableCameraUploadsButton(
             .padding(16.dp),
         shape = RoundedCornerShape(4.dp),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = teal_300.takeIf { isLight } ?: teal_200,
+            backgroundColor = accent_900.takeIf { isLight } ?: accent_050,
         ),
         content = {
             Text(

@@ -83,7 +83,7 @@ fun PhotoView(
             .border(
                 BorderStroke(
                     width = 2.dp,
-                    color = colorResource(id = R.color.teal_300)
+                    color = colorResource(id = R.color.accent_900)
                 ),
                 shape = RoundedCornerShape(4.dp)
             )

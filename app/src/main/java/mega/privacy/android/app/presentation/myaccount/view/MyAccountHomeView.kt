@@ -132,8 +132,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_050_gr
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_100_grey_600
 import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_600_teal_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.shared.original.core.ui.theme.extensions.white_grey_800
@@ -359,7 +358,7 @@ internal fun MyAccountHeader(
                 },
             painter = painterResource(id = R.drawable.ic_view_edit_profile),
             contentDescription = "Edit Profile",
-            tint = MaterialTheme.colors.teal_300_teal_200
+            tint = MaterialTheme.colors.accent_900_accent_050
         )
 
         if (email != null) {
@@ -941,7 +940,7 @@ internal fun UsageMeterSection(
                 },
                 text = stringResource(id = R.string.transfer_label),
                 style = MaterialTheme.typography.subtitle2medium,
-                color = MaterialTheme.colors.teal_600_teal_200,
+                color = MaterialTheme.colors.accent_900_accent_050,
             )
 
             Text(
@@ -951,7 +950,7 @@ internal fun UsageMeterSection(
                 },
                 text = formatSize(size = usedTransfer),
                 style = MaterialTheme.typography.subtitle2,
-                color = MaterialTheme.colors.teal_600_teal_200,
+                color = MaterialTheme.colors.accent_900_accent_050,
             )
         }
     }

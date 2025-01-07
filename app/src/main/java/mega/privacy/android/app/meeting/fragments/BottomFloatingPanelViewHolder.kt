@@ -15,7 +15,6 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.PopupWindow
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -446,7 +445,7 @@ class BottomFloatingPanelViewHolder(
 
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                OriginalTempTheme(isDark = isSystemInDarkTheme()) {
+                OriginalTempTheme(isDark = true) {
                     ParticipantsBottomPanelView(
                         viewModel = meetingViewModel,
                         waitingRoomManagementViewModel = waitingRoomManagementViewModel,

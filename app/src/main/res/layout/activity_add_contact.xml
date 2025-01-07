@@ -113,7 +113,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="@string/menu_item_scan_code"
-					android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AccentColor"
+					android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Link"
 					android:paddingLeft="16dp"
 					android:layout_centerVertical="true"/>
 

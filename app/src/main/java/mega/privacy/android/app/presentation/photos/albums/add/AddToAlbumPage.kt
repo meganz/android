@@ -216,7 +216,7 @@ private fun AlbumCard(
                                     Modifier.border(
                                         border = BorderStroke(
                                             width = 1.dp,
-                                            color = colorResource(id = R.color.teal_300),
+                                            color = colorResource(id = R.color.accent_900),
                                         ),
                                         shape = RoundedCornerShape(8.dp),
                                     )

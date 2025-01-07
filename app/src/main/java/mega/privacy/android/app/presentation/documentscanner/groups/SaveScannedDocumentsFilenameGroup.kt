@@ -43,7 +43,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.teal_300_teal_200
+import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 
 /**
@@ -156,7 +156,7 @@ internal fun SaveScannedDocumentsFilenameGroup(
                     .testTag(SAVE_SCANNED_DOCUMENTS_FILENAME_GROUP_EDIT_FILENAME_IMAGE)
                     .alpha(if (isFocused) 0f else 1f),
                 painter = painterResource(IconPackR.drawable.ic_pen_02_medium_regular_outline),
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.teal_300_teal_200),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.accent_900_accent_050),
                 contentDescription = "Edit Filename Image"
             )
         }

@@ -80,7 +80,7 @@ import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_087
-import mega.privacy.android.shared.original.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_038
@@ -345,7 +345,7 @@ private fun AlbumImportTopBar(
                     if (hasSelectedPhotos) {
                         Text(
                             text = "${selectedPhotos.size}",
-                            color = teal_300,
+                            color = accent_900,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.W500,
                             style = MaterialTheme.typography.subtitle1,
@@ -383,7 +383,7 @@ private fun AlbumImportTopBar(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow_back_white),
                         contentDescription = null,
-                        tint = teal_300.takeIf { hasSelectedPhotos }
+                        tint = accent_900.takeIf { hasSelectedPhotos }
                             ?: grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
                     )
                 },
@@ -397,7 +397,7 @@ private fun AlbumImportTopBar(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_dots_vertical_white),
                             contentDescription = null,
-                            tint = teal_300,
+                            tint = accent_900,
                         )
                     },
                 )
@@ -484,7 +484,7 @@ private fun AlbumImportBottomBar(
                             content = {
                                 Text(
                                     text = stringResource(id = R.string.general_save_to_cloud_drive),
-                                    color = teal_300,
+                                    color = accent_900,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.W500,
                                     style = MaterialTheme.typography.button,
@@ -503,7 +503,7 @@ private fun AlbumImportBottomBar(
                         content = {
                             Text(
                                 text = stringResource(id = R.string.general_save_to_device),
-                                color = teal_300,
+                                color = accent_900,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.W500,
                                 style = MaterialTheme.typography.button,
@@ -637,7 +637,7 @@ private fun InputDecryptionKeyDialog(
                 content = {
                     Text(
                         text = stringResource(id = R.string.general_decryp),
-                        color = teal_300,
+                        color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.button,
@@ -651,7 +651,7 @@ private fun InputDecryptionKeyDialog(
                 content = {
                     Text(
                         text = stringResource(id = sharedR.string.general_dialog_cancel_button),
-                        color = teal_300,
+                        color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.button,
@@ -693,7 +693,7 @@ private fun ErrorAccessDialog(
                 content = {
                     Text(
                         text = stringResource(id = R.string.general_ok),
-                        color = teal_300,
+                        color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.button,
@@ -763,7 +763,7 @@ private fun RenameAlbumDialog(
                 content = {
                     Text(
                         text = stringResource(id = sharedR.string.general_dialog_cancel_button),
-                        color = teal_300,
+                        color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.button,
@@ -777,7 +777,7 @@ private fun RenameAlbumDialog(
                 content = {
                     Text(
                         text = stringResource(id = R.string.context_rename),
-                        color = teal_300,
+                        color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.button,
@@ -879,7 +879,7 @@ private fun StorageExceededDialog(
                 content = {
                     Text(
                         text = stringResource(id = sharedR.string.general_dialog_cancel_button),
-                        color = teal_300,
+                        color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.button,
@@ -896,7 +896,7 @@ private fun StorageExceededDialog(
                 content = {
                     Text(
                         text = stringResource(id = sharedR.string.general_upgrade_button),
-                        color = teal_300,
+                        color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.button,

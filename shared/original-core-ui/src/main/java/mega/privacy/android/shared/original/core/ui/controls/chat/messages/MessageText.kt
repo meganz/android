@@ -1,9 +1,11 @@
 package mega.privacy.android.shared.original.core.ui.controls.chat.messages
 
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,8 +36,10 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.forma
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.format.FormatType
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.shared.original.core.ui.controls.text.megaSpanStyle
+import mega.privacy.android.shared.original.core.ui.theme.MegaOriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.theme.robotoMono
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 
@@ -53,6 +57,7 @@ fun MessageText(
     onLinkClicked: (String) -> String?,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
+    color: TextColor? = null,
     style: TextStyle = LocalTextStyle.current,
 ) {
     MessageTextView(
@@ -63,7 +68,8 @@ fun MessageText(
         onLinkClicked = onLinkClicked,
         onLongClick = onLongClick,
         modifier = modifier,
-        style = style
+        style = style,
+        color = color,
     )
 }
 
@@ -76,6 +82,7 @@ fun MessageText(
     message: String,
     overflow: TextOverflow,
     maxLines: Int,
+    color: TextColor?,
     modifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
 ) {
@@ -84,7 +91,8 @@ fun MessageText(
         overflow = overflow,
         maxLines = maxLines,
         modifier = modifier,
-        style = style
+        style = style,
+        color = color,
     )
 }
 
@@ -96,6 +104,8 @@ fun MessageText(
 @Composable
 private fun MessageTextView(
     message: String,
+    color: TextColor?,
+    modifier: Modifier = Modifier,
     isEdited: Boolean = false,
     links: List<String> = emptyList(),
     interactionEnabled: Boolean = false,
@@ -103,7 +113,6 @@ private fun MessageTextView(
     onLongClick: () -> Unit = { },
     overflow: TextOverflow = TextOverflow.Clip,
     maxLines: Int = Int.MAX_VALUE,
-    modifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
 ) {
     var clickedLink by rememberSaveable { mutableStateOf<String?>(null) }
@@ -128,17 +137,24 @@ private fun MessageTextView(
                 }
             }
         }
-
-        Text(
-            text = this,
-            modifier = modifier.conditional(interactionEnabled) {
-                then(pressIndicator)
-            },
-            style = style,
-            maxLines = maxLines,
-            overflow = overflow,
-            onTextLayout = { layoutResult.value = it }
-        )
+        CompositionLocalProvider(
+            LocalContentColor provides if (color == null) {
+                LocalContentColor.current
+            } else {
+                MegaOriginalTheme.textColor(textColor = color)
+            }
+        ) {
+            Text(
+                text = this,
+                modifier = modifier.conditional(interactionEnabled) {
+                    then(pressIndicator)
+                },
+                style = style,
+                maxLines = maxLines,
+                overflow = overflow,
+                onTextLayout = { layoutResult.value = it }
+            )
+        }
     }
 }
 

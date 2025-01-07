@@ -51,8 +51,8 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionLis
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_070
-import mega.privacy.android.shared.original.core.ui.theme.teal_200
-import mega.privacy.android.shared.original.core.ui.theme.teal_300
+import mega.privacy.android.shared.original.core.ui.theme.accent_050
+import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_070
 import nz.mega.sdk.MegaNode
@@ -429,7 +429,7 @@ internal fun ImagePreviewBottomSheet(
                             if (!accountType.isPaid || isBusinessAccountExpired) {
                                 Text(
                                     text = stringResource(id = R.string.general_pro_only),
-                                    color = teal_300.takeIf { isLight } ?: teal_200,
+                                    color = accent_900.takeIf { isLight } ?: accent_050,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.W400,
                                     style = MaterialTheme.typography.subtitle1,

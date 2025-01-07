@@ -535,7 +535,7 @@
                 android:layout_gravity="start|center_vertical"
                 android:layout_marginStart="16dp"
                 android:src="@drawable/ic_remove_contact"
-                app:tint="@color/red_600_red_300" />
+                app:tint="@color/color_text_error" />
 
             <TextView
                 android:id="@+id/chat_contact_properties_remove_contact_label"

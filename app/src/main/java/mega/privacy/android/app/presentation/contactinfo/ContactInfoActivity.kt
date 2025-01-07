@@ -1254,7 +1254,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             }
         }
 
-        val colorDisableButton = ContextCompat.getColor(this, R.color.teal_300_038_teal_200_038)
+        val colorDisableButton = ContextCompat.getColor(this, R.color.color_text_on_color_disabled)
         val colorEnableButton = ContextCompat.getColor(this, R.color.teal_300_teal_200)
 
         emojiEditText.doAfterTextChanged { text ->

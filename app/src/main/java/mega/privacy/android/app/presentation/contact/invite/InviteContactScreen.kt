@@ -114,6 +114,7 @@ import mega.privacy.android.shared.original.core.ui.controls.progressindicator.M
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
+import mega.privacy.android.shared.original.core.ui.controls.buttons.LinkButton
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
@@ -460,24 +461,15 @@ internal fun InviteContactScreen(
 
             Divider()
 
-            MegaText(
+            LinkButton(
+                onClick = onScanQRCodeClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onScanQRCodeClick
-                    )
                     .padding(start = 16.dp)
                     .wrapContentHeight()
                     .testTag(SCAN_QR_CODE_TEXT_TAG),
                 text = stringResource(id = R.string.menu_item_scan_code),
-                textColor = TextColor.Accent,
-                style = MaterialTheme.typography.subtitle2.copy(
-                    fontWeight = FontWeight.W600,
-                    fontSize = 14.sp
-                ),
             )
 
             Divider()
