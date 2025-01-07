@@ -2,7 +2,6 @@ package mega.privacy.android.domain.usecase.photos.mediadiscovery
 
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.SvgFileTypeInfo
-import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.NodeRepository
@@ -31,11 +30,8 @@ class ShouldEnterMediaDiscoveryModeUseCase @Inject constructor(
                 ?: return false
         val childNodesFileTypes =
             nodeRepository.getNodeChildrenFileTypes(nodeId = nodeId, order = getCloudSortOrder())
-        return childNodesFileTypes.none { fileType ->
-            fileType is UnMappedFileTypeInfo ||
-                    fileType is SvgFileTypeInfo ||
-                    fileType !is ImageFileTypeInfo
-                    && fileType !is VideoFileTypeInfo
+        return childNodesFileTypes.any { fileType ->
+            fileType !is SvgFileTypeInfo && (fileType is ImageFileTypeInfo || (fileType is VideoFileTypeInfo))
         }
     }
 }
