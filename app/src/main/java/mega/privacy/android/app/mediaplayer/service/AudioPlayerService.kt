@@ -149,7 +149,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                 }
 
                 AudioManager.AUDIOFOCUS_GAIN -> {
-                    if (!mediaPlayerGateway.getPlayWhenReady()) {
+                    if (!mediaPlayerGateway.getPlayWhenReady() && isForeground) {
                         setPlayWhenReady(true)
                     }
                 }
