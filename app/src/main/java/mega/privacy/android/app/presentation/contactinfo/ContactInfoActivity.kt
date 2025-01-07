@@ -641,7 +641,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private fun updateChatHistoryLayoutVisibility(shouldShow: Boolean) {
         with(contentContactProperties) {
-            manageChatHistoryLayout.isVisible = shouldShow
+            contactPropertiesLayout.isVisible = shouldShow
             dividerChatHistoryLayout.isVisible = shouldShow
         }
     }
