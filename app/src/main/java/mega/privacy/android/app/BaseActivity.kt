@@ -34,7 +34,8 @@ import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.Analytics
@@ -387,11 +388,11 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             }
         }
 
-        collectFlow(monitorTransferOverQuotaUseCase().filter { it }) { isCurrentOverQuota ->
-            if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
-                transfersManagement.isCurrentTransferOverQuota = isCurrentOverQuota
-                transfersManagement.setTransferOverQuotaTimestamp()
+        collectFlow(transfersManagementViewModel.state.map { it.transferOverQuotaWarning }
+            .distinctUntilChanged()) { isTransferOverQuotaWarning ->
+            if (isTransferOverQuotaWarning) {
                 showGeneralTransferOverQuotaWarning()
+                transfersManagementViewModel.onTransferOverQuotaWarningConsumed()
             }
         }
 
@@ -1061,13 +1062,13 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             .setOnDismissListener {
                 isGeneralTransferOverQuotaWarningShown = false
                 transferGeneralOverQuotaWarning = null
-                transfersManagement.resetTransferOverQuotaTimestamp()
+                transfersManagementViewModel.resetTransferOverQuotaTimestamp()
             }
             .setCancelable(false)
         transferGeneralOverQuotaWarning = builder.create()
         transferGeneralOverQuotaWarning?.setCanceledOnTouchOutside(false)
         val stringResource =
-            if (transfersManagement.isCurrentTransferOverQuota) R.string.current_text_depleted_transfer_overquota else R.string.text_depleted_transfer_overquota
+            if (transfersManagementViewModel.isTransferOverQuota()) R.string.current_text_depleted_transfer_overquota else R.string.text_depleted_transfer_overquota
         binding.textTransferOverquota.text = getString(
             stringResource, TimeUtils.getHumanizedTime(megaApi.bandwidthOverquotaDelay)
         )

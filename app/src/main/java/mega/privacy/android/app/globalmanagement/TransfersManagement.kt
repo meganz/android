@@ -1,8 +1,5 @@
 package mega.privacy.android.app.globalmanagement
 
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.data.qualifier.MegaApi
-import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,54 +9,15 @@ import javax.inject.Singleton
  * @property megaApi    MegaApiAndroid instance to check transfers status.
  */
 @Singleton
-class TransfersManagement @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
-) {
+class TransfersManagement @Inject constructor() {
 
-    companion object {
-        private const val WAIT_TIME_TO_SHOW_WARNING = 60000L
-    }
-
-    private var transferOverQuotaTimestamp: Long = 0
-    var isCurrentTransferOverQuota = false
     var isTransferOverQuotaNotificationShown = false
     var isTransferOverQuotaBannerShown = false
 
-    init {
-        resetTransferOverQuotaTimestamp()
-    }
-
     fun resetDefaults() {
-        transferOverQuotaTimestamp = 0
-        isCurrentTransferOverQuota = false
         isTransferOverQuotaNotificationShown = false
         isTransferOverQuotaBannerShown = false
     }
-
-    /**
-     * Sets the current time as timestamp to avoid show duplicated transfer over quota warnings.
-     */
-    fun setTransferOverQuotaTimestamp() {
-        transferOverQuotaTimestamp = System.currentTimeMillis()
-    }
-
-    /**
-     * Sets the transfer over quota time stamp as invalid.
-     */
-    fun resetTransferOverQuotaTimestamp() {
-        transferOverQuotaTimestamp = INVALID_VALUE.toLong()
-    }
-
-    /**
-     * Checks if a transfer over quota warning has to be shown.
-     * It will be shown if transferOverQuotaTimestamp has not been initialized yet
-     * or if more than a minute has passed since the last time it was shown.
-     *
-     * @return  True if the warning has to be shown, false otherwise
-     */
-    fun shouldShowTransferOverQuotaWarning(): Boolean =
-        transferOverQuotaTimestamp == INVALID_VALUE.toLong()
-                || transferOverQuotaTimestamp - System.currentTimeMillis() > WAIT_TIME_TO_SHOW_WARNING
 
     /**
      * Sets if the widget has to be shown depending on if it is on transfer over quota

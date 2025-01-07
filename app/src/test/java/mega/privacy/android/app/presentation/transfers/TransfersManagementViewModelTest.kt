@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel.Companion.INVALID_TIMESTAMP
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel.Companion.waitTimeToShowOffline
 import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -376,6 +377,39 @@ class TransfersManagementViewModelTest {
             assertThat(awaitItem()).isTrue()
         }
     }
+
+    @Test
+    fun `test that transferOverQuotaWarning and transferOverQuotaTimestamp are updated in state if a transfer over quota is received`() =
+        runTest {
+            whenever(monitorTransferOverQuotaUseCase()) doReturn flowOf(true)
+
+            initTest()
+
+            underTest.state.test {
+                val actual = awaitItem()
+                assertThat(actual.transferOverQuotaTimestamp).isNotEqualTo(INVALID_TIMESTAMP)
+                assertThat(actual.transferOverQuotaWarning).isTrue()
+
+                underTest.resetTransferOverQuotaTimestamp()
+
+                assertThat(awaitItem().transferOverQuotaTimestamp).isEqualTo(INVALID_TIMESTAMP)
+
+                underTest.onTransferOverQuotaWarningConsumed()
+
+
+                assertThat(awaitItem().transferOverQuotaWarning).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that isInTransfersSection is updated in state when setInTransfersSection is called`() =
+        runTest {
+            underTest.setInTransfersSection(true)
+            assertThat(underTest.isInTransfersSection()).isTrue()
+
+            underTest.setInTransfersSection(false)
+            assertThat(underTest.isInTransfersSection()).isFalse()
+        }
 
     private fun commonStub() {
         monitorConnectivityUseCaseFlow = MutableStateFlow(true)

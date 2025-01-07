@@ -110,6 +110,10 @@ class TransfersManagementViewModel @Inject constructor(
         viewModelScope.launch {
             monitorTransferOverQuotaUseCase().collectLatest { isTransferOverQuota ->
                 _state.update { state -> state.copy(isTransferOverQuota = isTransferOverQuota) }
+
+                if (isTransferOverQuota) {
+                    checkTransferOverQuotaWarning()
+                }
             }
         }
     }
@@ -221,7 +225,46 @@ class TransfersManagementViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Resets the transfer over quota timestamp to the default value.
+     */
+    fun resetTransferOverQuotaTimestamp() {
+        _state.update {
+            it.copy(transferOverQuotaTimestamp = INVALID_TIMESTAMP)
+        }
+    }
+
+    /**
+     * Checks if a transfer over quota warning has to be shown.
+     * If so, sets the timestamp to the current time to avoid show duplicated transfer over quota warnings.
+     */
+    private fun checkTransferOverQuotaWarning() {
+        if (state.value.transferOverQuotaTimestamp == INVALID_TIMESTAMP
+            || state.value.transferOverQuotaTimestamp - System.currentTimeMillis() > WAIT_TIME_TO_SHOW_TRANSFER_OVER_QUOTA_WARNING
+        ) {
+            _state.update {
+                it.copy(
+                    transferOverQuotaTimestamp = System.currentTimeMillis(),
+                    transferOverQuotaWarning = true
+                )
+            }
+        } else {
+            onTransferOverQuotaWarningConsumed()
+        }
+    }
+
+    /**
+     * Consumes the transfer over quota warning.
+     */
+    fun onTransferOverQuotaWarningConsumed() {
+        _state.update {
+            it.copy(transferOverQuotaWarning = false)
+        }
+    }
+
     companion object {
+        internal const val INVALID_TIMESTAMP = -1L
+        private const val WAIT_TIME_TO_SHOW_TRANSFER_OVER_QUOTA_WARNING = 60000L
         private const val DEFAULT_SAMPLE_PERIOD = 500L
         internal val waitTimeToShowOffline = 30_000L.milliseconds
     }
