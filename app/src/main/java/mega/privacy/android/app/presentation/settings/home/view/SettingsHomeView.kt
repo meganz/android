@@ -1,25 +1,22 @@
 package mega.privacy.android.app.presentation.settings.home.view
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.MegaScaffold
-import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.recentactions.view.RecentLoadingView
+import mega.privacy.android.app.presentation.settings.home.model.SettingsUiState
 
 @Composable
 internal fun SettingsHomeView(
     onBackPressed: () -> Unit,
+    state: SettingsUiState,
+    initialKey: String?,
 ) {
     MegaScaffold(
         modifier = Modifier.statusBarsPadding(),
@@ -34,20 +31,33 @@ internal fun SettingsHomeView(
         snackbarHost = {},
         bottomBar = {},
         content = { padding ->
-            ColumnView(padding)
+            when (state) {
+                is SettingsUiState.Data -> DataView(
+                    state,
+                    Modifier.padding(padding),
+                    initialKey
+                )
+
+                SettingsUiState.Loading -> LoadingView(Modifier.padding(padding))
+            }
         }
     )
 }
 
 @Composable
-private fun ColumnView(padding: PaddingValues) {
-    Column(
-        modifier = Modifier
-            .padding(padding)
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        MegaText("New Settings Activity", TextColor.Primary)
-    }
+private fun DataView(
+    state: SettingsUiState.Data,
+    modifier: Modifier,
+    initialKey: String?,
+) {
+    SettingsListView(
+        data = state,
+        modifier = modifier,
+        initialKey = initialKey,
+    )
+}
+
+@Composable
+private fun LoadingView(modifier: Modifier) {
+    RecentLoadingView(modifier) // Placeholder for a settings loading view
 }

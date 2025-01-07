@@ -1,12 +1,12 @@
-package mega.privacy.android.app.presentation.settings.navigation.destination
+package mega.privacy.android.app.presentation.settings.home
 
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.presentation.settings.home.SettingContainerViewModel
 import mega.privacy.android.app.presentation.settings.home.view.SettingsHomeView
 
 /**
@@ -25,8 +25,13 @@ fun NavGraphBuilder.settingsHome(
     onBackPressed: () -> Unit,
 ) {
     composable<SettingsHome> { backStackEntry ->
+        val args = backStackEntry.toRoute<SettingsHome>()
         val viewModel = hiltViewModel<SettingContainerViewModel>()
         val state by viewModel.state.collectAsStateWithLifecycle()
-        SettingsHomeView(onBackPressed = onBackPressed)
+        SettingsHomeView(
+            onBackPressed = onBackPressed,
+            state = state,
+            initialKey = args.initialSetting,
+        )
     }
 }
