@@ -24,7 +24,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
@@ -66,6 +65,7 @@ import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseC
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.ShouldEnterMediaDiscoveryModeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -88,7 +88,6 @@ import javax.inject.Inject
  * @param handleOptionClickMapper [HandleOptionClickMapper] handle option click click mapper
  * @param monitorRefreshSessionUseCase [MonitorRefreshSessionUseCase]
  * @param getBandwidthOverQuotaDelayUseCase [GetBandwidthOverQuotaDelayUseCase]
- * @param transfersManagement [TransfersManagement]
  * @param containsMediaItemUseCase [ContainsMediaItemUseCase]
  * @param fileDurationMapper [FileDurationMapper]
  */
@@ -106,7 +105,6 @@ class FileBrowserViewModel @Inject constructor(
     private val handleOptionClickMapper: HandleOptionClickMapper,
     private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase,
     private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
-    private val transfersManagement: TransfersManagement,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
     private val fileDurationMapper: FileDurationMapper,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
@@ -124,6 +122,7 @@ class FileBrowserViewModel @Inject constructor(
     private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase,
     private val monitorAlmostFullStorageBannerClosingTimestampUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase,
     private val storageCapacityMapper: StorageCapacityMapper,
+    private val isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -662,9 +661,10 @@ class FileBrowserViewModel @Inject constructor(
     fun changeTransferOverQuotaBannerVisibility() {
         viewModelScope.launch {
             val overQuotaBannerTimeDelay = getBandwidthOverQuotaDelayUseCase()
+            val isTransferOverQuota = isInTransferOverQuotaUseCase()
             _state.update {
                 it.copy(
-                    shouldShowBannerVisibility = transfersManagement.isTransferOverQuotaBannerShown,
+                    shouldShowBannerVisibility = isTransferOverQuota,
                     bannerTime = overQuotaBannerTimeDelay.inWholeSeconds
                 )
             }

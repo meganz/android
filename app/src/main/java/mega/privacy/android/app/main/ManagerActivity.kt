@@ -1267,10 +1267,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 selectDrawerItem(drawerItem)
             }
         }
-
-        if (transfersManagementViewModel.isTransferOverQuota()) {
-            transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
-        }
     }
 
     private fun initialiseChatBadgeView() {
@@ -2384,7 +2380,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         }
         checkScrollElevation()
-        checkTransferOverQuotaOnResume()
         checkForInAppUpdateInstallStatus()
         cookieDialogHandler.onResume()
         updateTransfersWidgetVisibility()
@@ -2796,7 +2791,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     override fun onPause() {
         Timber.d("onPause")
-        transfersManagementViewModel.setInTransfersSection(false)
         super.onPause()
     }
 
@@ -6738,17 +6732,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             params.bottomMargin = 0
         }
         transfersWidgetLayout.layoutParams = params
-    }
-
-    /**
-     * Updates values of TransfersManagement object after the activity comes from background.
-     */
-    private fun checkTransferOverQuotaOnResume() {
-        transfersManagementViewModel.setInTransfersSection(drawerItem == DrawerItem.TRANSFERS)
-        if (transfersManagement.isTransferOverQuotaNotificationShown) {
-            transfersManagement.isTransferOverQuotaBannerShown = true
-            transfersManagement.isTransferOverQuotaNotificationShown = false
-        }
     }
 
     private fun getRubbishBinComposeFragment(): RubbishBinComposeFragment? {

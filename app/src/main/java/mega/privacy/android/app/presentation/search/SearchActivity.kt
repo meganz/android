@@ -43,7 +43,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
@@ -118,12 +117,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
-
-    /**
-     * Transfers management
-     */
-    @Inject
-    lateinit var transfersManagement: TransfersManagement
 
     /**
      * Mapper to convert node source type to Int
@@ -714,9 +707,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                 )
             }
             finish()
-        }
-        if (transfersManagementViewModel.isTransferOverQuota()) {
-            transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
         }
     }
 }

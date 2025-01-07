@@ -24,7 +24,6 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
@@ -87,9 +86,6 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
     @Inject
     lateinit var fileTypeIconMapper: FileTypeIconMapper
-
-    @Inject
-    lateinit var transfersManagement: TransfersManagement
 
     @Inject
     lateinit var megaNavigator: MegaNavigator
@@ -294,9 +290,6 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 )
             }
-        }
-        if (transfersManagementViewModel.isTransferOverQuota()) {
-            transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
         }
     }
 

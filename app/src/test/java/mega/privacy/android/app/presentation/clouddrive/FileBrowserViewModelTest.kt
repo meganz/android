@@ -16,7 +16,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.featuretoggle.ApiFeatures
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.mapper.StorageCapacityMapper
 import mega.privacy.android.app.presentation.clouddrive.model.StorageOverQuotaCapacity
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -63,6 +62,7 @@ import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseC
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.ShouldEnterMediaDiscoveryModeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -105,7 +105,6 @@ class FileBrowserViewModelTest {
     private val setViewType = mock<SetViewType>()
     private val monitorRefreshSessionUseCase = mock<MonitorRefreshSessionUseCase>()
     private val getBandwidthOverQuotaDelayUseCase = mock<GetBandwidthOverQuotaDelayUseCase>()
-    private val transfersManagement = mock<TransfersManagement>()
     private val containsMediaItemUseCase = mock<ContainsMediaItemUseCase>()
     private val fileDurationMapper = mock<FileDurationMapper>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
@@ -134,6 +133,7 @@ class FileBrowserViewModelTest {
         mock<SetAlmostFullStorageBannerClosingTimestampUseCase>()
     private val monitorAlmostFullStorageBannerClosingTimestampUseCase =
         mock<MonitorAlmostFullStorageBannerVisibilityUseCase>()
+    private val isInTransferOverQuotaUseCase = mock<IsInTransferOverQuotaUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -157,7 +157,6 @@ class FileBrowserViewModelTest {
             handleOptionClickMapper = handleOptionClickMapper,
             monitorRefreshSessionUseCase = monitorRefreshSessionUseCase,
             getBandwidthOverQuotaDelayUseCase = getBandwidthOverQuotaDelayUseCase,
-            transfersManagement = transfersManagement,
             containsMediaItemUseCase = containsMediaItemUseCase,
             fileDurationMapper = fileDurationMapper,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
@@ -174,7 +173,8 @@ class FileBrowserViewModelTest {
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             setAlmostFullStorageBannerClosingTimestampUseCase = setAlmostFullStorageBannerClosingTimestampUseCase,
             monitorAlmostFullStorageBannerClosingTimestampUseCase = monitorAlmostFullStorageBannerClosingTimestampUseCase,
-            storageCapacityMapper = storageCapacityMapper
+            storageCapacityMapper = storageCapacityMapper,
+            isInTransferOverQuotaUseCase = isInTransferOverQuotaUseCase,
         )
     }
 
@@ -573,7 +573,7 @@ class FileBrowserViewModelTest {
     @Test
     fun `test that the transfer overquota banner is hidden when transfers management detects a non overquota state`() =
         runTest {
-            whenever(transfersManagement.isTransferOverQuotaBannerShown).thenReturn(false)
+            whenever(isInTransferOverQuotaUseCase()).thenReturn(false)
             whenever(getBandwidthOverQuotaDelayUseCase()).thenReturn(10000.seconds)
             underTest.changeTransferOverQuotaBannerVisibility()
             underTest.state.test {
@@ -731,6 +731,7 @@ class FileBrowserViewModelTest {
         ).thenReturn(
             StorageOverQuotaCapacity.DEFAULT
         )
+        whenever(isInTransferOverQuotaUseCase()).thenReturn(false)
     }
 
     @AfterEach
@@ -745,7 +746,6 @@ class FileBrowserViewModelTest {
             setViewType,
             monitorRefreshSessionUseCase,
             getBandwidthOverQuotaDelayUseCase,
-            transfersManagement,
             containsMediaItemUseCase,
             fileDurationMapper,
             monitorOfflineNodeUpdatesUseCase,

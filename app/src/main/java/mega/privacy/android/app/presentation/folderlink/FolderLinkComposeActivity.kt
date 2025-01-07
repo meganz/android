@@ -390,9 +390,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
      * Handle widget click
      */
     private fun onTransfersWidgetClick() {
-        if (transfersManagementViewModel.isTransferOverQuota()) {
-            transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
-        }
         lifecycleScope.launch {
             val credentials = runCatching { getAccountCredentialsUseCase() }.getOrNull()
             if (megaApi.isLoggedIn == 0 || credentials == null) {

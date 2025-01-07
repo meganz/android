@@ -36,7 +36,6 @@ import javax.inject.Singleton
  * @property chatManagement
  * @property myAccountInfo
  * @property passcodeManagement
- * @property transfersManagement
  */
 @Singleton
 class MegaChatRequestHandler @Inject constructor(
@@ -51,7 +50,6 @@ class MegaChatRequestHandler @Inject constructor(
     private val chatManagement: ChatManagement,
     private val myAccountInfo: MyAccountInfo,
     private val passcodeManagement: PasscodeManagement,
-    private val transfersManagement: TransfersManagement,
     private val broadcastFinishActivityUseCase: BroadcastFinishActivityUseCase,
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
     private val resetSdkLoggerUseCase: ResetSdkLoggerUseCase,
@@ -184,6 +182,5 @@ class MegaChatRequestHandler @Inject constructor(
     private fun resetDefaults() {
         passcodeManagement.resetDefaults()
         myAccountInfo.resetDefaults()
-        transfersManagement.resetDefaults()
     }
 }

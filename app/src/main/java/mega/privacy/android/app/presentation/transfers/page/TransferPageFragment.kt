@@ -24,7 +24,6 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentTransferPageBinding
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.TransfersPageAdapter
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
@@ -48,8 +47,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 internal class TransferPageFragment : Fragment() {
-    @Inject
-    lateinit var transfersManagement: TransfersManagement
 
     @Inject
     lateinit var areTransfersPausedUseCase: AreTransfersPausedUseCase

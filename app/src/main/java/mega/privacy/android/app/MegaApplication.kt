@@ -36,7 +36,6 @@ import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.listeners.GlobalChatListener
 import mega.privacy.android.app.meeting.CallService
 import mega.privacy.android.app.meeting.CallSoundType
@@ -54,9 +53,9 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -83,7 +82,6 @@ import javax.inject.Provider
  * @property updateCrashAndPerformanceReportersUseCase
  * @property monitorCallSoundsUseCase
  * @property themeModeState
- * @property transfersManagement
  * @property activityLifecycleHandler
  * @property megaChatNotificationHandler
  * @property pushNotificationSettingManagement
@@ -150,9 +148,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
 
     @Inject
     lateinit var themeModeState: ThemeModeState
-
-    @Inject
-    lateinit var transfersManagement: TransfersManagement
 
     @Inject
     lateinit var activityLifecycleHandler: ActivityLifecycleHandler

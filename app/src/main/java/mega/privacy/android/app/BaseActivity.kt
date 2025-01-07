@@ -45,7 +45,6 @@ import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.TransferOverquotaLayoutBinding
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -135,7 +134,6 @@ import kotlin.time.Duration.Companion.seconds
  * @property megaChatApi                    [MegaChatApiAndroid]
  * @property dbH                            [DatabaseHandler]
  * @property myAccountInfo                  [MyAccountInfo]
- * @property transfersManagement            [TransfersManagement]
  * @property app                            [MegaApplication]
  * @property outMetrics                     [DisplayMetrics]
  * @property getAccountDetailsUseCase
@@ -164,9 +162,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
-
-    @Inject
-    lateinit var transfersManagement: TransfersManagement
 
     @Inject
     lateinit var resetSdkLoggerUseCase: ResetSdkLoggerUseCase
