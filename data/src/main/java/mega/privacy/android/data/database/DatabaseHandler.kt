@@ -38,17 +38,6 @@ interface DatabaseHandler {
      * @param chatVideoQuality The new chat video quality.
      */
     var chatVideoQuality: Int
-
-    var isPasscodeLockEnabled: Boolean
-    var passcodeLockCode: String
-
-    /**
-     * Sets if the fingerprint lock setting is enabled or not.
-     *
-     * @param enabled True if the fingerprint is enabled, false otherwise.
-     */
-    var isFingerprintLockEnabled: Boolean
-
     /**
      * Sets the flag to indicate if should ask the user about set the current path as default download location.
      *

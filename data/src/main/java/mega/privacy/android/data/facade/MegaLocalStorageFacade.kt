@@ -114,14 +114,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.get().setAttrAskSizeDownload(askForConfirmation.toString())
     }
 
-    override fun setPasscodeLockEnabled(isPasscodeLockEnabled: Boolean) {
-        dbHandler.get().isPasscodeLockEnabled = isPasscodeLockEnabled
-    }
-
-    override suspend fun setPasscodeLockCode(passcodeLockCode: String) {
-        dbHandler.get().passcodeLockCode = passcodeLockCode
-    }
-
     override suspend fun setShowCopyright(showCopyrights: Boolean) {
         dbHandler.get().setShowCopyright(showCopyrights)
     }

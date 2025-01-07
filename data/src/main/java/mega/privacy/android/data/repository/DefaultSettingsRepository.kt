@@ -101,20 +101,6 @@ internal class DefaultSettingsRepository @Inject constructor(
     @Volatile
     private var isShowHiddenNodesPopulated: Boolean = false
 
-    override suspend fun isPasscodeLockPreferenceEnabled() =
-        withContext(ioDispatcher) {
-            databaseHandler.get().preferences
-                ?.passcodeLockEnabled
-                ?.toBooleanStrictOrNull()
-        }
-
-    override suspend fun setPasscodeLockEnabled(enabled: Boolean) {
-        withContext(ioDispatcher) { megaLocalStorageGateway.setPasscodeLockEnabled(enabled) }
-    }
-
-    override suspend fun setPasscodeLockCode(passcodeLockCode: String) =
-        withContext(ioDispatcher) { megaLocalStorageGateway.setPasscodeLockCode(passcodeLockCode) }
-
     override suspend fun fetchContactLinksOption(): Boolean = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
             megaApiGateway.isAutoAcceptContactsFromLinkEnabled(

@@ -150,20 +150,6 @@ interface MegaLocalStorageGateway {
     suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean)
 
     /**
-     * Set passcode l ock enabled
-     *
-     * @param isPasscodeLockEnabled
-     */
-    fun setPasscodeLockEnabled(isPasscodeLockEnabled: Boolean)
-
-    /**
-     * Set the passcode lock code
-     *
-     * @param passcodeLockCode
-     */
-    suspend fun setPasscodeLockCode(passcodeLockCode: String)
-
-    /**
      * Set show copyright
      *
      * @param showCopyrights

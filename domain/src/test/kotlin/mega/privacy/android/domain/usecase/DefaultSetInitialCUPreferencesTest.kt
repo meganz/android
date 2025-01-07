@@ -1,27 +1,28 @@
 package mega.privacy.android.domain.usecase
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.usecase.passcode.DisablePasscodeUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class DefaultSetInitialCUPreferencesTest {
     private lateinit var underTest: SetInitialCUPreferences
 
     private val settingsRepository = mock<SettingsRepository>()
 
     private val accountRepository = mock<AccountRepository>()
+    private val disablePasscodeUseCase = mock<DisablePasscodeUseCase>()
 
     @Before
     fun setUp() {
         underTest = DefaultSetInitialCUPreferences(
             settingsRepository = settingsRepository,
             accountRepository = accountRepository,
+            disablePasscodeUseCase = disablePasscodeUseCase
         )
     }
 
@@ -45,17 +46,11 @@ class DefaultSetInitialCUPreferencesTest {
         }
 
     @Test
-    fun `test that initial value for settingsRepository setPasscodeLockEnabled is set`() =
+    fun `test that disablePasscodeUseCase invokes correctly`() =
         runTest {
             underTest()
-            verify(settingsRepository).setPasscodeLockEnabled(false)
+            verify(disablePasscodeUseCase).invoke()
         }
-
-    @Test
-    fun `test that initial value for settingsRepository setPasscodeLockCode is set`() = runTest {
-        underTest()
-        verify(settingsRepository).setPasscodeLockCode("")
-    }
 
     @Test
     fun `test that initial value for settingsRepository setShowCopyright is set`() = runTest {

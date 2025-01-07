@@ -16,26 +16,6 @@ import java.io.File
  *
  */
 interface SettingsRepository {
-
-    /**
-     * Is passcode lock preference enabled
-     *
-     * @return true if enabled
-     */
-    suspend fun isPasscodeLockPreferenceEnabled(): Boolean?
-
-    /**
-     * Set passcode lock enabled/disabled
-     *
-     * @param enabled
-     */
-    suspend fun setPasscodeLockEnabled(enabled: Boolean)
-
-    /**
-     * Set the passcode lock code
-     */
-    suspend fun setPasscodeLockCode(passcodeLockCode: String)
-
     /**
      * Fetch contact links option
      *

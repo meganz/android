@@ -30,7 +30,6 @@ import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
-import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
@@ -55,7 +54,6 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val canDeleteAccount: CanDeleteAccount,
-    private val refreshPasscodeLockPreference: RefreshPasscodeLockPreference,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
@@ -328,8 +326,6 @@ class SettingsViewModel @Inject constructor(
     fun setShowHiddenItemsEnabled(enabled: Boolean) = viewModelScope.launch {
         setShowHiddenItemsUseCase(enabled)
     }
-
-    suspend fun fetchPasscodeEnabled() = refreshPasscodeLockPreference()
 
     internal fun toggleBackgroundPlay(isEnable: Boolean) {
         toggleBackgroundPlayJob?.cancel()

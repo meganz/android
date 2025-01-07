@@ -22,7 +22,6 @@ import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
-import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
@@ -63,10 +62,6 @@ object TestSettingsModule {
 
     @Provides
     fun provideCanDeleteAccount(): CanDeleteAccount = canDeleteAccount
-
-    @Provides
-    fun provideRefreshPasscodeLockPreference(): RefreshPasscodeLockPreference =
-        mock()
 
     @Provides
     fun provideIsMultiFactorAuthAvailable(): IsMultiFactorAuthAvailable =

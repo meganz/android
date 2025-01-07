@@ -13,19 +13,21 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.TEST_USER_ACCOUNT
+import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.COOKIES_URI
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
-import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
@@ -54,9 +56,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import mega.privacy.android.app.TEST_USER_ACCOUNT
-import mega.privacy.android.app.extensions.asHotFlow
-import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import java.util.stream.Stream
 
 @ExperimentalCoroutinesApi
@@ -71,7 +70,6 @@ class SettingsViewModelTest {
     private val setMediaDiscoveryView = mock<SetMediaDiscoveryView>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorPasscodeLockPreferenceUseCase = mock<MonitorPasscodeLockPreferenceUseCase>()
-    private val refreshPasscodeLockPreference = mock<RefreshPasscodeLockPreference>()
     private val monitorAutoAcceptQRLinks = mock<MonitorAutoAcceptQRLinks>()
     private val isChatLoggedIn = mock<IsChatLoggedIn>()
     private val monitorHideRecentActivityUseCase = mock<MonitorHideRecentActivityUseCase>()
@@ -99,10 +97,6 @@ class SettingsViewModelTest {
 
         getFeatureFlagValueUseCase.stub {
             onBlocking { invoke(any()) }.thenReturn(false)
-        }
-
-        refreshPasscodeLockPreference.stub {
-            onBlocking { invoke() }.thenReturn(false)
         }
 
         monitorAutoAcceptQRLinks.stub {
@@ -154,7 +148,6 @@ class SettingsViewModelTest {
         underTest = SettingsViewModel(
             getAccountDetailsUseCase = getAccountDetailsUseCase,
             canDeleteAccount = mock { on { invoke(TEST_USER_ACCOUNT) }.thenReturn(true) },
-            refreshPasscodeLockPreference = refreshPasscodeLockPreference,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             rootNodeExistsUseCase = mock { onBlocking { invoke() }.thenReturn(true) },
             isMultiFactorAuthAvailable = isMultiFactorAuthAvailable,

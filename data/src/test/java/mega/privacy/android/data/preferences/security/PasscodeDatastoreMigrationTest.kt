@@ -3,7 +3,6 @@ package mega.privacy.android.data.preferences.security
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaAttributes
@@ -15,7 +14,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 
-@OptIn(ExperimentalCoroutinesApi::class)
 internal class PasscodeDatastoreMigrationTest {
     private lateinit var underTest: PasscodeDatastoreMigration
 
@@ -85,6 +83,7 @@ internal class PasscodeDatastoreMigrationTest {
             on { passcodeLockEnabled }.thenReturn(expectedPasscodeLockEnabled.toString())
             on { passcodeLockRequireTime }.thenReturn(expectedPasscodeLockRequireTime.toString())
             on { passcodeLockType }.thenReturn(expectedType)
+            on { fingerprintLock }.thenReturn(expectedBiometricsState.toString())
         }
         val megaAttributes = mock<MegaAttributes> {
             on { attempts }.thenReturn(expectedAttempts)
@@ -93,7 +92,6 @@ internal class PasscodeDatastoreMigrationTest {
         databaseHandler.stub {
             on { preferences }.thenReturn(megaPreferences)
             on { attributes }.thenReturn(megaAttributes)
-            on { isFingerprintLockEnabled }.thenReturn(expectedBiometricsState)
         }
 
         underTest.migrate(mock())
@@ -123,6 +121,7 @@ internal class PasscodeDatastoreMigrationTest {
             on { passcodeLockEnabled }.thenReturn(expectedPasscodeLockEnabled.toString())
             on { passcodeLockRequireTime }.thenReturn(expectedPasscodeLockRequireTime)
             on { passcodeLockType }.thenReturn(expectedType)
+            on { fingerprintLock }.thenReturn(expectedBiometricsState.toString())
         }
         val megaAttributes = mock<MegaAttributes> {
             on { attempts }.thenReturn(expectedAttempts)
@@ -131,7 +130,6 @@ internal class PasscodeDatastoreMigrationTest {
         databaseHandler.stub {
             on { preferences }.thenReturn(megaPreferences)
             on { attributes }.thenReturn(megaAttributes)
-            on { isFingerprintLockEnabled }.thenReturn(expectedBiometricsState)
         }
 
         underTest.migrate(mock())

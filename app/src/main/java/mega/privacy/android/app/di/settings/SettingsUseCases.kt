@@ -14,7 +14,6 @@ import mega.privacy.android.domain.usecase.DefaultCanDeleteAccount
 import mega.privacy.android.domain.usecase.DefaultIsChatLoggedIn
 import mega.privacy.android.domain.usecase.DefaultMonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.DefaultMonitorMediaDiscoveryView
-import mega.privacy.android.domain.usecase.DefaultRefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.DefaultToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.GetChatImageQuality
@@ -22,7 +21,6 @@ import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
-import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
@@ -39,9 +37,6 @@ abstract class SettingsUseCases {
 
     @Binds
     abstract fun bindCanDeleteAccount(useCase: DefaultCanDeleteAccount): CanDeleteAccount
-
-    @Binds
-    abstract fun bindRefreshPasscodeLockPreference(useCase: DefaultRefreshPasscodeLockPreference): RefreshPasscodeLockPreference
 
     @Binds
     abstract fun bindToggleAutoAcceptQRLinks(useCase: DefaultToggleAutoAcceptQRLinks): ToggleAutoAcceptQRLinks
