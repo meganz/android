@@ -8,9 +8,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -48,6 +50,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
@@ -59,6 +64,8 @@ import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BUTTON_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTTON_TAG
+import mega.privacy.android.app.presentation.search.SEARCH_SCREEN_MINI_AUDIO_PLAYER_TEST_TAG
+import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.transfers.TransferManagementUiState
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
@@ -250,49 +257,76 @@ internal fun FolderLinkView(
                 }
             },
         ) { paddingValues ->
-            if (state.nodesList.isEmpty()) {
-                EmptyFolderLinkView(
+            ConstraintLayout(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+            ) {
+                val (audioPlayer, folderLinkView) = createRefs()
+                MiniAudioPlayerView(
                     modifier = Modifier
+                        .constrainAs(audioPlayer) {
+                            bottom.linkTo(parent.bottom)
+                        }
                         .fillMaxWidth()
-                        .fillMaxHeight()
-                        .padding(paddingValues)
-                        .padding(horizontal = 8.dp),
-                    emptyViewString = emptyViewString,
-                    state.isNodesFetched
+                        .testTag(SEARCH_SCREEN_MINI_AUDIO_PLAYER_TEST_TAG),
+                    lifecycle = LocalLifecycleOwner.current.lifecycle,
                 )
-            } else {
-                NodesView(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .padding(horizontal = 2.dp),
-                    nodeUIItems = state.nodesList,
-                    onMenuClick = { onMoreOptionClick(it) },
-                    onItemClicked = onItemClicked,
-                    onLongClick = onLongClick,
-                    sortOrder = "",
-                    isListView = state.currentViewType == ViewType.LIST,
-                    onSortOrderClick = onSortOrderClick,
-                    onChangeViewTypeClick = onChangeViewTypeClick,
-                    showSortOrder = false,
-                    listState = listState,
-                    gridState = gridState,
-                    onLinkClicked = onLinkClicked,
-                    onDisputeTakeDownClicked = onDisputeTakeDownClicked,
-                    showMediaDiscoveryButton = state.hasMediaItem,
-                    onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-                    isPublicNode = true,
-                    fileTypeIconMapper = fileTypeIconMapper,
-                    inSelectionMode = state.selectedNodeCount > 0
-                )
-            }
 
-            if (state.storageStatusDialogState != null) {
-                StorageStatusDialogView(
-                    state = state.storageStatusDialogState,
-                    dismissClickListener = onStorageStatusDialogDismiss,
-                    actionButtonClickListener = onStorageDialogActionButtonClick,
-                    achievementButtonClickListener = onStorageDialogAchievementButtonClick,
-                )
+                Box(
+                    modifier = Modifier
+                        .constrainAs(folderLinkView) {
+                            top.linkTo(parent.top)
+                            bottom.linkTo(audioPlayer.top)
+                            height = Dimension.fillToConstraints
+                        }
+                        .fillMaxWidth()
+                ) {
+                    if (state.nodesList.isEmpty()) {
+                        EmptyFolderLinkView(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .padding(paddingValues)
+                                .padding(horizontal = 8.dp),
+                            emptyViewString = emptyViewString,
+                            state.isNodesFetched
+                        )
+                    } else {
+                        NodesView(
+                            modifier = Modifier
+                                .padding(paddingValues)
+                                .padding(horizontal = 2.dp),
+                            nodeUIItems = state.nodesList,
+                            onMenuClick = { onMoreOptionClick(it) },
+                            onItemClicked = onItemClicked,
+                            onLongClick = onLongClick,
+                            sortOrder = "",
+                            isListView = state.currentViewType == ViewType.LIST,
+                            onSortOrderClick = onSortOrderClick,
+                            onChangeViewTypeClick = onChangeViewTypeClick,
+                            showSortOrder = false,
+                            listState = listState,
+                            gridState = gridState,
+                            onLinkClicked = onLinkClicked,
+                            onDisputeTakeDownClicked = onDisputeTakeDownClicked,
+                            showMediaDiscoveryButton = state.hasMediaItem,
+                            onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+                            isPublicNode = true,
+                            fileTypeIconMapper = fileTypeIconMapper,
+                            inSelectionMode = state.selectedNodeCount > 0
+                        )
+                    }
+
+                    if (state.storageStatusDialogState != null) {
+                        StorageStatusDialogView(
+                            state = state.storageStatusDialogState,
+                            dismissClickListener = onStorageStatusDialogDismiss,
+                            actionButtonClickListener = onStorageDialogActionButtonClick,
+                            achievementButtonClickListener = onStorageDialogAchievementButtonClick,
+                        )
+                    }
+                }
             }
         }
     }

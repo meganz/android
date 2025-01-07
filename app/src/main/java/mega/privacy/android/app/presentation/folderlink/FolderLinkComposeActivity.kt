@@ -6,7 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,14 +30,12 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.constants.IntentConstants
-import mega.privacy.android.app.databinding.ActivityFolderLinkComposeBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
-import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -116,18 +114,10 @@ class FolderLinkComposeActivity : PasscodeActivity(),
     @Inject
     lateinit var googleAdsManager: GoogleAdsManager
 
-    private lateinit var binding: ActivityFolderLinkComposeBinding
-
     private val viewModel: FolderLinkViewModel by viewModels()
 
     private var mKey: String? = null
     private var statusDialog: AlertDialog? = null
-
-    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            viewModel.handleBackPress()
-        }
-    }
 
     private val nameCollisionActivityLauncher = registerForActivityResult(
         NameCollisionActivityContract()
@@ -179,28 +169,14 @@ class FolderLinkComposeActivity : PasscodeActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
-        binding = ActivityFolderLinkComposeBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-
-        binding.folderLinkView.apply {
-            setContent {
-                StartFolderLinkView()
-            }
+        setContent {
+            StartFolderLinkView()
         }
 
         intent?.let { viewModel.handleIntent(it) }
         viewModel.checkLoginRequired()
         checkForInAppAdvertisement()
-        setupMiniAudioPlayer()
-    }
-
-    private fun setupMiniAudioPlayer() {
-        val audioPlayerController = MiniAudioPlayerController(binding.miniAudioPlayer).apply {
-            shouldVisible = true
-        }
-        lifecycle.addObserver(audioPlayerController)
     }
 
     private fun checkForInAppAdvertisement() {
