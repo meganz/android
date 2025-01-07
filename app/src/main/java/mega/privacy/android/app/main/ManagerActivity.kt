@@ -566,6 +566,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private var clearRubbishBinMenuItem: MenuItem? = null
     private var returnCallMenuItem: MenuItem? = null
     private var openLinkMenuItem: MenuItem? = null
+    private var moreMenuItem: MenuItem? = null
     private var chronometerMenuItem: Chronometer? = null
     private var layoutCallMenuItem: LinearLayout? = null
     private var typesCameraPermission = Constants.INVALID_TYPE_PERMISSIONS
@@ -3199,6 +3200,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
             supportActionBar?.setHomeAsUpIndicator(badgeDrawable)
         }
+        if (drawerItem == DrawerItem.CLOUD_DRIVE) {
+            openLinkMenuItem?.isVisible = isFirstNavigationLevel
+            moreMenuItem?.isVisible = !isFirstNavigationLevel
+        }
     }
 
     /**
@@ -4262,7 +4267,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         layoutCallMenuItem = rootView?.findViewById(R.id.layout_menu_call)
         chronometerMenuItem = rootView?.findViewById(R.id.chrono_menu)
         chronometerMenuItem?.visibility = View.GONE
-        val moreMenuItem = menu.findItem(R.id.action_more)
+        moreMenuItem = menu.findItem(R.id.action_more)
         openLinkMenuItem = menu.findItem(R.id.action_open_link)
         returnCallMenuItem?.let { menuItem ->
             rootView?.setOnClickListener {
@@ -4282,7 +4287,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             when (drawerItem) {
                 DrawerItem.CLOUD_DRIVE -> {
                     openLinkMenuItem?.isVisible = isFirstNavigationLevel
-                    moreMenuItem.isVisible = !isFirstNavigationLevel
+                    moreMenuItem?.isVisible = !isFirstNavigationLevel
                     if (!fileBrowserViewModel.isMediaDiscoveryOpen() && isCloudAdded && fileBrowserViewModel.state().nodesList.isNotEmpty()
                     ) {
                         searchMenuItem?.isVisible = true
@@ -4294,7 +4299,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 }
 
                 DrawerItem.RUBBISH_BIN -> {
-                    moreMenuItem.isVisible = !isFirstNavigationLevel
+                    moreMenuItem?.isVisible = !isFirstNavigationLevel
                     if (rubbishBinViewModel.state().nodeList.isNotEmpty()) {
                         clearRubbishBinMenuItem?.isVisible = isFirstNavigationLevel
                         searchMenuItem?.isVisible = true
@@ -4302,14 +4307,14 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 }
 
                 DrawerItem.BACKUPS -> {
-                    moreMenuItem.isVisible = false
+                    moreMenuItem?.isVisible = false
                     if ((backupsFragment?.getNodeCount() ?: 0) > 0) {
                         searchMenuItem?.isVisible = true
                     }
                 }
 
                 DrawerItem.SHARED_ITEMS -> {
-                    moreMenuItem.isVisible = false
+                    moreMenuItem?.isVisible = false
                 }
 
                 DrawerItem.TRANSFERS -> if (transferPageViewModel.transferTab == TransfersTab.PENDING_TAB
