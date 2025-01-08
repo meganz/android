@@ -4,7 +4,6 @@ import mega.privacy.android.icon.pack.R as IconPackR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Animatable
 import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
@@ -14,11 +13,8 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.drawee.controller.BaseControllerListener
-import com.facebook.imagepipeline.image.ImageInfo
-import com.facebook.imagepipeline.request.ImageRequest
-import com.facebook.imagepipeline.request.ImageRequestBuilder
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.MimeTypeList
@@ -29,7 +25,6 @@ import mega.privacy.android.app.databinding.ActivityNameCollisionBinding
 import mega.privacy.android.app.databinding.ViewNameCollisionOptionBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.listeners.OptionalRequestListener
 import mega.privacy.android.app.namecollision.data.NameCollisionActionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
@@ -53,7 +48,6 @@ import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
 import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -259,7 +253,9 @@ class NameCollisionActivity : PasscodeActivity() {
             thumbnailIcon.isVisible = !hasThumbnail
             when {
                 hasThumbnail -> {
-                    thumbnail.setImageRequest(ImageRequest.fromUri(collisionResult.thumbnail))
+                    thumbnail.load(collisionResult.thumbnail) {
+                        transformations(RoundedCornersTransformation(resources.getDimension(R.dimen.thumbnail_corner_radius)))
+                    }
                 }
 
                 else -> {
@@ -322,16 +318,22 @@ class NameCollisionActivity : PasscodeActivity() {
         }
 
         binding.cancelView.apply {
-            val hasThumbnail = collisionResult.collisionThumbnail != null
+            val hasThumbnail = collisionResult.thumbnail != null
             thumbnail.isVisible = hasThumbnail
             thumbnailIcon.isVisible = !hasThumbnail
             if (hasThumbnail) {
-                thumbnail.setImageRequest(ImageRequest.fromUri(collisionResult.collisionThumbnail))
+                thumbnail.load(collisionResult.thumbnail) {
+                    transformations(RoundedCornersTransformation(resources.getDimension(R.dimen.thumbnail_corner_radius)))
+                }
             } else {
                 thumbnailIcon.setImageResource(
                     if (isFile) MimeTypeList.typeForName(name).iconResourceId
                     else IconPackR.drawable.ic_folder_medium_solid
                 )
+
+                if (collisionResult.nameCollision is NameCollisionUiEntity.Upload) {
+                    requestFileThumbnail(collisionResult.nameCollision.absolutePath)
+                }
             }
             this.name.text = collisionResult.collisionName
             size.text =
@@ -366,7 +368,9 @@ class NameCollisionActivity : PasscodeActivity() {
                 thumbnailIcon.isVisible = !hasThumbnail
                 when {
                     hasThumbnail -> {
-                        thumbnail.setImageRequest(ImageRequest.fromUri(collisionResult.thumbnail))
+                        thumbnail.load(collisionResult.thumbnail) {
+                            transformations(RoundedCornersTransformation(resources.getDimension(R.dimen.thumbnail_corner_radius)))
+                        }
                     }
 
                     else -> {
@@ -428,25 +432,13 @@ class NameCollisionActivity : PasscodeActivity() {
     private fun ViewNameCollisionOptionBinding.requestFileThumbnail(absolutePath: String) {
         with(thumbnail) {
             isVisible = true
-            controller = Fresco.newDraweeControllerBuilder()
-                .setImageRequest(ImageRequestBuilder.fromRequest(
-                    if (viewModel.isFolderUploadContext) ImageRequest.fromUri(absolutePath.toUri())
-                    else ImageRequest.fromFile(File(absolutePath))
+            load(absolutePath) {
+                transformations(RoundedCornersTransformation(resources.getDimension(R.dimen.thumbnail_corner_radius)))
+                listener(
+                    onSuccess = { _, _ -> finishThumbnailRequest(true) },
+                    onError = { _, _ -> finishThumbnailRequest(false) }
                 )
-                    .setLocalThumbnailPreviewsEnabled(true)
-                    .setRequestListener(OptionalRequestListener(
-                        onRequestSuccess = { _, _, _ -> finishThumbnailRequest(true) },
-                        onRequestFailure = { _, _, _, _ -> finishThumbnailRequest(false) }
-                    )).build()
-                ).setControllerListener(object : BaseControllerListener<ImageInfo?>() {
-                    override fun onFinalImageSet(
-                        id: String,
-                        imageInfo: ImageInfo?,
-                        animatable: Animatable?,
-                    ) {
-                        finishThumbnailRequest(true)
-                    }
-                }).build()
+            }
         }
     }
 
