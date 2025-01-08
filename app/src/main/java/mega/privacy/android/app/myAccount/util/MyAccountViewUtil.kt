@@ -10,6 +10,7 @@ import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 
@@ -40,6 +41,7 @@ object MyAccountViewUtil {
         usedStoragePercentage: Int,
         usedTransfer: String,
         usedTransferPercentage: Int,
+        usedTransferStatus: UsedTransferStatus,
     ) {
         usageLayoutBusiness.isVisible = false
         storageLayout.isVisible = true
@@ -62,7 +64,7 @@ object MyAccountViewUtil {
 
             storageProgressBar.progress = usedStoragePercentage
 
-            val colors = when (storageState) {
+            val storageColors = when (storageState) {
                 StorageState.Red -> ContextCompat.getColorStateList(
                     context,
                     R.color.color_text_error
@@ -75,8 +77,8 @@ object MyAccountViewUtil {
 
                 else -> ContextCompat.getColorStateList(context, R.color.teal_300_teal_200)
             }
-            storageProgressBar.progressTintList = colors
-            storageProgressPercentage.setTextColor(colors)
+            storageProgressBar.progressTintList = storageColors
+            storageProgressPercentage.setTextColor(storageColors)
 
             storageProgress.text = context.getString(
                 R.string.used_storage_transfer,
@@ -109,6 +111,22 @@ object MyAccountViewUtil {
             }
 
             transferProgressBar.progress = usedTransferPercentage
+
+            val transferColors = when (usedTransferStatus) {
+                UsedTransferStatus.Full -> ContextCompat.getColorStateList(
+                    context,
+                    R.color.color_text_error
+                )
+
+                UsedTransferStatus.AlmostFull -> ContextCompat.getColorStateList(
+                    context,
+                    R.color.color_support_warning
+                )
+
+                else -> ContextCompat.getColorStateList(context, R.color.teal_300_teal_200)
+            }
+            transferProgressBar.progressTintList = transferColors
+            transferProgressPercentage.setTextColor(transferColors)
 
             transferProgress.text = context.getString(
                 R.string.used_storage_transfer,

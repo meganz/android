@@ -186,7 +186,8 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
                 viewModel.getUsedStorage(),
                 viewModel.getUsedStoragePercentage(),
                 viewModel.getUsedTransfer(),
-                viewModel.getUsedTransferPercentage()
+                viewModel.getUsedTransferPercentage(),
+                viewModel.getUsedTransferStatus()
             )
             paymentAlertBinding.root.isVisible = paymentAlertBinding.update(
                 viewModel.getRenewTime(),

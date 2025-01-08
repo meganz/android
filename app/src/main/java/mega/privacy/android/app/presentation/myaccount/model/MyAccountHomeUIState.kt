@@ -6,6 +6,7 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import java.io.File
 
 /**
@@ -32,6 +33,7 @@ import java.io.File
  * @property usedStoragePercentage
  * @property usedTransfer
  * @property usedTransferPercentage
+ * @property usedTransferStatus
  * @property totalStorage
  * @property totalTransfer
  * @property subscriptionRenewTime
@@ -64,6 +66,7 @@ data class MyAccountHomeUIState(
     val usedStoragePercentage: Int = 0,
     val usedTransfer: Long = 0,
     val usedTransferPercentage: Int = 0,
+    val usedTransferStatus: UsedTransferStatus = UsedTransferStatus.NoTransferProblems,
     val totalStorage: Long = 0,
     val totalTransfer: Long = 0,
     val subscriptionRenewTime: Long = 0,

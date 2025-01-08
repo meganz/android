@@ -65,6 +65,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.exception.account.ConfirmCancelAccountException
@@ -104,6 +105,7 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
+import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
 import nz.mega.sdk.MegaAccountDetails
@@ -193,6 +195,7 @@ class MyAccountViewModel @Inject constructor(
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
+    private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -525,6 +528,15 @@ class MyAccountViewModel @Inject constructor(
      * @return
      */
     fun getUsedTransferPercentage(): Int = myAccountInfo.usedTransferPercentage
+
+
+    /**
+     * Get used transfer status
+     *
+     * @return
+     */
+    fun getUsedTransferStatus(): UsedTransferStatus =
+        getUsedTransferStatusUseCase(myAccountInfo.usedTransferPercentage)
 
     /**
      * Get total transfer

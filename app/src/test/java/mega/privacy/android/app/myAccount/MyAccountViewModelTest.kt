@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.account.AccountSubscriptionDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.verification.VerificationStatus
@@ -69,6 +70,7 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
+import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -137,6 +139,7 @@ internal class MyAccountViewModelTest {
     private val testDispatcher = UnconfinedTestDispatcher()
     private val snackBarHandler: SnackBarHandler = mock()
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
+    private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase = mock()
     private val accountDetailFlow = MutableStateFlow(AccountDetail())
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
 
@@ -225,6 +228,7 @@ internal class MyAccountViewModelTest {
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorStorageStateUseCase = monitorStorageStateUseCase,
+            getUsedTransferStatusUseCase = getUsedTransferStatusUseCase,
         )
     }
 
@@ -733,6 +737,28 @@ internal class MyAccountViewModelTest {
         }
     }
 
+    @ParameterizedTest(name = " when usedTransferPercentage is {0} and usedTransferStatus is {1}")
+    @MethodSource("provideTransferDetails")
+    fun `test that used transfer status and percentage is returned correctly`(
+        usedTransferPercentage: Int,
+        usedTransferStatus: UsedTransferStatus,
+    ) = runTest {
+        whenever(myAccountInfo.usedTransferPercentage).thenReturn(usedTransferPercentage)
+        whenever(getUsedTransferStatusUseCase(usedTransferPercentage)).thenReturn(usedTransferStatus)
+
+        initializeViewModel()
+        assertThat(underTest.getUsedTransferPercentage()).isEqualTo(usedTransferPercentage)
+        assertThat(underTest.getUsedTransferStatus()).isEqualTo(usedTransferStatus)
+    }
+
+    private fun provideTransferDetails(): Stream<Arguments> {
+        return Stream.of(
+            Arguments.of(50, UsedTransferStatus.NoTransferProblems),
+            Arguments.of(90, UsedTransferStatus.AlmostFull),
+            Arguments.of(100, UsedTransferStatus.Full),
+        )
+    }
+
     @ParameterizedTest(name = "{0}")
     @EnumSource(StorageState::class)
     fun `test that storage state should be updated when monitorStorageState emits`(state: StorageState) =
@@ -881,6 +907,7 @@ internal class MyAccountViewModelTest {
             snackBarHandler,
             getBusinessStatusUseCase,
             monitorAccountDetailUseCase,
+            getUsedTransferStatusUseCase,
         )
     }
 }

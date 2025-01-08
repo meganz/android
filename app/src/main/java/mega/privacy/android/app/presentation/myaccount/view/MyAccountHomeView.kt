@@ -116,6 +116,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import mega.privacy.android.legacy.core.ui.controls.lists.ImageIconItem
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -523,6 +524,7 @@ private fun AccountInfoSection(
             totalTransfer = uiState.totalTransfer,
             usedStoragePercentage = uiState.usedStoragePercentage,
             usedTransferPercentage = uiState.usedTransferPercentage,
+            usedTransferStatus = uiState.usedTransferStatus,
             showTransfer = uiState.accountType != AccountType.FREE,
             showProgressBar = (uiState.isBusinessAccount || uiState.isProFlexiAccount).not(),
             onUsageMeterClick = uiActions::onClickUsageMeter
@@ -743,15 +745,22 @@ internal fun UsageMeterSection(
     usedStorage: Long,
     totalStorage: Long,
     usedTransferPercentage: Int,
+    usedTransferStatus: UsedTransferStatus,
     usedTransfer: Long,
     totalTransfer: Long,
     onUsageMeterClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val isStorageOverQuota = storageState == StorageState.Red
-    val color = when(storageState) {
+    val storageColor = when (storageState) {
         StorageState.Red -> colorResource(R.color.color_text_error)
         StorageState.Orange -> colorResource(R.color.color_support_warning)
+        else -> colorResource(R.color.teal_300_teal_200)
+    }
+
+    val transferColor = when (usedTransferStatus) {
+        UsedTransferStatus.Full -> colorResource(R.color.color_text_error)
+        UsedTransferStatus.AlmostFull -> colorResource(R.color.color_support_warning)
         else -> colorResource(R.color.teal_300_teal_200)
     }
     if (showProgressBar) {
@@ -785,7 +794,7 @@ internal fun UsageMeterSection(
                         .size(50.dp)
                         .align(Alignment.Center),
                     backgroundColor = MaterialTheme.colors.grey_100_grey_600,
-                    color = color,
+                    color = storageColor,
                     strokeWidth = 5.dp,
                     progress = (usedStoragePercentage.toFloat() / 100).coerceAtMost(1f)
                 )
@@ -794,7 +803,7 @@ internal fun UsageMeterSection(
                     modifier = Modifier.align(Alignment.Center),
                     text = "$usedStoragePercentage%",
                     style = MaterialTheme.typography.body2medium,
-                    color = color
+                    color = storageColor
                 )
             }
 
@@ -855,7 +864,7 @@ internal fun UsageMeterSection(
                             .size(50.dp)
                             .testTag(USAGE_TRANSFER_PROGRESS),
                         backgroundColor = MaterialTheme.colors.grey_100_grey_600,
-                        color = MaterialTheme.colors.secondary,
+                        color = transferColor,
                         strokeWidth = 6.dp,
                         progress = (usedTransferPercentage.toFloat() / 100).coerceAtMost(1f)
                     )
@@ -864,7 +873,7 @@ internal fun UsageMeterSection(
                         modifier = Modifier.align(Alignment.Center),
                         text = "$usedTransferPercentage%",
                         style = MaterialTheme.typography.body2medium,
-                        color = MaterialTheme.colors.secondary
+                        color = transferColor
                     )
                 }
 

@@ -20,6 +20,7 @@ import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIStat
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
+import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import timber.log.Timber
 import javax.inject.Inject
@@ -58,6 +60,7 @@ class MyAccountHomeViewModel @Inject constructor(
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
+    private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase,
     private val accountNameMapper: AccountNameMapper,
 ) : ViewModel() {
     private val _uiState =
@@ -138,6 +141,11 @@ class MyAccountHomeViewModel @Inject constructor(
                             usedTransfer = accountDetail.transferDetail?.usedTransfer ?: 0,
                             usedTransferPercentage = accountDetail.transferDetail?.usedTransferPercentage
                                 ?: 0,
+                            usedTransferStatus = accountDetail.transferDetail?.usedTransferPercentage?.let { usedTransferPercentage ->
+                                getUsedTransferStatusUseCase(
+                                    usedTransferPercentage
+                                )
+                            } ?: UsedTransferStatus.NoTransferProblems,
                             totalStorage = accountDetail.storageDetail?.totalStorage ?: 0,
                             totalTransfer = accountDetail.transferDetail?.totalTransfer ?: 0,
                             subscriptionRenewTime = accountDetail.levelDetail?.subscriptionRenewTime
