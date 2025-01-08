@@ -10,51 +10,26 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.cache.Cache
-import mega.privacy.android.data.constant.CacheFolderConstant
-import mega.privacy.android.data.extensions.failWithError
-import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
-import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
-import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
-import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.data.gateway.api.StreamingGateway
-import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.MegaExceptionMapper
-import mega.privacy.android.data.mapper.SortOrderIntMapper
-import mega.privacy.android.data.mapper.node.NodeMapper
-import mega.privacy.android.data.mapper.shares.ShareDataMapper
-import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants
-import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NullFileException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileSystemRepository
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaError.API_ENOENT
-import nz.mega.sdk.MegaError.API_OK
-import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
-import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -62,6 +37,7 @@ import java.io.IOException
 import java.net.URI
 import java.net.URLConnection
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Default implementation of [FileSystemRepository]
@@ -74,6 +50,7 @@ import javax.inject.Inject
  * @property sdCardGateway
  * @property fileAttributeGateway
  */
+@Singleton
 internal class FileSystemRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -85,6 +62,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val fileAttributeGateway: FileAttributeGateway,
     private val documentFileWrapper: DocumentFileWrapper,
 ) : FileSystemRepository {
+
+    private val moveSdDocumentMutex = Mutex()
 
     override val localDCIMFolderPath: String
         get() = fileGateway.localDCIMFolderPath
@@ -264,39 +243,62 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         file: File,
         destinationUri: String,
         subFolders: List<String>,
-    ) =
-        withContext(ioDispatcher) {
-            val sourceDocument = documentFileWrapper.fromFile(file)
-            val sdCardUri = Uri.parse(destinationUri)
+    ) = withContext(ioDispatcher) {
+        val sourceDocument = documentFileWrapper.fromFile(file)
+        val sdCardUri = Uri.parse(destinationUri)
 
-            val destDocument = documentFileWrapper.getSdDocumentFile(
+        val destDocument = moveSdDocumentMutex.withLock {
+            documentFileWrapper.getSdDocumentFile(
                 sdCardUri,
                 subFolders,
                 file.name,
                 MimeTypeMap.getSingleton().getMimeTypeFromExtension(file.extension)
                     ?: "application/octet-stream"
             )
-
-            try {
-                if (destDocument != null) {
-                    val inputStream =
-                        context.contentResolver.openInputStream(sourceDocument.uri)
-                    val outputStream =
-                        context.contentResolver.openOutputStream(destDocument.uri)
-
-                    inputStream?.use { input ->
-                        outputStream?.use { output ->
-                            input.copyTo(output)
-                        }
-                    }
-                    file.delete()
-                    return@withContext true
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-            return@withContext false
         }
+
+        try {
+            if (destDocument != null) {
+                val inputStream =
+                    context.contentResolver.openInputStream(sourceDocument.uri)
+                val outputStream =
+                    context.contentResolver.openOutputStream(destDocument.uri)
+
+                inputStream?.use { input ->
+                    outputStream?.use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                file.delete()
+                return@withContext true
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return@withContext false
+    }
+
+    override suspend fun moveDirectoryToSd(
+        directory: File,
+        destinationUri: String,
+    ): Boolean = withContext(ioDispatcher) {
+        val sdCardUri = Uri.parse(destinationUri) ?: throw NullFileException()
+        val directorySdCardStringUri = moveSdDocumentMutex.withLock {
+            documentFileWrapper.fromUri(sdCardUri)?.let {
+                it.findFile(directory.name) ?: it.createDirectory(directory.name)
+            }?.uri?.toString() ?: throw NullFileException()
+        }
+
+        directory.listFiles()?.forEach { childFile ->
+            if (childFile.isDirectory) {
+                moveDirectoryToSd(childFile, directorySdCardStringUri)
+            } else {
+                moveFileToSd(childFile, destinationUri, listOf(directory.name))
+            }
+        }
+
+        return@withContext directory.delete()
+    }
 
     override suspend fun createNewImageUri(fileName: String): String? = withContext(ioDispatcher) {
         fileGateway.createNewImageUri(fileName)?.toString()

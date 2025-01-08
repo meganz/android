@@ -238,6 +238,14 @@ interface FileSystemRepository {
     suspend fun moveFileToSd(file: File, destinationUri: String, subFolders: List<String>): Boolean
 
     /**
+     * Moves a [directory] to a [destinationUri] on the sd. It first copies the file to the [destinationUri] and then deletes the original one
+     *
+     * @param directory the directory to be moved
+     * @param destinationUri the target uri where the file will be moved (excluding the name of the file itself)
+     */
+    suspend fun moveDirectoryToSd(directory: File, destinationUri: String): Boolean
+
+    /**
      * Create new image uri
      *
      * @param fileName file name

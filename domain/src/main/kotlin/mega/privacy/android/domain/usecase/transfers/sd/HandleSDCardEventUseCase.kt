@@ -35,10 +35,7 @@ class HandleSDCardEventUseCase @Inject constructor(
             || !(transfer.isSDCardDownload() || fileSystemRepository.isSDCardCachePath(path))
         ) return
 
-        if (transferEvent is TransferEvent.TransferFinishEvent
-            && transferEvent.error == null
-            && transfer.isFolderTransfer.not()
-        ) {
+        if (transferEvent is TransferEvent.TransferFinishEvent && transferEvent.error == null) {
             scope.launch {
                 destinationUriAndSubFolders?.let { (path, subFolders) ->
                     moveFileToSdCardUseCase(

@@ -45,7 +45,7 @@ class DocumentFileFacade @Inject constructor(
         fileName: String,
         mimeType: String,
     ): DocumentFile? {
-        var folderDocument = fromTreeUri(folderUri)
+        var folderDocument = fromUri(folderUri)
 
         subFolders.forEach { folder ->
             folderDocument =

@@ -76,7 +76,6 @@ class HandleSDCardEventUseCaseTest {
             on { totalBytes }.thenReturn(11L)
             on { nodeHandle }.thenReturn(1L)
             on { localPath }.thenReturn("localPath")
-            on { isFolderTransfer }.thenReturn(false)
             on { transferType }.thenReturn(TransferType.DOWNLOAD)
             on { parentPath }.thenReturn("parentPath")
         }
