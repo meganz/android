@@ -72,9 +72,11 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
+import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.shared.original.core.ui.theme.grey_020
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_038
@@ -470,44 +472,28 @@ private fun AlbumImportBottomBar(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(grey_020.takeIf { isLight } ?: dark_grey)
+                    .background(MaterialTheme.colors.grey_020_grey_700)
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically,
                 content = {
                     if (isLogin) {
-                        TextButton(
+                        TextMegaButton(
+                            textId = R.string.general_save_to_cloud_drive,
                             onClick = {
                                 Analytics.tracker.trackEvent(AlbumImportSaveToCloudDriveButtonEvent)
                                 onImport()
-                            },
-                            content = {
-                                Text(
-                                    text = stringResource(id = R.string.general_save_to_cloud_drive),
-                                    color = accent_900,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.W500,
-                                    style = MaterialTheme.typography.button,
-                                )
                             },
                         )
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    TextButton(
+                    TextMegaButton(
+                        textId = R.string.general_save_to_device,
                         onClick = {
                             Analytics.tracker.trackEvent(AlbumImportSaveToDeviceButtonEvent)
                             onSaveToDevice()
-                        },
-                        content = {
-                            Text(
-                                text = stringResource(id = R.string.general_save_to_device),
-                                color = accent_900,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.W500,
-                                style = MaterialTheme.typography.button,
-                            )
                         },
                     )
                 },
