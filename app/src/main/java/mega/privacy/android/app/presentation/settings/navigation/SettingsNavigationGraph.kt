@@ -15,12 +15,11 @@ internal object SettingsGraph
  *
  */
 fun NavGraphBuilder.settingsGraph(
-    onBackPressed: () -> Unit,
     navController: NavHostController,
 ) {
     navigation<SettingsGraph>(
         startDestination = SettingsHome()
     ) {
-        settingsHome(onBackPressed)
+        settingsHome(navController)
     }
 }

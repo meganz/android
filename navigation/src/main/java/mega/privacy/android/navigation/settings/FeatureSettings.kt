@@ -1,5 +1,6 @@
 package mega.privacy.android.navigation.settings
 
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 
@@ -7,9 +8,17 @@ import androidx.navigation.NavHostController
  * Feature settings
  *
  * @property entryPoints
- * @property settingsNavGraph - onBackPressed is the function called when navigating back at the root of the nested graph
+ * @property settingsNavGraph
  */
-data class FeatureSettings(
-    val entryPoints: List<SettingEntryPoint>,
-    val settingsNavGraph: NavGraphBuilder.(onBackPressed: () -> Unit, navHostController: NavHostController) -> Unit,
-)
+interface FeatureSettings {
+    val entryPoints: List<SettingEntryPoint>
+    val settingsNavGraph: NavGraphBuilder.(navHostController: NavHostController) -> Unit
+
+    /**
+     * Get title for destination
+     *
+     * @param entry
+     * @return title for the destination if found, else null
+     */
+    fun getTitleForDestination(entry: NavBackStackEntry): String?
+}

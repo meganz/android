@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
@@ -34,6 +35,7 @@ class SettingsListViewTest {
                 ),
                 modifier = Modifier.fillMaxSize(),
                 initialKey = null,
+                navHostController = rememberNavController(),
             )
         }
 
@@ -57,6 +59,7 @@ class SettingsListViewTest {
                 ),
                 modifier = Modifier.fillMaxSize(),
                 initialKey = null,
+                navHostController = rememberNavController(),
             )
         }
 
@@ -76,6 +79,7 @@ class SettingsListViewTest {
                 ),
                 modifier = Modifier.fillMaxSize(),
                 initialKey = null,
+                navHostController = rememberNavController(),
             )
         }
 
@@ -98,6 +102,7 @@ class SettingsListViewTest {
                 ),
                 modifier = Modifier.fillMaxSize(),
                 initialKey = initialKey.toString(),
+                navHostController = rememberNavController(),
             )
         }
 

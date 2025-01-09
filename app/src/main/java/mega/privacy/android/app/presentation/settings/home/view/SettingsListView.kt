@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.settings.home.view
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.presentation.settings.home.model.SettingHeaderItem
@@ -31,8 +34,9 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 @Composable
 internal fun SettingsListView(
     data: SettingsUiState.Data,
-    modifier: Modifier = Modifier,
     initialKey: String?,
+    navHostController: NavHostController,
+    modifier: Modifier = Modifier,
 ) {
     val initialItemIndex by remember {
         derivedStateOf {
@@ -61,8 +65,9 @@ internal fun SettingsListView(
 
                 is SettingModelItem -> {
                     SettingItemViewPlaceHolder(
-                        item,
-                        Modifier.testTag(settingsItemTag(item.key)),
+                        settingItem = item,
+                        modifier = Modifier.testTag(settingsItemTag(item.key)),
+                        navHostController = navHostController,
                     )
                 }
             }
@@ -87,11 +92,15 @@ internal fun SettingsSectionHeaderPlaceHolder(
 internal fun SettingItemViewPlaceHolder(
     settingItem: SettingModelItem,
     modifier: Modifier,
+    navHostController: NavHostController,
 ) {
     Row(
         modifier = modifier
             .padding(8.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable {
+                settingItem.onClick(navHostController)
+            },
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Column {
@@ -164,6 +173,7 @@ private fun SettingsListViewPreview() {
                 .statusBarsPadding()
                 .fillMaxSize(),
             initialKey = null,
+            navHostController = rememberNavController(),
         )
     }
 }

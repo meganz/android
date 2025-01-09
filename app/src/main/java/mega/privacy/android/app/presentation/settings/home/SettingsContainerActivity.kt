@@ -1,24 +1,29 @@
 package mega.privacy.android.app.presentation.settings.home
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.button.PrimaryFilledButton
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.app.R
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -33,7 +38,7 @@ import mega.privacy.android.navigation.settings.FeatureSettings
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SettingsContainerActivity : ComponentActivity() {
+class SettingsContainerActivity : FragmentActivity() {
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
@@ -45,7 +50,7 @@ class SettingsContainerActivity : ComponentActivity() {
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
     @Inject
-    lateinit var featureSettings: Set<FeatureSettings>
+    lateinit var featureSettings: Set<@JvmSuppressWildcards FeatureSettings>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -57,7 +62,7 @@ class SettingsContainerActivity : ComponentActivity() {
                     PasscodeContainer(
                         passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         content = {
-                            content()
+                            SettingsContainerContent()
                         }
                     )
                 }
@@ -66,42 +71,63 @@ class SettingsContainerActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun content() {
+    private fun SettingsContainerContent() {
         val navHostController = rememberNavController()
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            NavHost(
-                navController = navHostController,
-                startDestination = SettingsGraph,
-                modifier = Modifier.fillMaxHeight(0.8f)
-            ) {
-                settingsGraph(
-                    onBackPressed = { finishAfterTransition() },
-                    navController = navHostController,
-                )
+        val navBackStackEntry by navHostController.currentBackStackEntryAsState()
 
-                featureSettings.forEach {
-                    it.settingsNavGraph(
-                        this,
-                        { finishAfterTransition() },
-                        navHostController,
-                    )
-                }
+        val title = navBackStackEntry?.let { entry ->
+            featureSettings.firstNotNullOfOrNull { settings: FeatureSettings ->
+                settings.getTitleForDestination(
+                    entry
+                )
             }
-            PrimaryFilledButton(
-                modifier = Modifier,
-                text = "Switch off compose settings feature flag",
-                onClick = {
-                    lifecycleScope.launch {
-                        setFeatureFlag(
-                            AppFeatures.SettingsComposeUI.name, false
+        } ?: stringResource(
+            R.string.action_settings
+        )
+
+        MegaScaffold(
+            modifier = Modifier.statusBarsPadding(),
+            topBar = {
+                MegaTopAppBar(
+                    navigationType = AppBarNavigationType.Back {
+                        if (navHostController.navigateUp().not()) finishAfterTransition()
+                    },
+                    title = title,
+                )
+            },
+            snackbarHost = {},
+            bottomBar = {
+                PrimaryFilledButton(
+                    modifier = Modifier.navigationBarsPadding(),
+                    text = "Switch off compose settings feature flag",
+                    onClick = {
+                        lifecycleScope.launch {
+                            setFeatureFlag(
+                                AppFeatures.SettingsComposeUI.name, false
+                            )
+                        }
+                        this@SettingsContainerActivity.finish()
+                    },
+                )
+            },
+            content = { padding ->
+                NavHost(
+                    navController = navHostController,
+                    startDestination = SettingsGraph,
+                    modifier = Modifier.padding(padding)
+                ) {
+                    settingsGraph(
+                        navController = navHostController,
+                    )
+
+                    featureSettings.forEach {
+                        it.settingsNavGraph(
+                            this,
+                            navHostController,
                         )
                     }
-                    this@SettingsContainerActivity.finish()
-                },
-            )
-        }
+                }
+            }
+        )
     }
 }

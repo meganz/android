@@ -37,7 +37,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 internal class SettingContainerViewModel @Inject constructor(
-    private val featureSettings: Set<FeatureSettings>,
+    private val featureSettings: Set<@JvmSuppressWildcards FeatureSettings>,
     private val settingItemMapper: SettingItemMapper,
     private val settingItemFlowMapper: SettingItemFlowMapper,
     private val sectionHeaderMapper: SectionHeaderMapper,

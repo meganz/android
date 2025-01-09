@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
@@ -22,16 +23,16 @@ data class SettingsHome(val initialSetting: String? = null)
  *
  */
 fun NavGraphBuilder.settingsHome(
-    onBackPressed: () -> Unit,
+    navHostController: NavHostController,
 ) {
     composable<SettingsHome> { backStackEntry ->
         val args = backStackEntry.toRoute<SettingsHome>()
         val viewModel = hiltViewModel<SettingContainerViewModel>()
         val state by viewModel.state.collectAsStateWithLifecycle()
         SettingsHomeView(
-            onBackPressed = onBackPressed,
             state = state,
             initialKey = args.initialSetting,
+            navHostController = navHostController,
         )
     }
 }

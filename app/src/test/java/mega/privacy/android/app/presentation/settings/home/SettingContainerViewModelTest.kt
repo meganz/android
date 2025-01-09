@@ -1,5 +1,8 @@
 package mega.privacy.android.app.presentation.settings.home
 
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
@@ -138,9 +141,8 @@ class SettingContainerViewModelTest {
         section: SettingSectionHeader,
         key: String,
         action: SettingClickActionType,
-    ) = FeatureSettings(
-        settingsNavGraph = { _, _ -> },
-        entryPoints = listOf(
+    ) = object : FeatureSettings {
+        override val entryPoints = listOf(
             SettingEntryPoint(
                 section = section,
                 items = listOf(
@@ -155,5 +157,9 @@ class SettingContainerViewModelTest {
                 )
             )
         )
-    )
+        override val settingsNavGraph: NavGraphBuilder.(navHostController: NavHostController) -> Unit =
+            { _ -> }
+
+        override fun getTitleForDestination(entry: NavBackStackEntry): String? = null
+    }
 }
