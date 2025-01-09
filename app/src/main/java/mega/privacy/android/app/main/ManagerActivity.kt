@@ -2348,13 +2348,16 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         handleShowingAds()
                     },
                     onAdFailedToLoad = {
-                        hideAdsView()
-                        fetchNewAd()
+                        if (adsContainerView.isVisible) {
+                            hideAdsView()
+                            showBNVImmediate()
+                            showHideBottomNavigationView(hide = false)
+                            updateHomepageFabPosition()
+                        }
                     },
                 )
             }
         }
-        fetchNewAd()
     }
 
     /**

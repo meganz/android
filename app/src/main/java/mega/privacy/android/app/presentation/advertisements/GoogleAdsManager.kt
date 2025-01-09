@@ -85,30 +85,35 @@ class GoogleAdsManager @Inject constructor(
         val params =
             ConsentRequestParameters.Builder()
                 .build()
-        val shouldShowGenericCookieDialog =
-            shouldShowGenericCookieDialogUseCase(getCookieSettingsUseCase())
 
-        val successCallback = ConsentInformation.OnConsentInfoUpdateSuccessListener {
-            if (shouldShowGenericCookieDialog.not()) {
-                UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity) { loadAndShowError: FormError? ->
-                    if (loadAndShowError != null) {
-                        Timber.e("Error loading or showing consent form: ${loadAndShowError.message}")
+        if (consentInformation.canRequestAds()) {
+            Timber.d("Consent information is ready")
+            onConsentInformationUpdated()
+        } else {
+            val shouldShowGenericCookieDialog =
+                shouldShowGenericCookieDialogUseCase(getCookieSettingsUseCase())
+
+            val successCallback = ConsentInformation.OnConsentInfoUpdateSuccessListener {
+                if (shouldShowGenericCookieDialog.not()) {
+                    UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity) { loadAndShowError: FormError? ->
+                        if (loadAndShowError != null) {
+                            Timber.e("Error loading or showing consent form: ${loadAndShowError.message}")
+                        }
+                        onConsentInformationUpdated()
                     }
-                    onConsentInformationUpdated()
                 }
             }
+            val failureCallback =
+                ConsentInformation.OnConsentInfoUpdateFailureListener { fromError: FormError ->
+                    Timber.e("Error loading or showing consent form: ${fromError.message}")
+                }
+            consentInformation.requestConsentInfoUpdate(
+                activity,
+                params,
+                successCallback,
+                failureCallback
+            )
         }
-        val failureCallback =
-            ConsentInformation.OnConsentInfoUpdateFailureListener { fromError: FormError ->
-                Timber.e("Error loading or showing consent form: ${fromError.message}")
-            }
-
-        consentInformation.requestConsentInfoUpdate(
-            activity,
-            params,
-            successCallback,
-            failureCallback
-        )
     }
 
     /**
