@@ -110,7 +110,6 @@ annotation class CombinedThemeComponentPreviews
     device = "spec:width=1280dp,height=800dp"
 
 )
-@CombinedThemePreviews
 annotation class CombinedThemeTabletLandscapePreviews
 
 /**
@@ -135,7 +134,6 @@ annotation class CombinedThemeTabletLandscapePreviews
     device = "spec:width=800dp,height=1280dp"
 
 )
-@CombinedThemePreviews
 annotation class CombinedThemeTabletPortraitPreviews
 
 /**
@@ -152,3 +150,26 @@ annotation class CombinedThemeRtlPreviews
 @FontScalePreviews
 @CombinedThemeComponentPreviews
 annotation class CombinedTextAndThemePreviews
+
+/**
+ * Annotation to generate previews with night and day themes for phone landscape
+ */
+@Preview(
+    showBackground = true,
+    locale = "en",
+    backgroundColor = 0xFF18191A,
+    name = "1-Dark theme",
+    group = "themes",
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    device = "spec:width=800dp,height=360dp"
+)
+@Preview(
+    showBackground = true,
+    locale = "en",
+    name = "2-Light theme",
+    group = "themes",
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    device = "spec:width=800dp,height=360dp"
+
+)
+annotation class CombinedThemePhoneLandscapePreviews

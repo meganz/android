@@ -102,6 +102,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.resources.R as SharedRes
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePhoneLandscapePreviews
 
 /**
  * Login fragment view.
@@ -635,12 +636,7 @@ private fun LoginViewPreview(
     }
 }
 
-@Preview(
-    uiMode = Configuration.ORIENTATION_LANDSCAPE,
-    heightDp = 360,
-    widthDp = 800,
-    name = "LandscapeLoginViewPreview"
-)
+@CombinedThemePhoneLandscapePreviews
 @Composable
 private fun LandscapeLoginViewPreview(
     @PreviewParameter(LoginStateProvider::class) state: LoginState,
