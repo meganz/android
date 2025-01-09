@@ -847,7 +847,7 @@
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
     <string name="dialog_not_enough_space_to_upload_title">لا توجد مساحة كافية لترفيع ملفات جديدة</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">You’re over your storage quota. Upgrade to a higher plan, or free up some space, to upload new files. [A]Learn more[/A].</string>
+    <string name="dialog_not_enough_space_to_upload_message">لقد تجاوزت مساحة التخزين الخاصة بك. قم بالترقية إلى باقة أعلى أو قم بإخلاء بعض المساحة لترفيع ملفات جديدة. [A]اعرف المزيد[/A].</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">ترقية</string>
     <!-- Photos search welcome title -->
@@ -882,7 +882,7 @@
     <!-- Move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option">انقل المجلد</string>
     <!-- Explanatory text for the move option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_text">Move this folder to another location to get full access to your data.</string>
+    <string name="sync_stop_backup_confirm_dialog_move_option_text">انقل هذا المجلد إلى موقع آخر للوصول الكامل إلى بياناتك.</string>
     <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_move_option_destination_label">نقل إلى:</string>
     <!-- Label text of the destination for the move option of the dialog to confirm stop a backup -->
@@ -890,7 +890,7 @@
     <!-- Delete option of the dialog to confirm stop a backup -->
     <string name="sync_stop_backup_confirm_dialog_delete_option">احذف المجلد بشكل نهائي</string>
     <!-- Explanatory text for the delete option of the dialog to confirm stop a backup -->
-    <string name="sync_stop_backup_confirm_dialog_delete_option_text">Folder will be deleted from MEGA. It won’t be deleted from your device.</string>
+    <string name="sync_stop_backup_confirm_dialog_delete_option_text">سيتم حذف المجلد من ميغا MEGA. لن يتم حذفه من جهازك.</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">تأكيد</string>
     <!-- The failed Message when adding the video to the playlists from the video section. -->
@@ -899,35 +899,39 @@
     <string name="video_to_playlist_add_button">اضافة</string>
     <!-- The success Message when adding the video to the playlists from the video section. -->
     <plurals name="video_section_playlists_add_to_playlists_successfully_message">
-        <item quantity="one">Added 1 item to “%1$s”</item>
-        <item quantity="other">Added 1 item to %1$d playlists</item>
+        <item quantity="zero">تمت إضافة عنصر واحد إلى %1$d قائمة تشغيل</item>
+        <item quantity="one">تمت إضافة عنصر واحد إلى ”%1$s“</item>
+        <item quantity="two">تمت إضافة عنصر واحد إلى %1$d قائمتي تشغيل</item>
+        <item quantity="few">تمت إضافة عنصر واحد إلى %1$d قوائم التشغيل</item>
+        <item quantity="many">تمت إضافة عنصر واحد إلى %1$d قائمة تشغيل</item>
+        <item quantity="other">تمت إضافة عنصر واحد إلى %1$d قائمة تشغيل</item>
     </plurals>
     <!-- Name for a general label which action is "Select" something -->
     <string name="general_select">تحديد</string>
     <!-- Name for a general label which action is "Select folder" -->
     <string name="general_select_folder">حدد المجلد</string>
     <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">Move to: [B]%1s[/B]</string>
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">انتقل إلى: [B]%1s[/B]</string>
     <!-- Message shown to user when app is connected to the MEGA server -->
-    <string name="login_connected_to_server">Connected to the server</string>
+    <string name="login_connected_to_server">متصل بالسيرفر</string>
     <!-- User Alert notification for scheduled recurring meeting changes -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A] [B]updated the recurring meeting details to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A] [B]تم تحديث تفاصيل الاجتماع المتكرر إلى[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting hour change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A] [B]updated the recurring meeting time to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A] [B]تم تحديث وقت الاجتماع المتكرر إلى[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting date of the week change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A] [B]updated the recurring meeting date to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A] [B]تم تحديث تاريخ الاجتماع المتكرر إلى[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting multiple fields change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%s[/A] [B]updated the meeting to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%s[/A] [B]تم تحديث الاجتماع إلى[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A] [B]cancelled the occurrence scheduled for[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">قام [A]%s[/A]  بإلغاء التكرار المقرر لـ[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s[/A] [B]updated an occurrence to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence">قام [A]%s[/A] [B]بتحديث التكرار إلى[/B]</string>
     <!-- User Alert notification for scheduled meeting date change -->
-    <string name="meetings_notification_subtitle_scheduled_meeting_updated_date">[A]%s[/A] [B]updated the meeting date to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_date">قام [A]%s[/A] [B]بتحديث تاريخ الاجتماع إلى[/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
-    <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]updated the meeting time to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">قام [A]%s[/A] [B]بتحديث وقت الاجتماع إلى[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]cancelled the meeting scheduled for[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">قام [A]%s[/A][B]بإلغاء التكرار المقرر ل[/B]</string>
     <!-- Title of the ads free introduction screen -->
     <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
     <!-- Description of the ads free introduction screen -->
@@ -935,13 +939,13 @@
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">مساحة تخزين سخية</string>
     <!-- The Generous storage description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_generous_storage_description">Store unlimited data, starting from %1$s.</string>
+    <string name="payment_ads_free_intro_generous_storage_description">قم بتخزين بيانات غير محدودة، بدءًا من %1$s.</string>
     <!-- The Transfer sharing label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_label">مشاركة تراسل المعطيات</string>
     <!-- The Transfer sharing description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_description">يمكن للأشخاص الذين تشارك البيانات معهم استخدام حجم تراسل المعطيات المتاح لك لتنزيل العناصر التي قمت بمشاركتها.</string>
     <!-- The additional security label in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass and MEGA&#160;VPN</string>
+    <string name="payment_ads_free_intro_additional_security_label">ميغا باس MEGA&#160;Pass و ميغا في بي إن MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_description">قم بتعيين كلمات المرور وتواريخ انتهاء الصلاحية لروابط الملفات والمجلدات.</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
@@ -956,4 +960,8 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">حذف المفضلة</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">المفضلة فارغة</string>
+    <!-- Message to enter confirm password -->
+    <string name="general_confirm_your_password">قم بتأكيد كلمة المرور الخاصة بك</string>
+    <!-- The Screen Toolbar Title for configuring the scan settings -->
+    <string name="document_scanning_settings_toolbar_title">Scan settings</string>
 </resources>

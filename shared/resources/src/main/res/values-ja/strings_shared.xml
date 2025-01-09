@@ -890,4 +890,8 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">お気に入りを削除</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">お気に入りがありません</string>
+    <!-- Message to enter confirm password -->
+    <string name="general_confirm_your_password">パスワードを確認</string>
+    <!-- The Screen Toolbar Title for configuring the scan settings -->
+    <string name="document_scanning_settings_toolbar_title">スキャン設定</string>
 </resources>

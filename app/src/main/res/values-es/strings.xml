@@ -2987,7 +2987,7 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">Sirven para entender cómo utilizas nuestros servicios y nos proporcionan datos que podemos utilizar para realizar mejoras. No aceptar estas Cookies significará que tendremos menos datos disponibles para mejorar el servicio.</string>
     <!-- Preference screen item state description -->
-    <string name="preference_cookies_always_on">Siempre activas</string>
+    <string name="preference_cookies_always_on">Activas por defecto</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
     <string name="menu_scan_document">Escanear documento</string>
     <!-- Message displayed when clicking on a contact attached to the chat that is not my contact -->
@@ -5467,7 +5467,7 @@
     <!-- Hidden nodes benefit: hide files and folders -->
     <string name="hidden_nodes_benefit_title_hide_files_folders">Oculta archivos y carpetas importantes</string>
     <!-- Hidden nodes benefit description: hide files and folders -->
-    <string name="hidden_nodes_benefit_description_hide_files_folders">Puedes ocultar archivos y carpetas confidenciales por motivos de privacidad. Solo tú puedes enseñarlos, ya sea de forma individual o mostrando temporalmente los elementos ocultos desde los ajustes.</string>
+    <string name="hidden_nodes_benefit_description_hide_files_folders">Puedes ocultar archivos y carpetas confidenciales por motivos de privacidad. Solo tú podrás verlos, ya sea de forma individual o mostrando temporalmente los elementos ocultos desde los ajustes.</string>
     <!-- Hidden nodes benefit: exclude from timeline -->
     <string name="hidden_nodes_benefit_title_exclude_timeline">Excluye de la cronología</string>
     <!-- Hidden nodes benefit description: exclude from timeline -->

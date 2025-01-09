@@ -834,35 +834,34 @@
     <string name="video_to_playlist_add_button">추가</string>
     <!-- The success Message when adding the video to the playlists from the video section. -->
     <plurals name="video_section_playlists_add_to_playlists_successfully_message">
-        <item quantity="one">Added 1 item to “%1$s”</item>
-        <item quantity="other">Added 1 item to %1$d playlists</item>
+        <item quantity="other">%1$d개의 재생목록에 1개의 항목을 추가하였습니다</item>
     </plurals>
     <!-- Name for a general label which action is "Select" something -->
     <string name="general_select">선택</string>
     <!-- Name for a general label which action is "Select folder" -->
     <string name="general_select_folder">폴더 선택</string>
     <!-- Clickable label text to select the destination for the move option of the dialog to confirm stop a backup. Keep the placeholders because "[B][/B]" are in order to make the text clickable and "%1s" in order to display the selected folder name. -->
-    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">Move to: [B]%1s[/B]</string>
+    <string name="sync_stop_backup_confirm_dialog_move_option_select_destination">다음으로 이동: [B]%1s[/B]</string>
     <!-- Message shown to user when app is connected to the MEGA server -->
-    <string name="login_connected_to_server">Connected to the server</string>
+    <string name="login_connected_to_server">서버에 연결됨</string>
     <!-- User Alert notification for scheduled recurring meeting changes -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A] [B]updated the recurring meeting details to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_scheduled_changes">[A]%s[/A] 님이 [B]반복 회의 정보를 다음으로 업데이트하였습니다[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting hour change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A] [B]updated the recurring meeting time to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_hour_changed">[A]%s[/A] 님이 [B]반복 회의 시간을 다음으로 업데이트하였습니다[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting date of the week change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A] [B]updated the recurring meeting date to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_date_of_the_week_changed">[A]%s[/A] 님이 [B]반복 회의 날짜를 다음으로 업데이트하였습니다[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting multiple fields change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%s[/A] [B]updated the meeting to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_multiple_fields_changed">[A]%s[/A] 님이 [B]회의를 다음과 같이 업데이트하였습니다[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A] [B]cancelled the occurrence scheduled for[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s[/A] 님이 [B]다음의 예약된 되풀이 항목을 취소하였습니다[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
-    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s[/A] [B]updated an occurrence to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s[/A] 님이 [B]되풀이 항목을 다음과 같이 업데이트하였습니다[/B]</string>
     <!-- User Alert notification for scheduled meeting date change -->
-    <string name="meetings_notification_subtitle_scheduled_meeting_updated_date">[A]%s[/A] [B]updated the meeting date to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_date">[A]%s[/A] 님이 [B]회의 날짜를 다음과 같이 업데이트하였습니다[/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
-    <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] [B]updated the meeting time to[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_meeting_updated_time">[A]%s[/A] 님이 [B]회의 시간을 다음과 같이 업데이트하였습니다[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] [B]cancelled the meeting scheduled for[/B]</string>
+    <string name="meetings_notification_subtitle_scheduled_meeting_canceled">[A]%s[/A] 님이 [B]다음의 예약된 회의을 취소하였습니다[/B]</string>
     <!-- Title of the ads free introduction screen -->
     <string name="payment_ads_free_intro_title">Want MEGA without the ads?</string>
     <!-- Description of the ads free introduction screen -->
@@ -870,13 +869,13 @@
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">넉넉한 저장소</string>
     <!-- The Generous storage description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_generous_storage_description">Store unlimited data, starting from %1$s.</string>
+    <string name="payment_ads_free_intro_generous_storage_description">무제한 데이터 보관, %1$s부터 시작</string>
     <!-- The Transfer sharing label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_label">전송 공유</string>
     <!-- The Transfer sharing description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_transfer_sharing_description">The people you share data with can use your transfer quota to download the items you shared.</string>
+    <string name="payment_ads_free_intro_transfer_sharing_description">당신이 데이터를 공유해준 사람들이 당신이 공유해준 것을 다운로드하기 위해 당신의 전송 할당량을 이용할 수 있습니다.</string>
     <!-- The additional security label in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass and MEGA&#160;VPN</string>
+    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass와 MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_description">파일과 폴더 링크에 암호와 만료일을 설정</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
@@ -891,4 +890,8 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">즐겨찾기 삭제</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">즐겨찾기 없음</string>
+    <!-- Message to enter confirm password -->
+    <string name="general_confirm_your_password">암호를 확인하세요</string>
+    <!-- The Screen Toolbar Title for configuring the scan settings -->
+    <string name="document_scanning_settings_toolbar_title">Scan settings</string>
 </resources>

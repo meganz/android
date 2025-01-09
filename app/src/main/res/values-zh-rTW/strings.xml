@@ -2197,7 +2197,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">設定MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs your permission to access your files for uploading or sharing with others. Other optional access permissions may be needed to use features and services that this app provides.\n\nIf you choose not to grant these permissions, you can still use the app, except for the functions requiring the specific permissions.</string>
+    <string name="setup_mega_explanation">MEGA需要您的授權才能存取您的檔案以使上傳或與他人共享。使用此應用程式提供的功能和服務可能需要允許其它選擇性的存取權限。\n\n如果您選擇不授予這些權限，您仍然可以使用應用程式，但無法使用需允許特定權限的功能。</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">允許存取相片、媒體與檔案</string>
     <!-- Subtitle of the screen asking permissions for files -->

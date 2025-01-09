@@ -51,7 +51,7 @@
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
     <string name="general_sync_unknown_drive_path">A localização da sincronização é desconhecida</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
-    <string name="general_sync_invalid_scan_interval">O intervalo de escaneado é inválido. Verifique a configuração do intervalo de escaneado e tente novamente.</string>
+    <string name="general_sync_invalid_scan_interval">O intervalo de análise é inválido. Verifique a configuração do intervalo de análise e tente novamente.</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
     <string name="general_sync_notification_system_unavailable">Não foi possível se comunicar com a localização da pasta. Verifique se o local está acessível e se as permissões para a localização da pasta foram concedidas.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
@@ -918,4 +918,8 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Remover favorito</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">Não há itens marcados como favoritos</string>
+    <!-- Message to enter confirm password -->
+    <string name="general_confirm_your_password">Confirme a sua senha</string>
+    <!-- The Screen Toolbar Title for configuring the scan settings -->
+    <string name="document_scanning_settings_toolbar_title">Configurações do scanner</string>
 </resources>

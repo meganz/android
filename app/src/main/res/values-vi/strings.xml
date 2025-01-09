@@ -2197,7 +2197,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Thiếp Lập MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs your permission to access your files for uploading or sharing with others. Other optional access permissions may be needed to use features and services that this app provides.\n\nIf you choose not to grant these permissions, you can still use the app, except for the functions requiring the specific permissions.</string>
+    <string name="setup_mega_explanation">MEGA cần sự cho phép của bạn để truy cập các tệp&#160;tin của bạn để tải lên hoặc chia&#160;sẻ với người khác. Các quyền truy&#160;cập tùy chọn khác có thể sẽ cần&#160;thiết để sử&#160;dụng các tính&#160;năng và dịch&#160;vụ mà ứng&#160;dụng này cung&#160;cấp.\n\nNếu bạn chọn không cấp các quyền này, bạn vẫn có thể sử&#160;dụng ứng&#160;dụng, ngoại trừ các chức&#160;năng có yêu&#160;cầu các quyền cụ&#160;thể.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Cho phép truy cập vào hình ảnh, phương tiện số và tệp tin</string>
     <!-- Subtitle of the screen asking permissions for files -->

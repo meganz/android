@@ -915,4 +915,8 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Rimuovi preferito</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">Nessun preferito</string>
+    <!-- Message to enter confirm password -->
+    <string name="general_confirm_your_password">Conferma la tua password</string>
+    <!-- The Screen Toolbar Title for configuring the scan settings -->
+    <string name="document_scanning_settings_toolbar_title">Scan settings</string>
 </resources>

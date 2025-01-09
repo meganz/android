@@ -897,13 +897,13 @@
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">Almacenamiento generoso</string>
     <!-- The Generous storage description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_generous_storage_description">Store unlimited data, starting from %1$s.</string>
+    <string name="payment_ads_free_intro_generous_storage_description">Almacena datos ilimitados, a partir de %1$s.</string>
     <!-- The Transfer sharing label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_label">Transferencia compartida</string>
     <!-- The Transfer sharing description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_transfer_sharing_description">The people you share data with can use your transfer quota to download the items you shared.</string>
+    <string name="payment_ads_free_intro_transfer_sharing_description">Las personas con las que compartes datos pueden usar tu cuota de transferencia para descargar lo que has compartido.</string>
     <!-- The additional security label in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass and MEGA&#160;VPN</string>
+    <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass y MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_description">Establece contraseñas y fechas de caducidad para los enlaces a carpetas y archivos.</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
@@ -918,4 +918,8 @@
     <string name="favourites_playlist_bottom_sheet_option_remove_favourite">Eliminar favorito</string>
     <!-- The empty hint of the Favourites playlist -->
     <string name="favourites_playlist_empty_hint">No hay favoritos</string>
+    <!-- Message to enter confirm password -->
+    <string name="general_confirm_your_password">Confirma tu contraseña</string>
+    <!-- The Screen Toolbar Title for configuring the scan settings -->
+    <string name="document_scanning_settings_toolbar_title">Scan settings</string>
 </resources>
