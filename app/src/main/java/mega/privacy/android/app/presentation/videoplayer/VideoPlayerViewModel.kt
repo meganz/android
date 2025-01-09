@@ -71,11 +71,8 @@ import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
-import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
-import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolderUseCase
@@ -83,15 +80,12 @@ import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
-import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStopUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.GetLocalFolderLinkUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByEmailUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByHandlesUseCase
@@ -102,6 +96,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodes
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosByParentHandleFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosBySearchTypeUseCase
+import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
@@ -140,15 +135,10 @@ class VideoPlayerViewModel @Inject constructor(
     private val getVideosByParentHandleFromMegaApiFolderUseCase: GetVideosByParentHandleFromMegaApiFolderUseCase,
     private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
-    private val hasCredentialsUseCase: HasCredentialsUseCase,
-    private val megaApiFolderHttpServerIsRunningUseCase: MegaApiFolderHttpServerIsRunningUseCase,
-    private val megaApiFolderHttpServerStartUseCase: MegaApiFolderHttpServerStartUseCase,
-    private val megaApiFolderHttpServerStopUseCase: MegaApiFolderHttpServerStopUseCase,
-    private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
-    private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
-    private val megaApiHttpServerStop: MegaApiHttpServerStopUseCase,
-    private val getLocalFolderLinkFromMegaApiFolderUseCase: GetLocalFolderLinkFromMegaApiFolderUseCase,
-    private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
+    private val httpServerIsRunningUseCase: HttpServerIsRunningUseCase,
+    private val httpServerStartUseCase: HttpServerStartUseCase,
+    private val httpServerStopUseCase: HttpServerStopUseCase,
+    private val getLocalFolderLinkUseCase: GetLocalFolderLinkUseCase,
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
     private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase,
     private val getOfflineNodesByParentIdUseCase: GetOfflineNodesByParentIdUseCase,
@@ -274,31 +264,17 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     private suspend fun setupStreamingServer(launchSource: Int): Boolean {
-        val isServerRunning = if (launchSource == FOLDER_LINK_ADAPTER && !hasCredentialsUseCase()) {
-            megaApiFolderHttpServerIsRunningUseCase()
-        } else {
-            megaApiHttpServerIsRunningUseCase()
-        }
-
+        val isServerRunning = httpServerIsRunningUseCase(launchSource == FOLDER_LINK_ADAPTER)
         if (isServerRunning != 0) return false
 
-        if (launchSource == FOLDER_LINK_ADAPTER && !hasCredentialsUseCase()) {
-            megaApiFolderHttpServerStartUseCase()
-        } else {
-            megaApiHttpServerStartUseCase()
-        }
-
+        httpServerStartUseCase(launchSource == FOLDER_LINK_ADAPTER)
         return true
     }
 
     private suspend fun getCurrentPlayingUri(uri: Uri?, launchSource: Int, handle: Long) =
         when (launchSource) {
             FOLDER_LINK_ADAPTER -> {
-                val url = if (hasCredentialsUseCase()) {
-                    getLocalFolderLinkFromMegaApiUseCase(handle)
-                } else {
-                    getLocalFolderLinkFromMegaApiFolderUseCase(handle)
-                }
+                val url = getLocalFolderLinkUseCase(handle)
                 url?.let { Uri.parse(it) }
             }
 
@@ -708,14 +684,7 @@ class VideoPlayerViewModel @Inject constructor(
                     .build()
             } else {
                 when (launchSource) {
-                    FOLDER_LINK_ADAPTER -> {
-                        if (!hasCredentialsUseCase()) {
-                            getLocalFolderLinkFromMegaApiFolderUseCase(node.id.longValue)
-                        } else {
-                            getLocalFolderLinkFromMegaApiUseCase(node.id.longValue)
-                        }
-                    }
-
+                    FOLDER_LINK_ADAPTER -> getLocalFolderLinkUseCase(node.id.longValue)
                     else -> getLocalLinkFromMegaApiUseCase(node.id.longValue)
                 }?.let { url ->
                     MediaItem.Builder()
@@ -752,8 +721,7 @@ class VideoPlayerViewModel @Inject constructor(
     private fun clear() {
         applicationScope.launch {
             if (needStopStreamingServer) {
-                megaApiHttpServerStop()
-                megaApiFolderHttpServerStopUseCase()
+                httpServerStopUseCase()
             }
         }
     }

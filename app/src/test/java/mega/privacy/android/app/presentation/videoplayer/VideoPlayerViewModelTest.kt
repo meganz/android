@@ -60,11 +60,8 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
-import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
-import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
-import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolderUseCase
@@ -72,15 +69,12 @@ import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
-import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStopUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.GetLocalFolderLinkUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByEmailUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByHandlesUseCase
@@ -91,6 +85,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodes
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosByParentHandleFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideosBySearchTypeUseCase
+import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
@@ -149,18 +144,11 @@ class VideoPlayerViewModelTest {
     private val monitorSubFolderMediaDiscoverySettingsUseCase =
         mock<MonitorSubFolderMediaDiscoverySettingsUseCase>()
     private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
-    private val hasCredentialsUseCase = mock<HasCredentialsUseCase>()
-    private val megaApiFolderHttpServerIsRunningUseCase =
-        mock<MegaApiFolderHttpServerIsRunningUseCase>()
-    private val megaApiFolderHttpServerStartUseCase = mock<MegaApiFolderHttpServerStartUseCase>()
-    private val megaApiFolderHttpServerStopUseCase = mock<MegaApiFolderHttpServerStopUseCase>()
-    private val megaApiHttpServerIsRunningUseCase = mock<MegaApiHttpServerIsRunningUseCase>()
-    private val megaApiHttpServerStartUseCase = mock<MegaApiHttpServerStartUseCase>()
-    private val megaApiHttpServerStop = mock<MegaApiHttpServerStopUseCase>()
+    private val httpServerIsRunningUseCase = mock<HttpServerIsRunningUseCase>()
+    private val httpServerStartUseCase = mock<HttpServerStartUseCase>()
+    private val httpServerStopUseCase = mock<HttpServerStopUseCase>()
+    private val getLocalFolderLinkUseCase = mock<GetLocalFolderLinkUseCase>()
     private val getLocalLinkFromMegaApiUseCase = mock<GetLocalLinkFromMegaApiUseCase>()
-    private val getLocalFolderLinkFromMegaApiFolderUseCase =
-        mock<GetLocalFolderLinkFromMegaApiFolderUseCase>()
-    private val getLocalFolderLinkFromMegaApiUseCase = mock<GetLocalFolderLinkFromMegaApiUseCase>()
     private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()
     private val getOfflineNodeInformationByIdUseCase = mock<GetOfflineNodeInformationByIdUseCase>()
     private val getOfflineNodesByParentIdUseCase = mock<GetOfflineNodesByParentIdUseCase>()
@@ -203,15 +191,10 @@ class VideoPlayerViewModelTest {
             getVideosByParentHandleFromMegaApiFolderUseCase = getVideosByParentHandleFromMegaApiFolderUseCase,
             monitorSubFolderMediaDiscoverySettingsUseCase = monitorSubFolderMediaDiscoverySettingsUseCase,
             getThumbnailUseCase = getThumbnailUseCase,
-            hasCredentialsUseCase = hasCredentialsUseCase,
-            megaApiFolderHttpServerIsRunningUseCase = megaApiFolderHttpServerIsRunningUseCase,
-            megaApiFolderHttpServerStartUseCase = megaApiFolderHttpServerStartUseCase,
-            megaApiFolderHttpServerStopUseCase = megaApiFolderHttpServerStopUseCase,
-            megaApiHttpServerIsRunningUseCase = megaApiHttpServerIsRunningUseCase,
-            megaApiHttpServerStartUseCase = megaApiHttpServerStartUseCase,
-            megaApiHttpServerStop = megaApiHttpServerStop,
-            getLocalFolderLinkFromMegaApiFolderUseCase = getLocalFolderLinkFromMegaApiFolderUseCase,
-            getLocalFolderLinkFromMegaApiUseCase = getLocalFolderLinkFromMegaApiUseCase,
+            httpServerIsRunningUseCase = httpServerIsRunningUseCase,
+            httpServerStartUseCase = httpServerStartUseCase,
+            httpServerStopUseCase = httpServerStopUseCase,
+            getLocalFolderLinkUseCase = getLocalFolderLinkUseCase,
             getFileTypeInfoByNameUseCase = getFileTypeInfoByNameUseCase,
             getOfflineNodeInformationByIdUseCase = getOfflineNodeInformationByIdUseCase,
             getOfflineNodesByParentIdUseCase = getOfflineNodesByParentIdUseCase,
@@ -256,15 +239,10 @@ class VideoPlayerViewModelTest {
             getVideosByParentHandleFromMegaApiFolderUseCase,
             monitorSubFolderMediaDiscoverySettingsUseCase,
             getThumbnailUseCase,
-            hasCredentialsUseCase,
-            megaApiFolderHttpServerIsRunningUseCase,
-            megaApiFolderHttpServerStartUseCase,
-            megaApiFolderHttpServerStopUseCase,
-            megaApiHttpServerIsRunningUseCase,
-            megaApiHttpServerStartUseCase,
-            megaApiHttpServerStop,
-            getLocalFolderLinkFromMegaApiFolderUseCase,
-            getLocalFolderLinkFromMegaApiUseCase,
+            httpServerStopUseCase,
+            httpServerStartUseCase,
+            httpServerIsRunningUseCase,
+            getLocalFilePathUseCase,
             getFileTypeInfoByNameUseCase,
             getOfflineNodeInformationByIdUseCase,
             getOfflineNodesByParentIdUseCase,
@@ -420,7 +398,7 @@ class VideoPlayerViewModelTest {
         }
 
     @Test
-    fun `test that the isRetry is false when currentPlayingUri is null when hasCredentialsUseCase is true`() =
+    fun `test that the isRetry is false when currentPlayingUri is null when getLocalFolderLink return null`() =
         runTest {
             val intent = mock<Intent>()
             initTestDataForTestingInvalidParams(
@@ -431,28 +409,7 @@ class VideoPlayerViewModelTest {
                 handle = 123456,
                 fileName = "test.mp4"
             )
-            whenever(hasCredentialsUseCase()).thenReturn(true)
-            whenever(getLocalFolderLinkFromMegaApiUseCase(any())).thenReturn(null)
-            underTest.initVideoPlaybackSources(intent)
-            underTest.uiState.test {
-                assertThat(awaitItem().isRetry).isFalse()
-            }
-        }
-
-    @Test
-    fun `test that the isRetry is false when currentPlayingUri is null when hasCredentialsUseCase is false`() =
-        runTest {
-            val intent = mock<Intent>()
-            initTestDataForTestingInvalidParams(
-                intent = intent,
-                rebuildPlaylist = true,
-                adapterType = FOLDER_LINK_ADAPTER,
-                data = mock(),
-                handle = 123456,
-                fileName = "test.mp4"
-            )
-            whenever(hasCredentialsUseCase()).thenReturn(false)
-            whenever(getLocalFolderLinkFromMegaApiFolderUseCase(any())).thenReturn(null)
+            whenever(getLocalFolderLinkUseCase(any())).thenReturn(null)
             underTest.initVideoPlaybackSources(intent)
             underTest.uiState.test {
                 assertThat(awaitItem().isRetry).isFalse()
@@ -759,11 +716,10 @@ class VideoPlayerViewModelTest {
             }
         }
 
-    @ParameterizedTest(name = "parentHandle is {0} and hasCredentials is {1}")
+    @ParameterizedTest(name = "parentHandle is {0}")
     @MethodSource("provideParametersForFolderLink")
     fun `test that state is updated correctly when launch source is FOLDER_LINK_ADAPTER`(
         parentHandle: Long,
-        hasCredentials: Boolean,
         getParentNode: suspend () -> FileNode,
         initSourceData: suspend () -> String,
     ) =
@@ -776,7 +732,6 @@ class VideoPlayerViewModelTest {
                 intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
             ).thenReturn(parentHandle)
             whenever(getParentNode()).thenReturn(testParentNode)
-            whenever(hasCredentialsUseCase()).thenReturn(hasCredentials)
             whenever(initSourceData()).thenReturn(testAbsolutePath)
             testStateIsUpdatedCorrectlyByLaunchSource(
                 intent = intent,
@@ -789,26 +744,13 @@ class VideoPlayerViewModelTest {
     private fun provideParametersForFolderLink() = listOf(
         arrayOf(
             INVALID_VALUE,
-            true,
             suspend { getRootNodeFromMegaApiFolderUseCase() },
-            suspend { getLocalFolderLinkFromMegaApiUseCase(any()) }
-        ),
-        arrayOf(
-            INVALID_VALUE,
-            false,
-            suspend { getRootNodeFromMegaApiFolderUseCase() },
-            suspend { getLocalFolderLinkFromMegaApiFolderUseCase(any()) }
+            suspend { getLocalFolderLinkUseCase(any()) }
         ),
         arrayOf(
             testHandle,
-            true,
             suspend { getParentNodeFromMegaApiFolderUseCase(any()) },
-            suspend { getLocalFolderLinkFromMegaApiUseCase(any()) }
-        ),
-        arrayOf(
-            testHandle, false,
-            suspend { getParentNodeFromMegaApiFolderUseCase(any()) },
-            suspend { getLocalFolderLinkFromMegaApiFolderUseCase(any()) }
+            suspend { getLocalFolderLinkUseCase(any()) }
         ),
     )
 
