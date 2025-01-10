@@ -21,16 +21,17 @@ class ShouldEnterMediaDiscoveryModeUseCase @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val nodeRepository: NodeRepository,
 ) {
-
-    suspend operator fun invoke(
-        parentHandle: Long,
-    ): Boolean {
+    suspend operator fun invoke(parentHandle: Long): Boolean {
         val nodeId =
             (if (parentHandle != nodeRepository.getInvalidHandle()) NodeId(parentHandle) else getRootNodeUseCase()?.id)
                 ?: return false
-        val childNodesFileTypes =
-            nodeRepository.getNodeChildrenFileTypes(nodeId = nodeId, order = getCloudSortOrder())
-        return childNodesFileTypes.any { fileType ->
+        val childNodesFileTypes = nodeRepository.getNodeChildrenFileTypes(
+            nodeId = nodeId,
+            order = getCloudSortOrder(),
+        )
+
+        if (childNodesFileTypes.isEmpty()) return false
+        return childNodesFileTypes.all { fileType ->
             fileType !is SvgFileTypeInfo && (fileType is ImageFileTypeInfo || (fileType is VideoFileTypeInfo))
         }
     }
