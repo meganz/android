@@ -61,7 +61,6 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/mega_zxcvbn.cpp \
     sdk/src/mediafileattribute.cpp \
     sdk/src/mega_evt_tls.cpp \
-    sdk/src/mega_ccronexpr.cpp\
     sdk/src/raid.cpp \
     sdk/src/raidproxy.cpp \
     sdk/src/testhooks.cpp \
@@ -74,8 +73,7 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/user_attribute_definition.cpp \
     sdk/src/user_attribute_manager.cpp \
     sdk/src/transferstats.cpp \
-    sdk/src/tlv.cpp \
-    sdk/src/impl/share.cpp
+    sdk/src/tlv.cpp
 
 C_SOURCES = sdk/src/mega_glob.c
 
@@ -146,8 +144,23 @@ HEADERS= sdk/include/mega.h \
         sdk/include/mega/user_attribute_manager.h \
         sdk/include/mega/user_attribute_types.h \
         sdk/include/mega/transferstats.h \
-        sdk/include/mega/tlv.h \
-        sdk/include/impl/share.h
+        sdk/include/mega/tlv.h
+
+# impl layer headers
+HEADERS += \
+    sdk/include/impl/share.h
+
+# impl layer sources
+CPP_SOURCES += \
+    sdk/src/impl/share.cpp
+
+# third party layer headers
+HEADERS += \
+    sdk/third_party/ccronexpr/ccronexpr.h
+
+# third party layer sources
+CPP_SOURCES += \
+    sdk/third_party/ccronexpr/ccronexpr.cpp
 
 # FUSE (Common headers.)
 HEADERS += \

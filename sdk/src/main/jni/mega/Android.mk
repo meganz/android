@@ -8,7 +8,8 @@ local_c_includes := \
         $(LOCAL_PATH)/sdk/include/mega/posix \
         $(LOCAL_PATH)/sdk/src/fuse/common \
         $(LOCAL_PATH)/sdk/src/fuse/unsupported \
-        $(LOCAL_PATH)/android
+        $(LOCAL_PATH)/android \
+        $(LOCAL_PATH)/sdk/third_party/ccronexpr \
 
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/Makefile.inc
