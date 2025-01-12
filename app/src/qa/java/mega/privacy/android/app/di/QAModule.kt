@@ -32,6 +32,7 @@ import mega.privacy.android.app.domain.usecase.SetFeatureFlag
 import mega.privacy.android.app.domain.usecase.UpdateApp
 import mega.privacy.android.app.domain.usecase.VibrateDevice
 import mega.privacy.android.app.featuretoggle.QAFeatures
+import mega.privacy.android.app.navigation.QaFeatureSettings
 import mega.privacy.android.app.presentation.featureflag.ShakeDetectorViewModel
 import mega.privacy.android.app.presentation.featureflag.model.FeatureFlagMapper
 import mega.privacy.android.app.presentation.featureflag.model.toFeatureFlag
@@ -42,6 +43,7 @@ import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.navigation.settings.FeatureSettings
 
 /**
  * Provides dependencies used in the QA module
@@ -222,4 +224,8 @@ class QAModule {
     fun provideSetFeatureFlagPlaceHolder(setFeatureFlag: SetFeatureFlag): SetFeatureFlagPlaceHolder =
         SetFeatureFlagPlaceHolder { name, enabled -> setFeatureFlag(name, enabled) }
 
+    @Provides
+    @IntoSet
+    fun provideQaSettings(@ApplicationContext context: Context): @JvmSuppressWildcards FeatureSettings =
+        QaFeatureSettings(context)
 }
