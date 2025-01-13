@@ -5,11 +5,16 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -27,7 +32,7 @@ import mega.privacy.android.app.presentation.search.mapper.TypeFilterOptionStrin
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterToSearchMapper
 import mega.privacy.android.app.presentation.search.model.DateFilterWithName
 import mega.privacy.android.app.presentation.search.model.FilterOptionEntity
-import mega.privacy.android.app.presentation.search.model.SearchActivityState
+import mega.privacy.android.app.presentation.search.model.SearchViewState
 import mega.privacy.android.app.presentation.search.model.TypeFilterWithName
 import mega.privacy.android.app.presentation.search.navigation.DATE_ADDED
 import mega.privacy.android.app.presentation.search.navigation.DATE_MODIFIED
@@ -74,7 +79,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * @property monitorOfflineNodeUpdatesUseCase [MonitorOfflineNodeUpdatesUseCase]
  */
 @HiltViewModel
-class SearchActivityViewModel @Inject constructor(
+class SearchViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val searchUseCase: SearchUseCase,
@@ -97,12 +102,12 @@ class SearchActivityViewModel @Inject constructor(
     /**
      * private UI state
      */
-    private val _state = MutableStateFlow(SearchActivityState())
+    private val _state = MutableStateFlow(SearchViewState())
 
     /**
      * public UI State
      */
-    val state: StateFlow<SearchActivityState> = _state
+    val state: StateFlow<SearchViewState> = _state
     private var searchJob: Job? = null
 
     private val nodeSourceType =
@@ -114,7 +119,6 @@ class SearchActivityViewModel @Inject constructor(
 
     init {
         checkSearchFlags()
-        monitorNodeUpdatesForSearch()
         initializeSearch()
         checkViewType()
         viewModelScope.launch {
@@ -158,53 +162,74 @@ class SearchActivityViewModel @Inject constructor(
                     dateAddedSelectedFilterOption = null,
                 )
             }
-        }
-    }
-
-    private fun monitorNodeUpdatesForSearch() {
-        viewModelScope.launch {
-            merge(monitorNodeUpdatesUseCase(), monitorOfflineNodeUpdatesUseCase()).conflate()
-                .collectLatest {
-                    performSearch()
-                }
+            performSearch()
         }
     }
 
     /**
      * Perform search by entering query or change in search type
+     *
+     * Animate search view when there is a user interaction like typing or changing filter
+     * when there is a change in search results due to node updates, no need to animate
      */
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun performSearch() {
         searchJob?.cancel()
         _state.update { it.copy(isSearching = true) }
         searchJob = viewModelScope.launch {
             runCatching {
-                cancelCancelTokenUseCase()
-                searchUseCase(
-                    parentHandle = NodeId(getCurrentParentHandle()),
-                    nodeSourceType = nodeSourceType,
-                    searchParameters = SearchParameters(
-                        query = getCurrentQueryWithSearchByTags(),
-                        searchTarget = nodeSourceTypeToSearchTargetMapper(nodeSourceType),
-                        searchCategory = state.value.typeSelectedFilterOption?.let {
-                            typeFilterToSearchMapper(it.type)
-                        } ?: SearchCategory.ALL,
-                        modificationDate = state.value.dateModifiedSelectedFilterOption?.date,
-                        creationDate = state.value.dateAddedSelectedFilterOption?.date,
-                        description = if (state.value.searchDescriptionEnabled == true) getCurrentQueryWithSearchByTags() else null,
-                        tag = if (state.value.searchTagsEnabled == true) getCurrentSearchQuery().removePrefix(
-                            "#"
-                        )
-                            .takeIf { nodeSourceType != NodeSourceType.RUBBISH_BIN && nodeSourceType != NodeSourceType.INCOMING_SHARES }
-                        else null
-                    )
-                )
-            }.onSuccess {
-                onSearchSuccess(it)
+                val search = executeSearchQuery()
+                channelFlow {
+                    send(search())
+                    monitorNodeChanges().flatMapLatest {
+                        flow { emit(search()) }
+                    }.collectLatest {
+                        send(it)
+                    }
+                }.collectLatest(::onSearchSuccess)
             }.onFailure { ex ->
                 onSearchFailure(ex)
             }
         }
     }
+
+    /**
+     * Monitor node change due to change in node update or offline node update
+     * @return flow of search results
+     */
+    private fun monitorNodeChanges() = merge(
+        monitorNodeUpdatesUseCase(),
+        monitorOfflineNodeUpdatesUseCase().drop(1)
+    ).conflate()
+
+    /**
+     * Execute search query
+     */
+    private fun executeSearchQuery() = suspend {
+        cancelCancelTokenUseCase()
+        searchUseCase(
+            parentHandle = NodeId(getCurrentParentHandle()),
+            nodeSourceType = nodeSourceType,
+            searchParameters = getSearchParameters()
+        )
+    }
+
+    private fun getSearchParameters() = SearchParameters(
+        query = getCurrentQueryWithSearchByTags(),
+        searchTarget = nodeSourceTypeToSearchTargetMapper(nodeSourceType),
+        searchCategory = state.value.typeSelectedFilterOption?.let {
+            typeFilterToSearchMapper(it.type)
+        } ?: SearchCategory.ALL,
+        modificationDate = state.value.dateModifiedSelectedFilterOption?.date,
+        creationDate = state.value.dateAddedSelectedFilterOption?.date,
+        description = if (state.value.searchDescriptionEnabled == true) getCurrentQueryWithSearchByTags() else null,
+        tag = if (state.value.searchTagsEnabled == true) getCurrentSearchQuery()
+            .removePrefix("#")
+            .takeIf {
+                nodeSourceType != NodeSourceType.RUBBISH_BIN && nodeSourceType != NodeSourceType.INCOMING_SHARES
+            }
+        else null
+    )
 
     // Get current query adjusted by search by tags
     private fun getCurrentQueryWithSearchByTags() =
@@ -289,6 +314,7 @@ class SearchActivityViewModel @Inject constructor(
      * @param query search text
      */
     fun updateSearchQuery(query: String) {
+        if (state.value.searchQuery == query) return
         _state.update { it.copy(searchQuery = query, resetScroll = state.value.resetScroll.not()) }
         viewModelScope.launch { performSearch() }
     }

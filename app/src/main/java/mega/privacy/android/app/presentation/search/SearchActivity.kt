@@ -107,7 +107,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalComposeUiApi::class)
 @AndroidEntryPoint
 class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
-    private val viewModel: SearchActivityViewModel by viewModels()
+    private val viewModel: SearchViewModel by viewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
     private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
@@ -634,19 +634,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         } ?: run {
             showMegaSnackbar(
                 message = getString(R.string.general_text_error),
-                actionLabel = null,
-                duration = MegaSnackbarDuration.Short
-            )
-        }
-    }
-
-    private fun safeLaunchActivity(intent: Intent) {
-        runCatching {
-            startActivity(intent)
-        }.onFailure {
-            Timber.e(it)
-            showMegaSnackbar(
-                message = getString(R.string.intent_not_available),
                 actionLabel = null,
                 duration = MegaSnackbarDuration.Short
             )

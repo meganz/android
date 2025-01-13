@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
@@ -43,6 +44,7 @@ class SearchRepositoryImplTest {
     private val getCloudSortOrder: GetCloudSortOrder = mock()
     private val megaCancelToken: MegaCancelToken = mock()
     private val megsSearchFilterMapper: MegaSearchFilterMapper = mock()
+    private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
     private val typedNode: TypedFileNode = mock {
         on { id } doReturn nodeId
     }
@@ -61,6 +63,7 @@ class SearchRepositoryImplTest {
             getLinksSortOrder = getLinksSortOrder,
             sortOrderIntMapper = sortOrderIntMapper,
             megaSearchFilterMapper = megsSearchFilterMapper,
+            megaLocalRoomGateway = megaLocalRoomGateway,
             getCloudSortOrder = getCloudSortOrder
         )
     }
@@ -76,6 +79,7 @@ class SearchRepositoryImplTest {
         whenever(megaNode.handle).thenReturn(-1L)
         whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(megaCancelToken)
         whenever(megaApiGateway.getMegaNodeByHandle(nodeID.longValue)).thenReturn(megaNode)
+        whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(emptyList())
         whenever(
             megsSearchFilterMapper(
                 searchQuery = query,
@@ -111,6 +115,7 @@ class SearchRepositoryImplTest {
         whenever(megaNode.handle).thenReturn(-1L)
         whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(megaCancelToken)
         whenever(megaApiGateway.getMegaNodeByHandle(nodeID.longValue)).thenReturn(megaNode)
+        whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(emptyList())
         whenever(
             megsSearchFilterMapper(
                 searchQuery = query,

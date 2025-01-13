@@ -38,7 +38,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property isBusinessAccountExpired if the business or pro flexi is expired
  * @property hiddenNodeEnabled if hidden nodes are enabled
  */
-data class SearchActivityState(
+data class SearchViewState(
     val searchDescriptionEnabled: Boolean? = null,
     val searchTagsEnabled: Boolean? = null,
     val searchItemList: List<NodeUIItem<TypedNode>> = emptyList(),

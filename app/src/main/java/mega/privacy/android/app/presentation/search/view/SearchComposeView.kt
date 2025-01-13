@@ -35,7 +35,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.search.SearchActivity
-import mega.privacy.android.app.presentation.search.model.SearchActivityState
+import mega.privacy.android.app.presentation.search.model.SearchViewState
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.SortOrder
@@ -48,7 +48,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 
 /**
  * View for Search compose
- * @param state [SearchActivityState]
+ * @param state [SearchViewState]
  * @param sortOrder String
  * @param onItemClick item click listener
  * @param onLongClick item long click listener
@@ -62,7 +62,7 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchComposeView(
-    state: SearchActivityState,
+    state: SearchViewState,
     sortOrder: String,
     onItemClick: (NodeUIItem<TypedNode>) -> Unit,
     onLongClick: (NodeUIItem<TypedNode>) -> Unit,
@@ -219,7 +219,7 @@ private fun <T> T.useDebounce(
 @Composable
 private fun PreviewSearchComposeView() {
     SearchComposeView(
-        state = SearchActivityState(),
+        state = SearchViewState(),
         sortOrder = SortOrder.ORDER_NONE.toString(),
         onItemClick = {},
         onLongClick = {},
