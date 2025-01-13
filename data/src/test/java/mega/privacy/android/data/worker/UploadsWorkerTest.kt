@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
@@ -344,7 +345,7 @@ class UploadsWorkerTest {
 
         underTest.onTransferEventReceived(finishEvent)
 
-        verify(setNodeAttributesAfterUploadUseCase).invoke(nodeId, File(localPath))
+        verify(setNodeAttributesAfterUploadUseCase).invoke(nodeId, UriPath(localPath))
     }
 
     @Test
@@ -359,7 +360,7 @@ class UploadsWorkerTest {
 
         underTest.onTransferEventReceived(transferEvent)
 
-        verify(setNodeAttributesAfterUploadUseCase).invoke(nodeId, File(localPath))
+        verify(setNodeAttributesAfterUploadUseCase).invoke(nodeId, UriPath(localPath))
     }
 
     private suspend fun commonStub(

@@ -1,7 +1,9 @@
 package mega.privacy.android.domain.usecase.file
 
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import javax.inject.Inject
+import kotlin.text.startsWith
 
 /**
  * Is pdf file use case
@@ -16,10 +18,12 @@ class IsPdfFileUseCase @Inject constructor(
     /**
      * Invoke
      *
-     * @param localPath
+     * @param uriPath
      * @return True if the file is a pdf, false otherwise.
      */
-    suspend operator fun invoke(localPath: String) =
-        fileSystemRepository.getGuessContentTypeFromName(localPath)
-            ?.startsWith("application/pdf") == true
+    suspend operator fun invoke(uriPath: UriPath) =
+        listOf(
+            fileSystemRepository.getGuessContentTypeFromName(uriPath.value),
+            fileSystemRepository.getContentTypeFromContentUri(uriPath)
+        ).any { it?.startsWith("application/pdf") == true }
 }

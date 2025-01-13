@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMes
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
@@ -137,7 +138,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
             inOrder.verify(setNodeAttributesAfterUploadUseCase)
                 .invoke(
                     nodeId.longValue,
-                    File(filePath),
+                    UriPath(filePath),
                 )
             inOrder.verify(chatMessageRepository).attachNode(chatId, nodeId)
         }

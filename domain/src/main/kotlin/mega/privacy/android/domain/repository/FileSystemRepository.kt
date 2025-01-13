@@ -160,6 +160,14 @@ interface FileSystemRepository {
     suspend fun getGuessContentTypeFromName(localPath: String): String?
 
     /**
+     * Return the MIME type of the given content Uri.
+     *
+     * @param uriPath UriPath of the file
+     * @return The content type of the Uri if any.
+     */
+    suspend fun getContentTypeFromContentUri(uriPath: UriPath): String?
+
+    /**
      * Get GPS coordinates from video file
      *
      * @param filePath

@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.transfers.uploads
 
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
 import mega.privacy.android.domain.usecase.file.IsPdfFileUseCase
 import mega.privacy.android.domain.usecase.file.IsVideoFileUseCase
@@ -40,12 +41,13 @@ class SetNodeAttributesAfterUploadUseCase @Inject constructor(
      * Invoke
      *
      * @param nodeHandle Node handle of the file already in the Cloud.
-     * @param localFile Local file.
+     * @param uriPath Uri path.
      */
-    suspend operator fun invoke(nodeHandle: Long, localFile: File) {
-        val localPath = localFile.absolutePath
+    suspend operator fun invoke(nodeHandle: Long, uriPath: UriPath) {
+        val localPath = uriPath.value
+        val localFile = File(localPath)
         val isVideoOrImage = isVideoFileUseCase(localPath) || isImageFileUseCase(localPath)
-        val isPdf = isPdfFileUseCase(localPath)
+        val isPdf = isPdfFileUseCase(uriPath)
 
         if (isVideoOrImage) {
             createImageOrVideoThumbnailUseCase(nodeHandle = nodeHandle, localFile = localFile)

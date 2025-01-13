@@ -15,6 +15,7 @@ import mega.privacy.android.data.mapper.transfer.TransfersNotificationMapper
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -96,7 +97,7 @@ class UploadsWorker @AssistedInject constructor(
                 runCatching {
                     setNodeAttributesAfterUploadUseCase(
                         nodeHandle = it.transfer.nodeHandle,
-                        localFile = File(it.transfer.localPath),
+                        uriPath = UriPath(it.transfer.localPath),
                     )
                 }.onFailure { exception ->
                     Timber.e(exception, "Node attributes not correctly set")

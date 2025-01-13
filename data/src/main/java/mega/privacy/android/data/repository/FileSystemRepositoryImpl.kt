@@ -158,6 +158,11 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             URLConnection.guessContentTypeFromName(localPath)
         }
 
+    override suspend fun getContentTypeFromContentUri(uriPath: UriPath): String? =
+        withContext(ioDispatcher) {
+            context.contentResolver.getType(uriPath.toUri())
+        }
+
     override suspend fun getVideoGPSCoordinates(filePath: String): Pair<Double, Double>? =
         withContext(ioDispatcher) {
             fileAttributeGateway.getVideoGPSCoordinates(filePath)

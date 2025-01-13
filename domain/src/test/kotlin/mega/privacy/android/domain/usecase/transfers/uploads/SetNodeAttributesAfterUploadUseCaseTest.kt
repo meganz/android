@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.transfers.uploads
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
 import mega.privacy.android.domain.usecase.file.IsPdfFileUseCase
 import mega.privacy.android.domain.usecase.file.IsVideoFileUseCase
@@ -42,7 +43,8 @@ class SetNodeAttributesAfterUploadUseCaseTest {
     private val fileName = "testName"
     private val nodeHandle = 1L
     private val localPath = "test/local/$fileName"
-    private val localFile = mock<File>()
+    private val localFile =File(localPath)
+    private val uriPath = UriPath(localPath)
     private val thumbnailCache = "test/thumbnail/cache"
     private val previewCache = "test/preview/cache"
     private val thumbnailPath = "$thumbnailCache/$fileName"
@@ -85,17 +87,16 @@ class SetNodeAttributesAfterUploadUseCaseTest {
         isImageFile: Boolean,
         isPdfFile: Boolean,
     ) = runTest {
-        whenever(localFile.absolutePath).thenReturn(localPath)
         whenever(isVideoFileUseCase(localPath)).thenReturn(isVideoFile)
         whenever(isImageFileUseCase(localPath)).thenReturn(isImageFile)
-        whenever(isPdfFileUseCase(localPath)).thenReturn(isPdfFile)
+        whenever(isPdfFileUseCase(uriPath)).thenReturn(isPdfFile)
         whenever(createImageOrVideoThumbnailUseCase(nodeHandle, localFile)).thenReturn(Unit)
         whenever(createPdfThumbnailUseCase(nodeHandle, localFile)).thenReturn(Unit)
         whenever(createImageOrVideoPreviewUseCase(nodeHandle, localFile)).thenReturn(Unit)
         whenever(createPdfPreviewUseCase(nodeHandle, localFile)).thenReturn(Unit)
         whenever(setNodeCoordinatesUseCase(localPath, nodeHandle)).thenReturn(Unit)
 
-        underTest.invoke(nodeHandle, localFile)
+        underTest.invoke(nodeHandle, uriPath)
 
         when {
             isVideoFile || isImageFile -> {
