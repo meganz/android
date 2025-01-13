@@ -4,8 +4,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.navigation
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.presentation.settings.home.SettingsHome
-import mega.privacy.android.app.presentation.settings.home.settingsHome
+import mega.privacy.android.app.presentation.settings.container.SettingsContainer
+import mega.privacy.android.app.presentation.settings.container.settingsContainer
 
 @Serializable
 internal object SettingsGraph
@@ -16,10 +16,11 @@ internal object SettingsGraph
  */
 fun NavGraphBuilder.settingsGraph(
     navController: NavHostController,
+    onNavigateBack: () -> Unit,
 ) {
     navigation<SettingsGraph>(
-        startDestination = SettingsHome()
+        startDestination = SettingsContainer()
     ) {
-        settingsHome(navController)
+        settingsContainer(navController, onNavigateBack)
     }
 }

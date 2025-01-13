@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.settings.home
+package mega.privacy.android.app.presentation.settings.container
 
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -8,7 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.presentation.settings.home.view.SettingsHomeView
+import mega.privacy.android.app.presentation.settings.container.view.SettingContainerView
 
 /**
  * Settings home
@@ -16,23 +16,27 @@ import mega.privacy.android.app.presentation.settings.home.view.SettingsHomeView
  * @property initialSetting
  */
 @Serializable
-data class SettingsHome(val initialSetting: String? = null)
+data class SettingsContainer(val initialSetting: String? = null)
 
 /**
  * Settings home
  *
  */
-fun NavGraphBuilder.settingsHome(
+fun NavGraphBuilder.settingsContainer(
     navHostController: NavHostController,
+    onNavigateBack: () -> Unit,
 ) {
-    composable<SettingsHome> { backStackEntry ->
-        val args = backStackEntry.toRoute<SettingsHome>()
-        val viewModel = hiltViewModel<SettingHomeViewModel>()
+    composable<SettingsContainer> { backStackEntry ->
+        val args = backStackEntry.toRoute<SettingsContainer>()
+        val viewModel = hiltViewModel<SettingContainerViewModel>()
         val state by viewModel.state.collectAsStateWithLifecycle()
-        SettingsHomeView(
+        SettingContainerView(
             state = state,
             initialKey = args.initialSetting,
             navHostController = navHostController,
+            getTitle = viewModel::getScreenTitle,
+            onNavigateBack = onNavigateBack,
         )
     }
 }
+

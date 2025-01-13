@@ -25,8 +25,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
-class SettingContainerViewModelTest {
-    private lateinit var underTest: SettingContainerViewModel
+class SettingHomeViewModelTest {
+    private lateinit var underTest: SettingHomeViewModel
 
     private val settingItemMapper = SettingItemMapper()
     private val settingItemFlowMapper = SettingItemFlowMapper()
@@ -34,7 +34,7 @@ class SettingContainerViewModelTest {
     private val settingHeaderComparator = SettingHeaderComparator()
 
     private fun initUnderTest(settings: Set<FeatureSettings>, scope: CoroutineScope) {
-        underTest = SettingContainerViewModel(
+        underTest = SettingHomeViewModel(
             featureSettings = settings,
             settingItemMapper = settingItemMapper,
             settingItemFlowMapper = settingItemFlowMapper,
