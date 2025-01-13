@@ -32,7 +32,7 @@ class GetAvailableNodeActionsUseCase @Inject constructor(
             add(NodeAction.SendToChat)
         }
         val accessPermission = getNodeAccessPermission(typedNode.id)
-        if (typedNode.isIncomingShare) {
+        if (accessPermission != AccessPermission.OWNER) {
             val incomingShareFirstLevel =
                 typedNode.parentId.longValue == -1L || getNodeByIdUseCase(typedNode.parentId)?.parentId?.longValue == -1L
             if (!typedNode.isTakenDown) {
@@ -42,7 +42,7 @@ class GetAvailableNodeActionsUseCase @Inject constructor(
                     add(NodeAction.Leave)
                 }
             }
-            if (!isNodeInBackupsUseCase(typedNode.id.longValue) && (accessPermission == AccessPermission.OWNER || accessPermission == AccessPermission.FULL)) {
+            if (!isNodeInBackupsUseCase(typedNode.id.longValue) && accessPermission == AccessPermission.FULL) {
                 add(NodeAction.Rename)
                 if (incomingShareFirstLevel) {
                     add(NodeAction.MoveToRubbishBin)
@@ -52,7 +52,7 @@ class GetAvailableNodeActionsUseCase @Inject constructor(
             if (!typedNode.isTakenDown) {
                 add(NodeAction.Download)
                 add(NodeAction.Copy)
-                if (typedNode !is FileNode && accessPermission == AccessPermission.OWNER) {
+                if (typedNode !is FileNode) {
                     add(NodeAction.ShareFolder)
                 }
 
@@ -72,5 +72,4 @@ class GetAvailableNodeActionsUseCase @Inject constructor(
             }
         }
     }
-
 }
