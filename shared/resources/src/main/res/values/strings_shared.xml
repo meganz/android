@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
@@ -908,4 +908,12 @@
     <string name="general_confirm_your_password">Confirm your password</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">Scan settings</string>
+    <!-- Title of the camera setting screen -->
+    <string name="camera_settings_title">Camera settings</string>
+    <!-- Title of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_title">Save location</string>
+    <!-- Description of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_description">Enable geotagging for photos and videos</string>
+    <!-- Message when user denies location permission in the camera setting screen -->
+    <string name="camera_settings_save_location_permission_denied">Allow MEGA to access this device’s location to continue</string>
 </resources>
