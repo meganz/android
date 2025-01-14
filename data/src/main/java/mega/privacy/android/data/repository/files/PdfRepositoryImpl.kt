@@ -2,7 +2,6 @@ package mega.privacy.android.data.repository.files
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.ParcelFileDescriptor
 import com.shockwave.pdfium.PdfiumCore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -10,11 +9,12 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.files.PdfRepository
 import timber.log.Timber
-import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
 
@@ -29,17 +29,18 @@ class PdfRepositoryImpl @Inject constructor(
     private val megaApi: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val cacheGateway: CacheGateway,
+    private val fileGateway: FileGateway,
 ) : PdfRepository {
 
-    override suspend fun createThumbnail(nodeHandle: Long, localFile: File) =
-        createThumbnailOrPreview(nodeHandle = nodeHandle, localFile = localFile, isPreview = false)
+    override suspend fun createThumbnail(nodeHandle: Long, uriPath: UriPath) =
+        createThumbnailOrPreview(nodeHandle = nodeHandle, uriPath = uriPath, isPreview = false)
 
-    override suspend fun createPreview(nodeHandle: Long, localFile: File) =
-        createThumbnailOrPreview(nodeHandle = nodeHandle, localFile = localFile, isPreview = true)
+    override suspend fun createPreview(nodeHandle: Long, uriPath: UriPath) =
+        createThumbnailOrPreview(nodeHandle = nodeHandle, uriPath = uriPath, isPreview = true)
 
     private suspend fun createThumbnailOrPreview(
         nodeHandle: Long,
-        localFile: File,
+        uriPath: UriPath,
         isPreview: Boolean,
     ) = withContext(ioDispatcher) {
         val pdfiumCore = PdfiumCore(context)
@@ -53,7 +54,7 @@ class PdfRepositoryImpl @Inject constructor(
 
         val out = FileOutputStream(file)
         val pdfDocument = pdfiumCore.newDocument(
-            ParcelFileDescriptor.open(localFile, ParcelFileDescriptor.MODE_READ_ONLY)
+            fileGateway.getFileDescriptor(uriPath, false) ?: return@withContext null
         )
 
         try {

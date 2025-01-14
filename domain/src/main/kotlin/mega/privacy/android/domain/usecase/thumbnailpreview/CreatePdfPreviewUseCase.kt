@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.thumbnailpreview
 
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.files.PdfRepository
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -21,9 +21,9 @@ class CreatePdfPreviewUseCase @Inject constructor(
      * @param localFile Local file.
      * @return Path of the thumbnail file if created successfully, null otherwise.
      */
-    suspend operator fun invoke(nodeHandle: Long, localFile: File) =
+    suspend operator fun invoke(nodeHandle: Long, uriPath: UriPath) =
         runCatching {
-            pdfRepository.createPreview(nodeHandle, localFile)
+            pdfRepository.createPreview(nodeHandle, uriPath)
         }.getOrNull()?.let { previewPath ->
             setPreviewUseCase(nodeHandle = nodeHandle, srcFilePath = previewPath)
         }

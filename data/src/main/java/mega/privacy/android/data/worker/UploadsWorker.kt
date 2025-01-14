@@ -92,8 +92,7 @@ class UploadsWorker @AssistedInject constructor(
         transfersFinishedNotificationMapper(activeTransferTotals)
 
     override suspend fun onTransferEventReceived(event: TransferEvent) {
-        (event as? TransferEvent.TransferFinishEvent)?.let {
-            if (it.error == null) {
+        (event as? TransferEvent.TransferFinishEvent)?.let {if (it.error == null) {
                 runCatching {
                     setNodeAttributesAfterUploadUseCase(
                         nodeHandle = it.transfer.nodeHandle,

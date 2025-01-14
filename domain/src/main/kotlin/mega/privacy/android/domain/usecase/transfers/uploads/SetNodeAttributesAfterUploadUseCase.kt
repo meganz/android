@@ -54,8 +54,8 @@ class SetNodeAttributesAfterUploadUseCase @Inject constructor(
             createImageOrVideoPreviewUseCase(nodeHandle = nodeHandle, localFile = localFile)
             setNodeCoordinatesUseCase(localPath = localPath, nodeHandle = nodeHandle)
         } else if (isPdf) {
-            createPdfThumbnailUseCase(nodeHandle = nodeHandle, localFile = localFile)
-            createPdfPreviewUseCase(nodeHandle = nodeHandle, localFile = localFile)
+            createPdfThumbnailUseCase(nodeHandle = nodeHandle, uriPath = uriPath)
+            createPdfPreviewUseCase(nodeHandle = nodeHandle, uriPath = uriPath)
         }
     }
 }

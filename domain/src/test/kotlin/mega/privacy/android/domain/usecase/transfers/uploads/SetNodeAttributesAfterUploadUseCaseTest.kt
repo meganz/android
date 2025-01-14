@@ -91,9 +91,9 @@ class SetNodeAttributesAfterUploadUseCaseTest {
         whenever(isImageFileUseCase(localPath)).thenReturn(isImageFile)
         whenever(isPdfFileUseCase(uriPath)).thenReturn(isPdfFile)
         whenever(createImageOrVideoThumbnailUseCase(nodeHandle, localFile)).thenReturn(Unit)
-        whenever(createPdfThumbnailUseCase(nodeHandle, localFile)).thenReturn(Unit)
+        whenever(createPdfThumbnailUseCase(nodeHandle, uriPath)).thenReturn(Unit)
         whenever(createImageOrVideoPreviewUseCase(nodeHandle, localFile)).thenReturn(Unit)
-        whenever(createPdfPreviewUseCase(nodeHandle, localFile)).thenReturn(Unit)
+        whenever(createPdfPreviewUseCase(nodeHandle, uriPath)).thenReturn(Unit)
         whenever(setNodeCoordinatesUseCase(localPath, nodeHandle)).thenReturn(Unit)
 
         underTest.invoke(nodeHandle, uriPath)
@@ -101,25 +101,25 @@ class SetNodeAttributesAfterUploadUseCaseTest {
         when {
             isVideoFile || isImageFile -> {
                 verify(createImageOrVideoThumbnailUseCase).invoke(nodeHandle, localFile)
-                verify(createPdfThumbnailUseCase, never()).invoke(nodeHandle, localFile)
+                verify(createPdfThumbnailUseCase, never()).invoke(nodeHandle, uriPath)
                 verify(createImageOrVideoPreviewUseCase).invoke(nodeHandle, localFile)
-                verify(createPdfPreviewUseCase, never()).invoke(nodeHandle, localFile)
+                verify(createPdfPreviewUseCase, never()).invoke(nodeHandle, uriPath)
                 verify(setNodeCoordinatesUseCase).invoke(localPath, nodeHandle)
             }
 
             isPdfFile -> {
                 verify(createImageOrVideoThumbnailUseCase, never()).invoke(nodeHandle, localFile)
-                verify(createPdfThumbnailUseCase).invoke(nodeHandle, localFile)
+                verify(createPdfThumbnailUseCase).invoke(nodeHandle, uriPath)
                 verify(createImageOrVideoPreviewUseCase, never()).invoke(nodeHandle, localFile)
-                verify(createPdfPreviewUseCase).invoke(nodeHandle, localFile)
+                verify(createPdfPreviewUseCase).invoke(nodeHandle, uriPath)
                 verify(setNodeCoordinatesUseCase, never()).invoke(localPath, nodeHandle)
             }
 
             else -> {
                 verify(createImageOrVideoThumbnailUseCase, never()).invoke(nodeHandle, localFile)
-                verify(createPdfThumbnailUseCase, never()).invoke(nodeHandle, localFile)
+                verify(createPdfThumbnailUseCase, never()).invoke(nodeHandle, uriPath)
                 verify(createImageOrVideoPreviewUseCase, never()).invoke(nodeHandle, localFile)
-                verify(createPdfPreviewUseCase, never()).invoke(nodeHandle, localFile)
+                verify(createPdfPreviewUseCase, never()).invoke(nodeHandle, uriPath)
                 verify(setNodeCoordinatesUseCase, never()).invoke(localPath, nodeHandle)
             }
         }

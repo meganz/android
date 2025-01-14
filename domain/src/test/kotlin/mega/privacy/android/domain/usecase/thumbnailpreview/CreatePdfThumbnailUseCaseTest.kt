@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.thumbnailpreview
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.files.PdfRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -14,7 +15,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.io.File
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -46,14 +46,14 @@ class CreatePdfThumbnailUseCaseTest {
     ) = runTest {
         val nodeHandle = 1L
         val path = "test/filePath"
-        val localFile = File(path)
-        whenever(pdfRepository.createThumbnail(nodeHandle, localFile))
+        val uriPath = UriPath(path)
+        whenever(pdfRepository.createThumbnail(nodeHandle, uriPath))
             .thenReturn(expectedThumbnailPath)
         expectedThumbnailPath?.let {
             whenever(setThumbnailUseCase(nodeHandle, expectedThumbnailPath)).thenReturn(Unit)
         }
-        underTest.invoke(nodeHandle, localFile)
-        verify(pdfRepository).createThumbnail(nodeHandle, localFile)
+        underTest.invoke(nodeHandle, uriPath)
+        verify(pdfRepository).createThumbnail(nodeHandle, uriPath)
 
         if (expectedThumbnailPath == null) {
             verify(setThumbnailUseCase, never()).invoke(nodeHandle, path)
