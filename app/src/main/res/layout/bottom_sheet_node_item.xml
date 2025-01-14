@@ -420,7 +420,7 @@
                     android:drawablePadding="8dp"
                     android:gravity="end"
                     android:text="@string/general_pro_only"
-                    android:textColor="@color/accent_900"
+                    android:textColor="@color/color_text_primary"
                     android:textSize="16sp"
                     android:visibility="gone" />
 
