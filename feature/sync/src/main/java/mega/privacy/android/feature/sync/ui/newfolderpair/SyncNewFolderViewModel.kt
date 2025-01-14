@@ -22,6 +22,7 @@ import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
@@ -37,6 +38,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
     private val clearSelectedMegaFolderUseCase: ClearSelectedMegaFolderUseCase,
     private val getDeviceIdUseCase: GetDeviceIdUseCase,
     private val getDeviceNameUseCase: GetDeviceNameUseCase,
+    private val getFolderPairsUseCase: GetFolderPairsUseCase,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -79,13 +81,23 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                 viewModelScope.launch {
                     action.path.toFile().absolutePath.let { path ->
                         val localDCIMFolderPath = getLocalDCIMFolderPathUseCase()
-                        if (localDCIMFolderPath.isNotEmpty() && path.contains(localDCIMFolderPath)) {
-                            _state.update { state ->
-                                state.copy(showSnackbar = triggered(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message))
+                        when {
+                            localDCIMFolderPath.isNotEmpty() && path.contains(localDCIMFolderPath) -> {
+                                _state.update { state ->
+                                    state.copy(showSnackbar = triggered(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message))
+                                }
                             }
-                        } else {
-                            _state.update { state ->
-                                state.copy(selectedLocalFolder = path)
+
+                            getFolderPairsUseCase().any { it.localFolderPath == path } -> {
+                                _state.update { state ->
+                                    state.copy(showSnackbar = triggered(sharedR.string.sync_local_device_folder_currently_synced_message))
+                                }
+                            }
+
+                            else -> {
+                                _state.update { state ->
+                                    state.copy(selectedLocalFolder = path)
+                                }
                             }
                         }
                     }

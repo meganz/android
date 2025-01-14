@@ -908,6 +908,8 @@
     <string name="general_confirm_your_password">Confirm your password</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">Scan settings</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="sync_local_device_folder_currently_synced_message">This folder is already synced</string>
     <!-- Title of the camera setting screen -->
     <string name="camera_settings_title">Camera settings</string>
     <!-- Title of the save location in the camera setting screen -->

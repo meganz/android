@@ -17,8 +17,11 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
+import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
@@ -49,6 +52,7 @@ internal class SyncNewFolderViewModelTest {
     private val clearSelectedMegaFolderUseCase: ClearSelectedMegaFolderUseCase = mock()
     private val getDeviceIdUseCase: GetDeviceIdUseCase = mock()
     private val getDeviceNameUseCase: GetDeviceNameUseCase = mock()
+    private val getFolderPairsUseCase: GetFolderPairsUseCase = mock()
     private lateinit var underTest: SyncNewFolderViewModel
 
     @AfterEach
@@ -61,6 +65,7 @@ internal class SyncNewFolderViewModelTest {
             clearSelectedMegaFolderUseCase,
             getDeviceIdUseCase,
             getDeviceNameUseCase,
+            getFolderPairsUseCase,
         )
     }
 
@@ -71,17 +76,18 @@ internal class SyncNewFolderViewModelTest {
             whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
             initViewModel(syncType = syncType)
             val localFolderUri: Uri = mock()
-            val localFolderFolderStoragePath = "/storage/emulated/0/Sync/someFolder"
+            val localFolderStoragePath = "/storage/emulated/0/Sync/someFolder"
             val localDCIMFolderPath = "/storage/emulated/0/DCIM"
             val expectedState = SyncNewFolderState(
                 syncType = syncType,
                 deviceName = "Device Name",
-                selectedLocalFolder = localFolderFolderStoragePath
+                selectedLocalFolder = localFolderStoragePath
             )
             whenever(getLocalDCIMFolderPathUseCase.invoke()).thenReturn(
                 localDCIMFolderPath
             )
-            whenever(localFolderUri.path).thenReturn(localFolderFolderStoragePath)
+            whenever(getFolderPairsUseCase.invoke()).thenReturn(emptyList())
+            whenever(localFolderUri.path).thenReturn(localFolderStoragePath)
             whenever(localFolderUri.scheme).thenReturn("file")
 
             underTest.handleAction(SyncNewFolderAction.LocalFolderSelected(localFolderUri))
@@ -96,7 +102,6 @@ internal class SyncNewFolderViewModelTest {
     ) = runTest {
         whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
         initViewModel(syncType = syncType)
-        val localFolderContentUri = "file:///storage/emulated/0/DCIM"
         val localFolderUri: Uri = mock()
         val localDCIMFolderPath = "/storage/emulated/0/DCIM"
         whenever(getLocalDCIMFolderPathUseCase.invoke()).thenReturn(
@@ -111,6 +116,44 @@ internal class SyncNewFolderViewModelTest {
             state.test {
                 val result = (awaitItem().showSnackbar as StateEventWithContentTriggered).content
                 assertThat(result).isEqualTo(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message)
+            }
+        }
+    }
+
+    @ParameterizedTest(name = "Sync type: {0}")
+    @MethodSource("syncTypeParameters")
+    fun `test that snackbar with warning message is displayed if try to select an already synced local device folder`(
+        syncType: SyncType,
+    ) = runTest {
+        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
+        initViewModel(syncType = syncType)
+        val localFolderUri: Uri = mock()
+        val localDCIMFolderPath = "/storage/emulated/0/DCIM"
+        val localFolderPath = "/storage/emulated/0/Folder"
+        whenever(getLocalDCIMFolderPathUseCase.invoke()).thenReturn(
+            localDCIMFolderPath
+        )
+        whenever(getFolderPairsUseCase.invoke()).thenReturn(
+            listOf(
+                FolderPair(
+                    id = 1234L,
+                    syncType = syncType,
+                    pairName = "Pair Name",
+                    localFolderPath = localFolderPath,
+                    remoteFolder = RemoteFolder(5678L, "Remote Folder"),
+                    syncStatus = SyncStatus.SYNCED,
+                )
+            )
+        )
+        whenever(localFolderUri.path).thenReturn(localFolderPath)
+        whenever(localFolderUri.scheme).thenReturn("file")
+
+        underTest.handleAction(SyncNewFolderAction.LocalFolderSelected(localFolderUri))
+
+        with(underTest) {
+            state.test {
+                val result = (awaitItem().showSnackbar as StateEventWithContentTriggered).content
+                assertThat(result).isEqualTo(sharedR.string.sync_local_device_folder_currently_synced_message)
             }
         }
     }
@@ -242,6 +285,7 @@ internal class SyncNewFolderViewModelTest {
             clearSelectedMegaFolderUseCase = clearSelectedMegaFolderUseCase,
             getDeviceIdUseCase = getDeviceIdUseCase,
             getDeviceNameUseCase = getDeviceNameUseCase,
+            getFolderPairsUseCase = getFolderPairsUseCase,
         )
     }
 
