@@ -159,8 +159,6 @@ internal class ManagerDrawerFragment : Fragment() {
         }
         viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
             setContactStatus(uiState.userChatStatus)
-            // For QA Builds, show Backups when the Device Center Feature Flag is also disabled
-            binding.backupsSection.isVisible = false
             setDrawerLayout(uiState.isRootNodeExist && uiState.isConnected)
             binding.navigationDrawerAddPhoneNumberContainer.isVisible = uiState.canVerifyPhoneNumber
             binding.deviceCenterSection.isVisible = true
@@ -198,7 +196,6 @@ internal class ManagerDrawerFragment : Fragment() {
             drawerManager.closeDrawer()
             startActivity(ContactsActivity.getListIntent(requireActivity()))
         }
-        binding.backupsSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.BACKUPS) }
         binding.notificationsSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.NOTIFICATIONS) }
         binding.deviceCenterSection.setOnClickListener {
             Analytics.tracker.trackEvent(DeviceCenterEntrypointButtonEvent)
