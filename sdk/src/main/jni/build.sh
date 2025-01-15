@@ -140,11 +140,11 @@ LIBWEBSOCKETS_SOURCE_FOLDER=libwebsockets-${LIBWEBSOCKETS_VERSION}
 LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/refs/heads/v${LIBWEBSOCKETS_VERSION}.zip
 
 PDFVIEWER=pdfviewer
-PDFVIEWER_VERSION=1.9.0
+PDFVIEWER_VERSION=1.9.1
 PDFVIEWER_SOURCE_FILE=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}.zip
 PDFVIEWER_SOURCE_FOLDER=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}
-PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/pdfium-android-${PDFVIEWER_VERSION}.zip
-PDFVIEWER_SHA1="9c346de2fcf328c65c7047f03357a049dc55b403"
+PDFVIEWER_DOWNLOAD_URL=https://github.com/meganz/PdfiumAndroid/archive/refs/tags/pdfium-android-${PDFVIEWER_VERSION}.zip
+PDFVIEWER_SHA1="5e7faf2169749da6609d12e9870b2d89fd8306fa"
 
 ICU=icu
 ICU_VERSION=71_1
