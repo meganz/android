@@ -2063,7 +2063,7 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">Podrías tener mensajes nuevos</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Limpieza automática de la Papelera</string>
+    <string name="settings_rb_scheduler_enable_title">Limpiar automáticamente la papelera</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">La Papelera se vacía automáticamente.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2079,7 +2079,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Si los vídeos a comprimir son superiores a</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Para desactivar la limpieza automática de la Papelera o establecer un período de retención más largo, amplía tu cuenta a Pro.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Para desactivar la limpieza automática de la Papelera o establecer un período de retención más largo, amplía tu cuenta a uno de nuestros planes de pago.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">días</string>
     <!-- Title of the option to generate a public chat link -->

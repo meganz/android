@@ -907,5 +907,15 @@
     <!-- Message to enter confirm password -->
     <string name="general_confirm_your_password">Bestätigen Sie Ihr Passwort</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
-    <string name="document_scanning_settings_toolbar_title">Scan settings</string>
+    <string name="document_scanning_settings_toolbar_title">Scan-Einstellungen</string>
+    <!-- Title of the camera setting screen -->
+    <string name="camera_settings_title">Kameraeinstellungen</string>
+    <!-- Title of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_title">Speicherort</string>
+    <!-- Description of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_description">Geotagging für Fotos und Videos aktivieren</string>
+    <!-- Message when user denies location permission in the camera setting screen -->
+    <string name="camera_settings_save_location_permission_denied">Um fortzufahren, erlauben Sie MEGA den Zugriff auf den Standort dieses Geräts</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="sync_local_device_folder_currently_synced_message">Dieser Ordner ist bereits synchronisiert</string>
 </resources>

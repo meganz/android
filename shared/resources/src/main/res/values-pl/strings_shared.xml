@@ -936,4 +936,14 @@
     <string name="general_confirm_your_password">Potwierdź hasło</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">Ustawienia skanowania</string>
+    <!-- Title of the camera setting screen -->
+    <string name="camera_settings_title">Ustawienia aparatu</string>
+    <!-- Title of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_title">Zapisz lokalizację</string>
+    <!-- Description of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_description">Włącz geotagowanie zdjęć i filmów</string>
+    <!-- Message when user denies location permission in the camera setting screen -->
+    <string name="camera_settings_save_location_permission_denied">Zezwalaj MEGA na dostęp do lokalizacji tego urządzenia, aby kontynuować</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="sync_local_device_folder_currently_synced_message">Ten katalog jest już zsynchronizowany</string>
 </resources>

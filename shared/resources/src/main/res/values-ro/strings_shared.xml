@@ -922,4 +922,14 @@
     <string name="general_confirm_your_password">Confirmați parola dvs.</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">Setări de scanare</string>
+    <!-- Title of the camera setting screen -->
+    <string name="camera_settings_title">Setările aparatului foto</string>
+    <!-- Title of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_title">Salvați locația</string>
+    <!-- Description of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_description">Activați etichetarea geografică pentru fotografii și videoclipuri</string>
+    <!-- Message when user denies location permission in the camera setting screen -->
+    <string name="camera_settings_save_location_permission_denied">Permiteți MEGA să acceseze locația acestui dispozitiv pentru a continua</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="sync_local_device_folder_currently_synced_message">Acest folder este deja sincronizat</string>
 </resources>

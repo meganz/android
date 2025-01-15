@@ -1973,7 +1973,7 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">새 메시지가 있을 수 있습니다</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">휴지통 비우기 일정</string>
+    <string name="settings_rb_scheduler_enable_title">자동으로 휴지통 비우기</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">휴지통이 자동으로 비워집니다.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -1989,7 +1989,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">압축할 비디오가 다음보다 크면</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">휴지통 비우기 스케줄러를 해제하거나 더 긴 보유 기간을 설정하려면, Pro 요금제를 구독하세요.</string>
+    <string name="settings_rb_scheduler_alert_disabling">To disable automatic Rubbish bin emptying or set a longer retention period, you need to subscribe to one of our plans.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">일</string>
     <!-- Title of the option to generate a public chat link -->
