@@ -451,15 +451,21 @@ interface FileSystemRepository {
 
     /**
      * Get a [DocumentMetadata] from an [UriPath] or null if the document doesn't exist
+     *
+     * Note that this fun is synchronous and must only be used in contexts where there is really
+     * no other option. For all other cases, create an asynchronous version.
      */
-    suspend fun getDocumentMetadata(uriPath: UriPath): DocumentMetadata?
+    fun getDocumentMetadataSync(uriPath: UriPath): DocumentMetadata?
 
     /**
      * Get the list of [UriPath]s that are direct children of the given [UriPath]
      *
+     * Note that this fun is synchronous and must only be used in contexts where there is really
+     * no other option. For all other cases, create an asynchronous version.
+     *
      * @return the list of [UriPath]s that are direct children of the [uriPath] or empty list if [uriPath] doesn't represent a folder or it's empty
      */
-    suspend fun getFolderChildUriPaths(uriPath: UriPath): List<UriPath>
+    fun getFolderChildUriPathsSync(uriPath: UriPath): List<UriPath>
 
     /**
      * Get file from uri
@@ -496,7 +502,11 @@ interface FileSystemRepository {
     /**
      * Get the detached native fd from the given uriPath. You are now responsible for closing the fd in native
      * code.
+     *
+     * Note that this fun is synchronous and must only be used in contexts where there is really
+     * no other option. For all other cases, create an asynchronous version.
+     *
      * @param writePermission true if write permission is needed, false if only read permission is needed
      */
-    suspend fun getDetachedFileDescriptor(uriPath: UriPath, writePermission: Boolean): Int?
+    fun getDetachedFileDescriptorSync(uriPath: UriPath, writePermission: Boolean): Int?
 }

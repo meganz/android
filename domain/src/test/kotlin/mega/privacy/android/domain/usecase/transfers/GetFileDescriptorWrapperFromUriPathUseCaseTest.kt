@@ -41,7 +41,7 @@ class GetFileDescriptorWrapperFromUriPathUseCaseTest {
     @Test
     fun `test that null is returned if document metadata from repository is null`() = runTest {
         val uriPath = UriPath("content://file")
-        whenever(fileSystemRepository.getDocumentMetadata(uriPath)) doReturn null
+        whenever(fileSystemRepository.getDocumentMetadataSync(uriPath)) doReturn null
 
         val actual = underTest(uriPath)
 
@@ -52,7 +52,7 @@ class GetFileDescriptorWrapperFromUriPathUseCaseTest {
     fun `test that name is correctly set from repository`() = runTest {
         val uriPath = UriPath("content://file")
         val expectedName = "name"
-        whenever(fileSystemRepository.getDocumentMetadata(uriPath)) doReturn
+        whenever(fileSystemRepository.getDocumentMetadataSync(uriPath)) doReturn
                 DocumentMetadata(expectedName)
 
         val actual = underTest(uriPath)
@@ -66,7 +66,7 @@ class GetFileDescriptorWrapperFromUriPathUseCaseTest {
         isFolder: Boolean,
     ) = runTest {
         val uriPath = UriPath("content://file")
-        whenever(fileSystemRepository.getDocumentMetadata(uriPath)) doReturn
+        whenever(fileSystemRepository.getDocumentMetadataSync(uriPath)) doReturn
                 DocumentMetadata("name", isFolder)
 
         val actual = underTest(uriPath)
@@ -81,49 +81,49 @@ class GetFileDescriptorWrapperFromUriPathUseCaseTest {
     ) = runTest {
         val uriPath = UriPath("content://file")
         val expected = 6354
-        whenever(fileSystemRepository.getDocumentMetadata(uriPath)) doReturn
+        whenever(fileSystemRepository.getDocumentMetadataSync(uriPath)) doReturn
                 DocumentMetadata("name")
-        whenever(fileSystemRepository.getDetachedFileDescriptor(uriPath, write)) doReturn
+        whenever(fileSystemRepository.getDetachedFileDescriptorSync(uriPath, write)) doReturn
                 expected
 
         val actual = underTest(uriPath)
 
-        verify(fileSystemRepository, times(0)).getDetachedFileDescriptor(uriPath, write)
+        verify(fileSystemRepository, times(0)).getDetachedFileDescriptorSync(uriPath, write)
         assertThat(actual?.getDetachedFileDescriptor(write)).isEqualTo(expected)
 
         assertThat(actual?.getDetachedFileDescriptor(write)).isEqualTo(expected)
-        verify(fileSystemRepository, times(1)).getDetachedFileDescriptor(uriPath, write)
+        verify(fileSystemRepository, times(1)).getDetachedFileDescriptorSync(uriPath, write)
     }
 
     @Test
     fun `test that children uris are not fetched when it is a file`() = runTest {
         val uriPath = UriPath("content://file")
-        whenever(fileSystemRepository.getDocumentMetadata(uriPath)) doReturn
+        whenever(fileSystemRepository.getDocumentMetadataSync(uriPath)) doReturn
                 DocumentMetadata("name")
 
         val actual = underTest(uriPath)
 
         assertThat(actual?.getChildrenUris()).isEmpty()
-        verify(fileSystemRepository, times(0)).getFolderChildUriPaths(uriPath)
+        verify(fileSystemRepository, times(0)).getFolderChildUriPathsSync(uriPath)
     }
 
     @Test
     fun `test that children uris are fetched from the repository on demand when it is a folder`() =
         runTest {
             val uriPath = UriPath("content://folder")
-            whenever(fileSystemRepository.getDocumentMetadata(uriPath)) doReturn
+            whenever(fileSystemRepository.getDocumentMetadataSync(uriPath)) doReturn
                     DocumentMetadata("name", true)
             val expected1 = listOf(UriPath("content://child1"))
-            whenever(fileSystemRepository.getFolderChildUriPaths(uriPath)) doReturn
+            whenever(fileSystemRepository.getFolderChildUriPathsSync(uriPath)) doReturn
                     expected1
 
             val actual = underTest(uriPath)
 
-            verify(fileSystemRepository, times(0)).getFolderChildUriPaths(uriPath)
+            verify(fileSystemRepository, times(0)).getFolderChildUriPathsSync(uriPath)
             assertThat(actual?.getChildrenUris()).isEqualTo(expected1)
 
             val expected2 = listOf(UriPath("content://child2"))
-            whenever(fileSystemRepository.getFolderChildUriPaths(uriPath)) doReturn
+            whenever(fileSystemRepository.getFolderChildUriPathsSync(uriPath)) doReturn
                     expected2
             val actual2 = underTest(uriPath)
             assertThat(actual2?.getChildrenUris()).isEqualTo(expected2)

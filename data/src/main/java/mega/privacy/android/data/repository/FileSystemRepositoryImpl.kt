@@ -433,16 +433,12 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileGateway.getDocumentEntities(uris.map { Uri.parse(it.value) })
         }
 
-    override suspend fun getDocumentMetadata(uriPath: UriPath): DocumentMetadata? =
-        withContext(ioDispatcher) {
-            fileGateway.getDocumentMetadata(uriPath.toUri())
-        }
+    override fun getDocumentMetadataSync(uriPath: UriPath): DocumentMetadata? =
+        fileGateway.getDocumentMetadataSync(uriPath.toUri())
 
-    override suspend fun getFolderChildUriPaths(uriPath: UriPath): List<UriPath> =
-        withContext(ioDispatcher) {
-            fileGateway.getFolderChildUris(uriPath.toUri())
-                .map { UriPath(it.toString()) }
-        }
+    override fun getFolderChildUriPathsSync(uriPath: UriPath): List<UriPath> =
+        fileGateway.getFolderChildUrisSync(uriPath.toUri())
+            .map { UriPath(it.toString()) }
 
     override suspend fun getFileFromUri(uri: UriPath): File? = withContext(ioDispatcher) {
         fileGateway.getFileFromUri(Uri.parse(uri.value))?.also {
@@ -475,10 +471,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             documentFileWrapper.fromSingleUri(uri)?.delete() ?: false
         } ?: false
 
-    override suspend fun getDetachedFileDescriptor(
+    override fun getDetachedFileDescriptorSync(
         uriPath: UriPath,
         writePermission: Boolean,
-    ) = withContext(ioDispatcher) {
-        fileGateway.getFileDescriptor(uriPath, writePermission)?.detachFd()
-    }
+    ) = fileGateway.getFileDescriptorSync(uriPath, writePermission)?.detachFd()
 }

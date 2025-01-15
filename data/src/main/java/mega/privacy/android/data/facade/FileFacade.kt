@@ -741,12 +741,12 @@ internal class FileFacade @Inject constructor(
         }
     }
 
-    override suspend fun getDocumentMetadata(uri: Uri): DocumentMetadata? =
+    override fun getDocumentMetadataSync(uri: Uri): DocumentMetadata? =
         getDocumentFileFromUri(uri)?.let { doc ->
             DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
         }
 
-    override suspend fun getFolderChildUris(uri: Uri): List<Uri> =
+    override fun getFolderChildUrisSync(uri: Uri): List<Uri> =
         (getDocumentFileFromUri(uri)
             ?.takeIf { it.isDirectory }
             ?.listFiles()
@@ -773,7 +773,7 @@ internal class FileFacade @Inject constructor(
         return null
     }
 
-    override suspend fun getFileDescriptor(uriPath: UriPath, writePermission: Boolean) =
+    override fun getFileDescriptorSync(uriPath: UriPath, writePermission: Boolean) =
         runCatching {
             context.contentResolver.openFileDescriptor(
                 uriPath.toUri(),
@@ -782,6 +782,11 @@ internal class FileFacade @Inject constructor(
         }.onFailure {
             Timber.e(it, "Error getting file descriptor for $uriPath")
         }.getOrNull()
+
+    override suspend fun getFileDescriptor(
+        uriPath: UriPath,
+        writePermission: Boolean,
+    ) = getFileDescriptorSync(uriPath, writePermission)
 
     private fun getRealPathFromUri(context: Context, uri: Uri): String? {
         when {

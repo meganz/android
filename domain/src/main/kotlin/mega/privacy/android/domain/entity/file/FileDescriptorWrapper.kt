@@ -12,8 +12,8 @@ data class FileDescriptorWrapper(
     val uriPath: UriPath,
     val name: String,
     val isFolder: Boolean,
-    private val getChildrenUrisFunction: suspend () -> List<UriPath>,
-    private val getDetachedFileDescriptorFunction: suspend (write: Boolean) -> Int?,
+    private val getChildrenUrisFunction: () -> List<UriPath>,
+    private val getDetachedFileDescriptorFunction: (write: Boolean) -> Int?,
 ) {
     private var detachedFileDescriptor: Int? = null
 
@@ -21,7 +21,7 @@ data class FileDescriptorWrapper(
      * Returns a native file descriptor integer (fd) to be used by native code to access the file. This fd is detached, so the native code is responsible to close it when it's not needed anymore.
      * To avoid multiple opened file descriptors for the same instance, the result is cached, so it's save to call this function multiple times.
      */
-    suspend fun getDetachedFileDescriptor(write: Boolean) =
+    fun getDetachedFileDescriptor(write: Boolean) =
         (detachedFileDescriptor ?: getDetachedFileDescriptorFunction(write)?.also {
             detachedFileDescriptor = it
         }) ?: -1
@@ -29,5 +29,5 @@ data class FileDescriptorWrapper(
     /**
      * Get the uris of the children of this entity. If it's a file or an empty folder, an empty list is returned
      */
-    suspend fun getChildrenUris() = getChildrenUrisFunction()
+    fun getChildrenUris() = getChildrenUrisFunction()
 }

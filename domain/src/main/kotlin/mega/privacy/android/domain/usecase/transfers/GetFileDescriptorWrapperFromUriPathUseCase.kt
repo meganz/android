@@ -14,19 +14,19 @@ class GetFileDescriptorWrapperFromUriPathUseCase @Inject constructor(
     /**
      * Invoke
      */
-    suspend operator fun invoke(uriPath: UriPath): FileDescriptorWrapper? =
-        fileSystemRepository.getDocumentMetadata(uriPath)
+    operator fun invoke(uriPath: UriPath): FileDescriptorWrapper? =
+        fileSystemRepository.getDocumentMetadataSync(uriPath)
             ?.let { (name, isFolder) ->
                 FileDescriptorWrapper(
                     uriPath = uriPath,
                     name = name,
                     isFolder = isFolder,
                     getDetachedFileDescriptorFunction = {
-                        fileSystemRepository.getDetachedFileDescriptor(uriPath, it)
+                        fileSystemRepository.getDetachedFileDescriptorSync(uriPath, it)
                     },
                     getChildrenUrisFunction = {
                         if (isFolder) {
-                            fileSystemRepository.getFolderChildUriPaths(uriPath)
+                            fileSystemRepository.getFolderChildUriPathsSync(uriPath)
                         } else {
                             emptyList()
                         }

@@ -2,9 +2,6 @@ package mega.privacy.android.app.utils
 
 import androidx.annotation.Keep
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.data.extensions.isFile
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.transfers.GetFileDescriptorWrapperFromUriPathUseCase
@@ -52,28 +49,20 @@ class FileWrapper(
         @JvmStatic
         @Keep
         fun getFromUri(uriPath: String) =
-            runBlocking(jniContext()) {
-                getFileWrapperFromUriPathUseCase(UriPath(uriPath))
-                    ?.let { asyncWrapper ->
-                        FileWrapper(
-                            uri = asyncWrapper.uriPath.value,
-                            name = asyncWrapper.name,
-                            isFolder = asyncWrapper.isFolder,
-                            getDetachedFileDescriptorFunction = {
-                                runBlocking(jniContext()) {
-                                    asyncWrapper.getDetachedFileDescriptor(it)
-                                }
-                            },
-                            getChildrenUrisFunction = {
-                                runBlocking(jniContext()) {
-                                    asyncWrapper.getChildrenUris()
-                                }
-                            }
-                        )
-                    }
-            }
-
-        private fun jniContext() = (SupervisorJob() + ioDispatcher)
+            getFileWrapperFromUriPathUseCase(UriPath(uriPath))
+                ?.let { asyncWrapper ->
+                    FileWrapper(
+                        uri = asyncWrapper.uriPath.value,
+                        name = asyncWrapper.name,
+                        isFolder = asyncWrapper.isFolder,
+                        getDetachedFileDescriptorFunction = {
+                            asyncWrapper.getDetachedFileDescriptor(it)
+                        },
+                        getChildrenUrisFunction = {
+                            asyncWrapper.getChildrenUris()
+                        }
+                    )
+                }
 
         /**
          * Static method to check if a string represents a file as opposed to an Uri.

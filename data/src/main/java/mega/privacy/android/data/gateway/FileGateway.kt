@@ -408,15 +408,21 @@ interface FileGateway {
 
     /**
      * Get a [DocumentEntity] from an [Uri] or null if the document doesn't exist
+     *
+     * Note that this fun is synchronous and must only be used in contexts where there is really
+     * no other option. For all other cases, create an asynchronous version.
      */
-    suspend fun getDocumentMetadata(uri: Uri): DocumentMetadata?
+    fun getDocumentMetadataSync(uri: Uri): DocumentMetadata?
 
     /**
      * Get the list of [Uri]s that are direct children of the given [Uri]
      *
+     * Note that this fun is synchronous and must only be used in contexts where there is really
+     * no other option. For all other cases, create an asynchronous version.
+     *
      * @return the list of [Uri]s that are direct children of the [uri] or an empty list if [uri] doesn't represent a folder or it's empty
      */
-    suspend fun getFolderChildUris(uri: Uri): List<Uri>
+    fun getFolderChildUrisSync(uri: Uri): List<Uri>
 
     /**
      * Get file from uri
@@ -427,6 +433,16 @@ interface FileGateway {
      * or selected a file inside downloads folder sometimes it returns null
      */
     suspend fun getFileFromUri(uri: Uri): File?
+
+    /**
+     * Get [ParcelFileDescriptor] from uriPath
+     *
+     * Note that this fun is synchronous and must only be used in contexts where there is really
+     * no other option. For all other cases, use the asynchronous version [getFileDescriptor].
+     *
+     * @param writePermission true if write permission is needed, false if only read permission is needed
+     */
+    fun getFileDescriptorSync(uriPath: UriPath, writePermission: Boolean): ParcelFileDescriptor?
 
     /**
      * Get [ParcelFileDescriptor] from uriPath

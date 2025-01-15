@@ -17,15 +17,9 @@ import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
-import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
-import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
-import mega.privacy.android.data.mapper.SortOrderIntMapper
-import mega.privacy.android.data.mapper.node.NodeMapper
-import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
@@ -540,11 +534,11 @@ internal class FileSystemRepositoryImplTest {
         val parcelFileDescriptor = mock<ParcelFileDescriptor> {
             on { detachFd() } doReturn expected
         }
-        val uriPath = mock<UriPath>()
-        whenever(fileGateway.getFileDescriptor(uriPath, writePermission)) doReturn
+        val uriPath = UriPath("file://test/file/path.txt")
+        whenever(fileGateway.getFileDescriptorSync(uriPath, writePermission)) doReturn
                 parcelFileDescriptor
 
-        val actual = underTest.getDetachedFileDescriptor(uriPath, writePermission)
+        val actual = underTest.getDetachedFileDescriptorSync(uriPath, writePermission)
 
         assertThat(actual).isEqualTo(expected)
     }
@@ -558,9 +552,9 @@ internal class FileSystemRepositoryImplTest {
                 on { scheme } doReturn "file"
             }
             whenever(Uri.parse(uriPath.value)) doReturn uri
-            whenever(fileGateway.getDocumentMetadata(uri)) doReturn expected
+            whenever(fileGateway.getDocumentMetadataSync(uri)) doReturn expected
 
-            val actual = underTest.getDocumentMetadata(uriPath)
+            val actual = underTest.getDocumentMetadataSync(uriPath)
 
             assertThat(actual).isEqualTo(expected)
         }
@@ -578,9 +572,9 @@ internal class FileSystemRepositoryImplTest {
                 on { scheme } doReturn "file"
             }
             whenever(Uri.parse(uriPath.value)) doReturn uri
-            whenever(fileGateway.getFolderChildUris(uri)) doReturn listOf(result)
+            whenever(fileGateway.getFolderChildUrisSync(uri)) doReturn listOf(result)
 
-            val actual = underTest.getFolderChildUriPaths(uriPath)
+            val actual = underTest.getFolderChildUriPathsSync(uriPath)
 
             assertThat(actual).containsExactly(expected)
         }

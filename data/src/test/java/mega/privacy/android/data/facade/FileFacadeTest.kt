@@ -285,7 +285,7 @@ internal class FileFacadeTest {
                 )
             ) doReturn expected
 
-            val actual = underTest.getFileDescriptor(testUri, writePermission)
+            val actual = underTest.getFileDescriptorSync(testUri, writePermission)
 
             assertThat(actual).isEqualTo(expected)
         }
@@ -328,7 +328,7 @@ internal class FileFacadeTest {
                     whenever(DocumentsContract.isTreeUri(uri)) doReturn false
                     whenever(DocumentFile.fromSingleUri(context, uri)) doReturn doc
 
-                    val actual = underTest.getDocumentMetadata(uri)
+                    val actual = underTest.getDocumentMetadataSync(uri)
 
                     assertThat(actual).isEqualTo(expected)
                 }
@@ -351,7 +351,7 @@ internal class FileFacadeTest {
                     whenever(DocumentsContract.isTreeUri(uri)) doReturn true
                     whenever(DocumentFile.fromTreeUri(context, uri)) doReturn doc
 
-                    val actual = underTest.getDocumentMetadata(uri)
+                    val actual = underTest.getDocumentMetadataSync(uri)
 
                     assertThat(actual).isEqualTo(expected)
                 }
@@ -377,7 +377,7 @@ internal class FileFacadeTest {
             val expected = DocumentMetadata(doc.name.orEmpty(), doc.isDirectory)
             whenever(DocumentFile.fromFile(file)) doReturn doc
 
-            val actual = underTest.getDocumentMetadata(uri)
+            val actual = underTest.getDocumentMetadataSync(uri)
 
             assertThat(actual).isEqualTo(expected)
         }
@@ -402,7 +402,7 @@ internal class FileFacadeTest {
                     whenever(DocumentsContract.isTreeUri(uri)) doReturn true
                     whenever(DocumentFile.fromTreeUri(context, uri)) doReturn doc
 
-                    val actual = underTest.getFolderChildUris(uri)
+                    val actual = underTest.getFolderChildUrisSync(uri)
 
                     assertThat(actual).containsExactly(expected)
                 }
