@@ -214,6 +214,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
         "Call settings implemented with the new components library",
         false,
     ),
+
+    /**
+     *  Cloud Drive and Sync in a single screen with the Two Tabs (Cloud Drive and Syncs)
+     */
+    CloudDriveAndSyncs(
+        "Implement Cloud Drive and Sync in a single screen with the Two Tabs (Cloud Drive and Syncs)",
+        false,
+    ),
     ;
 
     companion object : FeatureFlagValueProvider {
