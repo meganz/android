@@ -1973,7 +1973,7 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">新しいメッセージがあるかもしれません</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">ごみ箱を空にするスケジューラ</string>
+    <string name="settings_rb_scheduler_enable_title">ごみ箱を自動的に空にする</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">ごみ箱は自動的に空になります。</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -1989,7 +1989,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">圧縮する動画が以下より大きい場合</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">ごみ箱を空にするスケジューラを無効にするか、より長い保存期間を設定するには、Proプランのご契約をしていただく必要がございます。</string>
+    <string name="settings_rb_scheduler_alert_disabling">ごみ箱を自動的に空にする機能を無効にしたり、より長い保存期間を設定したりするには、当社のいずれかのプランにご加入いただく必要があります。</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">日</string>
     <!-- Title of the option to generate a public chat link -->

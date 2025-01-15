@@ -2018,7 +2018,7 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">U kunt nieuwe berichten hebben</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Planner voor het legen van vuilnisbakken</string>
+    <string name="settings_rb_scheduler_enable_title">Prullenbak automatisch legen</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">De Prullenbak is voor uw automatisch leeggemaakt.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2034,7 +2034,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Als video’s die gecomprimeerd moeten worden groter zijn dan</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Als u de planning voor het legen van de vuilnisbak wilt uitschakelen of een langere bewaarperiode wilt instellen, abonneer dan op een Pro-abonnement.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Als u het automatisch legen van de Prullenbak wilt uitschakelen of een langere bewaartermijn wilt instellen, moet u zich inschrijven voor een van onze abonnementen.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">dagen</string>
     <!-- Title of the option to generate a public chat link -->

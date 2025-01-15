@@ -1973,7 +1973,7 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">คุณอาจมีข้อความใหม่</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">ตัวกำหนดเวลาล้างถังขยะ</string>
+    <string name="settings_rb_scheduler_enable_title">ล้างถังขยะโดยอัตโนมัติ</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">ถังขยะจะถูกล้างโดยอัตโนมัติ</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -1989,7 +1989,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">หากวิดีโอที่บีบอัดมีขนาดใหญ่กว่า</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">หากต้องการปิดใช้งานตัวกำหนดเวลาล้างถังขยะหรือกำหนดระยะเวลาเก็บรักษาไฟล์ให้นานขึ้น กรุณาสมัครใช้งานแผน Pro</string>
+    <string name="settings_rb_scheduler_alert_disabling">To disable automatic Rubbish bin emptying or set a longer retention period, you need to subscribe to one of our plans.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">วัน</string>
     <!-- Title of the option to generate a public chat link -->

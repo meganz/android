@@ -2063,7 +2063,7 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">S-ar putea să ai mesaje noi</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Planificator de golire a Coșului de gunoi</string>
+    <string name="settings_rb_scheduler_enable_title">Goliți automat Coșul de gunoi</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">Coșul de gunoi este golit automat pentru dvs.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2079,7 +2079,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Dacă videoclipurile spre comprimare sunt mai mari de</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Pentru a dezactiva Planificatorul de golire a Coșului de gunoi sau pentru a seta o perioadă mai lungă de păstrare, vă rugăm să vă abonați la un abonament Pro.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Pentru a dezactiva golirea automată a Coșului de gunoi sau pentru a seta o perioadă mai lungă de păstrare, trebuie să vă abonați la unul dintre abonamentele noastre.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">zile</string>
     <!-- Title of the option to generate a public chat link -->

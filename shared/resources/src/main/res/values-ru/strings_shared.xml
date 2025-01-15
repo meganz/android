@@ -936,4 +936,14 @@
     <string name="general_confirm_your_password">Подтвердите пароль</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
     <string name="document_scanning_settings_toolbar_title">Настройки сканирования</string>
+    <!-- Title of the camera setting screen -->
+    <string name="camera_settings_title">Настройки камеры</string>
+    <!-- Title of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_title">Сохранять местоположение</string>
+    <!-- Description of the save location in the camera setting screen -->
+    <string name="camera_settings_save_location_description">Включить геотеги для фото и видео</string>
+    <!-- Message when user denies location permission in the camera setting screen -->
+    <string name="camera_settings_save_location_permission_denied">Чтобы продолжить, разрешите MEGA доступ к местоположению этого устройства</string>
+    <!-- Warning message to indicate that cannot select a currently synced folder -->
+    <string name="sync_local_device_folder_currently_synced_message">Эта папка уже синхронизируется</string>
 </resources>

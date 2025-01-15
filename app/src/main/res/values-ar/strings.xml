@@ -2198,7 +2198,7 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">قد يكون لديك رسائل جديدة</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">جدولة افراغ سلة المحذوفات</string>
+    <string name="settings_rb_scheduler_enable_title">قم بإفراغ سلة المحذوفات تلقائيًا</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">تم افراغ سلة المحذوفات خاصتك تلقائياً.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2214,7 +2214,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">إذا كانت مقاطع الفيديو المراد ضغطها أكبر من</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">لتعطيل الإفراغ المجدول لسلة المحذوفات أو لتحديد زمن أطول للاحتفاظ، يرجى الاشتراك بباقة برو Pro.</string>
+    <string name="settings_rb_scheduler_alert_disabling">To disable automatic Rubbish bin emptying or set a longer retention period, you need to subscribe to one of our plans.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">أيام</string>
     <!-- Title of the option to generate a public chat link -->

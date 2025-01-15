@@ -2108,7 +2108,7 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">У вас могут быть новые сообщения</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Планировщик очистки Корзины</string>
+    <string name="settings_rb_scheduler_enable_title">Автоматическая очистка Корзины</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">Корзина очищается автоматически.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2124,7 +2124,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Если видео для сжатия больше</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Чтобы отключить очистку Корзины по расписанию или выбрать более длительный период хранения, пожалуйста, подпишитесь на план Pro.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Чтобы отключить автоматическую очистку Корзины или выбрать более длительный период хранения, нужно подписаться на один из наших планов.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">срок в днях</string>
     <!-- Title of the option to generate a public chat link -->

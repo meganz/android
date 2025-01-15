@@ -2063,7 +2063,7 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">Vous pourriez avoir de nouveaux messages</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Programmateur de vidage de la Corbeille</string>
+    <string name="settings_rb_scheduler_enable_title">Videz automatiquement la Corbeille</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">La Corbeille est vidée pour vous automatiquement.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2079,7 +2079,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Si les vidéos à compresser dépassent</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Pour désactiver le programmateur de vidage de la Corbeille ou pour définir une période de conservation plus longue, veuillez souscrire un abonnement&#160;Pro.</string>
+    <string name="settings_rb_scheduler_alert_disabling">To disable automatic Rubbish bin emptying or set a longer retention period, you need to subscribe to one of our plans.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">jours</string>
     <!-- Title of the option to generate a public chat link -->

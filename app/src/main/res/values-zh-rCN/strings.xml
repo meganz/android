@@ -1973,7 +1973,7 @@
     <!-- Content of the notification when there is unknown activity on the Chat -->
     <string name="notification_chat_undefined_content">您有新的消息</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">回收站定时清空</string>
+    <string name="settings_rb_scheduler_enable_title">自动清空回收站</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">回收站会自动为您清空。</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -1989,7 +1989,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">当解压的视频大于</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">要禁用回收站定时清空或设置更长的保留期限，请订阅Pro会员方案。</string>
+    <string name="settings_rb_scheduler_alert_disabling">要禁用自动清空回收站或设置更长的保留期，您需要订阅我们的其中一项方案。</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">天</string>
     <!-- Title of the option to generate a public chat link -->
