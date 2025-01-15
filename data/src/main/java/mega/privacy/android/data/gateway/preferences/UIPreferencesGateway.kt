@@ -126,4 +126,16 @@ interface UIPreferencesGateway {
      * Set ads closing timestamp
      */
     suspend fun setAdsClosingTimestamp(timestamp: Long)
+
+    /**
+     * Monitor geo tagging status
+     */
+    fun monitorGeoTaggingStatus(): Flow<Boolean?>
+
+    /**
+     * Enable geo tagging
+     *
+     * @param enabled
+     */
+    suspend fun enableGeoTagging(enabled: Boolean)
 }

@@ -28,6 +28,7 @@ private const val VIEW_TYPE = "VIEW_TYPE"
 private const val ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP =
     "ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP"
 private const val ADS_CLOSING_TIMESTAMP = "ADS_CLOSING_TIMESTAMP"
+private const val GEO_TAGGING = "GEO_TAGGING"
 private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
     name = USER_INTERFACE_PREFERENCES,
     produceMigrations = {
@@ -143,5 +144,14 @@ internal class UIPreferencesDatastore @Inject constructor(
 
     override fun monitorAdsClosingTimestamp(): Flow<Long?> {
         return context.uiPreferenceDataStore.monitor(longPreferencesKey(ADS_CLOSING_TIMESTAMP))
+    }
+
+    override fun monitorGeoTaggingStatus(): Flow<Boolean?> =
+        context.uiPreferenceDataStore.monitor(booleanPreferencesKey(GEO_TAGGING))
+
+    override suspend fun enableGeoTagging(value: Boolean) {
+        context.uiPreferenceDataStore.edit {
+            it[booleanPreferencesKey(GEO_TAGGING)] = value
+        }
     }
 }

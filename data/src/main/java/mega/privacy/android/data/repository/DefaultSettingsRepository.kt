@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
@@ -596,4 +597,12 @@ internal class DefaultSettingsRepository @Inject constructor(
             megaApiGateway.getFileVersionsOption(listener)
         }
     }
+
+    override suspend fun enableGeoTagging(enabled: Boolean) = withContext(ioDispatcher) {
+        uiPreferencesGateway.enableGeoTagging(enabled)
+    }
+
+    override fun monitorGeoTaggingStatus(): Flow<Boolean?> =
+        uiPreferencesGateway.monitorGeoTaggingStatus()
+            .flowOn(ioDispatcher)
 }

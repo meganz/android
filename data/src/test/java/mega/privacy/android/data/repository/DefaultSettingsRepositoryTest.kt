@@ -1,9 +1,11 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.Cache
@@ -189,7 +191,7 @@ internal class DefaultSettingsRepositoryTest {
     @ParameterizedTest(name = "expected: {0}")
     @ValueSource(booleans = [true, false])
     fun `test that megaLocalStorageGateway value is returned when isStorageAskAlways is invoked`(
-        expected: Boolean
+        expected: Boolean,
     ) =
         runTest {
             whenever(megaLocalStorageGateway.isStorageAskAlways()).thenReturn(expected)
@@ -310,5 +312,25 @@ internal class DefaultSettingsRepositoryTest {
             verify(fileVersionsOptionCache, times(1)).set(expectedFileVersionsOption)
             verify(megaApiGateway, times(1)).getFileVersionsOption(any())
             assertThat(expectedFileVersionsOption).isEqualTo(actual)
+        }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test enableGeoTagging calls uiPreferencesGateway enableGeoTagging`(enabled: Boolean) =
+        runTest {
+            underTest.enableGeoTagging(enabled)
+            verify(uiPreferencesGateway).enableGeoTagging(enabled)
+        }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test monitorGeoTaggingStatus returns flow from uiPreferencesGateway`(enabled: Boolean) =
+        runTest {
+            whenever(uiPreferencesGateway.monitorGeoTaggingStatus()).thenReturn(flowOf(enabled))
+
+            underTest.monitorGeoTaggingStatus().test {
+                assertThat(awaitItem()).isEqualTo(enabled)
+                awaitComplete()
+            }
         }
 }

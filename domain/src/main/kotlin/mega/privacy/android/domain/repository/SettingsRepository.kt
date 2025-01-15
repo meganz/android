@@ -474,4 +474,18 @@ interface SettingsRepository {
      * @return
      */
     suspend fun getFileVersionsOption(forceRefresh: Boolean): Boolean
+
+    /**
+     * Monitor geo tagging status
+     *
+     * @return true if geo tagging is enabled, false or null otherwise
+     */
+    fun monitorGeoTaggingStatus(): Flow<Boolean?>
+
+    /**
+     * Enable geo tagging
+     *
+     * @param enabled
+     */
+    suspend fun enableGeoTagging(enabled: Boolean)
 }
