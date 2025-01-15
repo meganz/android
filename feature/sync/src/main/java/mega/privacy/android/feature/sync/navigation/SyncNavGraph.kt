@@ -232,6 +232,7 @@ internal fun NavGraphBuilder.syncNavGraph(
             Timber.d("Selected Chip = $selectedChip")
 
             val fragmentActivity = LocalContext.current.findFragmentActivity()
+            val context = LocalContext.current
             val viewModelStoreOwner =
                 fragmentActivity ?: checkNotNull(LocalViewModelStoreOwner.current)
 
@@ -255,6 +256,9 @@ internal fun NavGraphBuilder.syncNavGraph(
                 syncStalledIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
                 syncSolvedIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
                 selectedChip = selectedChip,
+                onOpenMegaFolderClicked = { handle ->
+                    megaNavigator.openSyncMegaFolder(context, handle)
+                },
             )
         }
     }

@@ -83,6 +83,7 @@ internal fun SyncListScreen(
     onSyncFolderClicked: () -> Unit,
     onBackupFolderClicked: () -> Unit,
     onAddFolderClicked: () -> Unit,
+    onOpenMegaFolderClicked: (handle: Long) -> Unit,
     actionSelected: (item: StalledIssueUiItem, selectedAction: StalledIssueResolutionAction) -> Unit,
     snackBarHostState: SnackbarHostState,
     syncPermissionsManager: SyncPermissionsManager,
@@ -254,6 +255,7 @@ internal fun SyncListScreen(
                         }
                     },
                     addFolderClicked = onSyncFolderClicked,
+                    onOpenMegaFolderClicked = onOpenMegaFolderClicked,
                     syncPermissionsManager = syncPermissionsManager,
                     onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
                     onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
@@ -278,6 +280,7 @@ private fun SyncListScreenContent(
     stalledIssuesDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
     addFolderClicked: () -> Unit,
+    onOpenMegaFolderClicked: (handle: Long) -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
     onSelectStopBackupDestinationClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
@@ -352,6 +355,7 @@ private fun SyncListScreenContent(
                 onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
                 upgradeAccountClicked = onOpenUpgradeAccountClicked,
                 stalledIssueDetailsClicked = stalledIssuesDetailsClicked,
+                onOpenMegaFolderClicked = onOpenMegaFolderClicked,
                 moreClicked = moreClicked,
                 issuesInfoClicked = {
                     checkedChip = STALLED_ISSUES
@@ -405,6 +409,7 @@ private fun HeaderChips(
 private fun SelectedChipScreen(
     addFolderClicked: () -> Unit,
     onSelectStopBackupDestinationClicked: () -> Unit,
+    onOpenMegaFolderClicked: (handle: Long) -> Unit,
     upgradeAccountClicked: () -> Unit,
     stalledIssueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
@@ -430,6 +435,7 @@ private fun SelectedChipScreen(
                 snackBarHostState = snackBarHostState,
                 deviceName = deviceName,
                 isBackupForAndroidEnabled = isBackupForAndroidEnabled,
+                onOpenMegaFolderClicked = onOpenMegaFolderClicked
             )
         }
 

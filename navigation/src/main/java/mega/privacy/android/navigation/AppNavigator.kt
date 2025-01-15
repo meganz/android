@@ -272,4 +272,10 @@ interface AppNavigator {
         launcher: ActivityResultLauncher<Intent>,
         initialUri: Uri? = null,
     )
+
+    /**
+     * Open Sync Mega folder
+     * @param handle the handle of the remote folder
+     */
+    fun openSyncMegaFolder(context: Context, handle: Long)
 }

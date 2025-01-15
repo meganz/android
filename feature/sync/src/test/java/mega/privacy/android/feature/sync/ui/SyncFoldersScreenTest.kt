@@ -94,6 +94,7 @@ class SyncFoldersScreenTest {
                 addFolderClicked = {},
                 upgradeAccountClicked = {},
                 issuesInfoClicked = {},
+                onOpenMegaFolderClicked = {},
                 uiState = syncFoldersUiState,
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
@@ -120,6 +121,7 @@ class SyncFoldersScreenTest {
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = false,
+                onOpenMegaFolderClicked = {},
             )
         }
 
@@ -149,6 +151,7 @@ class SyncFoldersScreenTest {
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = true,
+                onOpenMegaFolderClicked = {},
             )
         }
 
@@ -184,6 +187,7 @@ class SyncFoldersScreenTest {
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = false,
+                onOpenMegaFolderClicked = {},
             )
         }
 
@@ -217,6 +221,7 @@ class SyncFoldersScreenTest {
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = true,
+                onOpenMegaFolderClicked = {},
             )
         }
 
@@ -243,6 +248,7 @@ class SyncFoldersScreenTest {
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = false,
+                onOpenMegaFolderClicked = {},
             )
         }
 
@@ -271,6 +277,7 @@ class SyncFoldersScreenTest {
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = false,
+                onOpenMegaFolderClicked = {},
             )
         }
 

@@ -106,6 +106,7 @@ class SyncListRouteTest {
                 syncFoldersViewModel = syncFoldersViewModel,
                 syncStalledIssuesViewModel = syncStalledIssuesViewModel,
                 syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
+                onOpenMegaFolderClicked = {}
             )
         }
     }

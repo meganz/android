@@ -19,6 +19,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivity
+import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.settings.navigation.SettingsNavigatorImpl
 import mega.privacy.android.app.presentation.transfers.EXTRA_TAB
@@ -455,5 +456,11 @@ internal class MegaNavigatorImpl @Inject constructor(
                 putExtra(UploadFolderActivity.UPLOAD_FOLDER_TYPE, UploadFolderType.SINGLE_SELECT)
             }
         )
+    }
+
+    override fun openSyncMegaFolder(context: Context, handle: Long) {
+        context.startActivity(Intent(context, OpenLinkActivity::class.java).apply {
+            data = "https://mega.nz/opensync#${handle}".toUri()
+        })
     }
 }

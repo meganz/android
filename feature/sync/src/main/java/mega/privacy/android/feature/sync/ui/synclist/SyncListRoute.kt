@@ -41,6 +41,7 @@ internal fun SyncListRoute(
     syncPermissionsManager: SyncPermissionsManager,
     onSyncFolderClicked: () -> Unit,
     onBackupFolderClicked: () -> Unit,
+    onOpenMegaFolderClicked: (handle: Long) -> Unit,
     onSelectStopBackupDestinationClicked: () -> Unit,
     onOpenUpgradeAccountClicked: () -> Unit,
     syncFoldersViewModel: SyncFoldersViewModel,
@@ -60,6 +61,7 @@ internal fun SyncListRoute(
 
     SyncListScreen(
         stalledIssuesCount = state.stalledIssuesCount,
+        onOpenMegaFolderClicked = onOpenMegaFolderClicked,
         onSyncFolderClicked = {
             if (state.isFreeAccount) {
                 showUpgradeDialog = true

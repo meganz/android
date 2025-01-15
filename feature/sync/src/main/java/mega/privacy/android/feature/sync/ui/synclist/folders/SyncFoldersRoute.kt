@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
+import mega.privacy.android.shared.resources.R as sharedResR
 import android.content.Intent
 import android.provider.DocumentsContract
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -12,8 +13,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.OnRemoveSyncFolderDialogConfirmed
+import mega.privacy.android.feature.sync.ui.stopbackup.StopBackupConfirmationDialog
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.OnRemoveFolderDialogDismissed
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.OnRemoveSyncFolderDialogConfirmed
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.OnSyncsPausedErrorDialogDismissed
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.PauseRunClicked
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.RemoveFolderClicked
@@ -22,8 +24,6 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.Confirmatio
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import mega.privacy.android.shared.resources.R as sharedResR
-import mega.privacy.android.feature.sync.ui.stopbackup.StopBackupConfirmationDialog
 
 @Composable
 internal fun SyncFoldersRoute(
@@ -31,6 +31,7 @@ internal fun SyncFoldersRoute(
     onSelectStopBackupDestinationClicked: () -> Unit,
     upgradeAccountClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
+    onOpenMegaFolderClicked: (handle: Long) -> Unit,
     viewModel: SyncFoldersViewModel,
     uiState: SyncFoldersUiState,
     snackBarHostState: SnackbarHostState,
@@ -62,9 +63,7 @@ internal fun SyncFoldersRoute(
             )
         },
         onOpenMegaFolderClicked = { syncUiItem ->
-            context.startActivity(Intent(Intent.ACTION_VIEW).apply {
-                data = "https://mega.nz/opensync#${syncUiItem.megaStorageNodeId.longValue}".toUri()
-            })
+            onOpenMegaFolderClicked(syncUiItem.megaStorageNodeId.longValue)
         },
         isLowBatteryLevel = uiState.isLowBatteryLevel,
         isFreeAccount = uiState.isFreeAccount,
