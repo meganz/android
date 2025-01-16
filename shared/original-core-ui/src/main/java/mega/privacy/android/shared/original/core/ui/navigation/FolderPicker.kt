@@ -8,6 +8,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.fragment.app.Fragment
 
 /**
  * Launches a native Android Folder Picker
@@ -20,11 +21,44 @@ import androidx.compose.ui.platform.LocalContext
 fun launchFolderPicker(
     initialUri: Uri? = null,
     onCancel: () -> Unit = {},
-    onFolderSelected: (Uri) -> Unit,
+    onFolderSelected: (selectedFolderUri: Uri) -> Unit,
 ): ActivityResultLauncher<Uri?> {
     val context = LocalContext.current
 
-    return rememberLauncherForActivityResult(object : ActivityResultContracts.OpenDocumentTree() {
+    return rememberLauncherForActivityResult(
+        persistableOpenDocumentTree(initialUri)
+    ) { directoryUri ->
+        onResult(directoryUri, context, onCancel, onFolderSelected)
+    }
+}
+
+fun Fragment.launchFolderPicker(
+    initialUri: Uri? = null,
+    onCancel: () -> Unit = {},
+    onFolderSelected: (selectedFolderUri: Uri) -> Unit,
+) = registerForActivityResult(
+    persistableOpenDocumentTree(initialUri)
+) { directoryUri ->
+    onResult(directoryUri, requireContext(), onCancel, onFolderSelected)
+}
+
+private fun onResult(
+    directoryUri: Uri?,
+    context: Context,
+    onCancel: () -> Unit = {},
+    onFolderSelected: (Uri) -> Unit,
+) {
+    directoryUri?.let {
+        context.contentResolver.takePersistableUriPermission(
+            directoryUri,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION
+        )
+        onFolderSelected(it)
+    } ?: onCancel()
+}
+
+private fun persistableOpenDocumentTree(initialUri: Uri? = null) =
+    object : ActivityResultContracts.OpenDocumentTree() {
         override fun createIntent(context: Context, input: Uri?): Intent =
             super.createIntent(context, initialUri).also {
                 it.addFlags(
@@ -32,13 +66,4 @@ fun launchFolderPicker(
                             and Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
                 )
             }
-    }) { directoryUri ->
-        directoryUri?.let {
-            context.contentResolver.takePersistableUriPermission(
-                directoryUri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION
-            )
-            onFolderSelected(it)
-        } ?: onCancel()
     }
-}
