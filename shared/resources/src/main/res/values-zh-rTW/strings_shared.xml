@@ -901,7 +901,7 @@
     <!-- Description of the save location in the camera setting screen -->
     <string name="camera_settings_save_location_description">為照片和影片啟用地理標記功能</string>
     <!-- Message when user denies location permission in the camera setting screen -->
-    <string name="camera_settings_save_location_permission_denied">Allow MEGA to access this device’s location to continue</string>
+    <string name="camera_settings_save_location_permission_denied">允許MEGA存取此裝置的位置以繼續</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
     <string name="sync_local_device_folder_currently_synced_message">此資料夾已同步</string>
 </resources>
