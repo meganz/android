@@ -89,6 +89,12 @@ internal class PhotosSearchViewModel @Inject constructor(
         searchPhotos(query = _state.value.query)
     }
 
+    fun updateQuery(query: String) {
+        _state.update {
+            it.copy(query = query)
+        }
+    }
+
     fun search(query: String) {
         _state.update {
             it.copy(
@@ -102,7 +108,6 @@ internal class PhotosSearchViewModel @Inject constructor(
 
         searchAlbums(query)
         searchPhotos(query)
-        updateRecentQueries(query)
     }
 
     private fun searchAlbums(query: String) = viewModelScope.launch(defaultDispatcher) {
@@ -150,7 +155,7 @@ internal class PhotosSearchViewModel @Inject constructor(
         }
     }
 
-    private fun updateRecentQueries(query: String) = viewModelScope.launch(defaultDispatcher) {
+    fun updateRecentQueries(query: String) = viewModelScope.launch(defaultDispatcher) {
         if (query.isBlank()) return@launch
 
         val recentQueries = (listOf(query) + _state.value.recentQueries).toSet().take(6)

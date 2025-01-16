@@ -31,7 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -92,8 +92,10 @@ internal fun PhotosSearchScreen(
             PhotosSearchTopBar(
                 query = state.query,
                 selectedQuery = state.selectedQuery,
-                onUpdateQuery = photosSearchViewModel::search,
+                onUpdateQuery = photosSearchViewModel::updateQuery,
                 onSelectedQueryRead = { photosSearchViewModel.updateSelectedQuery(null) },
+                onSaveQuery = photosSearchViewModel::updateRecentQueries,
+                onSearch = photosSearchViewModel::search,
                 onCloseScreen = onCloseScreen,
             )
         },
@@ -163,15 +165,17 @@ private fun PhotosSearchTopBar(
     selectedQuery: String?,
     onUpdateQuery: (String) -> Unit,
     onSelectedQueryRead: () -> Unit,
+    onSaveQuery: (String) -> Unit,
+    onSearch: (String) -> Unit,
     onCloseScreen: () -> Unit,
 ) {
-    var text by remember { mutableStateOf("") }
+    var text by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(text) {
         if (text.isNotBlank()) {
             delay(300.milliseconds)
         }
-        onUpdateQuery(text)
+        onSearch(text)
     }
 
     LaunchedEffect(selectedQuery) {
@@ -182,10 +186,15 @@ private fun PhotosSearchTopBar(
     ExpandedSearchAppBar(
         text = query,
         hintId = R.string.hint_action_search,
-        onSearchTextChange = { text = it },
+        onSearchTextChange = {
+            text = it
+            onUpdateQuery(it)
+        },
         onCloseClicked = onCloseScreen,
+        onSearchClicked = onSaveQuery,
         elevation = false,
         modifier = modifier,
+        isHideAfterSearch = true,
         overwriteText = true,
     )
 }

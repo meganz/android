@@ -44,7 +44,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -474,11 +473,6 @@ class PhotosFragment : Fragment() {
         this.menu = menu
         handleMenuIcons(isShowing = photosViewModel.state.value.isMenuShowing)
         handleFilterIcons(timelineViewModel.state.value)
-
-        lifecycleScope.launch {
-            menu.findItem(R.id.action_photos_search)?.isVisible =
-                getFeatureFlagUseCase(AppFeatures.SearchInPhotos)
-        }
     }
 
     private fun handleMenuIcons(isShowing: Boolean) {

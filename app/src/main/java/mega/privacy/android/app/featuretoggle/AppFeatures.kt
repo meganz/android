@@ -200,14 +200,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Search in Photos feature
-     */
-    SearchInPhotos(
-        "Show search in photos entry point in Timeline",
-        false,
-    ),
-
-    /**
      * Call settings implemented with the new components library
      */
     CallSettingsNewComponents(

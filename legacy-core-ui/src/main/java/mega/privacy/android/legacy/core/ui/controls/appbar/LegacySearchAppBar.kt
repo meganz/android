@@ -209,6 +209,7 @@ fun ExpandedSearchAppBar(
     hintId: Int,
     onSearchTextChange: (String) -> Unit,
     onCloseClicked: () -> Unit,
+    onSearchClicked: (String) -> Unit = {},
     elevation: Boolean,
     modifier: Modifier = Modifier,
     isHideAfterSearch: Boolean = false,
@@ -285,6 +286,7 @@ fun ExpandedSearchAppBar(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = {
                 onSearchTextChange(text)
+                onSearchClicked(text)
                 if (isHideAfterSearch) {
                     keyboardController?.hide()
                 }
