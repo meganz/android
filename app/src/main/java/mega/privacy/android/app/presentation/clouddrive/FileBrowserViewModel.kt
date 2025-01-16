@@ -403,6 +403,7 @@ class FileBrowserViewModel @Inject constructor(
                 isLoading = false,
                 sortOrder = sortOrder,
                 isFileBrowserEmpty = isFileBrowserEmpty,
+                isRootNode = isRootNode
             )
         }
     }
@@ -964,5 +965,12 @@ class FileBrowserViewModel @Inject constructor(
                 setAlmostFullStorageBannerClosingTimestampUseCase()
             }.onFailure { Timber.e(it) }
         }
+    }
+
+    /**
+     * set the selected tab
+     */
+    fun onTabChanged(tab: CloudDriveTab) {
+        _state.update { it.copy(selectedTab = tab) }
     }
 }

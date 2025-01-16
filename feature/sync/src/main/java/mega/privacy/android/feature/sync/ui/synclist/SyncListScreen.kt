@@ -95,6 +95,7 @@ internal fun SyncListScreen(
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
     title: String,
+    isInCloudDrive: Boolean = false,
     selectedChip: SyncChip = SYNC_FOLDERS,
 ) {
     val onBackPressedDispatcher =
@@ -160,16 +161,18 @@ internal fun SyncListScreen(
         MegaScaffold(
             scaffoldState = scaffoldState,
             topBar = {
-                MegaAppBar(
-                    title = title.ifEmpty { stringResource(R.string.sync_toolbar_title) },
-                    appBarType = AppBarType.BACK_NAVIGATION,
-                    onNavigationPressed = {
-                        onBackPressedDispatcher?.onBackPressed()
-                    },
-                    actions = actions,
-                    onActionPressed = onActionPressed,
-                    elevation = if (isWarningBannerDisplayed) AppBarDefaults.TopAppBarElevation else 0.dp,
-                )
+                if (!isInCloudDrive) {
+                    MegaAppBar(
+                        title = title.ifEmpty { stringResource(R.string.sync_toolbar_title) },
+                        appBarType = AppBarType.BACK_NAVIGATION,
+                        onNavigationPressed = {
+                            onBackPressedDispatcher?.onBackPressed()
+                        },
+                        actions = actions,
+                        onActionPressed = onActionPressed,
+                        elevation = if (isWarningBannerDisplayed) AppBarDefaults.TopAppBarElevation else 0.dp,
+                    )
+                }
             },
             floatingActionButton = {
                 if (isBackupForAndroidEnabled) {

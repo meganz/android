@@ -18,6 +18,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,8 +37,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -38,6 +56,7 @@ import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -55,7 +74,9 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
+import mega.privacy.android.app.main.share.TAB_ROW_TEST_TAG
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.clouddrive.ui.FileBrowserComposeView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -64,7 +85,9 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
+import mega.privacy.android.app.presentation.node.model.NodeActionState
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
+import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
@@ -85,27 +108,41 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
+import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
 import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * A Fragment for File Browser
+ * A Fragment for Cloud Drive and Syncs
  */
 @AndroidEntryPoint
-class FileBrowserComposeFragment : Fragment() {
+class CloudDriveSyncsFragment : Fragment() {
 
     companion object {
         /**
-         * Returns the instance of FileBrowserComposeFragment
+         * Returns the instance of CloudDriveSyncsFragment
          */
         @JvmStatic
-        fun newInstance() = FileBrowserComposeFragment()
+        fun newInstance() = CloudDriveSyncsFragment()
+
+        /**
+         * Returns the strings of the tabs
+         */
+        val tabResIds = listOf(
+            R.string.section_cloud_drive,
+            mega.privacy.android.feature.sync.R.string.sync_toolbar_title
+        )
     }
 
     private var fileBackupManager: FileBackupManager? = null
@@ -147,8 +184,17 @@ class FileBrowserComposeFragment : Fragment() {
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
+    /**
+     * getFeatureFlagValueUseCase
+     */
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    /**
+     * syncPermissionsManager
+     */
+    @Inject
+    lateinit var syncPermissionsManager: SyncPermissionsManager
 
     /**
      * onAttach
@@ -194,91 +240,112 @@ class FileBrowserComposeFragment : Fragment() {
                 var clickedFile: TypedFileNode? by remember {
                     mutableStateOf(null)
                 }
+                val pagerState = rememberPagerState(initialPage = 0) { 2 }
+                val activity = LocalContext.current.findActivity() as AppCompatActivity
+                LaunchedEffect(pagerState.currentPage) {
+                    activity.supportActionBar?.title =
+                        activity.getString(tabResIds[pagerState.currentPage])
+                    fileBrowserViewModel.onTabChanged(CloudDriveTab.entries.first { it.position == pagerState.currentPage })
+                }
+                val isTabShown = when (uiState.selectedTab) {
+                    CloudDriveTab.CLOUD -> uiState.isRootNode && !uiState.isInSelection
+                    else -> true
+                }
 
                 OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                     MegaScaffold(
                         scaffoldState = scaffoldState,
-                    ) {
-                        FileBrowserComposeView(
-                            uiState = uiState,
-                            emptyState = getEmptyFolderDrawable(uiState.isFileBrowserEmpty),
-                            onItemClick = {
-                                if (uiState.selectedNodeHandles.isEmpty()) {
-                                    when (it.node) {
-                                        is TypedFileNode -> clickedFile = it.node
-
-                                        is TypedFolderNode -> {
-                                            fileBrowserViewModel.onFolderItemClicked(it.id.longValue)
+                        topBar = {
+                            if (isTabShown) {
+                                TabRow(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .testTag(TAB_ROW_TEST_TAG),
+                                    selectedTabIndex = pagerState.currentPage,
+                                    backgroundColor = MaterialTheme.colors.surface,
+                                    contentColor = colorResource(R.color.color_border_interactive),
+                                    indicator = { tabPositions ->
+                                        Box(
+                                            modifier = Modifier
+                                                .tabIndicatorOffset(tabPositions[pagerState.currentPage])
+                                                .height(2.dp)
+                                                .background(color = colorResource(R.color.color_border_interactive))
+                                        )
+                                    }
+                                ) {
+                                    CloudDriveTab.entries.filter { it != CloudDriveTab.NONE }
+                                        .forEachIndexed { index, tab ->
+                                            Tab(
+                                                text = {
+                                                    MegaText(
+                                                        text = stringResource(tabResIds[index]),
+                                                        style = MaterialTheme.typography.subtitle1,
+                                                        textColor = TextColor.Primary
+                                                    )
+                                                },
+                                                selected = pagerState.currentPage == index,
+                                                unselectedContentColor = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
+                                                onClick = {
+                                                    fileBrowserViewModel.onTabChanged(tab)
+                                                    coroutineScope.launch {
+                                                        pagerState.animateScrollToPage(index)
+                                                    }
+                                                }
+                                            )
                                         }
+                                }
+                            }
+                        }
+                    ) {
+                        HorizontalPager(
+                            modifier = Modifier.fillMaxWidth(),
+                            state = pagerState,
+                            verticalAlignment = Alignment.Top,
+                            userScrollEnabled = isTabShown,
+                        ) { page: Int ->
+                            when (page) {
+                                CloudDriveTab.CLOUD.position -> {
+                                    CloudDriveTab(
+                                        uiState = uiState,
+                                        snackbarHostState = snackbarHostState,
+                                        coroutineScope = coroutineScope,
+                                        fileTypeIconMapper = fileTypeIconMapper,
+                                        nodeActionState = nodeActionState,
+                                        onClickedFile = {
+                                            clickedFile = it
+                                        }
+                                    )
+                                }
 
-                                        else -> Timber.e("Unsupported click")
-                                    }
-                                } else {
-                                    fileBrowserViewModel.onItemClicked(it)
+                                CloudDriveTab.SYNC.position -> {
+                                    SyncListRoute(
+                                        isInCloudDrive = true,
+                                        syncPermissionsManager = syncPermissionsManager,
+                                        onSyncFolderClicked = {
+                                            Analytics.tracker.trackEvent(AndroidSyncFABButtonEvent)
+                                            // open sync fragment with specific folder
+                                        },
+                                        onBackupFolderClicked = {
+
+                                        },
+                                        onSelectStopBackupDestinationClicked = {
+
+                                        },
+                                        onOpenUpgradeAccountClicked = {
+
+                                        },
+                                        onOpenMegaFolderClicked = {
+                                            coroutineScope.launch {
+                                                fileBrowserViewModel.openFileBrowserWithSpecificNode(
+                                                    it,
+                                                    errorMessage = null
+                                                )
+                                                pagerState.scrollToPage(CloudDriveTab.CLOUD.position)
+                                            }
+                                        }
+                                    )
                                 }
-                            },
-                            onLongClick = {
-                                fileBrowserViewModel.onLongItemClicked(it)
-                                if (actionMode == null) {
-                                    actionMode =
-                                        (activity as? AppCompatActivity)?.startSupportActionMode(
-                                            ActionBarCallBack()
-                                        )
-                                }
-                            },
-                            onMenuClick = {
-                                if (uiState.isConnected) {
-                                    showOptionsMenuForItem(it)
-                                } else {
-                                    coroutineScope.launch {
-                                        snackbarHostState.showAutoDurationSnackbar(
-                                            message = getString(R.string.error_server_connection_problem),
-                                        )
-                                    }
-                                }
-                            },
-                            sortOrder = getString(
-                                SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
-                                    ?: R.string.sortby_name
-                            ),
-                            onSortOrderClick = { showSortByPanel() },
-                            onChangeViewTypeClick = fileBrowserViewModel::onChangeViewTypeClicked,
-                            onLinkClicked = ::navigateToLink,
-                            onDisputeTakeDownClicked = ::navigateToLink,
-                            onDismissClicked = fileBrowserViewModel::onBannerDismissClicked,
-                            onStorageAlmostFullWarningDismiss = fileBrowserViewModel::setStorageCapacityAsDefault,
-                            onUpgradeClicked = {
-                                fileBrowserViewModel::onBannerDismissClicked
-                                megaNavigator.openUpgradeAccount(requireContext())
-                            },
-                            onEnterMediaDiscoveryClick = {
-                                disableSelectMode()
-                                fileBrowserViewModel.setMediaDiscoveryVisibility(
-                                    isMediaDiscoveryOpen = true,
-                                    isMediaDiscoveryOpenedByIconClick = true,
-                                )
-                            },
-                            fileTypeIconMapper = fileTypeIconMapper
-                        )
-                        StartTransferComponent(
-                            uiState.downloadEvent,
-                            {
-                                fileBrowserViewModel.consumeDownloadEvent()
-                                disableSelectMode()
-                            },
-                            snackBarHostState = snackbarHostState,
-                            navigateToStorageSettings = {
-                                megaNavigator.openSettings(
-                                    requireActivity(),
-                                    StorageTargetPreference
-                                )
-                            },
-                        )
-                        EventEffect(
-                            event = nodeActionState.downloadEvent,
-                            onConsumed = nodeActionsViewModel::markDownloadEventConsumed
-                        ) {
-                            fileBrowserViewModel.onDownloadFileTriggered(it)
+                            }
                         }
                     }
                 }
@@ -313,6 +380,98 @@ class FileBrowserComposeFragment : Fragment() {
                     )
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun CloudDriveTab(
+        uiState: FileBrowserState,
+        snackbarHostState: SnackbarHostState,
+        coroutineScope: CoroutineScope,
+        fileTypeIconMapper: FileTypeIconMapper,
+        nodeActionState: NodeActionState,
+        onClickedFile: (TypedFileNode) -> Unit,
+    ) {
+        FileBrowserComposeView(
+            uiState = uiState,
+            emptyState = getEmptyFolderDrawable(uiState.isFileBrowserEmpty),
+            onItemClick = {
+                if (uiState.selectedNodeHandles.isEmpty()) {
+                    when (it.node) {
+                        is TypedFileNode -> onClickedFile(it.node)
+
+                        is TypedFolderNode -> {
+                            fileBrowserViewModel.onFolderItemClicked(it.id.longValue)
+                        }
+
+                        else -> Timber.e("Unsupported click")
+                    }
+                } else {
+                    fileBrowserViewModel.onItemClicked(it)
+                }
+            },
+            onLongClick = {
+                fileBrowserViewModel.onLongItemClicked(it)
+                if (actionMode == null) {
+                    actionMode =
+                        (activity as? AppCompatActivity)?.startSupportActionMode(
+                            ActionBarCallBack()
+                        )
+                }
+            },
+            onMenuClick = {
+                if (uiState.isConnected) {
+                    showOptionsMenuForItem(it)
+                } else {
+                    coroutineScope.launch {
+                        snackbarHostState.showAutoDurationSnackbar(
+                            message = getString(R.string.error_server_connection_problem),
+                        )
+                    }
+                }
+            },
+            sortOrder = getString(
+                SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
+                    ?: R.string.sortby_name
+            ),
+            onSortOrderClick = { showSortByPanel() },
+            onChangeViewTypeClick = fileBrowserViewModel::onChangeViewTypeClicked,
+            onLinkClicked = ::navigateToLink,
+            onDisputeTakeDownClicked = ::navigateToLink,
+            onDismissClicked = fileBrowserViewModel::onBannerDismissClicked,
+            onStorageAlmostFullWarningDismiss = fileBrowserViewModel::setStorageCapacityAsDefault,
+            onUpgradeClicked = {
+                fileBrowserViewModel::onBannerDismissClicked
+                megaNavigator.openUpgradeAccount(requireContext())
+            },
+            onEnterMediaDiscoveryClick = {
+                disableSelectMode()
+                fileBrowserViewModel.setMediaDiscoveryVisibility(
+                    isMediaDiscoveryOpen = true,
+                    isMediaDiscoveryOpenedByIconClick = true,
+                )
+            },
+            fileTypeIconMapper = fileTypeIconMapper
+        )
+        StartTransferComponent(
+            uiState.downloadEvent,
+            {
+                fileBrowserViewModel.consumeDownloadEvent()
+                disableSelectMode()
+            },
+            snackBarHostState = snackbarHostState,
+            navigateToStorageSettings = {
+                megaNavigator.openSettings(
+                    requireActivity(),
+                    StorageTargetPreference
+                )
+            },
+        )
+        EventEffect(
+            event = nodeActionState.downloadEvent,
+            onConsumed = nodeActionsViewModel::markDownloadEventConsumed
+        ) {
+            fileBrowserViewModel.onDownloadFileTriggered(it)
         }
     }
 
@@ -727,7 +886,7 @@ class FileBrowserComposeFragment : Fragment() {
 
                 OptionItems.ADD_TO_ALBUM -> {
                     val intent = Intent(requireContext(), AddToAlbumActivity::class.java).apply {
-                        val ids = it.selectedNode.map { it.id.longValue }.toTypedArray()
+                        val ids = it.selectedNode.map { node -> node.id.longValue }.toTypedArray()
                         putExtra("ids", ids)
                         putExtra("type", 0)
                     }
@@ -737,7 +896,7 @@ class FileBrowserComposeFragment : Fragment() {
 
                 OptionItems.ADD_TO -> {
                     val intent = Intent(requireContext(), AddToAlbumActivity::class.java).apply {
-                        val ids = it.selectedNode.map { it.id.longValue }.toTypedArray()
+                        val ids = it.selectedNode.map { node -> node.id.longValue }.toTypedArray()
                         putExtra("ids", ids)
                         putExtra("type", 1)
                     }
@@ -765,6 +924,15 @@ class FileBrowserComposeFragment : Fragment() {
         actionMode?.finish()
     }
 
+    /**
+     * Handles the click event for hiding nodes in the file browser.
+     *
+     * This function determines the appropriate action to take when a user attempts to hide nodes,
+     * based on their account status and whether they have completed the hidden nodes onboarding.
+     *
+     * @param nodeIds The list of [NodeId]s representing the nodes to be hidden.
+     *
+     */
     fun handleHideNodeClick(nodeIds: List<NodeId>) {
         val state = fileBrowserViewModel.state.value
         val isPaid = state.accountType?.isPaid ?: false

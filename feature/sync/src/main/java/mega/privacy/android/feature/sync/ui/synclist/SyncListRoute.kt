@@ -10,9 +10,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
@@ -21,6 +24,7 @@ import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssu
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
+import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLatestModifiedTimeEvent
@@ -35,9 +39,54 @@ import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogCancelButtonP
 import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogDisplayedEvent
 import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogUpgradeButtonPressedEvent
 
+/**
+ * Composable function that represents the route for the sync list screen.
+ *
+ * This function serves as an entry point to the sync list feature, handling
+ * navigation and data presentation related to syncing folders and backups.
+ *
+ * @param syncPermissionsManager Manages the permissions required for syncing.
+ * @param onSyncFolderClicked Callback invoked when the user clicks to manage sync folders.
+ * @param onBackupFolderClicked Callback invoked when the user clicks to manage backup folders.
+ * @param onSelectStopBackupDestinationClicked Callback invoked when the user clicks to stop a backup destination.
+ * @param onOpenUpgradeAccountClicked Callback invoked when the user clicks to upgrade their account.
+ * @param isInCloudDrive Indicates whether the user is currently within the cloud drive context. Defaults to false.
+ * @param selectedChip The currently selected chip in the sync list UI. Defaults to [SyncChip.SYNC_FOLDERS].
+ * @param onOpenMegaFolderClicked Callback invoked when the user clicks to open a specific Mega folder.
+ */
+@Composable
+fun SyncListRoute(
+    syncPermissionsManager: SyncPermissionsManager,
+    onSyncFolderClicked: () -> Unit,
+    onBackupFolderClicked: () -> Unit,
+    onSelectStopBackupDestinationClicked: () -> Unit,
+    onOpenUpgradeAccountClicked: () -> Unit,
+    isInCloudDrive: Boolean = false,
+    selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
+    onOpenMegaFolderClicked: (Long) -> Unit
+) {
+    val fragmentActivity = LocalContext.current.findFragmentActivity()
+    val viewModelStoreOwner =
+        fragmentActivity ?: checkNotNull(LocalViewModelStoreOwner.current)
+
+    SyncListRoute(
+        syncPermissionsManager = syncPermissionsManager,
+        onSyncFolderClicked = onSyncFolderClicked,
+        onBackupFolderClicked = onBackupFolderClicked,
+        onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
+        onOpenUpgradeAccountClicked = onOpenUpgradeAccountClicked,
+        syncFoldersViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
+        syncStalledIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
+        syncSolvedIssuesViewModel = hiltViewModel(viewModelStoreOwner = viewModelStoreOwner),
+        isInCloudDrive = isInCloudDrive,
+        viewModel = hiltViewModel(),
+        selectedChip = selectedChip,
+        onOpenMegaFolderClicked = onOpenMegaFolderClicked
+    )
+}
+
 @Composable
 internal fun SyncListRoute(
-    viewModel: SyncListViewModel,
     syncPermissionsManager: SyncPermissionsManager,
     onSyncFolderClicked: () -> Unit,
     onBackupFolderClicked: () -> Unit,
@@ -47,6 +96,8 @@ internal fun SyncListRoute(
     syncFoldersViewModel: SyncFoldersViewModel,
     syncStalledIssuesViewModel: SyncStalledIssuesViewModel,
     syncSolvedIssuesViewModel: SyncSolvedIssuesViewModel,
+    isInCloudDrive: Boolean = false,
+    viewModel: SyncListViewModel = hiltViewModel(),
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -60,6 +111,7 @@ internal fun SyncListRoute(
     }
 
     SyncListScreen(
+        isInCloudDrive = isInCloudDrive,
         stalledIssuesCount = state.stalledIssuesCount,
         onOpenMegaFolderClicked = onOpenMegaFolderClicked,
         onSyncFolderClicked = {

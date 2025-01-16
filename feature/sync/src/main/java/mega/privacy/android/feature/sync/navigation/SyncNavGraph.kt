@@ -237,8 +237,8 @@ internal fun NavGraphBuilder.syncNavGraph(
                 fragmentActivity ?: checkNotNull(LocalViewModelStoreOwner.current)
 
             SyncListRoute(
-                hiltViewModel(),
-                syncPermissionsManager,
+                viewModel = hiltViewModel(),
+                syncPermissionsManager = syncPermissionsManager,
                 onSyncFolderClicked = {
                     Analytics.tracker.trackEvent(AndroidSyncFABButtonEvent)
                     navController.navigate(

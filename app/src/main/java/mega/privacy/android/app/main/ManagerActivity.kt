@@ -100,6 +100,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -166,6 +167,8 @@ import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialog
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
 import mega.privacy.android.app.presentation.chat.list.ChatTabsFragment
+import mega.privacy.android.app.presentation.clouddrive.CloudDriveSyncsFragment
+import mega.privacy.android.app.presentation.clouddrive.CloudDriveTab
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserActionListener
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserComposeFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
@@ -551,6 +554,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     // Fragments
     private var fileBrowserComposeFragment: FileBrowserComposeFragment? = null
+    private var cloudDriveSyncsFragment: CloudDriveSyncsFragment? = null
     private var rubbishBinComposeFragment: RubbishBinComposeFragment? = null
     private var photosFragment: PhotosFragment? = null
     private var albumContentFragment: Fragment? = null
@@ -2049,6 +2053,21 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         ) { unreadCount ->
             updateChatBadge(unreadCount)
         }
+
+        collectFlow(fileBrowserViewModel.state.map { it.selectedTab }.distinctUntilChanged()) {
+            if (it != CloudDriveTab.NONE) {
+                val shouldVisible = it == CloudDriveTab.CLOUD
+                searchMenuItem?.isVisible = shouldVisible
+                openLinkMenuItem?.isVisible = shouldVisible
+                fabButton.isVisible = shouldVisible
+                if (shouldVisible) {
+                    transfersManagementViewModel.showTransfersWidget()
+                } else {
+                    transfersManagementViewModel.hideTransfersWidget()
+                }
+            }
+            Timber.d("Current Tab $it")
+        }
     }
 
     /**
@@ -2996,12 +3015,21 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private fun selectDrawerItemCloudDrive() {
         Timber.d("selectDrawerItemCloudDrive")
         setAppBarVisibility(true)
-
-        fileBrowserComposeFragment =
-            (supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE_COMPOSE.tag) as? FileBrowserComposeFragment
-                ?: FileBrowserComposeFragment.newInstance()).also {
-                replaceFragment(it, FragmentTag.CLOUD_DRIVE_COMPOSE.tag)
+        lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.CloudDriveAndSyncs)) {
+                cloudDriveSyncsFragment =
+                    (supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE_SYNCS.tag) as? CloudDriveSyncsFragment
+                        ?: CloudDriveSyncsFragment.newInstance()).also {
+                        replaceFragment(it, FragmentTag.CLOUD_DRIVE_SYNCS.tag)
+                    }
+            } else {
+                fileBrowserComposeFragment =
+                    (supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE_COMPOSE.tag) as? FileBrowserComposeFragment
+                        ?: FileBrowserComposeFragment.newInstance()).also {
+                        replaceFragment(it, FragmentTag.CLOUD_DRIVE_COMPOSE.tag)
+                    }
             }
+        }
     }
 
     private fun showGlobalAlertDialogsIfNeeded() {
@@ -4046,7 +4074,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         get() {
             fileBrowserComposeFragment =
                 supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE_COMPOSE.tag) as? FileBrowserComposeFragment
-            return fileBrowserComposeFragment != null && fileBrowserComposeFragment?.isAdded == true
+            cloudDriveSyncsFragment =
+                supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE_SYNCS.tag) as? CloudDriveSyncsFragment
+            return (fileBrowserComposeFragment != null && fileBrowserComposeFragment?.isAdded == true) || (cloudDriveSyncsFragment != null && cloudDriveSyncsFragment?.isAdded == true)
         }
 
     private val transferPageFragment: TransferPageFragment?
@@ -4786,7 +4816,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         if (isAtAccessedFolder()) {
                             resetSyncFolderVisibility()
                             // Remove Cloud Drive and go back to Syncs
-                            removeFragment(fileBrowserComposeFragment)
+                            if (getFeatureFlagValueUseCase(AppFeatures.CloudDriveAndSyncs)) {
+                                removeFragment(cloudDriveSyncsFragment)
+                            } else {
+                                removeFragment(fileBrowserComposeFragment)
+                            }
                             megaNavigator.openSyncs(this@ManagerActivity)
                             goBackToRootLevel()
                         } else {
@@ -4833,11 +4867,17 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         lifecycleScope.launch {
                             performBackNavigation()
                             ensureActive()
+                            val isCloudDriveSyncsFeatureActive =
+                                getFeatureFlagValueUseCase(AppFeatures.CloudDriveAndSyncs)
                             lifecycle.withStarted {
                                 if (isAccessedFolderExited()) {
                                     resetIsAccessedFolderExited()
                                     // Remove Cloud Drive and go back to Device Center
-                                    removeFragment(fileBrowserComposeFragment)
+                                    if (isCloudDriveSyncsFeatureActive) {
+                                        removeFragment(cloudDriveSyncsFragment)
+                                    } else {
+                                        removeFragment(fileBrowserComposeFragment)
+                                    }
                                     selectDrawerItem(DrawerItem.DEVICE_CENTER)
                                 }
                             }
