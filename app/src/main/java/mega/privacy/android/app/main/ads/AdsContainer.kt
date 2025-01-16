@@ -1,7 +1,6 @@
 package mega.privacy.android.app.main.ads
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,7 +9,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -45,83 +43,83 @@ fun AdsContainer(
     var handledState by remember { mutableStateOf(Lifecycle.State.INITIALIZED) }
     var handledRequest by remember { mutableStateOf<AdManagerAdRequest?>(null) }
     var adLoaded by remember { mutableStateOf(false) }
-    Box(modifier = modifier.height(50.dp)) {
-        AndroidView(modifier = Modifier.align(Alignment.Center), factory = { context ->
-            AdManagerAdView(context).apply {
-                adUnitId = BuildConfig.AD_UNIT_ID
-                setAdSize(AdSize(320, 50))
-                adListener = object : AdListener() {
-                    override fun onAdClicked() {
-                        Timber.d("Ad clicked")
-                    }
+    if (request != null) {
+        Box(modifier = modifier) {
+            AndroidView(modifier = Modifier.align(Alignment.Center), factory = { context ->
+                AdManagerAdView(context).apply {
+                    adUnitId = BuildConfig.AD_UNIT_ID
+                    setAdSize(AdSize(320, 50))
+                    adListener = object : AdListener() {
+                        override fun onAdClicked() {
+                            Timber.d("Ad clicked")
+                        }
 
-                    override fun onAdClosed() {
-                        Timber.i("Ad closed")
-                    }
+                        override fun onAdClosed() {
+                            Timber.i("Ad closed")
+                        }
 
-                    override fun onAdFailedToLoad(adError: LoadAdError) {
-                        Timber.w("Ad failed to load: ${adError.message}")
-                        onAdFailedToLoad()
-                    }
+                        override fun onAdFailedToLoad(adError: LoadAdError) {
+                            Timber.w("Ad failed to load: ${adError.message}")
+                            onAdFailedToLoad()
+                        }
 
-                    override fun onAdImpression() {
-                        Timber.i("Ad impression")
-                    }
+                        override fun onAdImpression() {
+                            Timber.i("Ad impression")
+                        }
 
-                    override fun onAdLoaded() {
-                        Timber.i("Ad loaded")
-                        adLoaded = true
-                        onAdLoaded()
-                    }
+                        override fun onAdLoaded() {
+                            Timber.i("Ad loaded")
+                            adLoaded = true
+                            onAdLoaded()
+                        }
 
-                    override fun onAdOpened() {
-                        Timber.i("Ad opened")
+                        override fun onAdOpened() {
+                            Timber.i("Ad opened")
+                        }
                     }
                 }
-            }
-        }, update = {
-            // update called many times when recomposition, so we need to check if the request and state are changed
-            if (handledRequest != request) {
-                request?.let { adRequest ->
-                    it.loadAd(adRequest)
+            }, update = {
+                // update called many times when recomposition, so we need to check if the request and state are changed
+                if (handledRequest != request) {
+                    it.loadAd(request)
+                    handledRequest = request
                 }
-                handledRequest = request
-            }
-            if (handledState != currentLifecycleState) {
-                when (currentLifecycleState) {
-                    Lifecycle.State.DESTROYED -> {
-                        Timber.d("Destroying AdView")
-                        it.destroy()
-                    }
+                if (handledState != currentLifecycleState) {
+                    when (currentLifecycleState) {
+                        Lifecycle.State.DESTROYED -> {
+                            Timber.d("Destroying AdView")
+                            it.destroy()
+                        }
 
-                    Lifecycle.State.RESUMED -> {
-                        Timber.d("Resuming AdView")
-                        it.resume()
-                    }
+                        Lifecycle.State.RESUMED -> {
+                            Timber.d("Resuming AdView")
+                            it.resume()
+                        }
 
-                    Lifecycle.State.STARTED -> {
-                        Timber.d("Pausing AdView")
-                        it.pause()
-                    }
+                        Lifecycle.State.STARTED -> {
+                            Timber.d("Pausing AdView")
+                            it.pause()
+                        }
 
-                    else -> Unit
+                        else -> Unit
+                    }
+                    handledState = currentLifecycleState
                 }
-                handledState = currentLifecycleState
-            }
-        })
-
-        if (adLoaded && isLoggedInUser) {
-            AdsCloseIcon(modifier = Modifier.align(Alignment.TopEnd), onClick = {
-                showFreeAdsDialog = true
-                viewModel.handleAdsClosed()
-                Analytics.tracker.trackEvent(AdsBannerCloseAdsButtonPressedEvent)
             })
-        }
 
-        if (showFreeAdsDialog) {
-            AdsFreeIntroView(onDismiss = {
-                showFreeAdsDialog = false
-            })
+            if (adLoaded && isLoggedInUser) {
+                AdsCloseIcon(modifier = Modifier.align(Alignment.TopEnd), onClick = {
+                    showFreeAdsDialog = true
+                    viewModel.handleAdsClosed()
+                    Analytics.tracker.trackEvent(AdsBannerCloseAdsButtonPressedEvent)
+                })
+            }
+
+            if (showFreeAdsDialog) {
+                AdsFreeIntroView(onDismiss = {
+                    showFreeAdsDialog = false
+                })
+            }
         }
     }
 }

@@ -82,6 +82,7 @@ class GoogleAdsManager @Inject constructor(
         activity: Activity,
         onConsentInformationUpdated: () -> Unit = {},
     ) {
+        Timber.d("Checking latest consent information")
         val params =
             ConsentRequestParameters.Builder()
                 .build()
@@ -106,6 +107,7 @@ class GoogleAdsManager @Inject constructor(
             val failureCallback =
                 ConsentInformation.OnConsentInfoUpdateFailureListener { fromError: FormError ->
                     Timber.e("Error loading or showing consent form: ${fromError.message}")
+                    onConsentInformationUpdated()
                 }
             consentInformation.requestConsentInfoUpdate(
                 activity,
