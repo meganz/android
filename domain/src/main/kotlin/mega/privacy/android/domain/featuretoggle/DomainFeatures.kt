@@ -12,7 +12,16 @@ enum class DomainFeatures(
     UseFileDescriptorForUploads(
         "Use file descriptor for uploads to avoid the copy to the cache folder",
         false,
-    );
+    ),
+
+    /**
+     * Use file descriptor for uploads to avoid the copy to the cache folder
+     */
+    AllowToChooseDownloadDestination(
+        "Allow to choose the download destination regardless of android version",
+        false,
+    ),
+    ;
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =

@@ -1,7 +1,9 @@
 package mega.privacy.android.domain.usecase.transfers.downloads
 
+import mega.privacy.android.domain.featuretoggle.DomainFeatures
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
 /**
@@ -10,12 +12,13 @@ import javax.inject.Inject
 class ShouldAskDownloadDestinationUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val transferRepository: TransferRepository,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) {
     /**
      * Invoke
      */
     suspend operator fun invoke(): Boolean =
-        transferRepository.allowUserToSetDownloadDestination()
+        getFeatureFlagValueUseCase(DomainFeatures.AllowToChooseDownloadDestination) || transferRepository.allowUserToSetDownloadDestination()
                 && (settingsRepository.isStorageAskAlways() || settingsRepository.getStorageDownloadLocation() == null)
 
 }
