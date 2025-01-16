@@ -67,7 +67,7 @@ object MyAccountViewUtil {
             val storageColors = when (storageState) {
                 StorageState.Red -> ContextCompat.getColorStateList(
                     context,
-                    R.color.color_text_error
+                    R.color.color_support_error
                 )
 
                 StorageState.Orange -> ContextCompat.getColorStateList(
@@ -75,7 +75,7 @@ object MyAccountViewUtil {
                     R.color.color_support_warning
                 )
 
-                else -> ContextCompat.getColorStateList(context, R.color.teal_300_teal_200)
+                else -> ContextCompat.getColorStateList(context, R.color.color_support_success)
             }
             storageProgressBar.progressTintList = storageColors
             storageProgressPercentage.setTextColor(storageColors)
@@ -115,7 +115,7 @@ object MyAccountViewUtil {
             val transferColors = when (usedTransferStatus) {
                 UsedTransferStatus.Full -> ContextCompat.getColorStateList(
                     context,
-                    R.color.color_text_error
+                    R.color.color_support_error
                 )
 
                 UsedTransferStatus.AlmostFull -> ContextCompat.getColorStateList(
@@ -123,7 +123,7 @@ object MyAccountViewUtil {
                     R.color.color_support_warning
                 )
 
-                else -> ContextCompat.getColorStateList(context, R.color.teal_300_teal_200)
+                else -> ContextCompat.getColorStateList(context, R.color.color_support_success)
             }
             transferProgressBar.progressTintList = transferColors
             transferProgressPercentage.setTextColor(transferColors)

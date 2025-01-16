@@ -248,10 +248,10 @@ internal class ManagerDrawerFragment : Fragment() {
             when (storageState) {
                 StorageState.Green -> {}
                 StorageState.Orange -> colorString =
-                    ColorUtils.getColorHexString(requireContext(), R.color.amber_600_amber_300)
+                    ColorUtils.getColorHexString(requireContext(), R.color.color_support_warning)
 
                 StorageState.Red, StorageState.PayWall -> colorString =
-                    ColorUtils.getColorHexString(requireContext(), R.color.color_button_brand)
+                    ColorUtils.getColorHexString(requireContext(), R.color.color_support_error)
 
                 else -> {}
             }
