@@ -62,6 +62,40 @@ fun ComponentActivity.consumeInsetsWithToolbar(
 }
 
 /**
+ * Consume insets for the activity used XML layout.
+ *
+ * @param type The type of insets to consume. default is systemBars.
+ * @param topInset Whether to consume top inset. default is true.
+ * @param bottomInset Whether to consume bottom inset. default is true.
+ * @param handleWindowInsets A lambda to handle window insets. default is empty.
+ */
+@JvmOverloads
+fun ComponentActivity.consumeParentInsets(
+    type: Int = WindowInsetsCompat.Type.systemBars(),
+    topInset: Boolean = true,
+    bottomInset: Boolean = true,
+    handleWindowInsets: (WindowInsetsCompat) -> Unit = {},
+) {
+    ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { v, windowInsets ->
+        val insets = windowInsets.getInsets(type)
+        v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            leftMargin = insets.left
+            rightMargin = insets.right
+            if (topInset) {
+                topMargin = insets.top
+            }
+            if (bottomInset) {
+                bottomMargin = insets.bottom
+            }
+        }
+
+        handleWindowInsets(windowInsets)
+
+        WindowInsetsCompat.CONSUMED
+    }
+}
+
+/**
  * Consume insets for the fragment used XML layout.
  *
  * @param type The type of insets to consume. default is systemBars.

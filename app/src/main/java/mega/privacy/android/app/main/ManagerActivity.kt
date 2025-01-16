@@ -61,10 +61,15 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.Insets
 import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.documentfile.provider.DocumentFile
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -88,6 +93,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.CoroutineDispatcher
@@ -109,7 +115,7 @@ import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
-import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
+import mega.privacy.android.app.extensions.consumeParentInsets
 import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.extensions.isTablet
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -837,7 +843,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
         enableEdgeToEdge()
         setupView()
-        consumeInsetsWithToolbar(customToolbar = appBarLayout)
+        handleInsets()
         initialiseChatBadgeView()
         setCallBadge()
         if (mElevationCause > 0) {
@@ -888,6 +894,39 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
         checkForInAppUpdate()
         checkForInAppAdvertisement()
+    }
+
+    /**
+     * System navigation bar insets of current window
+     */
+    var systemBarInsets: Insets? = null
+        private set
+
+    private fun handleInsets() {
+        consumeParentInsets(
+            topInset = false,
+            bottomInset = false
+        ) { windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            systemBarInsets = insets
+            appBarLayout.updatePadding(top = insets.top)
+            ViewCompat.onApplyWindowInsets(syncPromotionBottomSheetComposeView, windowInsets)
+            ViewCompat.onApplyWindowInsets(freePlanLimitParticipantsDialogComposeView, windowInsets)
+            findViewById<LinearLayout>(R.id.fragment_layout).updatePadding(bottom = insets.bottom)
+            // Set minimum height so that system bar padding is there when both bottom nav and ads are hidden
+            findViewById<LinearLayout>(R.id.bottom_navigation_container).minimumHeight = insets.bottom
+            // Adjust the ads container height to add system bar insets bottom padding
+            adsContainerView.updateLayoutParams<LinearLayout.LayoutParams> {
+                height = resources.getDimensionPixelSize(
+                    R.dimen.ads_web_view_container_height
+                ) + insets.bottom
+            }
+            adsContainerView.updatePadding(bottom = insets.bottom)
+            bottomNavigationView.updatePadding(bottom = if (adsContainerView.isVisible) 0 else insets.bottom)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
     }
 
     /**
@@ -1119,6 +1158,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                 .semantics {
                                     testTagsAsResourceId = true
                                 },
+                            bottomInsetPadding = false,
                             modalSheetState = upgradeToProPlanBottomSheetState,
                             sheetBody = {
                                 when {
@@ -2369,10 +2409,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     private fun showAdsView() {
         adsContainerView.isVisible = true
+        bottomNavigationView.updatePadding(bottom = 0)
     }
 
     fun hideAdsView() {
         adsContainerView.isVisible = false
+        systemBarInsets?.bottom?.let { bottomNavigationView.updatePadding(bottom = it) }
     }
 
     override fun onResume() {
@@ -3965,6 +4007,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             else resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
         params.setMargins(0, 0, 0, height)
         fragmentLayout.layoutParams = params
+        syncNavigationBarColorWithBottomNavMenu()
     }
 
     /**
@@ -5008,6 +5051,15 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         showSnackbar(type, fragmentContainer, content, chatId)
+        snackbar?.apply {
+            val snackbarLayout = this.view as? Snackbar.SnackbarLayout
+            // Add system navigation bar bottom insets padding
+            systemBarInsets?.let { insets ->
+                snackbarLayout?.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                    bottomMargin = insets.bottom
+                }
+            }
+        }
     }
 
     /**
@@ -6487,23 +6539,31 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
-            val height =
-                if (adsContainerView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
-                else resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
+            val height = if (adsContainerView.isVisible)
+                resources.getDimensionPixelSize(R.dimen.ads_web_view_and_bottom_navigation_view_height)
+            else
+                resources.getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
 
             if (hide && visibility == View.VISIBLE) {
                 updateMiniAudioPlayerVisibility(false)
-                val bottom = if (adsContainerView.isVisible) adsContainerView.height else 0
+                val bottom =
+                    if (adsContainerView.isVisible) resources.getDimensionPixelSize(R.dimen.ads_web_view_container_height) else 0
                 params.setMargins(0, 0, 0, bottom)
                 fragmentLayout.layoutParams = params
                 animate().translationY(height.toFloat())
                     .setDuration(Constants.ANIMATION_DURATION)
-                    .withEndAction { bottomNavigationView.visibility = View.GONE }
+                    .withEndAction {
+                        bottomNavigationView.visibility = View.GONE
+                        syncNavigationBarColorWithBottomNavMenu(isReset = bottom == 0)
+                    }
                     .start()
             } else if (!hide && visibility == View.VISIBLE) {
                 animate().translationY(0f)
                     .setDuration(Constants.ANIMATION_DURATION)
-                    .withStartAction { visibility = View.VISIBLE }
+                    .withStartAction {
+                        visibility = View.VISIBLE
+                        syncNavigationBarColorWithBottomNavMenu()
+                    }
                     .withEndAction {
                         updateMiniAudioPlayerVisibility(true)
                         params.setMargins(0, 0, 0, height)
@@ -6512,7 +6572,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     .start()
             } else if (!hide && visibility == View.GONE) {
                 animate().translationY(0f).setDuration(Constants.ANIMATION_DURATION)
-                    .withStartAction { visibility = View.VISIBLE }
+                    .withStartAction {
+                        visibility = View.VISIBLE
+                        syncNavigationBarColorWithBottomNavMenu()
+                    }
                     .withEndAction {
                         updateMiniAudioPlayerVisibility(true)
                         params.setMargins(0, 0, 0, height)
@@ -6521,6 +6584,21 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
             updateTransfersWidgetPosition(hide)
         }
+    }
+
+    /**
+     * Sync the system navigation bar color with the bottom navigation menu's background color.
+     * Applicable only for Android 9 and below as edge-to-edge is not supported on those.
+     *
+     * @param isReset True if need to reset the color to default, false otherwise.
+     */
+    private fun syncNavigationBarColorWithBottomNavMenu(
+        isReset: Boolean = false,
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) return
+
+        val colorId = if (isReset) R.color.app_background else R.color.color_background_surface_1
+        window.navigationBarColor = resources.getColor(colorId, theme)
     }
 
     private fun markNotificationsSeen(fromAndroidNotification: Boolean) {

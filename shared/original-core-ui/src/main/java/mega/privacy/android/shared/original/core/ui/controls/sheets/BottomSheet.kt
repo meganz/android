@@ -86,6 +86,7 @@ fun BottomSheet(
 fun BottomSheet(
     modalSheetState: ModalBottomSheetState,
     sheetBody: @Composable ColumnScope.() -> Unit,
+    bottomInsetPadding: Boolean = true,
     modifier: Modifier = Modifier,
     sheetElevation: Dp = ModalBottomSheetDefaults.Elevation,
     sheetGesturesEnabled: Boolean = true,
@@ -110,11 +111,13 @@ fun BottomSheet(
         sheetBackgroundColor = MegaOriginalTheme.colors.background.surface1,
         sheetContent = {
             sheetBody()
-            Spacer(
-                Modifier.windowInsetsBottomHeight(
-                    WindowInsets.systemBars
+            if (bottomInsetPadding) {
+                Spacer(
+                    Modifier.windowInsetsBottomHeight(
+                        WindowInsets.systemBars
+                    )
                 )
-            )
+            }
         },
     ) {
         content?.invoke()

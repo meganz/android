@@ -17,6 +17,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -485,8 +486,7 @@ class HomepageFragment : Fragment() {
      */
     private fun setupMask() {
         windowContent = activity?.window?.findViewById(Window.ID_ANDROID_CONTENT)
-        fabMaskLayoutDataBinding =
-            FabMaskLayoutBinding.inflate(layoutInflater, windowContent, false)
+        fabMaskLayoutDataBinding = FabMaskLayoutBinding.inflate(layoutInflater, windowContent, false)
     }
 
     /**
@@ -782,6 +782,9 @@ class HomepageFragment : Fragment() {
         fabMain.visibility = View.GONE
         if (fabMaskLayoutDataBinding.root.parent == null) {
             addMask()
+        }
+        (activity as? ManagerActivity)?.systemBarInsets?.let { insets ->
+            fabMaskLayoutDataBinding.fabsInMask.container.updatePadding(bottom = insets.bottom)
         }
         // Need to do so, otherwise, fabMaskMain.background is null.
         post {
