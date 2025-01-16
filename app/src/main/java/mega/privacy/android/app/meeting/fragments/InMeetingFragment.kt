@@ -662,6 +662,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         Timber.d("Update toolbar elements")
         val root = meetingActivity.binding.root
         toolbar = meetingActivity.binding.toolbar
+        toolbar.isVisible = true
         toolbarTitle = meetingActivity.binding.titleToolbar
         toolbarSubtitle = meetingActivity.binding.subtitleToolbar
 

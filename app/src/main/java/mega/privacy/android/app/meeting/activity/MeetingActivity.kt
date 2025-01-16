@@ -274,7 +274,6 @@ class MeetingActivity : PasscodeActivity() {
         initIntent()
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)
-        consumeInsetsWithToolbar(customToolbar = binding.toolbar)
         setContentView(binding.root)
 
         initActionBar()
