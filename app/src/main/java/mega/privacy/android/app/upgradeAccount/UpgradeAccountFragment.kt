@@ -74,7 +74,7 @@ class UpgradeAccountFragment : Fragment() {
     private val billingViewModel by activityViewModels<BillingViewModel>()
 
     private val openFromSource by lazy {
-        requireArguments().serializable(UpgradeAccountActivity.EXTRA_SOURCE)
+        arguments?.serializable(UpgradeAccountActivity.EXTRA_SOURCE)
             ?: UpgradeAccountSource.UNKNOWN
     }
 
