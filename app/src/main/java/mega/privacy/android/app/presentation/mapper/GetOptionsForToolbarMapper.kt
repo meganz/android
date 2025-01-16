@@ -188,7 +188,7 @@ class GetOptionsForToolbarMapper @Inject constructor(
     private suspend fun allHaveOwnerAccessAndNotTakenDown(selectedNodeHandleList: List<Long>): Boolean {
         selectedNodeHandleList.forEach {
             getNodeByHandle(it)?.let { megaNode ->
-                if (nodeAccessPermissionCheckUseCase(
+                if (!nodeAccessPermissionCheckUseCase(
                         nodeId = NodeId(megaNode.handle),
                         level = AccessPermission.OWNER,
                     ) || megaNode.isTakenDown
