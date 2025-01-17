@@ -117,7 +117,7 @@ internal fun StopBackupConfirmationDialogBody(
                             value = stringResource(
                                 id = sharedR.string.sync_stop_backup_confirm_dialog_move_option_select_destination,
                                 state.selectedMegaFolder?.name
-                                    ?: stringResource(id = sharedR.string.sync_stop_backup_confirm_dialog_move_option_select_destination_button)
+                                    ?: stringResource(id = sharedR.string.general_section_cloud_drive)
                             ),
                             styles = mapOf(
                                 SpanIndicator('B') to MegaSpanStyleWithAnnotation(

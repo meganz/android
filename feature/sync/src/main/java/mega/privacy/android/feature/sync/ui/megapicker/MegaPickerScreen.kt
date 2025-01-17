@@ -27,7 +27,6 @@ import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.createnewfolder.CreateNewFolderDialog
 import mega.privacy.android.feature.sync.ui.createnewfolder.model.CreateNewFolderMenuAction
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
@@ -76,7 +75,7 @@ internal fun MegaPickerScreen(
                     ?: if (isStopBackupMegaPicker) {
                         stringResource(sharedR.string.general_select_folder)
                     } else {
-                        stringResource(R.string.sync_toolbar_title)
+                        stringResource(sharedR.string.general_section_cloud_drive)
                     },
                 subtitle = if (isStopBackupMegaPicker || showCurrentFolderName) {
                     null
