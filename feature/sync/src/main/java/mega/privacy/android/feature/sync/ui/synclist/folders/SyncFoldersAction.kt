@@ -21,7 +21,5 @@ internal sealed interface SyncFoldersAction {
 
     data object OnRemoveFolderDialogDismissed : SyncFoldersAction
 
-    data object OnSyncsPausedErrorDialogDismissed : SyncFoldersAction
-
     data object SnackBarShown : SyncFoldersAction
 }

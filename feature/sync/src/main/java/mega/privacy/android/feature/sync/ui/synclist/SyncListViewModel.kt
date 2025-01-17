@@ -10,9 +10,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -38,8 +35,6 @@ internal class SyncListViewModel @Inject constructor(
     private val monitorSyncSolvedIssuesUseCase: MonitorSyncSolvedIssuesUseCase,
     private val clearSyncSolvedIssuesUseCase: ClearSyncSolvedIssuesUseCase,
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
-    private val getAccountTypeUseCase: GetAccountTypeUseCase,
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getDeviceIdUseCase: GetDeviceIdUseCase,
     private val getDeviceNameUseCase: GetDeviceNameUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
@@ -54,7 +49,6 @@ internal class SyncListViewModel @Inject constructor(
         monitorStalledIssue()
         monitorSolvedIssue()
         monitorSyncByWifiSetting()
-        getAndMonitorAccountType()
         getDeviceName()
     }
 
@@ -115,26 +109,6 @@ internal class SyncListViewModel @Inject constructor(
                         )
                     }
                 }
-        }
-    }
-
-    private fun getAndMonitorAccountType() {
-        viewModelScope.launch {
-            runCatching {
-                getAccountTypeUseCase()
-            }.onSuccess { accountType ->
-                _state.update { it.copy(isFreeAccount = accountType == AccountType.FREE) }
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
-
-        viewModelScope.launch {
-            monitorAccountDetailUseCase().collect { accountDetail ->
-                _state.update {
-                    it.copy(isFreeAccount = accountDetail.levelDetail?.accountType == AccountType.FREE)
-                }
-            }
         }
     }
 

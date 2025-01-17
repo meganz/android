@@ -58,7 +58,6 @@ class SyncCardTest {
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -108,7 +107,6 @@ class SyncCardTest {
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -159,7 +157,6 @@ class SyncCardTest {
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = { clicked = true },
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -206,7 +203,6 @@ class SyncCardTest {
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -252,7 +248,6 @@ class SyncCardTest {
                 onOpenDeviceFolderClicked = { clicked = true },
                 onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -283,7 +278,6 @@ class SyncCardTest {
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -333,7 +327,6 @@ class SyncCardTest {
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -384,7 +377,6 @@ class SyncCardTest {
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = { clicked = true },
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -431,7 +423,6 @@ class SyncCardTest {
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )
@@ -477,7 +468,6 @@ class SyncCardTest {
                 onOpenDeviceFolderClicked = { clicked = true },
                 onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 errorRes = null,
                 deviceName = "Device Name",
             )

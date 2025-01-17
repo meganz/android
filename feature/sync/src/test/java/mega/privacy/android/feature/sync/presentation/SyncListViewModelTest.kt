@@ -6,16 +6,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.account.AccountDetail
-import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -37,11 +30,9 @@ import mega.privacy.android.feature.sync.ui.synclist.SyncListAction
 import mega.privacy.android.feature.sync.ui.synclist.SyncListViewModel
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -60,8 +51,6 @@ class SyncListViewModelTest {
     private val monitorSyncSolvedIssuesUseCase: MonitorSyncSolvedIssuesUseCase = mock()
     private val clearSyncSolvedIssuesUseCase: ClearSyncSolvedIssuesUseCase = mock()
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
-    private val getAccountTypeUseCase: GetAccountTypeUseCase = mock()
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val getDeviceIdUseCase: GetDeviceIdUseCase = mock()
     private val getDeviceNameUseCase: GetDeviceNameUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
@@ -83,19 +72,6 @@ class SyncListViewModelTest {
         )
     )
 
-    @BeforeEach
-    fun setupMock(): Unit = runBlocking {
-        val accountLevelDetail = mock<AccountLevelDetail> {
-            on { accountType } doReturn AccountType.PRO_I
-        }
-        val accountDetail = mock<AccountDetail> {
-            on { levelDetail } doReturn accountLevelDetail
-        }
-        whenever(monitorAccountDetailUseCase()).thenReturn(
-            flowOf(accountDetail)
-        )
-    }
-
     @AfterEach
     fun resetAndTearDown() {
         reset(
@@ -104,8 +80,6 @@ class SyncListViewModelTest {
             resolveStalledIssueUseCase,
             stalledIssueItemMapper,
             monitorSyncSolvedIssuesUseCase,
-            getAccountTypeUseCase,
-            monitorAccountDetailUseCase,
             getDeviceIdUseCase,
             getDeviceNameUseCase,
         )
@@ -202,8 +176,6 @@ class SyncListViewModelTest {
             monitorSyncSolvedIssuesUseCase = monitorSyncSolvedIssuesUseCase,
             clearSyncSolvedIssuesUseCase = clearSyncSolvedIssuesUseCase,
             monitorSyncByWiFiUseCase = monitorSyncByWiFiUseCase,
-            getAccountTypeUseCase = getAccountTypeUseCase,
-            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getDeviceIdUseCase = getDeviceIdUseCase,
             getDeviceNameUseCase = getDeviceNameUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,

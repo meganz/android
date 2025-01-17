@@ -18,14 +18,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedWithoutBackgroundMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
@@ -39,16 +37,12 @@ import mega.privacy.mobile.analytics.event.SyncPromotionBottomSheetSyncFoldersBu
 /**
  * Composable function to show the bottom sheet for Sync Promotion
  *
- * @param isFreeAccount Indicates if account is Free or not
- * @param upgradeAccountClicked Callback called when upgrade button is tapped
  * @param onSyncNewFolderClicked Callback called when "Sync folders" button is tapped
  * @param modifier [Modifier]
  * @param hideSheet Callback called to hide the bottom sheet
  */
 @Composable
 fun SyncPromotionBottomSheet(
-    isFreeAccount: Boolean,
-    upgradeAccountClicked: () -> Unit,
     onSyncNewFolderClicked: () -> Unit,
     modifier: Modifier = Modifier,
     hideSheet: () -> Unit = {},
@@ -89,20 +83,12 @@ fun SyncPromotionBottomSheet(
             textAlign = TextAlign.Center,
         )
         RaisedDefaultMegaButton(
-            text = if (isFreeAccount) {
-                stringResource(sharedR.string.sync_promotion_bottom_sheet_primary_button_text_free)
-            } else {
-                stringResource(sharedR.string.sync_promotion_bottom_sheet_primary_button_text_pro)
-            },
+            text = stringResource(sharedR.string.sync_promotion_bottom_sheet_primary_button_text_pro),
             onClick = {
-                if (isFreeAccount) {
-                    upgradeAccountClicked()
-                } else {
-                    Analytics.tracker.trackEvent(
-                        SyncPromotionBottomSheetSyncFoldersButtonPressedEvent
-                    )
-                    onSyncNewFolderClicked()
-                }
+                Analytics.tracker.trackEvent(
+                    SyncPromotionBottomSheetSyncFoldersButtonPressedEvent
+                )
+                onSyncNewFolderClicked()
                 hideSheet()
             },
             modifier = Modifier
@@ -128,13 +114,9 @@ fun SyncPromotionBottomSheet(
 
 @CombinedThemePreviews
 @Composable
-private fun UpgradeProPlanBottomSheetPreview(
-    @PreviewParameter(BooleanProvider::class) isFreeAccount: Boolean,
-) {
+private fun UpgradeProPlanBottomSheetPreview() {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncPromotionBottomSheet(
-            isFreeAccount = isFreeAccount,
-            upgradeAccountClicked = {},
             onSyncNewFolderClicked = {},
         )
     }

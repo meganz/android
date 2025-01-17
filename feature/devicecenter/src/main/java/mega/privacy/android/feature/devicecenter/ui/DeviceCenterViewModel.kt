@@ -15,8 +15,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -40,7 +38,6 @@ import javax.inject.Inject
  * @property isCameraUploadsEnabledUseCase [IsCameraUploadsEnabledUseCase]
  * @property deviceUINodeListMapper [DeviceUINodeListMapper]
  * @property monitorConnectivityUseCase [MonitorConnectivityUseCase]
- * @property monitorAccountDetailUseCase [MonitorAccountDetailUseCase]
  * @property getFeatureFlagValueUseCase [GetFeatureFlagValueUseCase]
  */
 @HiltViewModel
@@ -49,7 +46,6 @@ internal class DeviceCenterViewModel @Inject constructor(
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val deviceUINodeListMapper: DeviceUINodeListMapper,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
@@ -64,7 +60,6 @@ internal class DeviceCenterViewModel @Inject constructor(
 
     init {
         monitorNetworkConnectivity()
-        monitorAccountDetail()
         checkFeatureFlags()
     }
 
@@ -77,16 +72,6 @@ internal class DeviceCenterViewModel @Inject constructor(
                         it.copy(isNetworkConnected = isNetworkConnected)
                     }
                 }
-        }
-    }
-
-    private fun monitorAccountDetail() {
-        viewModelScope.launch {
-            monitorAccountDetailUseCase().collect { accountDetail ->
-                _state.update {
-                    it.copy(isFreeAccount = accountDetail.levelDetail?.accountType == AccountType.FREE)
-                }
-            }
         }
     }
 

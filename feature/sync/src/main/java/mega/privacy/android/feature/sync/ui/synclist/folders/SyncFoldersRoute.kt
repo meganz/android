@@ -16,7 +16,6 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.ui.stopbackup.StopBackupConfirmationDialog
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.OnRemoveFolderDialogDismissed
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.OnRemoveSyncFolderDialogConfirmed
-import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.OnSyncsPausedErrorDialogDismissed
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.PauseRunClicked
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.RemoveFolderClicked
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.SnackBarShown
@@ -29,7 +28,6 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 internal fun SyncFoldersRoute(
     addFolderClicked: () -> Unit,
     onSelectStopBackupDestinationClicked: () -> Unit,
-    upgradeAccountClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
     viewModel: SyncFoldersViewModel,
@@ -50,7 +48,6 @@ internal fun SyncFoldersRoute(
             viewModel.handleAction(RemoveFolderClicked(it))
         },
         addFolderClicked = addFolderClicked,
-        upgradeAccountClicked = upgradeAccountClicked,
         issuesInfoClicked = issuesInfoClicked,
         onOpenDeviceFolderClicked = { deviceStoragePath ->
             context.startActivity(
@@ -66,12 +63,7 @@ internal fun SyncFoldersRoute(
             onOpenMegaFolderClicked(syncUiItem.megaStorageNodeId.longValue)
         },
         isLowBatteryLevel = uiState.isLowBatteryLevel,
-        isFreeAccount = uiState.isFreeAccount,
         isLoading = uiState.isLoading,
-        showSyncsPausedErrorDialog = uiState.showSyncsPausedErrorDialog,
-        onShowSyncsPausedErrorDialogDismissed = {
-            viewModel.handleAction(OnSyncsPausedErrorDialogDismissed)
-        },
         deviceName = deviceName,
         isBackupForAndroidEnabled = isBackupForAndroidEnabled,
     )

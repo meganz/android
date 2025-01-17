@@ -7,14 +7,10 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.BatteryInfo
-import mega.privacy.android.domain.entity.account.AccountDetail
-import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -52,7 +48,6 @@ class SyncMonitorViewModelTest {
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val pauseResumeSyncsBasedOnBatteryAndWiFiUseCase: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase =
         mock()
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase = mock()
@@ -69,7 +64,6 @@ class SyncMonitorViewModelTest {
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf())
         whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf())
         whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf())
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf())
         whenever(monitorSyncStalledIssuesUseCase()).thenReturn(flowOf())
         whenever(monitorSyncsUseCase()).thenReturn(flowOf())
     }
@@ -82,7 +76,6 @@ class SyncMonitorViewModelTest {
             monitorConnectivityUseCase,
             monitorSyncByWiFiUseCase,
             monitorBatteryInfoUseCase,
-            monitorAccountDetailUseCase,
             pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
             monitorSyncStalledIssuesUseCase,
             monitorSyncsUseCase,
@@ -116,12 +109,6 @@ class SyncMonitorViewModelTest {
     @Test
     fun `test that monitor sync state updates sync state`() = runTest {
         val batteryInfo = mock<BatteryInfo>()
-        val accountLevelDetails: AccountLevelDetail = mock {
-            on { accountType } doReturn AccountType.FREE
-        }
-        val accountDetail: AccountDetail = mock<AccountDetail> {
-            on { levelDetail } doReturn accountLevelDetails
-        }
         val connectedToInternet = true
         val syncByWifi = true
         whenever(monitorConnectivityUseCase()).thenReturn(
@@ -133,9 +120,6 @@ class SyncMonitorViewModelTest {
         whenever(monitorBatteryInfoUseCase()).thenReturn(
             flowOf(batteryInfo)
         )
-        whenever(monitorAccountDetailUseCase()).thenReturn(
-            flowOf(accountDetail)
-        )
 
         initViewModel()
         underTest.startMonitoring()
@@ -144,7 +128,6 @@ class SyncMonitorViewModelTest {
             connectedToInternet,
             syncByWifi,
             batteryInfo,
-            isFreeAccount = true
         )
     }
 
@@ -221,7 +204,6 @@ class SyncMonitorViewModelTest {
             monitorConnectivityUseCase,
             monitorSyncByWiFiUseCase,
             monitorBatteryInfoUseCase,
-            monitorAccountDetailUseCase,
             pauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
             monitorSyncStalledIssuesUseCase,
             monitorSyncsUseCase,

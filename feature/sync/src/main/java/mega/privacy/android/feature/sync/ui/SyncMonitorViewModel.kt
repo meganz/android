@@ -17,11 +17,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.collectChunked
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.BatteryInfo
-import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -51,7 +48,6 @@ class SyncMonitorViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val pauseResumeSyncsBasedOnBatteryAndWiFiUseCase: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
     private val monitorSyncStalledIssuesUseCase: MonitorSyncStalledIssuesUseCase,
     private val monitorSyncsUseCase: MonitorSyncsUseCase,
@@ -107,21 +103,19 @@ class SyncMonitorViewModel @Inject constructor(
                     monitorConnectivityUseCase(),
                     monitorSyncByWiFiUseCase(),
                     monitorBatteryInfoUseCase(),
-                    monitorAccountDetailUseCase()
-                ) { connectedToInternet: Boolean, syncByWifi: Boolean, batteryInfo: BatteryInfo, accountDetail: AccountDetail ->
-                    Triple(
+                ) { connectedToInternet: Boolean, syncByWifi: Boolean, batteryInfo: BatteryInfo ->
+                    Pair(
                         batteryInfo,
                         Pair(
                             connectedToInternet,
                             syncByWifi,
-                        ),
-                        accountDetail.levelDetail?.accountType == AccountType.FREE
+                        )
                     )
                 }
                     .distinctUntilChanged()
-                    .collect { (batteryInfo, connectionDetails, isFreeAccount) ->
+                    .collect { (batteryInfo, connectionDetails) ->
                         val (connectedToInternet, syncByWifi) = connectionDetails
-                        updateSyncState(connectedToInternet, syncByWifi, batteryInfo, isFreeAccount)
+                        updateSyncState(connectedToInternet, syncByWifi, batteryInfo)
                     }
             }
         }
@@ -131,13 +125,11 @@ class SyncMonitorViewModel @Inject constructor(
         connectedToInternet: Boolean,
         syncOnlyByWifi: Boolean,
         batteryInfo: BatteryInfo,
-        isFreeAccount: Boolean,
     ) {
         pauseResumeSyncsBasedOnBatteryAndWiFiUseCase(
             connectedToInternet = connectedToInternet,
             syncOnlyByWifi = syncOnlyByWifi,
             batteryInfo = batteryInfo,
-            isFreeAccount = isFreeAccount
         )
     }
 

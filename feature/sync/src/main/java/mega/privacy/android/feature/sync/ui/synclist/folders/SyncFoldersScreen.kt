@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.synclist.folders
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedResR
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -39,18 +38,15 @@ import mega.privacy.android.feature.sync.ui.views.SyncItemView
 import mega.privacy.android.feature.sync.ui.views.SyncTypePreviewProvider
 import mega.privacy.android.feature.sync.ui.views.TAG_SYNC_LIST_SCREEN_NO_ITEMS
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.skeleton.CardItemLoadingSkeleton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
-import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.mobile.analytics.event.SyncCardExpandedEvent
 import mega.privacy.mobile.analytics.event.SyncFoldersListDisplayedEvent
-import mega.privacy.mobile.analytics.event.SyncListEmptyStateUpgradeButtonPressedEvent
 
 @Composable
 internal fun SyncFoldersScreen(
@@ -59,15 +55,11 @@ internal fun SyncFoldersScreen(
     pauseRunClicked: (SyncUiItem) -> Unit,
     removeFolderClicked: (SyncUiItem) -> Unit,
     addFolderClicked: () -> Unit,
-    upgradeAccountClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
     onOpenDeviceFolderClicked: (String) -> Unit,
     onOpenMegaFolderClicked: (SyncUiItem) -> Unit,
     isLowBatteryLevel: Boolean,
-    isFreeAccount: Boolean,
     isLoading: Boolean,
-    showSyncsPausedErrorDialog: Boolean,
-    onShowSyncsPausedErrorDialogDismissed: () -> Unit,
     deviceName: String,
     isBackupForAndroidEnabled: Boolean,
     modifier: Modifier = Modifier,
@@ -86,9 +78,7 @@ internal fun SyncFoldersScreen(
             } else if (syncUiItems.isEmpty()) {
                 item {
                     SyncFoldersScreenEmptyState(
-                        isFreeAccount = isFreeAccount,
                         addFolderClicked = addFolderClicked,
-                        upgradeNowClicked = upgradeAccountClicked,
                         isBackupForAndroidEnabled = isBackupForAndroidEnabled,
                         modifier = Modifier
                             .fillParentMaxHeight()
@@ -116,24 +106,11 @@ internal fun SyncFoldersScreen(
                         onOpenDeviceFolderClicked = onOpenDeviceFolderClicked,
                         onOpenMegaFolderClicked = onOpenMegaFolderClicked,
                         isLowBatteryLevel = isLowBatteryLevel,
-                        isFreeAccount = isFreeAccount,
                         errorRes = syncUiItems[itemIndex].error,
                         deviceName = deviceName,
                     )
                 }
             }
-        }
-        if (showSyncsPausedErrorDialog) {
-            MegaAlertDialog(
-                title = "",
-                body = stringResource(sharedResR.string.sync_error_dialog_free_user),
-                icon = iconPackR.drawable.ic_alert_triangle_color,
-                confirmButtonText = stringResource(sharedResR.string.sync_error_dialog_free_user_confirm_action),
-                cancelButtonText = null,
-                onConfirm = onShowSyncsPausedErrorDialogDismissed,
-                onDismiss = onShowSyncsPausedErrorDialogDismissed,
-                bodyTextColor = TextColor.Primary,
-            )
         }
     }
 
@@ -146,9 +123,7 @@ internal fun SyncFoldersScreen(
 
 @Composable
 private fun SyncFoldersScreenEmptyState(
-    isFreeAccount: Boolean,
     addFolderClicked: () -> Unit,
-    upgradeNowClicked: () -> Unit,
     isBackupForAndroidEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -185,11 +160,7 @@ private fun SyncFoldersScreenEmptyState(
         )
         if (isBackupForAndroidEnabled) {
             MegaText(
-                text = if (isFreeAccount) {
-                    stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_message_free_account)
-                } else {
-                    stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_message)
-                },
+                text = stringResource(id = sharedResR.string.device_center_sync_backup_list_empty_state_message),
                 textColor = TextColor.Secondary,
                 modifier = Modifier
                     .padding(top = 16.dp)
@@ -197,54 +168,23 @@ private fun SyncFoldersScreenEmptyState(
                 style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
             )
         } else {
-            val messageTypography =
-                if (isFreeAccount) MaterialTheme.typography.subtitle2medium else MaterialTheme.typography.subtitle2
             MegaText(
                 text = stringResource(id = sharedResR.string.device_center_sync_list_empty_state_message),
-                textColor = if (isFreeAccount) TextColor.Primary else TextColor.Secondary,
+                textColor = TextColor.Secondary,
                 modifier = Modifier.padding(top = 16.dp),
-                style = messageTypography.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
             )
-            if (isFreeAccount) {
-                MegaText(
-                    text = stringResource(id = sharedResR.string.device_center_sync_list_empty_state_message_free_account),
-                    textColor = TextColor.Secondary,
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS),
-                    style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
-                )
-            }
         }
 
         val isLandscape =
             LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-        if (isBackupForAndroidEnabled) {
-            if (isFreeAccount) {
-                RaisedDefaultMegaButton(
-                    textId = sharedResR.string.device_center_sync_backup_see_upgrade_options_button_label,
-                    onClick = {
-                        Analytics.tracker.trackEvent(SyncListEmptyStateUpgradeButtonPressedEvent)
-                        upgradeNowClicked()
-                    },
-                    modifier = Modifier
-                        .padding(top = if (isLandscape) 32.dp else 144.dp)
-                        .defaultMinSize(minWidth = 232.dp)
-                        .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON),
-                )
-            }
-        } else {
+        if (isBackupForAndroidEnabled.not()) {
             RaisedDefaultMegaButton(
-                textId = if (isFreeAccount) sharedResR.string.general_upgrade_now_label else sharedResR.string.device_center_sync_add_new_syn_button_option,
-                onClick = if (isFreeAccount) {
-                    Analytics.tracker.trackEvent(SyncListEmptyStateUpgradeButtonPressedEvent)
-                    upgradeNowClicked
-                } else {
-                    addFolderClicked
-                },
+                textId = sharedResR.string.device_center_sync_add_new_syn_button_option,
+                onClick = addFolderClicked,
                 modifier = Modifier
-                    .padding(top = if (isLandscape) 32.dp else if (isFreeAccount) 108.dp else 162.dp)
+                    .padding(top = if (isLandscape) 32.dp else 162.dp)
                     .defaultMinSize(minWidth = 232.dp)
                     .testTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON),
             )
@@ -286,15 +226,11 @@ private fun SyncFoldersScreenEmptyStatePreview(
             pauseRunClicked = {},
             removeFolderClicked = {},
             addFolderClicked = {},
-            upgradeAccountClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
             isLowBatteryLevel = false,
-            isFreeAccount = isFreeAccount,
             isLoading = false,
-            showSyncsPausedErrorDialog = false,
-            onShowSyncsPausedErrorDialogDismissed = {},
             deviceName = "Device Name",
             isBackupForAndroidEnabled = true,
         )
@@ -314,15 +250,11 @@ private fun SyncFoldersScreenLoadingStatePreview() {
             pauseRunClicked = {},
             removeFolderClicked = {},
             addFolderClicked = {},
-            upgradeAccountClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
             isLowBatteryLevel = false,
-            isFreeAccount = false,
             isLoading = true,
-            showSyncsPausedErrorDialog = false,
-            onShowSyncsPausedErrorDialogDismissed = {},
             deviceName = "Device Name",
             isBackupForAndroidEnabled = true,
         )
@@ -353,15 +285,11 @@ private fun SyncFoldersScreenSyncingPreview(
             pauseRunClicked = {},
             removeFolderClicked = {},
             addFolderClicked = {},
-            upgradeAccountClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
             isLowBatteryLevel = false,
-            isFreeAccount = false,
             isLoading = false,
-            showSyncsPausedErrorDialog = false,
-            onShowSyncsPausedErrorDialogDismissed = {},
             deviceName = "Device Name",
             isBackupForAndroidEnabled = true,
         )
@@ -392,15 +320,11 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview(
             pauseRunClicked = {},
             removeFolderClicked = {},
             addFolderClicked = {},
-            upgradeAccountClicked = {},
             issuesInfoClicked = {},
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
             isLowBatteryLevel = false,
-            isFreeAccount = false,
             isLoading = false,
-            showSyncsPausedErrorDialog = false,
-            onShowSyncsPausedErrorDialogDismissed = {},
             deviceName = "Device Name",
             isBackupForAndroidEnabled = true,
         )

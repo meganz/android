@@ -41,7 +41,6 @@ internal class DeviceBottomSheetBodyTest {
                 onAddNewSyncClicked = {},
                 onAddBackupClicked = {},
                 onBottomSheetDismissed = {},
-                isFreeAccount = false,
                 isBackupForAndroidEnabled = true,
             )
         }
@@ -68,7 +67,6 @@ internal class DeviceBottomSheetBodyTest {
                 onAddNewSyncClicked = {},
                 onAddBackupClicked = {},
                 onBottomSheetDismissed = {},
-                isFreeAccount = false,
                 isBackupForAndroidEnabled = true,
             )
         }

@@ -62,7 +62,6 @@ internal class DeviceCenterScreenTest {
                 onSearchQueryChanged = {},
                 onSearchCloseClicked = {},
                 onSearchClicked = {},
-                onOpenUpgradeAccountClicked = {},
             )
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_TOOLBAR).assertIsDisplayed()
@@ -91,7 +90,6 @@ internal class DeviceCenterScreenTest {
                 onSearchQueryChanged = {},
                 onSearchCloseClicked = {},
                 onSearchClicked = {},
-                onOpenUpgradeAccountClicked = {},
             )
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_THIS_DEVICE_HEADER).assertDoesNotExist()
@@ -134,7 +132,6 @@ internal class DeviceCenterScreenTest {
                 onSearchQueryChanged = {},
                 onSearchCloseClicked = {},
                 onSearchClicked = {},
-                onOpenUpgradeAccountClicked = {},
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER).assertExists()
@@ -174,7 +171,6 @@ internal class DeviceCenterScreenTest {
                 onSearchQueryChanged = {},
                 onSearchCloseClicked = {},
                 onSearchClicked = {},
-                onOpenUpgradeAccountClicked = {},
             )
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_THIS_DEVICE_HEADER).assertIsDisplayed()
@@ -215,7 +211,6 @@ internal class DeviceCenterScreenTest {
                 onSearchQueryChanged = {},
                 onSearchCloseClicked = {},
                 onSearchClicked = {},
-                onOpenUpgradeAccountClicked = {},
             )
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_THIS_DEVICE_HEADER).assertDoesNotExist()
@@ -263,7 +258,6 @@ internal class DeviceCenterScreenTest {
                 onSearchQueryChanged = {},
                 onSearchCloseClicked = {},
                 onSearchClicked = {},
-                onOpenUpgradeAccountClicked = {},
             )
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_THIS_DEVICE_HEADER).assertIsDisplayed()
@@ -312,7 +306,6 @@ internal class DeviceCenterScreenTest {
                 onSearchQueryChanged = {},
                 onSearchCloseClicked = {},
                 onSearchClicked = {},
-                onOpenUpgradeAccountClicked = {},
             )
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_THIS_DEVICE_HEADER).assertDoesNotExist()
@@ -341,7 +334,6 @@ internal class DeviceCenterScreenTest {
                 onSearchQueryChanged = {},
                 onSearchCloseClicked = {},
                 onSearchClicked = {},
-                onOpenUpgradeAccountClicked = {},
             )
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_LOADING_SCREEN).assertIsDisplayed()
@@ -369,7 +361,6 @@ internal class DeviceCenterScreenTest {
                 onSearchQueryChanged = {},
                 onSearchCloseClicked = {},
                 onSearchClicked = {},
-                onOpenUpgradeAccountClicked = {},
             )
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_NO_NETWORK_STATE).assertIsDisplayed()
@@ -411,7 +402,6 @@ internal class DeviceCenterScreenTest {
                 onSearchQueryChanged = {},
                 onSearchCloseClicked = {},
                 onSearchClicked = {},
-                onOpenUpgradeAccountClicked = {},
             )
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_NOTHING_SETUP_STATE).assertIsDisplayed()
@@ -445,7 +435,6 @@ internal class DeviceCenterScreenTest {
                 onSearchQueryChanged = {},
                 onSearchCloseClicked = {},
                 onSearchClicked = {},
-                onOpenUpgradeAccountClicked = {},
             )
         }
     }

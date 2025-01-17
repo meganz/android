@@ -1,17 +1,11 @@
 package mega.privacy.android.feature.sync.ui.synclist
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -22,11 +16,9 @@ import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.model.MenuAction
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLatestModifiedTimeEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseLocalFileEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncChooseRemoteFileEvent
@@ -35,9 +27,6 @@ import mega.privacy.mobile.analytics.event.AndroidSyncMergeFoldersEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncRemoveDuplicatesAndRemoveRestEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncRemoveDuplicatesEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncRenameAllItemsEvent
-import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogCancelButtonPressedEvent
-import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogDisplayedEvent
-import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogUpgradeButtonPressedEvent
 
 /**
  * Composable function that represents the route for the sync list screen.
@@ -104,8 +93,6 @@ internal fun SyncListRoute(
 
     val snackBarHostState = remember { SnackbarHostState() }
 
-    var showUpgradeDialog by rememberSaveable { mutableStateOf(false) }
-
     val message = state.snackbarMessage?.let {
         stringResource(id = it)
     }
@@ -114,25 +101,8 @@ internal fun SyncListRoute(
         isInCloudDrive = isInCloudDrive,
         stalledIssuesCount = state.stalledIssuesCount,
         onOpenMegaFolderClicked = onOpenMegaFolderClicked,
-        onSyncFolderClicked = {
-            if (state.isFreeAccount) {
-                showUpgradeDialog = true
-            } else {
-                onSyncFolderClicked()
-            }
-        },
-        onBackupFolderClicked = {
-            if (state.isFreeAccount) {
-                showUpgradeDialog = true
-            } else {
-                onBackupFolderClicked()
-            }
-        },
-        onAddFolderClicked = {
-            if (state.isFreeAccount) {
-                showUpgradeDialog = true
-            }
-        },
+        onSyncFolderClicked = { onSyncFolderClicked() },
+        onBackupFolderClicked = { onBackupFolderClicked() },
         actionSelected = { item, selectedAction ->
             when (selectedAction.resolutionActionType) {
                 StalledIssueResolutionActionType.RENAME_ALL_ITEMS -> {
@@ -177,11 +147,7 @@ internal fun SyncListRoute(
         onActionPressed = {
             when (it) {
                 is SyncListMenuAction.AddNewSync -> {
-                    if (state.isFreeAccount) {
-                        showUpgradeDialog = true
-                    } else {
-                        onSyncFolderClicked()
-                    }
+                    onSyncFolderClicked()
                 }
 
                 is SyncListMenuAction.ClearSyncOptions -> {
@@ -198,35 +164,6 @@ internal fun SyncListRoute(
         syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
         selectedChip = selectedChip,
     )
-
-    if (showUpgradeDialog) {
-        Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogDisplayedEvent)
-        val isBackupForAndroidEnabled = state.enabledFlags.contains(SyncFeatures.BackupForAndroid)
-        MegaAlertDialog(
-            title = if (isBackupForAndroidEnabled) {
-                stringResource(id = sharedR.string.device_center_sync_backup_upgrade_dialog_title)
-            } else {
-                stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_title)
-            },
-            body = if (isBackupForAndroidEnabled) {
-                stringResource(id = sharedR.string.device_center_sync_backup_upgrade_dialog_message)
-            } else {
-                stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_message)
-            },
-            confirmButtonText = stringResource(id = sharedR.string.general_upgrade_button),
-            cancelButtonText = stringResource(id = sharedR.string.device_center_sync_upgrade_dialog_cancel_button),
-            onConfirm = {
-                Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogUpgradeButtonPressedEvent)
-                onOpenUpgradeAccountClicked()
-                showUpgradeDialog = false
-            },
-            onDismiss = {
-                Analytics.tracker.trackEvent(SyncFeatureUpgradeDialogCancelButtonPressedEvent)
-                showUpgradeDialog = false
-            },
-            modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG)
-        )
-    }
 
     LaunchedEffect(key1 = state.snackbarMessage) {
         message?.let {
@@ -245,6 +182,3 @@ private fun prepareMenuActions(state: SyncListState): List<MenuAction> {
     }
     return menuActionList
 }
-
-internal const val TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG =
-    "sync_list_screen:upgrade_dialog"

@@ -1241,8 +1241,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         sheetBody = {
                             SyncPromotionBottomSheet(
                                 modifier = Modifier.semantics { testTagsAsResourceId = true },
-                                isFreeAccount = state.isFreeAccount,
-                                upgradeAccountClicked = { megaNavigator.openUpgradeAccount(this@ManagerActivity) },
                                 onSyncNewFolderClicked = {
                                     megaNavigator.openNewSync(
                                         context = this@ManagerActivity,

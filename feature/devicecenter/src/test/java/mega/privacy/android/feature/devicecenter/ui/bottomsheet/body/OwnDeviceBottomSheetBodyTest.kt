@@ -33,7 +33,6 @@ internal class OwnDeviceBottomSheetBodyTest {
                 onInfoClicked = {},
                 onAddNewSyncClicked = {},
                 onAddBackupClicked = {},
-                isFreeAccount = false,
                 isBackupForAndroidEnabled = true,
             )
         }

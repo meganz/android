@@ -14,13 +14,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.account.IsProAccountUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
@@ -38,7 +36,6 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPausedSyncUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.StopBackupOption
-import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import timber.log.Timber
 import javax.inject.Inject
@@ -57,7 +54,6 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getFolderTreeInfo: GetFolderTreeInfo,
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase,
-    private val isProAccountUseCase: IsProAccountUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val moveDeconfiguredBackupNodesUseCase: MoveDeconfiguredBackupNodesUseCase,
@@ -67,8 +63,6 @@ internal class SyncFoldersViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(SyncFoldersUiState(emptyList()))
     val uiState: StateFlow<SyncFoldersUiState> = _uiState.asStateFlow()
-
-    private var showSyncsPausedErrorDialogShown = false
 
     init {
         checkFeatureFlags()
@@ -95,10 +89,7 @@ internal class SyncFoldersViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            monitorAccountDetailUseCase().collect { accountDetail ->
-                _uiState.update {
-                    it.copy(isFreeAccount = accountDetail.levelDetail?.accountType == AccountType.FREE)
-                }
+            monitorAccountDetailUseCase().collect {
                 checkOverQuotaStatus()
             }
         }
@@ -163,42 +154,16 @@ internal class SyncFoldersViewModel @Inject constructor(
                 )
             }
         }
-            .onEach {
-                updateSyncsState(it)
+            .onEach { syncs ->
+                _uiState.update {
+                    it.copy(
+                        syncUiItems = syncs,
+                        isRefreshing = false,
+                        isLoading = false,
+                    )
+                }
             }
             .launchIn(viewModelScope)
-    }
-
-    private suspend fun updateSyncsState(
-        syncs: List<SyncUiItem>,
-    ) {
-        val isProAccount = runCatching { isProAccountUseCase() }.getOrNull() ?: false
-        when {
-            syncs.isNotEmpty() && !showSyncsPausedErrorDialogShown && isProAccount.not() -> {
-                _uiState.update {
-                    it.copy(
-                        syncUiItems = syncs,
-                        isRefreshing = false,
-                        isFreeAccount = isProAccount.not(),
-                        isLoading = false,
-                        showSyncsPausedErrorDialog = true
-                    )
-                }
-                showSyncsPausedErrorDialogShown = true
-            }
-
-            else -> {
-                _uiState.update {
-                    it.copy(
-                        syncUiItems = syncs,
-                        isRefreshing = false,
-                        isFreeAccount = isProAccount.not(),
-                        isLoading = false,
-                        showSyncsPausedErrorDialog = false
-                    )
-                }
-            }
-        }
     }
 
     private fun checkOverQuotaStatus() {
@@ -327,12 +292,6 @@ internal class SyncFoldersViewModel @Inject constructor(
                     }.onFailure {
                         Timber.e(it)
                     }
-                }
-            }
-
-            is SyncFoldersAction.OnSyncsPausedErrorDialogDismissed -> {
-                _uiState.update {
-                    it.copy(showSyncsPausedErrorDialog = false)
                 }
             }
 

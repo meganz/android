@@ -5,7 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.usecase.account.IsProAccountUseCase
 import mega.privacy.android.feature.sync.domain.usecase.SetSyncPromotionShownUseCase
 import mega.privacy.android.feature.sync.domain.usecase.ShouldShowSyncPromotionUseCase
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionViewModel
@@ -24,13 +23,11 @@ class SyncPromotionViewModelTest {
 
     private val shouldShowSyncPromotionUseCase: ShouldShowSyncPromotionUseCase = mock()
     private val setSyncPromotionShownUseCase: SetSyncPromotionShownUseCase = mock()
-    private val isProAccountUseCase: IsProAccountUseCase = mock()
 
     private fun initViewModel() {
         underTest = SyncPromotionViewModel(
             shouldShowSyncPromotionUseCase = shouldShowSyncPromotionUseCase,
             setSyncPromotionShownUseCase = setSyncPromotionShownUseCase,
-            isProAccountUseCase = isProAccountUseCase,
         )
     }
 
@@ -39,21 +36,9 @@ class SyncPromotionViewModelTest {
         reset(
             shouldShowSyncPromotionUseCase,
             setSyncPromotionShownUseCase,
-            isProAccountUseCase,
         )
 
         initViewModel()
-    }
-
-    @Test
-    fun `test that the flag to indicate if is a free account is set`() = runTest {
-        whenever(isProAccountUseCase()).thenReturn(false)
-        initViewModel()
-        testScheduler.advanceUntilIdle()
-
-        underTest.state.test {
-            assertThat(awaitItem().isFreeAccount).isTrue()
-        }
     }
 
     @Test

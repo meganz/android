@@ -75,14 +75,12 @@ import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.mobile.analytics.event.AndroidBackupFABButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncMultiFABButtonPressedEvent
-import mega.privacy.mobile.analytics.event.SyncListBannerUpgradeButtonPressedEvent
 
 @Composable
 internal fun SyncListScreen(
     stalledIssuesCount: Int,
     onSyncFolderClicked: () -> Unit,
     onBackupFolderClicked: () -> Unit,
-    onAddFolderClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
     actionSelected: (item: StalledIssueUiItem, selectedAction: StalledIssueResolutionAction) -> Unit,
     snackBarHostState: SnackbarHostState,
@@ -176,51 +174,35 @@ internal fun SyncListScreen(
             },
             floatingActionButton = {
                 if (isBackupForAndroidEnabled) {
-                    when {
-                        syncFoldersState.isFreeAccount && syncFoldersState.syncUiItems.isNotEmpty() -> {
-                            MegaFloatingActionButton(
-                                onClick = onAddFolderClicked,
-                                modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
-                            ) {
-                                Icon(
-                                    painter = painterResource(CoreUiR.drawable.ic_plus),
-                                    contentDescription = null,
+                    MegaMultiFloatingActionButton(
+                        items = listOf(
+                            MultiFloatingActionButtonItem(
+                                icon = painterResource(id = iconPackR.drawable.ic_sync_01),
+                                label = stringResource(id = R.string.sync_toolbar_title),
+                                onClicked = onSyncFolderClicked,
+                            ),
+                            MultiFloatingActionButtonItem(
+                                icon = painterResource(id = iconPackR.drawable.ic_database),
+                                label = stringResource(id = sharedResR.string.sync_add_new_backup_toolbar_title),
+                                onClicked = {
+                                    Analytics.tracker.trackEvent(
+                                        AndroidBackupFABButtonPressedEvent
+                                    )
+                                    onBackupFolderClicked()
+                                },
+                            ),
+                        ),
+                        modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB),
+                        multiFabState = multiFabState,
+                        onStateChanged = { state ->
+                            if (state == MultiFloatingActionButtonState.EXPANDED) {
+                                Analytics.tracker.trackEvent(
+                                    AndroidSyncMultiFABButtonPressedEvent
                                 )
                             }
+                            multiFabState.value = state
                         }
-
-                        syncFoldersState.isFreeAccount.not() -> {
-                            MegaMultiFloatingActionButton(
-                                items = listOf(
-                                    MultiFloatingActionButtonItem(
-                                        icon = painterResource(id = iconPackR.drawable.ic_sync_01),
-                                        label = stringResource(id = R.string.sync_toolbar_title),
-                                        onClicked = onSyncFolderClicked,
-                                    ),
-                                    MultiFloatingActionButtonItem(
-                                        icon = painterResource(id = iconPackR.drawable.ic_database),
-                                        label = stringResource(id = sharedResR.string.sync_add_new_backup_toolbar_title),
-                                        onClicked = {
-                                            Analytics.tracker.trackEvent(
-                                                AndroidBackupFABButtonPressedEvent
-                                            )
-                                            onBackupFolderClicked()
-                                        },
-                                    ),
-                                ),
-                                modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB),
-                                multiFabState = multiFabState,
-                                onStateChanged = { state ->
-                                    if (state == MultiFloatingActionButtonState.EXPANDED) {
-                                        Analytics.tracker.trackEvent(
-                                            AndroidSyncMultiFABButtonPressedEvent
-                                        )
-                                    }
-                                    multiFabState.value = state
-                                }
-                            )
-                        }
-                    }
+                    )
                 } else {
                     if (syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) {
                         MegaFloatingActionButton(
@@ -309,21 +291,7 @@ private fun SyncListScreenContent(
         SyncPermissionWarningBanner(
             syncPermissionsManager = syncPermissionsManager
         )
-        if (syncFoldersUiState.isFreeAccount && syncFoldersUiState.syncUiItems.isNotEmpty()) {
-            ActionBanner(
-                mainText = stringResource(id = sharedR.string.sync_error_banner_free_user),
-                leftActionText = stringResource(sharedR.string.general_upgrade_button),
-                leftActionClicked = {
-                    Analytics.tracker.trackEvent(SyncListBannerUpgradeButtonPressedEvent)
-                    onOpenUpgradeAccountClicked()
-                },
-                modifier = Modifier.padding(top = 20.dp)
-            )
-            MegaDivider(
-                dividerType = DividerType.FullSize,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-        } else if (syncFoldersUiState.isStorageOverQuota) {
+        if (syncFoldersUiState.isStorageOverQuota) {
             ActionBanner(
                 mainText = stringResource(sharedR.string.sync_error_storage_over_quota_banner_title),
                 leftActionText = stringResource(sharedR.string.general_upgrade_button),
@@ -356,7 +324,6 @@ private fun SyncListScreenContent(
             SelectedChipScreen(
                 addFolderClicked = addFolderClicked,
                 onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
-                upgradeAccountClicked = onOpenUpgradeAccountClicked,
                 stalledIssueDetailsClicked = stalledIssuesDetailsClicked,
                 onOpenMegaFolderClicked = onOpenMegaFolderClicked,
                 moreClicked = moreClicked,
@@ -413,7 +380,6 @@ private fun SelectedChipScreen(
     addFolderClicked: () -> Unit,
     onSelectStopBackupDestinationClicked: () -> Unit,
     onOpenMegaFolderClicked: (handle: Long) -> Unit,
-    upgradeAccountClicked: () -> Unit,
     stalledIssueDetailsClicked: (StalledIssueUiItem) -> Unit,
     moreClicked: (StalledIssueUiItem) -> Unit,
     issuesInfoClicked: () -> Unit,
@@ -431,7 +397,6 @@ private fun SelectedChipScreen(
             SyncFoldersRoute(
                 addFolderClicked = addFolderClicked,
                 onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
-                upgradeAccountClicked = upgradeAccountClicked,
                 issuesInfoClicked = issuesInfoClicked,
                 viewModel = syncFoldersViewModel,
                 uiState = syncFoldersUiState,

@@ -29,7 +29,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class SyncPromotionBottomSheetTest {
@@ -43,8 +42,6 @@ class SyncPromotionBottomSheetTest {
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeRule)
-
-    private val onUpgrade = mock<() -> Unit>()
 
     @Before
     fun setUp() {
@@ -80,14 +77,7 @@ class SyncPromotionBottomSheetTest {
     }
 
     @Test
-    fun `test that primary button is shown (free account)`() = runTest {
-        initComposeRule(isFreeAccount = true)
-        composeRule.onNodeWithText(context.getString(R.string.sync_promotion_bottom_sheet_primary_button_text_free))
-            .assertExists().assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that primary button is shown (non free account)`() = runTest {
+    fun `test that primary button is shown`() = runTest {
         initComposeRule()
         composeRule.onNodeWithText(context.getString(R.string.sync_promotion_bottom_sheet_primary_button_text_pro))
             .assertExists().assertIsDisplayed()
@@ -131,9 +121,7 @@ class SyncPromotionBottomSheetTest {
         }
     }
 
-    private fun initComposeRule(
-        isFreeAccount: Boolean = false,
-    ) {
+    private fun initComposeRule() {
         composeRule.setContent {
             modalSheetState = rememberModalBottomSheetState(
                 initialValue = ModalBottomSheetValue.Expanded,
@@ -149,9 +137,7 @@ class SyncPromotionBottomSheetTest {
                 modalSheetState = modalSheetState,
                 sheetBody = {
                     SyncPromotionBottomSheet(
-                        upgradeAccountClicked = onUpgrade,
                         onSyncNewFolderClicked = {},
-                        isFreeAccount = isFreeAccount,
                     )
                 },
                 expandedRoundedCorners = true,

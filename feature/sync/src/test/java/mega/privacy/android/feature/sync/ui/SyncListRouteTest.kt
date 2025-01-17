@@ -1,8 +1,6 @@
 package mega.privacy.android.feature.sync.ui
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -16,30 +14,21 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
-import mega.privacy.android.feature.sync.ui.synclist.SyncListMenuAction.Companion.ADD_NEW_SYNC_ACTION_TEST_TAG
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.feature.sync.ui.synclist.SyncListState
 import mega.privacy.android.feature.sync.ui.synclist.SyncListViewModel
-import mega.privacy.android.feature.sync.ui.synclist.TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
-import mega.privacy.android.feature.sync.ui.synclist.folders.TEST_TAG_SYNC_LIST_SCREEN_FAB
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesState
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesViewModel
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesState
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MULTI_FAB_MAIN_FAB_TEST_TAG
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MULTI_FAB_OPTION_ROW_TEST_TAG
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CANCEL_TAG
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CONFIRM_TAG
-import mega.privacy.android.shared.original.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.shared.resources.R
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
 import mega.privacy.mobile.analytics.event.AndroidBackupFABButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncMultiFABButtonPressedEvent
-import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogCancelButtonPressedEvent
-import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogDisplayedEvent
-import mega.privacy.mobile.analytics.event.SyncFeatureUpgradeDialogUpgradeButtonPressedEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -112,86 +101,14 @@ class SyncListRouteTest {
     }
 
     @Test
-    fun `test that click on FAB of the sync list on a free account displays the upgrade dialog`() {
-        setComposeContent()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_FAB).performClick()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG).assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that click on FAB of the sync list on a non free account doesn't display the upgrade dialog`() {
-        whenever(state.value).thenReturn(SyncListState(isFreeAccount = false))
-        setComposeContent()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_FAB).performClick()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG)
-            .assertIsNotDisplayed()
-    }
-
-    @Test
-    fun `test that click add new sync menu entry on a free account displays the upgrade dialog`() {
-        setComposeContent()
-        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
-        composeTestRule.onNodeWithTag(ADD_NEW_SYNC_ACTION_TEST_TAG).assertIsDisplayed()
-            .performClick()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG).assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that click add new sync menu entry on a non free account doesn't display the upgrade dialog`() {
-        whenever(state.value).thenReturn(SyncListState(isFreeAccount = false))
-        setComposeContent()
-        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
-        composeTestRule.onNodeWithTag(ADD_NEW_SYNC_ACTION_TEST_TAG).assertIsDisplayed()
-            .performClick()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG)
-            .assertIsNotDisplayed()
-    }
-
-    @Test
-    fun `test that display the upgrade dialog sends the right analytics tracker event`() {
-        setComposeContent()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_FAB).performClick()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG).assertIsDisplayed()
-        assertThat(analyticsRule.events).contains(SyncFeatureUpgradeDialogDisplayedEvent)
-
-        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE).performClick()
-        composeTestRule.onNodeWithTag(ADD_NEW_SYNC_ACTION_TEST_TAG).assertIsDisplayed()
-            .performClick()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG).assertIsDisplayed()
-        assertThat(analyticsRule.events).contains(SyncFeatureUpgradeDialogDisplayedEvent)
-    }
-
-    @Test
-    fun `test that click the confirm button of the upgrade dialog sends the right analytics tracker event`() {
-        setComposeContent()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_FAB).performClick()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(CONFIRM_TAG).assertIsDisplayed().performClick()
-        assertThat(analyticsRule.events).contains(SyncFeatureUpgradeDialogUpgradeButtonPressedEvent)
-    }
-
-    @Test
-    fun `test that click the cancel button of the upgrade dialog sends the right analytics tracker event`() {
-        setComposeContent()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_FAB).performClick()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_UPGRADE_DIALOG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(CANCEL_TAG).assertIsDisplayed().performClick()
-        assertThat(analyticsRule.events).contains(SyncFeatureUpgradeDialogCancelButtonPressedEvent)
-    }
-
-    @Test
     fun `test that tap on and expand the multi FAB sends the right analytics tracker event`() {
         whenever(state.value).thenReturn(
-            SyncListState(
-                isFreeAccount = false,
-                enabledFlags = setOf(SyncFeatures.BackupForAndroid),
-            )
+            SyncListState(enabledFlags = setOf(SyncFeatures.BackupForAndroid))
         )
         whenever(viewModel.state).thenReturn(state)
         whenever(syncFoldersUiState.value).thenReturn(
             SyncFoldersUiState(
                 syncUiItems = emptyList(),
-                isFreeAccount = false,
                 enabledFlags = setOf(SyncFeatures.BackupForAndroid),
             )
         )
@@ -203,16 +120,12 @@ class SyncListRouteTest {
     @Test
     fun `test that tap on Backup FAB sends the right analytics tracker event`() {
         whenever(state.value).thenReturn(
-            SyncListState(
-                isFreeAccount = false,
-                enabledFlags = setOf(SyncFeatures.BackupForAndroid),
-            )
+            SyncListState(enabledFlags = setOf(SyncFeatures.BackupForAndroid))
         )
         whenever(viewModel.state).thenReturn(state)
         whenever(syncFoldersUiState.value).thenReturn(
             SyncFoldersUiState(
                 syncUiItems = emptyList(),
-                isFreeAccount = false,
                 enabledFlags = setOf(SyncFeatures.BackupForAndroid),
             )
         )

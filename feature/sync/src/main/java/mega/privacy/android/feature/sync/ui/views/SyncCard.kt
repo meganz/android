@@ -65,7 +65,6 @@ internal fun SyncCard(
     onOpenDeviceFolderClicked: (String) -> Unit,
     onOpenMegaFolderClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
-    isFreeAccount: Boolean,
     @StringRes errorRes: Int?,
     deviceName: String,
     modifier: Modifier = Modifier,
@@ -114,7 +113,6 @@ internal fun SyncCard(
                 onOpenMegaFolderClicked = onOpenMegaFolderClicked,
                 isLowBatteryLevel = isLowBatteryLevel,
                 isError = errorRes != null,
-                isFreeAccount = isFreeAccount,
                 expanded = sync.expanded,
             )
         },
@@ -319,7 +317,6 @@ private fun SyncCardFooter(
     onOpenMegaFolderClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
     isError: Boolean,
-    isFreeAccount: Boolean,
     expanded: Boolean,
 ) {
     when {
@@ -380,7 +377,7 @@ private fun SyncCardFooter(
                 } else {
                     stringResource(id = R.string.sync_card_run_sync)
                 },
-                enabled = !isLowBatteryLevel && !isError && !isFreeAccount
+                enabled = !isLowBatteryLevel && !isError
             )
             MegaButtonWithIconAndText(
                 modifier = Modifier
@@ -428,7 +425,6 @@ private fun SyncCardExpandedPreview(
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
             isLowBatteryLevel = false,
-            isFreeAccount = false,
             errorRes = null,
             deviceName = "Device Name",
         )
@@ -463,7 +459,6 @@ private fun SyncCardExpandedWithBannerPreview(
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
             isLowBatteryLevel = false,
-            isFreeAccount = false,
             errorRes = sharedR.string.general_sync_active_sync_below_path,
             deviceName = "Device Name",
         )
@@ -498,7 +493,6 @@ private fun SyncCardCollapsedPreview(
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
             isLowBatteryLevel = false,
-            isFreeAccount = false,
             errorRes = null,
             deviceName = "Device Name",
         )
@@ -533,7 +527,6 @@ private fun SyncCardCollapsedWithBannerPreview(
             onOpenDeviceFolderClicked = {},
             onOpenMegaFolderClicked = {},
             isLowBatteryLevel = false,
-            isFreeAccount = false,
             errorRes = sharedR.string.general_sync_active_sync_below_path,
             deviceName = "Device Name",
         )

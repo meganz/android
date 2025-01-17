@@ -42,7 +42,6 @@ import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CO
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.TITLE_TAG
 import mega.privacy.mobile.analytics.event.SyncCardExpandedEvent
 import mega.privacy.mobile.analytics.event.SyncFoldersListDisplayedEvent
-import mega.privacy.mobile.analytics.event.SyncListEmptyStateUpgradeButtonPressedEvent
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -92,7 +91,6 @@ class SyncFoldersScreenTest {
                 viewModel = viewModel,
                 onSelectStopBackupDestinationClicked = {},
                 addFolderClicked = {},
-                upgradeAccountClicked = {},
                 issuesInfoClicked = {},
                 onOpenMegaFolderClicked = {},
                 uiState = syncFoldersUiState,
@@ -107,71 +105,9 @@ class SyncFoldersScreenTest {
     }
 
     @Test
-    fun `test that folders list empty state is properly displayed when there are no synced folders (free account)`() {
-        whenever(state.value).thenReturn(SyncFoldersUiState(emptyList()))
-        whenever(viewModel.uiState).thenReturn(state)
-        composeTestRule.setContent {
-            SyncFoldersRoute(
-                viewModel = viewModel,
-                addFolderClicked = {},
-                onSelectStopBackupDestinationClicked = {},
-                upgradeAccountClicked = {},
-                issuesInfoClicked = {},
-                uiState = SyncFoldersUiState(emptyList()),
-                snackBarHostState = SnackbarHostState(),
-                deviceName = "Device Name",
-                isBackupForAndroidEnabled = false,
-                onOpenMegaFolderClicked = {},
-            )
-        }
-
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW)
-            .assertDoesNotExist()
-        composeTestRule.onNodeWithTag(TAG_SYNC_LIST_SCREEN_NO_ITEMS)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON)
-            .assertIsDisplayed()
-            .assertTextEquals(context.getString(sharedResR.string.general_upgrade_now_label))
-    }
-
-    @Test
-    fun `test that folders list empty state is properly displayed when backup feature is enabled (free account)`() {
-        whenever(state.value).thenReturn(SyncFoldersUiState(emptyList()))
-        whenever(viewModel.uiState).thenReturn(state)
-        composeTestRule.setContent {
-            SyncFoldersRoute(
-                viewModel = viewModel,
-                addFolderClicked = {},
-                onSelectStopBackupDestinationClicked = {},
-                upgradeAccountClicked = {},
-                issuesInfoClicked = {},
-                uiState = SyncFoldersUiState(emptyList()),
-                snackBarHostState = SnackbarHostState(),
-                deviceName = "Device Name",
-                isBackupForAndroidEnabled = true,
-                onOpenMegaFolderClicked = {},
-            )
-        }
-
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_ITEM_VIEW)
-            .assertDoesNotExist()
-        composeTestRule.onNodeWithTag(TAG_SYNC_LIST_SCREEN_NO_ITEMS)
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_TEXT_FOR_FREE_ACCOUNTS)
-            .assertIsNotDisplayed()
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON)
-            .assertIsDisplayed()
-            .assertTextEquals(context.getString(sharedResR.string.device_center_sync_backup_see_upgrade_options_button_label))
-    }
-
-    @Test
-    fun `test that folders list empty state is properly displayed when there are no synced folders (non free account)`() {
+    fun `test that folders list empty state is properly displayed when there are no synced folders`() {
         whenever(state.value).thenReturn(
-            SyncFoldersUiState(
-                syncUiItems = emptyList(), isFreeAccount = false
-            )
+            SyncFoldersUiState(syncUiItems = emptyList())
         )
         whenever(viewModel.uiState).thenReturn(state)
         composeTestRule.setContent {
@@ -179,11 +115,8 @@ class SyncFoldersScreenTest {
                 viewModel = viewModel,
                 addFolderClicked = {},
                 onSelectStopBackupDestinationClicked = {},
-                upgradeAccountClicked = {},
                 issuesInfoClicked = {},
-                uiState = SyncFoldersUiState(
-                    syncUiItems = emptyList(), isFreeAccount = false
-                ),
+                uiState = SyncFoldersUiState(syncUiItems = emptyList()),
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = false,
@@ -201,11 +134,9 @@ class SyncFoldersScreenTest {
     }
 
     @Test
-    fun `test that folders list empty state is properly displayed when backup feature is enabled (non free account)`() {
+    fun `test that folders list empty state is properly displayed when backup feature is enabled`() {
         whenever(state.value).thenReturn(
-            SyncFoldersUiState(
-                syncUiItems = emptyList(), isFreeAccount = false
-            )
+            SyncFoldersUiState(syncUiItems = emptyList())
         )
         whenever(viewModel.uiState).thenReturn(state)
         composeTestRule.setContent {
@@ -213,11 +144,8 @@ class SyncFoldersScreenTest {
                 viewModel = viewModel,
                 addFolderClicked = {},
                 onSelectStopBackupDestinationClicked = {},
-                upgradeAccountClicked = {},
                 issuesInfoClicked = {},
-                uiState = SyncFoldersUiState(
-                    syncUiItems = emptyList(), isFreeAccount = false
-                ),
+                uiState = SyncFoldersUiState(syncUiItems = emptyList()),
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = true,
@@ -234,34 +162,9 @@ class SyncFoldersScreenTest {
     }
 
     @Test
-    fun `test that click the empty state button on a free account sends the right analytics tracker event`() {
-        whenever(state.value).thenReturn(SyncFoldersUiState(emptyList()))
-        whenever(viewModel.uiState).thenReturn(state)
-        composeTestRule.setContent {
-            SyncFoldersRoute(
-                viewModel = viewModel,
-                addFolderClicked = {},
-                onSelectStopBackupDestinationClicked = {},
-                upgradeAccountClicked = {},
-                issuesInfoClicked = {},
-                uiState = SyncFoldersUiState(emptyList()),
-                snackBarHostState = SnackbarHostState(),
-                deviceName = "Device Name",
-                isBackupForAndroidEnabled = false,
-                onOpenMegaFolderClicked = {},
-            )
-        }
-
-        composeTestRule.onNodeWithTag(TEST_TAG_SYNC_LIST_SCREEN_EMPTY_STATUS_BUTTON).performClick()
-        assertThat(analyticsRule.events).contains(SyncListEmptyStateUpgradeButtonPressedEvent)
-    }
-
-    @Test
     fun `test that click the empty state button on a non free account doesn't send any analytics tracker event`() {
         whenever(state.value).thenReturn(
-            SyncFoldersUiState(
-                syncUiItems = emptyList(), isFreeAccount = false
-            )
+            SyncFoldersUiState(syncUiItems = emptyList())
         )
         whenever(viewModel.uiState).thenReturn(state)
         composeTestRule.setContent {
@@ -269,11 +172,8 @@ class SyncFoldersScreenTest {
                 viewModel = viewModel,
                 addFolderClicked = {},
                 onSelectStopBackupDestinationClicked = {},
-                upgradeAccountClicked = {},
                 issuesInfoClicked = {},
-                uiState = SyncFoldersUiState(
-                    syncUiItems = emptyList(), isFreeAccount = false
-                ),
+                uiState = SyncFoldersUiState(syncUiItems = emptyList()),
                 snackBarHostState = SnackbarHostState(),
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = false,
@@ -294,15 +194,11 @@ class SyncFoldersScreenTest {
                 pauseRunClicked = {},
                 removeFolderClicked = {},
                 addFolderClicked = {},
-                upgradeAccountClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 isLoading = true,
-                showSyncsPausedErrorDialog = false,
-                onShowSyncsPausedErrorDialogDismissed = {},
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = false,
             )
@@ -384,15 +280,11 @@ class SyncFoldersScreenTest {
                 pauseRunClicked = {},
                 removeFolderClicked = {},
                 addFolderClicked = {},
-                upgradeAccountClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 isLoading = false,
-                showSyncsPausedErrorDialog = false,
-                onShowSyncsPausedErrorDialogDismissed = {},
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = false,
             )
@@ -421,15 +313,11 @@ class SyncFoldersScreenTest {
                 pauseRunClicked = {},
                 removeFolderClicked = {},
                 addFolderClicked = {},
-                upgradeAccountClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 isLoading = false,
-                showSyncsPausedErrorDialog = false,
-                onShowSyncsPausedErrorDialogDismissed = {},
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = false,
             )
@@ -459,15 +347,11 @@ class SyncFoldersScreenTest {
                 pauseRunClicked = {},
                 removeFolderClicked = {},
                 addFolderClicked = {},
-                upgradeAccountClicked = {},
                 issuesInfoClicked = {},
                 onOpenDeviceFolderClicked = {},
                 onOpenMegaFolderClicked = {},
                 isLowBatteryLevel = false,
-                isFreeAccount = false,
                 isLoading = false,
-                showSyncsPausedErrorDialog = false,
-                onShowSyncsPausedErrorDialogDismissed = {},
                 deviceName = "Device Name",
                 isBackupForAndroidEnabled = false,
             )

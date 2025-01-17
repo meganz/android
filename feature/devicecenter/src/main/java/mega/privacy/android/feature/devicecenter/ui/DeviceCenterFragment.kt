@@ -201,9 +201,6 @@ class DeviceCenterFragment : Fragment() {
                                 }
                             }
                         },
-                        onOpenUpgradeAccountClicked = {
-                            megaNavigator.openUpgradeAccount(requireContext())
-                        },
                     )
                     if (showBlankOverlay) {
                         Box(
