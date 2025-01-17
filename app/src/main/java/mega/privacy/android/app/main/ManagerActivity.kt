@@ -2915,6 +2915,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         replaceFragment: Boolean = false,
         @StringRes errorMessage: Int?,
     ) {
+        transfersManagementViewModel.hideTransfersWidget()
         // Remove the existing Media Discovery View first
         mediaDiscoveryFragment?.let { removeFragment(it) }
         MediaDiscoveryFragment.newInstance(
@@ -4110,7 +4111,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 && drawerItem !== DrawerItem.RUBBISH_BIN
                 && drawerItem !== DrawerItem.PHOTOS
                 && !isInImagesPage
-
+                && !isInMediaDiscovery()
 
     /**
      * Updates the transfers widget.
