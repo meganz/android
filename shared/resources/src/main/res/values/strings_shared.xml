@@ -918,4 +918,6 @@
     <string name="camera_settings_save_location_permission_denied">Allow MEGA to access this device’s location to continue</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
     <string name="sync_local_device_folder_currently_synced_message">This folder is already synced</string>
+    <!-- Warning message to indicate that cannot select a currently backed up folder -->
+    <string name="sync_local_device_folder_currently_backed_up_message">This folder is already backed up</string>
 </resources>

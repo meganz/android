@@ -137,7 +137,7 @@ internal class SyncNewFolderViewModelTest {
             listOf(
                 FolderPair(
                     id = 1234L,
-                    syncType = syncType,
+                    syncType = SyncType.TYPE_TWOWAY,
                     pairName = "Pair Name",
                     localFolderPath = localFolderPath,
                     remoteFolder = RemoteFolder(5678L, "Remote Folder"),
@@ -154,6 +154,44 @@ internal class SyncNewFolderViewModelTest {
             state.test {
                 val result = (awaitItem().showSnackbar as StateEventWithContentTriggered).content
                 assertThat(result).isEqualTo(sharedR.string.sync_local_device_folder_currently_synced_message)
+            }
+        }
+    }
+
+    @ParameterizedTest(name = "Sync type: {0}")
+    @MethodSource("syncTypeParameters")
+    fun `test that snackbar with warning message is displayed if try to select an already backed up local device folder`(
+        syncType: SyncType,
+    ) = runTest {
+        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
+        initViewModel(syncType = syncType)
+        val localFolderUri: Uri = mock()
+        val localDCIMFolderPath = "/storage/emulated/0/DCIM"
+        val localFolderPath = "/storage/emulated/0/Folder"
+        whenever(getLocalDCIMFolderPathUseCase.invoke()).thenReturn(
+            localDCIMFolderPath
+        )
+        whenever(getFolderPairsUseCase.invoke()).thenReturn(
+            listOf(
+                FolderPair(
+                    id = 1234L,
+                    syncType = SyncType.TYPE_BACKUP,
+                    pairName = "Pair Name",
+                    localFolderPath = localFolderPath,
+                    remoteFolder = RemoteFolder(5678L, "Remote Folder"),
+                    syncStatus = SyncStatus.SYNCED,
+                )
+            )
+        )
+        whenever(localFolderUri.path).thenReturn(localFolderPath)
+        whenever(localFolderUri.scheme).thenReturn("file")
+
+        underTest.handleAction(SyncNewFolderAction.LocalFolderSelected(localFolderUri))
+
+        with(underTest) {
+            state.test {
+                val result = (awaitItem().showSnackbar as StateEventWithContentTriggered).content
+                assertThat(result).isEqualTo(sharedR.string.sync_local_device_folder_currently_backed_up_message)
             }
         }
     }

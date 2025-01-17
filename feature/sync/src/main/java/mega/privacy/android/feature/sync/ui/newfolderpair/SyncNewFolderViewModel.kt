@@ -81,6 +81,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                 viewModelScope.launch {
                     action.path.toFile().absolutePath.let { path ->
                         val localDCIMFolderPath = getLocalDCIMFolderPathUseCase()
+                        val folderPairs = getFolderPairsUseCase()
                         when {
                             localDCIMFolderPath.isNotEmpty() && path.contains(localDCIMFolderPath) -> {
                                 _state.update { state ->
@@ -88,9 +89,19 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                                 }
                             }
 
-                            getFolderPairsUseCase().any { it.localFolderPath == path } -> {
-                                _state.update { state ->
-                                    state.copy(showSnackbar = triggered(sharedR.string.sync_local_device_folder_currently_synced_message))
+                            folderPairs.any { it.localFolderPath == path } -> {
+                                when (folderPairs.first { it.localFolderPath == path }.syncType) {
+                                    SyncType.TYPE_BACKUP -> {
+                                        _state.update { state ->
+                                            state.copy(showSnackbar = triggered(sharedR.string.sync_local_device_folder_currently_backed_up_message))
+                                        }
+                                    }
+
+                                    else -> {
+                                        _state.update { state ->
+                                            state.copy(showSnackbar = triggered(sharedR.string.sync_local_device_folder_currently_synced_message))
+                                        }
+                                    }
                                 }
                             }
 
