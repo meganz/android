@@ -149,10 +149,6 @@ internal fun SyncListRoute(
         actions = prepareMenuActions(state),
         onActionPressed = {
             when (it) {
-                is SyncListMenuAction.AddNewSync -> {
-                    onSyncFolderClicked()
-                }
-
                 is SyncListMenuAction.ClearSyncOptions -> {
                     Analytics.tracker.trackEvent(AndroidSyncClearResolvedIssuesEvent)
                     viewModel.onClearSyncOptionsPressed()
@@ -180,7 +176,6 @@ internal fun SyncListRoute(
 
 private fun prepareMenuActions(state: SyncListState): List<MenuAction> {
     val menuActionList = mutableListOf<MenuAction>()
-    menuActionList.add(SyncListMenuAction.AddNewSync)
     if (state.shouldShowCleanSolvedIssueMenuItem) {
         menuActionList.add(SyncListMenuAction.ClearSyncOptions)
     }
