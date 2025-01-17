@@ -7,25 +7,22 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import androidx.preference.PreferenceManager
-import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.LegacyDatabaseMigrationImpl
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.nav.MegaNavigatorImpl
-import mega.privacy.android.app.utils.FileWrapper
 import mega.privacy.android.data.database.LegacyDatabaseMigration
+import mega.privacy.android.data.filewrapper.FileWrapper
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.DefaultGetThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.domain.usecase.transfers.GetFileDescriptorWrapperFromUriPathUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -39,10 +36,9 @@ class AppModule {
     @Provides
     fun provideMegaApi(
         @ApplicationContext context: Context,
-        @IoDispatcher ioDispatcher: CoroutineDispatcher,
-        getFileDescriptorWrapperFromUriPathUseCase: GetFileDescriptorWrapperFromUriPathUseCase,
+        fileGateway: FileGateway,
     ): MegaApiAndroid {
-        FileWrapper.initializeFactory(getFileDescriptorWrapperFromUriPathUseCase, ioDispatcher)
+        FileWrapper.initializeFactory(fileGateway)
         val packageInfo: PackageInfo
         var path: String? = null
         try {

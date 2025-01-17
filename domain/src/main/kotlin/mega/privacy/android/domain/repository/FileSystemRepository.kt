@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
-import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
@@ -450,24 +449,6 @@ interface FileSystemRepository {
     suspend fun getDocumentEntities(uris: List<UriPath>): List<DocumentEntity>
 
     /**
-     * Get a [DocumentMetadata] from an [UriPath] or null if the document doesn't exist
-     *
-     * Note that this fun is synchronous and must only be used in contexts where there is really
-     * no other option. For all other cases, create an asynchronous version.
-     */
-    fun getDocumentMetadataSync(uriPath: UriPath): DocumentMetadata?
-
-    /**
-     * Get the list of [UriPath]s that are direct children of the given [UriPath]
-     *
-     * Note that this fun is synchronous and must only be used in contexts where there is really
-     * no other option. For all other cases, create an asynchronous version.
-     *
-     * @return the list of [UriPath]s that are direct children of the [uriPath] or empty list if [uriPath] doesn't represent a folder or it's empty
-     */
-    fun getFolderChildUriPathsSync(uriPath: UriPath): List<UriPath>
-
-    /**
      * Get file from uri
      *
      * @param uri
@@ -498,15 +479,4 @@ interface FileSystemRepository {
      * Deletes the file given the content URI.
      */
     suspend fun deleteFileFromSdCardContentUri(fileContentUri: String): Boolean
-
-    /**
-     * Get the detached native fd from the given uriPath. You are now responsible for closing the fd in native
-     * code.
-     *
-     * Note that this fun is synchronous and must only be used in contexts where there is really
-     * no other option. For all other cases, create an asynchronous version.
-     *
-     * @param writePermission true if write permission is needed, false if only read permission is needed
-     */
-    fun getDetachedFileDescriptorSync(uriPath: UriPath, writePermission: Boolean): Int?
 }

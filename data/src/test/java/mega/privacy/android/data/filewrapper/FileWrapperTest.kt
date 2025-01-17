@@ -1,4 +1,4 @@
-package mega.privacy.android.app.utils
+package mega.privacy.android.data.filewrapper
 
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat

@@ -2,7 +2,6 @@ package mega.privacy.android.data.repository
 
 import android.content.Context
 import android.net.Uri
-import android.os.ParcelFileDescriptor
 import androidx.documentfile.provider.DocumentFile
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
@@ -24,7 +23,6 @@ import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
-import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -421,7 +419,7 @@ internal class FileSystemRepositoryImplTest {
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
     fun `test that deleteFileByUri deletes the file correctly`(expected: Boolean) = runTest {
-        Mockito.mockStatic(Uri::class.java).use { _ ->
+        mockStatic(Uri::class.java).use { _ ->
             val testUri = "file://test/file/path"
             val uri = mock<Uri>()
             whenever(Uri.parse(testUri)).thenReturn(uri)
@@ -523,60 +521,5 @@ internal class FileSystemRepositoryImplTest {
         )
 
         assertThat(result).isEqualTo(newFile)
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that file descriptor from gateway is returned with correct parameters when getFileDescriptor is invoked`(
-        writePermission: Boolean,
-    ) = runTest {
-        val expected = 354
-        val parcelFileDescriptor = mock<ParcelFileDescriptor> {
-            on { detachFd() } doReturn expected
-        }
-        val uriPath = UriPath("file://test/file/path.txt")
-        whenever(fileGateway.getFileDescriptorSync(uriPath, writePermission)) doReturn
-                parcelFileDescriptor
-
-        val actual = underTest.getDetachedFileDescriptorSync(uriPath, writePermission)
-
-        assertThat(actual).isEqualTo(expected)
-    }
-
-    @Test
-    fun `test that getDocumentMetadata returns correct value from gateway`() = runTest {
-        mockStatic(Uri::class.java).use {
-            val uriPath = UriPath("file://test/file/path.txt")
-            val expected = mock<DocumentMetadata>()
-            val uri = mock<Uri> {
-                on { scheme } doReturn "file"
-            }
-            whenever(Uri.parse(uriPath.value)) doReturn uri
-            whenever(fileGateway.getDocumentMetadataSync(uri)) doReturn expected
-
-            val actual = underTest.getDocumentMetadataSync(uriPath)
-
-            assertThat(actual).isEqualTo(expected)
-        }
-    }
-
-    @Test
-    fun `test that getFolderChildUriPaths returns correct value from gateway`() = runTest {
-        mockStatic(Uri::class.java).use {
-            val uriPath = UriPath("file://test/file/path")
-            val expected = UriPath("file://child.txt")
-            val result = mock<Uri> {
-                on { toString() } doReturn expected.value
-            }
-            val uri = mock<Uri> {
-                on { scheme } doReturn "file"
-            }
-            whenever(Uri.parse(uriPath.value)) doReturn uri
-            whenever(fileGateway.getFolderChildUrisSync(uri)) doReturn listOf(result)
-
-            val actual = underTest.getFolderChildUriPathsSync(uriPath)
-
-            assertThat(actual).containsExactly(expected)
-        }
     }
 }

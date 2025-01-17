@@ -24,7 +24,6 @@ import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
-import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NullFileException
@@ -433,13 +432,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileGateway.getDocumentEntities(uris.map { Uri.parse(it.value) })
         }
 
-    override fun getDocumentMetadataSync(uriPath: UriPath): DocumentMetadata? =
-        fileGateway.getDocumentMetadataSync(uriPath.toUri())
-
-    override fun getFolderChildUriPathsSync(uriPath: UriPath): List<UriPath> =
-        fileGateway.getFolderChildUrisSync(uriPath.toUri())
-            .map { UriPath(it.toString()) }
-
     override suspend fun getFileFromUri(uri: UriPath): File? = withContext(ioDispatcher) {
         fileGateway.getFileFromUri(Uri.parse(uri.value))?.also {
             Timber.d("getFileFromUri uri: $uri, file path: $it")
@@ -470,9 +462,4 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         Uri.parse(fileContentUri)?.let { uri ->
             documentFileWrapper.fromSingleUri(uri)?.delete() ?: false
         } ?: false
-
-    override fun getDetachedFileDescriptorSync(
-        uriPath: UriPath,
-        writePermission: Boolean,
-    ) = fileGateway.getFileDescriptorSync(uriPath, writePermission)?.detachFd()
 }
