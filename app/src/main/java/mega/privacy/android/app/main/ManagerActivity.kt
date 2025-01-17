@@ -918,7 +918,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             ViewCompat.onApplyWindowInsets(freePlanLimitParticipantsDialogComposeView, windowInsets)
             findViewById<LinearLayout>(R.id.fragment_layout).updatePadding(bottom = insets.bottom)
             // Set minimum height so that system bar padding is there when both bottom nav and ads are hidden
-            findViewById<LinearLayout>(R.id.bottom_navigation_container).minimumHeight = insets.bottom
+            findViewById<LinearLayout>(R.id.bottom_navigation_container).minimumHeight =
+                insets.bottom
             // Adjust the ads container height to add system bar insets bottom padding
             adsContainerView.updateLayoutParams<LinearLayout.LayoutParams> {
                 height = resources.getDimensionPixelSize(
@@ -4873,13 +4874,20 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                             lifecycle.withStarted {
                                 if (isAccessedFolderExited()) {
                                     resetIsAccessedFolderExited()
-                                    // Remove Cloud Drive and go back to Device Center
                                     if (isCloudDriveSyncsFeatureActive) {
-                                        removeFragment(cloudDriveSyncsFragment)
+                                        if (fileBrowserViewModel.isSyncFolderOpen()) {
+                                            //user is navigating to cloud drive from device fragment
+                                            // Remove Cloud Drive and go back to Device Center
+                                            removeFragment(cloudDriveSyncsFragment)
+                                            selectDrawerItem(DrawerItem.DEVICE_CENTER)
+                                        }
+                                        // user navigates from sync tab so need to remove cloud drive fragment
                                     } else {
+                                        //user is navigating to cloud drive from device fragment
+                                        // Remove Cloud Drive and go back to Device Center
                                         removeFragment(fileBrowserComposeFragment)
+                                        selectDrawerItem(DrawerItem.DEVICE_CENTER)
                                     }
-                                    selectDrawerItem(DrawerItem.DEVICE_CENTER)
                                 }
                             }
                         }

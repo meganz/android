@@ -172,6 +172,12 @@ class CloudDriveSyncsFragment : Fragment() {
     @Inject
     lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
 
+    /**
+     * App Navigator
+     */
+    @Inject
+    lateinit var appNavigator: MegaNavigator
+
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
@@ -303,6 +309,7 @@ class CloudDriveSyncsFragment : Fragment() {
                             verticalAlignment = Alignment.Top,
                             userScrollEnabled = isTabShown,
                         ) { page: Int ->
+                            val activity = LocalContext.current.findActivity() as AppCompatActivity
                             when (page) {
                                 CloudDriveTab.CLOUD.position -> {
                                     CloudDriveTab(
@@ -336,9 +343,11 @@ class CloudDriveSyncsFragment : Fragment() {
                                         },
                                         onOpenMegaFolderClicked = {
                                             coroutineScope.launch {
-                                                fileBrowserViewModel.openFileBrowserWithSpecificNode(
-                                                    it,
-                                                    errorMessage = null
+                                                appNavigator.openNodeInCloudDrive(
+                                                    activity,
+                                                    nodeHandle = it,
+                                                    errorMessage = null,
+                                                    isFromSyncFolders = false
                                                 )
                                                 pagerState.scrollToPage(CloudDriveTab.CLOUD.position)
                                             }
