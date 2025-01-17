@@ -455,11 +455,14 @@ pipeline {
                         }
                     }
 
+                    def parameters = parseDeliverAppStoreParameters(env.gitlabTriggerPhrase)
+                    def rolloutPercentage = parameters[0]
+
                     // Upload the AAB to Google Play
                     androidApkUpload googleCredentialsId: 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL',
                             filesPattern: 'archive/*-gms-release.aab',
                             trackName: 'alpha',
-                            rolloutPercentage: '100',
+                            rolloutPercentage: rolloutPercentage,
                             additionalVersionCodes: '233140859',
                             nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOLS_FILE}",
                             recentChangeList: common.getRecentChangeList(RELEASE_NOTES_CONTENT),
@@ -751,6 +754,40 @@ private def parseCreateJiraVersionParameters(String fullCommand) {
     return [releaseVersion, releaseDate]
 }
 
+/**
+ * parse the parameters of 'deliver_appStore' command
+ * If `--rollout` is not provided, default to 100% rollout. Otherwise, use the provided value.
+ * @param fullCommand
+ * @return
+ */
+private def parseDeliverAppStoreParameters(String fullCommand) {
+    println("Parsing deliver_appStore parameters")
+    String[] parameters = fullCommand.split("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*\$)")
+
+    String paramRollout = "rollout"
+    Options options = new Options()
+    Option releaseVersionOption = Option
+            .builder(paramRollout)
+            .longOpt(paramRollout)
+            .argName("Rollout Percentage")
+            .hasArg()
+            .required(false)
+            .desc("Rollout percentage of the release")
+            .build()
+    options.addOption(releaseVersionOption)
+
+    CommandLineParser commandLineParser = new DefaultParserWrapper()
+    CommandLine commandLine = commandLineParser.parse(options, parameters)
+
+    String rolloutPercentage = "100"  //default to 100% rollout
+    if (commandLine.hasOption(paramRollout)) {
+        rolloutPercentage = commandLine.getOptionValue(paramRollout)
+    }
+    println("rolloutPercentage: $rolloutPercentage")
+
+    return [rolloutPercentage]
+}
+
 private def parseSendCodeFreezeReminderParameters(String fullCommand) {
     println("Parsing createJiraVersion parameters")
     String[] parameters = fullCommand.split("\\s+(?=([^\"]*\"[^\"]*\")*[^\"]*\$)")
@@ -812,7 +849,7 @@ private boolean isMajorRelease(Object common) {
 private boolean triggeredByDeliverAppStore() {
     return isOnReleaseBranch() &&
             env.gitlabTriggerPhrase != null &&
-            env.gitlabTriggerPhrase == "deliver_appStore"
+            env.gitlabTriggerPhrase.trim().startsWith("deliver_appStore")
 }
 
 /**
