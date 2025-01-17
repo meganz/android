@@ -85,10 +85,10 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
-import mega.privacy.android.app.presentation.node.model.NodeActionState
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.presentation.settings.model.StorageTargetPreference
+import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -181,6 +181,7 @@ class CloudDriveSyncsFragment : Fragment() {
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
+    private val transfersManagementViewModel: TransfersManagementViewModel by activityViewModels()
 
     private var tempNodeIds: List<NodeId> = listOf()
 
@@ -317,7 +318,6 @@ class CloudDriveSyncsFragment : Fragment() {
                                         snackbarHostState = snackbarHostState,
                                         coroutineScope = coroutineScope,
                                         fileTypeIconMapper = fileTypeIconMapper,
-                                        nodeActionState = nodeActionState,
                                         onClickedFile = {
                                             clickedFile = it
                                         }
@@ -351,10 +351,38 @@ class CloudDriveSyncsFragment : Fragment() {
                                                 )
                                                 pagerState.scrollToPage(CloudDriveTab.CLOUD.position)
                                             }
+                                        },
+                                        onFabExpanded = { isExpanded ->
+                                            if (isExpanded) {
+                                                transfersManagementViewModel.hideTransfersWidget()
+                                            } else {
+                                                transfersManagementViewModel.showTransfersWidget()
+                                            }
                                         }
                                     )
                                 }
                             }
+                        }
+
+                        StartTransferComponent(
+                            uiState.downloadEvent,
+                            {
+                                fileBrowserViewModel.consumeDownloadEvent()
+                                disableSelectMode()
+                            },
+                            snackBarHostState = snackbarHostState,
+                            navigateToStorageSettings = {
+                                megaNavigator.openSettings(
+                                    requireActivity(),
+                                    StorageTargetPreference
+                                )
+                            },
+                        )
+                        EventEffect(
+                            event = nodeActionState.downloadEvent,
+                            onConsumed = nodeActionsViewModel::markDownloadEventConsumed
+                        ) {
+                            fileBrowserViewModel.onDownloadFileTriggered(it)
                         }
                     }
                 }
@@ -398,7 +426,6 @@ class CloudDriveSyncsFragment : Fragment() {
         snackbarHostState: SnackbarHostState,
         coroutineScope: CoroutineScope,
         fileTypeIconMapper: FileTypeIconMapper,
-        nodeActionState: NodeActionState,
         onClickedFile: (TypedFileNode) -> Unit,
     ) {
         FileBrowserComposeView(
@@ -462,26 +489,6 @@ class CloudDriveSyncsFragment : Fragment() {
             },
             fileTypeIconMapper = fileTypeIconMapper
         )
-        StartTransferComponent(
-            uiState.downloadEvent,
-            {
-                fileBrowserViewModel.consumeDownloadEvent()
-                disableSelectMode()
-            },
-            snackBarHostState = snackbarHostState,
-            navigateToStorageSettings = {
-                megaNavigator.openSettings(
-                    requireActivity(),
-                    StorageTargetPreference
-                )
-            },
-        )
-        EventEffect(
-            event = nodeActionState.downloadEvent,
-            onConsumed = nodeActionsViewModel::markDownloadEventConsumed
-        ) {
-            fileBrowserViewModel.onDownloadFileTriggered(it)
-        }
     }
 
     /**

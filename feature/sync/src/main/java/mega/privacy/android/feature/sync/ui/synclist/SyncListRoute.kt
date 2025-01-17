@@ -52,7 +52,8 @@ fun SyncListRoute(
     onOpenUpgradeAccountClicked: () -> Unit,
     isInCloudDrive: Boolean = false,
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
-    onOpenMegaFolderClicked: (Long) -> Unit
+    onFabExpanded: (Boolean) -> Unit = {},
+    onOpenMegaFolderClicked: (Long) -> Unit,
 ) {
     val fragmentActivity = LocalContext.current.findFragmentActivity()
     val viewModelStoreOwner =
@@ -70,7 +71,8 @@ fun SyncListRoute(
         isInCloudDrive = isInCloudDrive,
         viewModel = hiltViewModel(),
         selectedChip = selectedChip,
-        onOpenMegaFolderClicked = onOpenMegaFolderClicked
+        onOpenMegaFolderClicked = onOpenMegaFolderClicked,
+        onFabExpanded = onFabExpanded
     )
 }
 
@@ -88,6 +90,7 @@ internal fun SyncListRoute(
     isInCloudDrive: Boolean = false,
     viewModel: SyncListViewModel = hiltViewModel(),
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
+    onFabExpanded: (Boolean) -> Unit = {}
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -163,6 +166,7 @@ internal fun SyncListRoute(
         syncStalledIssuesViewModel = syncStalledIssuesViewModel,
         syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
         selectedChip = selectedChip,
+        onFabExpanded = onFabExpanded
     )
 
     LaunchedEffect(key1 = state.snackbarMessage) {

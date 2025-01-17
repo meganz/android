@@ -67,6 +67,7 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
@@ -2058,12 +2059,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 val shouldVisible = it == CloudDriveTab.CLOUD
                 searchMenuItem?.isVisible = shouldVisible
                 openLinkMenuItem?.isVisible = shouldVisible
-                fabButton.isVisible = shouldVisible
-                if (shouldVisible) {
-                    transfersManagementViewModel.showTransfersWidget()
-                } else {
-                    transfersManagementViewModel.hideTransfersWidget()
-                }
+                fabButton.isInvisible = !shouldVisible
             }
             Timber.d("Current Tab $it")
         }

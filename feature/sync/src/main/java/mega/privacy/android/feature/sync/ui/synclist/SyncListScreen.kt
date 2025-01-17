@@ -20,6 +20,7 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -95,6 +96,7 @@ internal fun SyncListScreen(
     title: String,
     isInCloudDrive: Boolean = false,
     selectedChip: SyncChip = SYNC_FOLDERS,
+    onFabExpanded: (Boolean) -> Unit = {},
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -156,6 +158,12 @@ internal fun SyncListScreen(
         }
 
         val multiFabState = rememberMultiFloatingActionButtonState()
+
+        DisposableEffect(multiFabState.value) {
+            onFabExpanded(multiFabState.value == MultiFloatingActionButtonState.EXPANDED)
+            onDispose { }
+        }
+
         MegaScaffold(
             scaffoldState = scaffoldState,
             topBar = {
@@ -200,9 +208,11 @@ internal fun SyncListScreen(
                                     AndroidSyncMultiFABButtonPressedEvent
                                 )
                             }
-                            multiFabState.value = state
-                        }
-                    )
+                            onFabExpanded(state == MultiFloatingActionButtonState.EXPANDED)
+                                    multiFabState.value = state
+                                }
+                            )
+
                 } else {
                     if (syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) {
                         MegaFloatingActionButton(
