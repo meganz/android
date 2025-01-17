@@ -32,7 +32,7 @@ internal class IsScanFilenameValidUseCaseTest {
     }
 
     @ParameterizedTest(name = "invalid character: {0}")
-    @ValueSource(strings = ["/", ":", "?", "\"", "*", "<", ">", "|"])
+    @ValueSource(strings = ["/", "\\", ":", "?", "\"", "*", "<", ">", "|"])
     fun `test that the filename is invalid when it contains any of the invalid characters`(character: String) =
         runTest {
             val filename = "Filename$character"

@@ -8,14 +8,15 @@ import javax.inject.Inject
  * The filename is invalid if it is empty, only has whitespaces, or contains any of the following
  * characters:
  *
- * 1. A forward slash /
- * 2. A colon :
- * 3. A question mark ?
- * 4. A double quote "
- * 5. An asterisk *
- * 6. A less than symbol <
- * 7. A greater than symbol >
- * 8. A pipe symbol |
+ *  1. A forward slash /
+ *  2. A back slash \
+ *  3. A colon :
+ *  4. A question mark ?
+ *  5. A double quote "
+ *  6. An asterisk *
+ *  7. A less than symbol <
+ *  8. A greater than symbol >
+ *  9. A pipe symbol |
  */
 class IsScanFilenameValidUseCase @Inject constructor() {
 
@@ -26,5 +27,5 @@ class IsScanFilenameValidUseCase @Inject constructor() {
      * @return true if the filename does not contain any of the characters specified in the [Regex]
      */
     operator fun invoke(filename: String) =
-        filename.isNotBlank() && !Regex("""["*/:<>?|]""").containsMatchIn(filename)
+        filename.isNotBlank() && !Regex("""["*/:<>?|\\]""").containsMatchIn(filename)
 }

@@ -22,5 +22,5 @@ enum class SaveScannedDocumentsSnackbarMessageUiItem(
     /**
      * The filename of the Scan/s to be uploaded contains invalid characters
      */
-    FilenameWithInvalidCharacters(R.string.scan_snackbar_invalid_characters, "\" * / : < > ? |"),
+    FilenameWithInvalidCharacters(R.string.scan_snackbar_invalid_characters, "\" * / : < > ? \\ |"),
 }
