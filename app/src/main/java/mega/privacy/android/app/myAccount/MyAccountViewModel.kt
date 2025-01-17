@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -41,7 +40,6 @@ import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
-import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
@@ -780,19 +778,20 @@ class MyAccountViewModel @Inject constructor(
 
     /**
      * Logout
-     *
-     * @param context
      */
-    fun logout(context: Context) {
+    fun logout() {
         viewModelScope.launch {
             runCatching { checkPasswordReminderUseCase(true) }
                 .onSuccess { show ->
                     if (show) {
-                        context.startActivity(
-                            Intent(context, TestPasswordActivity::class.java)
-                                .putExtra("logout", true)
-                        )
-                    } else logout()
+                        _state.update {
+                            it.copy(openTestPasswordScreenEvent = true)
+                        }
+                    } else {
+                        _state.update {
+                            it.copy(showLogoutConfirmationDialog = true)
+                        }
+                    }
                 }.onFailure { error ->
                     Timber.e(error, "Error when killing sessions")
                 }
@@ -1350,20 +1349,6 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Logout
-     *
-     * logs out the user from mega application and navigates to login activity
-     * logic is handled at [MegaChatRequestHandler] onRequestFinished callback
-     */
-    private fun logout() = viewModelScope.launch {
-        runCatching {
-            logoutUseCase()
-        }.onFailure {
-            Timber.d("Error on logout $it")
-        }
-    }
-
-    /**
      * Reset shouldNavigateToSmsVerification state
      */
     fun onNavigatedToSmsVerification() {
@@ -1402,4 +1387,22 @@ class MyAccountViewModel @Inject constructor(
      */
     fun isProSubscription(): Boolean =
         state.value.isProSubscription
+
+    /**
+     * Dismiss logout confirmation dialog
+     */
+    fun dismissLogoutConfirmationDialog() {
+        _state.update {
+            it.copy(showLogoutConfirmationDialog = false)
+        }
+    }
+
+    /**
+     * Reset open test password screen event
+     */
+    fun resetOpenTestPasswordScreenEvent() {
+        _state.update {
+            it.copy(openTestPasswordScreenEvent = false)
+        }
+    }
 }

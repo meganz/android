@@ -34,6 +34,8 @@ import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
  * @property subscriptionDetails  subscription details, including the subscription type, subscription cycle and expiration date
  * @property accountType The type of the account
  * @property storageState The current state of the storage
+ * @property showLogoutConfirmationDialog true if the logout confirmation dialog should be shown
+ * @property openTestPasswordScreenEvent true if the Test Password screen should be opened
  */
 data class MyAccountUiState(
     val isFileVersioningEnabled: Boolean = true,
@@ -57,5 +59,7 @@ data class MyAccountUiState(
     val isProSubscription: Boolean = false,
     val subscriptionDetails: AccountLevelDetail? = null,
     val accountType: AccountType = AccountType.FREE,
-    val storageState: StorageState = StorageState.Unknown
+    val storageState: StorageState = StorageState.Unknown,
+    val showLogoutConfirmationDialog: Boolean = false,
+    val openTestPasswordScreenEvent: Boolean = false,
 )

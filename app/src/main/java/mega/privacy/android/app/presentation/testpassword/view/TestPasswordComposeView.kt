@@ -123,126 +123,9 @@ import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import java.io.File
 
-internal object Constants {
-    /**
-     * Test tag for message SnackBar
-     */
-    const val SNACKBAR_TAG = "snackbar_test_tag"
-
-    /**
-     * Test tag for password reminder layout
-     */
-    const val PASSWORD_REMINDER_LAYOUT_TAG = "password_layout_test_tag"
-
-    /**
-     * Test tag for test password layout
-     */
-    const val TEST_PASSWORD_LAYOUT_TAG = "test_password_layout_test_tag"
-
-    /**
-     * Test tag for test password app bar
-     */
-    const val TEST_PASSWORD_APP_BAR_TAG = "test_password_app_bar_tag"
-
-    /**
-     * Test tag for password reminder app bar
-     */
-    const val PASSWORD_REMINDER_APP_BAR_TAG = "test_password_app_bar_tag"
-
-    /**
-     * Test tag for close button
-     */
-    const val CLOSE_BUTTON_TAG = "close_button_tag"
-
-    /**
-     * Test tag for progress loading
-     */
-    const val PROGRESS_LOADING_TAG = "progress_loading_tag"
-
-    /**
-     * Test tag for test password button
-     */
-    const val TEST_PASSWORD_BUTTON_TAG = "test_password_button_tag"
-
-    /**
-     * Test tag for confirm password button
-     */
-    const val CONFIRM_BUTTON_TAG = "confirm_button_tag"
-
-    /**
-     * Test tag for test backup button
-     */
-    const val BACKUP_BUTTON_TAG = "backup_button_tag"
-
-    /**
-     * Test tag for test backup button
-     */
-    const val DISMISS_BUTTON_TAG = "dismiss_button_tag"
-
-    /**
-     * Test tag for password reminder description
-     */
-    const val PASSWORD_REMINDER_DESC_TAG = "password_reminder_desc_tag"
-
-    /**
-     * Test tag for password reminder  dismiss button
-     */
-    const val PASSWORD_REMINDER_DISMISS_BUTTON_TAG = "password_reminder_dismiss_button_tag"
-
-    /**
-     * Test tag for password text field
-     */
-    const val PASSWORD_TEXT_FIELD_TAG = "password_text_field_tag"
-
-    /**
-     * Test tag for password text field footer
-     */
-    const val PASSWORD_TEXT_FIELD_FOOTER_TAG = "password_text_field_footer_tag"
-
-    /**
-     * Test tag for password text field footer icon
-     */
-    const val PASSWORD_TEXT_FIELD_FOOTER_ICON_TAG = "password_text_field_footer_icon_tag"
-
-    /**
-     * Test tag for proceed to logout button
-     */
-    const val PROCEED_TO_LOGOUT_BUTTON_TAG = "proceed_to_logout_button_tag"
-
-    /**
-     * Test tag for see password icon
-     */
-    const val SEE_PASSWORD_TEST_TAG = "see_password_test_tag"
-
-    /**
-     * Test tag for see bottom sheet title
-     * @see RecoveryKeyBottomSheet
-     */
-    const val BOTTOM_SHEET_TITLE = "bottom_sheet_title"
-
-    /**
-     * Test tag for see bottom sheet print menu
-     * @see RecoveryKeyBottomSheet
-     */
-    const val BOTTOM_SHEET_PRINT = "bottom_sheet_print"
-
-    /**
-     * Test tag for see bottom sheet copy menu
-     * @see RecoveryKeyBottomSheet
-     */
-    const val BOTTOM_SHEET_COPY = "bottom_sheet_copy"
-
-    /**
-     * Test tag for see bottom sheet save menu
-     * @see RecoveryKeyBottomSheet
-     */
-    const val BOTTOM_SHEET_SAVE = "bottom_sheet_save"
-}
-
 /**
  * Test Password Feature in Jetpack Compose
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun TestPasswordComposeView(
     uiState: TestPasswordUIState,
@@ -1014,4 +897,120 @@ private fun TestPasswordComposeViewPreview() {
             onPrintRecoveryKeyCompleted = {},
         )
     }
+}
+
+internal object Constants {
+    /**
+     * Test tag for message SnackBar
+     */
+    const val SNACKBAR_TAG = "snackbar_test_tag"
+
+    /**
+     * Test tag for password reminder layout
+     */
+    const val PASSWORD_REMINDER_LAYOUT_TAG = "password_layout_test_tag"
+
+    /**
+     * Test tag for test password layout
+     */
+    const val TEST_PASSWORD_LAYOUT_TAG = "test_password_layout_test_tag"
+
+    /**
+     * Test tag for test password app bar
+     */
+    const val TEST_PASSWORD_APP_BAR_TAG = "test_password_app_bar_tag"
+
+    /**
+     * Test tag for password reminder app bar
+     */
+    const val PASSWORD_REMINDER_APP_BAR_TAG = "test_password_app_bar_tag"
+
+    /**
+     * Test tag for close button
+     */
+    const val CLOSE_BUTTON_TAG = "close_button_tag"
+
+    /**
+     * Test tag for progress loading
+     */
+    const val PROGRESS_LOADING_TAG = "progress_loading_tag"
+
+    /**
+     * Test tag for test password button
+     */
+    const val TEST_PASSWORD_BUTTON_TAG = "test_password_button_tag"
+
+    /**
+     * Test tag for confirm password button
+     */
+    const val CONFIRM_BUTTON_TAG = "confirm_button_tag"
+
+    /**
+     * Test tag for test backup button
+     */
+    const val BACKUP_BUTTON_TAG = "backup_button_tag"
+
+    /**
+     * Test tag for test backup button
+     */
+    const val DISMISS_BUTTON_TAG = "dismiss_button_tag"
+
+    /**
+     * Test tag for password reminder description
+     */
+    const val PASSWORD_REMINDER_DESC_TAG = "password_reminder_desc_tag"
+
+    /**
+     * Test tag for password reminder  dismiss button
+     */
+    const val PASSWORD_REMINDER_DISMISS_BUTTON_TAG = "password_reminder_dismiss_button_tag"
+
+    /**
+     * Test tag for password text field
+     */
+    const val PASSWORD_TEXT_FIELD_TAG = "password_text_field_tag"
+
+    /**
+     * Test tag for password text field footer
+     */
+    const val PASSWORD_TEXT_FIELD_FOOTER_TAG = "password_text_field_footer_tag"
+
+    /**
+     * Test tag for password text field footer icon
+     */
+    const val PASSWORD_TEXT_FIELD_FOOTER_ICON_TAG = "password_text_field_footer_icon_tag"
+
+    /**
+     * Test tag for proceed to logout button
+     */
+    const val PROCEED_TO_LOGOUT_BUTTON_TAG = "proceed_to_logout_button_tag"
+
+    /**
+     * Test tag for see password icon
+     */
+    const val SEE_PASSWORD_TEST_TAG = "see_password_test_tag"
+
+    /**
+     * Test tag for see bottom sheet title
+     * @see RecoveryKeyBottomSheet
+     */
+    const val BOTTOM_SHEET_TITLE = "bottom_sheet_title"
+
+    /**
+     * Test tag for see bottom sheet print menu
+     * @see RecoveryKeyBottomSheet
+     */
+    const val BOTTOM_SHEET_PRINT = "bottom_sheet_print"
+
+    /**
+     * Test tag for see bottom sheet copy menu
+     * @see RecoveryKeyBottomSheet
+     */
+    const val BOTTOM_SHEET_COPY = "bottom_sheet_copy"
+
+    /**
+     * Test tag for see bottom sheet save menu
+     * @see RecoveryKeyBottomSheet
+     */
+    const val BOTTOM_SHEET_SAVE = "bottom_sheet_save"
 }

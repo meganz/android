@@ -17,6 +17,8 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -24,6 +26,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import coil.load
@@ -47,7 +50,11 @@ import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.CHECKING_2FA
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.editProfile.EditProfileViewModel
+import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
+import mega.privacy.android.app.presentation.logout.LogoutViewModel
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
+import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
@@ -68,8 +75,11 @@ import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.exception.ChangeEmailException
+import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import nz.mega.sdk.MegaChatApi
 import timber.log.Timber
 import java.io.File
@@ -98,6 +108,13 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
     private val viewModel by viewModels<MyAccountViewModel>()
     private val editProfileViewModel by viewModels<EditProfileViewModel>()
+    private val logoutViewModel: LogoutViewModel by viewModels()
+
+    /**
+     * Application Theme Mode
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
 
     private lateinit var binding: ActivityEditProfileBinding
 
@@ -282,7 +299,28 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             startActivity(Intent(this, ExportRecoveryKeyActivity::class.java))
         }
 
-        binding.logoutButton.setOnClickListener { viewModel.logout(this@EditProfileActivity) }
+        binding.logoutButton.setOnClickListener { viewModel.logout() }
+
+        initLogoutConfirmationDialogComposeView()
+    }
+
+    private fun initLogoutConfirmationDialogComposeView() {
+        binding.logoutConfirmationDialogComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val uiState by viewModel.state.collectAsStateWithLifecycle()
+                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                if (uiState.showLogoutConfirmationDialog) {
+                    OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                        LogoutConfirmationDialog(
+                            onDismissed = { viewModel.dismissLogoutConfirmationDialog() },
+                            logoutViewModel = logoutViewModel
+                        )
+                    }
+                }
+            }
+        }
     }
 
     private fun allowNameAndEmailEdition() {
@@ -318,6 +356,13 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             if (state.shouldNavigateToSmsVerification) {
                 startActivity(Intent(this, SMSVerificationActivity::class.java))
                 viewModel.onNavigatedToSmsVerification()
+            }
+            if (state.openTestPasswordScreenEvent) {
+                startActivity(
+                    Intent(this, TestPasswordActivity::class.java)
+                        .putExtra("logout", true)
+                )
+                viewModel.resetOpenTestPasswordScreenEvent()
             }
         }
 

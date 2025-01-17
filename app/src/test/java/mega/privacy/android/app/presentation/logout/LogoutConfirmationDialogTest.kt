@@ -42,7 +42,8 @@ class LogoutConfirmationDialogTest {
             )
         }
 
-        composeRule.onNodeWithText(R.string.logout_warning_offline_and_transfers).assertExists()
+        composeRule.onNodeWithText(R.string.logout_warning_dialog_offline_and_transfers_message)
+            .assertExists()
     }
 
     @Test
@@ -65,7 +66,7 @@ class LogoutConfirmationDialogTest {
             )
         }
 
-        composeRule.onNodeWithText(R.string.logout_warning_offline).assertExists()
+        composeRule.onNodeWithText(R.string.logout_warning_dialog_offline_message).assertExists()
     }
 
     @Test
@@ -88,6 +89,6 @@ class LogoutConfirmationDialogTest {
             )
         }
 
-        composeRule.onNodeWithText(R.string.logout_warning_transfers).assertExists()
+        composeRule.onNodeWithText(R.string.logout_warning_dialog_transfers_message).assertExists()
     }
 }

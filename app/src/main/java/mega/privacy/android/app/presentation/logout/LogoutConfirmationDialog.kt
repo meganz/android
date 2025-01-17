@@ -50,9 +50,9 @@ private fun ConfirmationDialog(
 @Composable
 private fun getConfirmationMessage(hasOfflineFiles: Boolean, hasTransfers: Boolean): String {
     return when {
-        hasOfflineFiles && hasTransfers -> stringResource(id = R.string.logout_warning_offline_and_transfers)
-        hasOfflineFiles -> stringResource(id = R.string.logout_warning_offline)
-        else -> stringResource(id = R.string.logout_warning_transfers)
+        hasOfflineFiles && hasTransfers -> stringResource(id = R.string.logout_warning_dialog_offline_and_transfers_message)
+        hasOfflineFiles -> stringResource(id = R.string.logout_warning_dialog_offline_message)
+        else -> stringResource(id = R.string.logout_warning_dialog_transfers_message)
     }
 }
 
@@ -64,7 +64,8 @@ private fun ShowDialog(
 ) {
     MegaAlertDialog(
         text = confirmationMessage,
-        confirmButtonText = stringResource(id = R.string.action_logout),
+        title = stringResource(id = R.string.logout_warning_dialog_title),
+        confirmButtonText = stringResource(id = R.string.logout_warning_dialog_positive_button),
         cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onConfirm = {
             logout()

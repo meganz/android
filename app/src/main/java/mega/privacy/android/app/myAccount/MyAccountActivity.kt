@@ -20,13 +20,18 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -46,6 +51,10 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.presentation.cancelaccountplan.CancelAccountPlanActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
+import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
+import mega.privacy.android.app.presentation.logout.LogoutViewModel
+import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
@@ -67,13 +76,18 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
 import mega.privacy.mobile.analytics.event.CancelSubscriptionMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ToolbarOverflowMenuItemEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError.API_OK
 import timber.log.Timber
 import java.util.Locale
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MyAccountActivity : PasscodeActivity(),
     SnackbarShower {
 
@@ -89,7 +103,13 @@ class MyAccountActivity : PasscodeActivity(),
     }
 
     private val viewModel: MyAccountViewModel by viewModels()
+    private val logoutViewModel: LogoutViewModel by viewModels()
 
+    /**
+     * Application Theme Mode
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
     private val isBusinessAccount
         get() = viewModel.state.value.isBusinessAccount
 
@@ -144,6 +164,7 @@ class MyAccountActivity : PasscodeActivity(),
         setupView()
         setupObservers()
         manageIntentExtras()
+        initLogoutConfirmationDialogComposeView()
 
         if (savedInstanceState != null) {
             when {
@@ -166,6 +187,25 @@ class MyAccountActivity : PasscodeActivity(),
 
                 savedInstanceState.getBoolean(CONFIRM_RESET_PASSWORD_SHOWN, false) -> {
                     showConfirmResetPasswordDialog()
+                }
+            }
+        }
+    }
+
+    private fun initLogoutConfirmationDialogComposeView() {
+        binding.logoutConfirmationDialogComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val uiState by viewModel.state.collectAsStateWithLifecycle()
+                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                if (uiState.showLogoutConfirmationDialog) {
+                    OriginalTempTheme(isDark = themeMode.isDarkMode()) {
+                        LogoutConfirmationDialog(
+                            onDismissed = { viewModel.dismissLogoutConfirmationDialog() },
+                            logoutViewModel = logoutViewModel
+                        )
+                    }
                 }
             }
         }
@@ -299,7 +339,7 @@ class MyAccountActivity : PasscodeActivity(),
                 handleShowCancelSubscription()
             }
 
-            R.id.action_logout -> viewModel.logout(this)
+            R.id.action_logout -> viewModel.logout()
         }
 
         return super.onOptionsItemSelected(item)
@@ -449,6 +489,13 @@ class MyAccountActivity : PasscodeActivity(),
         }
 
         collectFlow(viewModel.state) { state ->
+            if (state.openTestPasswordScreenEvent) {
+                startActivity(
+                    Intent(this, TestPasswordActivity::class.java)
+                        .putExtra("logout", true)
+                )
+                viewModel.resetOpenTestPasswordScreenEvent()
+            }
             state.errorMessageRes?.let {
                 showErrorAlert(getString(it))
                 viewModel.resetErrorMessageRes()

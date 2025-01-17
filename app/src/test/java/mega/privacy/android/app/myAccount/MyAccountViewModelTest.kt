@@ -696,6 +696,26 @@ internal class MyAccountViewModelTest {
             }
         }
 
+    @Test
+    fun `test that openTestPasswordScreenEvent is updated when logout is invoked and password reminder is true`() =
+        runTest {
+            whenever(checkPasswordReminderUseCase(true)).thenReturn(true)
+            underTest.logout()
+            underTest.state.test {
+                assertThat(awaitItem().openTestPasswordScreenEvent).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that showLogoutConfirmationDialog is updated when logout is invoked and password reminder is false`() =
+        runTest {
+            whenever(checkPasswordReminderUseCase(true)).thenReturn(false)
+            underTest.logout()
+            underTest.state.test {
+                assertThat(awaitItem().showLogoutConfirmationDialog).isTrue()
+            }
+        }
+
     private fun provideAccountTypeParameters() = Stream.of(
         Arguments.of(accountDetailsWithValidSubscription(AccountType.PRO_I), AccountType.PRO_I),
         Arguments.of(accountDetailsWithValidSubscription(AccountType.PRO_II), AccountType.PRO_II),

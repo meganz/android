@@ -280,15 +280,15 @@ class PasscodeLockActivity : BaseActivity() {
         }
 
         val messageId = when {
-            existOfflineFiles && existOutgoingTransfers -> R.string.logout_warning_offline_and_transfers
-            existOfflineFiles -> R.string.logout_warning_offline
-            else -> R.string.logout_warning_transfers
+            existOfflineFiles && existOutgoingTransfers -> R.string.logout_warning_dialog_offline_and_transfers_message
+            existOfflineFiles -> R.string.logout_warning_dialog_offline_message
+            else -> R.string.logout_warning_dialog_transfers_message
         }
 
         MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-            .setTitle(getString(R.string.proceed_to_logout))
+            .setTitle(getString(R.string.logout_warning_dialog_title))
             .setMessage(getString(messageId))
-            .setPositiveButton(getString(R.string.action_logout)) { _, _ ->
+            .setPositiveButton(getString(R.string.logout_warning_dialog_positive_button)) { _, _ ->
                 isConfirmLogoutDialogShown = false
                 logout()
             }
