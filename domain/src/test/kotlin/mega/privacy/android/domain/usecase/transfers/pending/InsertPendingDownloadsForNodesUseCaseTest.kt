@@ -11,7 +11,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
+import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceForNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DestinationAndAppDataForDownloadResult
 import mega.privacy.android.domain.usecase.transfers.downloads.GetFileDestinationAndAppDataForDownloadUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -21,7 +21,6 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
@@ -37,8 +36,8 @@ class InsertPendingDownloadsForNodesUseCaseTest {
     private val transferRepository = mock<TransferRepository>()
     private val getPendingTransferNodeIdentifierUseCase =
         mock<GetPendingTransferNodeIdentifierUseCase>()
-    private val doesPathHaveSufficientSpaceForNodesUseCase =
-        mock<DoesPathHaveSufficientSpaceForNodesUseCase>()
+    private val doesUriPathHaveSufficientSpaceForNodesUseCase =
+        mock<DoesUriPathHaveSufficientSpaceForNodesUseCase>()
     private val getFileDestinationAndAppDataForDownloadUseCase =
         mock<GetFileDestinationAndAppDataForDownloadUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
@@ -48,7 +47,7 @@ class InsertPendingDownloadsForNodesUseCaseTest {
         underTest = InsertPendingDownloadsForNodesUseCase(
             transferRepository,
             getPendingTransferNodeIdentifierUseCase,
-            doesPathHaveSufficientSpaceForNodesUseCase,
+            doesUriPathHaveSufficientSpaceForNodesUseCase,
             getFileDestinationAndAppDataForDownloadUseCase,
             fileSystemRepository,
         )
@@ -59,11 +58,10 @@ class InsertPendingDownloadsForNodesUseCaseTest {
         reset(
             transferRepository,
             getPendingTransferNodeIdentifierUseCase,
-            doesPathHaveSufficientSpaceForNodesUseCase,
+            doesUriPathHaveSufficientSpaceForNodesUseCase,
             getFileDestinationAndAppDataForDownloadUseCase,
             fileSystemRepository,
         )
-        whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())) doReturn true
         val nodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(647L))
         whenever(getPendingTransferNodeIdentifierUseCase(anyOrNull())) doReturn nodeIdentifier
         whenever(getFileDestinationAndAppDataForDownloadUseCase(UriPath(PATH_STRING))) doReturn
@@ -83,6 +81,9 @@ class InsertPendingDownloadsForNodesUseCaseTest {
             val nodeIdentifier =
                 PendingTransferNodeIdentifier.CloudDriveNode(NodeId(index.toLong()))
             whenever(getPendingTransferNodeIdentifierUseCase(node)) doReturn nodeIdentifier
+            whenever(
+                doesUriPathHaveSufficientSpaceForNodesUseCase(uriPath, nodes)
+            ) doReturn true
             InsertPendingTransferRequest(
                 transferType = TransferType.DOWNLOAD,
                 nodeIdentifier = nodeIdentifier,
@@ -101,12 +102,12 @@ class InsertPendingDownloadsForNodesUseCaseTest {
     fun `test that a NotEnoughStorageException is thrown when doesPathHaveSufficientSpaceForNodesUseCase returns false`() =
         runTest {
             val node = mock<DefaultTypedFileNode>()
-            val destination = PATH_STRING
-            whenever(doesPathHaveSufficientSpaceForNodesUseCase(destination, listOf(node))) doReturn
+            val destination = UriPath(PATH_STRING)
+            whenever(doesUriPathHaveSufficientSpaceForNodesUseCase(destination, listOf(node))) doReturn
                     false
 
             assertThrows<NotEnoughStorageException> {
-                underTest(listOf(node), UriPath(destination), false)
+                underTest(listOf(node), destination, false)
             }
         }
 
@@ -128,8 +129,12 @@ class InsertPendingDownloadsForNodesUseCaseTest {
     @Test
     fun `test that folder is created`() = runTest {
         val uriPath = UriPath(PATH_STRING)
+        val nodes = listOf(mock<DefaultTypedFileNode>())
+        whenever(
+            doesUriPathHaveSufficientSpaceForNodesUseCase(uriPath, nodes)
+        ) doReturn true
 
-        underTest(listOf(mock()), uriPath, false)
+        underTest(nodes, uriPath, false)
 
         verify(fileSystemRepository).createDirectory(PATH_STRING)
     }

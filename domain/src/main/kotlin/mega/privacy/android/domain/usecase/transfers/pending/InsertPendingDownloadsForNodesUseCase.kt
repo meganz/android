@@ -8,7 +8,7 @@ import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.exception.NullFileException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
+import mega.privacy.android.domain.usecase.file.DoesUriPathHaveSufficientSpaceForNodesUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetFileDestinationAndAppDataForDownloadUseCase
 import java.io.File
 import javax.inject.Inject
@@ -19,7 +19,7 @@ import javax.inject.Inject
 class InsertPendingDownloadsForNodesUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
     private val getPendingTransferNodeIdentifierUseCase: GetPendingTransferNodeIdentifierUseCase,
-    private val doesPathHaveSufficientSpaceForNodesUseCase: DoesPathHaveSufficientSpaceForNodesUseCase,
+    private val doesUriPathHaveSufficientSpaceForNodesUseCase: DoesUriPathHaveSufficientSpaceForNodesUseCase,
     private val getFileDestinationAndAppDataForDownloadUseCase: GetFileDestinationAndAppDataForDownloadUseCase,
     private val fileSystemRepository: FileSystemRepository,
 ) {
@@ -40,7 +40,7 @@ class InsertPendingDownloadsForNodesUseCase @Inject constructor(
             destination
         )
         fileSystemRepository.createDirectory(folderDestination.value)
-        if (!doesPathHaveSufficientSpaceForNodesUseCase(folderDestination.value, nodes)) {
+        if (!doesUriPathHaveSufficientSpaceForNodesUseCase(folderDestination, nodes)) {
             throw NotEnoughStorageException()
         }
         transferRepository.insertPendingTransfers(
