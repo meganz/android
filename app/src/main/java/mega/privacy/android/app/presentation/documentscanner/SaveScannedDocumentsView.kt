@@ -36,6 +36,7 @@ import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedD
 import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsUiState
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -84,17 +85,13 @@ internal fun SaveScannedDocumentsView(
     EventEffect(
         event = uiState.snackbarMessage,
         onConsumed = { onSnackbarMessageConsumed() },
-        action = { snackbarMessage ->
-            scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                message = if (snackbarMessage.formatArgsText != null) {
-                    context.resources.getString(
-                        snackbarMessage.textRes,
-                        snackbarMessage.formatArgsText,
-                    )
-                } else {
-                    context.resources.getString(snackbarMessage.textRes)
-                }
-            )
+        action = { filenameValidationStatus ->
+            val message = context.resources.getString(R.string.scan_snackbar_incorrect_name)
+                .takeIf { filenameValidationStatus == ScanFilenameValidationStatus.EmptyFilename }
+
+            message?.let {
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(it)
+            }
         }
     )
     EventEffect(
@@ -144,7 +141,7 @@ internal fun SaveScannedDocumentsView(
             ) {
                 SaveScannedDocumentsFilenameGroup(
                     filename = uiState.filename,
-                    filenameErrorMessage = uiState.filenameErrorMessage,
+                    filenameValidationStatus = uiState.filenameValidationStatus,
                     scanFileType = uiState.scanFileType,
                     onFilenameChanged = onFilenameChanged,
                     onFilenameConfirmed = onFilenameConfirmed,

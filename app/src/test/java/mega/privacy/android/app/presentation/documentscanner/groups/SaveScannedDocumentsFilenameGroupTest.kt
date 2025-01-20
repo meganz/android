@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +24,7 @@ internal class SaveScannedDocumentsFilenameGroupTest {
         composeTestRule.setContent {
             SaveScannedDocumentsFilenameGroup(
                 filename = "Filename",
-                filenameErrorMessage = null,
+                filenameValidationStatus = ScanFilenameValidationStatus.ValidFilename,
                 scanFileType = ScanFileType.Pdf,
                 onFilenameChanged = {},
                 onFilenameConfirmed = {},
@@ -38,18 +39,5 @@ internal class SaveScannedDocumentsFilenameGroupTest {
             .assertIsDisplayed()
         composeTestRule.onNodeWithTag(SAVE_SCANNED_DOCUMENTS_FILENAME_GROUP_EDIT_FILENAME_IMAGE)
             .assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that the PDF image is shown when the scan file type is PDF`() {
-        composeTestRule.setContent {
-            SaveScannedDocumentsFilenameGroup(
-                filename = "Filename",
-                filenameErrorMessage = null,
-                scanFileType = ScanFileType.Pdf,
-                onFilenameChanged = {},
-                onFilenameConfirmed = {},
-            )
-        }
     }
 }

@@ -9,13 +9,12 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.AnalyticsTestExtension
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsSnackbarMessageUiItem
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.usecase.documentscanner.IsScanFilenameValidUseCase
+import mega.privacy.android.domain.usecase.documentscanner.ValidateScanFilenameUseCase
 import mega.privacy.android.domain.usecase.file.RenameFileAndDeleteOriginalUseCase
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToCloudDriveEvent
@@ -31,10 +30,10 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.Mockito
-import org.mockito.Mockito.spy
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.spy
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.util.Calendar
@@ -49,7 +48,7 @@ internal class SaveScannedDocumentsViewModelTest {
 
     private lateinit var underTest: SaveScannedDocumentsViewModel
 
-    private val isScanFilenameValidUseCase = spy<IsScanFilenameValidUseCase>()
+    private val validateScanFilenameUseCase = spy<ValidateScanFilenameUseCase>()
     private val renameFileAndDeleteOriginalUseCase = mock<RenameFileAndDeleteOriginalUseCase>()
     private var savedStateHandle = SavedStateHandle(mapOf())
 
@@ -66,7 +65,7 @@ internal class SaveScannedDocumentsViewModelTest {
 
     private fun initViewModel() {
         underTest = SaveScannedDocumentsViewModel(
-            isScanFilenameValidUseCase = isScanFilenameValidUseCase,
+            validateScanFilenameUseCase = validateScanFilenameUseCase,
             renameFileAndDeleteOriginalUseCase = renameFileAndDeleteOriginalUseCase,
             savedStateHandle = savedStateHandle,
         )
@@ -125,104 +124,77 @@ internal class SaveScannedDocumentsViewModelTest {
         }
 
     @Test
-    fun `test that the default filename is set upon initialization`() = runTest {
+    fun `test that the default scan file type is set to PDF upon initialization`() =
+        runTest {
+            initViewModel()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().scanFileType).isEqualTo(ScanFileType.Pdf)
+            }
+        }
+
+    @Test
+    fun `test that the default actual filename ends with PDF upon initialization`() = runTest {
         val expectedFilename = String.format(
             Locale.getDefault(),
             "Scanned_%1tY%<tm%<td%<tH%<tM%<tS",
             Calendar.getInstance(),
         )
+        val actualFilename = "$expectedFilename.pdf"
 
         initViewModel()
 
         underTest.uiState.test {
-            assertThat(awaitItem().filename).isEqualTo(expectedFilename)
+            assertThat(awaitItem().actualFilename).isEqualTo(actualFilename)
         }
     }
 
     @Test
-    fun `test that the filename is updated when changed`() = runTest {
-        val filename = "New Filename"
+    fun `test that both filename and filename validation status are updated when the filename changes`() =
+        runTest {
+            val filename = "New Scan"
 
+            initViewModel()
+            // Just to ensure that the selected scan file type is a PDF
+            underTest.onScanFileTypeSelected(ScanFileType.Pdf)
+            underTest.onFilenameChanged(filename)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.filename).isEqualTo(filename)
+                assertThat(state.filenameValidationStatus).isEqualTo(
+                    ScanFilenameValidationStatus.ValidFilename
+                )
+            }
+        }
+
+    @Test
+    fun `test that the snackbar is shown when confirming an empty filename`() = runTest {
         initViewModel()
-        underTest.onFilenameChanged(filename)
 
-        underTest.uiState.test {
-            assertThat(awaitItem().filename).isEqualTo(filename)
-        }
-    }
-
-    @Test
-    fun `test that the specific filename input error message is shown when the new filename is empty`() =
-        runTest {
-            initViewModel()
-            underTest.onFilenameChanged("")
-
-            underTest.uiState.test {
-                assertThat(awaitItem().filenameErrorMessage).isEqualTo(R.string.scan_incorrect_name)
-            }
-        }
-
-    @Test
-    fun `test that the specific filename input error message is shown when the new filename only contains whitespaces`() =
-        runTest {
-            initViewModel()
-            underTest.onFilenameChanged("   ")
-
-            underTest.uiState.test {
-                assertThat(awaitItem().filenameErrorMessage).isEqualTo(R.string.scan_incorrect_name)
-            }
-        }
-
-    @Test
-    fun `test that the specific filename input error message is shown when the new filename contains invalid characters`() =
-        runTest {
-            initViewModel()
-            underTest.onFilenameChanged("New Filename?")
-
-            underTest.uiState.test {
-                assertThat(awaitItem().filenameErrorMessage).isEqualTo(R.string.scan_invalid_characters)
-            }
-        }
-
-    @Test
-    fun `test that no filename input error message is shown when the new filename is valid`() =
-        runTest {
-            initViewModel()
-            underTest.onFilenameChanged("New Filename")
-
-            underTest.uiState.test {
-                assertThat(awaitItem().filenameErrorMessage).isNull()
-            }
-        }
-
-    @Test
-    fun `test that the snackbar is shown when confirming a blank filename`() = runTest {
-        initViewModel()
         underTest.onFilenameConfirmed("")
 
         underTest.uiState.test {
-            assertThat(awaitItem().snackbarMessage).isEqualTo(
-                triggered(SaveScannedDocumentsSnackbarMessageUiItem.BlankFilename)
-            )
+            assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(ScanFilenameValidationStatus.EmptyFilename))
         }
     }
 
     @Test
-    fun `test that the snackbar is shown when confirming a filename with invalid characters`() =
+    fun `test that the snackbar is not shown when confirming a filename with invalid characters`() =
         runTest {
             initViewModel()
+
             underTest.onFilenameConfirmed("New Filename?")
 
             underTest.uiState.test {
-                assertThat(awaitItem().snackbarMessage).isEqualTo(
-                    triggered(SaveScannedDocumentsSnackbarMessageUiItem.FilenameWithInvalidCharacters)
-                )
+                assertThat(awaitItem().snackbarMessage).isEqualTo(consumed())
             }
         }
 
     @Test
     fun `test that the snackbar is not shown when confirming a valid filename`() = runTest {
         initViewModel()
+
         underTest.onFilenameConfirmed("New Filename")
 
         underTest.uiState.test {
@@ -241,28 +213,36 @@ internal class SaveScannedDocumentsViewModelTest {
 
             underTest.uiState.test {
                 assertThat(awaitItem().snackbarMessage).isEqualTo(
-                    triggered(
-                        SaveScannedDocumentsSnackbarMessageUiItem.BlankFilename
-                    )
+                    triggered(ScanFilenameValidationStatus.EmptyFilename)
                 )
             }
         }
 
     @Test
-    fun `test that the snackbar is shown when proceeding to upload the scanned documents using a filename with invalid characters`() =
+    fun `test that the snackbar is not shown when proceeding to upload the scanned documents using a filename with invalid characters`() =
         runTest {
             initViewModel()
             // First, set a filename with invalid characters to the UI State
-            underTest.onFilenameChanged("new*filename")
+            underTest.onFilenameChanged("New Filename?")
 
             underTest.onSaveButtonClicked()
 
             underTest.uiState.test {
-                assertThat(awaitItem().snackbarMessage).isEqualTo(
-                    triggered(
-                        SaveScannedDocumentsSnackbarMessageUiItem.FilenameWithInvalidCharacters
-                    )
-                )
+                assertThat(awaitItem().snackbarMessage).isEqualTo(consumed())
+            }
+        }
+
+    @Test
+    fun `test that the snackbar is not shown when proceeding to upload the scanned documents using a valid filename`() =
+        runTest {
+            initViewModel()
+            // First, set a valid filename to the UI State
+            underTest.onFilenameChanged("New Filename")
+
+            underTest.onSaveButtonClicked()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().snackbarMessage).isEqualTo(consumed())
             }
         }
 

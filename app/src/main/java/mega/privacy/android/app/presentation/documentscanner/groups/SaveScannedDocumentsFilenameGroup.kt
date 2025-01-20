@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.documentscanner.groups
 
 import mega.privacy.android.icon.pack.R as IconPackR
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -39,6 +38,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -50,7 +50,7 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
  * A Composable Group allowing Users to change the filename of the scanned Document/s
  *
  * @param filename The file of the resulting scan/s
- * @param filenameErrorMessage The error message shown in the filename input
+ * @param filenameValidationStatus The filename validation status
  * @param scanFileType The Scan File Type to determine the File Image Type shown
  * @param onFilenameChanged Lambda when the filename changes
  * @param onFilenameConfirmed Lambda when the filename is accepted by the User, triggered by the
@@ -60,7 +60,7 @@ import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 @Composable
 internal fun SaveScannedDocumentsFilenameGroup(
     filename: String,
-    @StringRes filenameErrorMessage: Int?,
+    filenameValidationStatus: ScanFilenameValidationStatus?,
     scanFileType: ScanFileType,
     onFilenameChanged: (String) -> Unit,
     onFilenameConfirmed: (String) -> Unit,
@@ -128,7 +128,7 @@ internal fun SaveScannedDocumentsFilenameGroup(
                     TextFieldValue("${filenameValueState.text}${scanFileType.fileSuffix}")
                 },
                 placeholder = "",
-                showIndicatorLine = isFocused || filenameErrorMessage != null,
+                showIndicatorLine = isFocused || (filenameValidationStatus != null && filenameValidationStatus != ScanFilenameValidationStatus.ValidFilename),
                 onTextChange = { newTextFieldValue ->
                     onFilenameChanged(newTextFieldValue.text)
 
@@ -138,7 +138,7 @@ internal fun SaveScannedDocumentsFilenameGroup(
                         filenameValueState = newTextFieldValue
                     }
                 },
-                errorText = filenameErrorMessage?.let { stringResource(it) },
+                errorText = getFilenameErrorMessage(filenameValidationStatus),
                 imeAction = ImeAction.Done,
                 keyboardActions = KeyboardActions(
                     onDone = {
@@ -164,6 +164,25 @@ internal fun SaveScannedDocumentsFilenameGroup(
 }
 
 /**
+ * Retrieves the correct error message when an incorrect filename is supplied
+ *
+ * @param filenameValidationStatus The filename validation status
+ *
+ * @return The error message to be displayed in the filename input
+ */
+@Composable
+private fun getFilenameErrorMessage(filenameValidationStatus: ScanFilenameValidationStatus?) =
+    when (filenameValidationStatus) {
+        ScanFilenameValidationStatus.EmptyFilename -> stringResource(R.string.scan_incorrect_name)
+        ScanFilenameValidationStatus.InvalidFilename -> stringResource(
+            R.string.scan_snackbar_invalid_characters,
+            "\" * / : < > ? \\ |"
+        )
+
+        else -> null
+    }
+
+/**
  * A Preview Composable for [SaveScannedDocumentsFilenameGroup] that shows the different File Image
  * types
  *
@@ -177,7 +196,7 @@ private fun SaveScannedDocumentsFilenameGroupFileImagePreview(
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SaveScannedDocumentsFilenameGroup(
             filename = "Scanned_file",
-            filenameErrorMessage = null,
+            filenameValidationStatus = ScanFilenameValidationStatus.ValidFilename,
             scanFileType = scanFileType,
             onFilenameChanged = {},
             onFilenameConfirmed = {},
@@ -204,7 +223,7 @@ private fun SaveScannedDocumentsFilenameGroupInputErrorPreview(
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SaveScannedDocumentsFilenameGroup(
             filename = filenameInputError.filename,
-            filenameErrorMessage = filenameInputError.filenameErrorMessage,
+            filenameValidationStatus = filenameInputError.filenameValidationStatus,
             scanFileType = ScanFileType.Pdf,
             onFilenameChanged = {},
             onFilenameConfirmed = {},
@@ -214,7 +233,7 @@ private fun SaveScannedDocumentsFilenameGroupInputErrorPreview(
 
 private data class FilenameInputError(
     val filename: String,
-    @StringRes val filenameErrorMessage: Int?,
+    val filenameValidationStatus: ScanFilenameValidationStatus?,
 )
 
 private class FilenameInputErrorProvider : PreviewParameterProvider<FilenameInputError> {
@@ -222,11 +241,11 @@ private class FilenameInputErrorProvider : PreviewParameterProvider<FilenameInpu
         get() = sequenceOf(
             FilenameInputError(
                 filename = "",
-                filenameErrorMessage = R.string.scan_incorrect_name,
+                filenameValidationStatus = ScanFilenameValidationStatus.EmptyFilename,
             ),
             FilenameInputError(
-                filename = "Scanned_file?",
-                filenameErrorMessage = R.string.scan_invalid_characters,
+                filename = "Scanned_f\\le",
+                filenameValidationStatus = ScanFilenameValidationStatus.InvalidFilename,
             ),
         )
 }

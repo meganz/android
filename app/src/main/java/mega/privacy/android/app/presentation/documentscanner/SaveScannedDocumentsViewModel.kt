@@ -15,13 +15,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsSnackbarMessageUiItem
 import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsUiState
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.usecase.documentscanner.IsScanFilenameValidUseCase
+import mega.privacy.android.domain.usecase.documentscanner.ValidateScanFilenameUseCase
 import mega.privacy.android.domain.usecase.file.RenameFileAndDeleteOriginalUseCase
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToCloudDriveEvent
@@ -35,14 +34,15 @@ import javax.inject.Inject
 /**
  * The [ViewModel] for Save Scanned Documents
  *
- * @property isScanFilenameValidUseCase Checks whether the filename of the scanned Document/s is valid
+ * @property validateScanFilenameUseCase Validates a given scan filename and returns the
+ * corresponding validation status
  * @property renameFileAndDeleteOriginalUseCase Renames the original File, deletes it and returns
  * the renamed File
  * @property savedStateHandle The Saved State Handle
  */
 @HiltViewModel
 internal class SaveScannedDocumentsViewModel @Inject constructor(
-    private val isScanFilenameValidUseCase: IsScanFilenameValidUseCase,
+    private val validateScanFilenameUseCase: ValidateScanFilenameUseCase,
     private val renameFileAndDeleteOriginalUseCase: RenameFileAndDeleteOriginalUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -102,28 +102,16 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
      * Updates the filename of the scanned Document/s to be uploaded and displays an Error Message
      * in the filename input if the new filename is invalid
      *
-     * @param filename the new Filename
+     * @param newFilename the new Filename
      */
-    fun onFilenameChanged(filename: String) {
+    fun onFilenameChanged(newFilename: String) {
+        val filenameValidationStatus = validateScanFilenameUseCase(newFilename)
         _uiState.update {
             it.copy(
-                filename = filename,
-                filenameErrorMessage = getFilenameErrorMessage(filename),
+                filename = newFilename,
+                filenameValidationStatus = filenameValidationStatus,
             )
         }
-    }
-
-    /**
-     * Retrieves the Error Message associated with the invalid Filename
-     *
-     * @param filename The filename to be checked.
-     * @return A String resource specifying the type of invalid Filename, or null if the Filename is
-     * valid
-     */
-    private fun getFilenameErrorMessage(filename: String = _uiState.value.filename) = when {
-        isScanFilenameValidUseCase(filename) -> null
-        filename.isBlank() -> R.string.scan_incorrect_name
-        else -> R.string.scan_invalid_characters
     }
 
     /**
@@ -131,9 +119,9 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
      * Keyboard Event. If the new filename is invalid, a Snackbar is shown displaying an error
      * message
      *
-     * @param filename the new Filename
+     * @param newFilename the new Filename
      */
-    fun onFilenameConfirmed(filename: String) = isConfirmedFilenameValid(filename)
+    fun onFilenameConfirmed(newFilename: String) = isConfirmedFilenameValid(newFilename)
 
     /**
      * Checks if the filename is valid before proceeding to save the Scan/s to the selected
@@ -198,40 +186,33 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
      * @param filename The filename to be checked. Defaults to the saved filename in the UI State if
      * it is not provided
      */
-    private fun isConfirmedFilenameValid(filename: String = _uiState.value.filename) =
-        if (isScanFilenameValidUseCase(filename)) {
-            true
-        } else {
-            _uiState.update {
-                it.copy(
-                    snackbarMessage = triggered(
-                        if (filename.isBlank()) {
-                            SaveScannedDocumentsSnackbarMessageUiItem.BlankFilename
-                        } else {
-                            SaveScannedDocumentsSnackbarMessageUiItem.FilenameWithInvalidCharacters
-                        }
-                    )
-                )
+    private fun isConfirmedFilenameValid(filename: String = _uiState.value.filename): Boolean {
+        return when (val filenameValidationStatus = validateScanFilenameUseCase(filename)) {
+            ScanFilenameValidationStatus.ValidFilename -> true
+            ScanFilenameValidationStatus.InvalidFilename -> false
+            else -> {
+                _uiState.update { it.copy(snackbarMessage = triggered(filenameValidationStatus)) }
+                false
             }
-            false
         }
+    }
 
     /**
      * Updates the Scan Destination of the scanned Document/s to be uploaded
      *
-     * @param scanDestination The new Scan Destination
+     * @param newScanDestination The new Scan Destination
      */
-    fun onScanDestinationSelected(scanDestination: ScanDestination) {
-        _uiState.update { it.copy(scanDestination = scanDestination) }
+    fun onScanDestinationSelected(newScanDestination: ScanDestination) {
+        _uiState.update { it.copy(scanDestination = newScanDestination) }
     }
 
     /**
      * Updates the File Type of the scanned Document/s to be uploaded
      *
-     * @param scanFileType The new Scan File Type
+     * @param newScanFileType The new Scan File Type
      */
-    fun onScanFileTypeSelected(scanFileType: ScanFileType) {
-        _uiState.update { it.copy(scanFileType = scanFileType) }
+    fun onScanFileTypeSelected(newScanFileType: ScanFileType) {
+        _uiState.update { it.copy(scanFileType = newScanFileType) }
     }
 
     /**
