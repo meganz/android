@@ -127,7 +127,17 @@ internal fun SaveScannedDocumentsView(
                 appBarType = AppBarType.CLOSE,
                 onNavigationPressed = { onBackPressedDispatcher?.onBackPressed() },
             )
-        }
+        },
+        bottomBar = {
+            RaisedDefaultMegaButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp, start = 16.dp, end = 16.dp)
+                    .testTag(SAVE_SCANNED_DOCUMENTS_SAVE_BUTTON),
+                textId = R.string.general_next,
+                onClick = onSaveButtonClicked,
+            )
+        },
     ) { padding ->
         Column(
             modifier = Modifier
@@ -170,14 +180,6 @@ internal fun SaveScannedDocumentsView(
                     dividerType = DividerType.FullSize,
                 )
             }
-            RaisedDefaultMegaButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp, start = 16.dp, end = 16.dp)
-                    .testTag(SAVE_SCANNED_DOCUMENTS_SAVE_BUTTON),
-                textId = R.string.general_next,
-                onClick = onSaveButtonClicked,
-            )
         }
     }
 }
