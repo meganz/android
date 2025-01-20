@@ -32,7 +32,7 @@ class SetNodeCoordinatesUseCase @Inject constructor(
      */
     suspend operator fun invoke(localPath: String, nodeHandle: Long) {
         val isVideo = isVideoFileUseCase(UriPath(localPath))
-        if (isVideo || isImageFileUseCase(localPath)) {
+        if (isVideo || isImageFileUseCase(UriPath(localPath))) {
             getGPSCoordinatesUseCase(localPath, isVideo)?.let { (latitude, longitude) ->
                 nodeRepository.setNodeCoordinates(
                     NodeId(nodeHandle),

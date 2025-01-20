@@ -27,7 +27,7 @@ class CompressFileForChatUseCase @Inject constructor(
         val path = original.absolutePath
         return when {
             !chatAttachmentNeedsCompressionUseCase(original) -> null
-            isImageFileUseCase(path) -> {
+            isImageFileUseCase(UriPath.fromFile(original)) -> {
                 downscaleImageForChatUseCase(original)
             }
 

@@ -46,7 +46,7 @@ class SetNodeAttributesAfterUploadUseCase @Inject constructor(
     suspend operator fun invoke(nodeHandle: Long, uriPath: UriPath) {
         val localPath = uriPath.value
         val localFile = File(localPath)
-        val isVideoOrImage = isVideoFileUseCase(uriPath) || isImageFileUseCase(localPath)
+        val isVideoOrImage = isVideoFileUseCase(uriPath) || isImageFileUseCase(uriPath)
         val isPdf = isPdfFileUseCase(uriPath)
 
         if (isVideoOrImage) {

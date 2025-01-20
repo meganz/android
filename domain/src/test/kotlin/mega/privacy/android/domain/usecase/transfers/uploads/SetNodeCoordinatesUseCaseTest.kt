@@ -62,7 +62,7 @@ class SetNodeCoordinatesUseCaseTest {
         val nodeHandle = 1L
         val coordinates = Pair(123.0, 6345.0)
         whenever(isVideoFileUseCase(UriPath(path))).thenReturn(isVideoFile)
-        whenever(isImageFileUseCase(path)).thenReturn(isImageFile)
+        whenever(isImageFileUseCase(UriPath(path))).thenReturn(isImageFile)
         whenever(getGPSCoordinatesUseCase.invoke(path, isVideoFile)).thenReturn(coordinates)
         underTest.invoke(path, nodeHandle)
 

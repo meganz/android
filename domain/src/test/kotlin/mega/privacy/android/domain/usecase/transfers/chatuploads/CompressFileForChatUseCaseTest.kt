@@ -78,7 +78,7 @@ class CompressFileForChatUseCaseTest {
             }
             whenever(chatAttachmentNeedsCompressionUseCase(original)) doReturn true
             val expected = ChatUploadCompressionState.Compressed(mock<File>())
-            whenever(isImageFileUseCase(original.absolutePath)) doReturn true
+            whenever(isImageFileUseCase(UriPath(original.absolutePath))) doReturn true
             whenever(downscaleImageForChatUseCase(original)) doReturn flowOf(expected)
 
             underTest(original).test {
@@ -96,7 +96,7 @@ class CompressFileForChatUseCaseTest {
             }
             val expected = ChatUploadCompressionState.Compressed(mock<File>())
             whenever(chatAttachmentNeedsCompressionUseCase(original)) doReturn true
-            whenever(isImageFileUseCase(original.absolutePath)) doReturn false
+            whenever(isImageFileUseCase(UriPath(original.absolutePath))) doReturn false
             whenever(isVideoFileUseCase(UriPath(original.absolutePath))) doReturn true
             whenever(compressVideoForChatUseCase(original)) doReturn flowOf(expected)
 

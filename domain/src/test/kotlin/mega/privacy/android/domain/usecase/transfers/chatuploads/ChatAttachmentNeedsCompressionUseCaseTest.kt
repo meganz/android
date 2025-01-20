@@ -20,7 +20,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyValueClass
-import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -65,8 +64,8 @@ class ChatAttachmentNeedsCompressionUseCaseTest {
         @BeforeEach
         fun setup() {
             wheneverBlocking { isVideoFileUseCase(anyValueClass()) } doReturn false
-            wheneverBlocking { isImageFileUseCase(jpg.absolutePath) } doReturn true
-            wheneverBlocking { isImageFileUseCase(gif.absolutePath) } doReturn true
+            wheneverBlocking { isImageFileUseCase(UriPath(jpg.absolutePath)) } doReturn true
+            wheneverBlocking { isImageFileUseCase(UriPath(gif.absolutePath)) } doReturn true
         }
 
         @Test

@@ -35,7 +35,7 @@ class ChatAttachmentNeedsCompressionUseCase @Inject constructor(
     suspend operator fun invoke(file: File): Boolean {
         val path = file.absolutePath
         when {
-            isImageFileUseCase(path) -> {
+            isImageFileUseCase(UriPath.fromFile(file)) -> {
                 if (file.isGif()) return false
                 val imageQuality = defaultSettingsRepository.getChatImageQuality().first()
                 return !(imageQuality == ChatImageQuality.Original
