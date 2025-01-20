@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.isPath
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
@@ -162,14 +163,24 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             context.contentResolver.getType(uriPath.toUri())
         }
 
-    override suspend fun getVideoGPSCoordinates(filePath: String): Pair<Double, Double>? =
+    override suspend fun getVideoGPSCoordinates(uriPath: UriPath): Pair<Double, Double>? =
         withContext(ioDispatcher) {
-            fileAttributeGateway.getVideoGPSCoordinates(filePath)
+            if (uriPath.isPath()) {
+                fileAttributeGateway.getVideoGPSCoordinates(uriPath.value)
+            } else {
+                fileAttributeGateway.getVideoGPSCoordinates(uriPath.toUri(), context)
+            }
         }
 
-    override suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Double, Double>? =
+    override suspend fun getPhotoGPSCoordinates(uriPath: UriPath): Pair<Double, Double>? =
         withContext(ioDispatcher) {
-            fileAttributeGateway.getPhotoGPSCoordinates(filePath)
+            if (uriPath.isPath()) {
+                fileAttributeGateway.getPhotoGPSCoordinates(uriPath.value)
+            } else {
+                fileGateway.getInputStream(uriPath)?.let {inputStream ->
+                    fileAttributeGateway.getPhotoGPSCoordinates(inputStream)
+                }
+            }
         }
 
     override suspend fun setLastModified(path: String, timestamp: Long) =

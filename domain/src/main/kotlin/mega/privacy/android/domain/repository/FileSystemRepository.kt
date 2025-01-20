@@ -173,7 +173,7 @@ interface FileSystemRepository {
      *
      * @return a pair with latitude and longitude coordinates
      */
-    suspend fun getVideoGPSCoordinates(filePath: String): Pair<Double, Double>?
+    suspend fun getVideoGPSCoordinates(uriPath: UriPath): Pair<Double, Double>?
 
     /**
      * Get GPS coordinates from photo file
@@ -182,7 +182,7 @@ interface FileSystemRepository {
      *
      * @return a pair with latitude and longitude coordinates
      */
-    suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Double, Double>?
+    suspend fun getPhotoGPSCoordinates(uriPath: UriPath): Pair<Double, Double>?
 
     /**
      * Sets the last-modified time of the file or directory named by this abstract pathname

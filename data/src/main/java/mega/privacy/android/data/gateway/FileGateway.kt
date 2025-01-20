@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.document.DocumentMetadata
 import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
 
 /**
  * File gateway
@@ -449,4 +450,10 @@ interface FileGateway {
      * @param writePermission true if write permission is needed, false if only read permission is needed
      */
     suspend fun getFileDescriptor(uriPath: UriPath, writePermission: Boolean): ParcelFileDescriptor?
+
+    /**
+     * Get [InputStream] from an uriPath
+     * @param uriPath the file represented by an Uri or a path
+     */
+    suspend fun getInputStream(uriPath: UriPath): InputStream?
 }

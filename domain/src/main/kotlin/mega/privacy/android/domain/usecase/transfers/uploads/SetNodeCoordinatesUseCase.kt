@@ -30,10 +30,10 @@ class SetNodeCoordinatesUseCase @Inject constructor(
      * @param localPath File local path.
      * @param nodeHandle Node identifier of the file in the cloud.
      */
-    suspend operator fun invoke(localPath: String, nodeHandle: Long) {
-        val isVideo = isVideoFileUseCase(UriPath(localPath))
-        if (isVideo || isImageFileUseCase(UriPath(localPath))) {
-            getGPSCoordinatesUseCase(localPath, isVideo)?.let { (latitude, longitude) ->
+    suspend operator fun invoke(uriPath: UriPath, nodeHandle: Long) {
+        val isVideo = isVideoFileUseCase(uriPath)
+        if (isVideo || isImageFileUseCase(uriPath)) {
+            getGPSCoordinatesUseCase(uriPath, isVideo)?.let { (latitude, longitude) ->
                 nodeRepository.setNodeCoordinates(
                     NodeId(nodeHandle),
                     latitude,

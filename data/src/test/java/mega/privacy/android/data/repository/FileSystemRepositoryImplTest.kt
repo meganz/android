@@ -41,6 +41,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyValueClass
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -50,6 +51,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
+import java.io.InputStream
 import kotlin.test.assertFailsWith
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -199,21 +201,73 @@ internal class FileSystemRepositoryImplTest {
     inner class GPSCoordinatesTest {
         @Test
         fun `test that the video GPS coordinates are retrieved`() = runTest {
-            val testCoordinates = Pair(6.0, 9.0)
+            mockStatic(Uri::class.java).use {
+                val testCoordinates = Pair(6.0, 9.0)
+                val uri = mock<Uri> {
+                    on { this.scheme } doReturn "file"
+                }
+                val uriPath = UriPath("/folder/foo.mp4")
+                whenever(Uri.fromFile(File(uriPath.value))) doReturn uri
+                whenever(fileAttributeGateway.getVideoGPSCoordinates(any()))
+                    .thenReturn(testCoordinates)
 
-            whenever(fileAttributeGateway.getVideoGPSCoordinates(any())).thenReturn(testCoordinates)
-            assertThat(underTest.getVideoGPSCoordinates("")).isEqualTo(testCoordinates)
+                assertThat(underTest.getVideoGPSCoordinates(uriPath)).isEqualTo(
+                    testCoordinates
+                )
+            }
         }
 
         @Test
-        fun `test that the photo GPS coordinates are retrieved`() {
-            runTest {
-                val testCoordinates = Pair(6.0, 9.0)
+        fun `test that the photo GPS coordinates are retrieved`() = runTest {
+            mockStatic(Uri::class.java).use {
+                val testCoordinates = Pair(6.0, 9.1)
+                val uri = mock<Uri> {
+                    on { this.scheme } doReturn "file"
+                }
+                val uriPath = UriPath("/folder/foo.jpg")
+                whenever(Uri.fromFile(File(uriPath.value))) doReturn uri
+                whenever(fileAttributeGateway.getPhotoGPSCoordinates(any<String>()))
+                    .thenReturn(testCoordinates)
 
-                whenever(fileAttributeGateway.getPhotoGPSCoordinates(any())).thenReturn(
+                assertThat(underTest.getPhotoGPSCoordinates(uriPath)).isEqualTo(
                     testCoordinates
                 )
-                assertThat(underTest.getPhotoGPSCoordinates("")).isEqualTo(testCoordinates)
+            }
+        }
+
+        @Test
+        fun `test that the video GPS coordinates are retrieved from an Uri`() = runTest {
+            mockStatic(Uri::class.java).use {
+                val testCoordinates = Pair(6.1, 8.0)
+                val uri = mock<Uri> {
+                    on { this.scheme } doReturn "content"
+                }
+                val uriPath = UriPath("content:://foo.mp4")
+                whenever(Uri.parse(uriPath.value)) doReturn uri
+                whenever(fileAttributeGateway.getVideoGPSCoordinates(uri, context))
+                    .thenReturn(testCoordinates)
+
+                assertThat(underTest.getVideoGPSCoordinates(uriPath)).isEqualTo(testCoordinates)
+            }
+        }
+
+        @Test
+        fun `test that the photo GPS coordinates are retrieved from an Input Stream`() {
+            mockStatic(Uri::class.java).use {
+                runTest {
+                    val testCoordinates = Pair(6.0, 8.1)
+                    val inputStream = mock<InputStream>()
+                    val uri = mock<Uri> {
+                        on { this.scheme } doReturn "content"
+                    }
+                    val uriPath = UriPath("content:://foo.jpg")
+                    whenever(Uri.parse(uriPath.value)) doReturn uri
+                    whenever(fileGateway.getInputStream(uriPath)) doReturn inputStream
+                    whenever(fileAttributeGateway.getPhotoGPSCoordinates(inputStream))
+                        .thenReturn(testCoordinates)
+
+                    assertThat(underTest.getPhotoGPSCoordinates(uriPath)).isEqualTo(testCoordinates)
+                }
             }
         }
     }

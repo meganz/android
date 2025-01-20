@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -66,7 +67,7 @@ class ExtractGpsCoordinatesUseCaseTest {
         val list = listOf(record1)
         whenever(
             getGPSCoordinatesUseCase(
-                record.filePath,
+                UriPath(record.filePath),
                 record.type == CameraUploadsRecordType.TYPE_VIDEO
             )
         ).thenReturn(expected)
@@ -93,7 +94,7 @@ class ExtractGpsCoordinatesUseCaseTest {
             for (i in 0..<expected) {
                 whenever(
                     getGPSCoordinatesUseCase(
-                        list[i].filePath,
+                        UriPath(list[i].filePath),
                         list[i].type == CameraUploadsRecordType.TYPE_VIDEO,
                     )
                 ).thenReturn(Pair(0.0, 0.0))
@@ -115,7 +116,7 @@ class ExtractGpsCoordinatesUseCaseTest {
             for (i in 0..<expected) {
                 val stub = whenever(
                     getGPSCoordinatesUseCase(
-                        list[i].filePath,
+                        UriPath(list[i].filePath),
                         list[i].type == CameraUploadsRecordType.TYPE_VIDEO,
                     )
                 )

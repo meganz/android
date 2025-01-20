@@ -58,6 +58,7 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
 import java.util.Stack
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
@@ -845,6 +846,9 @@ internal class FileFacade @Inject constructor(
         }
         return null
     }
+
+    override suspend fun getInputStream(uriPath: UriPath): InputStream? =
+        context.contentResolver.openInputStream(uriPath.toUri())
 
     private fun isMediaDocumentUri() = "com.android.providers.media.documents"
 

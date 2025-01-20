@@ -58,16 +58,16 @@ class SetNodeCoordinatesUseCaseTest {
         isVideoFile: Boolean,
         isImageFile: Boolean,
     ) = runTest {
-        val path = "path"
+        val uriPath = UriPath("path")
         val nodeHandle = 1L
         val coordinates = Pair(123.0, 6345.0)
-        whenever(isVideoFileUseCase(UriPath(path))).thenReturn(isVideoFile)
-        whenever(isImageFileUseCase(UriPath(path))).thenReturn(isImageFile)
-        whenever(getGPSCoordinatesUseCase.invoke(path, isVideoFile)).thenReturn(coordinates)
-        underTest.invoke(path, nodeHandle)
+        whenever(isVideoFileUseCase(uriPath)).thenReturn(isVideoFile)
+        whenever(isImageFileUseCase(uriPath)).thenReturn(isImageFile)
+        whenever(getGPSCoordinatesUseCase.invoke(uriPath, isVideoFile)).thenReturn(coordinates)
+        underTest.invoke(uriPath, nodeHandle)
 
         if (isInvoked) {
-            verify(getGPSCoordinatesUseCase).invoke(path, isVideoFile)
+            verify(getGPSCoordinatesUseCase).invoke(uriPath, isVideoFile)
             nodeRepository.setNodeCoordinates(
                 NodeId(nodeHandle),
                 coordinates.first,

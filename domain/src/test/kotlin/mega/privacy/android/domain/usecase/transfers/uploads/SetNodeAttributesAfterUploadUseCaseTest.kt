@@ -94,7 +94,7 @@ class SetNodeAttributesAfterUploadUseCaseTest {
         whenever(createPdfThumbnailUseCase(nodeHandle, uriPath)).thenReturn(Unit)
         whenever(createImageOrVideoPreviewUseCase(nodeHandle, localFile)).thenReturn(Unit)
         whenever(createPdfPreviewUseCase(nodeHandle, uriPath)).thenReturn(Unit)
-        whenever(setNodeCoordinatesUseCase(localPath, nodeHandle)).thenReturn(Unit)
+        whenever(setNodeCoordinatesUseCase(uriPath, nodeHandle)).thenReturn(Unit)
 
         underTest.invoke(nodeHandle, uriPath)
 
@@ -104,7 +104,7 @@ class SetNodeAttributesAfterUploadUseCaseTest {
                 verify(createPdfThumbnailUseCase, never()).invoke(nodeHandle, uriPath)
                 verify(createImageOrVideoPreviewUseCase).invoke(nodeHandle, localFile)
                 verify(createPdfPreviewUseCase, never()).invoke(nodeHandle, uriPath)
-                verify(setNodeCoordinatesUseCase).invoke(localPath, nodeHandle)
+                verify(setNodeCoordinatesUseCase).invoke(uriPath, nodeHandle)
             }
 
             isPdfFile -> {
@@ -112,7 +112,7 @@ class SetNodeAttributesAfterUploadUseCaseTest {
                 verify(createPdfThumbnailUseCase).invoke(nodeHandle, uriPath)
                 verify(createImageOrVideoPreviewUseCase, never()).invoke(nodeHandle, localFile)
                 verify(createPdfPreviewUseCase).invoke(nodeHandle, uriPath)
-                verify(setNodeCoordinatesUseCase, never()).invoke(localPath, nodeHandle)
+                verify(setNodeCoordinatesUseCase, never()).invoke(uriPath, nodeHandle)
             }
 
             else -> {
@@ -120,7 +120,7 @@ class SetNodeAttributesAfterUploadUseCaseTest {
                 verify(createPdfThumbnailUseCase, never()).invoke(nodeHandle, uriPath)
                 verify(createImageOrVideoPreviewUseCase, never()).invoke(nodeHandle, localFile)
                 verify(createPdfPreviewUseCase, never()).invoke(nodeHandle, uriPath)
-                verify(setNodeCoordinatesUseCase, never()).invoke(localPath, nodeHandle)
+                verify(setNodeCoordinatesUseCase, never()).invoke(uriPath, nodeHandle)
             }
         }
     }
