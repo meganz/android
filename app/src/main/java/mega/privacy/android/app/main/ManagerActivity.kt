@@ -3078,39 +3078,41 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE -> {
-                supportActionBar?.subtitle = null
-                Timber.d("Cloud Drive SECTION")
-                val parentNode = withContext(ioDispatcher) {
-                    megaApi.getNodeByHandle(fileBrowserViewModel.state().fileBrowserHandle)
-                }
-                if (parentNode != null) {
-                    if (megaApi.rootNode != null) {
-                        if ((parentNode.handle == megaApi.rootNode?.handle
-                                    || fileBrowserViewModel.state().fileBrowserHandle == -1L)
-                            && !fileBrowserViewModel.isMediaDiscoveryOpen()
-                        ) {
-                            supportActionBar?.title = getString(R.string.section_cloud_drive)
-                            viewModel.setIsFirstNavigationLevel(true)
-                        } else {
-                            supportActionBar?.title = parentNode.name
-                            viewModel.setIsFirstNavigationLevel(false)
-                        }
-                    } else {
-                        fileBrowserViewModel.setFileBrowserHandle(-1)
+                if (fileBrowserViewModel.state().selectedTab != CloudDriveTab.SYNC) {
+                    supportActionBar?.subtitle = null
+                    Timber.d("Cloud Drive SECTION")
+                    val parentNode = withContext(ioDispatcher) {
+                        megaApi.getNodeByHandle(fileBrowserViewModel.state().fileBrowserHandle)
                     }
-                } else {
-                    if (megaApi.rootNode != null) {
-                        if (fileBrowserViewModel.state().fileBrowserHandle == INVALID_HANDLE) {
-                            fileBrowserViewModel.setFileBrowserHandle(
-                                megaApi.rootNode?.handle ?: INVALID_HANDLE
-                            )
-                            supportActionBar?.title =
-                                getString(R.string.title_mega_info_empty_screen)
-                            viewModel.setIsFirstNavigationLevel(true)
+                    if (parentNode != null) {
+                        if (megaApi.rootNode != null) {
+                            if ((parentNode.handle == megaApi.rootNode?.handle
+                                        || fileBrowserViewModel.state().fileBrowserHandle == -1L)
+                                && !fileBrowserViewModel.isMediaDiscoveryOpen()
+                            ) {
+                                supportActionBar?.title = getString(R.string.section_cloud_drive)
+                                viewModel.setIsFirstNavigationLevel(true)
+                            } else {
+                                supportActionBar?.title = parentNode.name
+                                viewModel.setIsFirstNavigationLevel(false)
+                            }
+                        } else {
+                            fileBrowserViewModel.setFileBrowserHandle(-1)
                         }
                     } else {
-                        fileBrowserViewModel.setFileBrowserHandle(-1)
-                        viewModel.setIsFirstNavigationLevel(true)
+                        if (megaApi.rootNode != null) {
+                            if (fileBrowserViewModel.state().fileBrowserHandle == INVALID_HANDLE) {
+                                fileBrowserViewModel.setFileBrowserHandle(
+                                    megaApi.rootNode?.handle ?: INVALID_HANDLE
+                                )
+                                supportActionBar?.title =
+                                    getString(R.string.title_mega_info_empty_screen)
+                                viewModel.setIsFirstNavigationLevel(true)
+                            }
+                        } else {
+                            fileBrowserViewModel.setFileBrowserHandle(-1)
+                            viewModel.setIsFirstNavigationLevel(true)
+                        }
                     }
                 }
             }
@@ -3264,8 +3266,10 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             supportActionBar?.setHomeAsUpIndicator(badgeDrawable)
         }
         if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-            openLinkMenuItem?.isVisible = isFirstNavigationLevel
-            moreMenuItem?.isVisible = !isFirstNavigationLevel
+            if (fileBrowserViewModel.state().selectedTab != CloudDriveTab.SYNC) {
+                openLinkMenuItem?.isVisible = isFirstNavigationLevel
+                moreMenuItem?.isVisible = !isFirstNavigationLevel
+            }
         }
     }
 
@@ -4352,11 +4356,13 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         if (viewModel.isConnected) {
             when (drawerItem) {
                 DrawerItem.CLOUD_DRIVE -> {
-                    openLinkMenuItem?.isVisible = isFirstNavigationLevel
-                    moreMenuItem?.isVisible = !isFirstNavigationLevel
-                    if (!fileBrowserViewModel.isMediaDiscoveryOpen() && isCloudAdded && fileBrowserViewModel.state().nodesList.isNotEmpty()
-                    ) {
-                        searchMenuItem?.isVisible = true
+                    if (fileBrowserViewModel.state().selectedTab != CloudDriveTab.SYNC) {
+                        openLinkMenuItem?.isVisible = isFirstNavigationLevel
+                        moreMenuItem?.isVisible = !isFirstNavigationLevel
+                        if (!fileBrowserViewModel.isMediaDiscoveryOpen() && isCloudAdded && fileBrowserViewModel.state().nodesList.isNotEmpty()
+                        ) {
+                            searchMenuItem?.isVisible = true
+                        }
                     }
                 }
 
