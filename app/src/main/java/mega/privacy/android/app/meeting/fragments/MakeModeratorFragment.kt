@@ -66,6 +66,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        meetingActivity.consumeInsetsWithToolbar()
         Timber.d("In make moderator fragment")
         chatId = arguments?.getLong(MeetingActivity.MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
         if (chatId == MEGACHAT_INVALID_HANDLE) {

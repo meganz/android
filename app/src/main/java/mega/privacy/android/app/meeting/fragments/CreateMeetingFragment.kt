@@ -89,6 +89,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        meetingActivity.consumeInsetsWithToolbar()
         initViewModel()
         initComponent()
     }

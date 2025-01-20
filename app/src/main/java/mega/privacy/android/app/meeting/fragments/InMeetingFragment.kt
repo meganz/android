@@ -446,6 +446,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Timber.d("In the meeting fragment")
+        meetingActivity.consumeInsetsWithToolbar()
         updateCurrentOrientation()
         blink = AnimationUtils.loadAnimation(requireContext(), R.anim.blink)
 

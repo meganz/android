@@ -762,6 +762,13 @@ class MeetingActivity : PasscodeActivity() {
         })
     }
 
+    /**
+     * Consume insets with toolbar
+     */
+    fun consumeInsetsWithToolbar() {
+        consumeInsetsWithToolbar(customToolbar = binding.toolbar)
+    }
+
     private fun isSystemPipEnabledAndAvailable(): Boolean {
         return packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
     }

@@ -74,7 +74,7 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        meetingActivity.consumeInsetsWithToolbar()
         initRTCAudioManager()
 
         binding.mainBk.visibility = View.VISIBLE
