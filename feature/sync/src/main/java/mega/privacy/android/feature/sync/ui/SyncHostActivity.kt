@@ -66,10 +66,16 @@ class SyncHostActivity : AppCompatActivity() {
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            startActivity(Intent(Intent.ACTION_VIEW).apply {
-                data = "https://mega.nz/devicecenter".toUri()
-            })
+            if (!intent.getBooleanExtra(EXTRA_IS_FROM_CLOUD_DRIVE, false)) {
+                startActivity(Intent(Intent.ACTION_VIEW).apply {
+                    data = "https://mega.nz/devicecenter".toUri()
+                })
+            }
             finish()
         }
+    }
+
+    companion object {
+        const val EXTRA_IS_FROM_CLOUD_DRIVE = "IS_FROM_CLOUD_DRIVE"
     }
 }

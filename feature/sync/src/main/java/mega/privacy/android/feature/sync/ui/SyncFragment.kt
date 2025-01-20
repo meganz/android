@@ -85,7 +85,12 @@ class SyncFragment : Fragment() {
 
                 OriginalTempTheme(isDark = themeMode.isDarkMode()) {
                     if (state.isNetworkConnected) {
-                        AndroidSyncFeatureNavigation(animatedNavController)
+                        AndroidSyncFeatureNavigation(
+                            animatedNavController,
+                            shouldNavigateToSyncList = activity?.intent?.getBooleanExtra(
+                                SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, false
+                            ) == false
+                        )
                     } else {
                         SyncNoNetworkState()
                     }
@@ -97,6 +102,7 @@ class SyncFragment : Fragment() {
     @Composable
     private fun AndroidSyncFeatureNavigation(
         animatedNavController: NavHostController,
+        shouldNavigateToSyncList: Boolean,
     ) {
         val context = LocalContext.current
         NavHost(
@@ -115,6 +121,7 @@ class SyncFragment : Fragment() {
                 openUpgradeAccountPage = {
                     megaNavigator.openUpgradeAccount(context)
                 },
+                shouldNavigateToSyncList = shouldNavigateToSyncList
             )
         }
     }

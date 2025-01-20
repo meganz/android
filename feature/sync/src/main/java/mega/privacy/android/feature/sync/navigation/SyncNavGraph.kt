@@ -32,7 +32,6 @@ import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.mobile.analytics.event.AddSyncScreenEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncGetStartedButtonEvent
-import timber.log.Timber
 
 /**
  * Route ro the Sync feature
@@ -98,9 +97,10 @@ internal fun NavGraphBuilder.syncNavGraph(
     fileTypeIconMapper: FileTypeIconMapper,
     syncPermissionsManager: SyncPermissionsManager,
     openUpgradeAccountPage: () -> Unit,
+    shouldNavigateToSyncList: Boolean = true,
 ) {
     navigation(
-        startDestination = syncListRoute,
+        startDestination = if (shouldNavigateToSyncList) syncListRoute else syncNewFolderRoute,
         route = syncRoute,
     ) {
 
@@ -145,7 +145,6 @@ internal fun NavGraphBuilder.syncNavGraph(
             val syncType = GsonBuilder().create()
                 .fromJson(navBackStackEntry.arguments?.getString("syncType"), SyncType::class.java)
                 ?: SyncType.TYPE_TWOWAY
-            Timber.d("Sync Type = $syncType")
 
             val viewModel =
                 hiltViewModel<SyncNewFolderViewModel, SyncNewFolderViewModel.SyncNewFolderViewModelFactory> { factory ->
@@ -169,13 +168,25 @@ internal fun NavGraphBuilder.syncNavGraph(
                     navController.navigate(syncMegaPicker)
                 },
                 openNextScreen = {
-                    navFromNewFolderRouteToListRoute()
+                    if (shouldNavigateToSyncList) {
+                        navFromNewFolderRouteToListRoute()
+                    } else {
+                        if (!navController.popBackStack()) {
+                            context.findFragmentActivity()?.finish()
+                        }
+                    }
                 },
                 openUpgradeAccount = {
                     openUpgradeAccountPage()
                 },
                 onBackClicked = {
-                    navFromNewFolderRouteToListRoute()
+                    if (shouldNavigateToSyncList) {
+                        navFromNewFolderRouteToListRoute()
+                    } else {
+                        if (!navController.popBackStack()) {
+                            context.findFragmentActivity()?.finish()
+                        }
+                    }
                 },
                 onSelectFolder = {
                     megaNavigator.openInternalFolderPicker(
@@ -229,7 +240,6 @@ internal fun NavGraphBuilder.syncNavGraph(
                 navBackStackEntry.arguments?.getString("selectedChip"),
                 SyncChip::class.java
             ) ?: SyncChip.SYNC_FOLDERS
-            Timber.d("Selected Chip = $selectedChip")
 
             val fragmentActivity = LocalContext.current.findFragmentActivity()
             val context = LocalContext.current

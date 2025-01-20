@@ -106,6 +106,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
@@ -331,9 +332,18 @@ class CloudDriveSyncsFragment : Fragment() {
                                         onSyncFolderClicked = {
                                             Analytics.tracker.trackEvent(AndroidSyncFABButtonEvent)
                                             // open sync fragment with specific folder
+                                            megaNavigator.openNewSync(
+                                                activity,
+                                                SyncType.TYPE_TWOWAY,
+                                                isFromCloudDrive = true
+                                            )
                                         },
                                         onBackupFolderClicked = {
-
+                                            megaNavigator.openNewSync(
+                                                activity,
+                                                SyncType.TYPE_BACKUP,
+                                                isFromCloudDrive = true
+                                            )
                                         },
                                         onSelectStopBackupDestinationClicked = {
 

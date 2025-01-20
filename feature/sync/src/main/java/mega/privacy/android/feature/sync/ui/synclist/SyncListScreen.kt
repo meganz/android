@@ -187,7 +187,10 @@ internal fun SyncListScreen(
                             MultiFloatingActionButtonItem(
                                 icon = painterResource(id = iconPackR.drawable.ic_sync_01),
                                 label = stringResource(id = R.string.sync_toolbar_title),
-                                onClicked = onSyncFolderClicked,
+                                onClicked = {
+                                    onSyncFolderClicked()
+                                    multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
+                                },
                             ),
                             MultiFloatingActionButtonItem(
                                 icon = painterResource(id = iconPackR.drawable.ic_database),
@@ -197,6 +200,7 @@ internal fun SyncListScreen(
                                         AndroidBackupFABButtonPressedEvent
                                     )
                                     onBackupFolderClicked()
+                                    multiFabState.value = MultiFloatingActionButtonState.COLLAPSED
                                 },
                             ),
                         ),
@@ -209,9 +213,9 @@ internal fun SyncListScreen(
                                 )
                             }
                             onFabExpanded(state == MultiFloatingActionButtonState.EXPANDED)
-                                    multiFabState.value = state
-                                }
-                            )
+                            multiFabState.value = state
+                        }
+                    )
 
                 } else {
                     if (syncFoldersState.syncUiItems.isNotEmpty() || syncFoldersState.isLoading) {
