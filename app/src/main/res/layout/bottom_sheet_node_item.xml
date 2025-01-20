@@ -248,22 +248,42 @@
                 android:background="@color/grey_012_white_012"
                 android:orientation="horizontal" />
 
-            <TextView
-                android:id="@+id/option_sync"
-                style="@style/BottomSheetOption"
-                android:text="@string/sync"
+            <LinearLayout
+                android:id="@+id/option_sync_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:visibility="gone"
-                app:drawableStartCompat="@drawable/ic_sync_01"
-                tools:visibility="visible"/>
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/option_sync"
+                    style="@style/BottomSheetOption"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/sync"
+                    app:drawableStartCompat="@drawable/ic_sync_01" />
+
+                <mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
+                    android:id="@+id/option_sync_tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    app:mega_chip_selected="true"
+                    app:mega_chip_style="TagChipStyle"
+                    app:mega_chip_text="@string/notifications_notification_item_new_tag" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/separator_sync"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:visibility="gone"
                 android:background="@color/grey_012_white_012"
-                android:orientation="horizontal" />
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
             <LinearLayout
                 android:id="@+id/remove_recently_watched_item_option"

@@ -234,7 +234,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val optionRemove = contentView.findViewById<TextView>(R.id.remove_option)
         val viewInFolder = contentView.findViewById<TextView>(R.id.view_in_folder_option)
 
-        val optionSync = contentView.findViewById<TextView>(R.id.option_sync)
+        val optionSync = contentView.findViewById<LinearLayout>(R.id.option_sync_layout)
         val separatorInfo = contentView.findViewById<View>(R.id.separator_info_option)
         val separatorOpen = contentView.findViewById<LinearLayout>(R.id.separator_open_options)
         val separatorDownload =

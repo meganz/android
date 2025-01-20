@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MegaChip">
+        <attr name="mega_chip_selected" format="boolean"/>
+        <attr name="mega_chip_enabled" format="boolean"/>
+        <attr name="mega_chip_text" format="string"/>
+        <attr name="mega_chip_leading_icon" format="reference"/>
+        <attr name="mega_chip_trailing_icon" format="reference"/>
+        <attr name="mega_chip_style" format="enum">
+            <enum name="DefaultChipStyle" value="0" />
+            <enum name="TransparentChipStyle" value="1" />
+            <enum name="RoundedChipStyle" value="2" />
+            <enum name="TagChipStyle" value="3" />
+        </attr>
+    </declare-styleable>
+</resources>
