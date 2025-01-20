@@ -29,6 +29,7 @@ import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderState
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
@@ -313,9 +314,57 @@ internal class SyncNewFolderViewModelTest {
         verify(clearSelectedMegaFolderUseCase).invoke()
     }
 
-    private fun initViewModel(syncType: SyncType) {
+    @Test
+    fun `test that selected mega folder is set when view model is initiated with remote folder parameters`(
+    ) = runTest {
+
+        val remoteFolder = RemoteFolder(123L, "someFolder")
+        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow {
+            awaitCancellation()
+        })
+
+        initViewModel(
+            syncType = SyncType.TYPE_TWOWAY,
+            remoteFolderHandle = remoteFolder.id,
+            remoteFolderName = remoteFolder.name,
+        )
+
+        with(underTest) {
+            state.test {
+                val result = awaitItem().selectedMegaFolder as RemoteFolder
+                assertThat(result).isEqualTo(remoteFolder)
+            }
+        }
+    }
+
+    @Test
+    fun `test that selected mega folder is not set when view model is not initiated with remote folder parameters`(
+    ) = runTest {
+        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow {
+            awaitCancellation()
+        })
+
+        initViewModel(
+            syncType = SyncType.TYPE_TWOWAY
+        )
+
+        with(underTest) {
+            state.test {
+                val result = awaitItem().selectedMegaFolder
+                assertThat(result).isEqualTo(null)
+            }
+        }
+    }
+
+    private fun initViewModel(
+        syncType: SyncType,
+        remoteFolderHandle: Long? = null,
+        remoteFolderName: String? = null,
+    ) {
         underTest = SyncNewFolderViewModel(
             syncType = syncType,
+            remoteFolderHandle = remoteFolderHandle,
+            remoteFolderName = remoteFolderName,
             monitorSelectedMegaFolderUseCase = monitorSelectedMegaFolderUseCase,
             syncFolderPairUseCase = syncFolderPairUseCase,
             isStorageOverQuotaUseCase = isStorageOverQuotaUseCase,

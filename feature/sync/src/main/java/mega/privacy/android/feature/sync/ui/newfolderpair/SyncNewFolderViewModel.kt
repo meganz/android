@@ -31,6 +31,8 @@ import timber.log.Timber
 @HiltViewModel(assistedFactory = SyncNewFolderViewModel.SyncNewFolderViewModelFactory::class)
 internal class SyncNewFolderViewModel @AssistedInject constructor(
     @Assisted val syncType: SyncType,
+    @Assisted val remoteFolderHandle: Long?,
+    @Assisted val remoteFolderName: String?,
     private val monitorSelectedMegaFolderUseCase: MonitorSelectedMegaFolderUseCase,
     private val syncFolderPairUseCase: SyncFolderPairUseCase,
     private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase,
@@ -43,7 +45,11 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface SyncNewFolderViewModelFactory {
-        fun create(syncType: SyncType): SyncNewFolderViewModel
+        fun create(
+            syncType: SyncType,
+            remoteFolderHandle: Long?,
+            remoteFolderName: String?,
+        ): SyncNewFolderViewModel
     }
 
     private val _state =
@@ -58,6 +64,11 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                 _state.update { state ->
                     state.copy(selectedMegaFolder = folder)
                 }
+            }
+        }
+        if (remoteFolderHandle != null && remoteFolderName != null) {
+            _state.update { state ->
+                state.copy(selectedMegaFolder = RemoteFolder(remoteFolderHandle, remoteFolderName))
             }
         }
     }

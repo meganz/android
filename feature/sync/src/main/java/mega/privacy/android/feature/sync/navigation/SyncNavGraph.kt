@@ -32,6 +32,7 @@ import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.mobile.analytics.event.AddSyncScreenEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncGetStartedButtonEvent
+import timber.log.Timber
 
 /**
  * Route ro the Sync feature
@@ -68,7 +69,8 @@ private const val syncEmptyRoute = "$syncRoute/empty"
 /**
  * Route to the add new sync screen
  */
-private const val syncNewFolderRoute = "$syncRoute/new-folder/{syncType}"
+private const val syncNewFolderRoute =
+    "$syncRoute/new-folder/{syncType}/{remoteFolderHandle}/{remoteFolderName}"
 
 /**
  * Gets the route to the add new sync screen and allow set some allowed possible parameters through it
@@ -76,12 +78,19 @@ private const val syncNewFolderRoute = "$syncRoute/new-folder/{syncType}"
  * @param syncType The [SyncType] for the new sync
  * @return The route to the the add new sync screen with the allowed possible parameters
  */
-fun getSyncNewFolderRoute(syncType: SyncType): String {
+fun getSyncNewFolderRoute(
+    syncType: SyncType,
+    remoteFolderHandle: Long? = null,
+    remoteFolderName: String? = null,
+): String {
     val syncTypeJson = GsonBuilder().create().toJson(syncType)
-    return syncNewFolderRoute.replace(oldValue = "{syncType}", newValue = syncTypeJson)
+    return syncNewFolderRoute.replace(oldValue = "{syncType}", newValue = syncTypeJson).replace(
+        oldValue = "{remoteFolderHandle}",
+        newValue = remoteFolderHandle.toString()
+    ).replace(oldValue = "{remoteFolderName}", newValue = remoteFolderName.toString())
 }
 
-/**
+/**-
  * Route to the MEGA folder picker screen
  */
 private const val syncMegaPicker = "$syncRoute/mega-picker"
@@ -138,6 +147,12 @@ internal fun NavGraphBuilder.syncNavGraph(
             arguments = listOf(
                 navArgument("syncType") {
                     nullable = false
+                },
+                navArgument("remoteFolderHandle") {
+                    nullable = true
+                },
+                navArgument("remoteFolderName") {
+                    nullable = true
                 }
             )
         ) { navBackStackEntry ->
@@ -146,9 +161,22 @@ internal fun NavGraphBuilder.syncNavGraph(
                 .fromJson(navBackStackEntry.arguments?.getString("syncType"), SyncType::class.java)
                 ?: SyncType.TYPE_TWOWAY
 
+            val remoteFolderHandle =
+                navBackStackEntry.arguments?.getString("remoteFolderHandle")?.toLongOrNull()
+            val remoteFolderName = navBackStackEntry.arguments?.getString("remoteFolderName")
+
+            Timber.d(
+                "Sync Type = $syncType | Remote Folder Handle = $remoteFolderHandle | Remote Folder Name = $remoteFolderName"
+            )
+
+
             val viewModel =
                 hiltViewModel<SyncNewFolderViewModel, SyncNewFolderViewModel.SyncNewFolderViewModelFactory> { factory ->
-                    factory.create(syncType = syncType)
+                    factory.create(
+                        syncType = syncType,
+                        remoteFolderHandle = remoteFolderHandle,
+                        remoteFolderName = remoteFolderName
+                    )
                 }
 
             val launcher =

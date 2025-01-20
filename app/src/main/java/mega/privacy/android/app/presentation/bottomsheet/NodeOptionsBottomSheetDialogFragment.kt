@@ -91,8 +91,10 @@ import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
 import nz.mega.sdk.MegaNode
@@ -129,6 +131,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     @Inject
     lateinit var getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
@@ -229,12 +234,14 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val optionRemove = contentView.findViewById<TextView>(R.id.remove_option)
         val viewInFolder = contentView.findViewById<TextView>(R.id.view_in_folder_option)
 
+        val optionSync = contentView.findViewById<TextView>(R.id.option_sync)
         val separatorInfo = contentView.findViewById<View>(R.id.separator_info_option)
         val separatorOpen = contentView.findViewById<LinearLayout>(R.id.separator_open_options)
         val separatorDownload =
             contentView.findViewById<LinearLayout>(R.id.separator_download_options)
         val separatorShares = contentView.findViewById<LinearLayout>(R.id.separator_share_options)
         val separatorModify = contentView.findViewById<LinearLayout>(R.id.separator_modify_options)
+        val separatorSync = contentView.findViewById<View>(R.id.separator_sync)
         val optionRemoveRecentlyWatchedItem =
             contentView.findViewById<View>(R.id.remove_recently_watched_item_option)
         val optionAddVideoToPlaylistItem =
@@ -570,6 +577,24 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 if (mode == DEFAULT_MODE) {
                     mapDrawerItemToMode(state.nodeDeviceCenterInformation)
                 }
+
+                viewLifecycleOwner.lifecycleScope.launch {
+                    if (getFeatureFlagValueUseCase(
+                            AppFeatures.CloudDriveAndSyncs
+                        ) && mode == CLOUD_DRIVE_MODE && node.isFolder && !isTakenDown && state.isOnline
+                    ) {
+                        optionSync.visibility = View.VISIBLE
+                        separatorSync.visibility = View.VISIBLE
+                        optionSync.setOnClickListener {
+                            openNewSyncScreen(node)
+                        }
+                    } else {
+                        optionSync.visibility = View.GONE
+                        separatorSync.visibility = View.GONE
+                        optionSync.setOnClickListener(null)
+                    }
+                }
+
                 when (mode) {
                     CLOUD_DRIVE_MODE,
                     SEARCH_MODE,
@@ -883,6 +908,18 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             calculatePeekHeight()
         }
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun openNewSyncScreen(node: MegaNode) {
+        val managerActivity =
+            requireActivity() as? ManagerActivity ?: return
+        megaNavigator.openNewSync(
+            context = managerActivity,
+            syncType = SyncType.TYPE_TWOWAY,
+            remoteFolderHandle = node.handle,
+            remoteFolderName = node.name,
+        )
+        dismiss()
     }
 
     private fun onClick(action: () -> Unit) {

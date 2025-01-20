@@ -106,8 +106,16 @@ interface AppNavigator {
      * @param context       Context
      * @param syncType      The sync type from [SyncType]
      * @param isFromCloudDrive Indicates if the sync is from Cloud Drive. False by default.
+     * @param remoteFolderHandle The remote folder handle
+     * @param remoteFolderName The remote folder name
      */
-    fun openNewSync(context: Context, syncType: SyncType, isFromCloudDrive: Boolean = false)
+    fun openNewSync(
+        context: Context,
+        syncType: SyncType,
+        isFromCloudDrive: Boolean = false,
+        remoteFolderHandle: Long? = null,
+        remoteFolderName: String? = null,
+    )
 
     /**
      * Open zip browser
