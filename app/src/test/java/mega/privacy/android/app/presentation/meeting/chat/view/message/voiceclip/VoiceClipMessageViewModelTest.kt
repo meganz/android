@@ -29,6 +29,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -103,7 +104,7 @@ class VoiceClipMessageViewModelTest {
             on { exists() }.thenReturn(true)
             on { length() }.thenReturn(voiceClipMessage.size)
         }
-        whenever(durationInSecondsTextMapper(any())).thenReturn(mockTimestamp)
+        whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(mockTimestamp)
     }
 
     @BeforeEach

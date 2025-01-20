@@ -16,6 +16,8 @@ fun UriPath.toUri(): Uri {
 /**
  * @return true if this UriPath represents a file, false otherwise
  */
-fun UriPath.isFile(): Boolean {
-    return toUri().scheme == "file"
-}
+fun UriPath.isFile() = toUri().scheme == "file"
+
+fun UriPath.isPath(): Boolean = value.startsWith("file").not() && isFile()
+
+fun UriPath.fromUri(uri: Uri) = UriPath(uri.toString())

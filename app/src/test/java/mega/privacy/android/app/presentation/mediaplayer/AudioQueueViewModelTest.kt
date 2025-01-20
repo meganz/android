@@ -14,7 +14,7 @@ import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -147,7 +147,7 @@ class AudioQueueViewModelTest {
     fun `test that state is updated correctly when updateCurrentPlayingPosition is called`() =
         runTest {
             val durationString = "10:00"
-            whenever(durationInSecondsTextMapper(any())).thenReturn(durationString)
+            whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(durationString)
             initUnderTest()
             underTest.updateCurrentPlayingPosition(0)
             underTest.uiState.test {

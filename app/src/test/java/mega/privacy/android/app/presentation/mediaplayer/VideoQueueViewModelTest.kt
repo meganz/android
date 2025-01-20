@@ -16,7 +16,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -142,7 +142,7 @@ class VideoQueueViewModelTest {
 
     private fun initCurrentPlayingPosition() {
         whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(testPlayingPosition)
-        whenever(durationInSecondsTextMapper(any())).thenReturn(durationString)
+        whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(durationString)
     }
 
     @Test

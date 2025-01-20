@@ -87,7 +87,7 @@ class SetNodeAttributesAfterUploadUseCaseTest {
         isImageFile: Boolean,
         isPdfFile: Boolean,
     ) = runTest {
-        whenever(isVideoFileUseCase(localPath)).thenReturn(isVideoFile)
+        whenever(isVideoFileUseCase(UriPath(localPath))).thenReturn(isVideoFile)
         whenever(isImageFileUseCase(localPath)).thenReturn(isImageFile)
         whenever(isPdfFileUseCase(uriPath)).thenReturn(isPdfFile)
         whenever(createImageOrVideoThumbnailUseCase(nodeHandle, localFile)).thenReturn(Unit)

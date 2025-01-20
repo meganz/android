@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
@@ -96,7 +97,7 @@ class CompressFileForChatUseCaseTest {
             val expected = ChatUploadCompressionState.Compressed(mock<File>())
             whenever(chatAttachmentNeedsCompressionUseCase(original)) doReturn true
             whenever(isImageFileUseCase(original.absolutePath)) doReturn false
-            whenever(isVideoFileUseCase(original.absolutePath)) doReturn true
+            whenever(isVideoFileUseCase(UriPath(original.absolutePath))) doReturn true
             whenever(compressVideoForChatUseCase(original)) doReturn flowOf(expected)
 
             underTest(original).test {

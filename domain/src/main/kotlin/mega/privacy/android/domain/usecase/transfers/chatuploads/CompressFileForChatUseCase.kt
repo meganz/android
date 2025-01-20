@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.chat.ChatUploadCompressionState
 import mega.privacy.android.domain.usecase.chat.ChatUploadNotCompressedReason
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
@@ -30,7 +31,7 @@ class CompressFileForChatUseCase @Inject constructor(
                 downscaleImageForChatUseCase(original)
             }
 
-            isVideoFileUseCase(path) -> {
+            isVideoFileUseCase(UriPath.fromFile(original)) -> {
                 compressVideoForChatUseCase(original)
             }
 

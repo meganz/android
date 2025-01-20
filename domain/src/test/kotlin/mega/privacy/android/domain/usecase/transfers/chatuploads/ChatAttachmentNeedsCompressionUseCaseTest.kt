@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
@@ -18,6 +19,8 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyValueClass
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -61,7 +64,7 @@ class ChatAttachmentNeedsCompressionUseCaseTest {
 
         @BeforeEach
         fun setup() {
-            wheneverBlocking { isVideoFileUseCase(any()) } doReturn false
+            wheneverBlocking { isVideoFileUseCase(anyValueClass()) } doReturn false
             wheneverBlocking { isImageFileUseCase(jpg.absolutePath) } doReturn true
             wheneverBlocking { isImageFileUseCase(gif.absolutePath) } doReturn true
         }
@@ -132,8 +135,8 @@ class ChatAttachmentNeedsCompressionUseCaseTest {
         @BeforeEach
         fun setup() {
             wheneverBlocking { isImageFileUseCase(any()) } doReturn false
-            wheneverBlocking { isVideoFileUseCase(mp4.absolutePath) } doReturn true
-            wheneverBlocking { isVideoFileUseCase(mpg.absolutePath) } doReturn true
+            wheneverBlocking { isVideoFileUseCase(UriPath(mp4.absolutePath)) } doReturn true
+            wheneverBlocking { isVideoFileUseCase(UriPath(mpg.absolutePath)) } doReturn true
         }
 
         @Test

@@ -92,6 +92,8 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.anyValueClass
 import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -1268,7 +1270,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 )
 
                 whenever(isNewFolderNodeValidUseCase(any())).thenReturn(true)
-                whenever(getPrimaryFolderNodeUseCase(any())).thenReturn(cameraUploadsNode)
+                whenever(getPrimaryFolderNodeUseCase(anyOrNull())).thenReturn(cameraUploadsNode)
                 whenever(monitorCameraUploadsFolderDestinationUseCase()).thenReturn(
                     flow {
                         emit(folderDestinationUpdate)
@@ -1615,7 +1617,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 cameraUploadFolderType = CameraUploadFolderType.Secondary,
             )
             whenever(isNewFolderNodeValidUseCase(any())).thenReturn(true)
-            whenever(getSecondaryFolderNodeUseCase(any())).thenThrow(RuntimeException())
+            whenever(getSecondaryFolderNodeUseCase(anyValueClass())).thenThrow(RuntimeException())
             whenever(monitorCameraUploadsFolderDestinationUseCase()).thenReturn(
                 flow {
                     emit(folderDestinationUpdate)
@@ -1642,7 +1644,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 )
 
                 whenever(isNewFolderNodeValidUseCase(any())).thenReturn(true)
-                whenever(getSecondaryFolderNodeUseCase(any())).thenReturn(mediaUploadsNode)
+                whenever(getSecondaryFolderNodeUseCase(anyOrNull())).thenReturn(mediaUploadsNode)
                 whenever(monitorCameraUploadsFolderDestinationUseCase()).thenReturn(
                     flow {
                         emit(folderDestinationUpdate)

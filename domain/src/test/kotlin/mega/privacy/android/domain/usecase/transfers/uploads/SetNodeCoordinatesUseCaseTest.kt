@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.transfers.uploads
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
@@ -60,7 +61,7 @@ class SetNodeCoordinatesUseCaseTest {
         val path = "path"
         val nodeHandle = 1L
         val coordinates = Pair(123.0, 6345.0)
-        whenever(isVideoFileUseCase(path)).thenReturn(isVideoFile)
+        whenever(isVideoFileUseCase(UriPath(path))).thenReturn(isVideoFile)
         whenever(isImageFileUseCase(path)).thenReturn(isImageFile)
         whenever(getGPSCoordinatesUseCase.invoke(path, isVideoFile)).thenReturn(coordinates)
         underTest.invoke(path, nodeHandle)

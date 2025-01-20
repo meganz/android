@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.transfers.uploads
 
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
@@ -30,7 +31,7 @@ class SetNodeCoordinatesUseCase @Inject constructor(
      * @param nodeHandle Node identifier of the file in the cloud.
      */
     suspend operator fun invoke(localPath: String, nodeHandle: Long) {
-        val isVideo = isVideoFileUseCase(localPath)
+        val isVideo = isVideoFileUseCase(UriPath(localPath))
         if (isVideo || isImageFileUseCase(localPath)) {
             getGPSCoordinatesUseCase(localPath, isVideo)?.let { (latitude, longitude) ->
                 nodeRepository.setNodeCoordinates(

@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 import kotlinx.coroutines.flow.first
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
@@ -41,7 +42,7 @@ class ChatAttachmentNeedsCompressionUseCase @Inject constructor(
                         || (imageQuality == ChatImageQuality.Automatic && networkRepository.isOnWifi()))
             }
 
-            isVideoFileUseCase(path) -> {
+            isVideoFileUseCase(UriPath.fromFile(file)) -> {
                 if (file.extension != "mp4") return false
                 val videoQuality = defaultSettingsRepository.getChatVideoQualityPreference()
                 return videoQuality != VideoQuality.ORIGINAL
