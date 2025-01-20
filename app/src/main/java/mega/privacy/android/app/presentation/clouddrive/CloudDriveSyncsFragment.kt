@@ -29,6 +29,7 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,6 +46,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -113,10 +115,7 @@ import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.values.TextColor
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.AndroidSyncFABButtonEvent
 import mega.privacy.mobile.analytics.event.CloudDriveHideNodeMenuItemEvent
@@ -285,14 +284,16 @@ class CloudDriveSyncsFragment : Fragment() {
                                         .forEachIndexed { index, tab ->
                                             Tab(
                                                 text = {
-                                                    MegaText(
+                                                    Text(
                                                         text = stringResource(tabResIds[index]),
-                                                        style = MaterialTheme.typography.subtitle1,
-                                                        textColor = TextColor.Primary
+                                                        style = MaterialTheme.typography.subtitle2.copy(
+                                                            fontWeight = FontWeight.Medium
+                                                        ),
                                                     )
                                                 },
                                                 selected = pagerState.currentPage == index,
-                                                unselectedContentColor = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
+                                                selectedContentColor = colorResource(R.color.color_border_interactive),
+                                                unselectedContentColor = MaterialTheme.colors.secondary,
                                                 onClick = {
                                                     fileBrowserViewModel.onTabChanged(tab)
                                                     coroutineScope.launch {

@@ -202,7 +202,9 @@ internal fun SharesScreen(
                                         text = {
                                             Text(
                                                 text = stringResource(item.stringRes),
-                                                style = MaterialTheme.typography.subtitle1,
+                                                style = MaterialTheme.typography.subtitle2.copy(
+                                                    fontWeight = FontWeight.Medium
+                                                ),
                                             )
                                         },
                                         icon = {
