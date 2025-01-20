@@ -352,7 +352,7 @@ internal class FileFacade @Inject constructor(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 put(
                     MediaStore.Images.Media.RELATIVE_PATH,
-                    "${Environment.DIRECTORY_PICTURES}/$PHOTO_DIR"
+                    "${Environment.DIRECTORY_DCIM}/$PHOTO_DIR"
                 )
             }
         }
@@ -368,7 +368,7 @@ internal class FileFacade @Inject constructor(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 put(
                     MediaStore.Video.Media.RELATIVE_PATH,
-                    "${Environment.DIRECTORY_MOVIES}/$PHOTO_DIR"
+                    "${Environment.DIRECTORY_DCIM}/$PHOTO_DIR"
                 )
             }
         }
