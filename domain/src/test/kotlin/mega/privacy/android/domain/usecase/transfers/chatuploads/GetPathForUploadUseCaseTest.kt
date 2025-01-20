@@ -3,12 +3,13 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.featuretoggle.DomainFeatures
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.PermissionRepository
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceUseCase
 import mega.privacy.android.domain.usecase.transfers.GetCacheFileForUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.GetPathForUploadUseCase
-import mega.privacy.android.domain.usecase.transfers.uploads.UseContentUrisForUploadsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -34,7 +35,7 @@ class GetPathForUploadUseCaseTest {
     private val doesPathHaveSufficientSpaceUseCase = mock<DoesPathHaveSufficientSpaceUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val permissionRepository = mock<PermissionRepository>()
-    val useContentUrisForUploadsUseCase = mock<UseContentUrisForUploadsUseCase>()
+    val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -43,7 +44,7 @@ class GetPathForUploadUseCaseTest {
             doesPathHaveSufficientSpaceUseCase = doesPathHaveSufficientSpaceUseCase,
             fileSystemRepository = fileSystemRepository,
             permissionRepository = permissionRepository,
-            useContentUrisForUploadsUseCase = useContentUrisForUploadsUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -54,13 +55,13 @@ class GetPathForUploadUseCaseTest {
             doesPathHaveSufficientSpaceUseCase,
             fileSystemRepository,
             permissionRepository,
-            useContentUrisForUploadsUseCase,
+            getFeatureFlagValueUseCase,
         )
         whenever(fileSystemRepository.isFileUri(any())).thenReturn(false)
         whenever(fileSystemRepository.isContentUri(any())).thenReturn(false)
         whenever(fileSystemRepository.isFilePath(any())).thenReturn(false)
         whenever(doesPathHaveSufficientSpaceUseCase(any(), any())).thenReturn(true)
-        whenever(useContentUrisForUploadsUseCase(any())).thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
     }
 
     @ParameterizedTest(name = " and isChatUpload is {0}")
@@ -101,7 +102,8 @@ class GetPathForUploadUseCaseTest {
         val file = mock<File> {
             on { this.absolutePath } doReturn path
         }
-        whenever(useContentUrisForUploadsUseCase(false)).thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(DomainFeatures.UseFileDescriptorForUploads))
+            .thenReturn(true)
         whenever(permissionRepository.hasManageExternalStoragePermission()).thenReturn(false)
         whenever(fileSystemRepository.isFileUri(uri)).thenReturn(true)
         whenever(fileSystemRepository.getFileFromFileUri(uri)).thenReturn(file)

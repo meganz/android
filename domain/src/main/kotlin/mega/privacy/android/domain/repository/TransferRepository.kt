@@ -601,9 +601,4 @@ interface TransferRepository {
         replaceWith = ReplaceWith("StartDownloadUseCase"),
     )
     suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String
-
-    /**
-     * Return true if the transfers with content uris are allowed by this android sdk version
-     */
-    suspend fun allowTransfersWithContentUris(): Boolean
 }

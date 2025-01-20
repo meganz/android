@@ -904,9 +904,6 @@ internal class DefaultTransfersRepository @Inject constructor(
                 megaApiFolderGateway.authorizeNode(it)
             }
         }
-
-    override suspend fun allowTransfersWithContentUris() =
-        deviceGateway.getSdkVersionInt() >= Build.VERSION_CODES.R
 }
 
 private fun MegaTransfer.isBackgroundTransfer() =
