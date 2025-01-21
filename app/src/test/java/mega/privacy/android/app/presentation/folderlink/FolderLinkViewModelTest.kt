@@ -206,7 +206,8 @@ class FolderLinkViewModelTest {
             updateCrashAndPerformanceReportersUseCase = updateCrashAndPerformanceReportersUseCase,
             isUserLoggedInUseCase = isUserLoggedInUseCase,
             stopAudioService = stopAudioService,
-            applicationScope = CoroutineScope(UnconfinedTestDispatcher())
+            applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
+            monitorMiscLoadedUseCase = mock()
         )
     }
 

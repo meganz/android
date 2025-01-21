@@ -388,4 +388,14 @@ internal interface AppEventGateway {
      *
      */
     suspend fun broadcastUpgradeDialogClosed()
+
+    /**
+     * Monitor misc loaded
+     */
+    fun monitorMiscLoaded(): Flow<Unit>
+
+    /**
+     * Broadcast misc loaded
+     */
+    suspend fun broadcastMiscLoaded()
 }

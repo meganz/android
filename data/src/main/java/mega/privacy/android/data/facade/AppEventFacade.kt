@@ -72,6 +72,8 @@ internal class AppEventFacade @Inject constructor(
 
     private val updateUserData = MutableSharedFlow<Unit>()
 
+    private val miscLoaded = MutableSharedFlow<Unit>()
+
     override suspend fun broadcastCookieSettings(enabledCookieSettings: Set<CookieType>) {
         _cookieSettings.emit(enabledCookieSettings)
     }
@@ -243,7 +245,13 @@ internal class AppEventFacade @Inject constructor(
         _monitorUpgradeDialogShown.emit(Unit)
     }
 
+    override suspend fun broadcastMiscLoaded() {
+        miscLoaded.emit(Unit)
+    }
 
+    override fun monitorMiscLoaded(): Flow<Unit> {
+        return miscLoaded.asSharedFlow()
+    }
 }
 
 private fun <T> Flow<T>.toSharedFlow(

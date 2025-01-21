@@ -48,6 +48,7 @@ import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import timber.log.Timber
 import java.io.File
@@ -55,6 +56,8 @@ import javax.inject.Inject
 
 /**
  * View Model class for [mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity]
+ *
+ * @param monitorMiscLoadedUseCase Use case to monitor when misc data is loaded
  */
 @HiltViewModel
 class FileLinkViewModel @Inject constructor(
@@ -73,6 +76,7 @@ class FileLinkViewModel @Inject constructor(
     private val megaNavigator: MegaNavigator,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
+    val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileLinkState())
