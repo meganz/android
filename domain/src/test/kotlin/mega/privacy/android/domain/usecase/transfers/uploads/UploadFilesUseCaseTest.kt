@@ -24,6 +24,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
+import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import org.junit.jupiter.api.AfterAll
@@ -35,6 +36,9 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.internal.verification.Times
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.anyValueClass
 import org.mockito.kotlin.anyVararg
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
@@ -59,6 +63,7 @@ class UploadFilesUseCaseTest {
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val transfer = mock<Transfer>()
     private val cacheRepository = mock<CacheRepository>()
+    private val getGPSCoordinatesUseCase = mock<GetGPSCoordinatesUseCase>()
 
     private lateinit var underTest: UploadFilesUseCase
 
@@ -72,7 +77,8 @@ class UploadFilesUseCaseTest {
                 handleTransferEventUseCase = handleTransferEventUseCase,
                 monitorTransferEventsUseCase = monitorTransferEventsUseCase,
                 transferRepository = transferRepository,
-                cacheRepository = cacheRepository
+                cacheRepository = cacheRepository,
+                getGPSCoordinatesUseCase = getGPSCoordinatesUseCase,
             )
     }
 
@@ -82,7 +88,7 @@ class UploadFilesUseCaseTest {
             transferRepository, cancelTokenRepository, fileSystemRepository,
             handleTransferEventUseCase, fileNode, invalidateCancelTokenUseCase,
             cancelCancelTokenUseCase, transfer,
-            monitorTransferEventsUseCase, cacheRepository,
+            monitorTransferEventsUseCase, cacheRepository,getGPSCoordinatesUseCase
         )
         commonStub()
     }
@@ -198,6 +204,56 @@ class UploadFilesUseCaseTest {
                 null,
                 appData,
                 isSourceTemporary = false,
+            )
+            awaitComplete()
+        }
+    }
+
+    @ParameterizedTest(name = "appdata: \"{0}\"")
+    @MethodSource("provideAppDataExceptChat")
+    fun `test that geolocation is added for temporary files`(
+        appData: List<TransferAppData>,
+    ) = runTest {
+        whenever(cacheRepository.isFileInCacheDirectory(any())) doReturn true
+        val location = Pair(34.8,2.56)
+        val locationAppData = TransferAppData.Geolocation(location.first, location.second)
+        whenever(getGPSCoordinatesUseCase(anyValueClass(), anyOrNull())) doReturn location
+        underTest(
+            listOf(UploadFileInfo(file, null, appData)), parentId,
+            isHighPriority = false
+        ).test {
+            verify(transferRepository).startUpload(
+                ABSOLUTE_PATH,
+                parentId,
+                null,
+                null,
+                appData + locationAppData,
+                isSourceTemporary = true,
+                shouldStartFirst = false,
+            )
+            awaitComplete()
+        }
+    }
+
+    @ParameterizedTest(name = "appdata: \"{0}\"")
+    @MethodSource("provideChatAppData")
+    fun `test that geolocation is added for chat temporary files`(
+        appData: List<TransferAppData.ChatUploadAppData>,
+    ) = runTest {
+        whenever(cacheRepository.isFileInCacheDirectory(any())) doReturn true
+        val location = Pair(34.8,2.56)
+        val locationAppData = TransferAppData.Geolocation(location.first, location.second)
+        whenever(getGPSCoordinatesUseCase(anyValueClass(), anyOrNull())) doReturn location
+        underTest(
+            listOf(UploadFileInfo(file, null, appData)), parentId,
+            isHighPriority = false
+        ).test {
+            verify(transferRepository).startUploadForChat(
+                ABSOLUTE_PATH,
+                parentId,
+                null,
+                appData + locationAppData,
+                isSourceTemporary = true,
             )
             awaitComplete()
         }

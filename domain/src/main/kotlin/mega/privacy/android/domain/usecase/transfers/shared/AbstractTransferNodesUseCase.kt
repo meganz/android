@@ -45,7 +45,7 @@ abstract class AbstractTransferNodesUseCase<T, R>(
     internal fun commonInvoke(
         items: List<T>,
         beforeStartTransfer: (suspend () -> Unit)?,
-        doTransfer: (T) -> Flow<TransferEvent>,
+        doTransfer: suspend (T) -> Flow<TransferEvent>,
     ): Flow<MultiTransferEvent> {
         val itemsScanned =
             mutableSetOf<R>() //to check if all [items] have been scanned (children not needed here)

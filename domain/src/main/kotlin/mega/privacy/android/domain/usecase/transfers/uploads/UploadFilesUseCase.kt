@@ -10,6 +10,7 @@ import mega.privacy.android.domain.repository.CacheRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
+import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractTransferNodesUseCase
@@ -26,6 +27,7 @@ class UploadFilesUseCase @Inject constructor(
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val transferRepository: TransferRepository,
     private val cacheRepository: CacheRepository,
+    private val getGPSCoordinatesUseCase: GetGPSCoordinatesUseCase,
 ) : AbstractTransferNodesUseCase<UploadFileInfo, String>(
     cancelCancelTokenUseCase,
     invalidateCancelTokenUseCase,
@@ -53,13 +55,21 @@ class UploadFilesUseCase @Inject constructor(
         ) { uploadFileInfo ->
             val isSourceTemporary =
                 cacheRepository.isFileInCacheDirectory(File(uploadFileInfo.uriPath.value))
-            if (!uploadFileInfo.appData.isNullOrEmpty() && uploadFileInfo.appData.all { it is TransferAppData.ChatUploadAppData }) {
+            val appData = buildList<TransferAppData> {
+                uploadFileInfo.appData?.let { addAll(it) }
+                if (isSourceTemporary) {
+                    getGPSCoordinatesUseCase(uploadFileInfo.uriPath)?.let {
+                        add(TransferAppData.Geolocation(it.first, it.second))
+                    }
+                }
+            }.takeIf { it.isNotEmpty() }
+            if (appData?.any { it is TransferAppData.ChatUploadAppData } == true) {
                 @Suppress("UNCHECKED_CAST")
                 transferRepository.startUploadForChat(
                     localPath = uploadFileInfo.uriPath.value,
                     parentNodeId = parentFolderId,
                     fileName = uploadFileInfo.fileName,
-                    appData = uploadFileInfo.appData as List<TransferAppData.ChatUploadAppData>,
+                    appData = appData,
                     isSourceTemporary = isSourceTemporary,
                 )
             } else {
@@ -68,7 +78,7 @@ class UploadFilesUseCase @Inject constructor(
                     parentNodeId = parentFolderId,
                     fileName = uploadFileInfo.fileName,
                     modificationTime = null,
-                    appData = uploadFileInfo.appData,
+                    appData = appData,
                     isSourceTemporary = isSourceTemporary,
                     shouldStartFirst = isHighPriority,
                 )

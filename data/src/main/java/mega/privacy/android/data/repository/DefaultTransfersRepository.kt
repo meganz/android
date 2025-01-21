@@ -188,12 +188,12 @@ internal class DefaultTransfersRepository @Inject constructor(
         localPath: String,
         parentNodeId: NodeId,
         fileName: String?,
-        appData: List<TransferAppData.ChatUploadAppData>,
+        appData: List<TransferAppData>,
         isSourceTemporary: Boolean,
     ) = callbackFlow {
         val parentNode = megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue)
         requireNotNull(parentNode)
-        require(appData.isNotEmpty())
+        require(appData.any { it is TransferAppData.ChatUploadAppData })
         val listener = transferListener(channel)
 
         megaApiGateway.startUploadForChat(
