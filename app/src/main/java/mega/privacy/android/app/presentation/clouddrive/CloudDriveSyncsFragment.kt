@@ -141,7 +141,7 @@ class CloudDriveSyncsFragment : Fragment() {
          */
         val tabResIds = listOf(
             R.string.section_cloud_drive,
-            mega.privacy.android.feature.sync.R.string.sync_toolbar_title
+            sharedR.string.general_syncs
         )
     }
 
@@ -248,10 +248,7 @@ class CloudDriveSyncsFragment : Fragment() {
                     mutableStateOf(null)
                 }
                 val pagerState = rememberPagerState(initialPage = 0) { 2 }
-                val activity = LocalContext.current.findActivity() as AppCompatActivity
                 LaunchedEffect(pagerState.currentPage) {
-                    activity.supportActionBar?.title =
-                        activity.getString(tabResIds[pagerState.currentPage])
                     fileBrowserViewModel.onTabChanged(CloudDriveTab.entries.first { it.position == pagerState.currentPage })
                 }
                 val isTabShown = when (uiState.selectedTab) {

@@ -2,6 +2,7 @@
 
 package mega.privacy.android.app.main
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -3078,6 +3079,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE -> {
+                val isCloudDriveSyncsFeatureOn =
+                    getFeatureFlagValueUseCase(AppFeatures.CloudDriveAndSyncs)
                 if (fileBrowserViewModel.state().selectedTab != CloudDriveTab.SYNC) {
                     supportActionBar?.subtitle = null
                     Timber.d("Cloud Drive SECTION")
@@ -3090,7 +3093,14 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                         || fileBrowserViewModel.state().fileBrowserHandle == -1L)
                                 && !fileBrowserViewModel.isMediaDiscoveryOpen()
                             ) {
-                                supportActionBar?.title = getString(R.string.section_cloud_drive)
+                                if (isCloudDriveSyncsFeatureOn) {
+                                    supportActionBar?.title =
+                                        getString(sharedR.string.general_drive)
+                                } else {
+                                    supportActionBar?.title =
+                                        getString(R.string.section_cloud_drive)
+                                }
+
                                 viewModel.setIsFirstNavigationLevel(true)
                             } else {
                                 supportActionBar?.title = parentNode.name

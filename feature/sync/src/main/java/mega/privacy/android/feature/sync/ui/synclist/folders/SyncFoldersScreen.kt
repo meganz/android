@@ -264,7 +264,7 @@ private fun SyncFoldersScreenLoadingStatePreview() {
 @CombinedThemePreviews
 @Composable
 private fun SyncFoldersScreenSyncingPreview(
-    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(
@@ -299,7 +299,7 @@ private fun SyncFoldersScreenSyncingPreview(
 @CombinedThemePreviews
 @Composable
 private fun SyncFoldersScreenSyncingWithStalledIssuesPreview(
-    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType
+    @PreviewParameter(SyncTypePreviewProvider::class) syncType: SyncType,
 ) {
     OriginalTempTheme(isDark = isSystemInDarkTheme()) {
         SyncFoldersScreen(

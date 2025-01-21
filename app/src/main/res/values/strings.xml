@@ -5349,9 +5349,9 @@
     <!-- Logout warning dialog positive button text -->
     <string name="logout_warning_dialog_positive_button">Log out anyway</string>
     <!-- Logout warning dialog message if offline files exists -->
-    <string name="logout_warning_dialog_offline_message">If you log out now your offline files will be deleted</string>
+    <string name="logout_warning_dialog_offline_message">If you log out now, your offline files will be deleted</string>
     <!-- Logout warning dialog message if user has transfers in progress. -->
-    <string name="logout_warning_dialog_transfers_message">If you log out now your transfers cannot be completed, and the data will be deleted</string>
+    <string name="logout_warning_dialog_transfers_message">If you log out now, your transfers won’t be completed and the data will be deleted</string>
     <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
-    <string name="logout_warning_dialog_offline_and_transfers_message">If you log out now any pending transfers or offline files will be deleted</string>
+    <string name="logout_warning_dialog_offline_and_transfers_message">If you log out now, any pending transfers and offline files will be deleted</string>
 </resources>

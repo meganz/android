@@ -922,4 +922,10 @@
     <string name="sync_local_device_folder_currently_backed_up_message">This folder is already backed up</string>
     <!-- The name of every users root drive in the cloud of MEGA. -->
     <string name="general_section_cloud_drive">Cloud drive</string>
+    <!-- App Bar Title in of Cloud Drive Bottom Menu -->
+    <string name="general_drive">Drive</string>
+    <!-- Tab bar title of Syncs tab -->
+    <string name="general_syncs">Syncs</string>
+    <!-- Text under the syncs list -->
+    <string name="syncs_tab_view_other_devices">View other devices in Device Centre</string>
 </resources>
