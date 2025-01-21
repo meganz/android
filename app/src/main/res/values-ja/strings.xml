@@ -5100,4 +5100,14 @@
     <string name="file_properties_info_map_location">場所</string>
     <!-- Image or Video no map location info-->
     <string name="file_properties_info_map_location_no_location_info">位置情報がありません</string>
+    <!-- Logout warning dialog title if user has offline files or transfers in progress -->
+    <string name="logout_warning_dialog_title">今すぐログアウトするとデータが失われます</string>
+    <!-- Logout warning dialog positive button text -->
+    <string name="logout_warning_dialog_positive_button">とにかくログアウトする</string>
+    <!-- Logout warning dialog message if offline files exists -->
+    <string name="logout_warning_dialog_offline_message">今ログアウトすると、オフラインファイルは削除されます</string>
+    <!-- Logout warning dialog message if user has transfers in progress. -->
+    <string name="logout_warning_dialog_transfers_message">今ログアウトすると転送は完了せず、データは削除されます</string>
+    <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
+    <string name="logout_warning_dialog_offline_and_transfers_message">今ログアウトすると、保留中の転送とオフラインファイルはすべて削除されます</string>
 </resources>

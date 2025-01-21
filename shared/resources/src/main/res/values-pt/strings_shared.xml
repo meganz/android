@@ -541,7 +541,7 @@
     <!-- Step 4: instruction step no.4 Tap Cancel subscription on the account from the MEGA website from the mobile device-->
     <string name="account_cancellation_instructions_tap_cancel_subscription">4. Pressione [A]Cancelar assinatura[/A].</string>
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
-    <string name="sync_no_network_state">Não há conexão à internet</string>
+    <string name="sync_no_network_state">Não há conexão à Internet</string>
     <!-- Menu option to create a new folder in the file manager -->
     <string name="general_menu_create_new_folder">Criar nova pasta</string>
     <!-- Create new folder dialog title -->
@@ -932,4 +932,14 @@
     <string name="camera_settings_save_location_permission_denied">Permita que o MEGA acesse a localização deste dispositivo para continuar</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
     <string name="sync_local_device_folder_currently_synced_message">Esta pasta já está sincronizada</string>
+    <!-- Warning message to indicate that cannot select a currently backed up folder -->
+    <string name="sync_local_device_folder_currently_backed_up_message">Já foi feito o backup desta pasta</string>
+    <!-- The name of every users root drive in the cloud of MEGA. -->
+    <string name="general_section_cloud_drive">Nuvem de arquivos</string>
+    <!-- App Bar Title in of Cloud Drive Bottom Menu -->
+    <string name="general_drive">Unidade</string>
+    <!-- Tab bar title of Syncs tab -->
+    <string name="general_syncs">Sincronizações</string>
+    <!-- Text under the syncs list -->
+    <string name="syncs_tab_view_other_devices">View other devices in Device centre</string>
 </resources>

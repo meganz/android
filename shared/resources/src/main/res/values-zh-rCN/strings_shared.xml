@@ -904,4 +904,14 @@
     <string name="camera_settings_save_location_permission_denied">允许MEGA访问此设备的位置以继续</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
     <string name="sync_local_device_folder_currently_synced_message">此文件夹已同步</string>
+    <!-- Warning message to indicate that cannot select a currently backed up folder -->
+    <string name="sync_local_device_folder_currently_backed_up_message">此文件夹已备份</string>
+    <!-- The name of every users root drive in the cloud of MEGA. -->
+    <string name="general_section_cloud_drive">云盘</string>
+    <!-- App Bar Title in of Cloud Drive Bottom Menu -->
+    <string name="general_drive">云盘</string>
+    <!-- Tab bar title of Syncs tab -->
+    <string name="general_syncs">同步</string>
+    <!-- Text under the syncs list -->
+    <string name="syncs_tab_view_other_devices">View other devices in Device centre</string>
 </resources>

@@ -5814,4 +5814,14 @@
     <string name="file_properties_info_map_location">Расположение</string>
     <!-- Image or Video no map location info-->
     <string name="file_properties_info_map_location_no_location_info">Нет информации о местоположении</string>
+    <!-- Logout warning dialog title if user has offline files or transfers in progress -->
+    <string name="logout_warning_dialog_title">Если выйти из системы сейчас, будут потеряны данные.</string>
+    <!-- Logout warning dialog positive button text -->
+    <string name="logout_warning_dialog_positive_button">Всё равно выйти</string>
+    <!-- Logout warning dialog message if offline files exists -->
+    <string name="logout_warning_dialog_offline_message">Если выйти из системы сейчас, ваши локальные файлы будут удалены</string>
+    <!-- Logout warning dialog message if user has transfers in progress. -->
+    <string name="logout_warning_dialog_transfers_message">Если выйти из системы сейчас, ваши передачи не будут завершены, а данные будут удалены</string>
+    <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
+    <string name="logout_warning_dialog_offline_and_transfers_message">Если выйти из системы сейчас, все ожидающие передачи и локальные файлы будут удалены</string>
 </resources>
