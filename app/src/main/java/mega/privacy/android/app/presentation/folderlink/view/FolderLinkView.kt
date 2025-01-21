@@ -76,8 +76,8 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTempTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.shared.original.core.ui.theme.extensions.accent_900_accent_050
+import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 
 internal object Constants {
@@ -287,7 +287,6 @@ internal fun FolderLinkView(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .fillMaxHeight()
-                                .padding(paddingValues)
                                 .padding(horizontal = 8.dp),
                             emptyViewString = emptyViewString,
                             state.isNodesFetched
@@ -295,7 +294,6 @@ internal fun FolderLinkView(
                     } else {
                         NodesView(
                             modifier = Modifier
-                                .padding(paddingValues)
                                 .padding(horizontal = 2.dp),
                             nodeUIItems = state.nodesList,
                             onMenuClick = { onMoreOptionClick(it) },

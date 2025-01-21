@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.setting
 
-import mega.privacy.android.domain.entity.featureflag.ABTestFeature
+import mega.privacy.android.domain.entity.featureflag.ApiFeature
 import mega.privacy.android.domain.entity.settings.cookie.CookieDialog
 import mega.privacy.android.domain.entity.settings.cookie.CookieDialogType
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
@@ -20,19 +20,16 @@ class GetCookieDialogUseCase @Inject constructor(
     /**
      *  Get the type of cookie dialog to be shown.
      *
-     * @param isAdsEnabledFeature Feature flag to check if ads are enabled.
      * @param isExternalAdsEnabledFeature Feature flag to check if external ads are enabled.
      * @return Type of cookie dialog to be shown.
      */
     suspend operator fun invoke(
-        isAdsEnabledFeature: ABTestFeature,
-        isExternalAdsEnabledFeature: ABTestFeature,
+        isExternalAdsEnabledFeature: ApiFeature,
     ): CookieDialog {
         val cookieSettings = getCookieSettingsUseCase()
 
         val shouldShowCookieDialogWithAds = shouldShowCookieDialogWithAdsUseCase(
             cookieSettings,
-            isAdsEnabledFeature,
             isExternalAdsEnabledFeature
         )
 
