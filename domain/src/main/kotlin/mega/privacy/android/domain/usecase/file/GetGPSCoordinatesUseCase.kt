@@ -12,16 +12,28 @@ import javax.inject.Inject
  */
 class GetGPSCoordinatesUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository,
+    private val isVideoFileUseCase: IsVideoFileUseCase,
+    private val isImageFileUseCase: IsImageFileUseCase,
 ) {
 
     /**
      * Invoke
      *
-     * @param filePath Local path of the file.
-     * @param isVideo True if is a video, false if is an image.
+     * @param uriPath Uri path of the file.
+     * @param isVideo True if is a video, false if is an image, null if it's unknown.
      * @return GPS coordinates.
      */
-    suspend operator fun invoke(uriPath: UriPath, isVideo: Boolean) =
+    suspend operator fun invoke(uriPath: UriPath, isVideo: Boolean? = null): Pair<Double, Double>? {
+        return when {
+            isVideo == true -> getGPS(uriPath, true)
+            isVideo == false -> getGPS(uriPath, false)
+            isVideoFileUseCase(uriPath) -> getGPS(uriPath, true)
+            isImageFileUseCase(uriPath) -> getGPS(uriPath, false)
+            else -> null
+        }
+    }
+
+    private suspend fun getGPS(uriPath: UriPath, isVideo: Boolean) =
         if (isVideo) {
             fileSystemRepository.getVideoGPSCoordinates(uriPath)
         } else {
