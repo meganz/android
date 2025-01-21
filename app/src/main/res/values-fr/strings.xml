@@ -2079,7 +2079,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Si les vidéos à compresser dépassent</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable automatic Rubbish bin emptying or set a longer retention period, you need to subscribe to one of our plans.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Pour désactiver la vidange automatique de la Corbeille ou fixer une durée de conservation plus longue, vous devez souscrire à l\’un de nos abonnements.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">jours</string>
     <!-- Title of the option to generate a public chat link -->
@@ -5576,4 +5576,14 @@
     <string name="file_properties_info_map_location">Emplacement</string>
     <!-- Image or Video no map location info-->
     <string name="file_properties_info_map_location_no_location_info">Aucun renseignement sur la position</string>
+    <!-- Logout warning dialog title if user has offline files or transfers in progress -->
+    <string name="logout_warning_dialog_title">La déconnexion maintenant entraînera la perte de données</string>
+    <!-- Logout warning dialog positive button text -->
+    <string name="logout_warning_dialog_positive_button">Déconnectez-vous quand même</string>
+    <!-- Logout warning dialog message if offline files exists -->
+    <string name="logout_warning_dialog_offline_message">Si vous vous déconnectez maintenant, vos fichiers hors connexion seront supprimés</string>
+    <!-- Logout warning dialog message if user has transfers in progress. -->
+    <string name="logout_warning_dialog_transfers_message">Si vous vous déconnectez maintenant, vos transferts ne seront pas terminés et les données seront supprimées</string>
+    <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
+    <string name="logout_warning_dialog_offline_and_transfers_message">Si vous vous déconnectez maintenant, tous les transferts en attente et les fichiers hors ligne seront supprimés</string>
 </resources>

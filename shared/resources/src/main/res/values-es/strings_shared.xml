@@ -932,4 +932,14 @@
     <string name="camera_settings_save_location_permission_denied">Allow MEGA to access this device’s location to continue</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
     <string name="sync_local_device_folder_currently_synced_message">This folder is already synced</string>
+    <!-- Warning message to indicate that cannot select a currently backed up folder -->
+    <string name="sync_local_device_folder_currently_backed_up_message">This folder is already backed up</string>
+    <!-- The name of every users root drive in the cloud of MEGA. -->
+    <string name="general_section_cloud_drive">Nube</string>
+    <!-- App Bar Title in of Cloud Drive Bottom Menu -->
+    <string name="general_drive">Unidad</string>
+    <!-- Tab bar title of Syncs tab -->
+    <string name="general_syncs">Sincronizar</string>
+    <!-- Text under the syncs list -->
+    <string name="syncs_tab_view_other_devices">View other devices in Device centre</string>
 </resources>

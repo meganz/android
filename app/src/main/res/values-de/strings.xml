@@ -5338,4 +5338,14 @@
     <string name="file_properties_info_map_location">Ort</string>
     <!-- Image or Video no map location info-->
     <string name="file_properties_info_map_location_no_location_info">Keine Standortdaten</string>
+    <!-- Logout warning dialog title if user has offline files or transfers in progress -->
+    <string name="logout_warning_dialog_title">Wenn Sie sich jetzt ausloggen, verlieren Sie Daten</string>
+    <!-- Logout warning dialog positive button text -->
+    <string name="logout_warning_dialog_positive_button">Trotzdem ausloggen</string>
+    <!-- Logout warning dialog message if offline files exists -->
+    <string name="logout_warning_dialog_offline_message">Wenn Sie sich jetzt ausloggen, werden Ihre Offline-Dateien gelöscht</string>
+    <!-- Logout warning dialog message if user has transfers in progress. -->
+    <string name="logout_warning_dialog_transfers_message">Wenn Sie sich jetzt ausloggen, werden Ihre Transfers nicht abgeschlossen und die Daten werden gelöscht</string>
+    <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
+    <string name="logout_warning_dialog_offline_and_transfers_message">Wenn Sie sich jetzt ausloggen, werden alle ausstehenden Transfers und Offline-Dateien gelöscht</string>
 </resources>

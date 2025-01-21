@@ -5100,4 +5100,14 @@
     <string name="file_properties_info_map_location">位置</string>
     <!-- Image or Video no map location info-->
     <string name="file_properties_info_map_location_no_location_info">没有位置信息</string>
+    <!-- Logout warning dialog title if user has offline files or transfers in progress -->
+    <string name="logout_warning_dialog_title">现在登出将导致数据丢失</string>
+    <!-- Logout warning dialog positive button text -->
+    <string name="logout_warning_dialog_positive_button">无论如何都要登出</string>
+    <!-- Logout warning dialog message if offline files exists -->
+    <string name="logout_warning_dialog_offline_message">如果您现在登出，您的离线文件将被删除</string>
+    <!-- Logout warning dialog message if user has transfers in progress. -->
+    <string name="logout_warning_dialog_transfers_message">如果您现在登出，您的传输将无法完成，并且数据将被删除</string>
+    <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
+    <string name="logout_warning_dialog_offline_and_transfers_message">如果您现在登出，所有待处理的传输和离线文件都将被删除</string>
 </resources>

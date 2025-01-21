@@ -921,15 +921,25 @@
     <!-- Message to enter confirm password -->
     <string name="general_confirm_your_password">Confirmez votre mot de passe</string>
     <!-- The Screen Toolbar Title for configuring the scan settings -->
-    <string name="document_scanning_settings_toolbar_title">Scan settings</string>
+    <string name="document_scanning_settings_toolbar_title">Paramètres de numérisation</string>
     <!-- Title of the camera setting screen -->
-    <string name="camera_settings_title">Camera settings</string>
+    <string name="camera_settings_title">Paramètres de l\’appareil photo</string>
     <!-- Title of the save location in the camera setting screen -->
-    <string name="camera_settings_save_location_title">Save location</string>
+    <string name="camera_settings_save_location_title">Enregistrer l\’emplacement</string>
     <!-- Description of the save location in the camera setting screen -->
-    <string name="camera_settings_save_location_description">Enable geotagging for photos and videos</string>
+    <string name="camera_settings_save_location_description">Activez la géolocalisation pour les photos et les vidéos</string>
     <!-- Message when user denies location permission in the camera setting screen -->
-    <string name="camera_settings_save_location_permission_denied">Allow MEGA to access this device’s location to continue</string>
+    <string name="camera_settings_save_location_permission_denied">Autorisez MEGA à accéder à l\’emplacement de cet appareil pour continuer</string>
     <!-- Warning message to indicate that cannot select a currently synced folder -->
-    <string name="sync_local_device_folder_currently_synced_message">This folder is already synced</string>
+    <string name="sync_local_device_folder_currently_synced_message">Ce dossier est déjà synchronisé</string>
+    <!-- Warning message to indicate that cannot select a currently backed up folder -->
+    <string name="sync_local_device_folder_currently_backed_up_message">Ce dossier est déjà sauvegardé</string>
+    <!-- The name of every users root drive in the cloud of MEGA. -->
+    <string name="general_section_cloud_drive">Disque nuagique</string>
+    <!-- App Bar Title in of Cloud Drive Bottom Menu -->
+    <string name="general_drive">Disque</string>
+    <!-- Tab bar title of Syncs tab -->
+    <string name="general_syncs">Synchronisations</string>
+    <!-- Text under the syncs list -->
+    <string name="syncs_tab_view_other_devices">Afficher les autres appareils dans Centre des appareils</string>
 </resources>
