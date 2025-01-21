@@ -24,6 +24,7 @@ import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -197,6 +198,9 @@ class FileLinkComposeActivity : PasscodeActivity(),
             }
         }
         checkForInAppAdvertisement()
+        collectFlow(viewModel.monitorMiscLoadedUseCase()) {
+            checkForInAppAdvertisement()
+        }
     }
 
     private fun checkForInAppAdvertisement() {

@@ -81,6 +81,7 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -91,6 +92,8 @@ import javax.inject.Inject
 
 /**
  * View Model class for [FolderLinkComposeActivity]
+ *
+ * @param monitorMiscLoadedUseCase Use case to monitor when misc data is loaded
  */
 @HiltViewModel
 class FolderLinkViewModel @Inject constructor(
@@ -130,6 +133,7 @@ class FolderLinkViewModel @Inject constructor(
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     private val stopAudioService: StopAudioService,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
 ) : ViewModel() {
 
     /**

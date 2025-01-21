@@ -112,6 +112,7 @@ class FileLinkViewModelTest {
             megaNavigator = megaNavigator,
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            monitorMiscLoadedUseCase = mock(),
         )
     }
 

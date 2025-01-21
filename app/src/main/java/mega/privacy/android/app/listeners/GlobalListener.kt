@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.chat.link.IsRichPreviewsEnabledUseCas
 import mega.privacy.android.domain.usecase.chat.link.ShouldShowRichLinkWarningUseCase
 import mega.privacy.android.domain.usecase.contact.GetIncomingContactRequestsNotificationListUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
+import mega.privacy.android.domain.usecase.setting.BroadcastMiscLoadedUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -89,6 +90,7 @@ class GlobalListener @Inject constructor(
     private val updatePushNotificationSettingsUseCase: UpdatePushNotificationSettingsUseCase,
     private val shouldShowRichLinkWarningUseCase: ShouldShowRichLinkWarningUseCase,
     private val isRichPreviewsEnabledUseCase: IsRichPreviewsEnabledUseCase,
+    private val broadcastMiscLoadedUseCase: BroadcastMiscLoadedUseCase,
 ) : MegaGlobalListenerInterface {
 
     private val globalSyncUpdates = MutableSharedFlow<Unit>()
@@ -282,7 +284,12 @@ class GlobalListener @Inject constructor(
             }
 
             MegaEvent.EVENT_BUSINESS_STATUS -> sendBroadcastUpdateAccountDetails()
-            MegaEvent.EVENT_MISC_FLAGS_READY -> getInstance().checkEnabledCookies()
+            MegaEvent.EVENT_MISC_FLAGS_READY -> {
+                applicationScope.launch {
+                    broadcastMiscLoadedUseCase()
+                }
+                getInstance().checkEnabledCookies()
+            }
             MegaEvent.EVENT_RELOADING -> showLoginFetchingNodes()
             MegaEvent.EVENT_UPGRADE_SECURITY -> applicationScope.launch {
                 setSecurityUpgradeInAppUseCase(true)

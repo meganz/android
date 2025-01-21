@@ -2309,4 +2309,23 @@ class DefaultAccountRepositoryTest {
                 )
             }
         }
+
+    @Test
+    fun `test that monitorMiscLoaded is invoked when monitorMiscLoaded called`() =
+        runTest {
+            whenever(appEventGateway.monitorMiscLoaded()).thenReturn(
+                flowOf(Unit)
+            )
+            underTest.monitorMiscLoaded().test {
+                assertThat(awaitItem()).isEqualTo(Unit)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that appEventGateway invokes broadcastMiscLoaded when calling broadcastMiscLoaded`() =
+        runTest {
+            underTest.broadcastMiscLoaded()
+            verify(appEventGateway).broadcastMiscLoaded()
+        }
 }

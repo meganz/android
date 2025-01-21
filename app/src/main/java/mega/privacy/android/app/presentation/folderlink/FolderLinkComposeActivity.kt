@@ -29,6 +29,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -177,6 +178,9 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         intent?.let { viewModel.handleIntent(it) }
         viewModel.checkLoginRequired()
         checkForInAppAdvertisement()
+        collectFlow(viewModel.monitorMiscLoadedUseCase()) {
+            checkForInAppAdvertisement()
+        }
     }
 
     private fun checkForInAppAdvertisement() {

@@ -772,4 +772,15 @@ interface AccountRepository {
      * Get Invalid Affiliate Type
      */
     fun getInvalidAffiliateType(): Int
+
+
+    /**
+     * Monitor misc loaded
+     */
+    fun monitorMiscLoaded(): Flow<Unit>
+
+    /**
+     * Broadcast misc loaded
+     */
+    suspend fun broadcastMiscLoaded()
 }
