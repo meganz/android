@@ -32,7 +32,6 @@ class GoogleAdsManager @Inject constructor(
 ) {
 
     private var isAdsFeatureEnabled: Boolean = false
-    private var isAdRequestAvailable: Boolean = false
 
     private val _request = MutableStateFlow<AdManagerAdRequest?>(null)
 
@@ -48,11 +47,6 @@ class GoogleAdsManager @Inject constructor(
         get() =
             consentInformation.privacyOptionsRequirementStatus ==
                     ConsentInformation.PrivacyOptionsRequirementStatus.REQUIRED
-
-    /**
-     * Check if an AdRequest is available to be used.
-     */
-    fun isAdRequestAvailable() = isAdRequestAvailable
 
     /**
      * Check if the ads feature is enabled.
@@ -80,7 +74,7 @@ class GoogleAdsManager @Inject constructor(
      */
     suspend fun checkLatestConsentInformation(
         activity: Activity,
-        onConsentInformationUpdated: () -> Unit = {},
+        onConsentInformationUpdated: () -> Unit = { fetchAdRequest() },
     ) {
         Timber.d("Checking latest consent information")
         val params =
@@ -91,10 +85,13 @@ class GoogleAdsManager @Inject constructor(
             Timber.d("Consent information is ready")
             onConsentInformationUpdated()
         } else {
-            val shouldShowGenericCookieDialog =
+            val shouldShowGenericCookieDialog = runCatching {
+                // non-logged in user can't see the dialog
                 shouldShowGenericCookieDialogUseCase(getCookieSettingsUseCase())
+            }.getOrElse { false }
 
             val successCallback = ConsentInformation.OnConsentInfoUpdateSuccessListener {
+                Timber.d("success loading consent $shouldShowGenericCookieDialog")
                 if (shouldShowGenericCookieDialog.not()) {
                     UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity) { loadAndShowError: FormError? ->
                         if (loadAndShowError != null) {
@@ -109,6 +106,7 @@ class GoogleAdsManager @Inject constructor(
                     Timber.e("Error loading or showing consent form: ${fromError.message}")
                     onConsentInformationUpdated()
                 }
+            Timber.d("Requesting consent information")
             consentInformation.requestConsentInfoUpdate(
                 activity,
                 params,
@@ -137,8 +135,8 @@ class GoogleAdsManager @Inject constructor(
      * Fetch an AdRequest to be used in the AdManager.
      */
     fun fetchAdRequest() {
+        Timber.d("Fetching AdRequest")
         if (isAdsEnabled() && consentInformation.canRequestAds()) {
-            isAdRequestAvailable = true
             _request.update { AdManagerAdRequest.Builder().build() }
         } else {
             _request.update { null }

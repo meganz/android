@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -103,7 +104,7 @@ internal fun AdsFreeIntroContent(
             MegaText(
                 text = stringResource(sharedR.string.payment_ads_free_intro_title),
                 textColor = TextColor.Primary,
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.W500),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(top = 24.dp)
@@ -119,7 +120,7 @@ internal fun AdsFreeIntroContent(
                 style = MaterialTheme.typography.subtitle2,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 8.dp, horizontal = 16.dp)
                     .testTag(ADS_FREE_DESCRIPTION_TEST_TAG),
             )
 

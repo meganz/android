@@ -2378,7 +2378,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     private fun isShowingAds(): Boolean {
-        return isPortrait() && googleAdsManager.isAdRequestAvailable() &&
+        return isPortrait() && googleAdsManager.isAdsEnabled() &&
                 (drawerItem == DrawerItem.CLOUD_DRIVE
                         || drawerItem == DrawerItem.CHAT
                         || drawerItem == DrawerItem.SHARED_ITEMS
