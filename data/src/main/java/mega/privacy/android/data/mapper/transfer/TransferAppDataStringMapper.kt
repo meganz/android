@@ -41,6 +41,11 @@ class TransferAppDataStringMapper @Inject constructor() {
                     msgIndex.toString()
                 )
 
+                is TransferAppData.Geolocation -> listOf(
+                    latitude.toString(),
+                    longitude.toString()
+                )
+
                 else -> emptyList()
             }
         ).filterNotNull()

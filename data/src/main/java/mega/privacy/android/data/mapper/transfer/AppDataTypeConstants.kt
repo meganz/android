@@ -13,7 +13,8 @@ internal enum class AppDataTypeConstants(
     SDCardDownload("SD_CARD_DOWNLOAD", TransferAppData.SdCardDownload::class),
     BackgroundTransfer("BACKGROUND_TRANSFER", TransferAppData.BackgroundTransfer::class),
     OriginalContentUri("ORIGINAL_URI", TransferAppData.OriginalContentUri::class),
-    ChatDownload("CHAT_DOWNLOAD", TransferAppData.ChatDownload::class)
+    ChatDownload("CHAT_DOWNLOAD", TransferAppData.ChatDownload::class),
+    GeoLocation("GEO_LOCATION", TransferAppData.Geolocation::class),
     ;
 
     override fun toString() = sdkTypeValue

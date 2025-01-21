@@ -60,4 +60,6 @@ sealed interface TransferAppData {
      */
     data class ChatDownload(val chatId: Long, val msgId: Long, val msgIndex: Int) :
         TransferAppData
+
+    data class Geolocation(val latitude: Double, val longitude: Double): TransferAppData
 }

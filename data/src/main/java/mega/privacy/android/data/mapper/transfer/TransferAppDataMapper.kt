@@ -67,6 +67,14 @@ class TransferAppDataMapper @Inject constructor() {
                         } else null
                     }
 
+                    AppDataTypeConstants.GeoLocation -> {
+                        val latitude = values.getOrNull(0)?.toDoubleOrNull()
+                        val longitude = values.getOrNull(1)?.toDoubleOrNull()
+                        if (latitude != null && longitude != null) {
+                            TransferAppData.Geolocation(latitude = latitude, longitude= longitude)
+                        } else null
+                    }
+
                     else -> null
                 }
                 if (result == null) {

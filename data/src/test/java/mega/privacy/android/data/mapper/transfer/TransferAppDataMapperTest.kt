@@ -8,6 +8,7 @@ import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.ChatUpload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OriginalContentUri
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SDCardDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.GeoLocation
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_INDICATOR
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_REPEATED_TRANSFER_SEPARATOR
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_SEPARATOR
@@ -129,6 +130,13 @@ class TransferAppDataMapperTest {
             val expected = TransferAppData.ChatDownload(chatId, msgId, msgIndex)
             Truth.assertThat(underTest(raw)).containsExactly(expected)
         }
+
+        @Test
+        fun `test that a Geolocation is mapped correctly`() {
+            val raw = "GEO_LOCATION>$LAT>$LON"
+            val expected = TransferAppData.Geolocation(LAT, LON)
+            Truth.assertThat(underTest(raw)).containsExactly(expected)
+        }
     }
 
     private fun provideWrongParameters() = wrongParameters
@@ -155,6 +163,8 @@ class TransferAppDataMapperTest {
         private const val PARENT_PATH = "parentPath"
         private const val TARGET_PATH = "target"
         private const val TARGET_URI = "targetUri"
+        private const val LAT = 41.60
+        private const val LON = 2.28
         private val wrongParameters = listOf(
             "",
             "something wrong",
@@ -194,6 +204,10 @@ class TransferAppDataMapperTest {
                 FAKE_ID_2.toString(),
                 FAKE_INDEX.toString()
             ) to listOf(TransferAppData.ChatDownload(FAKE_ID, FAKE_ID_2, FAKE_INDEX)),
+            generateAppDataString(
+                GeoLocation,
+                LAT.toString(), LON.toString()
+            ) to listOf(TransferAppData.Geolocation(LAT, LON))
         )
 
         private fun generateAppDataString(
